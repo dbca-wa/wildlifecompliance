@@ -208,7 +208,7 @@ def search_keys(dictionary, search_list=['help_text', 'label']):
                             {search_item2: j[key_label], search_item1: i[key]})
         except Exception as e:
             #import ipdb; ipdb.set_trace()
-            print e
+            print(e)
 
     return help_list
 
@@ -266,7 +266,7 @@ def search_multiple_keys(
 
         except Exception as e:
             #import ipdb; ipdb.set_trace()
-            print e
+            print(e)
 
     return help_list
 

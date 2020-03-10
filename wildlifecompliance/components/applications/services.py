@@ -720,7 +720,7 @@ class TSCSpecieService():
             return self._strategy.request_species(specie_id)
 
         except BaseException:
-            print "{} error: {}".format(self._strategy, sys.exc_info()[0])
+            print("{} error: {}".format(self._strategy, sys.exc_info()[0]))
             raise
 
     def __str__(self):

@@ -80,7 +80,6 @@ from wildlifecompliance.components.organisations.models import (
     Organisation,    
 )
 from django.contrib.auth.models import Permission, ContentType
-from utils import SchemaParser
 
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 from rest_framework_datatables.filters import DatatablesFilterBackend
@@ -478,8 +477,6 @@ class InspectionViewSet(viewsets.ModelViewSet):
         if filter_date_to:
             date_to = datetime.strptime(filter_date_to, '%d/%m/%Y')
             q_list.append(Q(planned_for_date__lte=date_to))
-
-        print q_list
 
         queryset = queryset.filter(reduce(operator.and_, q_list)) if len(q_list) else queryset
 
