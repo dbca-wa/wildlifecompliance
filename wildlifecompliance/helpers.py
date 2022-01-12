@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import logging
 
 from django.contrib.auth.models import Group
+from rest_framework import serializers
 from ledger.accounts.models import EmailUser
 from wildlifecompliance import settings
 from wildlifecompliance.components.applications.models import ActivityPermissionGroup
@@ -119,8 +120,10 @@ def in_dbca_domain(request):
 
 
 def is_departmentUser(request):
-    return request.user.is_authenticated() and (is_model_backend(
-        request) or settings.ALLOW_EMAIL_ADMINS) and in_dbca_domain(request)
+    return request.user.is_authenticated() and (
+            ((is_model_backend(request) or settings.ALLOW_EMAIL_ADMINS) and in_dbca_domain(request)) #or
+            #is_compliance_management_approved_external_user(request)
+            )
 
 
 def is_reception(request):
@@ -203,12 +206,18 @@ def is_compliance_internal_user(request):
 
 def is_compliance_management_readonly_user(request):
     compliance_group = CompliancePermissionGroup.objects.get(permissions__codename='compliance_management_readonly')
-    #return request.user.is_authenticated() and (belongs_to(request.user, compliance_group.name) or request.user.is_superuser)
     return request.user.is_authenticated() and belongs_to(request.user, compliance_group.name)
 
 def is_compliance_management_callemail_readonly_user(request):
     compliance_group = CompliancePermissionGroup.objects.get(permissions__codename='compliance_management_callemail_readonly')
-    #return request.user.is_authenticated() and (belongs_to(request.user, compliance_group.name) or request.user.is_superuser)
+    return request.user.is_authenticated() and belongs_to(request.user, compliance_group.name)
+
+def is_compliance_management_approved_external_user(request):
+    compliance_group = CompliancePermissionGroup.objects.get(permissions__codename='compliance_management_approved_external_users')
+    return request.user.is_authenticated() and belongs_to(request.user, compliance_group.name)
+
+def is_compliance_management_volunteer(request):
+    compliance_group = CompliancePermissionGroup.objects.get(permissions__codename='volunteer')
     return request.user.is_authenticated() and belongs_to(request.user, compliance_group.name)
 
 def is_able_to_view_sanction_outcome_pdf(user):
@@ -230,3 +239,23 @@ def get_all_officers():
                                        'payment_officer'])
     return EmailUser.objects.filter(
         groups__name__in=licence_officer_groups)
+
+def is_in_organisation_contacts(request, organisation):
+    return request.user.email in organisation.contacts.all().values_list('email', flat=True)
+
+
+def is_authorised_to_modify(request, instance):
+    authorised = True
+                
+    # Can only modify if Open (not overdue, submitted, accepted).
+    if instance.status not in ['open', 'overdue']:
+        raise serializers.ValidationError('The status of this application means it cannot be modified: {}'
+                                          .format(instance.status))
+
+    # Submitter must be the offence holder.
+    offender = instance.sanction_outcome.offender.person.email # organisation to be handled later
+    submitter = request.user.email
+    authorised &= offender == submitter
+
+    if not authorised:
+        raise serializers.ValidationError('You are not authorised to modify this application.')

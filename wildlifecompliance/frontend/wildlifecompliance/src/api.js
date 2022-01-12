@@ -1,6 +1,8 @@
 var site_url = location.origin
 
 module.exports = {
+    person_org_lookup: '/api/person_org_lookup',
+    staff_member_lookup: '/api/staff_member_lookup',
     organisations: '/api/organisations/',
     organisations_paginated: '/api/organisations_paginated/',
     organisation_requests: '/api/organisation_requests/',
@@ -21,6 +23,7 @@ module.exports = {
     user_profile_completed: '/api/user_profile_completed/',
     //countries: "https://restcountries.eu/rest/v1/?fullText=true/",
     countries: '/api/countries',
+    is_compliance_management_callemail_readonly_user: '/api/is_compliance_management_callemail_readonly_user',
     application_type:"/api/application_type/",
     applications:"/api/application/",
     application_selected_activity:"/api/application_selected_activity/",
@@ -43,6 +46,10 @@ module.exports = {
     sanction_outcome_paginated: "/api/sanction_outcome_paginated/",
     remediation_action: "/api/remediation_action/",
     classification: "/api/classification/",
+    lov_collection: "/api/lov_collection/",
+    //call_type : "/api/call_type/",
+    //wildcare_species_type : "/api/wildcare_species_type/",
+    //wildcare_species_sub_type : "/api/wildcare_species_sub_type/",
     report_types: "/api/report_types/",
     referrers: "/api/referrers/",
     location: "/api/location/",

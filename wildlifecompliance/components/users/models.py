@@ -3,6 +3,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.db import models
 from django.contrib.auth.models import Group
 from ledger.accounts.models import EmailUser
+from wildlifecompliance.components.main.models import Document
 
 
 class RegionDistrict(models.Model):
@@ -125,6 +126,7 @@ class ComplianceManagementUserPreferences(models.Model):
 
     prefer_compliance_management = models.BooleanField(default=False)
     email_user = models.OneToOneField(EmailUser)
+    intelligence_information_text = models.TextField(blank=True)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -132,4 +134,20 @@ class ComplianceManagementUserPreferences(models.Model):
 
     def __str__(self):
         return '{}, {}'.format(self.email_user.id, self.prefer_compliance_management)
+
+
+class ComplianceUserIntelligenceDocument(Document):
+    email_user = models.ForeignKey(EmailUser, related_name='intelligence_documents')
+    _file = models.FileField(max_length=255,)
+
+    class Meta:
+        app_label = 'wildlifecompliance'
+
+
+import reversion
+reversion.register(RegionDistrict, follow=['districts', 'compliancepermissiongroup_set', 'callemail_region', 'callemail_district', 'legal_case_region', 'legal_case_district', 'inspection_region', 'inspection_district', 'offence_region', 'offence_district', 'sanction_outcome_region', 'sanction_outcome_district'])
+#reversion.register(CompliancePermissionGroup_region_district, follow=[])
+reversion.register(CompliancePermissionGroup, follow=['user_set', 'callemail_allocated_group', 'legal_case_allocated_group', 'inspection_allocated_group', 'offence_allocated_group', 'sanction_outcome_allocated_group'])
+reversion.register(ComplianceManagementUserPreferences, follow=[])
+reversion.register(ComplianceUserIntelligenceDocument, follow=[])
 

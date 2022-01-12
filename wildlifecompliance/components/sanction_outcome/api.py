@@ -13,6 +13,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, FileResponse, HttpResponseNotFound
 from ledger.payments.invoice.models import Invoice
+from ledger.accounts.models import EmailUser
 
 from rest_framework import viewsets, serializers, status
 from rest_framework.decorators import list_route, detail_route, renderer_classes
@@ -50,7 +51,7 @@ from wildlifecompliance.components.sanction_outcome.serializers import SanctionO
     SanctionOutcomeDocumentAccessLogSerializer
 from wildlifecompliance.components.users.models import CompliancePermissionGroup, RegionDistrict
 from wildlifecompliance.components.wc_payments.models import InfringementPenalty, InfringementPenaltyInvoice
-from wildlifecompliance.helpers import is_internal
+from wildlifecompliance.helpers import is_authorised_to_modify, is_internal
 from wildlifecompliance.components.main.models import TemporaryDocumentCollection
 from wildlifecompliance.settings import SO_TYPE_CHOICES, SO_TYPE_REMEDIATION_NOTICE, SO_TYPE_INFRINGEMENT_NOTICE, \
     SO_TYPE_LETTER_OF_ADVICE, SO_TYPE_CAUTION_NOTICE
@@ -180,6 +181,33 @@ class SanctionOutcomePaginatedViewSet(viewsets.ModelViewSet):
             (Q(offender__person=request.user) & Q(offender__removed=False) & Q(registration_holder__isnull=True) & Q(driver__isnull=True)) |
             (Q(offender__isnull=True) & Q(registration_holder=request.user) & Q(driver__isnull=True)) |
             (Q(offender__isnull=True) & Q(driver=request.user))
+        )
+        queryset = self.filter_queryset(queryset).order_by('-id')
+        self.paginator.page_size = queryset.count()
+        result_page = self.paginator.paginate_queryset(queryset, request)
+        serializer = SanctionOutcomeDatatableSerializer(result_page, many=True, context={'request': request, 'internal': is_internal(request)})
+        ret = self.paginator.get_paginated_response(serializer.data)
+        return ret
+
+    @list_route(methods=['GET', ])
+    def person_org_datatable_list(self, request, *args, **kwargs):
+        """
+        This function is called from the external dashboard page by external user
+        """
+        entity_id = request.GET.get('entity_id')
+        entity_type = request.GET.get('entity_type')
+        person = None
+        org = None
+        if entity_type == 'person':
+            person = EmailUser.objects.get(id=entity_id)
+        ## Expand to include Orgs
+        elif entity_type == 'org':
+            pass
+        #import ipdb; ipdb.set_trace()
+        queryset = SanctionOutcome.objects.filter(
+            (Q(offender__person=person) & Q(offender__removed=False) & Q(registration_holder__isnull=True) & Q(driver__isnull=True)) |
+            (Q(offender__isnull=True) & Q(registration_holder=person) & Q(driver__isnull=True)) |
+            (Q(offender__isnull=True) & Q(driver=person))
         )
         queryset = self.filter_queryset(queryset).order_by('-id')
         self.paginator.page_size = queryset.count()
@@ -324,6 +352,10 @@ class RemediationActionViewSet(viewsets.ModelViewSet):
             with transaction.atomic():
                 serializer = self._update_instance(request)
                 ra = serializer.instance
+                instance = self.get_object()
+
+                # Ensure status is Open and submbitter is same as offender.
+                is_authorised_to_modify(request, instance)
 
                 # Update status
                 serializer = RemediationActionUpdateStatusSerializer(serializer.instance, data={'status': RemediationAction.STATUS_SUBMITTED}, context={'request': request})

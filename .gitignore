@@ -109,3 +109,11 @@ wildlifecompliance/static/wildlifecompliance_vue/*
 # *-lock.json
 
 wlc_git_history
+wildlifecompliance/static/wildlifecompliance_vue/*
+
+# Jupyter lab
+.ipynb_checkpoints/
+*.ipynb
+
+# Reversion utility
+reversion_utility_output.txt
