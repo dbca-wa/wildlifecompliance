@@ -267,7 +267,18 @@ class DTSchemaMasterlistSerializer(SchemaMasterlistSerializer):
 
     def get_headers(self, obj):
         headers = obj.get_headers()
-        data = [{'value': h['value'], 'label': h['label']} for h in headers]
+        #data = [{'value': h['value'], 'label': h['label']} for h in headers]
+        data=[]
+        for h in headers:
+            header={}
+            header={'value': h['value'], 'label': h['label']}
+            header['options']=[]
+            header['showOptions']=False
+            if 'options' in h:
+                header['options']=h['options']
+            if 'showOptions' in h:
+                header['showOptions']=h['showOptions']
+            data.append(header)
         return data
 
     def get_expanders(self, obj):

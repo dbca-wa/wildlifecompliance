@@ -228,7 +228,10 @@ export default {
             addedHeaders: [],
             addedHeader: {
                 label: '',
-                value: ''
+                value: '',
+                options:[],
+                showOptions: false,
+
             },
             addedExpanders: [],
             addedExpander: {

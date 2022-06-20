@@ -1856,6 +1856,8 @@ class MasterlistQuestion(models.Model):
                         header = {
                             'label': h['label'],
                             'value': h['value'],
+                            'options': h['options'],
+                            'showOptions': h['showOptions']
                         }
                         headers.append(header)
                     return headers
