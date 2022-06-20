@@ -985,7 +985,18 @@ class LicenceSchemaUtility(LicenceUtility):
                 'type': h['value'],
                 'label': h['label'],
             }
-
+            options=[]
+            if 'showOptions' in h and 'options' in h:
+                if h['showOptions']:
+                    for op in h['options']:
+                        if not op['label']=='':
+                            op_dict = {
+                                'label': op['label'],
+                                'value': op['label'].replace(" ", "").lower(),
+                            }
+                            options.append(op_dict)
+            if options:
+                header['options']=options
             header_question_count += 1
             header_children.append(header)
 
@@ -1013,6 +1024,18 @@ class LicenceSchemaUtility(LicenceUtility):
                 'type': e['value'],
                 'label': e['label'],
             }
+            options=[]
+            if 'showOptions' in e and 'options' in e:
+                if e['showOptions']:
+                    for op in e['options']:
+                        if not op['label']=='':
+                            op_dict = {
+                                'label': op['label'],
+                                'value': op['label'].replace(" ", "").lower(),
+                            }
+                            options.append(op_dict)
+            if options:
+                expander['options']=options
 
             expander_question_count += 1
             expander_children.append(expander)
