@@ -79,7 +79,7 @@
                     <div class="row" v-else-if="showTables">
 
                         <SchemaHeader :addedHeaders="addedHeaders" :answerTypes="answerTypes" :canAddMore="true" />
-                        <SchemaExpander :addedExpanders="addedExpanders" :answerTypes="answerTypes" :canAddMore="true" />
+                        <SchemaExpander :addedExpanders="addedExpanders" :answerTypes="answerTypes" :canAddMore="true" ref="schema_expander" />
 
                     </div>
 
@@ -231,12 +231,13 @@ export default {
                 value: '',
                 options:[],
                 showOptions: false,
-
             },
             addedExpanders: [],
             addedExpander: {
                 label: '',
                 value: '',
+                options:[],
+                showOptions: false,
             },
             showOptions: false,
             showTables: false,
@@ -399,6 +400,9 @@ export default {
                 self.addedOptions = self.$refs.schema_masterlist_table.row_of_data.data().options;
                 self.addedHeaders = self.$refs.schema_masterlist_table.row_of_data.data().headers;       
                 self.addedExpanders = self.$refs.schema_masterlist_table.row_of_data.data().expanders;
+                //for(var i=0; i<self.addedExpanders.length; i++){
+                //    self.$refs.schema_expander.setShowAdditional(self.addedExpanders[i], self.addedExpanders[i].answer_type);
+                //}
 
                 $(self.$refs.select_answer_type).val(self.masterlist.answer_type).trigger('change');
                 self.setShowAdditional(self.masterlist.answer_type)

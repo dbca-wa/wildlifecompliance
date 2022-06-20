@@ -283,7 +283,18 @@ class DTSchemaMasterlistSerializer(SchemaMasterlistSerializer):
 
     def get_expanders(self, obj):
         expanders = obj.get_expanders()
-        data = [{'value': e['value'], 'label': e['label']} for e in expanders]
+        #data = [{'value': e['value'], 'label': e['label']} for e in expanders]
+        data=[]
+        for h in expanders:
+            expander={}
+            expander={'value': h['value'], 'label': h['label']}
+            expander['options']=[]
+            expander['showOptions']=False
+            if 'options' in h:
+                expander['options']=h['options']
+            if 'showOptions' in h:
+                expander['showOptions']=h['showOptions']
+            data.append(expander)
         return data
 
 

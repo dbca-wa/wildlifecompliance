@@ -1924,6 +1924,8 @@ class MasterlistQuestion(models.Model):
                         expander = {
                             'label': e['label'],
                             'value': e['value'],
+                            'options': e['options'],
+                            'showOptions': e['showOptions']
                         }
                         expanders.append(expander)
                     return expanders

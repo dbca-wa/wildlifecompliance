@@ -116,7 +116,7 @@ export default {
                     header.options.push(newOption1); 
                 }
                 else{//if in edit mode but has no options added previously then allow to add options.
-                    if(header.options && header.options.length==0){
+                    if(header.options.length==0){
                         const newOption=Object();
                         newOption.id = ''
                         newOption.label = ''
