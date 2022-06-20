@@ -203,10 +203,8 @@ class CallEmailPaginatedViewSet(viewsets.ModelViewSet):
     page_size = 10
     
     def get_queryset(self):
-        # import ipdb; ipdb.set_trace()
-        #user = self.request.user
-        #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        #if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_compliance_internal_user(self.request):
             return CallEmail.objects.all()
         return CallEmail.objects.none()
 
@@ -227,10 +225,7 @@ class CallEmailViewSet(viewsets.ModelViewSet):
     serializer_class = CallEmailSerializer
 
     def get_queryset(self):
-        # import ipdb; ipdb.set_trace()
-        #user = self.request.user
-        #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_compliance_internal_user(self.request):
             return CallEmail.objects.all()
         return CallEmail.objects.none()
 
@@ -650,9 +645,9 @@ class CallEmailViewSet(viewsets.ModelViewSet):
 
     @detail_route(methods=['POST', ])
     @renderer_classes((JSONRenderer,))
-    def close(self, request, *args, **kwargs):
+    def draft(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer_data, headers = self.common_save(instance, request, close=True)
+        serializer_data, headers = self.common_save(instance, request, draft=True)
         return Response(
                         serializer_data,
                         status=status.HTTP_201_CREATED,
@@ -670,7 +665,7 @@ class CallEmailViewSet(viewsets.ModelViewSet):
                         headers=headers
                     )
 
-    def common_save(self, instance, request, close=False):
+    def common_save(self, instance, request, draft=False):
         try:
             with transaction.atomic():
                 request_data = request.data
@@ -696,7 +691,7 @@ class CallEmailViewSet(viewsets.ModelViewSet):
                 if instance.report_type and 'report_type_id' in request.data.keys() and not request.data.get('report_type_id'):
                         del request.data['report_type_id']
 
-                serializer = SaveCallEmailSerializer(instance, data=request_data, context={'close': close})
+                serializer = SaveCallEmailSerializer(instance, data=request_data, context={'draft': draft})
                 serializer.is_valid(raise_exception=True)
                 if serializer.is_valid():
                     saved_instance = serializer.save()

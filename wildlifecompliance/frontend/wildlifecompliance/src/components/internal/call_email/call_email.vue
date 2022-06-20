@@ -23,7 +23,8 @@
                             </div>
                         </div>
 
-                        <div v-if="call_email.allocated_group && !(statusId === 'closed')" class="form-group">
+                        <!--div v-if="call_email.allocated_group && !(statusId === 'closed')" class="form-group"-->
+                        <div v-if="assignToVisible" class="form-group">
                           <div class="row">
                             <div class="col-sm-12 top-buffer-s">
                               <strong>Currently assigned to</strong><br/>
@@ -38,11 +39,11 @@
                               </select>
                             </div>
                           </div>
-                        </div>
-                        <div v-if="call_email.user_in_group">
-                            <a @click="updateAssignedToId('current_user')" class="btn pull-right">
-                                Assign to me
-                            </a>
+                          <div v-if="call_email.user_in_group">
+                              <a @click="updateAssignedToId('current_user')" class="btn pull-right">
+                                  Assign to me
+                              </a>
+                          </div>
                         </div>
                     </div>
                 </div>
@@ -334,14 +335,14 @@
                               </div>
                             </div></div>
 
-                            <div class="col-sm-12 form-group" v-if="speciesSubTypeDisabled">
+                            <!--div class="col-sm-12 form-group" v-if="speciesSubTypeDisabled">
                               <div class="row">
                                   <label class="col-sm-3">Species Name</label>
                                   <div class="col-sm-9">
                                     <input :disabled="readonlyForm" class="form-control" v-model="call_email.species_name"/>
                                   </div>
                               </div>
-                            </div>
+                            </div-->
 
                             <div class="col-sm-12 form-group"><div class="row">
                               <label class="col-sm-3">Age</label>
@@ -695,6 +696,21 @@ export default {
       renderer_form_data: 'renderer_form_data',
       //current_user: 'current_user',
     }),
+    locationExists: function() {
+        if (this.call_email && 
+            this.call_email.location && 
+            this.call_email.location.geometry && 
+            this.call_email.location.geometry.coordinates.length > 0) {
+            return true;
+        }
+    },
+    assignToVisible: function() {
+        let visible = false;
+        if (this.call_email && this.call_email.allocated_group && this.call_email.can_user_action && this.statusId ==='open') {
+            visible = true;
+        }
+        return visible;
+    },
     personSearchVisibility: function() {
         let visible = false;
         if (this.statusId ==='open') {
@@ -836,7 +852,6 @@ export default {
         this.uuid += 1;
     },
     entitySelected: async function(para) {
-        console.log(para);
         await this.setCaller(para);
     },
     loadReportAdviceUrl: function(url) {
@@ -886,14 +901,25 @@ export default {
         }
     },
     async addWorkflow(workflow_type) {
-      //await this.save();
-      await this.saveCallEmail({ crud: 'save', internal: true });
-      this.workflow_type = workflow_type;
-      this.updateWorkflowBindId();
-      this.$nextTick(() => {
-        this.$refs.add_workflow.isModalOpen = true;
-      });
-      // this.$refs.add_workflow.isModalOpen = true;
+      if (!this.locationExists) {
+            await swal({
+                title: 'Mandatory Field',
+                html: "Location must be specified",
+                type: "error",
+            })
+      } else {
+          try {
+              const res = await this.saveCallEmail({ crud: 'forward', internal: true });
+              if (res.ok) {
+                  this.workflow_type = workflow_type;
+                  this.updateWorkflowBindId();
+                  this.$nextTick(() => {
+                    this.$refs.add_workflow.isModalOpen = true;
+                  });
+              }
+          } catch (err) {
+          }
+      }
     },
     openSanctionOutcome(){
       this.sanctionOutcomeInitialised = true;
@@ -1007,7 +1033,6 @@ export default {
     //  this.save(noPersonSave)
     //},
     save: async function (returnToDash) {
-        console.log(returnToDash)
         let savedCallEmail = null;
         let savedPerson = null;
         if (this.call_email.id) {
@@ -1184,7 +1209,6 @@ export default {
     /// large LOV(List Of Values) object
     const lovResponse = await Vue.http.get('/api/lov_collection/lov_collection_choices/');
     this.lovCollection = lovResponse.body;
-    console.log(this.lovCollection)
 
     // classification_types
     //let returned_classification_types = await Vue.http.get('/api/classification/classification_choices/');
