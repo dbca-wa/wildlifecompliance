@@ -19,3 +19,18 @@ class ProposalTests(APITestSetup):
         self.assertEqual(create_response.status_code, 201)
         self.assertTrue(create_response.data.get('id') > 0)
 
+    def test_call_email_forward_to_regions(self):
+        print("test_call_email_forward_to_regions")
+        # Step 1: create call_email
+        self.client.login(email=self.volunteer1, password='pass')
+        self.client.enforce_csrf_checks=True
+        create_response = self.client.post(
+            '/api/call_email/',
+            self.create_call_email_data,
+            format='json',
+            HTTP_HOST=HTTP_HOST_FOR_TEST,
+        )
+        # Step 2: add data
+
+        # Step 3: forward to regions
+

@@ -1,0 +1,152 @@
+{
+    "test_data": "NB: This data has been generated for test purposes only",
+    "id": 55,
+    "status": {
+        "id": "draft",
+        "name": "Draft"
+    },
+    "entangled": [],
+    "entangled_other": null,
+    "gender": [],
+    "baby_kangaroo": [],
+    "age": [],
+    "assigned_to_id": null,
+    "allocated_group": [
+        {
+            "email": "",
+            "first_name": "",
+            "full_name": "",
+            "id": null,
+            "last_name": "",
+            "title": ""
+        },
+        {
+            "title": null,
+            "id": 174466,
+            "last_name": "20220615_1",
+            "first_name": "20220615_1",
+            "email": "20220615_1@local.com",
+            "full_name": "20220615_1 20220615_1"
+        },
+        {
+            "title": null,
+            "id": 174467,
+            "last_name": "20220624_1",
+            "first_name": "20220624_1",
+            "email": "20220624_1@local.com",
+            "full_name": "20220624_1 20220624_1"
+        }
+    ],
+    "allocated_group_id": 11,
+    "location": {
+        "id": 31,
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                116.83940210979723,
+                -33.82122837890473
+            ]
+        },
+        "properties": {
+            "street": "",
+            "town_suburb": "",
+            "state": "",
+            "postcode": "",
+            "country": "",
+            "details": "",
+            "ben_number": null
+        }
+    },
+    "location_id": 31,
+    "classification": {
+        "id": 8,
+        "name": "enquiry",
+        "classification_display": "Enquiry"
+    },
+    "classification_id": 8,
+    "schema": null,
+    "lodgement_date": "2022-06-24",
+    "number": "C000055",
+    "caller": null,
+    "call_type": {
+        "id": 11,
+        "name": "something2"
+    },
+    "call_type_id": 11,
+    "wildcare_species_type_id": 2,
+    "wildcare_species_sub_type_id": 2,
+    "species_name": null,
+    "dead": null,
+    "euthanise": null,
+    "number_of_animals": null,
+    "brief_nature_of_call": "xgfzghdgh",
+    "report_type": null,
+    "report_type_id": null,
+    "data": [],
+    "caller_phone_number": null,
+    "anonymous_call": false,
+    "caller_wishes_to_remain_anonymous": false,
+    "occurrence_from_to": false,
+    "occurrence_date_from": null,
+    "occurrence_time_start": null,
+    "occurrence_date_to": null,
+    "occurrence_time_end": null,
+    "date_of_call": "2022-06-24",
+    "time_of_call": "10:10",
+    "referrer": [],
+    "advice_given": false,
+    "advice_details": null,
+    "email_user": {
+        "first_name": "",
+        "last_name": "",
+        "dob": null,
+        "residential_address": {
+            "line1": "",
+            "locality": "",
+            "state": "WA",
+            "postcode": "",
+            "country": "AU"
+        }
+    },
+    "user_in_group": true,
+    "related_items": [],
+    "selected_referrers": [],
+    "user_is_assignee": false,
+    "can_user_action": true,
+    "can_user_edit_form": true,
+    "can_user_search_person": false,
+    "user_is_volunteer": true,
+    "volunteer_list": [
+        {
+            "email": "",
+            "first_name": "",
+            "full_name": "",
+            "id": null,
+            "last_name": "",
+            "title": ""
+        },
+        {
+            "title": null,
+            "id": 174466,
+            "last_name": "20220615_1",
+            "first_name": "20220615_1",
+            "email": "20220615_1@local.com",
+            "full_name": "20220615_1 20220615_1"
+        },
+        {
+            "title": null,
+            "id": 174467,
+            "last_name": "20220624_1",
+            "first_name": "20220624_1",
+            "email": "20220624_1@local.com",
+            "full_name": "20220624_1 20220624_1"
+        }
+    ],
+    "volunteer_id": 174467,
+    "current_user_id": 174467,
+    "region_gis": "South West",
+    "district_gis": "Blackwood",
+    "rendererDocumentUrl": "/api/call_email/55/process_renderer_document/",
+    "commsLogsDocumentUrl": "/api/call_email/55/process_comms_log_document/"
+}
