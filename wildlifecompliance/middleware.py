@@ -28,8 +28,10 @@ class FirstTimeNagScreenMiddleware(object):
     Generic FirstTimeNagScreenMiddleware.
     '''
     def process_request(self, request):
+        if 'static' in request.path:
+            return
         if request.method == 'GET' and request.user.is_authenticated(
-        ) and 'api' not in request.path and 'admin' not in request.path and 'static' not in request.path:
+        ) and 'api' not in request.path and 'admin' not in request.path:
             # add CM Approved External users to CallEmail RO and volunteer groups
             if is_compliance_management_approved_external_user(request):
                 if not is_compliance_management_callemail_readonly_user(request):
@@ -58,8 +60,10 @@ class FirstTimeDefaultNag(object):
     A specialised FirstTimeNagScreenMiddleware for non WildlifeLicensing.
     '''
     def process_request(self, request):
+        if 'static' in request.path:
+            return
         if request.method == 'GET' and request.user.is_authenticated(
-        ) and 'api' not in request.path and 'admin' not in request.path and 'static' not in request.path:
+        ) and 'api' not in request.path and 'admin' not in request.path:
 
             if (not request.user.first_name) or \
                     (not request.user.last_name) or \
