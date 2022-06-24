@@ -17,6 +17,7 @@ from wildlifecompliance.helpers import (
     is_reception,
     is_wildlifecompliance_payment_officer,
     is_new_to_wildlifelicensing,
+    is_compliance_management_user,
 )
 from rest_framework import serializers
 from django.core.exceptions import ValidationError
@@ -399,6 +400,7 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
     is_customer = serializers.SerializerMethodField()
     is_internal = serializers.SerializerMethodField()
     prefer_compliance_management = serializers.SerializerMethodField()
+    is_compliance_management_user = serializers.SerializerMethodField()
     is_reception = serializers.SerializerMethodField()
     dob = serializers.SerializerMethodField(read_only=True)
     is_payment_officer = serializers.SerializerMethodField(read_only=True)
@@ -428,6 +430,7 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
             'is_reception',
             'is_payment_officer',
             'has_complete_first_time',
+            'is_compliance_management_user',
         )
 
     def get_has_complete_first_time(self, obj):
@@ -488,11 +491,13 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
     def get_is_internal(self, obj):
         return is_internal(self.context.get('request'))
 
+    def get_is_compliance_management_user(self, obj):
+        return is_compliance_management_user(self.context.get('request'))
+
     def get_prefer_compliance_management(self, obj):
         if ComplianceManagementUserPreferences.objects.filter(email_user_id=obj.id):
             return obj.compliancemanagementuserpreferences.prefer_compliance_management
-        else:
-            return False
+        return False
 
     def get_is_reception(self, obj):
         return is_reception(self.context.get('request'))
