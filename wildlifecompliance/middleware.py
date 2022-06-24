@@ -44,8 +44,8 @@ class FirstTimeNagScreenMiddleware(object):
                 preference.prefer_compliance_management = True
                 preference.save()
 
-        #if not is_compliance_management_user(request) and SecureBaseUtils.is_wildlifelicensing_request(request):
-        if SecureBaseUtils.is_wildlifelicensing_request(request):
+        if not is_compliance_management_user(request) and SecureBaseUtils.is_wildlifelicensing_request(request):
+        #if SecureBaseUtils.is_wildlifelicensing_request(request):
             # Apply WildifeLicensing first-time checks.
             first_time_nag = SecureAuthorisationEnforcer(request)
 
