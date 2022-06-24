@@ -47,6 +47,7 @@ from wildlifecompliance.management.default_data_manager import DefaultDataManage
 from wildlifecompliance.utils import are_migrations_running
 
 from ledger.urls import urlpatterns as ledger_patterns
+from django_media_serv.urls import urlpatterns as media_serv_patterns
 
 logger = logging.getLogger(__name__)
 
@@ -305,7 +306,7 @@ urlpatterns = [
     url(r'^securebase-view/',views.SecureBaseView.as_view(), name='securebase-view'),
     url(r'^api/person_org_lookup$', users_api.GetPersonOrg.as_view(), name='get-person-org'),
 
-] + ledger_patterns
+] + ledger_patterns + media_serv_patterns
 
 if not are_migrations_running():
     DefaultDataManager()
