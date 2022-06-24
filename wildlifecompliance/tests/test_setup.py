@@ -40,13 +40,15 @@ class APITestSetup(APITestCase):
         # Create security groups
         self.region = Region.objects.create(name="South West", cddp_name="South West")
         self.district = District.objects.create(name="Blackwood", cddp_name="Blackwood", region=self.region)
-        #self.callemailtriagegroup = CallEmailTriageGroup.objects.create(region=self.region, district=self.district)
-        #self.volunteergroup = VolunteerGroup.objects.first()
-        #self.callemailreadonlygroup = ComplianceManagementCallEmailReadOnlyGroup.objects.first()
+        self.region2 = Region.objects.create(name="Wheatbelt", cddp_name="Wheatbelt")
         self.callemailtriagegroup = ComplianceManagementSystemGroup.objects.create(
                 name=settings.GROUP_CALL_EMAIL_TRIAGE, 
                 region=self.region, 
                 district=self.district
+                )
+        self.callemailtriagegroup_wheatbelt = ComplianceManagementSystemGroup.objects.create(
+                name=settings.GROUP_CALL_EMAIL_TRIAGE, 
+                region=self.region2, 
                 )
         self.volunteergroup = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_VOLUNTEER)
         self.callemailreadonlygroup = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_COMPLIANCE_MANAGEMENT_CALL_EMAIL_READ_ONLY)
