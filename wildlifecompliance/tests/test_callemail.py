@@ -30,7 +30,8 @@ class ProposalTests(APITestSetup):
             format='json',
             HTTP_HOST=HTTP_HOST_FOR_TEST,
         )
-        # Step 2: add data
+        # Step 2: save data
+
 
         # Step 3: forward to regions
 

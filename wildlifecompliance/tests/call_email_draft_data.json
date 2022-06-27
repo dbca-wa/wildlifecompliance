@@ -1,6 +1,6 @@
 {
     "test_data": "NB: This data has been generated for test purposes only",
-    "id": 55,
+    "id": 56,
     "status": {
         "id": "draft",
         "name": "Draft"
@@ -19,60 +19,35 @@
             "id": null,
             "last_name": "",
             "title": ""
-        },
-        {
-            "title": null,
-            "id": 174466,
-            "last_name": "20220615_1",
-            "first_name": "20220615_1",
-            "email": "20220615_1@local.com",
-            "full_name": "20220615_1 20220615_1"
-        },
-        {
-            "title": null,
-            "id": 174467,
-            "last_name": "20220624_1",
-            "first_name": "20220624_1",
-            "email": "20220624_1@local.com",
-            "full_name": "20220624_1 20220624_1"
         }
     ],
     "allocated_group_id": 11,
     "location": {
-        "id": 31,
         "type": "Feature",
+        "properties": {
+            "town_suburb": "",
+            "street": "",
+            "state": "",
+            "postcode": "",
+            "country": ""
+        },
+        "id": null,
         "geometry": {
             "type": "Point",
             "coordinates": [
-                116.83940210979723,
-                -33.82122837890473
+                125.15686059938254,
+                -28.9910245136895
             ]
-        },
-        "properties": {
-            "street": "",
-            "town_suburb": "",
-            "state": "",
-            "postcode": "",
-            "country": "",
-            "details": "",
-            "ben_number": null
         }
     },
-    "location_id": 31,
-    "classification": {
-        "id": 8,
-        "name": "enquiry",
-        "classification_display": "Enquiry"
-    },
-    "classification_id": 8,
+    "location_id": null,
+    "classification": null,
+    "classification_id": 7,
     "schema": null,
-    "lodgement_date": "2022-06-24",
-    "number": "C000055",
+    "lodgement_date": "2022-06-27",
+    "number": "C000056",
     "caller": null,
-    "call_type": {
-        "id": 11,
-        "name": "something2"
-    },
+    "call_type": null,
     "call_type_id": 11,
     "wildcare_species_type_id": 2,
     "wildcare_species_sub_type_id": 2,
@@ -80,7 +55,7 @@
     "dead": null,
     "euthanise": null,
     "number_of_animals": null,
-    "brief_nature_of_call": "xgfzghdgh",
+    "brief_nature_of_call": "brief nature of call",
     "report_type": null,
     "report_type_id": null,
     "data": [],
@@ -92,8 +67,8 @@
     "occurrence_time_start": null,
     "occurrence_date_to": null,
     "occurrence_time_end": null,
-    "date_of_call": "2022-06-24",
-    "time_of_call": "10:10",
+    "date_of_call": "2022-06-27",
+    "time_of_call": "10:20",
     "referrer": [],
     "advice_given": false,
     "advice_details": null,
@@ -125,28 +100,12 @@
             "id": null,
             "last_name": "",
             "title": ""
-        },
-        {
-            "title": null,
-            "id": 174466,
-            "last_name": "20220615_1",
-            "first_name": "20220615_1",
-            "email": "20220615_1@local.com",
-            "full_name": "20220615_1 20220615_1"
-        },
-        {
-            "title": null,
-            "id": 174467,
-            "last_name": "20220624_1",
-            "first_name": "20220624_1",
-            "email": "20220624_1@local.com",
-            "full_name": "20220624_1 20220624_1"
         }
     ],
-    "volunteer_id": 174467,
-    "current_user_id": 174467,
-    "region_gis": "South West",
-    "district_gis": "Blackwood",
-    "rendererDocumentUrl": "/api/call_email/55/process_renderer_document/",
-    "commsLogsDocumentUrl": "/api/call_email/55/process_comms_log_document/"
+    "volunteer_id": 174471,
+    "current_user_id": 174471,
+    "region_gis": "",
+    "district_gis": "",
+    "rendererDocumentUrl": "/api/call_email/56/process_renderer_document/",
+    "commsLogsDocumentUrl": "/api/call_email/56/process_comms_log_document/"
 }
