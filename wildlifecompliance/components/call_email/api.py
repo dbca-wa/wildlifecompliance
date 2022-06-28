@@ -4,6 +4,7 @@ import operator
 import traceback
 import os
 import base64
+from functools import reduce
 import geojson
 from django.db.models import Q, Min, Max
 from django.db import transaction
@@ -42,6 +43,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from wildlifecompliance.components.main.api import save_location
 from wildlifecompliance.components.main.process_document import process_generic_document
 from wildlifecompliance.components.main.email import prepare_mail
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.users.api import generate_dummy_email
 from wildlifecompliance.components.users.serializers import (
     UserAddressSerializer,
@@ -88,13 +90,9 @@ from wildlifecompliance.components.call_email.serializers import (
     SaveUserAddressSerializer,
     #InspectionTypeSerializer,
     # ExternalOrganisationSerializer,
-    CallEmailAllocatedGroupSerializer,
+    #CallEmailAllocatedGroupSerializer,
     UpdateAssignedToIdSerializer
     )
-from wildlifecompliance.components.users.models import (
-    CompliancePermissionGroup,    
-)
-from django.contrib.auth.models import Permission, ContentType
 # from utils import SchemaParser
 
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
@@ -133,6 +131,9 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
                     or search_text in (
                         call_email.assigned_to.first_name.lower() + ' ' + call_email.assigned_to.last_name.lower()
                         if call_email.assigned_to else ''
+                        )
+                    or search_text in (call_email.wildcare_species_sub_type.species_sub_name 
+                        if call_email.wildcare_species_sub_type else ''
                         )
                     ):
                     search_text_callemail_ids.append(call_email.id)
@@ -206,10 +207,8 @@ class CallEmailPaginatedViewSet(viewsets.ModelViewSet):
     page_size = 10
     
     def get_queryset(self):
-        # import ipdb; ipdb.set_trace()
-        #user = self.request.user
-        #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        #if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_compliance_internal_user(self.request):
             return CallEmail.objects.all()
         return CallEmail.objects.none()
 
@@ -230,10 +229,7 @@ class CallEmailViewSet(viewsets.ModelViewSet):
     serializer_class = CallEmailSerializer
 
     def get_queryset(self):
-        # import ipdb; ipdb.set_trace()
-        #user = self.request.user
-        #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_compliance_internal_user(self.request):
             return CallEmail.objects.all()
         return CallEmail.objects.none()
 
@@ -286,7 +282,9 @@ class CallEmailViewSet(viewsets.ModelViewSet):
     def status_choices(self, request, *args, **kwargs):
         res_obj = [] 
         for choice in CallEmail.STATUS_CHOICES:
-            res_obj.append({'id': choice[0], 'display': choice[1]});
+            # restrict CallEmail status choices
+            if choice[0] in settings.CALL_EMAIL_AVAILABLE_STATUS_VALUES:
+                res_obj.append({'id': choice[0], 'display': choice[1]});
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
@@ -504,19 +502,22 @@ class CallEmailViewSet(viewsets.ModelViewSet):
                  #   request_data.update({'report_type_id': request_data.get('report_type', {}).get('id')})
 
                 # Initial allocated_group_id must be volunteers
-                compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
-                permission = Permission.objects.filter(codename='volunteer').filter(content_type_id=compliance_content_type.id).first()
-                group = CompliancePermissionGroup.objects.filter(permissions=permission).first()
-                request_data.update({'allocated_group_id': group.id})
+                #compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
+                #permission = Permission.objects.filter(codename='volunteer').filter(content_type_id=compliance_content_type.id).first()
+                #group = CompliancePermissionGroup.objects.filter(permissions=permission).first()
+                #request_data.update({'allocated_group_id': group.id})
                 serializer = CreateCallEmailSerializer(data=request_data, partial=True)
                 serializer.is_valid(raise_exception=True)
                 if serializer.is_valid():
                     new_instance = serializer.save()
+                    # set allocated group
+                    new_instance.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_VOLUNTEER)
+                    new_instance.save()
                     new_instance.log_user_action(
                             CallEmailUserAction.ACTION_CREATE_CALL_EMAIL.format(
                             new_instance.number), request)
-                    new_returned = serializer.data
-                    # Ensure classification_id and report_type_id is returned for Vue template evaluation                
+                    new_returned = CallEmailSerializer(instance=new_instance, context={'request': request}).data
+                    # Ensure classification_id and report_type_id is returned for Vue template evaluation
                     # new_returned.update({'classification_id': request_data.get('classification_id')})
                     new_returned.update({'report_type_id': request_data.get('report_type_id')})
                     # new_returned.update({'referrer_id': request_data.get('referrer_id')})
@@ -541,7 +542,6 @@ class CallEmailViewSet(viewsets.ModelViewSet):
                         # duplicate.data.update({'referrer_id': request_data.get('referrer_id')})
                         if request_data.get('location'):
                             duplicate.data.update({'location_id': request_data.get('location').get('id')})
-                        
                         return Response(
                             duplicate.data,
                             status=status.HTTP_201_CREATED,
@@ -651,9 +651,9 @@ class CallEmailViewSet(viewsets.ModelViewSet):
 
     @detail_route(methods=['POST', ])
     @renderer_classes((JSONRenderer,))
-    def close(self, request, *args, **kwargs):
+    def draft(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer_data, headers = self.common_save(instance, request, close=True)
+        serializer_data, headers = self.common_save(instance, request, draft=True)
         return Response(
                         serializer_data,
                         status=status.HTTP_201_CREATED,
@@ -671,7 +671,7 @@ class CallEmailViewSet(viewsets.ModelViewSet):
                         headers=headers
                     )
 
-    def common_save(self, instance, request, close=False):
+    def common_save(self, instance, request, draft=False):
         try:
             with transaction.atomic():
                 request_data = request.data
@@ -697,7 +697,7 @@ class CallEmailViewSet(viewsets.ModelViewSet):
                 if instance.report_type and 'report_type_id' in request.data.keys() and not request.data.get('report_type_id'):
                         del request.data['report_type_id']
 
-                serializer = SaveCallEmailSerializer(instance, data=request_data, context={'close': close})
+                serializer = SaveCallEmailSerializer(instance, data=request_data, context={'draft': draft})
                 serializer.is_valid(raise_exception=True)
                 if serializer.is_valid():
                     saved_instance = serializer.save()
@@ -736,15 +736,29 @@ class CallEmailViewSet(viewsets.ModelViewSet):
 
                 # Set CallEmail status depending on workflow type
                 workflow_type = request.data.get('workflow_type')
+                #region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+                #district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+                instance.assigned_to_id = None if not request.data.get('assigned_to_id') else request.data.get('assigned_to_id')
+                instance.inspection_type_id = None if not request.data.get('inspection_type_id') else request.data.get('inspection_type_id')
+                instance.case_priority_id = None if not request.data.get('case_priority_id') else request.data.get('case_priority_id')
+                # should be set by back end
+                #instance.allocated_group_id = None if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
+                instance.advice_details = None if not request.data.get('advice_details') else request.data.get('advice_details')
+
                 if workflow_type == 'forward_to_regions':
+                    #instance.set_allocated_group('triage_call_email', region_id=region_id, district_id=district_id)
                     instance.forward_to_regions(request)
                 elif workflow_type == 'forward_to_wildlife_protection_branch':
+                    #instance.set_allocated_group('triage_call_email', region_id=region_id, district_id=district_id)
                     instance.forward_to_wildlife_protection_branch(request)
                 elif workflow_type == 'allocate_for_follow_up':
+                    #instance.set_allocated_group('officer', region_id=region_id, district_id=district_id)
                     instance.allocate_for_follow_up(request)
                 elif workflow_type == 'allocate_for_inspection':
+                    #instance.set_allocated_group('officer', region_id=region_id, district_id=district_id)
                     instance.allocate_for_inspection(request)
                 elif workflow_type == 'allocate_for_case':
+                    #instance.set_allocated_group('officer', region_id=region_id, district_id=district_id)
                     instance.allocate_for_case(request)
                 elif workflow_type == 'close':
                     instance.close(request)
@@ -755,14 +769,6 @@ class CallEmailViewSet(viewsets.ModelViewSet):
 
                 if request.data.get('referrers_selected'):
                     instance.add_referrers(request)
-
-                instance.region_id = None if not request.data.get('region_id') else request.data.get('region_id')
-                instance.district_id = None if not request.data.get('district_id') else request.data.get('district_id')
-                instance.assigned_to_id = None if not request.data.get('assigned_to_id') else request.data.get('assigned_to_id')
-                instance.inspection_type_id = None if not request.data.get('inspection_type_id') else request.data.get('inspection_type_id')
-                instance.case_priority_id = None if not request.data.get('case_priority_id') else request.data.get('case_priority_id')
-                instance.allocated_group_id = None if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
-                instance.advice_details = None if not request.data.get('advice_details') else request.data.get('advice_details')
 
                 instance.save()
 
@@ -882,23 +888,26 @@ class LOVCollectionViewSet(viewsets.ModelViewSet):
                 'display': choice.get_name_display()
                 })
         call_type_choices = []
-        for choice in CallType.objects.all():
+        for choice in CallType.objects.all().order_by('call_type_index'):
             call_type_choices.append({
                 'id': choice.id, 
-                'display': choice.get_name_display()
+                'display': choice.name,
+                'all_wildcare_species': choice.all_wildcare_species
                 })
         wildcare_species_types = []
         for choice in WildcareSpeciesType.objects.all():
             wildcare_species_types.append({
                 'id': choice.id,
-                'display': choice.get_species_name_display(),
-                'call_type_id': choice.call_type_id
+                'display': choice.species_name,
+                'call_type_id': choice.call_type_id,
+                'check_pinky_joey': choice.check_pinky_joey,
+                'show_species_name_textbox' : choice.show_species_name_textbox,
                 })
         wildcare_species_sub_types = []
         for choice in WildcareSpeciesSubType.objects.all():
             wildcare_species_sub_types.append({
                 'id': choice.id,
-                'display': choice.get_species_sub_name_display(),
+                'display': choice.species_sub_name,
                 'wildcare_species_type_id': choice.wildcare_species_type_id
                 })
         age_choices = []
@@ -939,69 +948,6 @@ class LOVCollectionViewSet(viewsets.ModelViewSet):
         res_json = json.dumps(res_json)
         return HttpResponse(res_json, content_type='application/json')
 
-class CallTypeViewSet(viewsets.ModelViewSet):
-    queryset = CallType.objects.all()
-    serializer_class = CallTypeSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        if is_internal(self.request):
-            return CallType.objects.all()
-        return CallType.objects.none()
-
-    @list_route(methods=['GET', ])    
-    def call_type_choices(self, request, *args, **kwargs):
-        res_obj = [] 
-        #for choice in CallType.NAME_CHOICES:
-            # res_obj.append({'id': choice[0], 'display': choice[1]});
-        for choice in CallType.objects.all():
-            res_obj.append({'id': choice.id, 'display': choice.get_name_display()})
-        res_json = json.dumps(res_obj)
-        return HttpResponse(res_json, content_type='application/json')
-
-class WildcareSpeciesTypeViewSet(viewsets.ModelViewSet):
-    queryset = WildcareSpeciesType.objects.all()
-    serializer_class = WildcareSpeciesTypeSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        if is_internal(self.request):
-            return WildcareSpeciesType.objects.all()
-        return WildcareSpeciesType.objects.none()
-
-    @list_route(methods=['GET', ])
-    def wildcare_species_type_choices(self, request, *args, **kwargs):
-        res_obj = []
-        for choice in WildcareSpeciesType.objects.all():
-            res_obj.append({
-                'id': choice.id,
-                'display': choice.get_species_name_display(),
-                'call_type_id': choice.call_type_id
-                })
-        res_json = json.dumps(res_obj)
-        return HttpResponse(res_json, content_type='application/json')
-
-class WildcareSpeciesSubTypeViewSet(viewsets.ModelViewSet):
-    queryset = WildcareSpeciesSubType.objects.all()
-    serializer_class = WildcareSpeciesSubTypeSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        if is_internal(self.request):
-            return WildcareSpeciesSubType.objects.all()
-        return WildcareSpeciesSubType.objects.none()
-
-    @list_route(methods=['GET', ])
-    def wildcare_species_sub_type_choices(self, request, *args, **kwargs):
-        res_obj = []
-        for choice in WildcareSpeciesSubType.objects.all():
-            res_obj.append({
-                'id': choice.id,
-                'display': choice.get_species_sub_name_display(),
-                'wildcare_species_type_id': choice.wildcare_species_type_id
-                })
-        res_json = json.dumps(res_obj)
-        return HttpResponse(res_json, content_type='application/json')
 
 class ReferrerViewSet(viewsets.ModelViewSet):
     queryset = Referrer.objects.all()

@@ -1,20 +1,26 @@
 from __future__ import unicode_literals
 import logging
 from django.db import models
+from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.db.models import Max
+from django.contrib.auth.models import Permission, ContentType
 from multiselectfield import MultiSelectField
 from django.utils.encoding import python_2_unicode_compatible
+from rest_framework import serializers
 from ledger.accounts.models import EmailUser, RevisionedMixin
 from ledger.licence.models import LicenceType
 from wildlifecompliance.components.main.models import (
         CommunicationsLogEntry,
         UserAction, 
-        Document
+        Document,
+        #CallEmailTriageGroup, OfficerGroup, ManagerGroup,
+        ComplianceManagementSystemGroup,
         )
 from wildlifecompliance.components.main.related_item import can_close_record
-from wildlifecompliance.components.users.models import RegionDistrict, CompliancePermissionGroup
+#from wildlifecompliance.components.users.models import CompliancePermissionGroup
+from wildlifecompliance.components.main.models import Region, District
 
 logger = logging.getLogger(__name__)
 
@@ -71,32 +77,12 @@ class Classification(models.Model):
         return self.get_name_display()
 
 class CallType(models.Model):
-    CALL_TYPE_GENERAL_ENQUIRY = 'general_enquiry'
-    CALL_TYPE_ILLEGAL_ACTIVITY = 'illegal_activity'
-    CALL_TYPE_AMPHIBIAN = 'amphibian'
-    CALL_TYPE_MAMMAL = 'mammal'
-    CALL_TYPE_BIRD = 'bird'
-    CALL_TYPE_NON_NATIVE_SPECIES = 'non_native_species'
-    CALL_TYPE_REPTILE = 'reptile'
-    CALL_TYPE_OTHER = 'other'
-
-    NAME_CHOICES = (
-        (CALL_TYPE_GENERAL_ENQUIRY, 'General Enquiry'),
-        (CALL_TYPE_ILLEGAL_ACTIVITY, 'Illegal Activity'),
-        (CALL_TYPE_AMPHIBIAN, 'Ambhibian - e.g. frog, cane toad'),
-        (CALL_TYPE_MAMMAL, 'Mammal'),
-        (CALL_TYPE_BIRD, 'Bird'),
-        (CALL_TYPE_NON_NATIVE_SPECIES, 'Non native species - e.g. pigeon, fox, cattle, peacock'),
-        (CALL_TYPE_REPTILE, 'Reptile - e.g. snake, turtles, lizard'),
-        (CALL_TYPE_OTHER, 'Other - e.g. spider, bees, fish'),
-    )
-
     name = models.CharField(
         max_length=50,
-        choices=NAME_CHOICES,
-        default=CALL_TYPE_AMPHIBIAN,
         unique=True,
     )
+    all_wildcare_species = models.BooleanField(default=False)
+    call_type_index = models.SmallIntegerField(default=0,blank=True, null=True)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -104,149 +90,16 @@ class CallType(models.Model):
         verbose_name_plural = 'CM_CallTypes'
 
     def __str__(self):
-        return self.get_name_display()
-
+        return self.name
+        
 class WildcareSpeciesType(models.Model):
-    WILDCARE_SPECIES_TYPE_CANETOAD = 'cane_toad'
-    WILDCARE_SPECIES_TYPE_FROG = 'frog'
-    WILDCARE_SPECIES_TYPE_BUTCHERBIRD = 'butcherbird'
-    WILDCARE_SPECIES_TYPE_COCKATOO = 'cockatoo'
-    WILDCARE_SPECIES_TYPE_COOT = 'coot'
-    WILDCARE_SPECIES_TYPE_CORMORANT = 'cormorant'
-    WILDCARE_SPECIES_TYPE_DUCK = 'duck'
-    WILDCARE_SPECIES_TYPE_EAGLE_FALCON_HAWK = 'eagle_falcon_hawk'
-    WILDCARE_SPECIES_TYPE_EMU = 'emu'
-    WILDCARE_SPECIES_TYPE_FINCH = 'finch'
-    WILDCARE_SPECIES_TYPE_GOOSE = 'goose'
-    WILDCARE_SPECIES_TYPE_HERON = 'heron'
-    WILDCARE_SPECIES_TYPE_HONEYEATER = 'honeyeater'
-    WILDCARE_SPECIES_TYPE_IBIS = 'ibis'
-    WILDCARE_SPECIES_TYPE_KINGFISHER = 'kingfisher'
-    WILDCARE_SPECIES_TYPE_MAGPIE = 'magpie'
-    WILDCARE_SPECIES_TYPE_MAGPIE_LARK = 'magpie_lark'
-    WILDCARE_SPECIES_TYPE_OWL = 'owl'
-    WILDCARE_SPECIES_TYPE_PARROT = 'parrot'
-    WILDCARE_SPECIES_TYPE_PEACOCK = 'peacock'
-    WILDCARE_SPECIES_TYPE_PENGUIN = 'penguin'
-    WILDCARE_SPECIES_TYPE_QUAIL = 'quail'
-    WILDCARE_SPECIES_TYPE_RAINBOW_BEE_EATER = 'rainbow_bee_eater'
-    WILDCARE_SPECIES_TYPE_RAINBOW_LORIKEET = 'rainbow_lorikeet'
-    WILDCARE_SPECIES_TYPE_RAVEN = 'raven'
-    WILDCARE_SPECIES_TYPE_ALBATROSS = 'albatross'
-    WILDCARE_SPECIES_TYPE_GULL = 'gull'
-    WILDCARE_SPECIES_TYPE_PELICAN = 'pelican'
-    WILDCARE_SPECIES_TYPE_SHEARWATER = 'shearwater'
-    WILDCARE_SPECIES_TYPE_TERN = 'tern'
-    WILDCARE_SPECIES_TYPE_SWALLOW = 'swallow'
-    WILDCARE_SPECIES_TYPE_SWAN = 'swan'
-    WILDCARE_SPECIES_TYPE_TAWNY_FROGMOUTH = 'tawny_frogmouth'
-    WILDCARE_SPECIES_TYPE_WILLY_WAGTAIL = 'willy_wagtail'
-    WILDCARE_SPECIES_TYPE_BAT = 'bat'
-    WILDCARE_SPECIES_TYPE_DINGO = 'dingo'
-    WILDCARE_SPECIES_TYPE_DOLPHIN = 'dolphin'
-    WILDCARE_SPECIES_TYPE_ECHIDNA = 'echidna'
-    WILDCARE_SPECIES_TYPE_FERRET = 'ferret'
-    WILDCARE_SPECIES_TYPE_KANGAROO = 'kangaroo'
-    WILDCARE_SPECIES_TYPE_POSSUM = 'possum'
-    WILDCARE_SPECIES_TYPE_QUENDA_OR_BANDICOOT = 'quenda_or_bandicoot'
-    WILDCARE_SPECIES_TYPE_QUOKKA = 'quokka'
-    WILDCARE_SPECIES_TYPE_SEAL_AND_SEALION = 'seal_and_sealion'
-    WILDCARE_SPECIES_TYPE_WHALE = 'whale'
-    WILDCARE_SPECIES_TYPE_WOMBAT = 'wombat'
-    WILDCARE_SPECIES_TYPE_LIZARD = 'lizard'
-    WILDCARE_SPECIES_TYPE_SNAKE = 'snake'
-    WILDCARE_SPECIES_TYPE_TURTLE = 'turtle'
-    WILDCARE_SPECIES_TYPE_CAT = 'cat'
-    WILDCARE_SPECIES_TYPE_DOG = 'dog'
-    WILDCARE_SPECIES_TYPE_FOX = 'fox'
-    WILDCARE_SPECIES_TYPE_RABBIT = 'rabbit'
-    WILDCARE_SPECIES_TYPE_RODENT = 'rodent'
-    WILDCARE_SPECIES_TYPE_CHICKEN = 'chicken'
-    WILDCARE_SPECIES_TYPE_DUCK_DOMESTIC = 'duck_domestic'
-    WILDCARE_SPECIES_TYPE_INDIAN_RINGNECK_PARAKEET = 'indian_ringneck_parakeet'
-    WILDCARE_SPECIES_TYPE_PIGEON_OR_DOVE_ = 'pigeon_or_dove'
-    WILDCARE_SPECIES_TYPE_FISH = 'fish'
-    WILDCARE_SPECIES_TYPE_SHARK = 'shark'
-    WILDCARE_SPECIES_TYPE_CATERPILLAR = 'caterpillar'
-    WILDCARE_SPECIES_TYPE_BEES_AND_WASPS = 'bees_and_wasps'
-    WILDCARE_SPECIES_TYPE_CRAB = 'crab'
-    WILDCARE_SPECIES_TYPE_SPIDER = 'spider'
-    WILDCARE_SPECIES_TYPE_OTHER = 'other'
-
-
-    WILDCARE_SPECIES_TYPE_CHOICES = (
-        (WILDCARE_SPECIES_TYPE_CANETOAD, 'Cane Toad'),
-        (WILDCARE_SPECIES_TYPE_FROG, 'Frog'),
-        (WILDCARE_SPECIES_TYPE_BUTCHERBIRD, 'Butcherbird'),
-        (WILDCARE_SPECIES_TYPE_COCKATOO, 'Cockatoo'),
-        (WILDCARE_SPECIES_TYPE_COOT, 'Coot'),
-        (WILDCARE_SPECIES_TYPE_CORMORANT, 'Cormorant'),
-        (WILDCARE_SPECIES_TYPE_DUCK, 'Duck'),
-        (WILDCARE_SPECIES_TYPE_EAGLE_FALCON_HAWK, 'Eagle, Falcon, Hawk'),
-        (WILDCARE_SPECIES_TYPE_EMU, 'Emu'),
-        (WILDCARE_SPECIES_TYPE_GOOSE, 'Goose'),
-        (WILDCARE_SPECIES_TYPE_HERON, 'Heron'),
-        (WILDCARE_SPECIES_TYPE_HONEYEATER, 'Honeyeater'),
-        (WILDCARE_SPECIES_TYPE_IBIS, 'Ibis'),
-        (WILDCARE_SPECIES_TYPE_KINGFISHER, 'Kingfisher'),
-        (WILDCARE_SPECIES_TYPE_MAGPIE, 'Magpie'),
-        (WILDCARE_SPECIES_TYPE_MAGPIE_LARK, 'Magpie-Lark'),
-        (WILDCARE_SPECIES_TYPE_OWL, 'Owl'),
-        (WILDCARE_SPECIES_TYPE_PARROT, 'Parrot'),
-        (WILDCARE_SPECIES_TYPE_PEACOCK, 'Peacock'),
-        (WILDCARE_SPECIES_TYPE_PENGUIN, 'Penguin'),
-        (WILDCARE_SPECIES_TYPE_QUAIL, 'Quail'),
-        (WILDCARE_SPECIES_TYPE_RAINBOW_BEE_EATER, 'Rainbow Bee-Eater'),
-        (WILDCARE_SPECIES_TYPE_RAINBOW_LORIKEET, 'Rainbow Lorikeet'),
-        (WILDCARE_SPECIES_TYPE_RAVEN, 'Raven'),
-        (WILDCARE_SPECIES_TYPE_ALBATROSS, 'Albatross'),
-        (WILDCARE_SPECIES_TYPE_GULL, 'Gull'),
-        (WILDCARE_SPECIES_TYPE_PELICAN, 'Pelican'),
-        (WILDCARE_SPECIES_TYPE_SHEARWATER, 'Shearwater'),
-        (WILDCARE_SPECIES_TYPE_TERN, 'Tern'),
-        (WILDCARE_SPECIES_TYPE_SWALLOW, 'Swallow'),
-        (WILDCARE_SPECIES_TYPE_SWAN, 'Swan'),
-        (WILDCARE_SPECIES_TYPE_TAWNY_FROGMOUTH, 'Tawny Frogmouth'),
-        (WILDCARE_SPECIES_TYPE_WILLY_WAGTAIL, 'Willy Wagtail'),
-        (WILDCARE_SPECIES_TYPE_BAT, 'Bat'),
-        (WILDCARE_SPECIES_TYPE_DINGO, 'Dingo'),
-        (WILDCARE_SPECIES_TYPE_DOLPHIN, 'Dolphin'),
-        (WILDCARE_SPECIES_TYPE_ECHIDNA, 'Echidna'),
-        (WILDCARE_SPECIES_TYPE_FERRET, 'Ferret'),
-        (WILDCARE_SPECIES_TYPE_KANGAROO, 'Kangaroo'),
-        (WILDCARE_SPECIES_TYPE_POSSUM, 'Possum'),
-        (WILDCARE_SPECIES_TYPE_QUENDA_OR_BANDICOOT, 'Quenda or Bandicoot'),
-        (WILDCARE_SPECIES_TYPE_QUOKKA, 'Quokka'),
-        (WILDCARE_SPECIES_TYPE_SEAL_AND_SEALION, 'Seal and Sea Lion'),
-        (WILDCARE_SPECIES_TYPE_WHALE, 'Whale'),
-        (WILDCARE_SPECIES_TYPE_WOMBAT, 'Wombat'),
-        (WILDCARE_SPECIES_TYPE_LIZARD, 'Lizard'),
-        (WILDCARE_SPECIES_TYPE_SNAKE, 'Snake'),
-        (WILDCARE_SPECIES_TYPE_TURTLE, 'Turtle'),
-        (WILDCARE_SPECIES_TYPE_CAT, 'Cat'),
-        (WILDCARE_SPECIES_TYPE_DOG, 'Dog'),
-        (WILDCARE_SPECIES_TYPE_FOX, 'Fox'),
-        (WILDCARE_SPECIES_TYPE_RABBIT, 'Rabbit'),
-        (WILDCARE_SPECIES_TYPE_RODENT, 'Rodent - Rat, mouse'),
-        (WILDCARE_SPECIES_TYPE_CHICKEN, 'Chicken'),
-        (WILDCARE_SPECIES_TYPE_DUCK_DOMESTIC, 'Duck - domestic'),
-        (WILDCARE_SPECIES_TYPE_INDIAN_RINGNECK_PARAKEET,'Indian Ringneck Parakeet'),
-        (WILDCARE_SPECIES_TYPE_PIGEON_OR_DOVE_,'Pigeon or Dove'),
-        (WILDCARE_SPECIES_TYPE_FISH,'Fish'),
-        (WILDCARE_SPECIES_TYPE_SHARK,'Shark'),
-        (WILDCARE_SPECIES_TYPE_CATERPILLAR,'Caterpillar'),
-        (WILDCARE_SPECIES_TYPE_BEES_AND_WASPS,'Bees And Wasps'),
-        (WILDCARE_SPECIES_TYPE_CRAB,'Crab'),
-        (WILDCARE_SPECIES_TYPE_SPIDER,'Spider'),
-        (WILDCARE_SPECIES_TYPE_OTHER, 'Other'),
-    )
-
     call_type=models.ForeignKey(CallType, on_delete=models.CASCADE , related_name='wildcare_species_types', blank=True, null=True)
     species_name = models.CharField(
         max_length=100,
-        choices=WILDCARE_SPECIES_TYPE_CHOICES,
         unique=True,
     )
+    check_pinky_joey = models.BooleanField(default=False)
+    show_species_name_textbox = models.BooleanField(default=False)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -256,102 +109,13 @@ class WildcareSpeciesType(models.Model):
         #unique_together = ['species_name','call_type']
 
     def __str__(self):
-        return self.get_species_name_display()
+        return self.species_name
         
 class WildcareSpeciesSubType(models.Model):
-    WILDCARE_SPECIES_SUB_TYPE_CORELLA = 'corella'
-    WILDCARE_SPECIES_SUB_TYPE_RED_TAILED_BLACK = 'red_tailed_black'
-    WILDCARE_SPECIES_SUB_TYPE_WHITE_TAILED_BLACK = 'white_tailed_black'
-    WILDCARE_SPECIES_SUB_TYPE_SWAMPHEN = 'swamphen'
-    WILDCARE_SPECIES_SUB_TYPE_DARTER = 'darter'
-    WILDCARE_SPECIES_SUB_TYPE_GOSHAWK = 'goshawk'
-    WILDCARE_SPECIES_SUB_TYPE_KESTREL = 'kestrel'
-    WILDCARE_SPECIES_SUB_TYPE_OSPREY = 'osprey'
-    WILDCARE_SPECIES_SUB_TYPE_PEREGRINE = 'peregrine'
-    WILDCARE_SPECIES_SUB_TYPE_WEDGE_TAILED = 'wedge_tailed'
-    WILDCARE_SPECIES_SUB_TYPE_WHITE_BELLIED_SEA = 'white_bellied_sea'
-    WILDCARE_SPECIES_SUB_TYPE_EGRET = 'egret'
-    WILDCARE_SPECIES_SUB_TYPE_NANKEEN_NIGHT = 'nankeen_night'
-    WILDCARE_SPECIES_SUB_TYPE_NEW_HOLLAND = 'new_holland'
-    WILDCARE_SPECIES_SUB_TYPE_WATTLEBIRD = 'wattlebird'
-    WILDCARE_SPECIES_SUB_TYPE_BLUE_WINGED_KOOKABURRA = 'blue_winged_kookaburra'
-    WILDCARE_SPECIES_SUB_TYPE_LAUGHING_KOOKABURRA = 'laughing_kookaburra'
-    WILDCARE_SPECIES_SUB_TYPE_SACRED = 'sacred'
-    WILDCARE_SPECIES_SUB_TYPE_BARN = 'barn'
-    WILDCARE_SPECIES_SUB_TYPE_BOOKBOOK = 'bookbook'
-    WILDCARE_SPECIES_SUB_TYPE_AUSTRALIAN_RINGNECK = "28_australian_ringneck"
-    WILDCARE_SPECIES_SUB_TYPE_COCKATIEL = 'cockatiel'
-    WILDCARE_SPECIES_SUB_TYPE_GALAH = 'galah_pink_and_grey'
-    WILDCARE_SPECIES_SUB_TYPE_ROSELLA = 'rosella'
-    WILDCARE_SPECIES_SUB_TYPE_LITTLE = 'little'
-    WILDCARE_SPECIES_SUB_TYPE_WELCOME = 'welcome'
-    WILDCARE_SPECIES_SUB_TYPE_TAMMAR_WALLABY = 'tammar_wallaby'
-    WILDCARE_SPECIES_SUB_TYPE_WESTERN_BRUSH_WALLABY = 'western_brush_wallaby'
-    WILDCARE_SPECIES_SUB_TYPE_WESTERN_GREY = 'western_grey'
-    WILDCARE_SPECIES_SUB_TYPE_BRUSHTAIL = 'brushtail'
-    WILDCARE_SPECIES_SUB_TYPE_PYGMY = 'pygmy'
-    WILDCARE_SPECIES_SUB_TYPE_RINGTAIL = 'ringtail'
-    WILDCARE_SPECIES_SUB_TYPE_BLUE_TONGUE_BOBTAIL = 'blue_tongue_bobtail'
-    WILDCARE_SPECIES_SUB_TYPE_GOANNA = 'goanna'
-    WILDCARE_SPECIES_SUB_TYPE_MONITOR = 'monitor'
-    WILDCARE_SPECIES_SUB_TYPE_SKINK = 'skink'
-    WILDCARE_SPECIES_SUB_TYPE_DUGITE = 'dugite'
-    WILDCARE_SPECIES_SUB_TYPE_PYTHON = 'python'
-    WILDCARE_SPECIES_SUB_TYPE_TIGER = 'tiger'
-    WILDCARE_SPECIES_SUB_TYPE_LONG_NECKED_OBLANGA = 'long_necked_oblanga'
-    WILDCARE_SPECIES_SUB_TYPE_MARINE = 'marine'
-    WILDCARE_SPECIES_SUB_TYPE_WESTERN_SWAMP = 'western_swamp'
-
-
-    WILDCARE_SPECIES_SUB_TYPE_CHOICES = (
-        (WILDCARE_SPECIES_SUB_TYPE_CORELLA, 'Corella'),
-        (WILDCARE_SPECIES_SUB_TYPE_RED_TAILED_BLACK, 'Red-tailed Black'),
-        (WILDCARE_SPECIES_SUB_TYPE_WHITE_TAILED_BLACK, 'White-tailed Black'),
-        (WILDCARE_SPECIES_SUB_TYPE_SWAMPHEN, 'Swamphen'),
-        (WILDCARE_SPECIES_SUB_TYPE_DARTER, 'Darter'),
-        (WILDCARE_SPECIES_SUB_TYPE_GOSHAWK, 'Goshawk'),
-        (WILDCARE_SPECIES_SUB_TYPE_OSPREY, 'Osprey'),
-        (WILDCARE_SPECIES_SUB_TYPE_KESTREL, 'Kestrel'),
-        (WILDCARE_SPECIES_SUB_TYPE_PEREGRINE, 'Peregrine'),
-        (WILDCARE_SPECIES_SUB_TYPE_WEDGE_TAILED, 'Wedge-tailed'),
-        (WILDCARE_SPECIES_SUB_TYPE_WHITE_BELLIED_SEA, 'White-bellied Sea'),
-        (WILDCARE_SPECIES_SUB_TYPE_EGRET, 'Egret'),
-        (WILDCARE_SPECIES_SUB_TYPE_NANKEEN_NIGHT, 'Nankeen Night'),
-        (WILDCARE_SPECIES_SUB_TYPE_NEW_HOLLAND, 'New Holland'),
-        (WILDCARE_SPECIES_SUB_TYPE_WATTLEBIRD, 'Wattlebird'),
-        (WILDCARE_SPECIES_SUB_TYPE_BLUE_WINGED_KOOKABURRA, 'Blue-winged Kookaburra'),
-        (WILDCARE_SPECIES_SUB_TYPE_LAUGHING_KOOKABURRA, 'Laughing Kookaburra'),
-        (WILDCARE_SPECIES_SUB_TYPE_SACRED, 'Sacred'),
-        (WILDCARE_SPECIES_SUB_TYPE_BARN, 'Barn'),
-        (WILDCARE_SPECIES_SUB_TYPE_BOOKBOOK, 'Bookbook'),
-        (WILDCARE_SPECIES_SUB_TYPE_AUSTRALIAN_RINGNECK, '28 - Australian Ringneck'),
-        (WILDCARE_SPECIES_SUB_TYPE_COCKATIEL, 'Cockatiel'),
-        (WILDCARE_SPECIES_SUB_TYPE_GALAH, 'Galah - Pink and Grey'),
-        (WILDCARE_SPECIES_SUB_TYPE_ROSELLA, 'Rosella'),
-        (WILDCARE_SPECIES_SUB_TYPE_LITTLE, 'Little'),
-        (WILDCARE_SPECIES_SUB_TYPE_WELCOME, 'Welcome'),
-        (WILDCARE_SPECIES_SUB_TYPE_TAMMAR_WALLABY, 'Tammar-Wallaby'),
-        (WILDCARE_SPECIES_SUB_TYPE_WESTERN_BRUSH_WALLABY, 'Western Brush Wallaby'),
-        (WILDCARE_SPECIES_SUB_TYPE_WESTERN_GREY, 'Western Grey'),
-        (WILDCARE_SPECIES_SUB_TYPE_BRUSHTAIL, 'Brushtail'),
-        (WILDCARE_SPECIES_SUB_TYPE_PYGMY, 'Pygmy'),
-        (WILDCARE_SPECIES_SUB_TYPE_RINGTAIL, 'Ringtail'),
-        (WILDCARE_SPECIES_SUB_TYPE_BLUE_TONGUE_BOBTAIL, 'Blue Tongue, Bobtail'),
-        (WILDCARE_SPECIES_SUB_TYPE_GOANNA, 'Goanna'),
-        (WILDCARE_SPECIES_SUB_TYPE_MONITOR, 'Monitor'),
-        (WILDCARE_SPECIES_SUB_TYPE_SKINK, 'Skink'),
-        (WILDCARE_SPECIES_SUB_TYPE_DUGITE, 'Dugite'),
-        (WILDCARE_SPECIES_SUB_TYPE_PYTHON, 'Python'),
-        (WILDCARE_SPECIES_SUB_TYPE_TIGER, 'Tiger'),
-        (WILDCARE_SPECIES_SUB_TYPE_LONG_NECKED_OBLANGA, 'Long-necked (oblanga)'),
-        (WILDCARE_SPECIES_SUB_TYPE_MARINE, 'Marine'),
-        (WILDCARE_SPECIES_SUB_TYPE_WESTERN_SWAMP, 'Western Swamp'),
-    )
-
-    wildcare_species_type=models.ForeignKey(WildcareSpeciesType, on_delete=models.CASCADE , related_name='wildcare_species_sub_types')
+    wildcare_species_type=models.ForeignKey(WildcareSpeciesType, on_delete=models.CASCADE , related_name='wildcare_species_sub_types', limit_choices_to={'show_species_name_textbox':False},)
     species_sub_name = models.CharField(
         max_length=100,
-        choices=WILDCARE_SPECIES_SUB_TYPE_CHOICES,
+        #choices=WILDCARE_SPECIES_SUB_TYPE_CHOICES,
         unique=True,
     )
 
@@ -363,7 +127,7 @@ class WildcareSpeciesSubType(models.Model):
         #unique_together = ['species_sub_name','wildcare_species_type']
 
     def __str__(self):
-        return self.get_species_sub_name_display()
+        return self.species_sub_name
 
 
 class Referrer(models.Model):
@@ -501,12 +265,12 @@ class CallEmail(RevisionedMixin):
     )
 
     AGE_BABY = 'baby'
-    AGE_ADULT = 'adult'
     AGE_JUVENILE = 'juvenile'
+    AGE_ADULT = 'adult'
     AGE_CHOICES = (
         (AGE_BABY, 'Baby'),
-        (AGE_ADULT, 'Adult'),
         (AGE_JUVENILE, 'Juvenile'),
+        (AGE_ADULT, 'Adult'),
     )
 
     BABY_KANGAROO_PINKY = 'pinky'
@@ -599,22 +363,21 @@ class CallEmail(RevisionedMixin):
     )
     advice_given = models.BooleanField(default=False)
     advice_details = models.TextField(blank=True, null=True)
-    region = models.ForeignKey(
-        RegionDistrict, 
-        related_name='callemail_region', 
-        null=True
-    )
-    district = models.ForeignKey(
-        RegionDistrict, 
-        related_name='callemail_district', 
-        null=True
-    )
+    #region = models.ForeignKey(
+    #    Region, 
+    #    related_name='callemail_region', 
+    #    null=True
+    #)
+    #district = models.ForeignKey(
+    #    District, 
+    #    related_name='callemail_district', 
+    #    null=True
+    #)
     allocated_group = models.ForeignKey(
-        CompliancePermissionGroup,
-        related_name='callemail_allocated_group', 
+        ComplianceManagementSystemGroup,
         null=True
     )
-    
+
     class Meta:
         app_label = 'wildlifecompliance'
         verbose_name = 'CM_Call/Email'
@@ -664,35 +427,70 @@ class CallEmail(RevisionedMixin):
     # def related_items(self):
     #     return get_related_items(self)
 
+    #def set_allocated_group(self, permission_codename, region_id=None, district_id=None):
+    #    #import ipdb; ipdb.set_trace()
+    #    if district_id:
+    #        region_id = None
+    #    compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
+    #    permission = Permission.objects.filter(codename=permission_codename).filter(content_type_id=compliance_content_type.id).first()
+    #    self.allocated_group = CompliancePermissionGroup.objects.get(permissions=permission, region_id=region_id, district_id=district_id)
+    #    #request_data.update({'allocated_group_id': group.id})
+    #    self.save()
+
     def forward_to_regions(self, request):
+        if not self.location:
+            raise serializers.ValidationError({"Location": "must be recorded"})
+        region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+        district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+        #self.allocated_group =  CallEmailTriageGroup.objects.get(region_id=region_id, district_id=district_id)
+        self.allocated_group =  ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_CALL_EMAIL_TRIAGE, region_id=region_id, district_id=district_id)
         self.status = self.STATUS_OPEN
         self.log_user_action(
-            CallEmailUserAction.ACTION_FORWARD_TO_REGIONS.format(self.number), 
+            CallEmailUserAction.ACTION_FORWARD_TO_REGIONS.format(self.number),
             request)
         self.save()
 
     def forward_to_wildlife_protection_branch(self, request):
+        if not self.location:
+            raise serializers.ValidationError({"Location": "must be recorded"})
+        self.allocated_group =  ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_CALL_EMAIL_TRIAGE, region=Region.objects.get(head_office=True))
+        #self.allocated_group = CallEmailTriageGroup.objects.get(region=Region.objects.get(head_office=True))
         self.status = self.STATUS_OPEN
         self.log_user_action(
-            CallEmailUserAction.ACTION_FORWARD_TO_WILDLIFE_PROTECTION_BRANCH.format(self.number), 
+            CallEmailUserAction.ACTION_FORWARD_TO_WILDLIFE_PROTECTION_BRANCH.format(self.number),
             request)
         self.save()
 
     def allocate_for_follow_up(self, request):
+        region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+        district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+        if district_id:
+            region_id = None
+        self.allocated_group = OfficerGroup.objects.get(region_id=region_id, district_id=district_id)
         self.status = self.STATUS_OPEN_FOLLOWUP
         self.log_user_action(
-                CallEmailUserAction.ACTION_ALLOCATE_FOR_FOLLOWUP.format(self.number), 
+                CallEmailUserAction.ACTION_ALLOCATE_FOR_FOLLOWUP.format(self.number),
                 request)
         self.save()
 
     def allocate_for_inspection(self, request):
+        region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+        district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+        if district_id:
+            region_id = None
+        self.allocated_group = OfficerGroup.objects.get(region_id=region_id, district_id=district_id)
         self.status = self.STATUS_OPEN_INSPECTION
         self.log_user_action(
-                CallEmailUserAction.ACTION_ALLOCATE_FOR_INSPECTION.format(self.number), 
+                CallEmailUserAction.ACTION_ALLOCATE_FOR_INSPECTION.format(self.number),
                 request)
         self.save()
 
     def allocate_for_case(self, request):
+        region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+        district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+        if district_id:
+            region_id = None
+        self.allocated_group = OfficerGroup.objects.get(region_id=region_id, district_id=district_id)
         self.status = self.STATUS_OPEN_CASE
         self.log_user_action(
                 CallEmailUserAction.ACTION_ALLOCATE_FOR_CASE.format(self.number),

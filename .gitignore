@@ -108,7 +108,7 @@ wildlifecompliance/static/wildlifecompliance_vue/*
 # npm locks
 # *-lock.json
 
-wlc_git_history
+git_history_recent
 wildlifecompliance/static/wildlifecompliance_vue/*
 
 # Jupyter lab
@@ -117,3 +117,7 @@ wildlifecompliance/static/wildlifecompliance_vue/*
 
 # Reversion utility
 reversion_utility_output.txt
+
+# data files
+*.csv
+*.xls*
