@@ -4,6 +4,7 @@ import operator
 import traceback
 import os
 import base64
+from functools import reduce
 import geojson
 from django.db.models import Q, Min, Max
 from django.db import transaction
@@ -281,7 +282,9 @@ class CallEmailViewSet(viewsets.ModelViewSet):
     def status_choices(self, request, *args, **kwargs):
         res_obj = [] 
         for choice in CallEmail.STATUS_CHOICES:
-            res_obj.append({'id': choice[0], 'display': choice[1]});
+            # restrict CallEmail status choices
+            if choice[0] in settings.CALL_EMAIL_AVAILABLE_STATUS_VALUES:
+                res_obj.append({'id': choice[0], 'display': choice[1]});
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
