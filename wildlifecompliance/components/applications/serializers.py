@@ -556,6 +556,7 @@ class DTInternalApplicationSelectedActivitySerializer(
     processing_status = CustomChoiceField(read_only=True, choices=ApplicationSelectedActivity.PROCESSING_STATUS_CHOICES)
     can_pay_licence = serializers.SerializerMethodField()
     officer_name = serializers.SerializerMethodField()
+    activity_purpose_names_status = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = ApplicationSelectedActivity
@@ -574,6 +575,7 @@ class DTInternalApplicationSelectedActivitySerializer(
             'processing_status',
             'can_pay_licence',
             'officer_name',
+            'activity_purpose_names_status'
         )
         # the serverSide functionality of datatables is such that only columns
         # that have field 'data' defined are requested from the serializer. Use
@@ -648,6 +650,32 @@ class DTInternalApplicationSelectedActivitySerializer(
             name = ''
 
         return name
+
+    def get_activity_purpose_names_status(self, obj):
+        logger.debug('SelectedActivitySerializer.purpose_names() - start')
+        # purposes = [
+        #     p.purpose for p in obj.proposed_purposes.all()
+        # ]
+        purpose_names_qs=[]
+        purpose_status_qs=[]
+        for p in obj.proposed_purposes.all():
+            purpose_names_qs.append(p.purpose.name)
+            purpose_status_qs.append(p.get_processing_status_display())
+
+
+        if obj.proposed_action \
+                == ApplicationSelectedActivity.PROPOSED_ACTION_DEFAULT:
+            purpose_names_qs=[]
+            purpose_status_qs=[]
+            purposes = obj.purposes
+            for p in purposes.all():
+                purpose_names_qs.append(p.name)
+                purpose_status_qs.append('')
+
+        result={'name_string': ','.join(purpose_names_qs), 'status_string': ','.join(purpose_status_qs)}
+        #purpose_names = ','.join([p.name for p in purposes])
+        logger.debug('SelectedActivitySerializer.purpose_names() - end')
+        return result
 
 
 class ExternalApplicationSelectedActivityMergedSerializer(serializers.Serializer):
@@ -1101,8 +1129,8 @@ class BaseApplicationSerializer(serializers.ModelSerializer):
             result = True
         elif not obj.licence:
             result = obj.can_user_edit
-        elif not obj.licence.has_proposed_purposes_in_current():
-            # no active purposes ie. licence is expired.
+        elif not obj.licence.has_proposed_purposes_in_current() and not obj.application_fee_paid:
+            # no active purposes ie. licence is expired, and never previously submitted.
             result = False
         else:
             result = obj.can_user_edit

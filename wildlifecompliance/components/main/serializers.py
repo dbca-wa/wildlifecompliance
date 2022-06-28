@@ -5,6 +5,8 @@ from ledger.accounts.models import EmailUser
 from wildlifecompliance.components.main.models import (
     TemporaryDocumentCollection,
     CommunicationsLogEntry,
+    Region,
+    District,
 )
 
 from wildlifecompliance.components.licences.models import SectionQuestion
@@ -14,6 +16,36 @@ from wildlifecompliance.components.licences.models import MasterlistQuestion
 from wildlifecompliance.components.licences.models import LicencePurpose
 from wildlifecompliance.components.licences.models import QuestionOption
 
+
+class DistrictSerializer(serializers.ModelSerializer):
+    region = serializers.SerializerMethodField()
+
+    class Meta:
+        model = District
+        fields = (
+                'id',
+                'name',
+                'region',
+                )
+
+    def get_region(self, obj):
+        #return obj.region.name
+        return {"region_name": obj.region.name, "region_id": obj.region.id}
+
+class RegionSerializer(serializers.ModelSerializer):
+    districts = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Region
+        fields = (
+                'id',
+                'name',
+                'districts',
+                'head_office',
+                )
+
+    def get_districts(self, obj):
+        return [{"district_name": district.name, "district_id": district.id} for district in obj.district_set.all()]
 
 class CommunicationLogEntrySerializer(serializers.ModelSerializer):
     customer = serializers.PrimaryKeyRelatedField(
@@ -109,21 +141,40 @@ class SchemaMasterlistSerializer(serializers.ModelSerializer):
         model = MasterlistQuestion
         fields = '__all__'
 
+    # def get_options_original(self, obj):
+    #     option_labels = []
+    #     try:
+    #         options = self.initial_data.get('options', None)
+    #         for o in options:
+    #             if not o['label'] == '':
+    #                 option_labels.append(o)
+    #                 qo = QuestionOption.objects.filter(label=o['label'])
+    #                 if qo.exists():
+    #                     o['value'] = qo[0].id
+    #                     continue
+    #                 option_serializer = SchemaOptionSerializer(data=o)
+    #                 option_serializer.is_valid(raise_exception=True)
+    #                 option_serializer.save()
+    #                 opt_id = option_serializer.data['id']
+    #                 o['value'] = opt_id
+    #         obj.set_property_cache_options(option_labels)
     def get_options(self, obj):
         option_labels = []
         try:
             options = self.initial_data.get('options', None)
             for o in options:
-                option_labels.append(o)
-                qo = QuestionOption.objects.filter(label=o['label'])
-                if qo.exists():
-                    o['value'] = qo[0].id
-                    continue
-                option_serializer = SchemaOptionSerializer(data=o)
-                option_serializer.is_valid(raise_exception=True)
-                option_serializer.save()
-                opt_id = option_serializer.data['id']
-                o['value'] = opt_id
+                if not o['label'] == '':
+                    #option_labels.append(o)
+                    qo = QuestionOption.objects.filter(label=o['label'])
+                    if qo.exists():
+                        o['value'] = qo[0].id
+                    else:
+                        option_serializer = SchemaOptionSerializer(data=o)
+                        option_serializer.is_valid(raise_exception=True)
+                        option_serializer.save()
+                        opt_id = option_serializer.data['id']
+                        o['value'] = opt_id
+                    option_labels.append(o)
             obj.set_property_cache_options(option_labels)
 
         except Exception:

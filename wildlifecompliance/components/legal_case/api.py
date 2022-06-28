@@ -98,9 +98,6 @@ from wildlifecompliance.components.legal_case.serializers import (
     CourtSerializer, 
     LegalCaseNoRunningSheetSerializer,
     CourtOutcomeTypeSerializer)
-from wildlifecompliance.components.users.models import (
-    CompliancePermissionGroup,    
-)
 from wildlifecompliance.components.organisations.models import (
     Organisation,    
 )
@@ -231,6 +228,24 @@ class LegalCasePaginatedViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
 
         queryset = self.filter_queryset(queryset)
+        self.paginator.page_size = queryset.count()
+        result_page = self.paginator.paginate_queryset(queryset, request)
+        serializer = LegalCaseDatatableSerializer(
+            result_page, many=True, context={'request': request})
+        return self.paginator.get_paginated_response(serializer.data)
+
+    @list_route(methods=['GET', ])
+    def get_person_org_paginated_datatable(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        entity_id = request.GET.get('entity_id')
+        entity_type = request.GET.get('entity_type')
+        person = None
+        if entity_type == 'person':
+            person = EmailUser.objects.get(id=entity_id)
+
+        #queryset = self.filter_queryset(queryset)
+        queryset = person.legal_case_associated_persons.all()
         self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = LegalCaseDatatableSerializer(

@@ -13,6 +13,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, FileResponse, HttpResponseNotFound
 from ledger.payments.invoice.models import Invoice
+from ledger.accounts.models import EmailUser
 
 from rest_framework import viewsets, serializers, status
 from rest_framework.decorators import list_route, detail_route, renderer_classes
@@ -48,9 +49,9 @@ from wildlifecompliance.components.sanction_outcome.serializers import SanctionO
     RemediationActionSerializer, RemediationActionUpdateStatusSerializer, AmendmentRequestReasonSerializer, \
     SaveAmendmentRequestForRemediationAction, AllegedCommittedOffenceCreateSerializer, \
     SanctionOutcomeDocumentAccessLogSerializer
-from wildlifecompliance.components.users.models import CompliancePermissionGroup, RegionDistrict
+#from wildlifecompliance.components.users.models import CompliancePermissionGroup
 from wildlifecompliance.components.wc_payments.models import InfringementPenalty, InfringementPenaltyInvoice
-from wildlifecompliance.helpers import is_internal
+from wildlifecompliance.helpers import is_authorised_to_modify, is_internal
 from wildlifecompliance.components.main.models import TemporaryDocumentCollection
 from wildlifecompliance.settings import SO_TYPE_CHOICES, SO_TYPE_REMEDIATION_NOTICE, SO_TYPE_INFRINGEMENT_NOTICE, \
     SO_TYPE_LETTER_OF_ADVICE, SO_TYPE_CAUTION_NOTICE
@@ -180,6 +181,33 @@ class SanctionOutcomePaginatedViewSet(viewsets.ModelViewSet):
             (Q(offender__person=request.user) & Q(offender__removed=False) & Q(registration_holder__isnull=True) & Q(driver__isnull=True)) |
             (Q(offender__isnull=True) & Q(registration_holder=request.user) & Q(driver__isnull=True)) |
             (Q(offender__isnull=True) & Q(driver=request.user))
+        )
+        queryset = self.filter_queryset(queryset).order_by('-id')
+        self.paginator.page_size = queryset.count()
+        result_page = self.paginator.paginate_queryset(queryset, request)
+        serializer = SanctionOutcomeDatatableSerializer(result_page, many=True, context={'request': request, 'internal': is_internal(request)})
+        ret = self.paginator.get_paginated_response(serializer.data)
+        return ret
+
+    @list_route(methods=['GET', ])
+    def person_org_datatable_list(self, request, *args, **kwargs):
+        """
+        This function is called from the external dashboard page by external user
+        """
+        entity_id = request.GET.get('entity_id')
+        entity_type = request.GET.get('entity_type')
+        person = None
+        org = None
+        if entity_type == 'person':
+            person = EmailUser.objects.get(id=entity_id)
+        ## Expand to include Orgs
+        elif entity_type == 'org':
+            pass
+        #import ipdb; ipdb.set_trace()
+        queryset = SanctionOutcome.objects.filter(
+            (Q(offender__person=person) & Q(offender__removed=False) & Q(registration_holder__isnull=True) & Q(driver__isnull=True)) |
+            (Q(offender__isnull=True) & Q(registration_holder=person) & Q(driver__isnull=True)) |
+            (Q(offender__isnull=True) & Q(driver=person))
         )
         queryset = self.filter_queryset(queryset).order_by('-id')
         self.paginator.page_size = queryset.count()
@@ -324,6 +352,10 @@ class RemediationActionViewSet(viewsets.ModelViewSet):
             with transaction.atomic():
                 serializer = self._update_instance(request)
                 ra = serializer.instance
+                instance = self.get_object()
+
+                # Ensure status is Open and submbitter is same as offender.
+                is_authorised_to_modify(request, instance)
 
                 # Update status
                 serializer = RemediationActionUpdateStatusSerializer(serializer.instance, data={'status': RemediationAction.STATUS_SUBMITTED}, context={'request': request})
@@ -572,42 +604,42 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
         """
         return super(SanctionOutcomeViewSet, self).retrieve(request, *args, **kwargs)
 
-    def get_compliance_permission_groups(self, region_district_id, workflow_type):
-        """
-        Determine which CompliancePermissionGroup this sanction outcome should belong to
-        :param region_district_id: The regionDistrict id this sanction outcome is in
-        :param workflow_type: string like 'send_to_manager', 'return_to_officer', ...
-        :return: CompliancePermissionGroup quersyet
-        """
-        # 1. Determine regionDistrict of this sanction outcome
-        region_district = RegionDistrict.objects.filter(id=region_district_id)
+    #def get_compliance_permission_groups(self, region_district_id, workflow_type):
+    #    """
+    #    Determine which CompliancePermissionGroup this sanction outcome should belong to
+    #    :param region_district_id: The regionDistrict id this sanction outcome is in
+    #    :param workflow_type: string like 'send_to_manager', 'return_to_officer', ...
+    #    :return: CompliancePermissionGroup quersyet
+    #    """
+    #    # 1. Determine regionDistrict of this sanction outcome
+    #    region_district = RegionDistrict.objects.filter(id=region_district_id)
 
-        # 2. Determine which permission(s) is going to be apllied
-        compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
-        codename = 'officer'
-        if workflow_type == SanctionOutcome.WORKFLOW_SEND_TO_MANAGER:
-            codename = 'manager'
-        elif workflow_type == SanctionOutcome.WORKFLOW_DECLINE:
-            codename = '---'
-        elif workflow_type == SanctionOutcome.WORKFLOW_ENDORSE:
-            codename = 'infringement_notice_coordinator'
-        elif workflow_type == SanctionOutcome.WORKFLOW_RETURN_TO_OFFICER:
-            codename = 'officer'
-        elif workflow_type == SanctionOutcome.WORKFLOW_WITHDRAW:
-            codename = '---'
-        elif workflow_type == SanctionOutcome.WORKFLOW_CLOSE:
-            codename = '---'
-        else:
-            # Should not reach here
-            # instance.save()
-            pass
+    #    # 2. Determine which permission(s) is going to be apllied
+    #    compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
+    #    codename = 'officer'
+    #    if workflow_type == SanctionOutcome.WORKFLOW_SEND_TO_MANAGER:
+    #        codename = 'manager'
+    #    elif workflow_type == SanctionOutcome.WORKFLOW_DECLINE:
+    #        codename = '---'
+    #    elif workflow_type == SanctionOutcome.WORKFLOW_ENDORSE:
+    #        codename = 'infringement_notice_coordinator'
+    #    elif workflow_type == SanctionOutcome.WORKFLOW_RETURN_TO_OFFICER:
+    #        codename = 'officer'
+    #    elif workflow_type == SanctionOutcome.WORKFLOW_WITHDRAW:
+    #        codename = '---'
+    #    elif workflow_type == SanctionOutcome.WORKFLOW_CLOSE:
+    #        codename = '---'
+    #    else:
+    #        # Should not reach here
+    #        # instance.save()
+    #        pass
 
-        permissions = Permission.objects.filter(codename=codename, content_type_id=compliance_content_type.id)
+    #    permissions = Permission.objects.filter(codename=codename, content_type_id=compliance_content_type.id)
 
-        # 3. Find groups which has the permission(s) determined above in the regionDistrict.
-        groups = CompliancePermissionGroup.objects.filter(region_district__in=region_district, permissions__in=permissions)
+    #    # 3. Find groups which has the permission(s) determined above in the regionDistrict.
+    #    groups = CompliancePermissionGroup.objects.filter(region_district__in=region_district, permissions__in=permissions)
 
-        return groups
+    #    return groups
 
     @detail_route(methods=['POST', ])
     @renderer_classes((JSONRenderer,))
@@ -908,7 +940,7 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
 
                 if workflow_type == SanctionOutcome.WORKFLOW_SEND_TO_MANAGER:
                     # email_data = prepare_mail(request, instance, workflow_entry, send_mail)
-                    compliance_group = CompliancePermissionGroup.objects.get(id=request.data.get('allocated_group_id'))
+                    #compliance_group = CompliancePermissionGroup.objects.get(id=request.data.get('allocated_group_id'))
                     to_address = [user.email for user in compliance_group.members.all()]
                     cc = [request.user.email,]
                     bcc = None

@@ -23,7 +23,8 @@
                             </div>
                         </div>
 
-                        <div v-if="call_email.allocated_group && !(statusId === 'closed')" class="form-group">
+                        <!--div v-if="call_email.allocated_group && !(statusId === 'closed')" class="form-group"-->
+                        <div v-if="assignToVisible" class="form-group">
                           <div class="row">
                             <div class="col-sm-12 top-buffer-s">
                               <strong>Currently assigned to</strong><br/>
@@ -38,11 +39,11 @@
                               </select>
                             </div>
                           </div>
-                        </div>
-                        <div v-if="call_email.user_in_group">
-                            <a @click="updateAssignedToId('current_user')" class="btn pull-right">
-                                Assign to me
-                            </a>
+                          <div v-if="call_email.user_in_group">
+                              <a @click="updateAssignedToId('current_user')" class="btn pull-right">
+                                  Assign to me
+                              </a>
+                          </div>
                         </div>
                     </div>
                 </div>
@@ -102,22 +103,16 @@
                                 </a>
                           </div>
                         </div>
-                        <!-- <div class="row">
-                          <div class="col-sm-12"/>
-                        </div> -->
-                        <div v-if="statusId ==='open' && canUserAction" class="row action-button">
+                        <!-- Following 3 actions are temporarily commented out  -->
+                        <!--div v-if="statusId ==='open' && canUserAction" class="row action-button">
                           <div class="col-sm-12">
                                 <a ref="allocateForFollowUp" @click="addWorkflow('allocate_for_follow_up')" class="btn btn-primary btn-block" >
                                   Allocate for Follow Up
                                 </a>
                           </div>
                         </div>
-                        <!-- <div class="row">
-                          <div class="col-sm-12"/>
-                        </div> -->
                         <div v-if="statusId ==='open' && canUserAction" class="row action-button">
                           <div class="col-sm-12">
-                                <!--a ref="allocateForInspection" @click="addWorkflow('allocate_for_inspection')" class="btn btn-primary btn-block"-->
                                 <a ref="allocateForInspection" @click="allocateForInspection()" class="btn btn-primary btn-block" >
                                   Allocate for Inspection
                                 </a>
@@ -125,12 +120,11 @@
                         </div>
                         <div v-if="statusId ==='open' && canUserAction" class="row action-button">
                           <div class="col-sm-12">
-                                <!--a ref="allocateForInspection" @click="addWorkflow('allocate_for_inspection')" class="btn btn-primary btn-block"-->
                                 <a ref="allocateForLegalCase" @click="allocateForLegalCase()" class="btn btn-primary btn-block" >
                                   Allocate for Case
                                 </a>
                           </div>
-                        </div>
+                        </div-->
                         <div v-if="closeButtonVisibility && canUserAction" class="row action-button">
                           <div class="col-sm-12">
                                 <a ref="close" @click="addWorkflow('close')" class="btn btn-primary btn-block">
@@ -163,25 +157,25 @@
                               <input :readonly="readonlyForm" class="form-control" v-model="call_email.caller"/>
                             </div></div>
                             <div class="col-sm-4 form-group"><div class="row">
-                              <label class="col-sm-12">Caller contact number</label>
+                              <label class="col-sm-12">Caller contact information</label>
                             <input :readonly="readonlyForm" class="form-control" v-model="call_email.caller_phone_number"/>
                             </div></div>
                             
                             <div class="col-sm-12 form-group"><div class="row">
                               <label class="col-sm-4">Anonymous call?</label>
-                                <input :disabled="readonlyForm" class="col-sm-1" id="yes" type="radio" v-model="call_email.anonymous_call" v-bind:value="true">
-                                <label class="col-sm-1" for="yes">Yes</label>
-                                <input :disabled="readonlyForm" class="col-sm-1" id="no" type="radio" v-model="call_email.anonymous_call" v-bind:value="false">
-                                <label class="col-sm-1" for="no">No</label>
+                                <input :disabled="readonlyForm" class="col-sm-1" id="anon_yes" type="radio" v-model="call_email.anonymous_call" v-bind:value="true">
+                                <label class="col-sm-1" for="anon_yes">Yes</label>
+                                <input :disabled="readonlyForm" class="col-sm-1" id="anon_no" type="radio" v-model="call_email.anonymous_call" v-bind:value="false">
+                                <label class="col-sm-1" for="anon_no">No</label>
                             </div></div>
             
-                            <div class="col-sm-12 form-group"><div class="row">
+                            <!--div class="col-sm-12 form-group"><div class="row">
                               <label class="col-sm-4">Caller wishes to remain anonymous?</label>
-                                <input :disabled="readonlyForm" class="col-sm-1" type="radio" v-model="call_email.caller_wishes_to_remain_anonymous" v-bind:value="true">
-                                <label class="col-sm-1">Yes</label>
-                                <input :disabled="readonlyForm" class="col-sm-1" type="radio" v-model="call_email.caller_wishes_to_remain_anonymous" v-bind:value="false">
-                                <label class="col-sm-1">No</label>
-                            </div></div>
+                                <input :disabled="readonlyForm" class="col-sm-1" id="call_anon_yes" type="radio" v-model="call_email.caller_wishes_to_remain_anonymous" v-bind:value="true">
+                                <label class="col-sm-1" for="call_anon_yes">Yes</label>
+                                <input :disabled="readonlyForm" class="col-sm-1" id="call_anon_no" type="radio" v-model="call_email.caller_wishes_to_remain_anonymous" v-bind:value="false">
+                                <label class="col-sm-1" for="call_anon_no">No</label>
+                            </div></div-->
             
                             <div v-show="statusId !=='draft'">
                                 <SearchPersonOrganisation 
@@ -197,7 +191,7 @@
                             </div>
                           </FormSection>
             
-                          <FormSection :formCollapse="false" label="Location" Index="1">
+                          <FormSection :formCollapse="false" label="Location *" Index="1">
                               <div v-if="call_email.location">
                                 <MapLocation 
                                 :isReadonly="readonlyForm"
@@ -238,11 +232,15 @@
                             </div></div>
             
                             <div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-4">Use occurrence from/to</label>
-                                <input :disabled="readonlyForm" class="col-sm-1" type="radio" v-model="call_email.occurrence_from_to" v-bind:value="true">
-                                <label class="col-sm-1">Yes</label>
-                                <input :disabled="readonlyForm" class="col-sm-1" type="radio" v-model="call_email.occurrence_from_to" v-bind:value="false">
-                                <label class="col-sm-1">No</label>
+                              <label class="col-sm-3">Use occurrence from/to</label>
+                              <div class="col-sm-2">
+                                <input :disabled="readonlyForm" type="radio" id="occurenceYes" v-model="call_email.occurrence_from_to" v-bind:value="true">
+                                <label for="occurenceYes">Yes</label>
+                              </div>
+                              <div class="col-sm-2">
+                                <input :disabled="readonlyForm" type="radio" id="occurenceNo" v-model="call_email.occurrence_from_to" v-bind:value="false">
+                                <label for="occurenceNo">No</label>
+                              </div>
                             </div></div>
             
                             <div class="col-sm-12 form-group"><div class="row">
@@ -291,15 +289,153 @@
                             </div></div>
               
                             <div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-4">Classification</label>
-                              <select :disabled="readonlyForm" class="form-control" v-model="call_email.classification_id">
+                              <label class="col-sm-3">Classification *</label>
+                              <!-- <select :disabled="readonlyForm" class="form-control" v-model="call_email.classification_id">
                                     <option v-for="option in classification_types" :value="option.id" v-bind:key="option.id">
                                       {{ option.display }} 
                                     </option>
-                                </select>
+                                </select> -->
+                              <div>
+                                <div v-for="option in classification_types" class="col-sm-3">
+                                  <input :disabled="readonlyForm" type="radio" v-bind:value="option.id" v-bind:key="option.id" :id="'classification_'+option.id" v-model="call_email.classification_id">
+                                  <label :for="'classification_'+option.id">{{ option.display }}</label>
+                                </div>
+                              </div>
                             </div></div>
-            
-                            <div class="row">
+
+                             <div class="col-sm-12 form-group"><div class="row">
+                              <label class="col-sm-3">Call Type *</label>
+                              <div  class="col-sm-9">
+                                <div v-for="option in call_types">
+                                  <input :disabled="readonlyForm"  @change="filterWildcareSpeciesType($event,option.all_wildcare_species)" type="radio" v-bind:value="option.id" :id="'call_type_'+option.id" v-model="call_email.call_type_id">
+                                   <label :for="'call_type_'+option.id">{{ option.display }}</label>
+                                </div>
+                              </div>
+                            </div></div>
+
+                            <div class="col-sm-12 form-group"><div class="row">
+                              <label class="col-sm-3">Wildcare Species Type</label>
+                              <div class="col-sm-9">
+                              <select :disabled="readonlyForm" class="form-control" @change="filterWildcareSpeciesSubType()" v-model="call_email.wildcare_species_type_id">
+                                    <option v-for="option in filter_wildcare_species_types" :value="option.id" v-bind:key="option.id" >
+                                      {{ option.display }}
+                                    </option>
+                              </select>
+                              </div>
+                            </div></div>
+
+                            <div class="col-sm-12 form-group"><div class="row">
+                              <label class="col-sm-3">Wildcare Species Sub Type</label>
+                              <div class="col-sm-9">
+                              <select :disabled="speciesSubTypeDisabled" class="form-control" v-model="call_email.wildcare_species_sub_type_id">
+                                    <option v-for="option in filter_wildcare_species_sub_types" :value="option.id" v-bind:key="option.id" >
+                                      {{ option.display }}
+                                    </option>
+                              </select>
+                              </div>
+                            </div></div>
+
+                            <!--div class="col-sm-12 form-group" v-if="speciesSubTypeDisabled">
+                              <div class="row">
+                                  <label class="col-sm-3">Species Name</label>
+                                  <div class="col-sm-9">
+                                    <input :disabled="readonlyForm" class="form-control" v-model="call_email.species_name"/>
+                                  </div>
+                              </div>
+                            </div-->
+
+                            <div class="col-sm-12 form-group"><div class="row">
+                              <label class="col-sm-3">Age</label>
+                              <div>
+                                <div v-for="option in age_choices" class="col-sm-2">
+                                  <input :disabled="readonlyForm" type="checkbox" :value="option.id" v-bind:key="option.id" :id="'age_'+option.id" v-model="call_email.age"/>
+                                   <label :for="'age_'+option.id" >{{ option.display }}</label>
+                                </div>
+                              </div>
+                            </div></div>
+
+                            <div class="col-sm-12 form-group"><div class="row">
+                              <label class="col-sm-3">Dead</label>
+                              <div class="col-sm-2">
+                                <input :disabled="readonlyForm" id="deadYes" type="radio" v-model="call_email.dead" value="true">
+                                <label for="deadYes">Yes</label>
+                              </div>
+                              <div class="col-sm-2">
+                                <input :disabled="readonlyForm" id="deadNo" type="radio" v-model="call_email.dead" value="false">
+                                <label for="deadNo">No</label>
+                              </div>
+                            </div></div>
+
+                            <div class="col-sm-12 form-group"><div class="row">
+                              <label class="col-sm-3">Euthanise</label>
+                              <div class="col-sm-2">
+                                <input :disabled="readonlyForm" id="euthaniseYes" type="radio" v-model="call_email.euthanise" value="true">
+                                <label for="euthaniseYes">Yes</label>
+                              </div>
+                              <div class="col-sm-2">
+                                <input :disabled="readonlyForm" id="euthaniseNo" type="radio" v-model="call_email.euthanise" value="false">
+                                <label for="euthaniseNo">No</label>
+                              </div>
+                            </div></div>
+
+                             <div class="col-sm-12 form-group"><div class="row">
+                              <label class="col-sm-3">Female / Male</label>
+                              <div>
+                                <div v-for="option in gender_choices" class="col-sm-2">
+                                  <input :disabled="readonlyForm" type="checkbox" @change="checkFemalePinkyJoey" :value="option.id" :id="'gender_'+option.id" v-bind:key="option.id" v-model="call_email.gender"/>
+                                   <label :for="'gender_'+option.id" >{{ option.display }}</label>
+                                </div>
+                              </div>
+                            </div></div>
+
+                            <div v-if="isFemalePinkyJoey" class="col-sm-12 form-group"><div class="row">
+                              <label class="col-sm-3">Pinky / Joey</label>
+                              <div>
+                                <div v-for="option in baby_kangaroo_choices" class="col-sm-2">
+                                  <input :disabled="readonlyForm" type="checkbox" :value="option.id" :id="'babyKangaroo'+option.id" v-bind:key="option.id" v-model="call_email.baby_kangaroo"/>
+                                   <label :for="'babyKangaroo'+option.id">{{ option.display }}</label>
+                                </div>
+                              </div>
+                            </div></div>
+
+                            <div class="col-sm-12 form-group">
+                              <div class="row">
+                                  <label class="col-sm-3">Number of Animals</label>
+                                  <div class="col-sm-9">
+                                    <input :disabled="readonlyForm" class="form-control" v-model="call_email.number_of_animals" />
+                                  </div>
+                              </div>
+                            </div>
+
+                            <div class="col-sm-12 form-group">
+                              <div class="row">
+                                  <label class="col-sm-3">Brief nature of call *</label>
+                                  <div class="col-sm-9">
+                                    <textarea :disabled="readonlyForm" class="form-control" v-model="call_email.brief_nature_of_call" />
+                                  </div>
+                              </div>
+                            </div>
+
+                            <div class="col-sm-12 form-group"><div class="row">
+                              <label class="col-sm-3">Entangled</label>
+                              <div  class="col-sm-8" style="padding:0px">
+                                <div v-for="option in entangled_choices" class="col-sm-4">
+                                  <input :disabled="readonlyForm" type="checkbox" :value="option.id" v-bind:key="option.id" :id="'entangled_'+option.id" v-model="call_email.entangled"/>
+                                   <label :for="'entangled_'+option.id" >{{ option.display }}</label>
+                                </div>
+                              </div>
+                            </div></div>
+
+                             <div v-if="isEntangledOther" class="col-sm-12 form-group">
+                              <div class="row">
+                                  <label class="col-sm-3">Entangled Other</label>
+                                  <div class="col-sm-9">
+                                    <input :disabled="readonlyForm" class="form-control" v-model="call_email.entangled_other"/>
+                                  </div>
+                              </div>
+                            </div>
+
+                           <!-- <div class="row">
                                 <div class="col-sm-9 form-group">
                                   <label class="col-sm-4">Report Type</label>
                                   <select :disabled="readonlyForm" @change.prevent="loadSchema" class="form-control" v-model="call_email.report_type_id">
@@ -316,7 +452,7 @@
                                         <a v-if="reportAdviceUrl" class="advice-url" :href="reportAdviceUrl" target="_blank" >Advice</a>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             
                             <div v-if="rendererVisibility"  v-for="(item, index) in current_schema">
                               <compliance-renderer-block
@@ -364,7 +500,7 @@
                             <div class="container">
                                 <p class="pull-right" style="margin-top:5px;">
                                     
-                                    <input type="button" @click.prevent="save('exit')" class="btn btn-primary" value="Save and Exit"w/>
+                                    <input type="button" @click.prevent="save('exit')" class="btn btn-primary" value="Save and Exit"/>
                                     <input type="button" @click.prevent="save('noexit')" class="btn btn-primary" value="Save and Continue" />
                                 </p>
                             </div>
@@ -460,7 +596,21 @@ export default {
         from: new Date(),
       },
       workflow_type: '',
+      lovCollection : {},
+      // get rid of these
       classification_types: [],
+      call_types: [],
+      wildcare_species_types: [],
+      filter_wildcare_species_types: [],
+      wildcare_species_sub_types: [],
+      filter_wildcare_species_sub_types: [],
+      //
+      speciesSubTypeDisabled: false,
+      isFemalePinkyJoey: false,
+      entangled_choices: [],
+      gender_choices: [],
+      baby_kangaroo_choices: [],
+      age_choices: [],
       report_types: [],
       referrers: [],
       referrersSelected: [],
@@ -497,6 +647,8 @@ export default {
           "location_id",
           "classification",
           "classification_id",
+          "call_type",
+          "call_type_id",
           "lodgement_date",
           "number",
           "caller",
@@ -516,6 +668,10 @@ export default {
           "region_id",
           "district_id",
           "case_priority_id",
+          "dead",
+          "euthanise",
+          "number_of_animals",
+          "brief_nature_of_call",
           ]
     };
   },
@@ -540,6 +696,21 @@ export default {
       renderer_form_data: 'renderer_form_data',
       //current_user: 'current_user',
     }),
+    locationExists: function() {
+        if (this.call_email && 
+            this.call_email.location && 
+            this.call_email.location.geometry && 
+            this.call_email.location.geometry.coordinates.length > 0) {
+            return true;
+        }
+    },
+    assignToVisible: function() {
+        let visible = false;
+        if (this.call_email && this.call_email.allocated_group && this.call_email.can_user_action && this.statusId ==='open') {
+            visible = true;
+        }
+        return visible;
+    },
     personSearchVisibility: function() {
         let visible = false;
         if (this.statusId ==='open') {
@@ -639,6 +810,21 @@ export default {
         //this.uuid += 1
         return 'offence' + this.uuid;
     },
+    isEntangledOther: function() {
+        let entangled_other_checked=false;
+        if(this.call_email && this.call_email.entangled){
+          for (let choice of this.call_email.entangled){
+            if(choice === "other")
+              entangled_other_checked = true;
+          }
+        } else{
+          entangled_other_checked = false;
+        }
+        if (entangled_other_checked===false) {
+          this.call_email.entangled_other=null;
+        }
+        return entangled_other_checked;
+    },
   },
   filters: {
     formatDate: function(data) {
@@ -666,7 +852,6 @@ export default {
         this.uuid += 1;
     },
     entitySelected: async function(para) {
-        console.log(para);
         await this.setCaller(para);
     },
     loadReportAdviceUrl: function(url) {
@@ -715,13 +900,26 @@ export default {
             this.workflowBindId = timeNow.toString();
         }
     },
-    addWorkflow(workflow_type) {
-      this.workflow_type = workflow_type;
-      this.updateWorkflowBindId();
-      this.$nextTick(() => {
-        this.$refs.add_workflow.isModalOpen = true;
-      });
-      // this.$refs.add_workflow.isModalOpen = true;
+    async addWorkflow(workflow_type) {
+      if (!this.locationExists) {
+            await swal({
+                title: 'Mandatory Field',
+                html: "Location must be specified",
+                type: "error",
+            })
+      } else {
+          try {
+              const res = await this.saveCallEmail({ crud: 'forward', internal: true });
+              if (res.ok) {
+                  this.workflow_type = workflow_type;
+                  this.updateWorkflowBindId();
+                  this.$nextTick(() => {
+                    this.$refs.add_workflow.isModalOpen = true;
+                  });
+              }
+          } catch (err) {
+          }
+      }
     },
     openSanctionOutcome(){
       this.sanctionOutcomeInitialised = true;
@@ -745,12 +943,100 @@ export default {
           this.$refs.legal_case.isModalOpen = true
       });
     },
+    filterWildcareSpeciesType: function(event,all_wildcare_species) {
+      this.$nextTick(() => {
+        if(event){
+          this.call_email.species_name=null;
+          this.call_email.wildcare_species_type_id=null; //-----to remove the previous selection
+        }
+        this.filter_wildcare_species_types=[];
+        this.filter_wildcare_species_types=[{
+          id:null,
+          display:"",
+          call_type_id:null,
+          check_pinky_joey:false,
+          show_species_name_textbox:false,
+        }];
+        this.filter_wildcare_species_sub_types=[];
+        //------show dependent species for call_type selected
+        if(all_wildcare_species === false)
+        {
+          for(let choice of this.wildcare_species_types){
+            if(choice.call_type_id === this.call_email.call_type_id || choice.call_type_id === null)
+            {
+              this.filter_wildcare_species_types.push(choice);
+            }
+          }
+        }
+        else
+        {
+          this.filter_wildcare_species_types=this.wildcare_species_types; //------else show all species
+        }
+        //---to reset pinky/Joey onchange of call type
+        this.checkFemalePinkyJoey();
+      });
+    },
+    filterWildcareSpeciesSubType: function(event) {
+      this.$nextTick(() => {
+        if(event){
+          this.call_email.species_name=null;
+          this.call_email.wildcare_species_sub_type_id=null; //-----to remove the previous selection
+        }
+        this.filter_wildcare_species_sub_types=[{
+          id:null,
+          display:"",
+          wildcare_species_type_id:null,
+        }];
+        //---to disable sub type and show species name textbox if 'Other' is selected
+        this.speciesSubTypeDisabled = false;
+        if(this.readonlyForm)
+        {
+          this.speciesSubTypeDisabled = true;
+        }
+        else if(this.call_email.wildcare_species_type_id){
+          for(let choice of this.filter_wildcare_species_types){
+            if(choice.id === this.call_email.wildcare_species_type_id && choice.show_species_name_textbox === true){
+              this.speciesSubTypeDisabled=true;
+            }
+          }
+        }
+        //---filter wildcare species sub type as per species type selected
+          /*
+        if(this.speciesSubTypeDisabled === false)
+        {
+        */
+          for(let choice of this.wildcare_species_sub_types){
+            if(choice.wildcare_species_type_id === this.call_email.wildcare_species_type_id)
+            {
+              this.filter_wildcare_species_sub_types.push(choice);
+            }
+          }
+          /*
+        }
+        */
+        //---to reset pinky/Joey onchange of species type
+        this.checkFemalePinkyJoey();
+      });
+    },
+    checkFemalePinkyJoey: function() {
+      this.isFemalePinkyJoey=false;
+      if(this.call_email && this.call_email.gender.includes("female") && this.call_email.wildcare_species_type_id){
+        for(let choice of this.filter_wildcare_species_types){
+          if(choice.id === this.call_email.wildcare_species_type_id && choice.check_pinky_joey === true){
+            this.isFemalePinkyJoey=true;
+          }
+        }
+      }
+      //---to reset pinky/joey if uncheck female
+      if (!this.isFemalePinkyJoey) {
+        this.call_email.baby_kangaroo=[];
+      }
+    },
     //saveIndividual: function() {
     //  let noPersonSave = true;
     //  this.save(noPersonSave)
     //},
     save: async function (returnToDash) {
-        console.log(returnToDash)
         let savedCallEmail = null;
         let savedPerson = null;
         if (this.call_email.id) {
@@ -768,7 +1054,6 @@ export default {
             // new CallEmail
             savedCallEmail = await this.saveCallEmail({ crud: 'create'});
         }
-        console.log(savedCallEmail)
         // recalc hash after save
         this.calculateHash();
         if (savedCallEmail && savedCallEmail.ok && returnToDash === 'exit') {
@@ -924,16 +1209,35 @@ export default {
     }
     // await this.loadComplianceAllocatedGroup(this.call_email.allocated_group_id);
     // load drop-down select lists
+    
+    /// large LOV(List Of Values) object
+    const lovResponse = await Vue.http.get('/api/lov_collection/lov_collection_choices/');
+    this.lovCollection = lovResponse.body;
+
     // classification_types
-    //let returned_classification_types = await cache_helper.getSetCacheList('CallEmail_ClassificationTypes', '/api/classification/classification_choices/');
-    let returned_classification_types = await Vue.http.get('/api/classification/classification_choices/');
-    Object.assign(this.classification_types, returned_classification_types.body);
-    // blank entry allows user to clear selection
-    this.classification_types.splice(0, 0, 
-      {
-        id: null, 
-        name: "",
-      });
+    //let returned_classification_types = await Vue.http.get('/api/classification/classification_choices/');
+    Object.assign(this.classification_types, this.lovCollection.classification_types);
+    // call_types
+    //let returned_call_types = await Vue.http.get('/api/call_type/call_type_choices/');
+    Object.assign(this.call_types, this.lovCollection.call_type_choices);
+    //Wildcare Species Types
+    //let returned_wildcare_species_types = await Vue.http.get('/api/wildcare_species_type/wildcare_species_type_choices/');
+    Object.assign(this.wildcare_species_types, this.lovCollection.wildcare_species_types);
+    //Wildcare Species Sub Types
+    //let returned_wildcare_species_sub_types = await Vue.http.get('/api/wildcare_species_sub_type/wildcare_species_sub_type_choices/');
+    Object.assign(this.wildcare_species_sub_types, this.lovCollection.wildcare_species_sub_types);
+    // Entangled choices
+    //let returned_entangled_choices = await Vue.http.get('/api/call_email/entangled_choices/');
+    Object.assign(this.entangled_choices, this.lovCollection.entangled_choices);
+    // Gender choices
+    //let returned_gender_choices = await Vue.http.get('/api/call_email/gender_choices/');
+    Object.assign(this.gender_choices, this.lovCollection.gender_choices);
+    // Pinky/Joey choices
+    //let returned_baby_kangaroo_choices = await Vue.http.get('/api/call_email/baby_kangaroo_choices/');
+    Object.assign(this.baby_kangaroo_choices, this.lovCollection.baby_kangaroo_choices);
+    // Age choices
+    //let returned_age_choices = await Vue.http.get('/api/call_email/age_choices/');
+    Object.assign(this.age_choices, this.lovCollection.age_choices);
     //report_types
     let returned_report_types = await cache_helper.getSetCacheList('CallEmail_ReportTypes', helpers.add_endpoint_json(
                     api_endpoints.report_types,
@@ -984,6 +1288,11 @@ export default {
         this.setTimeOfCall(moment().format('LT'));
     }
     this.calculateHash();
+    this.filterWildcareSpeciesType();
+    this.$nextTick(function() {
+        this.filterWildcareSpeciesSubType();
+        this.checkFemalePinkyJoey();
+    });
   },
   mounted: function() {
       let vm = this;

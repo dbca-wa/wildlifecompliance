@@ -3,13 +3,21 @@ import logging
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.utils.http import urlquote_plus
+from django.conf import settings
 
 from wildlifecompliance.management.securebase_manager import (
     SecureBaseUtils,
     SecureAuthorisationEnforcer,
 )
 from wildlifecompliance.components.users.models import ComplianceManagementUserPreferences
-from wildlifecompliance.helpers import is_compliance_management_callemail_readonly_user
+#from wildlifecompliance.components.main.models import VolunteerGroup, ComplianceManagementCallEmailReadOnlyGroup
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
+from wildlifecompliance.helpers import (
+        is_compliance_management_callemail_readonly_user, 
+        is_compliance_management_approved_external_user,
+        is_compliance_management_volunteer,
+        is_compliance_management_user,
+        )
 
 logger = logging.getLogger(__name__)
 # logger = logging
@@ -20,14 +28,24 @@ class FirstTimeNagScreenMiddleware(object):
     Generic FirstTimeNagScreenMiddleware.
     '''
     def process_request(self, request):
+        if 'static' in request.path:
+            return
         if request.method == 'GET' and request.user.is_authenticated(
         ) and 'api' not in request.path and 'admin' not in request.path:
+            # add CM Approved External users to CallEmail RO and volunteer groups
+            if is_compliance_management_approved_external_user(request):
+                if not is_compliance_management_callemail_readonly_user(request):
+                    ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_COMPLIANCE_MANAGEMENT_CALL_EMAIL_READ_ONLY).add_member(request.user)
+                if not is_compliance_management_volunteer(request):
+                    ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_VOLUNTEER).add_member(request.user)
+            # Ensure CallEmail RO group users have prefer_compliance_management=True
             preference, created = ComplianceManagementUserPreferences.objects.get_or_create(email_user=request.user)
             if is_compliance_management_callemail_readonly_user(request) and not preference.prefer_compliance_management:
                 preference.prefer_compliance_management = True
                 preference.save()
 
-        if SecureBaseUtils.is_wildlifelicensing_request(request):
+        if not is_compliance_management_user(request) and SecureBaseUtils.is_wildlifelicensing_request(request):
+        #if SecureBaseUtils.is_wildlifelicensing_request(request):
             # Apply WildifeLicensing first-time checks.
             first_time_nag = SecureAuthorisationEnforcer(request)
 
@@ -42,6 +60,8 @@ class FirstTimeDefaultNag(object):
     A specialised FirstTimeNagScreenMiddleware for non WildlifeLicensing.
     '''
     def process_request(self, request):
+        if 'static' in request.path:
+            return
         if request.method == 'GET' and request.user.is_authenticated(
         ) and 'api' not in request.path and 'admin' not in request.path:
 
@@ -69,5 +89,7 @@ class CacheControlMiddleware(object):
             response['Cache-Control'] = 'private, no-store'
         elif request.path[:8] == '/static/':
             response['Cache-Control'] = 'public, max-age=86400'
+        else:
+            response['Cache-Control'] = 'private, no-store'
         return response
 
