@@ -24,7 +24,7 @@ class DefaultDataManager(object):
     def __init__(self):
 
         # RegionGIS: store geometries
-        path_to_regions = os.path.join(settings.BASE_DIR, 'wildlifecompliance', 'static', 'wildlifecompliance', 'DBCA_regions.geojson')
+        path_to_regions = os.path.join(settings.BASE_DIR, 'wildlifecompliance', 'static', 'wildlifecompliance', 'DBCA_Regions.geojson')
         count = RegionGIS.objects.all().count()
         if not count > 0:
             with open(path_to_regions) as f:
@@ -43,7 +43,7 @@ class DefaultDataManager(object):
                     logger.info("Created Region: {}".format(region['properties']['DRG_REGION_NAME']))
 
         # DistrictGIS: store geometries
-        path_to_districts = os.path.join(settings.BASE_DIR, 'wildlifecompliance', 'static', 'wildlifecompliance', 'DBCA_districts.geojson')
+        path_to_districts = os.path.join(settings.BASE_DIR, 'wildlifecompliance', 'static', 'wildlifecompliance', 'DBCA_Districts.geojson')
         count = DistrictGIS.objects.all().count()
         if not count > 0:
             with open(path_to_districts) as f:
