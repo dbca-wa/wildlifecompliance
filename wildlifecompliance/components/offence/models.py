@@ -9,10 +9,10 @@ from ledger.accounts.models import RevisionedMixin, EmailUser
 from wildlifecompliance.components.call_email.models import Location, CallEmail
 from wildlifecompliance.components.legal_case.models import LegalCase
 from wildlifecompliance.components.inspection.models import Inspection
-from wildlifecompliance.components.main.models import Document, CommunicationsLogEntry
+from wildlifecompliance.components.main.models import Document, CommunicationsLogEntry, Region, District
 from wildlifecompliance.components.main.related_item import can_close_record
 from wildlifecompliance.components.section_regulation.models import SectionRegulation
-from wildlifecompliance.components.users.models import RegionDistrict, CompliancePermissionGroup
+#from wildlifecompliance.components.users.models import CompliancePermissionGroup
 from wildlifecompliance.components.organisations.models import Organisation
 
 
@@ -85,13 +85,13 @@ class Offence(RevisionedMixin):
         related_name='offence_assigned_to',
         null=True
     )
-    allocated_group = models.ForeignKey(
-        CompliancePermissionGroup,
-        related_name='offence_allocated_group',
-        null=True
-    )
-    region = models.ForeignKey(RegionDistrict, related_name='offence_region', null=True,)
-    district = models.ForeignKey(RegionDistrict, related_name='offence_district', null=True,)
+    #allocated_group = models.ForeignKey(
+    #    CompliancePermissionGroup,
+    #    related_name='offence_allocated_group',
+    #    null=True
+    #)
+    #region = models.ForeignKey(Region, related_name='offence_region', null=True,)
+    #district = models.ForeignKey(District, related_name='offence_district', null=True,)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -122,8 +122,9 @@ class Offence(RevisionedMixin):
         return self.lodgement_number
 
     @staticmethod
+    # Rewrite for Region District models
     def get_compliance_permission_group(regionDistrictId):
-        region_district = RegionDistrict.objects.filter(id=regionDistrictId)
+        #region_district = RegionDistrict.objects.filter(id=regionDistrictId)
 
         # 2. Determine which permission(s) is going to be applied
         compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
@@ -141,6 +142,7 @@ class Offence(RevisionedMixin):
         return groups.first()
 
     @property
+    # Rewrite for Region District models
     def regionDistrictId(self):
         return self.district.id if self.district else self.region.id
 
@@ -178,6 +180,22 @@ def perform_can_close_record(sender, instance, **kwargs):
 post_save.connect(perform_can_close_record, sender=Offence)
 
 
+def update_offence_doc_filename(instance, filename):
+    return 'wildlifecompliance/offence/{}/documents/{}'.format(
+        instance.sanction_outcome.id, filename
+    )
+
+
+class OffenceDocument(Document):
+    offence = models.ForeignKey(Offence, related_name='documents')
+    _file = models.FileField(max_length=255, upload_to=update_offence_doc_filename)
+
+    class Meta:
+        app_label = 'wildlifecompliance'
+        verbose_name = 'CM_OffenceDocument'
+        verbose_name_plural = 'CM_OffenceDocuments'
+
+
 class AllegedOffence(RevisionedMixin):
     offence = models.ForeignKey(Offence, null=False,)
     section_regulation = models.ForeignKey(SectionRegulation, null=False, )
@@ -194,6 +212,10 @@ class AllegedOffence(RevisionedMixin):
 
     def retrieve_penalty_amounts_by_date(self, date_of_issue):
         return self.section_regulation.retrieve_penalty_amounts_by_date(date_of_issue)
+
+    @property
+    def act(self):
+        return self.section_regulation.act
 
     @property
     def dotag_offence_code(self):
@@ -295,4 +317,14 @@ class OffenceCommsLogEntry(CommunicationsLogEntry):
 
     class Meta:
         app_label = 'wildlifecompliance'
+
+
+import reversion
+reversion.register(Offence, follow=['documents', 'allegedoffence_set', 'offender_set', 'action_logs', 'comms_logs', 'offence_sanction_outcomes', 'document_artifact_offence', 'offence_boe_roi', 'offence_pb_roi'])
+reversion.register(OffenceDocument, follow=[])
+reversion.register(AllegedOffence, follow=['sanction_outcome_alleged_committed_offences', 'allegedcommittedoffence_set'])
+reversion.register(Offender, follow=['sanction_outcome_offender', 'document_artifact_offender', 'offender_boe_roi', 'offender_pb_roi'])
+reversion.register(OffenceUserAction, follow=[])
+reversion.register(OffenceCommsLogDocument, follow=[])
+reversion.register(OffenceCommsLogEntry, follow=['documents'])
 

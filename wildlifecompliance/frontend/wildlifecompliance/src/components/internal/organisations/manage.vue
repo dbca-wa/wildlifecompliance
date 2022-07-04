@@ -1,21 +1,37 @@
 <template>
-    <div class="container-fluid" id="internalOrgInfo">
-    <div class="row">
-    <div class="col-md-10 col-md-offset-1">
+    <div class="container" id="internalOrgInfo">
+    <!-- <div class="row"> -->
+    <!-- <div class="col-md-10 col-md-offset-1"> -->
         <div class="row">
-            <h3>{{ org.name }} - {{org.abn}}</h3>
+            <div class="col-md-9">
+                <h3>{{ org.name }} - {{org.abn}}</h3>
+            </div>
+        </div>        
             <div class="col-md-3">
                 <CommsLogs :comms_url="comms_url" :logs_url="logs_url" comms_add_url="test"/>
             </div>
             <div class="col-md-1">
             </div>
             <div class="col-md-8">
-                <ul class="nav nav-tabs">
-                    <li class="active"><a data-toggle="tab" :href="'#'+dTab">Details</a></li>
-                    <li><a data-toggle="tab" :href="'#'+oTab">Licensing</a></li>
+                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="pills-details-tab" data-toggle="pill" href="#pills-details" role="tab" aria-controls="pills-details" aria-selected="true">
+                            Details
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="pills-licensing-tab" data-toggle="pill" href="#pills-licensing" role="tab" aria-controls="pills-licensing" aria-selected="false">
+                            Licensing
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="pills-compliance-tab" data-toggle="pill" href="#pills-compliance" role="tab" aria-controls="pills-compliance" aria-selected="false">
+                            Compliance
+                        </a>
+                    </li>
                 </ul>
                 <div class="tab-content">
-                    <div :id="dTab" class="tab-pane fade in active">
+                    <div class="tab-pane fade" id="pills-details" role="tabpanel" aria-labelledby="pills-details-tab">
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="panel panel-default">
@@ -219,16 +235,32 @@
                             </div>
                         </div>
                     </div> 
-                    <div :id="oTab" class="tab-pane fade">
+                    <!--div :id="oTab" class="tab-pane fade"-->
+                    <div class="tab-pane fade" id="pills-licensing" role="tabpanel" aria-labelledby="pills-licensing-tab">
                         <ApplicationDashTable ref="applications_table" level='internal' :url='applications_url'/>
                         <LicenceDashTable ref="licences_table" level='internal' :url='licences_url'/>
                         <ReturnDashTable ref="returns_table" level='internal' :url='returns_url'/>
                     </div>
+                    <div class="tab-pane fade" id="pills-compliance" role="tabpanel" aria-labelledby="pills-compliance-tab">
+                        <SanctionOutcomePersonOrgDashTable 
+                        v-if="org.id"
+                        ref="sanction_outcome_person_org_table" 
+                        level='internal' 
+                        :entity_id='org.id'
+                        entity_type='org'
+                        />
+                        <IntelligenceInformation
+                        v-if="org.id"
+                        ref="intelligence_information" 
+                        :entity_id='org.id'
+                        entity_type='org'
+                        />
+                    </div>
                 </div>
             </div>
-        </div>
-        </div>
-        </div>
+        <!-- </div>
+        </div> -->
+        <!-- </div> -->
         <AddContact ref="add_contact" :org_id="org.id" />
     </div>
 </template>
@@ -242,6 +274,8 @@ import AddContact from '@common-components/add_contact.vue'
 import ApplicationDashTable from '@common-components/applications_dashboard.vue'
 import LicenceDashTable from '@common-components/licences_dashboard.vue'
 import ReturnDashTable from '@common-components/returns_dashboard.vue'
+import SanctionOutcomePersonOrgDashTable from '@common-components/sanction_outcomes_person_org_dashboard.vue'
+import IntelligenceInformation from '@common-components/intelligence_information.vue'
 import CommsLogs from '@common-components/comms_logs.vue'
 import utils from '../utils'
 import api from '../api'
@@ -361,8 +395,10 @@ export default {
         ApplicationDashTable,
         LicenceDashTable,
         ReturnDashTable,
+        SanctionOutcomePersonOrgDashTable,
         AddContact,
-        CommsLogs
+        CommsLogs,
+        IntelligenceInformation,
     },
     computed: {
         isLoading: function () {
@@ -403,6 +439,13 @@ export default {
         });
     },
     methods: {
+        set_tabs:function(){
+            let vm = this;
+
+            /* set Applicant tab Active */
+            $('#pills-tab a[href="#pills-details"]').tab('show');
+        },
+
         addContact: function(){
             this.$refs.add_contact.isModalOpen = true;
         },
@@ -558,7 +601,8 @@ export default {
         },
     },
     mounted: function(){
-        let vm = this;
+        let vm =this;
+        this.set_tabs();
         this.personal_form = document.forms.personal_form;
         this.eventListeners();
     },
@@ -575,5 +619,10 @@ export default {
 }
 .hidePopover {
     display: none;
+}
+#main-column {
+  padding-left: 2%;
+  padding-right: 0;
+  margin-bottom: 50px;
 }
 </style>

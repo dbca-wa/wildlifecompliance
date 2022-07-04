@@ -2,6 +2,7 @@
 .env
 venv/
 venv2/
+venv*/
 node_modules/
 mooring/cache/*
 .ropeproject/
@@ -102,15 +103,21 @@ uwsgi*.ini
 *.djcache
 
 # wildlifecompliance build static files
-# wildlifecompliance/static/wildlifecompliance_vue/static/*
+wildlifecompliance/static/wildlifecompliance_vue/*
 
 # npm locks
 # *-lock.json
 
-# wildlifecompliance/static/wildlifecompliance_vue/css/app.css
-# wildlifecompliance/static/wildlifecompliance_vue/js/app.js
-# wildlifecompliance/static/wildlifecompliance_vue/js/manifest.js
-# wildlifecompliance/static/wildlifecompliance_vue/js/vendor.js
-# wildlifecompliance/static/wildlifecompliance_vue/static/js/babel-polyfill.js
+git_history_recent
 wildlifecompliance/static/wildlifecompliance_vue/*
 
+# Jupyter lab
+.ipynb_checkpoints/
+*.ipynb
+
+# Reversion utility
+reversion_utility_output.txt
+
+# data files
+*.csv
+*.xls*

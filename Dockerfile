@@ -18,7 +18,7 @@ ENV BPAY_ALLOWED=False
 
 # For app.js, manifest.js, vendor.js versioning (default value set to 0.0.0)
 ARG build_tag=0.0.0
-ENV BUILD_TAG=$build_tag
+#ENV BUILD_TAG=$build_tag
 RUN echo "*************************************************** Build TAG = $build_tag ***************************************************"
 
 # Install Python libs from base environment.
@@ -41,13 +41,13 @@ RUN apt-get install --no-install-recommends -y wget git libmagic-dev gcc \
     rsyslog gunicorn libreoffice
 RUN apt-get install --no-install-recommends -y libpq-dev patch
 RUN apt-get install --no-install-recommends -y postgresql-client mtr htop \
-    vim ssh 
+    vim
 RUN apt-get install --no-install-recommends -y python3-gevent \
     software-properties-common imagemagick
 
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt-get update
-RUN apt-get install --no-install-recommends -y python3.7 python3.7-dev
+RUN apt-get install --no-install-recommends -y python3.7 python3.7-dev python3.7-distutils
 
 RUN ln -s /usr/bin/python3.7 /usr/bin/python 
     # ln -s /usr/bin/pip3 /usr/bin/pip
@@ -58,6 +58,8 @@ RUN apt-get install -yq vim
 FROM builder_base_wls as python_libs_wls
 WORKDIR /app
 COPY requirements.txt ./
+COPY git_history_recent ./
+RUN touch /app/rand_hash
 RUN python3.7 -m pip install --no-cache-dir -r requirements.txt \
   # Update the Django <1.11 bug in django/contrib/gis/geos/libgeos.py
   # Reference: https://stackoverflow.com/questions/18643998/geodjango-geosexception-error

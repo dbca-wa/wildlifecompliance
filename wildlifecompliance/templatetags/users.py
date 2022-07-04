@@ -48,6 +48,11 @@ def is_model_backend(context):
     return wildlifecompliance_helpers.is_model_backend(request)
 
 @register.simple_tag(takes_context=True)
+def is_compliance_management_user(context):
+    request = context['request']
+    return wildlifecompliance_helpers.is_compliance_management_user(request)
+
+@register.simple_tag(takes_context=True)
 def is_compliance_internal_user(context):
     request = context['request']
     return wildlifecompliance_helpers.is_compliance_internal_user(request)
@@ -62,6 +67,15 @@ def is_compliance_management_readonly_user(context):
     request = context['request']
     return wildlifecompliance_helpers.is_compliance_management_readonly_user(request)
 
+@register.simple_tag(takes_context=True)
+def is_compliance_management_callemail_readonly_user(context):
+    request = context['request']
+    return wildlifecompliance_helpers.is_compliance_management_callemail_readonly_user(request)
+
+@register.simple_tag(takes_context=True)
+def is_external_url(context):
+    request = context['request']
+    return wildlifecompliance_helpers.is_external_url(request)
 
 @register.simple_tag()
 def system_maintenance_due():

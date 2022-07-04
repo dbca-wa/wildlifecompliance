@@ -1,5 +1,6 @@
 import re
 import traceback
+from django.db.models import Q
 from django.db import transaction
 from django.http import HttpResponse
 from django.core.exceptions import ValidationError
@@ -15,14 +16,18 @@ from wildlifecompliance.components.applications.models import Application
 from wildlifecompliance.components.applications.email import send_id_updated_notification
 from wildlifecompliance.components.call_email.serializers import SaveEmailUserSerializer, SaveUserAddressSerializer
 from wildlifecompliance.components.organisations.models import (
-    OrganisationRequest,
+    OrganisationRequest, Organisation
 )
+from wildlifecompliance.components.main.models import Region, District
 from wildlifecompliance.components.users.models import (
-        CompliancePermissionGroup, 
-        RegionDistrict, 
+        #CompliancePermissionGroup, 
         ComplianceManagementUserPreferences,
         )
-from wildlifecompliance.helpers import is_customer, is_internal
+from wildlifecompliance.helpers import (
+        is_customer, is_internal, is_compliance_management_callemail_readonly_user,
+        is_compliance_management_volunteer, is_compliance_management_readonly_user, 
+        is_compliance_management_callemail_readonly_user, prefer_compliance_management,
+        )
 from wildlifecompliance.components.users.serializers import (
     UserSerializer,
     DTUserSerializer,
@@ -33,12 +38,11 @@ from wildlifecompliance.components.users.serializers import (
     EmailIdentitySerializer,
     EmailUserActionSerializer,
     MyUserDetailsSerializer,
-    CompliancePermissionGroupSerializer,
-    RegionDistrictSerializer,
+    #CompliancePermissionGroupSerializer,
     ComplianceUserDetailsSerializer,
-    CompliancePermissionGroupDetailedSerializer,
+    #CompliancePermissionGroupDetailedSerializer,
     ComplianceUserDetailsOptimisedSerializer,
-    CompliancePermissionGroupMembersSerializer,
+    #CompliancePermissionGroupMembersSerializer,
     UpdateComplianceManagementUserPreferencesSerializer,
     ComplianceManagementSaveUserSerializer,
     ComplianceManagementUserSerializer,
@@ -62,7 +66,8 @@ from rest_framework.decorators import (
     api_view
 )
 from django.core.cache import cache
-from wildlifecompliance.components.main.utils import retrieve_department_users
+from wildlifecompliance.components.main.process_document import process_generic_document
+#from wildlifecompliance.components.main.utils import retrieve_department_users
 
 
 def generate_dummy_email(first_name, last_name):
@@ -71,6 +76,15 @@ def generate_dummy_email(first_name, last_name):
     email_address = re.sub(r'\.+', '.', email_address)
     email_address = re.sub(r'\s+', '_', email_address)
     return email_address
+
+
+class IsComplianceManagementCallEmailReadonlyUser(views.APIView):
+    renderer_classes = [JSONRenderer,]
+    def get(self, request, format=None):
+        user = False
+        if is_compliance_management_callemail_readonly_user(request):
+            user = True
+        return Response({"compliance_management_callemail_readonly_user": user})
 
 
 class GetCountries(views.APIView):
@@ -82,16 +96,16 @@ class GetCountries(views.APIView):
         return Response(country_list)
 
 
-class DepartmentUserList(views.APIView):
-    renderer_classes = [JSONRenderer,]
-    def get(self, request, format=None):
-        data = cache.get('department_users')
-        if not data:
-            retrieve_department_users()
-            data = cache.get('department_users')
-        return Response(data)
-
-        #serializer  = UserSerializer(request.user)
+#class DepartmentUserList(views.APIView):
+#    renderer_classes = [JSONRenderer,]
+#    def get(self, request, format=None):
+#        data = cache.get('department_users')
+#        if not data:
+#            retrieve_department_users()
+#            data = cache.get('department_users')
+#        return Response(data)
+#
+#        #serializer  = UserSerializer(request.user)
 
 
 class GetMyUserDetails(views.APIView):
@@ -111,17 +125,10 @@ class GetComplianceUserDetails(views.APIView):
         if returned_data.get('id'):
             user_id = returned_data.get('id')
             user = EmailUser.objects.get(id=user_id)
-            
-            
-            compliance_permissions = []
-            for group in user.groups.all():
-                for permission in group.permissions.all():
-                    compliance_permissions.append(permission.codename)
-                returned_data.update({ 'base_compliance_permissions': compliance_permissions })
-            if 'volunteer' in compliance_permissions:
-                returned_data.update({'is_volunteer': True})
-            else:
-                returned_data.update({'is_volunteer': False})
+        returned_data.update({'is_internal': is_internal(request)})
+        returned_data.update({'is_volunteer': is_compliance_management_volunteer(request)})
+        returned_data.update({'is_readonly_user': is_compliance_management_readonly_user(request)})
+        returned_data.update({'is_callemail_readonly_user': is_compliance_management_callemail_readonly_user(request)})
         return Response(returned_data)
 
 
@@ -278,6 +285,87 @@ class UserViewSet(viewsets.ModelViewSet):
         if dob is not None and dob is not u'':
             queryset = queryset.filter(dob=dob)
         return queryset
+
+    @detail_route(methods=['GET'])
+    @renderer_classes((JSONRenderer,))
+    def get_intelligence_text(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            intelligence_text = ""
+            preference_qs = ComplianceManagementUserPreferences.objects.filter(email_user=instance)
+            if preference_qs:
+                intelligence_text = preference_qs[0].intelligence_information_text
+            return Response({"intelligence_text": intelligence_text})
+
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            if hasattr(e, 'error_dict'):
+                raise serializers.ValidationError(repr(e.error_dict))
+            else:
+                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
+                raise serializers.ValidationError(repr(e[0]))
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
+
+    @detail_route(methods=['POST'])
+    @renderer_classes((JSONRenderer,))
+    def save_intelligence_text(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            intelligence_text = request.data.get('intelligence_text')
+            preference, created = ComplianceManagementUserPreferences.objects.get_or_create(email_user=instance)
+            preference.intelligence_information_text = intelligence_text
+            preference.save()
+            return Response()
+
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            if hasattr(e, 'error_dict'):
+                raise serializers.ValidationError(repr(e.error_dict))
+            else:
+                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
+                raise serializers.ValidationError(repr(e[0]))
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
+
+    @detail_route(methods=['POST'])
+    @renderer_classes((JSONRenderer,))
+    def process_intelligence_document(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            # process docs
+            returned_data = process_generic_document(request, instance, 'intelligence_document')
+            # delete Sanction Outcome if user cancels modal
+            action = request.data.get('action')
+            if action == 'cancel' and returned_data:
+                instance.status = 'discarded'
+                instance.save()
+
+            # return response
+            if returned_data:
+                return Response(returned_data)
+            else:
+                return Response()
+
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            if hasattr(e, 'error_dict'):
+                raise serializers.ValidationError(repr(e.error_dict))
+            else:
+                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
+                raise serializers.ValidationError(repr(e[0]))
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
+
 
     @detail_route(methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
@@ -566,7 +654,7 @@ class UserViewSet(viewsets.ModelViewSet):
             try:
                 prefer_compliance_management = request.data.get('prefer_compliance_management', False)
                 user_instance = self.get_object()
-                system_preference_instance, created = ComplianceManagementUserPreferences.objects.get_or_create(email_user_id=user_instance.id)
+                system_preference_instance = ComplianceManagementUserPreferences.objects.get(email_user_id=user_instance.id)
                 serializer = UpdateComplianceManagementUserPreferencesSerializer(
                         system_preference_instance,
                         data={
@@ -758,152 +846,253 @@ class EmailIdentityViewSet(viewsets.ModelViewSet):
             queryset = queryset.exclude(user=exclude_user)
         return queryset
 
+#class CompliancePermissionGroupViewSet(viewsets.ModelViewSet):
+#    queryset = CompliancePermissionGroup.objects.none()
+#    serializer_class = CompliancePermissionGroupSerializer
+#    renderer_classes = [JSONRenderer, ]
+#
+#    def get_queryset(self):
+#        if is_internal(self.request):
+#            return CompliancePermissionGroup.objects.all()
+#        elif is_customer(self.request):
+#            return CompliancePermissionGroup.objects.none()
+#        return CompliancePermissionGroup.objects.none()
+#
+#    @list_route(methods=['GET', ])
+#    def get_officers(self, request, *args, **kwargs):
+#        try:
+#            officers = EmailUser.objects.filter(groups__in=CompliancePermissionGroup.objects.filter(permissions__in=Permission.objects.filter(codename='officer')))
+#            serializer = ComplianceUserDetailsOptimisedSerializer(officers, many=True)
+#            return Response(serializer.data)
+#        except serializers.ValidationError:
+#            print(traceback.print_exc())
+#            raise
+#        except ValidationError as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(repr(e.error_dict))
+#        except Exception as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(str(e))
+#
+#    @list_route(methods=['POST'])
+#    def get_users(self, request, *args, **kwargs):
+#        try:
+#            users = (EmailUser.objects.filter(id__in=request.data.get('user_list')))
+#            serializer = ComplianceUserDetailsOptimisedSerializer(users, many=True)
+#            return Response(serializer.data)
+#        except serializers.ValidationError:
+#            print(traceback.print_exc())
+#            raise
+#        except ValidationError as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(repr(e.error_dict))
+#        except Exception as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(str(e))
+#
+#    @list_route(methods=['GET', ])
+#    def get_detailed_list(self, request, *args, **kwargs):
+#        try:
+#            serializer = CompliancePermissionGroupDetailedSerializer(
+#                CompliancePermissionGroup.objects.all(), 
+#                many=True
+#                )
+#            return Response(serializer.data)
+#        except serializers.ValidationError:
+#            print(traceback.print_exc())
+#            raise
+#        except ValidationError as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(repr(e.error_dict))
+#        except Exception as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(str(e))
+#
+#    @list_route(methods=['POST', ])
+#    def get_compliance_group_by_region_district(self, request, *args, **kwargs):
+#        try:
+#            instance = self.get_object()
+#            group_permission = request.data.get('group_permission')
+#            compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
+#            permission = Permission.objects.filter(codename=group_permission).filter(content_type_id=compliance_content_type.id).first()
+#            group = CompliancePermissionGroup.objects.filter(region_district=instance).filter(permissions=permission).first()
+#            print(group)
+#
+#            allocated_group = [{
+#                'email': '',
+#                'first_name': '',
+#                'full_name': '',
+#                'id': None,
+#                'last_name': '',
+#                'title': '',
+#                }]
+#            #serializer = ComplianceUserDetailsOptimisedSerializer(group.members, many=True)
+#            serializer = CompliancePermissionGroupMembersSerializer(instance=group)
+#            print(serializer.data)
+#            for member in serializer.data['members']:
+#                allocated_group.append(member)
+#
+#            return Response(data={'allocated_group': allocated_group, 'group_id': group.id})
+#        except serializers.ValidationError:
+#            print(traceback.print_exc())
+#            raise
+#        except ValidationError as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(repr(e.error_dict))
+#        except Exception as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(str(e))
 
-class CompliancePermissionGroupViewSet(viewsets.ModelViewSet):
-    queryset = CompliancePermissionGroup.objects.none()
-    serializer_class = CompliancePermissionGroupSerializer
-    renderer_classes = [JSONRenderer, ]
+#class RegionDistrictViewSet(viewsets.ModelViewSet):
+#    queryset = RegionDistrict.objects.all()
+#    serializer_class = RegionDistrictSerializer
+#    renderer_classes = [JSONRenderer, ]
+#
+#    def get_queryset(self):
+#        # import ipdb; ipdb.set_trace()
+#        user = self.request.user
+#        if is_internal(self.request):
+#            return RegionDistrict.objects.all()
+#        elif is_customer(self.request):
+#            return RegionDistrict.objects.none()
+#        return RegionDistrict.objects.none()
+#    
+#    @list_route(methods=['GET', ])
+#    def get_regions(self, request, *args, **kwargs):
+#        try:
+#            serializer = RegionDistrictSerializer(
+#                RegionDistrict.objects.filter(region=None), 
+#                many=True
+#                )
+#            print(serializer.data)
+#            return Response(serializer.data)
+#        except serializers.ValidationError:
+#            print(traceback.print_exc())
+#            raise
+#        except ValidationError as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(repr(e.error_dict))
+#        except Exception as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(str(e))
+#
+#    @detail_route(methods=['GET', ])
+#    def get_region_districts(self, request, *args, **kwargs):
+#        try:
+#            instance = self.get_object()
+#            serializer = RegionDistrictSerializer(
+#                instance.districts.all(), many=True)
+#            return Response(serializer.data)
+#        except serializers.ValidationError:
+#            print(traceback.print_exc())
+#            raise
+#        except ValidationError as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(repr(e.error_dict))
+#        except Exception as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(str(e))
+#
+#    @detail_route(methods=['POST', ])
+#    def get_compliance_group_by_region_district(self, request, *args, **kwargs):
+#        try:
+#            instance = self.get_object()
+#            group_permission = request.data.get('group_permission')
+#            compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
+#            permission = Permission.objects.filter(codename=group_permission).filter(content_type_id=compliance_content_type.id).first()
+#            group = CompliancePermissionGroup.objects.filter(region_district=instance).filter(permissions=permission).first()
+#            print(group)
+#
+#            allocated_group = [{
+#                'email': '',
+#                'first_name': '',
+#                'full_name': '',
+#                'id': None,
+#                'last_name': '',
+#                'title': '',
+#                }]
+#            #serializer = ComplianceUserDetailsOptimisedSerializer(group.members, many=True)
+#            serializer = CompliancePermissionGroupMembersSerializer(instance=group)
+#            print(serializer.data)
+#            for member in serializer.data['members']:
+#                allocated_group.append(member)
+#
+#            return Response(data={'allocated_group': allocated_group, 'group_id': group.id})
+#        except serializers.ValidationError:
+#            print(traceback.print_exc())
+#            raise
+#        except ValidationError as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(repr(e.error_dict))
+#        except Exception as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(str(e))
 
-    def get_queryset(self):
-        if is_internal(self.request):
-            return CompliancePermissionGroup.objects.all()
-        elif is_customer(self.request):
-            return CompliancePermissionGroup.objects.none()
-        return CompliancePermissionGroup.objects.none()
+class GetPersonOrg(views.APIView):
+    renderer_classes = [JSONRenderer,]
 
-    @list_route(methods=['GET', ])
-    def get_officers(self, request, *args, **kwargs):
-        try:
-            officers = EmailUser.objects.filter(groups__in=CompliancePermissionGroup.objects.filter(permissions__in=Permission.objects.filter(codename='officer')))
-            serializer = ComplianceUserDetailsOptimisedSerializer(officers, many=True)
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+    def get(self, request, format=None):
+        search_term = request.GET.get('term', '')
+        if search_term:
+            data_transform = []
+            user_data = EmailUser.objects.filter(
+                Q(first_name__icontains=search_term) |
+                Q(last_name__icontains=search_term) |
+                Q(email__icontains=search_term)
+            )[:10]
+            for email_user in user_data:
+                if email_user.dob:
+                    text = '{} {} (DOB: {})'.format(email_user.first_name, email_user.last_name, email_user.dob)
+                else:
+                    text = '{} {}'.format(email_user.first_name, email_user.last_name)
 
-    @list_route(methods=['POST'])
-    def get_users(self, request, *args, **kwargs):
-        try:
-            users = (EmailUser.objects.filter(id__in=request.data.get('user_list')))
-            serializer = ComplianceUserDetailsOptimisedSerializer(users, many=True)
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
-
-    @list_route(methods=['GET', ])
-    def get_detailed_list(self, request, *args, **kwargs):
-        try:
-            serializer = CompliancePermissionGroupDetailedSerializer(
-                CompliancePermissionGroup.objects.all(), 
-                many=True
-                )
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+                #serializer = EmailUserAppViewSerializer(email_user)
+                #email_user_data = serializer.data
+                email_user_data = {}
+                email_user_data['text'] = text
+                email_user_data['entity_type'] = 'user'
+                email_user_data['id'] = email_user.id
+                data_transform.append(email_user_data)
+            org_data = Organisation.objects.filter(
+                Q(organisation__name__icontains=search_term) |
+                Q(organisation__abn__icontains=search_term) |
+                Q(organisation__trading_name__icontains=search_term)
+            )[:10]
+            for org in org_data:
+                text = '{} (ABN: {})'.format(org.name, org.abn)
+                data = {}
+                data['text'] = text
+                data['entity_type'] = 'org'
+                data['id'] = org.id
+                data_transform.append(data)
+            ## order results
+            data_transform.sort(key=lambda item: item.get("id"))
+            return Response({"results": data_transform})
+        return Response()
 
 
-class RegionDistrictViewSet(viewsets.ModelViewSet):
-    queryset = RegionDistrict.objects.all()
-    serializer_class = RegionDistrictSerializer
-    renderer_classes = [JSONRenderer, ]
+class StaffMemberLookup(views.APIView):
+    renderer_classes = [JSONRenderer,]
 
-    def get_queryset(self):
-        # import ipdb; ipdb.set_trace()
-        user = self.request.user
-        if is_internal(self.request):
-            return RegionDistrict.objects.all()
-        elif is_customer(self.request):
-            return RegionDistrict.objects.none()
-        return RegionDistrict.objects.none()
-    
-    @list_route(methods=['GET', ])
-    def get_regions(self, request, *args, **kwargs):
-        try:
-            serializer = RegionDistrictSerializer(
-                RegionDistrict.objects.filter(region=None), 
-                many=True
-                )
-            print(serializer.data)
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+    def get(self, request, format=None):
+        search_term = request.GET.get('term', '')
+        if search_term:
+            data_transform = []
+            user_data = EmailUser.objects.filter(is_staff=True).filter(
+                Q(first_name__icontains=search_term) |
+                Q(last_name__icontains=search_term) |
+                Q(email__icontains=search_term)
+            )[:10]
+            for email_user in user_data:
+                if email_user.dob:
+                    text = '{} {} (DOB: {})'.format(email_user.first_name, email_user.last_name, email_user.dob)
+                else:
+                    text = '{} {}'.format(email_user.first_name, email_user.last_name)
 
-    @detail_route(methods=['GET', ])
-    def get_region_districts(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            serializer = RegionDistrictSerializer(
-                instance.districts.all(), many=True)
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
-
-    @detail_route(methods=['POST', ])
-    def get_compliance_group_by_region_district(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            group_permission = request.data.get('group_permission')
-            compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
-            permission = Permission.objects.filter(codename=group_permission).filter(content_type_id=compliance_content_type.id).first()
-            group = CompliancePermissionGroup.objects.filter(region_district=instance).filter(permissions=permission).first()
-            print(group)
-
-            allocated_group = [{
-                'email': '',
-                'first_name': '',
-                'full_name': '',
-                'id': None,
-                'last_name': '',
-                'title': '',
-                }]
-            #serializer = ComplianceUserDetailsOptimisedSerializer(group.members, many=True)
-            serializer = CompliancePermissionGroupMembersSerializer(instance=group)
-            print(serializer.data)
-            for member in serializer.data['members']:
-                allocated_group.append(member)
-
-            return Response(data={'allocated_group': allocated_group, 'group_id': group.id})
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+                email_user_data = {}
+                email_user_data['text'] = text
+                email_user_data['id'] = email_user.id
+                data_transform.append(email_user_data)
+            return Response({"results": data_transform})
+        return Response()
 

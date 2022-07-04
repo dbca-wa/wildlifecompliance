@@ -5,6 +5,7 @@
                 <ul class="nav nav-pills">
                     <li class="nav-item active"><a data-toggle="tab" :href="'#'+oTab">Offence</a></li>
                     <li class="nav-item"><a data-toggle="tab" :href="'#'+dTab">Details</a></li>
+                    <li class="nav-item"><a data-toggle="tab" :href="'#'+documentTab">Document</a></li>
                     <li class="nav-item"><a data-toggle="tab" :href="'#'+pTab">Offender(s)</a></li>
                     <li class="nav-item"><a data-toggle="tab" :href="'#'+lTab" @click="mapOffenceClicked">Location</a></li>
                 </ul>
@@ -140,6 +141,25 @@
                         </div>
                     </div>
 
+                    <div :id="documentTab" class="tab-pane face in">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <label class="control-label pull-left"  for="Name">Attachments</label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <FileField 
+                                            ref="comms_log_file" 
+                                            name="comms-log-file" 
+                                            :isRepeatable="true" 
+                                            documentActionUrl="temporary_document" 
+                                            @update-temp-doc-coll-id="setTemporaryDocumentCollectionId"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+
                     <div :id="pTab" class="tab-pane fade in">
                         <div class="row"><div class="col-sm-12">
 
@@ -226,6 +246,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "awesomplete/awesomplete.css";
 import uuid from 'uuid';
 import "jquery-ui/ui/widgets/draggable.js";
+import FileField from '@/components/common/compliance_file.vue';
 
 export default {
   name: "Offence",
@@ -259,7 +280,10 @@ export default {
       dTab: "dTab" + vm._uid,
       pTab: "pTab" + vm._uid,
       lTab: "lTab" + vm._uid,
+      documentTab: 'documentTab' + vm._uid,
       errorResponse: '',
+
+      temporary_document_collection_id: null,
 
       regionDistricts: [],
       regions: [], // this is the list of options
@@ -284,8 +308,8 @@ export default {
             visible: true
           },
           {
-            data: "",
-            mRender: function(data, type, row) {
+            data: "data_type",
+            render: function(data, type, row) {
               if (row.data_type == "individual") {
                 let full_name = [row.first_name, row.last_name]
                   .filter(Boolean)
@@ -319,8 +343,8 @@ export default {
             }
           },
           {
-            data: "Action",
-            mRender: function(data, type, row) {
+            data: "id",
+            render: function(data, type, row) {
               return (
                 '<a href="#" class="remove_button" data-offender-id="' +
                 row.id +
@@ -357,44 +381,50 @@ export default {
       //    }
                     {
                         visible: false,
-                        mRender: function(data, type, row) {
+                        data: 'allegedOffence',
+                        render: function(data, type, row) {
                             return row.allegedOffence.id;
                         }
                     },
                     {
-                        mRender: function(data, type, row) {
+                        data: 'allegedOffence',
+                        render: function(data, type, row) {
                             let ret_str = row.allegedOffence.section_regulation.act;
                             return ret_str;
                         }
                     },
                     {
-                        mRender: function(data, type, row) {
+                        data: 'allegedOffence',
+                        render: function(data, type, row) {
                             let ret_str = row.allegedOffence.section_regulation.name;
                             return ret_str;
                         }
                     },
                     {
-                        mRender: function(data, type, row) {
+                        data: 'allegedOffence',
+                        render: function(data, type, row) {
                             let ret_str = row.allegedOffence.section_regulation.offence_text;
                             return ret_str;
                         }
                     },
                     {
-                        mRender: function(data, type, row) {
+                        data: 'allegedOffence',
+                        render: function(data, type, row) {
                             let ret_str = '<a href="#" class="remove_button" data-alleged-offence-uuid="' + row.allegedOffence.uuid + '">Remove</a>';
                             return ret_str;
-
                         }
                     },
         ]
       }
     };
+
   },
   components: {
-    modal,
-    datatable,
-    MapLocationOffence,
-    SearchPersonOrganisation,
+      modal,
+      datatable,
+      MapLocationOffence,
+      SearchPersonOrganisation,
+      FileField,
     //CreateNewPerson
   },
     props:{
@@ -482,6 +512,7 @@ export default {
       setLegalCaseId: "setLegalCaseId",
       createOffence: "createOffence",
       setOffenceEmpty: "setOffenceEmpty",
+      setTempDocumentCollectionId: "setTempDocumentCollectionId",
     }),
     ...mapActions('inspectionStore', {
       loadInspection: "loadInspection",
@@ -492,6 +523,9 @@ export default {
     ...mapActions('legalCaseStore', {
       loadLegalCase: "loadLegalCase",
     }),
+        setTemporaryDocumentCollectionId: function(val) {
+            this.temporary_document_collection_id = val;
+        },
     makeModalsDraggable: function(){
         this.elem_modal = $('.modal > .modal-dialog');
         for (let i=0; i<this.elem_modal.length; i++){
@@ -527,7 +561,7 @@ export default {
         let value = [full_name, dob].filter(Boolean).join(", ");
         this.$refs.person_search.setInput(value);
       } else if (obj.err) {
-        console.log(err);
+        //console.log(err);
       } else {
         // Should not reach here
       }
@@ -558,11 +592,9 @@ export default {
                 if (alleged_offence.uuid == alleged_offence_uuid){
                     if (alleged_offence.id){
                         // this alleged_offence exists in the database
-                        console.log('existing');
                         alleged_offence.removed = true;
                     } else {
                         // this is new alleged_offence
-                        console.log('new');
                         this.offence.alleged_offences.splice(i, 1);
                     }
                 }
@@ -656,7 +688,6 @@ export default {
       vm.setCurrentOffenderEmpty();
     },
     addAllegedOffenceClicked: function() {
-
         if (this.current_alleged_offence && this.current_alleged_offence.id) {
 
             // Check if the item is already in the list
@@ -683,35 +714,21 @@ export default {
                 this.offence.alleged_offences.push(alleged_offence_obj);
             }
         }
-
-//      if (this.current_alleged_offence.id) {
-//        let already_exists = this.$refs.alleged_offence_table.vmDataTable.columns(0).data()[0].includes(this.current_alleged_offence.id);
-//
-//        if (!already_exists) {
-//          this.$refs.alleged_offence_table.vmDataTable.row.add({
-//              id: this.current_alleged_offence.id,
-//              Act: this.current_alleged_offence.Act,
-//              "Section/Regulation": this.current_alleged_offence.SectionRegulation,
-//              "Alleged Offence": this.current_alleged_offence.AllegedOffence
-//            }).draw();
-//        }
-//      }
-
-      this.setCurrentAllegedOffenceEmpty();
+        this.setCurrentAllegedOffenceEmpty();
         this.constructAllegedOffencesTable();
     },
-        constructAllegedOffencesTable: function(){
-            this.$refs.alleged_offence_table.vmDataTable.clear().draw();
-            if (this.offence.alleged_offences){
-                for(let i=0; i<this.offence.alleged_offences.length; i++){
-                    this.addAllegedOffenceToTable(this.offence.alleged_offences[i]);
-                }
+    constructAllegedOffencesTable: function(){
+        this.$refs.alleged_offence_table.vmDataTable.clear().draw();
+        if (this.offence.alleged_offences){
+            for(let i=0; i<this.offence.alleged_offences.length; i++){
+                this.addAllegedOffenceToTable(this.offence.alleged_offences[i]);
             }
-        },
-        addAllegedOffenceToTable: function(allegedOffence){
-            allegedOffence.uuid = uuid();
-            this.$refs.alleged_offence_table.vmDataTable.row.add({ allegedOffence: allegedOffence, offence: this.offence }).draw();
-        },
+        }
+    },
+    addAllegedOffenceToTable: function(allegedOffence){
+        allegedOffence.uuid = uuid();
+        this.$refs.alleged_offence_table.vmDataTable.row.add({ "allegedOffence": allegedOffence, "offence": this.offence }).draw();
+    },
     ok: async function() {
         try {
             this.processingDetails = true;
@@ -752,7 +769,6 @@ export default {
         }
     },
     processError: async function(err) {
-        console.log(typeof(err))
         let errorText = '';
         if (err.body){
             if (err.body.non_field_errors) {
@@ -802,7 +818,6 @@ export default {
       this.$refs.mapOffenceComponent.mapTabClicked();
     },
     sendData: async function() {
-        console.log('sendData');
         let vm = this;
 
         // If exists, set call_email_id and other attributes to the offence
@@ -818,6 +833,10 @@ export default {
         // If exists, set legal_case_id to the offence
         if (this.$parent.legal_case && this.$parent.legal_case.id) {
             vm.setLegalCaseId(this.$parent.legal_case.id);
+        }
+
+        if (this.temporary_document_collection_id){
+            vm.setTempDocumentCollectionId(this.temporary_document_collection_id)
         }
 
         // Collect offenders data from the datatable, and set them to the vuex
@@ -1079,7 +1098,6 @@ export default {
       this.updateDistricts();
     },
     updateDistricts: function(updateFromUI) {
-      console.log('updateDistricts');
       if (updateFromUI) {
         // We don't want to clear the default district selection when initially loaded, which derived from the call_email
         this.offence.district_id = null;
@@ -1108,17 +1126,18 @@ export default {
     },
   },
     created: async function() {
-        console.log('created');
 
         let self = this;
         self.setOffenceEmpty();
         self.$nextTick(function() {
             self.initAwesompleteAllegedOffence();
         });
+        /*
         await this.constructRegionsAndDistricts();
         this.setRegionId(this.region_id);
         this.setDistrictId(this.district_id);
         this.setAllocatedGroupId(this.allocated_group_id);
+        */
     },
     mounted: function() {
         this.$nextTick(() => {

@@ -41,6 +41,9 @@ export const offenceStore = {
         updateOffenders(state, offenders) {
             Vue.set(state.offence, 'offenders', offenders);
         },
+        updateTemporaryDocumentCollectionId(state, id){
+            state.offence.temporary_document_collection_id = id;
+        },
         updateCallEmailId(state, id) {
             state.offence.call_email_id = id;
         },
@@ -184,7 +187,6 @@ export const offenceStore = {
                 // Construct payload to store data to be sent
                 let payload = new Object();
                 Object.assign(payload, state.offence);
-
                 if (params.fr_date && params.fr_time){
                     let occurrence_datetime_from = moment(params.fr_date + ' ' + params.fr_time, 'DD/MM/YYYY LT');
                     payload.occurrence_datetime_from = occurrence_datetime_from.toDate().toISOString();
@@ -246,6 +248,9 @@ export const offenceStore = {
             console.log('createOffence');
             let fetchUrl = '/api/offence/';
 
+            console.log('this: ')
+            console.log(this)
+
             let payload = new Object();
             Object.assign(payload, state.offence);
 
@@ -298,6 +303,9 @@ export const offenceStore = {
         },
         setCallEmailId({ commit, }, id){
             commit("updateCallEmailId", id);
+        },
+        setTempDocumentCollectionId({ commit, }, id){
+            commit("updateTemporaryDocumentCollectionId", id);
         },
         setLegalCaseId({ commit, }, id){
             commit("updateLegalCaseId", id);
