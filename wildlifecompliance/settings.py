@@ -246,6 +246,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
 # Department details
 SYSTEM_NAME = env('SYSTEM_NAME', 'Wildlife Licensing System')
+WILDCARE_SYSTEM_NAME = env('WILDCARE_SYSTEM_NAME', 'Wildcare')
 SYSTEM_EMAIL = env('SYSTEM_EMAIL', 'wildlifelicensing@dbca.wa.gov.au')
 
 WC_PAYMENT_SYSTEM_ID = env('WC_PAYMENT_SYSTEM_ID', 'S566')
