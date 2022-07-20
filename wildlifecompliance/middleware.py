@@ -43,6 +43,10 @@ class FirstTimeNagScreenMiddleware(object):
             if is_compliance_management_callemail_readonly_user(request) and not preference.prefer_compliance_management:
                 preference.prefer_compliance_management = True
                 preference.save()
+            # If no CM read only role, revert to WL
+            if not is_compliance_management_callemail_readonly_user(request) and not is_compliance_management_readonly_user(request):
+                preference.prefer_compliance_management = False
+                preference.save()
 
         if not is_compliance_management_user(request) and SecureBaseUtils.is_wildlifelicensing_request(request):
         #if SecureBaseUtils.is_wildlifelicensing_request(request):
