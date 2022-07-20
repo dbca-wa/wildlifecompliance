@@ -13,7 +13,8 @@ from wildlifecompliance.components.users.models import ComplianceManagementUserP
 #from wildlifecompliance.components.main.models import VolunteerGroup, ComplianceManagementCallEmailReadOnlyGroup
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.helpers import (
-        is_compliance_management_callemail_readonly_user, 
+        is_compliance_management_callemail_readonly_user,
+        is_compliance_management_readonly_user,
         is_compliance_management_approved_external_user,
         is_compliance_management_volunteer,
         is_compliance_management_user,
