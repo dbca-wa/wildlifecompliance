@@ -13,7 +13,8 @@ from wildlifecompliance.components.users.models import ComplianceManagementUserP
 #from wildlifecompliance.components.main.models import VolunteerGroup, ComplianceManagementCallEmailReadOnlyGroup
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.helpers import (
-        is_compliance_management_callemail_readonly_user, 
+        is_compliance_management_callemail_readonly_user,
+        is_compliance_management_readonly_user,
         is_compliance_management_approved_external_user,
         is_compliance_management_volunteer,
         is_compliance_management_user,
@@ -42,6 +43,10 @@ class FirstTimeNagScreenMiddleware(object):
             preference, created = ComplianceManagementUserPreferences.objects.get_or_create(email_user=request.user)
             if is_compliance_management_callemail_readonly_user(request) and not preference.prefer_compliance_management:
                 preference.prefer_compliance_management = True
+                preference.save()
+            # If no CM read only role, revert to WL
+            if not is_compliance_management_callemail_readonly_user(request) and not is_compliance_management_readonly_user(request):
+                preference.prefer_compliance_management = False
                 preference.save()
 
         if not is_compliance_management_user(request) and SecureBaseUtils.is_wildlifelicensing_request(request):
