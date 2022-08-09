@@ -117,3 +117,7 @@ wildlifecompliance/static/wildlifecompliance_vue/*
 
 # Reversion utility
 reversion_utility_output.txt
+
+# data files
+*.csv
+*.xls*

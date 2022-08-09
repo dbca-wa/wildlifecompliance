@@ -41,7 +41,7 @@ RUN apt-get install --no-install-recommends -y wget git libmagic-dev gcc \
     rsyslog gunicorn libreoffice
 RUN apt-get install --no-install-recommends -y libpq-dev patch
 RUN apt-get install --no-install-recommends -y postgresql-client mtr htop \
-    vim ssh 
+    vim
 RUN apt-get install --no-install-recommends -y python3-gevent \
     software-properties-common imagemagick
 

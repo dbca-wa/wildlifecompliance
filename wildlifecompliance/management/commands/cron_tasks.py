@@ -6,7 +6,6 @@ from django.conf import settings
 from pathlib import Path
 import subprocess
 import logging
-from wildlifecompliance.components.users.models import CompliancePermissionGroup
 
 logger = logging.getLogger(__name__)
 

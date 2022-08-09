@@ -1,12 +1,21 @@
 from django.template import Library
 from django.utils import timezone
 from datetime import timedelta
+from django.conf import settings
 
 from wildlifecompliance import helpers as wildlifecompliance_helpers
 from wildlifecompliance.components.main.models import SystemMaintenance
 
 register = Library()
 
+
+@register.simple_tag(takes_context=True)
+def system_name_var(context):
+    request = context['request']
+    if wildlifecompliance_helpers.is_compliance_management_callemail_readonly_user(request):
+        return settings.WILDCARE_SYSTEM_NAME
+    else:
+        return settings.SYSTEM_NAME
 
 @register.simple_tag(takes_context=True)
 def is_customer(context):
@@ -46,6 +55,11 @@ def is_model_backend(context):
     # social_auth i.e. an external user signing in with a login-token)
     request = context['request']
     return wildlifecompliance_helpers.is_model_backend(request)
+
+@register.simple_tag(takes_context=True)
+def is_compliance_management_user(context):
+    request = context['request']
+    return wildlifecompliance_helpers.is_compliance_management_user(request)
 
 @register.simple_tag(takes_context=True)
 def is_compliance_internal_user(context):

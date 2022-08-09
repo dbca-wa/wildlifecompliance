@@ -7,11 +7,15 @@
                 <div class="column">
                     <div class="col-lg-8">
                     <a href="{% url 'home' %}">
-                        <img src="{% static 'wildlifecompliance/img/dpaw_logo.gif' %}" {% if instance_type != 'PROD' %}style="filter: grayscale(100%);"{% endif %} alt="DPaW Logo" />
+                        {% if is_compliance_management_callemail_readonly_user %}
+                            <img src="{% static 'wildlifecompliance/img/WildcareHelpline_resized.jpg' %}" alt="Wildcare Logo" />
+                        {% else %}
+                            <img src="{% static 'wildlifecompliance/img/dpaw_logo.gif' %}" alt="DPaW Logo" />
+                        {% endif %}
                     </a>
                     </div>
                 </div>
-                <div class="column"><h2 id="site-title" class="site-logo"style="color: white;">Wildlife Licensing System {% if instance_type != 'PROD' %}{{ instance_type }}{% endif %}</h2></div>
+                <div class="column"><h2 id="site-title" class="site-logo"style="color: white;">{{ system_name_var }} {% if instance_type != 'PROD' %}{{ instance_type }}{% endif %}</h2></div>
             </div>
         </div>
     </div>

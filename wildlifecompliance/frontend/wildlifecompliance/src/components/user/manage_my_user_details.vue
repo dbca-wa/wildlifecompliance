@@ -495,7 +495,11 @@ export default {
             return this.$route.name == 'first-time'
         },
         completedProfile: function(){
-            return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details && this.current_user.identification;
+            if (this.current_user.prefer_compliance_management && this.current_user.is_compliance_management_user) {
+                return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details;
+            } else {
+                return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details && this.current_user.identification;
+            }
         },
     },
     methods: {
