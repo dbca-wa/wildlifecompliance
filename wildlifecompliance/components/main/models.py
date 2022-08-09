@@ -282,7 +282,8 @@ class SanctionOutcomeWordTemplate(models.Model):
 
     class Meta:
         app_label = 'wildlifecompliance'
-        verbose_name_plural = 'Wildlife Compliance Templates'
+        verbose_name = 'CM_Wildlife Compliance Template'
+        verbose_name_plural = 'CM_Wildlife Compliance Templates'
         ordering = ['-id']
 
     def __str__(self):

@@ -270,6 +270,8 @@ class InspectionTypeApprovalDocument(Document):
 
     class Meta:
         app_label = 'wildlifecompliance'
+        verbose_name = 'CM_Inspection type approval document'
+        verbose_name_plural = 'CM_Inspection type approval documents'
 
 
 class InspectionCommsLogDocument(Document):
