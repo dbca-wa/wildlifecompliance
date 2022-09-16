@@ -326,6 +326,7 @@ class FirstTimeUserSerializer(UserSerializer):
     first-time user.
     '''
     has_complete_first_time = serializers.SerializerMethodField(read_only=True)
+    prefer_compliance_management = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = EmailUser
@@ -348,6 +349,7 @@ class FirstTimeUserSerializer(UserSerializer):
             'address_details',
             'contact_details',
             'has_complete_first_time',
+            'prefer_compliance_management',
         )
 
     def get_has_complete_first_time(self, obj):
@@ -365,6 +367,11 @@ class FirstTimeUserSerializer(UserSerializer):
             is_completed = not is_new_to_wildlifelicensing(request)
 
         return is_completed
+
+    def get_prefer_compliance_management(self, obj):
+        if ComplianceManagementUserPreferences.objects.filter(email_user_id=obj.id):
+            return obj.compliancemanagementuserpreferences.prefer_compliance_management
+        return False
 
 
 class DTUserSerializer(serializers.ModelSerializer):
