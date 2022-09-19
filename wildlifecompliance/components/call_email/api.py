@@ -446,15 +446,24 @@ class CallEmailViewSet(viewsets.ModelViewSet):
         try:
             with transaction.atomic():
                 instance = self.get_object()
-                request.data['call_email'] = u'{}'.format(instance.id)
+                request_data = request.data.copy()
+                request_data['call_email'] = u'{}'.format(instance.id)
                 # request.data['staff'] = u'{}'.format(request.user.id)
-                if request.data.get('comms_log_id'):
-                    comms_instance = CallEmailLogEntry.objects.get(id=request.data.get('comms_log_id'))
-                    serializer = CallEmailLogEntrySerializer(comms_instance, data=request.data)
+                if request_data.get('comms_log_id'):
+                    comms_instance = CallEmailLogEntry.objects.get(id=request_data.get('comms_log_id'))
+                    serializer = CallEmailLogEntrySerializer(comms_instance, data=request_data)
                 else:
-                    serializer = CallEmailLogEntrySerializer(data=request.data)
+                    serializer = CallEmailLogEntrySerializer(data=request_data)
                 serializer.is_valid(raise_exception=True)
                 comms = serializer.save()
+                # Save the files
+                for f in request.FILES:
+                    document = comms.documents.create()
+                    document.name = str(request.FILES[f])
+                    document._file = request.FILES[f]
+                    document.save()
+                # End Save Documents
+
                 # Save the files
                 #comms.process_comms_log_document(request)
                 # for f in request.FILES:
