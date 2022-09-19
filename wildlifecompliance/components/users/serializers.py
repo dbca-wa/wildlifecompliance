@@ -18,6 +18,7 @@ from wildlifecompliance.helpers import (
     is_wildlifecompliance_payment_officer,
     is_new_to_wildlifelicensing,
     is_compliance_management_user,
+    is_compliance_management_approved_external_user,
 )
 from rest_framework import serializers
 from django.core.exceptions import ValidationError
@@ -327,6 +328,7 @@ class FirstTimeUserSerializer(UserSerializer):
     '''
     has_complete_first_time = serializers.SerializerMethodField(read_only=True)
     prefer_compliance_management = serializers.SerializerMethodField(read_only=True)
+    is_compliance_management_approved_external_user = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = EmailUser
@@ -350,6 +352,7 @@ class FirstTimeUserSerializer(UserSerializer):
             'contact_details',
             'has_complete_first_time',
             'prefer_compliance_management',
+            'is_compliance_management_approved_external_user',
         )
 
     def get_has_complete_first_time(self, obj):
@@ -372,6 +375,9 @@ class FirstTimeUserSerializer(UserSerializer):
         if ComplianceManagementUserPreferences.objects.filter(email_user_id=obj.id):
             return obj.compliancemanagementuserpreferences.prefer_compliance_management
         return False
+
+    def get_is_compliance_management_approved_external_user(self, obj):
+        return is_compliance_management_approved_external_user(self.context.get('request'))
 
 
 class DTUserSerializer(serializers.ModelSerializer):
@@ -408,6 +414,7 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
     is_internal = serializers.SerializerMethodField()
     prefer_compliance_management = serializers.SerializerMethodField()
     is_compliance_management_user = serializers.SerializerMethodField()
+    is_compliance_management_approved_external_user = serializers.SerializerMethodField()
     is_reception = serializers.SerializerMethodField()
     dob = serializers.SerializerMethodField(read_only=True)
     is_payment_officer = serializers.SerializerMethodField(read_only=True)
@@ -438,6 +445,7 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
             'is_payment_officer',
             'has_complete_first_time',
             'is_compliance_management_user',
+            'is_compliance_management_approved_external_user',
         )
 
     def get_has_complete_first_time(self, obj):
@@ -497,6 +505,9 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
 
     def get_is_internal(self, obj):
         return is_internal(self.context.get('request'))
+
+    def get_is_compliance_management_approved_external_user(self, obj):
+        return is_compliance_management_approved_external_user(self.context.get('request'))
 
     def get_is_compliance_management_user(self, obj):
         return is_compliance_management_user(self.context.get('request'))
