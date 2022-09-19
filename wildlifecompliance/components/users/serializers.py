@@ -379,6 +379,7 @@ class FirstTimeUserSerializer(UserSerializer):
     def get_is_compliance_management_approved_external_user(self, obj):
         return is_compliance_management_approved_external_user(self.context.get('request'))
 
+
 class DTUserSerializer(serializers.ModelSerializer):
 
     class Meta:

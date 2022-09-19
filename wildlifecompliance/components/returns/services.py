@@ -682,7 +682,7 @@ class ReturnGenerator(ReturnFactory):
                 do_discard_return(condition, prev_ret)
                 discard_returns = [
                     r for r in prev_ret
-                    if r.condition.licence_activity == c.licence_activity
+                    if r.condition and r.condition.licence_activity == c.licence_activity
                     and r.condition.licence_purpose == c.licence_purpose
                     and r.condition.return_type == c.return_type
                     and r.condition.condition_text == c.condition_text
@@ -752,7 +752,7 @@ class ReturnGenerator(ReturnFactory):
 
             discardable = [
                 r for r in return_list
-                if r.condition.licence_activity == condition.licence_activity
+                if r.condition and r.condition.licence_activity == condition.licence_activity
                 and r.condition.licence_purpose == condition.licence_purpose
                 and r.condition.return_type == condition.return_type
                 and r.condition.condition_text == condition.condition_text
