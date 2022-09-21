@@ -82,14 +82,13 @@ def prepare_mail(request, instance, workflow_entry, send_mail, recipient_id=None
                 # recipient_id is not iterable.  Which means it is an id.
                 user = EmailUser.objects.get(id=recipient_id)
                 email_group.append(user)
-        #elif request.data.get('assigned_to_id'):
         elif instance.assigned_to:
-            #user = EmailUser.objects.get(id=request.data.get('assigned_to_id'))
-            #email_group.append(user)
             email_group.append(instance.assigned_to)
-        #elif request.data.get('allocated_group_id'):
+        elif instance.allocated_group and instance.allocated_group.group_email:
+            group_list = instance.allocated_group.group_email.split(',')
+            for group in group_list:
+                email_group.append(group.strip())
         elif instance.allocated_group:
-            #compliance_group = ComplianceManagementSystemGroup.objects.get(id=request.data.get('allocated_group_id'))
             email_group.extend(instance.allocated_group.get_members())
         else:
             request_user = getattr(request, 'user')

@@ -4,6 +4,7 @@ import operator
 import traceback
 import os
 import base64
+from functools import reduce
 import geojson
 from django.db.models import Q, Min, Max
 from django.db import transaction
@@ -130,6 +131,9 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
                     or search_text in (
                         call_email.assigned_to.first_name.lower() + ' ' + call_email.assigned_to.last_name.lower()
                         if call_email.assigned_to else ''
+                        )
+                    or search_text in (call_email.wildcare_species_sub_type.species_sub_name 
+                        if call_email.wildcare_species_sub_type else ''
                         )
                     ):
                     search_text_callemail_ids.append(call_email.id)
@@ -278,7 +282,9 @@ class CallEmailViewSet(viewsets.ModelViewSet):
     def status_choices(self, request, *args, **kwargs):
         res_obj = [] 
         for choice in CallEmail.STATUS_CHOICES:
-            res_obj.append({'id': choice[0], 'display': choice[1]});
+            # restrict CallEmail status choices
+            if choice[0] in settings.CALL_EMAIL_AVAILABLE_STATUS_VALUES:
+                res_obj.append({'id': choice[0], 'display': choice[1]});
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
@@ -440,15 +446,24 @@ class CallEmailViewSet(viewsets.ModelViewSet):
         try:
             with transaction.atomic():
                 instance = self.get_object()
-                request.data['call_email'] = u'{}'.format(instance.id)
+                request_data = request.data.copy()
+                request_data['call_email'] = u'{}'.format(instance.id)
                 # request.data['staff'] = u'{}'.format(request.user.id)
-                if request.data.get('comms_log_id'):
-                    comms_instance = CallEmailLogEntry.objects.get(id=request.data.get('comms_log_id'))
-                    serializer = CallEmailLogEntrySerializer(comms_instance, data=request.data)
+                if request_data.get('comms_log_id'):
+                    comms_instance = CallEmailLogEntry.objects.get(id=request_data.get('comms_log_id'))
+                    serializer = CallEmailLogEntrySerializer(comms_instance, data=request_data)
                 else:
-                    serializer = CallEmailLogEntrySerializer(data=request.data)
+                    serializer = CallEmailLogEntrySerializer(data=request_data)
                 serializer.is_valid(raise_exception=True)
                 comms = serializer.save()
+                # Save the files
+                for f in request.FILES:
+                    document = comms.documents.create()
+                    document.name = str(request.FILES[f])
+                    document._file = request.FILES[f]
+                    document.save()
+                # End Save Documents
+
                 # Save the files
                 #comms.process_comms_log_document(request)
                 # for f in request.FILES:

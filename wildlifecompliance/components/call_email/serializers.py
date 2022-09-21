@@ -366,6 +366,8 @@ class SaveCallEmailSerializer(serializers.ModelSerializer):
     def validate(self, data):
         custom_errors = {}
         if not self.context.get('draft'):
+            if not data.get("classification_id"):
+                custom_errors["Classification"] = "You must choose classification"
             if not data.get("call_type_id"):
                 custom_errors["Call Type"] = "You must choose call type"
             if not data.get("brief_nature_of_call"):
@@ -535,7 +537,7 @@ class CallEmailSerializer(serializers.ModelSerializer):
     def get_region_gis(self, obj):
         try:
             res = get_region_gis(obj.location.wkb_geometry)
-            region_list = Region.objects.filter(name__iexact=res)
+            region_list = Region.objects.filter(cddp_name__iexact=res.strip())
             if region_list:
                 return region_list[0].name
         except Exception as e:
@@ -545,7 +547,7 @@ class CallEmailSerializer(serializers.ModelSerializer):
     def get_district_gis(self, obj):
         try:
             res = get_district_gis(obj.location.wkb_geometry)
-            district_list = District.objects.filter(name__iexact=res)
+            district_list = District.objects.filter(cddp_name__iexact=res.strip())
             if district_list:
                 return district_list[0].name
         except Exception as e:
@@ -665,6 +667,7 @@ class CallEmailDatatableSerializer(serializers.ModelSerializer):
     assigned_to = ComplianceUserDetailsOptimisedSerializer(read_only=True)
     user_action = serializers.SerializerMethodField()
     user_is_volunteer = serializers.SerializerMethodField()
+    species_sub_type = serializers.SerializerMethodField()
 
     class Meta:
         model = CallEmail
@@ -682,12 +685,15 @@ class CallEmailDatatableSerializer(serializers.ModelSerializer):
             'user_action',
             'user_is_volunteer',
             'volunteer_id',
-
+            'species_sub_type',
         )
         read_only_fields = (
             'id', 
             )
-        
+
+    def get_species_sub_type(self, obj):
+        return obj.wildcare_species_sub_type.species_sub_name if obj.wildcare_species_sub_type else ''
+
     def get_user_is_assignee(self, obj):
         user_id = self.context.get('request', {}).user.id
         if user_id == obj.assigned_to_id:

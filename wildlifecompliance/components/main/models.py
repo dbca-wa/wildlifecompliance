@@ -332,6 +332,7 @@ class ComplianceManagementSystemGroup(models.Model):
             show_all=False,
             null=True,
             )
+    group_email = models.CharField(max_length=255, blank=True)
 
     class Meta:
         app_label = 'wildlifecompliance'

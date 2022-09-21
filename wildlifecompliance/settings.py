@@ -131,6 +131,7 @@ if env('EMAIL_INSTANCE') is not None and env('EMAIL_INSTANCE','') != 'PROD':
 MIDDLEWARE_CLASSES += [
     'wildlifecompliance.middleware.FirstTimeNagScreenMiddleware',
     'wildlifecompliance.middleware.CacheControlMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 LATEX_GRAPHIC_FOLDER = os.path.join(BASE_DIR,"templates","latex","images")
@@ -245,6 +246,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
 # Department details
 SYSTEM_NAME = env('SYSTEM_NAME', 'Wildlife Licensing System')
+WILDCARE_SYSTEM_NAME = env('WILDCARE_SYSTEM_NAME', 'Wildcare')
 SYSTEM_EMAIL = env('SYSTEM_EMAIL', 'wildlifelicensing@dbca.wa.gov.au')
 
 WC_PAYMENT_SYSTEM_ID = env('WC_PAYMENT_SYSTEM_ID', 'S566')
@@ -338,3 +340,4 @@ AUTH_GROUP_COMPLIANCE_BUSINESS_ADMIN = 'Wildlife Compliance - Compliance Busines
 CUSTOM_AUTH_GROUPS = [
     AUTH_GROUP_COMPLIANCE_BUSINESS_ADMIN,
     ]
+CALL_EMAIL_AVAILABLE_STATUS_VALUES = ['draft','open','closed']

@@ -41,7 +41,7 @@ RUN apt-get install --no-install-recommends -y wget git libmagic-dev gcc \
     rsyslog gunicorn libreoffice
 RUN apt-get install --no-install-recommends -y libpq-dev patch
 RUN apt-get install --no-install-recommends -y postgresql-client mtr htop \
-    vim ssh 
+    vim
 RUN apt-get install --no-install-recommends -y python3-gevent \
     software-properties-common imagemagick
 
@@ -58,7 +58,7 @@ RUN apt-get install -yq vim
 FROM builder_base_wls as python_libs_wls
 WORKDIR /app
 COPY requirements.txt ./
-COPY git_history_recent ./
+#COPY git_history_recent ./
 RUN touch /app/rand_hash
 RUN python3.7 -m pip install --no-cache-dir -r requirements.txt \
   # Update the Django <1.11 bug in django/contrib/gis/geos/libgeos.py

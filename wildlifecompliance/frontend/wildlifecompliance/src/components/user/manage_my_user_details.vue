@@ -64,7 +64,7 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row" v-if="!approvedExternalUser">
             <div class="col-sm-12">
                 <div class="panel panel-default">
                   <div class="panel-heading">
@@ -201,7 +201,7 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row" v-if="!approvedExternalUser">
             <div class="col-sm-12">
                 <div class="panel panel-default">
                   <div class="panel-heading">
@@ -494,8 +494,17 @@ export default {
             // }
             return this.$route.name == 'first-time'
         },
+        approvedExternalUser: function() {
+            if (this.current_user.is_compliance_management_approved_external_user) {
+                return true;
+            }
+        },
         completedProfile: function(){
-            return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details && this.current_user.identification;
+            if (this.current_user.is_compliance_management_approved_external_user) {
+                return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details;
+            } else {
+                return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details && this.current_user.identification;
+            }
         },
     },
     methods: {
