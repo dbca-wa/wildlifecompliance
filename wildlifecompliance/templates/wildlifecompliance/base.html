@@ -16,6 +16,7 @@
 {% system_maintenance_due as system_maintenance_due %}
 {% is_external_url as is_external_url %}
 {% RAND_HASH as RAND_HASH %}
+{% system_name_var as system_name_var %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -49,14 +50,7 @@
         {% block menu %}
             <div class="container-fluid">
                 <div class="row">
-                    
-                    {% if request.session.is_new %}
-                        <nav class="navbar navbar-default hidden">
-                    {% elif request.session.new_to_wildlifecompliance %}
-                        <nav class="navbar navbar-default hidden">
-                    {% else %}
-                        <nav class="navbar navbar-default">
-                    {% endif %}
+                    <nav class="navbar navbar-default">
                         <div class="container">
                             <div class="navbar-header">
                                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -83,11 +77,11 @@
                                             <li><a href="/internal/advices">Advices to CEO</a></li> -->
                                         {% elif is_compliance_internal_login and prefer_compliance_management %}
                                             <a class="navbar-brand" href="/internal/call_email"><div style="inline"><img src="{% static 'wildlifecompliance/img/dpaw_small.png' %}">Home</div></a>
-                                            <li><a href="/internal/inspection">Inspections</a></li>
+                                            <!--li><a href="/internal/inspection">Inspections</a></li>
                                             <li><a href="/internal/offence">Offences</a></li>
                                             <li><a href="/internal/object">Objects</a></li>
                                             <li><a href="/internal/sanction_outcome">Sanction Outcomes</a></li>
-                                            <li><a href="/internal/legal_case">Cases</a></li>
+                                            <li><a href="/internal/legal_case">Cases</a></li-->
                                         {% endif %}
 
                                         {% if is_officer_login %}

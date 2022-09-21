@@ -1856,6 +1856,8 @@ class MasterlistQuestion(models.Model):
                         header = {
                             'label': h['label'],
                             'value': h['value'],
+                            'options': h['options'],
+                            'showOptions': h['showOptions']
                         }
                         headers.append(header)
                     return headers
@@ -1922,6 +1924,8 @@ class MasterlistQuestion(models.Model):
                         expander = {
                             'label': e['label'],
                             'value': e['value'],
+                            'options': e['options'],
+                            'showOptions': e['showOptions']
                         }
                         expanders.append(expander)
                     return expanders

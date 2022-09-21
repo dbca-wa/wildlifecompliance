@@ -4,6 +4,7 @@ import operator
 import traceback
 import os
 import base64
+from functools import reduce
 import geojson
 from django.db.models import Q, Min, Max
 from django.db import transaction
@@ -42,6 +43,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from wildlifecompliance.components.main.api import save_location
 from wildlifecompliance.components.main.process_document import process_generic_document
 from wildlifecompliance.components.main.email import prepare_mail
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.users.api import generate_dummy_email
 from wildlifecompliance.components.users.serializers import (
     UserAddressSerializer,
@@ -130,6 +132,9 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
                         call_email.assigned_to.first_name.lower() + ' ' + call_email.assigned_to.last_name.lower()
                         if call_email.assigned_to else ''
                         )
+                    or search_text in (call_email.wildcare_species_sub_type.species_sub_name 
+                        if call_email.wildcare_species_sub_type else ''
+                        )
                     ):
                     search_text_callemail_ids.append(call_email.id)
 
@@ -202,10 +207,8 @@ class CallEmailPaginatedViewSet(viewsets.ModelViewSet):
     page_size = 10
     
     def get_queryset(self):
-        # import ipdb; ipdb.set_trace()
-        #user = self.request.user
-        #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        #if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_compliance_internal_user(self.request):
             return CallEmail.objects.all()
         return CallEmail.objects.none()
 
@@ -226,10 +229,7 @@ class CallEmailViewSet(viewsets.ModelViewSet):
     serializer_class = CallEmailSerializer
 
     def get_queryset(self):
-        # import ipdb; ipdb.set_trace()
-        #user = self.request.user
-        #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_compliance_internal_user(self.request):
             return CallEmail.objects.all()
         return CallEmail.objects.none()
 
@@ -282,7 +282,9 @@ class CallEmailViewSet(viewsets.ModelViewSet):
     def status_choices(self, request, *args, **kwargs):
         res_obj = [] 
         for choice in CallEmail.STATUS_CHOICES:
-            res_obj.append({'id': choice[0], 'display': choice[1]});
+            # restrict CallEmail status choices
+            if choice[0] in settings.CALL_EMAIL_AVAILABLE_STATUS_VALUES:
+                res_obj.append({'id': choice[0], 'display': choice[1]});
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
@@ -444,15 +446,24 @@ class CallEmailViewSet(viewsets.ModelViewSet):
         try:
             with transaction.atomic():
                 instance = self.get_object()
-                request.data['call_email'] = u'{}'.format(instance.id)
+                request_data = request.data.copy()
+                request_data['call_email'] = u'{}'.format(instance.id)
                 # request.data['staff'] = u'{}'.format(request.user.id)
-                if request.data.get('comms_log_id'):
-                    comms_instance = CallEmailLogEntry.objects.get(id=request.data.get('comms_log_id'))
-                    serializer = CallEmailLogEntrySerializer(comms_instance, data=request.data)
+                if request_data.get('comms_log_id'):
+                    comms_instance = CallEmailLogEntry.objects.get(id=request_data.get('comms_log_id'))
+                    serializer = CallEmailLogEntrySerializer(comms_instance, data=request_data)
                 else:
-                    serializer = CallEmailLogEntrySerializer(data=request.data)
+                    serializer = CallEmailLogEntrySerializer(data=request_data)
                 serializer.is_valid(raise_exception=True)
                 comms = serializer.save()
+                # Save the files
+                for f in request.FILES:
+                    document = comms.documents.create()
+                    document.name = str(request.FILES[f])
+                    document._file = request.FILES[f]
+                    document.save()
+                # End Save Documents
+
                 # Save the files
                 #comms.process_comms_log_document(request)
                 # for f in request.FILES:
@@ -508,7 +519,9 @@ class CallEmailViewSet(viewsets.ModelViewSet):
                 serializer.is_valid(raise_exception=True)
                 if serializer.is_valid():
                     new_instance = serializer.save()
-                    #new_instance.set_allocated_group('volunteer')
+                    # set allocated group
+                    new_instance.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_VOLUNTEER)
+                    new_instance.save()
                     new_instance.log_user_action(
                             CallEmailUserAction.ACTION_CREATE_CALL_EMAIL.format(
                             new_instance.number), request)
@@ -647,9 +660,9 @@ class CallEmailViewSet(viewsets.ModelViewSet):
 
     @detail_route(methods=['POST', ])
     @renderer_classes((JSONRenderer,))
-    def close(self, request, *args, **kwargs):
+    def draft(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer_data, headers = self.common_save(instance, request, close=True)
+        serializer_data, headers = self.common_save(instance, request, draft=True)
         return Response(
                         serializer_data,
                         status=status.HTTP_201_CREATED,
@@ -667,7 +680,7 @@ class CallEmailViewSet(viewsets.ModelViewSet):
                         headers=headers
                     )
 
-    def common_save(self, instance, request, close=False):
+    def common_save(self, instance, request, draft=False):
         try:
             with transaction.atomic():
                 request_data = request.data
@@ -693,7 +706,7 @@ class CallEmailViewSet(viewsets.ModelViewSet):
                 if instance.report_type and 'report_type_id' in request.data.keys() and not request.data.get('report_type_id'):
                         del request.data['report_type_id']
 
-                serializer = SaveCallEmailSerializer(instance, data=request_data, context={'close': close})
+                serializer = SaveCallEmailSerializer(instance, data=request_data, context={'draft': draft})
                 serializer.is_valid(raise_exception=True)
                 if serializer.is_valid():
                     saved_instance = serializer.save()
