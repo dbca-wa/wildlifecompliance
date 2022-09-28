@@ -56,7 +56,14 @@ router.beforeEach(async (to, from, next) => {
     const res = await Vue.http.get(api_endpoints.is_compliance_management_callemail_readonly_user);
     const isComplianceManagementCallemailReadonlyUser = res.body.compliance_management_callemail_readonly_user;
     //if (to.name !=="internal-call-email-dash" && isComplianceManagementCallemailReadonlyUser) next({name:"internal-call-email-dash"})
-    if (!(["account", "internal-call-email-dash", "view-call-email"].includes(to.name)) && isComplianceManagementCallemailReadonlyUser) next({name:"internal-call-email-dash"})
+    if (!([
+        "first-time",
+        "account",
+        "internal-call-email-dash",
+        "view-call-email"].includes(to.name)) && isComplianceManagementCallemailReadonlyUser) {
+        // Call Email Read Only users can only access these four routes
+        next({name:"internal-call-email-dash"})
+    }
     else next()
 });
 export { router as default }
