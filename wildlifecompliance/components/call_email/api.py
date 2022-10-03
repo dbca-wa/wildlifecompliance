@@ -781,11 +781,13 @@ class CallEmailViewSet(viewsets.ModelViewSet):
 
                 instance.save()
 
-                #if workflow_type == 'close':
+                if workflow_type == 'close':
                     #email_data = prepare_mail(request, instance, workflow_entry, send_mail, email_type="close")
-                if workflow_type in ['forward_to_regions', 'forward_to_wildlife_protection_branch']:
+                    email_data = prepare_mail(request=request, instance=instance, workflow_entry=workflow_entry, 
+                            send_mail=send_mail, recipient_id=[request.user.id,], email_type="close")
+                elif workflow_type in ['forward_to_regions', 'forward_to_wildlife_protection_branch']:
                     email_data = prepare_mail(request=request, instance=instance, workflow_entry=workflow_entry, send_mail=send_mail)
-                elif workflow_type in ['close', 'offence', 'sanction_outcome']:
+                elif workflow_type in ['offence', 'sanction_outcome']:
                     email_data = prepare_mail(request=request, instance=instance, workflow_entry=workflow_entry, send_mail=send_mail, recipient_id=[request.user.id,])
                     #email_data = prepare_mail(request, instance, workflow_entry, send_mail, request.user.id)
                 elif workflow_type in ['allocate_for_follow_up', 'allocate_for_inspection', 'allocate_for_case']:
