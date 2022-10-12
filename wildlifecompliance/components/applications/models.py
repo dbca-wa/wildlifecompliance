@@ -651,6 +651,9 @@ class Application(RevisionedMixin):
         Gets the payment status for this application.
         '''
         logger.debug('Application.payment_status()')
+        if hasattr(self.latest_invoice, 'voided') and self.latest_invoice.voided:
+            return ApplicationInvoice.PAYMENT_STATUS_NOT_REQUIRED
+
         if self.submit_type == Application.SUBMIT_TYPE_MIGRATE:
             # when application is migrated from paper version.
             return ApplicationInvoice.PAYMENT_STATUS_NOT_REQUIRED
