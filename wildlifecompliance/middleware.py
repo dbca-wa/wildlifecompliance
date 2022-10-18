@@ -68,7 +68,7 @@ class FirstTimeDefaultNag(object):
         if 'static' in request.path:
             return
         if request.method == 'GET' and request.user.is_authenticated(
-        ) and 'api' not in request.path and 'admin' not in request.path:
+        ) and 'api' not in request.path and 'admin' not in request.path and 'ledger-private' not in request.path:
 
             if (not request.user.first_name) or \
                     (not request.user.last_name) or \

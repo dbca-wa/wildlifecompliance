@@ -503,7 +503,7 @@ export default {
             if (this.current_user.is_compliance_management_approved_external_user) {
                 return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details;
             } else {
-                return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details && this.current_user.identification;
+                return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details && this.current_user.identification2;
             }
         },
     },
@@ -801,7 +801,7 @@ export default {
             let vm = this;
             vm.uploadingID = true;
             let data = new FormData();
-            data.append('identification', vm.uploadedID);
+            data.append('identification2', vm.uploadedID);
             if (vm.uploadedID == null){
                 vm.uploadingID = false;
                 swal({
@@ -815,8 +815,8 @@ export default {
                 }).then((response) => {
                     vm.uploadingID = false;
                     vm.uploadedID = null;
-                    vm.uploadedID = response.body.identification;
-                    vm.current_user.identification = response.body.identification;
+                    vm.uploadedID = response.body.identification2;
+                    vm.current_user.identification2 = response.body.identification2;
                 }, (error) => {
                     console.log(error);
                     vm.uploadingID = false;
@@ -1092,7 +1092,7 @@ export default {
                     vm.current_user = response.body
                     if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
                     if (vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0) { vm.managesOrg = 'Yes' }
-                    if (vm.current_user.identification){ vm.uploadedID = vm.current_user.identification; }
+                    if (vm.current_user.identification2){ vm.uploadedID = vm.current_user.identification2; }
                 });
             }
         },(error) => {

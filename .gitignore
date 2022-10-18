@@ -121,3 +121,9 @@ reversion_utility_output.txt
 # data files
 *.csv
 *.xls*
+
+
+.DAV
+
+private-media/
+temp/

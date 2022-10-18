@@ -1,6 +1,6 @@
 import os
 from django.conf import settings
-from ledger.accounts.models import EmailUser, Address, Profile, EmailIdentity, EmailUserAction, Document
+from ledger.accounts.models import EmailUser, Address, Profile, EmailIdentity, EmailUserAction, Document, PrivateDocument
 from wildlifecompliance.components.organisations.models import (
     Organisation,
     OrganisationRequest,
@@ -40,6 +40,15 @@ class IdentificationSerializer(DocumentSerializer):
 
     class Meta:
         model = Document
+        fields = ('id', 'uploaded_date')
+
+class Identification2Serializer(DocumentSerializer):
+    '''
+    Serializer to obfuscate the file name and description from identification.
+    '''
+
+    class Meta:
+        model = PrivateDocument
         fields = ('id', 'uploaded_date')
 
 
@@ -409,7 +418,8 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
     address_details = serializers.SerializerMethodField()
     contact_details = serializers.SerializerMethodField()
     wildlifecompliance_organisations = serializers.SerializerMethodField()
-    identification = IdentificationSerializer()
+    #identification = IdentificationSerializer()
+    identification2 = Identification2Serializer()
     is_customer = serializers.SerializerMethodField()
     is_internal = serializers.SerializerMethodField()
     prefer_compliance_management = serializers.SerializerMethodField()
@@ -429,7 +439,8 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
             'first_name',
             'dob',
             'email',
-            'identification',
+            # 'identification',
+            'identification2',
             'residential_address',
             'phone_number',
             'mobile_number',

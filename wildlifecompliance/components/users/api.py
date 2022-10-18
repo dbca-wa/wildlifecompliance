@@ -507,7 +507,7 @@ class UserViewSet(viewsets.ModelViewSet):
         try:
             instance = self.get_object()
             SecureBaseUtils.timestamp_id_request(request)
-            instance.upload_identification(request)
+            instance.upload_identification2(request)
             with transaction.atomic():
                 instance.save()
                 instance.log_user_action(
