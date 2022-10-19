@@ -49,7 +49,7 @@ class Identification2Serializer(DocumentSerializer):
 
     class Meta:
         model = PrivateDocument
-        fields = ('id', 'uploaded_date')
+        fields = ('id', 'created')
 
 
 class UpdateComplianceManagementUserPreferencesSerializer(serializers.ModelSerializer):
@@ -274,7 +274,8 @@ class UserSerializer(serializers.ModelSerializer):
     address_details = serializers.SerializerMethodField()
     contact_details = serializers.SerializerMethodField()
     wildlifecompliance_organisations = serializers.SerializerMethodField()
-    identification = IdentificationSerializer()
+    # identification = IdentificationSerializer()
+    identification2 = Identification2Serializer()
     dob = serializers.SerializerMethodField()
 
     class Meta:
@@ -286,7 +287,7 @@ class UserSerializer(serializers.ModelSerializer):
             'first_name',
             'dob',
             'email',
-            'identification',
+            'identification2',
             'residential_address',
             'phone_number',
             'mobile_number',
