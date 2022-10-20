@@ -38,7 +38,7 @@ from wildlifecompliance.components.organisations.serializers import (
     ExternalOrganisationSerializer
 )
 from wildlifecompliance.components.users.serializers import (
-    UserAddressSerializer, IdentificationSerializer
+    UserAddressSerializer, IdentificationSerializer, Identification2Serializer
 )
 from wildlifecompliance.components.main.fields import CustomChoiceField
 from wildlifecompliance.management.permissions_manager import PermissionUser
@@ -722,7 +722,8 @@ class ExternalApplicationSelectedActivityMergedSerializer(serializers.Serializer
 
 class EmailUserAppViewSerializer(serializers.ModelSerializer):
     residential_address = UserAddressSerializer()
-    identification = IdentificationSerializer()
+    # identification = IdentificationSerializer()
+    identification2 = Identification2Serializer()
     dob = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -735,7 +736,7 @@ class EmailUserAppViewSerializer(serializers.ModelSerializer):
                   'title',
                   'organisation',
                   'residential_address',
-                  'identification',
+                  'identification2',
                   'email',
                   'phone_number',
                   'mobile_number',)
