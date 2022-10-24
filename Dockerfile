@@ -28,6 +28,7 @@ COPY startup.sh /
 COPY reporting_database_rebuild.sh /
 COPY open_reporting_db /
 COPY nginx-default.conf /etc/nginx/sites-enabled/default
+COPY .git ./.git
 RUN service rsyslog start
 RUN chmod 0644 /etc/cron.d/container
 RUN crontab /etc/cron.d/container
