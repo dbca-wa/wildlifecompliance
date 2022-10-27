@@ -303,17 +303,17 @@
                                           </div>
                                       </form>
                                 </div>
-                                <div v-if="applicantType == 'proxy' && application.proxy_applicant.identification" class="panel-body panel-collapse collapse" :id="identificationBody">
+                                <div v-if="applicantType == 'proxy' && application.proxy_applicant.identification2" class="panel-body panel-collapse collapse" :id="identificationBody">
                                       <form class="form-horizontal">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Identification</label>
                                             <div class="col-sm-8">
-                                                <img width="100%" name="applicantIdentification" v-bind:src="application.proxy_applicant.identification" />
+                                                <img width="100%" name="applicantIdentification" v-bind:src="application.proxy_applicant.identification2" />
                                             </div>
                                           </div>
                                       </form>
                                 </div>
-                                <div v-if="applicantType == 'submitter' && application.submitter.identification" class="panel-body panel-collapse collapse" :id="identificationBody">
+                                <div v-if="applicantType == 'submitter' && application.submitter.identification2" class="panel-body panel-collapse collapse" :id="identificationBody">
                                       <form class="form-horizontal">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Identification</label>

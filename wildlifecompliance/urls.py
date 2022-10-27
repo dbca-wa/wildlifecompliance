@@ -305,6 +305,8 @@ urlpatterns = [
 
     url(r'^securebase-view/',views.SecureBaseView.as_view(), name='securebase-view'),
     url(r'^api/person_org_lookup$', users_api.GetPersonOrg.as_view(), name='get-person-org'),
+    url(r'^ledger-private/identification/(?P<emailuser_id>\d+)', views.getLedgerIdentificationFile, name='view_ledger_identification_file'),
+    url(r'^ledger-private/senior-card/(?P<emailuser_id>\d+)', views.getLedgerSeniorCardFile, name='view_ledger_senior_card_file'),
 
 ] + ledger_patterns + media_serv_patterns
 

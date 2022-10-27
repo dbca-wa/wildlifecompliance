@@ -35,9 +35,11 @@ class SecureBaseUtils(object):
         '''
         logger.debug('SecureBaseUtils.timestamp_id_request() - start')
         try:
-            id_file = request.data.dict()['identification']
+            # id_file = request.data.dict()['identification']
+            id_file = request.data.dict()['identification2']
             ts = calendar.timegm(time.gmtime())
             id_file.name = '{0}_{1}'.format(str(ts), id_file.name)
+            # request.data.dict()['identification'] = id_file
             request.data.dict()['identification'] = id_file
 
         except Exception as e:
@@ -224,6 +226,7 @@ class SecurePipe(SecureBase):
         :return: HttpResponse for a client request.
         '''
         response = HttpResponse()
+        
 
         try:
             self.validate_request()
@@ -260,19 +263,22 @@ class SecurePipe(SecureBase):
 
         try:
             if request_user_id:
-                document = self.request.user.identification
-                mime = mimetypes.guess_type(document.filename)[0]
+                # document = self.request.user.identification
+                document = self.request.user.identification2
+                mime = mimetypes.guess_type(document.upload.path)[0]
 
                 response = HttpResponse(content_type=mime)
-                response.write(document.file.read())
+                response.write(document.upload.read())
 
             elif request_customer_id:
                 customer = EmailUser.objects.get(id=int(request_customer_id))
-                document = customer.identification
-                mime = mimetypes.guess_type(document.filename)[0]
+                # document = customer.identification
+                # mime = mimetypes.guess_type(document.filename)[0]
+                document = customer.identification2
+                mime = mimetypes.guess_type(document.upload.path)[0]
 
                 response = HttpResponse(content_type=mime)
-                response.write(document.file.read())
+                response.write(document.upload.read())
 
             elif request_licence_id:
                 licence = WildlifeLicence.objects.get(
