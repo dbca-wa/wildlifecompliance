@@ -201,7 +201,6 @@ def getLedgerIdentificationFile(request, emailuser_id):
         if id_path[-4:-3] == '.':
             extension = id_path[-3:]
 
-        print(extension)
 
 
 
@@ -210,7 +209,7 @@ def getLedgerIdentificationFile(request, emailuser_id):
             file_name_path =  id_path 
             full_file_path= id_path
             if os.path.isfile(full_file_path) is True:
-                    extension = file_name_path[-3:] 
+                    #extension = file_name_path[-3:] 
                     the_file = open(full_file_path, 'rb')
                     the_data = the_file.read()
                     the_file.close()
@@ -246,14 +245,13 @@ def getLedgerSeniorCardFile(request, emailuser_id):
         if senior_card_path[-4:-3] == '.':
             extension = senior_card_path[-3:]
 
-        print(extension)
 
 
         if allow_access == True:
             file_name_path =  senior_card_path 
             full_file_path= senior_card_path
             if os.path.isfile(full_file_path) is True:
-                    extension = file_name_path[-3:] 
+                    #extension = file_name_path[-3:] 
                     the_file = open(full_file_path, 'rb')
                     the_data = the_file.read()
                     the_file.close()
