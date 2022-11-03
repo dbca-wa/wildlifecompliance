@@ -1,4 +1,4 @@
-{%  extends 'wildlifecompliance/emails/base_email.txt' %}
+{%  extends 'wildlifecompliance/emails/base_email_compliance.txt' %}
 
 {%  block content %}
         Reminder: Due is in one week
