@@ -4,14 +4,14 @@ date_var=$(date +%Y.%m.%d.%H.%M%S)
 BUILD_TAG=dbcawa/wildlifecompliance:v$date_var
 cd wildlifecompliance/frontend/wildlifecompliance/ &&
 
-# Apply front end venv if it exists
-{ 
-    source venv/bin/activate && npm run build 
-} || 
-{ 
-    npm run build
-    echo "INFO: Front end built without venv"
-}
+# # Apply front end venv if it exists
+# { 
+#     source venv/bin/activate && npm run build 
+# } || 
+# { 
+#     npm run build
+#     echo "INFO: Front end built without venv"
+# }
 
 #npm run build &&
 cd ../../../ &&
