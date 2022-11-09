@@ -1,5 +1,5 @@
 {% block greetings %}
-Dear Sir/Madam,
+Dear Wildlife System User,
 {% endblock %}
 
 {% block content %}
@@ -8,12 +8,12 @@ Dear Sir/Madam,
 {% block signature %}
 Yours sincerely,
 
-Wildlife Licensing Section
+Wildlife System Admin
 {% endblock %}
 
 
 
 {% block reply_statement %}
-Should you need further information about this call, please contact Wildcare on (08) 9474 9055.
+Further information please call the Wildcare Helpline - (08) 9474 9055.
 {% endblock %}
 
