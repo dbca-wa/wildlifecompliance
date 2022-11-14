@@ -21,7 +21,7 @@ from wildlifecompliance.components.section_regulation.serializers import Section
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, RemediationAction, \
     SanctionOutcomeCommsLogEntry, SanctionOutcomeUserAction, AllegedCommittedOffence, AmendmentRequestReason, \
     AmendmentRequestForRemediationAction, RemediationActionNotification, SanctionOutcomeDocumentAccessLog
-from wildlifecompliance.components.users.serializers import CompliancePermissionGroupMembersSerializer
+#from wildlifecompliance.components.users.serializers import CompliancePermissionGroupMembersSerializer
 from wildlifecompliance.helpers import is_internal
 
 logger = logging.getLogger('payment_checkout')
@@ -345,19 +345,20 @@ class SanctionOutcomeSerializer(serializers.ModelSerializer):
         return [[r.name, r._file.url] for r in obj.documents.all()]
 
     def get_allocated_group(self, obj):
-        allocated_group = [{
-            'email': '',
-            'first_name': '',
-            'full_name': '',
-            'id': None,
-            'last_name': '',
-            'title': '',
-        }]
-        returned_allocated_group = CompliancePermissionGroupMembersSerializer(instance=obj.allocated_group)
-        for member in returned_allocated_group.data['members']:
-            allocated_group.append(member)
+        return ''
+        #allocated_group = [{
+        #    'email': '',
+        #    'first_name': '',
+        #    'full_name': '',
+        #    'id': None,
+        #    'last_name': '',
+        #    'title': '',
+        #}]
+        #returned_allocated_group = CompliancePermissionGroupMembersSerializer(instance=obj.allocated_group)
+        #for member in returned_allocated_group.data['members']:
+        #    allocated_group.append(member)
 
-        return allocated_group
+        #return allocated_group
 
     def get_user_in_group(self, obj):
         user_id = self.context.get('request', {}).user.id
@@ -509,7 +510,6 @@ class SanctionOutcomeDatatableSerializer(serializers.ModelSerializer):
         process_url = '<a href=/internal/sanction_outcome/' + str(obj.id) + '>Process</a>'
         view_payment_url = '<a href="/ledger/payments/invoice/payment?invoice=' + inv_ref + '">View Payment</a>' if inv_ref else ''
         cc_payment_url = '<a href="#" data-pay-infringement-penalty="' + str(obj.id) + '">Pay</a>'
-
         record_payment_url = '<a href="' + reverse('payments:invoice-payment') + '?invoice={}'.format(inv_ref) + '">Record Payment</a>' if inv_ref \
             else '<a href="' + reverse('preview_deferred_invoicing', kwargs={'sanction_outcome_pk': obj.id}) + '">Record Payment</a>'
 
@@ -518,7 +518,11 @@ class SanctionOutcomeDatatableSerializer(serializers.ModelSerializer):
             if obj.payment_status == 'unpaid' and obj.status == SanctionOutcome.STATUS_AWAITING_PAYMENT:
                 url_list.append(cc_payment_url)
         elif is_internal(self.context.get('request')):
-            if obj.status not in SanctionOutcome.FINAL_STATUSES:
+            if obj.status in SanctionOutcome.FINAL_STATUSES:
+                if is_payment_admin(user):
+                    if inv_ref:
+                        url_list.append(view_payment_url)
+            else:
                 # infringement notice is not in the final statuses
                 if user.id == obj.assigned_to_id:
                     # if user is assigned to the object, the user can process it
@@ -668,6 +672,13 @@ class SaveRemediationActionSerializer(serializers.ModelSerializer):
 
     def validate(self, obj):
         return obj
+
+
+class SanctionOutcomeNoticeSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model = SanctionOutcome
 
 
 class SanctionOutcomeUserActionSerializer(serializers.ModelSerializer):

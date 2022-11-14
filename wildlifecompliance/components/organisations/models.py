@@ -29,10 +29,12 @@ from wildlifecompliance.components.organisations.emails import (
     send_organisation_id_upload_email_notification,
     send_organisation_contact_consultant_email_notification,
 )
+from wildlifecompliance.components.main.models import Document
 
 
 @python_2_unicode_compatible
 class Organisation(models.Model):
+    intelligence_information_text = models.TextField(blank=True)
     organisation = models.ForeignKey(ledger_organisation)
     # TODO: business logic related to delegate changes.
     delegates = models.ManyToManyField(
@@ -576,6 +578,16 @@ class Organisation(models.Model):
         return self.name
 
 
+class OrganisationIntelligenceDocument(Document):
+    organisation = models.ForeignKey(Organisation, related_name='intelligence_documents')
+    _file = models.FileField(max_length=255,)
+
+    class Meta:
+        app_label = 'wildlifecompliance'
+        #verbose_name = 'CM_ProsecutionNoticeDocument'
+        #verbose_name_plural = 'CM_ProsecutionNoticeDocuments'
+
+
 @python_2_unicode_compatible
 class OrganisationContact(models.Model):
     ORG_CONTACT_STATUS_DRAFT = 'draft'
@@ -1057,13 +1069,27 @@ class OrganisationRequestLogEntry(CommunicationsLogEntry):
 NOTE: REGISTER MODELS FOR REVERSION HERE.
 '''
 import reversion
-reversion.register(Organisation)
-reversion.register(OrganisationAction)
-reversion.register(OrganisationContact)
-reversion.register(OrganisationContactAction)
-reversion.register(OrganisationContactDeclinedDetails)
-reversion.register(OrganisationLogEntry)
-reversion.register(OrganisationRequest)
-reversion.register(OrganisationRequestDeclinedDetails)
-reversion.register(OrganisationRequestLogEntry)
-reversion.register(OrganisationRequestUserAction)
+#reversion.register(Organisation)
+#reversion.register(OrganisationAction)
+#reversion.register(OrganisationContact)
+#reversion.register(OrganisationContactAction)
+#reversion.register(OrganisationContactDeclinedDetails)
+#reversion.register(OrganisationLogEntry)
+#reversion.register(OrganisationRequest)
+#reversion.register(OrganisationRequestDeclinedDetails)
+#reversion.register(OrganisationRequestLogEntry)
+#reversion.register(OrganisationRequestUserAction)
+
+reversion.register(Organisation, follow=['intelligence_documents', 'contacts', 'userdelegation_set', 'action_logs', 'comms_logs', 'organisation_inspected', 'org_applications', 'offender_organisation'])
+reversion.register(OrganisationIntelligenceDocument, follow=[])
+reversion.register(OrganisationContact, follow=['action_logs', 'organisationcontactdeclineddetails_set'])
+reversion.register(OrganisationContactAction, follow=[])
+reversion.register(OrganisationContactDeclinedDetails, follow=[])
+reversion.register(UserDelegation, follow=[])
+reversion.register(OrganisationAction, follow=[])
+reversion.register(OrganisationLogEntry, follow=[])
+reversion.register(OrganisationRequest, follow=['action_logs', 'organisationrequestdeclineddetails_set', 'comms_logs'])
+reversion.register(OrganisationRequestUserAction, follow=[])
+reversion.register(OrganisationRequestDeclinedDetails, follow=[])
+reversion.register(OrganisationRequestLogEntry, follow=[])
+

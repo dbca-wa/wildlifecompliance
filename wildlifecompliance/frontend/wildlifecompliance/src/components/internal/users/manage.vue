@@ -1,19 +1,38 @@
 <template>
-    <div class="container-fluid" id="internalUserInfo">
-    <div class="row">
-    <div class="col-md-10 col-md-offset-1">
+    <div class="container" id="internalUserInfo">
+    <!-- <div class="row"> -->
+    <!-- <div class="col-md-10 col-md-offset-1"> -->
         <div class="row">
-            <h3>{{ user.first_name }} {{ user.last_name  }} - {{ user.dob }} ({{ user.email }})</h3>
+            <div class="col-md-9">
+                <h3>{{ user.first_name }} {{ user.last_name  }} - {{ user.dob }} ({{ user.email }})</h3>
+            </div>
+        </div>    
             <div class="col-md-3">
                 <CommsLogs :comms_url="comms_url" :logs_url="logs_url" comms_add_url="test"/>
             </div>
             <div class="col-md-9">
-                <ul class="nav nav-tabs">
-                    <li class="active"><a data-toggle="tab" :href="'#'+dTab">Details</a></li>
-                    <li><a data-toggle="tab" :href="'#'+oTab">Licensing</a></li>
+                <!--ul class="nav nav-tabs"-->
+                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="pills-details-tab" data-toggle="pill" href="#pills-details" role="tab" aria-controls="pills-details" aria-selected="true">
+                            Details
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="pills-licensing-tab" data-toggle="pill" href="#pills-licensing" role="tab" aria-controls="pills-licensing" aria-selected="false">
+                            Licensing
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="pills-compliance-tab" data-toggle="pill" href="#pills-compliance" role="tab" aria-controls="pills-compliance" aria-selected="false">
+                            Compliance
+                        </a>
+                    </li>
                 </ul>
-                <div class="tab-content">
-                    <div :id="dTab" class="tab-pane fade in active">
+                <div class="tab-content" id="pills-tabContent">
+                  <div class="tab-pane fade" id="pills-details" role="tabpanel" aria-labelledby="pills-details-tab">
+                <!--div class="tab-content">
+                    <div :id="dTab" class="tab-pane fade in active"-->
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="panel panel-default">
@@ -41,7 +60,6 @@
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label" >Date of Birth</label>
                                             <div class="col-sm-6">
-                                                <!-- <input type="date" class="form-control" name="dob" placeholder="" v-model="user.dob"> -->
                                                 <div class="input-group date" ref="dob" style="width: 100%;">
                                                     <input type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="user.dob">
                                                     <span class="input-group-addon">
@@ -75,20 +93,17 @@
                                       <form class="form-horizontal" name="id_form" method="post">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Identification</label>
-                                            <div class="col-sm-6">
-                                                <img v-if="user.identification" width="100%" name="identification" v-bind:src="user.identification.file" />
-                                            </div>
+                                            <div class="col-sm-9">
+                                                <span class="col-sm-3 btn btn-link btn-file pull-left" v-if="uploadedID"><SecureBaseLink link_name="Uploaded Photo ID" :link_data="{'customer_id': user.id}" /></span>
+                                                <span class="col-sm-3 btn btn-link btn-file pull-left" v-else-if="!uploadedID">Attach Photo ID<input type="file" ref="uploadedID" @change="readFileID()"/></span>
+                                                <span class="col-sm-3 btn btn-link btn-file pull-left" v-else >&nbsp;Uploading...</span>
+                                                <span v-if="uploadedID" class="btn btn-link btn-file pull-left">
+                                                    <a @click="removeID()" class="fa fa-trash-o" title="Remove file" style="cursor: pointer; color:red;" />
+                                                </span>
+                                            </div> 
                                           </div>
                                           <div class="form-group">
-                                            <div class="col-sm-12">
-                                                <!-- output order in reverse due to pull-right at runtime -->
-                                                <button v-if="!uploadingID" class="pull-right btn btn-primary" @click.prevent="uploadID()">Upload</button>
-                                                <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Uploading</button>
-                                                <span class="pull-right" style="margin-left:10px;margin-top:10px;margin-right:10px">{{uploadedIDFileName}}</span>
-                                                <span class="btn btn-primary btn-file pull-right">
-                                                    Select ID to Upload<input type="file" ref="uploadedID" @change="readFileID()"/>
-                                                </span>
-                                            </div>
+                                            <div class="col-sm-12"></div>
                                           </div>
                                        </form>
                                   </div>
@@ -133,7 +148,7 @@
                                             <label for="" class="col-sm-3 control-label" >Country</label>
                                             <div class="col-sm-4">
                                                 <select class="form-control" name="country" v-model="user.residential_address.country">
-                                                    <option v-for="c in countries" :value="c.alpha2Code">{{ c.name }}</option>
+                                                    <option v-for="c in countries" :value="c.code" v-bind:key="c.code">{{ c.name }}</option>
                                                 </select>
                                             </div>
                                           </div>
@@ -200,7 +215,7 @@
                                     </h3>
                                   </div>
                                   <div class="panel-body collapse in" :id="odBody">
-                                      <div v-for="org in user.wildlifecompliance_organisations">
+                                      <div v-for="org in user.wildlifecompliance_organisations" v-bind:key="org.id">
                                           <div class="form-group">
                                             <label for="" class="col-sm-2 control-label" >Organisation</label>
                                             <div class="col-sm-3">
@@ -213,7 +228,7 @@
                                             <a style="cursor:pointer;text-decoration:none;" @click.prevent="unlinkUser(org)"><i class="fa fa-chain-broken fa-2x" ></i>&nbsp;Unlink</a>
                                           </div>
                                       </div>
-                                      <div v-for="orgReq in orgRequest_pending">
+                                      <div v-for="orgReq in orgRequest_pending" v-bind:key="orgReq.id">
                                           <div class="form-group">
                                             <label for="" class="col-sm-2 control-label" >Organisation</label>
                                             <div class="col-sm-3">
@@ -231,31 +246,54 @@
                             </div>
                         </div>
                     </div> 
-                    <div :id="oTab" class="tab-pane fade">
+
+                    <div class="tab-pane fade" id="pills-licensing" role="tabpanel" aria-labelledby="pills-licensing-tab">
                         <ApplicationDashTable ref="applications_table" level='internal' :url='applications_url'/>
                         <LicenceDashTable ref="licences_table" level='internal' :url='licences_url'/>
                         <ReturnDashTable ref="returns_table" level='internal' :url='returns_url'/>
                     </div>
+                    <div class="tab-pane fade" id="pills-compliance" role="tabpanel" aria-labelledby="pills-compliance-tab">
+                        <SanctionOutcomePersonOrgDashTable 
+                        v-if="user.id"
+                        ref="sanction_outcome_person_org_table" 
+                        level='internal' 
+                        :entity_id='user.id'
+                        entity_type='person'
+                        />
+                        <LegalCasePersonOrgDashTable 
+                        v-if="user.id"
+                        ref="legal_case_person_org_table" 
+                        level='internal' 
+                        :entity_id='user.id'
+                        entity_type='person'
+                        />
+                        <IntelligenceInformation
+                        v-if="user.id"
+                        ref="intelligence_information" 
+                        :entity_id='user.id'
+                        entity_type='person'
+                        />
+                    </div>
                 </div>
             </div>
-        </div>
-        </div>
-        </div>
+        <!-- </div> -->
+        <!-- </div> -->
+        <!-- </div> -->
     </div>
 </template>
 
 <script>
-//import $ from 'jquery'
-import Vue from 'vue'
 import { api_endpoints, helpers } from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
-import AddContact from '@common-components/add_contact.vue'
 import ApplicationDashTable from '@common-components/applications_dashboard.vue'
 import LicenceDashTable from '@common-components/licences_dashboard.vue'
 import ReturnDashTable from '@common-components/returns_dashboard.vue'
+import SanctionOutcomePersonOrgDashTable from '@common-components/sanction_outcomes_person_org_dashboard.vue'
+import LegalCasePersonOrgDashTable from '@common-components/legal_case_person_org_dashboard.vue'
 import CommsLogs from '@common-components/comms_logs.vue'
+import IntelligenceInformation from '@common-components/intelligence_information.vue'
+import SecureBaseLink from '@common-components/securebase_link.vue';
 import utils from '../utils'
-import api from '../api'
 export default {
     name: 'User',
     data () {
@@ -287,7 +325,7 @@ export default {
             logs_url: helpers.add_endpoint_json(api_endpoints.users,vm.$route.params.user_id+'/action_log'),
             applications_url: api_endpoints.applications_paginated+'internal_datatable_list?user_id='+vm.$route.params.user_id,
             licences_url: api_endpoints.licences_paginated+'internal_datatable_list?user_id='+vm.$route.params.user_id,
-            returns_url: api_endpoints.returns_paginated+'?user_id='+vm.$route.params.user_id,
+            returns_url: api_endpoints.returns_paginated+'user_datatable_list?user_id='+vm.$route.params.user_id,
             orgRequest_pending: [],
             datepickerOptions:{
                 format: 'DD/MM/YYYY',
@@ -303,7 +341,11 @@ export default {
         ApplicationDashTable,
         LicenceDashTable,
         ReturnDashTable,
-        CommsLogs
+        SanctionOutcomePersonOrgDashTable,
+        LegalCasePersonOrgDashTable,
+        CommsLogs,
+        SecureBaseLink,
+        IntelligenceInformation,
     },
     computed: {
         isLoading: function () {
@@ -325,6 +367,8 @@ export default {
                 vm.user = data[1];
                 vm.user.residential_address = vm.user.residential_address != null ? vm.user.residential_address : {};
                 vm.orgRequest_pending = data[2];
+                //vm.uploadedID = vm.user.identification;
+                vm.uploadedID = vm.user.identification2;
             });
         });
     },
@@ -340,6 +384,13 @@ export default {
         });
     },
     methods: {
+        set_tabs:function(){
+            let vm = this;
+
+            /* set Applicant tab Active */
+            $('#pills-tab a[href="#pills-details"]').tab('show');
+        },
+
         eventListeners: function(){
             let vm = this;
             // Fix the table responsiveness when tab is shown
@@ -380,7 +431,7 @@ export default {
 				});
 			}, (error) => {
 				vm.updatingPersonal = false;
-				let error_msg = '<br/>';
+				details_msg = '<br/>';
 				for (var key in error.body) {
 					if (key === 'dob') {
 						error_msg += 'dob: Please enter a valid date.<br/>';
@@ -487,7 +538,7 @@ export default {
             },(error) => {
             });
         },
-        readFileID: function() {
+        readFileID: async function() {
             let vm = this;
             let _file = null;
             var input = $(vm.$refs.uploadedID)[0];
@@ -500,14 +551,17 @@ export default {
                 _file = input.files[0];
             }
             vm.uploadedID = _file;
+            await vm.uploadID();
         },
-        uploadID: function() {
+        removeID: async function() {
+            this.uploadedID = null;
+        },
+        uploadID: async function() {
             let vm = this;
-            console.log('uploading id');
             vm.uploadingID = true;
             let data = new FormData();
-            data.append('identification', vm.uploadedID);
-            console.log(data);
+            //data.append('identification', vm.uploadedID);
+            data.append('identification2', vm.uploadedID);
             if (vm.uploadedID == null){
                 vm.uploadingID = false;
                 swal({
@@ -521,23 +575,21 @@ export default {
                 }).then((response) => {
                     vm.uploadingID = false;
                     vm.uploadedID = null;
-                    swal({
-                        title: 'Upload ID',
-                        html: 'The user ID has been successfully uploaded.',
-                        type: 'success',
-                    }).then(() => {
-                        window.location.reload(true);
-                    });
+                    //vm.uploadedID = response.body.identification;
+                    //vm.user.identification = response.body.identification;
+                    vm.uploadedID = response.body.identification2;
+                    vm.user.identification2 = response.body.identification2;
                 }, (error) => {
                     console.log(error);
                     vm.uploadingID = false;
+                    vm.uploadedID = null;
                     let error_msg = '<br/>';
                     for (var key in error.body) {
                         error_msg += key + ': ' + error.body[key] + '<br/>';
                     }
                     swal({
                         title: 'Upload ID',
-                        html: 'There was an error uploading the user ID.<br/>' + error_msg,
+                        html: 'There was an error uploading your ID.<br/>' + error_msg,
                         type: 'error'
                     });
                 });
@@ -559,6 +611,7 @@ export default {
     },
     mounted: function(){
         let vm = this;
+        vm.set_tabs();
         this.personal_form = document.forms.personal_form;
         this.eventListeners();
     },
@@ -575,5 +628,10 @@ export default {
 }
 .hidePopover {
     display: none;
+}
+#main-column {
+  padding-left: 2%;
+  padding-right: 0;
+  margin-bottom: 50px;
 }
 </style>

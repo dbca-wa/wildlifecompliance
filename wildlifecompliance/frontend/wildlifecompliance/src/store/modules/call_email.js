@@ -29,6 +29,9 @@ export const callemailStore = {
                     "coordinates": [],
                 },
             },
+            call_type: {
+                id: null,
+            },
             report_type: {
                 id: null,
             },
@@ -39,6 +42,7 @@ export const callemailStore = {
             volunteer_list: [],
         },
         classification_types: [],
+        call_types: [],
         report_types: [],
         referrers: [],
         status_choices: [],
@@ -220,17 +224,13 @@ export const callemailStore = {
             Vue.set(state.call_email, 'email_user', email_user_empty);
         },
         updateResidentialAddress(state, address){
-            console.log("updateResidentialAddress");
-            console.log(address);
             Vue.set(state.call_email.email_user, 'residential_address', address);
         },
         updateLocation(state, location) {
             Vue.set(state.call_email, 'location', location);
         },
         updateLocationPoint(state, point) {
-            console.log("point");
-            console.log(point);
-                state.call_email.location.geometry.coordinates = point;
+            state.call_email.location.geometry.coordinates = point;
         },
         updateLocationAddress(state, location_properties) {
             state.call_email.location.properties = location_properties;
@@ -247,21 +247,6 @@ export const callemailStore = {
         },
         updateAllocatedGroupList(state, members) {
             Vue.set(state.call_email, 'allocated_group', {});
-            //let blankable_members = [];
-            //Object.assign(blankable_members, members);
-            //if (blankable_members) {
-              //  blankable_members.splice(0, 0, 
-                //    {
-                  //  id: null, 
-                   // email: "",
-                   // first_name: "",
-                    //last_name: "",
-                    //full_name: "",
-                    //title: "",
-                    //});
-            //}
-            //Vue.set(state.call_email.allocated_group, 'members', blankable_members);
-            console.log(members);
             Vue.set(state.call_email, 'allocated_group', members);
         },
         updateAllocatedGroupId(state, id) {
@@ -293,8 +278,6 @@ export const callemailStore = {
     },
     actions: {
         async loadCallEmail({ dispatch, commit }, { call_email_id }) {
-            console.log("loadCallEmail");
-            console.log(call_email_id);
             try {
                 const returnedCallEmail = await Vue.http.get(
                     helpers.add_endpoint_json(
@@ -319,7 +302,7 @@ export const callemailStore = {
                 }
 
             } catch (err) {
-                console.log(err);
+                //console.log(err);
             }
         },
         async saveCallEmailPerson({dispatch, state}){
@@ -329,7 +312,7 @@ export const callemailStore = {
                 await dispatch("setEmailUser", savedEmailUser.body);
                 await swal("Saved", "The record has been saved", "success");
             } catch (err) {
-                console.log(err);
+                //console.log(err);
                 if (err.body.non_field_errors){
                     await swal("Error", err.body.non_field_errors[0], "error");
                 } else {
@@ -337,10 +320,8 @@ export const callemailStore = {
                 }
             }
         },
+        //async saveCallEmail({ dispatch, state, rootGetters}, { crud, internal, close }) {
         async saveCallEmail({ dispatch, state, rootGetters}, { crud, internal }) {
-            console.log("saveCallEmail");
-            console.log("internal");
-            console.log(internal);
             let callId = null;
             let savedCallEmail = null;
             try {
@@ -377,7 +358,6 @@ export const callemailStore = {
                 } else if (payload.time_of_call === '') {
                     payload.time_of_call = null;
                 }
-                console.log(payload);
                 if (crud == 'duplicate') {
                     payload.id = null;
                     payload.location_id = null;
@@ -392,24 +372,47 @@ export const callemailStore = {
                     }
                 }
 
-                let fetchUrl = null;
-                if (crud === 'create' || crud === 'duplicate') {
-                    fetchUrl = api_endpoints.call_email;
-                    savedCallEmail = await Vue.http.post(fetchUrl, payload)
+                if (crud === 'create') {
+                    const createUrl = api_endpoints.call_email;
+                    savedCallEmail = await Vue.http.post(createUrl, {});
+                } else if (crud === 'duplicate') {
+                    const createUrl = api_endpoints.call_email;
+                    savedCallEmail = await Vue.http.post(createUrl, payload);
+                } else if (crud === 'save') {
+                        //---Save the draft call/email
+                        const draftUrl = helpers.add_endpoint_join(
+                        api_endpoints.call_email,
+                        state.call_email.id + "/draft/")
+                    try {
+                        savedCallEmail = await Vue.http.post(draftUrl, payload)
+                    }catch(err) {
+                        await swal({
+                            title: 'Error',
+                            html: helpers.formatError(err),
+                            type: "error",
+                        })
+                    }
                 } else {
-                    fetchUrl = helpers.add_endpoint_join(
+                    try {
+                        const fetchUrl = helpers.add_endpoint_join(
                         api_endpoints.call_email, 
-                        //state.call_email.id + "/call_email_save/"
                         state.call_email.id + "/"
                         )
-                    savedCallEmail = await Vue.http.put(fetchUrl, payload)
+                        savedCallEmail = await Vue.http.put(fetchUrl, payload)
+                    }catch(err) {
+                        await swal({
+                            title: 'Mandatory Field',
+                            html: helpers.formatError(err),
+                            type: "error",
+                        })
+                    }
                 }
 
                 await dispatch("setCallEmail", savedCallEmail.body);
                 callId = savedCallEmail.body.id;
 
             } catch (err) {
-                console.log(err);
+                //console.log(err);
                 if (internal) {
                     // return "There was an error saving the record";
                     return err;
@@ -428,7 +431,6 @@ export const callemailStore = {
                     return savedCallEmail;
                 }
             }
-            //return callId;
             return savedCallEmail;
         },
         setAllocatedGroupList({ commit }, data) {
@@ -441,11 +443,9 @@ export const callemailStore = {
             commit("updateAllocatedGroupId", id);
         },
         setCallID({ commit, }, id) {
-            console.log("setCallID");
             commit("updateCallID", id);
         },
         setSchema({ commit, }, schema) {
-            console.log("setSchema");
             commit("updateSchema", schema);
         },
         setEmailUser({ commit, }, email_user) {
@@ -470,7 +470,6 @@ export const callemailStore = {
             commit("updateLocationDetailsFieldEmpty");
         },
         setLocationPoint({ commit, }, point) {
-            console.log("setLocationPoint");
             commit("updateLocationPoint", point);
         },
         setClassificationEntry({ commit, }, classification_entry) {

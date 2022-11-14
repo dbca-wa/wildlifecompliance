@@ -31,14 +31,14 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                <!-- <label for="">Submitter</label>
-                                <select class="form-control" v-model="filterApplicationSubmitter">
+                                <label for="">Licence Activity</label>
+                                <select class="form-control" v-model="filterApplicationActivity">
                                     <option value="All">All</option>
-                                    <option v-for="s in application_submitters" :value="s.email" v-bind:key="`submitter_${s.email}`">{{s.search_term}}</option>
-                                </select> -->
+                                    <option v-for="a in application_activities" :value="a.value" v-bind:key="`activity_${a.value}`">{{a.label}}</option>
+                                </select>
                             </div>
                         </div>
-                        <div v-show="showNewApplicationButton" class="col-md-3">
+                        <div class="col-md-3">
                             <router-link  style="margin-top:25px;" class="btn btn-primary pull-right" :to="{ name: 'apply_application_organisation' }">New Application</router-link>
                         </div>
                     </div>
@@ -322,6 +322,7 @@ export default {
             filterApplicationLodgedFrom: '',
             filterApplicationLodgedTo: '',
             filterApplicationSubmitter: 'All',
+            filterApplicationActivity: 'All',
             dateFormat: 'DD/MM/YYYY',
             datepickerOptions:{
                 format: 'DD/MM/YYYY',
@@ -376,6 +377,7 @@ export default {
                         d.submitter = vm.filterApplicationSubmitter;
                         d.date_from = vm.filterApplicationLodgedFrom != '' && vm.filterApplicationLodgedFrom != null ? moment(vm.filterApplicationLodgedFrom, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
                         d.date_to = vm.filterApplicationLodgedTo != '' && vm.filterApplicationLodgedTo != null ? moment(vm.filterApplicationLodgedTo, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                        d.activity_purpose = vm.filterApplicationActivity;
                     }
                 },
                 columns: external_columns,
@@ -449,6 +451,7 @@ export default {
                         d.submitter = vm.filterApplicationSubmitter;
                         d.date_from = vm.filterApplicationLodgedFrom != '' && vm.filterApplicationLodgedFrom != null ? moment(vm.filterApplicationLodgedFrom, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
                         d.date_to = vm.filterApplicationLodgedTo != '' && vm.filterApplicationLodgedTo != null ? moment(vm.filterApplicationLodgedTo, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                        d.activity_purpose = vm.filterApplicationActivity;
                     }
                 },
                 columns: internal_columns,
@@ -498,6 +501,7 @@ export default {
                 }
             },
             activities : [],
+            application_activities: [],
         }
     },
     components:{
@@ -519,11 +523,15 @@ export default {
         filterApplicationLicenceType: function(){
             this.visibleDatatable.vmDataTable.draw();
         },
+        filterApplicationActivity: function(){
+            this.visibleDatatable.vmDataTable.draw();
+        },
     },
     computed: {
         ...mapGetters([
             'canViewPayments',
             'current_user',
+            'isIdentifiedUser',
         ]),
         visibleHeaders: function() {
             return this.is_external ? this.application_ex_headers : this.application_headers;
@@ -533,9 +541,6 @@ export default {
         },
         is_external: function(){
             return this.level == 'external';
-        },
-        showNewApplicationButton: function() {
-            return this.is_external && this.current_user.identification
         },
     },
     methods:{
@@ -693,10 +698,14 @@ export default {
                         activity_rows += `
                             <tr>
                                 <td>${activity['activity_name_str']}</td>
-                                <td>${activity['activity_purpose_names'].
+                                
+                                <td>${activity['activity_purpose_names_status']['name_string'].
                                     replace(/(?:\r\n|\r|\n|,)/g, '<br>')}</td>
                                 ${vm.is_external ? '' : activity['officer_name'] == null ?  `<td>&nbsp;</td>`: `<td>${activity['officer_name']}</td>`}    
-                                ${vm.is_external ? '' : `<td>${activity['processing_status']['name']}</td>`}
+    
+                                ${vm.is_external ? '' : `<td>${activity['activity_purpose_names_status']['status_string'].
+                                    replace(/(?:\r\n|\r|\n|,)/g, '<br>')}</td>`}
+
                                 ${vm.is_external ? '' : `<td>${activity['can_pay_licence_fee'] ?
                                     `<a pay-licence-fee-for='${activity['id']}' application-id='${row.data()['id']}'>Pay licence fee</a>` : ''}
                                 </td>`}
@@ -810,6 +819,7 @@ export default {
 
                     this.application_status = res.body.all_status
                     this.application_licence_types = res.body.all_category
+                    this.application_activities = res.body.all_activity
                 },err=>{
 
                     swal(
@@ -822,7 +832,7 @@ export default {
     },
     mounted: function(){
         let vm = this;
-        vm.loadCurrentUser({ url: `/api/my_user_details` });
+        vm.loadCurrentUser({ url: `/api/my_user_details` });     
         $( 'a[data-toggle="collapse"]' ).on( 'click', function () {
             var chev = $( this ).children()[ 0 ];
             window.setTimeout( function () {

@@ -11,7 +11,8 @@ from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from datetime import datetime, timedelta
 
 from wildlifecompliance.helpers import is_internal, prefer_compliance_management, is_model_backend, in_dbca_domain, \
-    is_compliance_internal_user, is_wildlifecompliance_admin
+    is_compliance_internal_user, is_wildlifecompliance_admin, is_compliance_management_callemail_readonly_user, belongs_to, \
+    is_compliance_management_approved_external_user
 from wildlifecompliance.forms import *
 from wildlifecompliance.components.applications.models import Application
 from wildlifecompliance.components.call_email.models import CallEmail
@@ -19,6 +20,12 @@ from wildlifecompliance.components.returns.models import Return
 from wildlifecompliance.components.main import utils
 from wildlifecompliance.exceptions import BindApplicationException
 from django.core.management import call_command
+from ledger.accounts.models import EmailUser
+import os
+import mimetypes
+from django.contrib import messages
+#from wildlifecompliance.components.users.models import CompliancePermissionGroup
+
 
 logger = logging.getLogger(__name__)
 # logger = logging
@@ -44,17 +51,18 @@ class ExternalReturnView(DetailView):
 
 
 class InternalView(UserPassesTestMixin, TemplateView):
+#class InternalView(TemplateView):
     template_name = 'wildlifecompliance/dash/index.html'
 
     def test_func(self):
-        return is_internal(self.request)
+        return is_internal(self.request) or is_compliance_management_approved_external_user(self.request)
 
     def get_context_data(self, **kwargs):
         context = super(InternalView, self).get_context_data(**kwargs)
         context['dev'] = settings.DEV_STATIC
         context['dev_url'] = settings.DEV_STATIC_URL
         context['app_build_url'] = settings.DEV_APP_BUILD_URL
-        context['build_tag'] = settings.BUILD_TAG
+        #context['build_tag'] = settings.BUILD_TAG
         return context
 
 
@@ -66,7 +74,7 @@ class ExternalView(LoginRequiredMixin, TemplateView):
         context['dev'] = settings.DEV_STATIC
         context['dev_url'] = settings.DEV_STATIC_URL
         context['app_build_url'] = settings.DEV_APP_BUILD_URL
-        context['build_tag'] = settings.BUILD_TAG
+        #context['build_tag'] = settings.BUILD_TAG
         return context
 
 
@@ -83,8 +91,11 @@ class WildlifeComplianceRoutingView(TemplateView):
             print('is_compliance_internal_user: {}'.format(is_compliance_internal_user(self.request)))
             print('is_wildlifecompliance_admin: {}'.format(is_wildlifecompliance_admin(self.request)))
             print('prefer compliance management: {}'.format(prefer_compliance_management(self.request)))
-            if is_internal(self.request) and prefer_compliance_management(self.request):
-                return redirect('internal/call_email/')
+            if (
+                    (is_internal(self.request) and prefer_compliance_management(self.request)) or
+                    is_compliance_management_approved_external_user(self.request)
+                    ):
+                return redirect('internal')
             elif is_internal(self.request):
                 return redirect('internal')
             return redirect('external')
@@ -118,7 +129,7 @@ def first_time(request):
     context['dev'] = settings.DEV_STATIC
     context['dev_url'] = settings.DEV_STATIC_URL
     context['app_build_url'] = settings.DEV_APP_BUILD_URL
-    context['build_tag'] = settings.BUILD_TAG
+    #context['build_tag'] = settings.BUILD_TAG
     return render(request, 'wildlifecompliance/dash/index.html', context)
 
 
@@ -157,3 +168,102 @@ class ManagementCommandsView(LoginRequiredMixin, TemplateView):
             data.update({command_script: 'true'})
 
         return render(request, self.template_name, data)
+
+class SecureBaseView(View):
+    '''
+    A generic view that applies the securebase policy to a post request. 
+    '''
+    def post(self, request, *args, **kwargs):
+        from wildlifecompliance.management.securebase_manager import SecurePipe
+        
+
+        securebase_view = SecurePipe(request)
+
+        return securebase_view.get_http_response()
+
+
+def getLedgerIdentificationFile(request, emailuser_id):
+    allow_access = False
+    # Add permission rules
+    #allow_access = True
+    ####
+    try:
+        user= EmailUser.objects.get(id=emailuser_id)
+        if request.user == user or request.user.is_staff is True or request.user.is_superuser is True:
+            allow_access=True
+        user_id=user.identification2
+        id_path=user_id.upload.path
+
+        extension = ""
+
+        if id_path[-5:-4] == '.':
+            extension = id_path[-4:]
+        if id_path[-4:-3] == '.':
+            extension = id_path[-3:]
+
+
+
+
+        #if request.user.is_superuser:
+        if allow_access == True:
+            file_name_path =  id_path 
+            full_file_path= id_path
+            if os.path.isfile(full_file_path) is True:
+                    #extension = file_name_path[-3:] 
+                    the_file = open(full_file_path, 'rb')
+                    the_data = the_file.read()
+                    the_file.close()
+                    if extension == 'msg':
+                        return HttpResponse(the_data, content_type="application/vnd.ms-outlook")
+                    if extension == 'eml':
+                        return HttpResponse(the_data, content_type="application/vnd.ms-outlook")
+
+                    return HttpResponse(the_data, content_type=mimetypes.types_map['.'+str(extension)])
+        else:
+                messages.error(request, 'Unable to find the document')
+                return redirect('wc_home')
+    except:
+        messages.error(request, 'Unable to find the document')
+        return redirect('wc_home')
+
+def getLedgerSeniorCardFile(request, emailuser_id):
+    allow_access = False
+    # Add permission rules
+    #allow_access = True
+    ####
+    try:
+        user= EmailUser.objects.get(id=emailuser_id)
+        if request.user == user or request.user.is_staff is True or request.user.is_superuser is True:
+            allow_access=True
+        user_senior_card=user.senior_card2
+        senior_card_path=user_senior_card.upload.path
+
+        extension = ""
+
+        if senior_card_path[-5:-4] == '.':
+            extension = senior_card_path[-4:]
+        if senior_card_path[-4:-3] == '.':
+            extension = senior_card_path[-3:]
+
+
+
+        if allow_access == True:
+            file_name_path =  senior_card_path 
+            full_file_path= senior_card_path
+            if os.path.isfile(full_file_path) is True:
+                    #extension = file_name_path[-3:] 
+                    the_file = open(full_file_path, 'rb')
+                    the_data = the_file.read()
+                    the_file.close()
+                    if extension == 'msg':
+                        return HttpResponse(the_data, content_type="application/vnd.ms-outlook")
+                    if extension == 'eml':
+                        return HttpResponse(the_data, content_type="application/vnd.ms-outlook")
+
+                    return HttpResponse(the_data, content_type=mimetypes.types_map['.'+str(extension)])
+        else:
+                messages.error(request, 'Unable to find the document')
+                return redirect('wc_home')
+    except:
+        messages.error(request, 'Unable to find the document')
+        return redirect('wc_home')

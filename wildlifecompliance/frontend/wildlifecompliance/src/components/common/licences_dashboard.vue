@@ -133,7 +133,7 @@ export default {
             licence_holders: [],
             licence_categories: [],
 //            licence_headers: ["Number", "Category", "Holder", "Status", "Issue Date", "Licence", "Action"],
-            licence_headers: ["Number", "Category", "Holder", "Issue Date", "Licence", "Action"],
+            licence_headers: ["Number", "Category", "Holder", "Issue Date", "Licence", "Status", "Action"],
             licence_options:{
                 serverSide: true,
                 searchDelay: 1000,
@@ -189,8 +189,13 @@ export default {
                     {
                         data: "licence_document",
                         mRender:function(data,type,full){
-                            return `<a href="${data}" target="_blank"><i style="color:red" class="fa fa-file-pdf-o"></i></a>`;
+                            return `<a href='#' view-licence='${full.id}'><i style="color:red" class="fa fa-file-pdf-o"></i></a>`;
                         },
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: "status",
                         orderable: false,
                         searchable: false
                     },
@@ -229,9 +234,9 @@ export default {
                                 if (!vm.is_external && full.can_add_purpose && !full.has_inspection_open) {
                                     links += `<a inspection-licence='${full.id}'>Request Inspection</a><br/>`
                                 }
-                                if (!vm.is_external) {
-                                    links += `<a licence-history='${full.id}'>History</a><br/>`
-                                }
+                            }
+                            if (!vm.is_external) {
+                                links += `<a licence-history='${full.id}'>History</a><br/>`
                             }
                             return links;
                         },
@@ -302,6 +307,9 @@ export default {
         },
     },
     computed: {
+        csrf_token: function() {
+            return helpers.getCookie('csrftoken')
+        },
         is_external: function(){
             return this.level == 'external';
         },        
@@ -397,9 +405,10 @@ export default {
                         var licence_activity_id = $(this).attr('amend-activity');
                         var select_activity_id = $(this).attr('select-activity');
                         var select_purpose_id = $(this).attr('select-purpose');
+                        var licence_purpose_id = $(this).attr('licence-purpose-id');
                         vm.setApplyProxyId({id: $(this).attr('proxy-id')});
                         vm.setApplyOrgId({id: $(this).attr('org-id')});
-                        vm.routeApplyLicence(licence_no, licence_category_id, licence_activity_id, select_activity_id, select_purpose_id);
+                        vm.routeApplyLicence(licence_no, licence_category_id, licence_activity_id, select_activity_id, select_purpose_id, licence_purpose_id);
                     }
                 },(error) => {
                 });
@@ -443,9 +452,10 @@ export default {
                         var licence_activity_id = $(this).attr('renew-activity');
                         var select_activity_id = $(this).attr('select-activity');
                         var select_purpose_id = $(this).attr('select-purpose');
+                        var licence_purpose_id = $(this).attr('licence-purpose-id');
                         vm.setApplyProxyId({id: $(this).attr('proxy-id')});
                         vm.setApplyOrgId({id: $(this).attr('org-id')});
-                        vm.routeApplyLicence(licence_no, licence_category_id, licence_activity_id, select_activity_id, select_purpose_id);
+                        vm.routeApplyLicence(licence_no, licence_category_id, licence_activity_id, select_activity_id, select_purpose_id, licence_purpose_id);
                     }
                 },(error) => {
                 });
@@ -907,6 +917,12 @@ export default {
                 vm.$refs.selected_licence_id = $(this).attr('inspection-licence');
                 vm.$refs.inspection.isModalOpen = true;
             });
+            // Create External view licence listener
+            vm.$refs.licence_datatable.vmDataTable.on('click', 'a[view-licence]', function(e) {
+                e.preventDefault();
+                const licence_id = $(this).attr('view-licence');
+                vm.viewLicence(licence_id);
+            });
             // Child row listener
             vm.$refs.licence_datatable.vmDataTable.on('click', 'tr.licRecordRow', function(e) {
                 // If a link is clicked, ignore
@@ -937,18 +953,19 @@ export default {
                     row.data()['latest_activities_merged'].forEach(function(activity) {
                         activity_rows += `
                             <tr>
+                                <td>${activity['activity_purpose_no']}</td>
                                 <td>${activity['activity_name_str']}</td>
-                                <td>${activity['sequence']}. ${activity['activity_purpose_names_and_status'].
-                                    replace(/(?:\r\n|\r|\n|,)/g, '<br>')}</td>
+                                <td>${activity['activity_purpose_name']}</td>
                                 <td>${activity['expiry_date'].replace(/(?:\r\n|\r|\n|,)/g, '<br>')}</td>
+                                <td>${activity['activity_purpose_status']}</td>
                                 <td>`;
                                     if (vm.is_external && activity['can_action']['can_amend']) {
                                         activity_rows +=
-                                            `<a licence-id='${licence_id}' select-activity='${activity["id"]}' amend-activity='${activity["licence_activity_id"]}' select-purpose='${activity["activity_purpose_id"]}' proxy-id='${proxy_id}' org-id='${org_id}' licence-category-id='${licence_category_id}'>Amend</a></br>`;
+                                            `<a licence-id='${licence_id}' select-activity='${activity["id"]}' amend-activity='${activity["licence_activity_id"]}' select-purpose='${activity["activity_purpose_id"]}' proxy-id='${proxy_id}' org-id='${org_id}' licence-purpose-id='${activity["licence_purpose_id"]}' licence-category-id='${licence_category_id}'>Amend</a></br>`;
                                     }
                                     if (vm.is_external && activity['can_action']['can_renew']) {
                                         activity_rows +=
-                                            `<a licence-id='${licence_id}' select-activity='${activity["id"]}' renew-activity='${activity["licence_activity_id"]}' select-purpose='${activity["activity_purpose_id"]}' proxy-id='${proxy_id}' org-id='${org_id}' licence-category-id='${licence_category_id}'>Renew</a></br>`;
+                                            `<a licence-id='${licence_id}' select-activity='${activity["id"]}' renew-activity='${activity["licence_activity_id"]}' select-purpose='${activity["activity_purpose_id"]}' proxy-id='${proxy_id}' org-id='${org_id}' licence-purpose-id='${activity["licence_purpose_id"]}' licence-category-id='${licence_category_id}'>Renew</a></br>`;
                                     }
                                     if (!vm.is_external && activity['can_action']['can_reactivate_renew']) {
                                         activity_rows +=
@@ -993,10 +1010,12 @@ export default {
                     child_row += `
                         <table class="table table-striped table-bordered child-row-table">
                             <tr>
+                                <th>Number</th>
                                 <th>Activity</th>
-                                <th class="width_55pc">Purposes</th>
-                                <th class="width_20pc">Expiry Date</th>
-                                <th class="width_20pc">Action</th>
+                                <th class="width_50pc">Purpose</th>
+                                <th class="width_10pc">Expiry Date</th>
+                                <th class="width_10pc">Status</th>
+                                <th class="width_10pc">Action</th>
                             </tr>
                             ${activity_rows}
                         </table>`;
@@ -1008,6 +1027,26 @@ export default {
                 }
             });
 
+        },
+        post_and_redirect: function(url, postData) {
+            var postFormStr = "<form method='POST' target='_blank' name='securebase-view' action='" + url + "'>";
+
+            for (var key in postData) {
+                if (postData.hasOwnProperty(key)) {
+                    postFormStr += "<input type='hidden' name='" + key + "' value='" + postData[key] + "'>";
+                }
+            }
+            postFormStr += "</form>";
+            var formElement = $(postFormStr);
+            $('body').append(formElement);
+            $(formElement).submit();
+            this.spinner = false;
+        },
+        viewLicence: function(licence_id) {
+            this.post_and_redirect(
+                `/securebase-view/`,
+                {'csrfmiddlewaretoken' : this.csrf_token, 'licence_id': licence_id}
+            );
         },
         requestedInspection: function(event){
             const data = {
@@ -1088,7 +1127,7 @@ export default {
         getColumnIndex: function(column_name) {
             return this.licence_headers.map(header => header.toLowerCase()).indexOf(column_name.toLowerCase());
         },
-        routeApplyLicence:function (licence_no, licence_category_id, licence_activity_id, select_activity_id, select_purpose_id) {
+        routeApplyLicence:function (licence_no, licence_category_id, licence_activity_id, select_activity_id, select_purpose_id, select_licence_purpose_id) {
             this.setApplicationWorkflowState({bool: true});
             return this.$router.push({
                 name: "apply_application_licence",
@@ -1098,6 +1137,7 @@ export default {
                     licence_no: licence_no,
                     select_activity: select_activity_id,
                     select_purpose: select_purpose_id,
+                    select_licence_purpose: select_licence_purpose_id,
                 }
             });
         },

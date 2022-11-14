@@ -107,13 +107,34 @@ def application_refund_callback(invoice_ref, bpoint_tid):
     logger.info(
         'application_refund_callback: Inv {0}'.format(invoice_ref)
     )
+    AMENDMENT = Application.APPLICATION_TYPE_AMENDMENT
+    DISCARDED = Application.CUSTOMER_STATUS_DRAFT
     try:
         ai = ApplicationInvoice.objects.filter(
             invoice_reference=invoice_ref
         )
+        with transaction.atomic():
 
-        for i in ai:
-            i.application.save()
+            for i in ai:
+                '''
+                Check where invoice is for an amendment application as refunds
+                are paid back to previous application invoice - will apply a 
+                save on both applications.
+                '''
+                amend = Application.objects.filter(
+                    previous_application_id=i.application_id,
+                    application_type=AMENDMENT,
+                ).exclude(
+                    customer_status=DISCARDED,
+                ).first()
+
+                if (amend):
+                    logger.info('refund_callback amendID {0}'.format(amend))
+                    amend.set_property_cache_refund_invoice(ai)
+                    amend.save()
+
+                i.application.set_property_cache_refund_invoice(ai)
+                i.application.save()
 
     except Exception as e:
         logger.error(
@@ -131,13 +152,42 @@ def application_invoice_callback(invoice_ref):
     logger.info(
         'application_invoice_callback: Inv {0}'.format(invoice_ref)
     )
+    AMENDMENT = Application.APPLICATION_TYPE_AMENDMENT
+    CASH = ApplicationInvoice.OTHER_PAYMENT_METHOD_CASH 
+    DISCARDED = Application.CUSTOMER_STATUS_DRAFT 
     try:
         ai = ApplicationInvoice.objects.filter(
             invoice_reference=invoice_ref
         )
+        with transaction.atomic():
 
-        for i in ai:
-            i.application.save()
+            for i in ai:
+                '''
+                Check for cash payment invoices on amendments as refunds are 
+                recorded causing the invoice_callback() to be applied. Save on 
+                both applications.
+
+                NOTE: cannot apply a ledger refund to an invoice for recorded 
+                cash payment - can only be recorded as a refund amount.
+                '''
+                if i.other_payment_method == CASH:
+
+                    amend = Application.objects.filter(
+                        previous_application_id=i.application_id,
+                        application_type=AMENDMENT,
+                    ).exclude(
+                        customer_status=DISCARDED,
+                    ).first()
+
+                    if amend and amend.requires_refund_amendment():
+                        logger.info('inv_callback amendID {0}'.format(amend))
+                        amend.set_property_cache_refund_invoice(ai)
+                        amend.save()
+
+                    if int(i.application.application_fee) < 0:
+                        i.application.set_property_cache_refund_invoice(ai)
+
+                i.application.save()
 
     except Exception as e:
         logger.error(
@@ -171,6 +221,7 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
         customer_status = request.GET.get('customer_status')
         status_filter = request.GET.get('status')
         submitter = request.GET.get('submitter')
+        activity_purpose = request.GET.get('activity_purpose')
         search_text = request.GET.get('search[value]')
 
         if queryset.model is Application:
@@ -194,6 +245,15 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
                 ).distinct() | super_queryset
 
             # apply user selected filters
+            activity_purpose = \
+                activity_purpose.lower() if activity_purpose else 'all'
+            if activity_purpose != 'all':
+                activity_purpose_app_ids = \
+                ApplicationSelectedActivityPurpose.objects.filter(
+                    purpose_id=int(activity_purpose)
+                ).values('selected_activity__application_id')
+                queryset = queryset.filter(id__in=activity_purpose_app_ids)
+
             category_name = category_name.lower() if category_name else 'all'
             if category_name != 'all':
                 # category_name_app_ids = []
@@ -203,21 +263,59 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
                     selected_activities__licence_activity__licence_category__name__icontains=category_name
                 )
                 queryset = queryset.filter(id__in=category_name_app_ids)
+
             processing_status = processing_status.lower() if processing_status else 'all'
             if processing_status != 'all':
-                # processing_status_app_ids = []
-                processing_status_app_ids = [
-                    application.id for application in queryset.all()
-                    if processing_status in application.processing_status.lower()
-                    or (
-                        processing_status == Application.PROCESSING_STATUS_DRAFT
-                        and Application.PROCESSING_STATUS_AWAITING_APPLICANT_RESPONSE in application.processing_status.lower()
+
+                if processing_status \
+                == Application.CUSTOMER_STATUS_UNDER_REVIEW:
+                    exclude = [
+                        ApplicationSelectedActivity.PROCESSING_STATUS_DRAFT,
+                        ApplicationSelectedActivity.PROCESSING_STATUS_AWAITING_LICENCE_FEE_PAYMENT,
+                        ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED,
+                        ApplicationSelectedActivity.PROCESSING_STATUS_DECLINED,
+                        ApplicationSelectedActivity.PROCESSING_STATUS_DISCARDED,
+                    ]
+
+                    processing_status_app_ids = Application.objects.values(
+                        'id'
+                    ).filter().exclude(
+                        selected_activities__processing_status__in=exclude,
                     )
-                ]
-                # for application in queryset:
-                #     if processing_status in application.processing_status.lower():
-                #         processing_status_app_ids.append(application.id)
+
+                elif processing_status \
+                == Application.CUSTOMER_STATUS_AWAITING_PAYMENT:
+                    include = [
+                        ApplicationSelectedActivity.PROCESSING_STATUS_AWAITING_LICENCE_FEE_PAYMENT,
+                    ]
+                    processing_status_app_ids = Application.objects.values(
+                        'id'
+                    ).filter(
+                        selected_activities__processing_status__in=include,
+                    )
+
+                elif processing_status \
+                == Application.CUSTOMER_STATUS_PARTIALLY_APPROVED:
+                    include = [
+                        Application.CUSTOMER_STATUS_PARTIALLY_APPROVED,
+                    ]
+                    processing_status_app_ids = Application.objects.values(
+                        'id'
+                    ).filter(
+                        customer_status__in=include,
+                    )
+
+                else:
+                    processing_status_app_ids = Application.objects.values(
+                        'id'
+                    ).filter(
+                        selected_activities__processing_status__in=[
+                            processing_status
+                        ]
+                    )
+
                 queryset = queryset.filter(id__in=processing_status_app_ids)
+
             customer_status = customer_status.lower() if customer_status else 'all'
             if customer_status != 'all':
                 customer_status_app_ids = []
@@ -225,11 +323,13 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
                     if customer_status in application.customer_status.lower():
                         customer_status_app_ids.append(application.id)
                 queryset = queryset.filter(id__in=customer_status_app_ids)
+
             if date_from:
                 queryset = queryset.filter(lodgement_date__gte=date_from)
             if date_to:
                 date_to = datetime.strptime(date_to, '%Y-%m-%d') + timedelta(days=1)
                 queryset = queryset.filter(lodgement_date__lte=date_to)
+
             submitter = submitter.lower() if submitter else 'all'
             if submitter != 'all':
                 queryset = queryset.filter(submitter__email__iexact=submitter)
@@ -324,7 +424,7 @@ class ApplicationPaginatedViewSet(viewsets.ModelViewSet):
     @list_route(methods=['GET', ])
     def internal_datatable_list(self, request, *args, **kwargs):
         self.serializer_class = DTInternalApplicationSerializer
-        #self.serializer_class = DTInternalApplicationDashboardSerializer
+
         queryset = self.get_queryset()
         # Filter by org
         org_id = request.GET.get('org_id', None)
@@ -351,14 +451,9 @@ class ApplicationPaginatedViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(queryset)
         self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
-        # TODO: add caching
-        # cached_response = cache.get('internalapplications_{}'.format(result_page))
-        # if cached_response:
-        #     return cached_response
         serializer = DTInternalApplicationSerializer(result_page, context={'request': request}, many=True)
-        # most expensive query that traverses properties etc
         response = self.paginator.get_paginated_response(serializer.data)
-        # cache.set('internalapplications_{}'.format(result_page), response, 3600)
+
         return response
 
     @list_route(methods=['GET', ])
@@ -519,10 +614,11 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         try:
             with transaction.atomic():
                 instance = self.get_object()
-                request.data['application'] = u'{}'.format(instance.id)
-                request.data['staff'] = u'{}'.format(request.user.id)
-                request.data['log_type'] = request.data['type']
-                serializer = ApplicationLogEntrySerializer(data=request.data)
+                request_data = request.data.copy()
+                request_data['application'] = u'{}'.format(instance.id)
+                request_data['staff'] = u'{}'.format(request.user.id)
+                request_data['log_type'] = request.data['type']
+                serializer = ApplicationLogEntrySerializer(data=request_data)
                 serializer.is_valid(raise_exception=True)
                 comms = serializer.save()
                 # Save the files
@@ -552,7 +648,9 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         try:
 
             instance = Application.objects.last()
-            serializer = DTApplicationSelectSerializer(instance)
+            serializer = DTApplicationSelectSerializer(
+                instance, context={'is_internal': is_internal(request)}
+            )
 
             return Response(serializer.data)
 
@@ -640,7 +738,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -669,8 +766,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['GET', ])
     def active_licence_application(self, request, *args, **kwargs):
-        # active_application = Application.get_active_licence_applications(
-        #     request).first()
         active_application = Application.get_first_active_licence_application(
             request
         )
@@ -756,7 +851,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             delete_session_application(request.session)
@@ -766,6 +860,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['post'])
     @renderer_classes((JSONRenderer,))
     def application_fee_checkout(self, request, *args, **kwargs):
+        import decimal
         try:
             checkout_result = None
             instance = self.get_object()
@@ -773,7 +868,11 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             with transaction.atomic():
 
                 product_lines = []
-                if instance.application_fee < 1:
+
+                licence_fee = decimal.Decimal(
+                    instance.get_property_cache_licence_fee() * 1)
+
+                if instance.application_fee < 1 and licence_fee < 1:
                     raise Exception('Checkout request for zero amount.')
 
                 application_submission = u'Application No: {}'.format(
@@ -797,7 +896,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -813,9 +911,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             instance = self.get_object()
 
             with transaction.atomic():
-
-                # if not request.user.is_staff:
-                #     raise Exception('Non staff member.')
 
                 session = request.session
                 set_session_application(session, instance)
@@ -853,7 +948,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -900,10 +994,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                    or a.has_additional_fee
                 ]
                 # only fees which are greater than zero.
-                # activities_with_fees = [
-                #    a for a in activities_adj
-                #    if a.application_fee > 0 or a.licence_fee > 0
-                # ]
 
                 for activity in activities_adj:
 
@@ -976,27 +1066,16 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                                 clear_inv.get_product_line_refund_for(p)
                             )
 
-            # Check if refund is required from last invoice.
-            # last_inv = LicenceFeeClearingInvoice(instance)
-            # if last_inv.is_refundable:
-            #     product_lines.append(last_inv.get_product_line_for_refund())
-
-                # # refund any application fee adjustments.
-                # if instance.application_fee < 0:
-
-                #     price_excl = calculate_excl_gst(instance.application_fee)
-                #     if ApplicationFeePolicy.GST_FREE:
-                #         price_excl = instance.application_fee
-                #     # _code = activity.licence_activity.oracle_account_code
-                #     oracle_code = ''
-
-                #     product_lines.append({
-                #         'ledger_description': 'Adjusted fee refund',
-                #         'quantity': 1,
-                #         'price_incl_tax': str(instance.application_fee),
-                #         'price_excl_tax': str(price_excl),
-                #         'oracle_code': oracle_code
-                #     })
+#            if not product_lines and hasattr(instance.latest_invoice, 'voided') and instance.latest_invoice.voided:
+#                product_lines.append(
+#                    {
+#                        'ledger_description': f'{instance.lodgement_number} - Invoice Voided {instance.latest_invoice.reference}',
+#                        'quantity': 1,
+#                        'price_incl_tax': '0.00',
+#                        'price_excl_tax': '0.00',
+#                        'oracle_code': 'K417 EXEMPT'
+#                    }
+#                )
 
             checkout_result = checkout(
                 request, instance,
@@ -1015,7 +1094,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -1026,9 +1104,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         try:
             instance = self.get_object()
             instance.accept_id_check(request)
-            # serializer = InternalApplicationSerializer(
-            #     instance, context={'request': request})
-            # return Response(serializer.data)
+
             return Response(
                 {'id_check_status': instance.id_check_status},
                 status=status.HTTP_200_OK
@@ -1048,9 +1124,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         try:
             instance = self.get_object()
             instance.reset_id_check(request)
-            # serializer = InternalApplicationSerializer(
-            #     instance, context={'request': request})
-            # return Response(serializer.data)
+
             return Response(
                 {'id_check_status': instance.id_check_status},
                 status=status.HTTP_200_OK
@@ -1070,9 +1144,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         try:
             instance = self.get_object()
             instance.request_id_check(request)
-            # serializer = InternalApplicationSerializer(
-            #     instance, context={'request': request})
-            # return Response(serializer.data)
+
             return Response(
                 {'id_check_status': instance.id_check_status},
                 status=status.HTTP_200_OK
@@ -1116,9 +1188,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         try:
             instance = self.get_object()
             instance.accept_character_check(request)
-            # serializer = InternalApplicationSerializer(
-            #     instance, context={'request': request})
-            # return Response(serializer.data)
+
             return Response(
                 {'character_check_status': instance.character_check_status},
                 status=status.HTTP_200_OK
@@ -1158,9 +1228,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         try:
             instance = self.get_object()
             instance.accept_return_check(request)
-            # serializer = InternalApplicationSerializer(
-            #     instance, context={'request': request})
-            # return Response(serializer.data)
+
             return Response(
                 {'return_check_status': instance.return_check_status},
                 status=status.HTTP_200_OK
@@ -1180,9 +1248,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         try:
             instance = self.get_object()
             instance.reset_return_check(request)
-            # serializer = InternalApplicationSerializer(
-            #     instance, context={'request': request})
-            # return Response(serializer.data)
+
             return Response(
                 {'return_check_status': instance.return_check_status},
                 status=status.HTTP_200_OK
@@ -1234,9 +1300,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                 raise serializers.ValidationError(
                     'You are not in any relevant licence officer groups for this application.')
             instance.assign_officer(request, request.user)
-            # serializer = InternalApplicationSerializer(
-            #     instance, context={'request': request})
-            # return Response(serializer.data)
+
             return Response(
                 {'assigned_officer_id': user.id},
                 status=status.HTTP_200_OK
@@ -1271,9 +1335,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                 raise serializers.ValidationError(
                     'User is not in any relevant licence officer groups for this application')
             instance.assign_officer(request, user)
-            # serializer = InternalApplicationSerializer(
-            #     instance, context={'request': request})
-            # return Response(serializer.data)
+
             return Response(
                 {'assigned_officer_id': user.id},
                 status=status.HTTP_200_OK
@@ -1293,9 +1355,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         try:
             instance = self.get_object()
             instance.unassign_officer(request)
-            # serializer = InternalApplicationSerializer(
-            #     instance, context={'request': request})
-            # return Response(serializer.data)
+
             return Response(
                 {'assigned_officer_id': None},
                 status=status.HTTP_200_OK
@@ -1322,10 +1382,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                     licence approver groups for this application.')
 
             instance.set_activity_approver(activity_id, me)
-            # serializer = InternalApplicationSerializer(
-            #     instance, context={'request': request})
-
-            # return Response(serializer.data)
 
             return Response(
                 {'assigned_approver_id': me.id},
@@ -1371,10 +1427,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                     licence approver groups for application activity.')
 
             instance.set_activity_approver(activity_id, approver)
-            # serializer = InternalApplicationSerializer(
-            #     instance, context={'request': request})
-
-            # return Response(serializer.data)
 
             return Response(
                 {'assigned_approver_id': approver.id},
@@ -1399,10 +1451,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             instance = self.get_object()
             activity_id = request.data.get('activity_id', None)
             instance.set_activity_approver(activity_id, None)
-            # serializer = InternalApplicationSerializer(
-            #     instance, context={'request': request})
-
-            # return Response(serializer.data)
 
             return Response(
                 {'assigned_approver_id': None},
@@ -1449,23 +1497,43 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
     @detail_route(methods=['POST', ])
-    def update_activity_status(self, request, *args, **kwargs):
+    def update_licence_type_data(self, request, *args, **kwargs):
+        '''
+        Update the Licence Type Data on the application to set the status for 
+        a selected Licence Activity.
 
+        NOTE: there is no check whether user has correct privileges.
+        '''
+        PROCESS = 'process'
+        ASSESS = 'assess'
         try:
             instance = self.get_object()
-            activity_id = request.data.get('activity_id')
-            status = request.data.get('status')
-            if not status or not activity_id:
+            licence_activity_id = request.data.get('licence_activity_id', None)
+            workflow = request.data.get('licence_activity_workflow', None)
+
+            if not workflow or not licence_activity_id:
                 raise serializers.ValidationError(
-                    'Status and activity id is required')
-            else:
-                if not ApplicationSelectedActivity.is_valid_status(status):
-                    raise serializers.ValidationError(
-                        'The status provided is not allowed')
-            instance.set_activity_processing_status(activity_id, status)
+                    'Activity workflow and activity id is required')
+
+            if workflow.lower() == PROCESS:
+                instance.set_activity_processing_status(
+                    licence_activity_id, 
+                    ApplicationSelectedActivity.PROCESSING_STATUS_WITH_OFFICER,
+                )
+            elif workflow.lower() == ASSESS:
+                instance.set_activity_processing_status(
+                    licence_activity_id, 
+                    ApplicationSelectedActivity.PROCESSING_STATUS_OFFICER_CONDITIONS,
+                )
+
             serializer = InternalApplicationSerializer(
-                instance, context={'request': request})
-            return Response(serializer.data)
+                instance, 
+                context={'request': request}
+            )
+            response = Response(serializer.data)
+
+            return response
+
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
@@ -1473,7 +1541,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -1494,7 +1561,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -1507,9 +1573,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             serializer = ProposedLicenceSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             instance.proposed_licence(request, serializer.validated_data)
-            # serializer = InternalApplicationSerializer(
-            #     instance, context={'request': request})
-            # return Response(serializer.data)
 
             return Response({'success': True})
 
@@ -1520,7 +1583,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -1540,7 +1602,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -1548,11 +1609,118 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
     @detail_route(methods=['post'])
     @renderer_classes((JSONRenderer,))
-    def assessment_data(self, request, *args, **kwargs):
-        logger.debug('assessment_data()')
+    def assessment_data_and_save(self, request, *args, **kwargs):
+        '''
+        Process assessment data for officer management by setting the workflow
+        status to Officer with Conditions.
+
+        NOTE: there is no check whether user has correct privileges.
+
+        :param __assess is a boolean indicating whether assessing or viewing.
+        :param __licence_activity is Licence Activity identifier.
+
+        :return updated instance.licence_type_data property.
+        '''
+        logger.debug('assessment_data_and_save()')
+        STAT = ApplicationSelectedActivity.PROCESSING_STATUS_OFFICER_CONDITIONS
+        correct_status = [
+            ApplicationSelectedActivity.PROCESSING_STATUS_WITH_OFFICER,
+        ]
         try:
             instance = self.get_object()
             assess = request.data.pop('__assess', False)
+            licence_activity_id = request.data.pop('__licence_activity', None)
+            is_submit = self.request.data.pop('__submit', False)
+
+            if is_submit:
+                action = ApplicationFormDataRecord.ACTION_TYPE_ASSIGN_SUBMIT
+            else:
+                action = ApplicationFormDataRecord.ACTION_TYPE_ASSIGN_VALUE
+
+            with transaction.atomic():
+
+                ApplicationService.process_form(
+                    request,
+                    instance,
+                    request.data,
+                    action=action
+                )
+
+                is_initial_assess = instance.get_property_cache_assess()
+                if assess or is_initial_assess:
+
+                    checkbox = CheckboxAndRadioButtonVisitor(
+                        instance, request.data
+                    )
+                    # Set StandardCondition Fields.
+                    for_condition_fields = StandardConditionFieldElement()
+                    for_condition_fields.accept(checkbox)
+
+                    # Set PromptInspection Fields.
+                    for_inspection_fields = PromptInspectionFieldElement()
+                    for_inspection_fields.accept(checkbox)
+
+                    if is_initial_assess:
+                        instance.set_property_cache_assess(False)
+
+                selected_activity = instance.get_selected_activity(
+                    licence_activity_id
+                )
+                if selected_activity.processing_status in correct_status:
+                    instance.set_activity_processing_status(
+                        licence_activity_id,
+                        STAT,
+                    )
+
+                instance.save()
+                instance.log_user_action(
+                    ApplicationUserAction.ACTION_SAVE_APPLICATION.format(
+                        instance.lodgement_number
+                    ), request)
+
+            logger.debug('assessment_data_and_save() - response success')
+
+            serializer = InternalApplicationSerializer(
+                instance,
+                context={'request': request}
+            )
+            response = Response(serializer.data)
+            return response
+
+        except MissingFieldsException as e:
+            return Response({
+                'missing': e.error_list},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except ValidationError as e:
+            raise serializers.ValidationError(repr(e.error_dict))
+        except Exception as e:
+            print(traceback.print_exc())
+        raise serializers.ValidationError(str(e))
+
+    @detail_route(methods=['post'])
+    @renderer_classes((JSONRenderer,))
+    def assessment_data(self, request, *args, **kwargs):
+        '''
+        Process assessment data for officer management by setting the workflow
+        status to Officer with Conditions.
+
+        NOTE: there is no check whether user has correct privileges.
+
+        :param __assess is a boolean indicating whether assessing or viewing.
+        :param __licence_activity is Licence Activity identifier.
+
+        :return updated instance.licence_type_data property.        
+        '''
+        logger.debug('assessment_data()')
+        STAT = ApplicationSelectedActivity.PROCESSING_STATUS_OFFICER_CONDITIONS
+        correct_status = [
+            ApplicationSelectedActivity.PROCESSING_STATUS_WITH_OFFICER,
+        ]
+        try:
+            instance = self.get_object()
+            assess = request.data.pop('__assess', False)
+            licence_activity_id = request.data.pop('__licence_activity', None)
             with transaction.atomic():
                 is_initial_assess = instance.get_property_cache_assess()
                 if assess or is_initial_assess:
@@ -1572,8 +1740,23 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                         instance.set_property_cache_assess(False)
                         instance.save()
 
+                selected_activity = instance.get_selected_activity(
+                    licence_activity_id
+                )
+                if selected_activity.processing_status in correct_status:
+                    instance.set_activity_processing_status(
+                        licence_activity_id, 
+                        STAT,
+                    )
+
             logger.debug('assessment_data() - response success')
-            return Response({'success': True})
+
+            serializer = InternalApplicationSerializer(
+                instance, 
+                context={'request': request}
+            )
+            response = Response(serializer.data)
+            return response
 
         except MissingFieldsException as e:
             return Response({
@@ -1619,10 +1802,9 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             instance = self.get_object()
             serializer = IssueLicenceSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            instance.final_decision(request)
-            # serializer = InternalApplicationSerializer(
-            #     instance, context={'request': request})
-            # return Response(serializer.data)
+
+            with transaction.atomic():
+                instance.final_decision(request)
 
             return Response({'success': True})
 
@@ -1633,7 +1815,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -1656,7 +1837,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -1697,6 +1877,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                     request.data,
                     action=ApplicationFormDataRecord.ACTION_TYPE_ASSIGN_COMMENT
                 )
+                instance.save()
 
             return Response({'success': True})
         except Exception as e:
@@ -1709,14 +1890,21 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         logger.debug('form_data()')
         try:
             instance = self.get_object()
+            is_submit = self.request.data.pop('__submit', False)
+
+            if is_submit:
+                action = ApplicationFormDataRecord.ACTION_TYPE_ASSIGN_SUBMIT
+            else:
+                action = ApplicationFormDataRecord.ACTION_TYPE_ASSIGN_VALUE
+
             with transaction.atomic():
                 ApplicationService.process_form(
                     request,
                     instance,
                     request.data,
-                    action=ApplicationFormDataRecord.ACTION_TYPE_ASSIGN_VALUE
+                    action=action
                 )
-
+                instance.save()
                 instance.log_user_action(
                     ApplicationUserAction.ACTION_SAVE_APPLICATION.format(
                         instance.lodgement_number
@@ -1779,6 +1967,9 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         from wildlifecompliance.components.licences.models import (
             WildlifeLicence, LicencePurpose
         )
+        from wildlifecompliance.components.applications.payments import (
+            ApplicationFeePolicy,
+        )
 
         try:
             org_applicant = request.data.get('organisation_id')
@@ -1790,6 +1981,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             # Amendment to licence purpose requires the selected activity it
             # belongs to - allows for multiple purposes of same type.
             selected_activity = request.data.get('selected_activity', None)
+            selected_purpose = request.data.get('selected_purpose', None)
 
             # establish the submit type from the payment method.
             CASH = ApplicationInvoice.OTHER_PAYMENT_METHOD_CASH
@@ -1832,10 +2024,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                 active_current_applications = active_applications.exclude(
                     selected_activities__activity_status=ApplicationSelectedActivity.ACTIVITY_STATUS_SUSPENDED
                 )
-                # latest_active_licence = WildlifeLicence.objects.filter(
-                #     licence_category_id=licence_category.id,
-                #     current_application__in=active_applications.values_list('id', flat=True)
-                # ).order_by('-id').first()
 
                 # determine licence no from active application for category.
                 latest_active_licence = WildlifeLicence.objects.filter(
@@ -1849,6 +2037,12 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                     Application.APPLICATION_TYPE_RENEWAL,
                     Application.APPLICATION_TYPE_REISSUE,
                 ]:
+                    # Check an Application Selected Activity has been chosen.
+                    if not (selected_activity and selected_purpose):
+                        raise serializers.ValidationError(
+                            'Cannot create application: licence not found!'
+                        )
+
                     # Check that at least one active application exists in this
                     # licence category for amendment/renewal.
                     if not latest_active_licence:
@@ -1860,7 +2054,8 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                     # tampering. Remove any that aren't valid for 
                     # renew/amendment/reissue.
                     active_current_purposes = active_current_applications.filter(
-                        licence_purposes__licence_activity_id__in=licence_activity_ids
+                        licence_purposes__licence_activity_id__in=licence_activity_ids,
+                        licence_purposes__id__in=licence_purposes,
                     ).values_list(
                         'licence_purposes__id',
                         flat=True
@@ -1870,14 +2065,23 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                     # Although multiple purposes of the same type can exist for
                     # a licence, only one can be created for selected activity.
                     previous_application = licence_activities.filter(
-                        id=selected_activity
+                        id=int(selected_activity)
                     ).values_list(
                         'application_id',
                         flat=True
                     ).first()
                     data['previous_application'] = previous_application
 
-                    cleaned_purpose_ids = set(active_current_purposes) & set(licence_purposes)
+                    # cleaned_purpose_ids = set(active_current_purposes) & set(licence_purposes)
+
+                    # Set to the latest licence purpose version in queryset.
+                    amendable_purposes_qs = licence_purposes_queryset
+                    cleaned_purposes = [
+                        p.get_latest_version() for p in amendable_purposes_qs
+                        if p.id in active_current_purposes
+                    ]
+                    cleaned_purpose_ids = [p.id for p in cleaned_purposes]
+                    # cleaned_purpose_ids = []
                     data['licence_purposes'] = cleaned_purpose_ids
 
                 if latest_active_licence:
@@ -1890,40 +2094,46 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
 
-                # Pre-fill the ApplicationFormDataRecord table with data from
-                # latest current applications.
-                # for selected purpose ids
+                # Pre-fill the Application Form and Conditions with data from
+                # current Application Selected Activity (selected_activity).
+                # NOTE: Only selected purpose can be amended or renewed.
                 if application_type in [
                     Application.APPLICATION_TYPE_AMENDMENT,
                     Application.APPLICATION_TYPE_RENEWAL,
                 ]:
                     target_application = serializer.instance
                     copied_purpose_ids = []
-                    # FIXME: Copying the first licence purpose from list.
-                    # duplicates can exist for multi. Correctly select the
-                    # required activity and pass in for amend and renewal.
-                    for activity in licence_activities:
-                        activity_purpose_ids = [
-                            p.purpose.id
-                            for p in activity.proposed_purposes.all()
-                            if p.is_issued
-                        ]
-                        copy_purpose_ids = list(
-                           set(activity_purpose_ids) - set(copied_purpose_ids)
+                    activity = licence_activities.filter(
+                        id=int(selected_activity)).first() 
+
+                    selected_purpose = activity.proposed_purposes.filter(
+                        id=int(selected_purpose)).first()
+
+                    activity.application.copy_application_purpose_to_target_application(
+                        target_application, 
+                        selected_purpose.purpose_id,
+                    )
+                    activity.application.copy_conditions_to_target(
+                        target_application,
+                        selected_purpose.purpose_id,
+                    )
+
+                    # When Licence Purpose has been replaced update target with
+                    # the latest version using the selected_purpose from the
+                    # accepted application.
+                    licence_version_updated = \
+                    target_application.update_application_purpose_version(
+                        selected_purpose,
+                    )
+                    if licence_version_updated:
+                        action = ApplicationUserAction.ACTION_VERSION_LICENCE_
+                        target_application.log_user_action(
+                            action.format(
+                                selected_purpose.purpose.short_name,
+                                selected_purpose.purpose.version,
+                            ),
+                            request
                         )
-                        purposes_to_copy = set(
-                            cleaned_purpose_ids) & set(copy_purpose_ids)
-
-                        for purpose_id in purposes_to_copy:
-
-                            activity.application.copy_application_purpose_to_target_application(
-                                target_application, purpose_id)
-
-                            activity.application.copy_conditions_to_target(
-                                target_application,
-                                purpose_id,
-                            )
-                            copied_purpose_ids.append(purpose_id)
 
                 # Set previous_application to the latest active application if
                 # exists
@@ -1936,12 +2146,19 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                 # serializer.instance.update_dynamic_attributes()
                 ApplicationService.update_dynamic_attributes(
                     serializer.instance)
+
+                # Use fee policy to set initial base fee for the application.
+                policy = \
+                ApplicationFeePolicy.get_fee_policy_for(serializer.instance)
+                policy.set_base_application_fee_for(serializer.instance)
+
                 response = Response(serializer.data)
 
             return response
 
         except Exception as e:
-            print(traceback.print_exc())
+            logger.error('ApplicationViewSet.create() {}'.format(e))
+            traceback.print_exc()
             raise serializers.ValidationError(str(e))
 
     def update(self, request, *args, **kwargs):
@@ -2014,35 +2231,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             'species': None
         })
 
-    @detail_route(permission_classes=[], methods=['GET'])
-    def application_checkout_status(self, request, *args, **kwargs):
-        # TODO: may need to re-build this function for Wildlife Licensing (code taken from Parkstay) if required
-        try:
-            # instance = self.get_object()
-            response = {
-                'status': 'rejected',
-                'error': ''
-            }
-            # # Check the type of booking
-            # if instance.booking_type != 3:
-            #    response['error'] = 'This booking has already been paid for'
-            #    return Response(response,status=status.HTTP_200_OK)
-            # # Check if the time for the booking has elapsed
-            # if instance.expiry_time <= timezone.now():
-            #     response['error'] = 'This booking has expired'
-            #     return Response(response,status=status.HTTP_200_OK)
-            # if all is well
-            response['status'] = 'approved'
-            return Response(response, status=status.HTTP_200_OK)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
-
 
 class ApplicationConditionViewSet(viewsets.ModelViewSet):
     queryset = ApplicationCondition.objects.all()
@@ -2063,18 +2251,25 @@ class ApplicationConditionViewSet(viewsets.ModelViewSet):
 
     @detail_route(methods=['DELETE', ])
     def delete(self, request, *args, **kwargs):
+        from wildlifecompliance.components.returns.services import ReturnService
         try:
             instance = self.get_object()
-            instance.application.log_user_action(
-                ApplicationUserAction.ACTION_DELETE_CONDITION.format(
-                    instance.licence_purpose.short_name,
-                    instance.condition[:256],
-                ),
-                request
-            )
-            instance.delete()
+
+            with transaction.atomic():
+                ReturnService.discard_return_request(request, instance)
+
+                instance.application.log_user_action(
+                    ApplicationUserAction.ACTION_DELETE_CONDITION.format(
+                        instance.licence_purpose.short_name,
+                        instance.condition[:256],
+                    ),
+                    request
+                )
+                instance.delete()
+
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
+
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
@@ -2207,7 +2402,6 @@ class ApplicationSelectedActivityViewSet(viewsets.ModelViewSet):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -2331,7 +2525,6 @@ class AssessmentViewSet(viewsets.ModelViewSet):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
                 logger.error('AssessmentViewSet.create(): {0}'.format(e))
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -2406,7 +2599,6 @@ class AssessmentViewSet(viewsets.ModelViewSet):
                 logger.error(
                     'AssessmentViewSet.update_assessment(): {0}'.format(e)
                 )
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -2509,7 +2701,6 @@ class AmendmentRequestViewSet(viewsets.ModelViewSet):
                 logger.error(
                     'AmendmentRequestViewSet.create(): {0}'.format(e)
                 )
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())

@@ -7,8 +7,8 @@ It provides authentication, address and online payments functionality.
 
 # Requirements
 
-- Python (2.7.x)
-- PostgreSQL (>=9.3)
+- Python (3.7.x)
+- PostgreSQL (11.0)
 
 Python library requirements should be installed using `pip`:
 
@@ -43,6 +43,16 @@ required environment variables at run time. Example content:
     EMAIL_INSTANCE='UAT' (DEV/TEST/UAT/PROD)
     NON_PROD_EMAIL='comma@separated.email,listfor@nonproduction.emails'
     TSC_AUTH="Token pd12312313dd12321313asdd21321312344123s"
+
+# Compliance Management (CM)
+
+This section contains information specific to the Compliance Management project.
+
+## TODOs
+
+Note 20220603: RegionDistrict has been replaced with Region, District. 
+In addition, CompliancePermissionGroup model has been dropped as CM permissions are no longer generated via `management/permissions_manager.py`
+As a result, the security model for all entities must be updated.  This has only been done for CallEmail.
 
 # Wildlife Licensing
 

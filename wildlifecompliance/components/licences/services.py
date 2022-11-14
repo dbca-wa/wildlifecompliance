@@ -2,18 +2,22 @@ import logging
 import abc
 
 from datetime import date
+from wildlifecompliance.components.licences.utils import LicenceSchemaUtility
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
-from wildlifecompliance.components.main.models import (
-    GlobalSettings,
-)
+from wildlifecompliance.components.main.admin import AdministrationAction
+from wildlifecompliance.components.main.models import GlobalSettings
 
 from wildlifecompliance.components.licences.models import (
     WildlifeLicence,
+    LicencePurpose,
+    # DefaultPurpose,
+    PurposeSpecies,
+    LicencePurposeSection,
 )
 from wildlifecompliance.components.licences.email import (
     send_licence_renewal_notification,
@@ -27,7 +31,9 @@ from wildlifecompliance.components.applications.models import (
     ApplicationSelectedActivity,
     ApplicationSelectedActivityPurpose,
     ApplicationUserAction,
+    DefaultCondition,
 )
+from wildlifecompliance.exceptions import LicenceServiceException
 
 logger = logging.getLogger(__name__)
 logging.disable(logging.NOTSET)
@@ -74,7 +80,7 @@ class LicenceService(object):
                 on_licence_actioner = LicenceActioner(licence)
                 on_licence_actioner.apply_action(request, REISSUE)
                 application = on_licence_actioner.actioned_application
-                licence.current_application = application                   
+                licence.current_application = application
 
         except Exception as e:
             logger.error('ERR request_reissue_licence() ID {0}: {1}'.format(
@@ -212,7 +218,6 @@ class LicenceService(object):
         the_list = None
         try:
             actioner = LicenceActioner(licence)
-            # the_list = actioner.get_latest_activities_for_request()
             the_list = actioner.get_latest_activity_purposes_for_request()
 
         except Exception as e:
@@ -231,7 +236,7 @@ class LicenceService(object):
 
         :return a count of total renew notification sent.
         '''
-        licence_ids_count = 0               # count of licences verified.
+        verified = []
         today = date.today()
         issued_status = [
             ApplicationSelectedActivityPurpose.PROCESSING_STATUS_ISSUED,
@@ -263,13 +268,14 @@ class LicenceService(object):
                 this_licence = LicenceService.verify_licence_renewal_for(
                     licence_id['licence_id']
                 )
-                licence_ids_count = licence_ids_count + this_licence
+                if this_licence:
+                    verified.append(this_licence)
 
         except Exception as e:
             logger.error('ERR verify_licence_renewals: {0}'.format(e))
             raise Exception('Failed verifying licence renewal.')
 
-        return licence_ids_count
+        return verified
 
     @staticmethod
     def verify_licence_renewal_for(licence_id, request=None):
@@ -277,8 +283,8 @@ class LicenceService(object):
         Verifies a licence requiring renewal and send a notification to the
         applicant.
         '''
-        has_sent_notification = 0       # Count of notification sent.
         try:
+            verified = None
             period_days = GlobalSettings.objects.values('value').filter(
                 key=GlobalSettings.LICENCE_RENEW_DAYS
             ).first()
@@ -300,7 +306,7 @@ class LicenceService(object):
                 # Send out renewal notice. (only with request)
                 send_licence_renewal_notification(
                     licence, purposes_to_renew, request)
-                has_sent_notification = 1
+                verified = licence
 
         except Exception as e:
             logger.error('ERR verify_licence_renewal_for {0}: {1}'.format(
@@ -309,7 +315,7 @@ class LicenceService(object):
             ))
             raise Exception('Failed verifying licence renewal.')
 
-        return has_sent_notification
+        return verified
 
     @staticmethod
     def verify_expired_licences(request=None):
@@ -319,6 +325,7 @@ class LicenceService(object):
 
         :return a count of licenses expired and re-generated.
         '''
+        verified = []
         try:
             # raise Exception('LicenceService not implemented')
 
@@ -355,15 +362,17 @@ class LicenceService(object):
                 # for each licence id verify if renewal required.
                 if not licence_id['licence_id']:
                     continue
-                LicenceService.verify_expired_licence_for(
+                this_licence = LicenceService.verify_expired_licence_for(
                     licence_id['licence_id']
                 )
+                if this_licence:
+                    verified.append(this_licence)
 
         except Exception as e:
             logger.error('ERR verify_licence_renewal: {0}'.format(e))
             raise Exception('Failed verifying licence renewal.')
 
-        return licence_ids.count()
+        return verified
 
     @staticmethod
     def verify_expired_licence_for(licence_id, request=None):
@@ -373,6 +382,7 @@ class LicenceService(object):
         '''
         EXPIRED = ApplicationSelectedActivityPurpose.PURPOSE_STATUS_EXPIRED
         try:
+            verified = None
             # raise Exception('LicenceService not implemented')
             licence = WildlifeLicence.objects.get(
                 id=licence_id
@@ -385,6 +395,18 @@ class LicenceService(object):
                     purpose.purpose_status = EXPIRED
                     purpose.save()
 
+            if not licence.has_purposes_in_current():
+                # Update licence status if all purposes expired.
+                new_status = licence.LICENCE_STATUS_EXPIRE
+                licence.set_property_cache_status(new_status)
+                licence.save()
+                # Prevent future proposals on recently opened applications.
+                activities = licence.get_activities_in_open_applications()
+                for activity in activities:
+                    application = activity.application
+                    application.set_property_nonactive_licence(True)
+                    application.save()
+
             if purposes_to_expire:
                 # Re-generate licence.
                 licence.generate_doc()
@@ -395,12 +417,193 @@ class LicenceService(object):
                     'Licence {0} re-generated with expired purpose.'.format(
                         licence.licence_number,
                     ))
+                verified = licence
 
         except Exception as e:
             logger.error('ERR verify_licence_renewal: {0}'.format(e))
             raise Exception('Failed verifying licence renewal.')
 
-        return True
+        return verified
+
+    @staticmethod
+    def generate_licence_schema(licence_purpose, request=None):
+        '''
+        Generate a JSON schema from the Licence Purpose.
+
+        :param: licence_purpose the LicencePurpose containing schema.
+        :param: request is an incoming client request.
+        '''
+        logger.debug('LicenceService.generate_licence_schema() - start')
+        logger_title = '{0}'.format('LicenceService.generate_licence_schema()')
+        schema = None
+        try:
+            admin = GenerateAdminLicenceSchema(licence_purpose, request)
+            admin.do_action()
+            schema = admin.get_action_result()
+
+        except LicenceServiceException as lse:
+            log = '{0} {1}'.format(logger_title, lse)
+            logger.exception(log)
+
+        except Exception as e:
+            log = '{0} {1}'.format(logger_title, e)
+            logger.exception(log)
+            raise
+
+        logger.debug('LicenceService.generate_licence_schema() - end')
+        return schema
+
+    @staticmethod
+    def version_licence_purpose(licence_purpose_id, request=None):
+        '''
+        Service to create a new version of a Licence Purpose.
+
+        :param: licence_purpose the LicencePurpose to be versioned.
+        :param: request is an incoming client request.
+
+        :return: LicencePurpose a new new licence purpose version.
+        '''
+        logger.debug('LicenceService.version_licence_purpose() - start')
+        logger_title = '{0} LicencePurposeID {1}'.format(
+            'LicenceService.version_licence_purpose()',
+            licence_purpose_id
+        )
+        new_version = None
+        try:
+            licence_purpose = LicencePurpose.objects.get(id=licence_purpose_id)
+
+            # check licence_purpose is latest version.
+            latest_version = licence_purpose.get_latest_version()
+            if licence_purpose.version != latest_version.version:
+                log = '{0} {1}'.format(logger_title, 'Not Latest Version.')
+                raise LicenceServiceException(log)
+
+            # 1. get licence_purpose and next version number.
+            new_purpose = LicencePurpose.objects.get(id=licence_purpose_id)
+            new_version = licence_purpose.version + 1
+
+            # 2. clone licence_purpose with next version number.
+            new_purpose.id = None
+            new_purpose.version = new_version
+            new_purpose.save()
+
+            # 3. clone species with licence_purpose.
+            purpose_species = licence_purpose.purpose_species.all()
+            new_species = []
+            for species in purpose_species:
+                new_species.append(PurposeSpecies(
+                    licence_purpose=new_purpose,
+                    order=species.order,
+                    header=species.header,
+                    details=species.details,
+                    species=species.species,
+                    is_additional_info=species.is_additional_info,
+                ))
+            if new_species:
+                PurposeSpecies.objects.bulk_create(new_species)
+
+            # 4. clone default purposes with licence_purpose.
+            purpose_defaults = licence_purpose.default_purpose.all()
+            new_defaults = []
+
+            for default in purpose_defaults:
+                new_defaults.append(DefaultCondition(
+                    standard_condition=default.standard_condition,
+                    licence_activity=default.licence_activity,
+                    licence_purpose=new_purpose,
+                    comments=default.comments,
+                    order=default.order,
+                ))
+            if new_defaults:
+                DefaultCondition.objects.bulk_create(new_defaults)
+
+            # 5. update replaced_by on previous version.
+            licence_purpose.replaced_by = new_purpose
+            licence_purpose.save()
+
+            # 6. log.
+            log = '{0} {1}'.format(logger_title, 'New version created.')
+            logger.info(log)
+
+        except LicenceServiceException as lse:
+            log = '{0} {1}'.format(logger_title, lse)
+            logger.exception(log)
+
+        except Exception as e:
+            log = '{0} {1}'.format(logger_title, e)
+            logger.exception(log)
+            raise
+
+        logger.debug('LicenceService.version_licence_purpose() - end')
+        return new_version
+
+
+class GenerateAdminLicenceSchema(AdministrationAction):
+    '''
+    An AdministrationAction for a Licence Purpose Schema.
+    '''
+    action_result = None                    # the generated schema.
+    licence_purpose = None                  # the associated licence purpose.
+
+    def __init__(self, licence_purpose, request):
+        super(AdministrationAction, self).__init__()
+        self.request = request
+        self.licence_purpose = licence_purpose
+
+    def __str__(self):
+        return 'GenerateLicenceSchema userID {0}'.format(self.request.user_id)
+
+    def do_action(self, row_ids=None) -> None:
+        '''
+        Method to execute a command from Administration on selected rows.
+        '''
+        section_list = LicencePurposeSection.objects.filter(
+            licence_purpose=self.licence_purpose
+        ).order_by('index')
+
+        util = LicenceSchemaUtility(section_list)
+        self.action_result = util.get_licence_schema()
+
+    def log_action(self):
+        '''
+        Method to log this command action.
+        '''
+        pass
+
+    def get_action_result(self):
+        '''
+        getter for generated schema.
+        '''
+        return self.action_result
+
+
+class LicenceCommand(object):
+    '''
+    Declares an interface common to all supported Licence client requests.
+
+    '''
+    request = None                      # property for client request.
+    licence = None                      # property for WildlifeLicence.
+    user_action = None                  # property for the logging action.
+
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def execute(self):
+        '''
+        Method to perfom an operation on the Licence.
+        '''
+        pass
+
+    def log_action(self):
+        '''
+        Method to log this command action.
+        '''
+        self.the_return.log_user_action(
+            self.user_action.format(
+
+            ), self.request
+        )
 
 
 class LicenceActionable(object):
@@ -556,8 +759,9 @@ class LicenceActioner(LicenceActionable):
             ).exclude(activity_status=SUSPENDED).count() > 0
 
         amendable = [
-            p for p in activity.proposed_purposes.all() 
+            p for p in activity.proposed_purposes.all()
             if p.is_issued and p.is_active and not p.is_replaced()
+            and p.purpose_id in purpose_list
         ]
 
         can_action['can_amend'] = current and len(amendable)
@@ -572,7 +776,9 @@ class LicenceActioner(LicenceActionable):
         ).exclude(activity_status=SUSPENDED).count() > 0
 
         renewable = [
-            p for p in activity.proposed_purposes.all() if p.is_renewable
+            p for p in activity.proposed_purposes.all()
+            if p.is_renewable and not p.is_replaced()
+            and p.purpose_id in purpose_list
         ]
         # can_renew when activity is current with renewable purposes.
         can_action['can_renew'] = current and len(renewable)
@@ -604,8 +810,9 @@ class LicenceActioner(LicenceActionable):
         ).exclude(activity_status=SUSPENDED).count() > 0
 
         surrenderable = [
-            p for p in activity.proposed_purposes.all() 
+            p for p in activity.proposed_purposes.all()
             if p.is_issued and p.is_active and not p.is_replaced()
+            and p.purpose_id in purpose_list
         ]
 
         can_action['can_surrender'] = current and len(surrenderable)
@@ -621,6 +828,7 @@ class LicenceActioner(LicenceActionable):
         cancelable = [
             p for p in activity.proposed_purposes.all()
             if p.is_issued and p.is_active and not p.is_replaced()
+            and p.purpose_id in purpose_list
         ]
 
         can_action['can_cancel'] = current and len(cancelable)
@@ -636,6 +844,7 @@ class LicenceActioner(LicenceActionable):
         suspendable = [
             p for p in activity.proposed_purposes.all()
             if p.is_issued and p.is_active and not p.is_replaced()
+            and p.purpose_id in purpose_list
         ]
 
         can_action['can_suspend'] = current and len(suspendable)
@@ -654,8 +863,9 @@ class LicenceActioner(LicenceActionable):
             ).count() > 0
 
             reissuable = [
-                p for p in activity.proposed_purposes.all() 
-                if p.is_issued and not p.is_replaced()
+                p for p in activity.proposed_purposes.all()
+                if p.is_issued and p.is_active and not p.is_replaced()
+                and p.purpose_id in purpose_list
             ]
 
             can_action['can_reissue'] = current and len(reissuable)
@@ -664,6 +874,7 @@ class LicenceActioner(LicenceActionable):
         # currently SUSPENDED, CANCELLED or SURRENDERED.
         reinstatable = [
             p for p in activity.proposed_purposes.all() if p.is_reinstatable
+            and p.purpose_id in purpose_list
         ]
         can_action['can_reinstate'] = len(reinstatable)
 
@@ -691,18 +902,16 @@ class LicenceActioner(LicenceActionable):
 
             # Use proposed purpose to ensure multiple purposes of the same type
             # are included.
-            opened_proposed_purpose_ids = None
+            # opened_proposed_purpose_ids = None
             opened_proposed_purposes = \
                 self.licence.get_proposed_purposes_in_open_applications()
-            if len(opened_proposed_purposes) > 0:
-                opened_proposed_purpose_ids = [
-                    p.purpose_id for p in opened_proposed_purposes
-                ]
-            purposes_in_open_applications = opened_proposed_purpose_ids
-        else:
-            purposes_in_open_applications = None
-
-        sequence = 0
+            # if len(opened_proposed_purposes) > 0:
+            #     opened_proposed_purpose_ids = [
+            #         p.purpose_id for p in opened_proposed_purposes
+            #     ]
+            # purposes_in_open_applications = opened_proposed_purpose_ids
+        # else:
+        #     purposes_in_open_applications = None
 
         # for activity in latest_activities:
         for purpose in licence_purposes:
@@ -711,7 +920,7 @@ class LicenceActioner(LicenceActionable):
 
             # if not purpose.purpose_id in purposes_in_open_applications or\
             #         purposes_in_open_applications == []:
-            if not purpose in opened_proposed_purposes \
+            if purpose not in opened_proposed_purposes \
                     or opened_proposed_purposes == []:
 
                 activity_can_action = self.can_action_purposes(
@@ -731,11 +940,21 @@ class LicenceActioner(LicenceActionable):
                     'can_reinstate': False,
                 }
 
-            sequence = sequence + 1
+            default_status = [
+                purpose.PURPOSE_STATUS_CURRENT
+            ]
+
+            purpose_status = [
+                s[1] for s in purpose.PURPOSE_STATUS_CHOICES
+                if s[0] == purpose.purpose_status or
+                (s[0] in default_status and not purpose.purpose_status)
+            ][0]
+
             latest_activity_purposes[purpose] = {
                 'id': activity.id,
                 'licence_activity_id': activity.licence_activity_id,
                 'activity_purpose_id': purpose.id,
+                'licence_purpose_id': purpose.purpose_id,
                 'activity_name_str': activity.licence_activity.name,
                 'issue_date': purpose.issue_date,
                 'start_date': purpose.start_date,
@@ -743,10 +962,9 @@ class LicenceActioner(LicenceActionable):
                     '{}'.format(purpose.expiry_date.strftime(
                         '%d/%m/%Y') if purpose.expiry_date else '')
                 ]),
-                'activity_purpose_names_and_status': '\n'.join([
-                    '{} ({})'.format(
-                        purpose.purpose.name, purpose.purpose_status)
-                ]),
+                'activity_purpose_name': purpose.purpose.name,
+                'activity_purpose_no': purpose.purpose_sequence,
+                'activity_purpose_status': purpose_status,
                 'can_action':
                     {
                         'licence_activity_id': activity.licence_activity_id,
@@ -758,111 +976,9 @@ class LicenceActioner(LicenceActionable):
                         'can_reissue': activity_can_action['can_reissue'],
                         'can_reinstate': activity_can_action['can_reinstate'],
                     },
-                'sequence': sequence,
             }
 
         return latest_activity_purposes.values()
-
-    def get_latest_activities_for_request(self, request=None):
-        '''
-        Gets a list of current selected licence activities available on this
-        licence for an action request. The list is a merged set of new and
-        amended activities which can be actioned.
-
-        :return a list of actionable current selected licence activities.
-        '''
-        licence_purposes = [
-            p for p in self.licence.get_purposes_in_sequence()
-            if p.is_issued
-            # if p.purpose_status in include and p.is_issued
-        ]
-        latest_activities = []
-        for purpose in licence_purposes:
-            latest_activities.append(purpose.selected_activity)
-
-        new_ids = [
-            a.id for a in latest_activities
-        ]
-
-        merged_activities = {}
-
-        if self.licence.is_latest_in_category:
-            purposes_in_open_applications = list(
-                self.licence.get_purposes_in_open_applications())
-        else:
-            purposes_in_open_applications = None
-
-        sequence = 0
-        for activity in latest_activities:
-
-            if purposes_in_open_applications or\
-                    purposes_in_open_applications == []:
-
-                activity_can_action = self.can_action_purposes(
-                    purposes_in_open_applications,
-                    activity,
-                )
-
-            else:
-                activity_can_action = {
-                    'licence_activity_id': activity.licence_activity_id,
-                    'can_renew': False,
-                    'can_amend': False,
-                    'can_surrender': False,
-                    'can_cancel': False,
-                    'can_suspend': False,
-                    'can_reissue': False,
-                    'can_reinstate': False,
-                }
-
-            sequence = sequence + 1
-
-            # Check if a record for the licence_activity_id already exists, if
-            # not, add.
-            if activity.id in new_ids:
-                issued_list = [
-                    p for p in activity.proposed_purposes.all() if p.is_issued]
-
-                if not len(issued_list):
-                    continue
-
-                merged_activities[activity] = {
-                    'id': activity.id,
-                    'licence_activity_id': activity.licence_activity_id,
-                    'activity_name_str': activity.licence_activity.name,
-                    'issue_date': activity.get_issue_date(),
-                    'start_date': activity.get_start_date(),
-                    'expiry_date': '\n'.join([
-                        '{}'.format(p.expiry_date.strftime(
-                            '%d/%m/%Y') if p.expiry_date else '')
-                        for p in activity.proposed_purposes.all()
-                        if p.is_issued
-                    ]),
-                    'activity_purpose_names_and_status': '\n'.join([
-                        '{} ({})'.format(p.purpose.name, p.purpose_status)
-                        for p in activity.proposed_purposes.all()
-                        if p.is_issued
-                    ]),
-                    'can_action':
-                        {
-                            'licence_activity_id':
-                                activity.licence_activity_id,
-                            'can_renew': activity_can_action['can_renew'],
-                            'can_amend': activity_can_action['can_amend'],
-                            'can_surrender':
-                                activity_can_action['can_surrender'],
-                            'can_cancel': activity_can_action['can_cancel'],
-                            'can_suspend': activity_can_action['can_suspend'],
-                            'can_reissue': activity_can_action['can_reissue'],
-                            'can_reinstate':
-                                activity_can_action['can_reinstate'],
-                        },
-                    'sequence': sequence,
-                }
-
-        merged_activities_list = merged_activities.values()
-
-        return merged_activities_list
 
     def get_latest_purposes_for_request(self, request):
         '''
@@ -927,7 +1043,7 @@ class LicenceActioner(LicenceActionable):
         2. Build purpose list;
         3. Action selected_activity_id; or
         4. Action licence when no selected_activity_id;
-        5. Re-generate the licence and save.
+        5. Save licence status when no current purposes;
         '''
         if action not in [
             self.RENEW, self.SURRENDER, self.CANCEL,
@@ -973,20 +1089,48 @@ class LicenceActioner(LicenceActionable):
                 selected_user_action =\
                     ApplicationUserAction.ACTION_SURRENDER_LICENCE_
 
+                if action_licence:
+                    # Prevent any open application future activity on the
+                    # Surrendered licence.
+                    self.actioned_application.set_property_nonactive_licence(
+                        True
+                    )
+                    self.actioned_application.save()
+
             elif action == self.CANCEL:
                 selected_activity.cancel_purposes(purpose_ids_list)
                 selected_user_action =\
                     ApplicationUserAction.ACTION_CANCEL_LICENCE_
+
+                if action_licence:
+                    # Prevent any open application future activity on the
+                    # Cancelled licence.
+                    self.actioned_application.set_property_nonactive_licence(
+                        True
+                    )
+                    self.actioned_application.save()
 
             elif action == self.SUSPEND:
                 selected_activity.suspend_purposes(purpose_ids_list)
                 selected_user_action =\
                     ApplicationUserAction.ACTION_SUSPEND_LICENCE_
 
+                if action_licence:
+                    # Allow any open application activity to continue on the
+                    # Suspended licence.
+                    self.actioned_application.set_property_nonactive_licence()
+                    self.actioned_application.save()
+
             elif action == self.REINSTATE:
                 selected_activity.reinstate_purposes(purpose_ids_list)
                 selected_user_action =\
                     ApplicationUserAction.ACTION_REINSTATE_LICENCE_
+
+                if action_licence:
+                    # Allow any open application activity to continue on the
+                    # Reinstated licence.
+                    self.actioned_application.set_property_nonactive_licence()
+                    self.actioned_application.save()
 
             elif action == self.REISSUE:
                 selected_activity.reissue_purposes(purpose_ids_list)
@@ -998,3 +1142,19 @@ class LicenceActioner(LicenceActionable):
                 selected_activity,
                 selected_user_action,
             )
+
+        # Update the overall status for Wildlife Licence.
+        new_status = self.licence.LICENCE_STATUS_CURRENT
+        if not self.licence.has_purposes_in_current():
+
+            if action == self.SURRENDER:
+                new_status = self.licence.LICENCE_STATUS_SURRENDER
+
+            elif action == self.CANCEL:
+                new_status = self.licence.LICENCE_STATUS_CANCEL
+
+            elif action == self.SUSPEND:
+                new_status = self.licence.LICENCE_STATUS_SUSPEND
+
+        self.licence.set_property_cache_status(new_status)
+        self.licence.save()

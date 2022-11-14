@@ -16,7 +16,7 @@ from wildlifecompliance.components.offence.models import Offence, Offender, Alle
     OffenceUserAction, OffenceCommsLogEntry
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, AllegedCommittedOffence
 from wildlifecompliance.components.section_regulation.serializers import SectionRegulationSerializer
-from wildlifecompliance.components.users.serializers import CompliancePermissionGroupMembersSerializer
+#from wildlifecompliance.components.users.serializers import CompliancePermissionGroupMembersSerializer
 
 
 class OrganisationSerializer(serializers.ModelSerializer):
@@ -99,6 +99,7 @@ class OffenceDatatableSerializer(serializers.ModelSerializer):
     user_action = serializers.SerializerMethodField()
     alleged_offences = SectionRegulationSerializer(read_only=True, many=True)
     offenders = serializers.SerializerMethodField(read_only=True)
+    documents = serializers.SerializerMethodField()
 
     class Meta:
         model = Offence
@@ -114,8 +115,23 @@ class OffenceDatatableSerializer(serializers.ModelSerializer):
             'occurrence_datetime_to',
             'details',
             'user_action',
+            'documents',
         )
         read_only_fields = ()
+
+    def get_documents(self, obj):
+        from wildlifecompliance.helpers import is_internal
+        url_list = []
+
+        if obj.documents.all().count():
+            # Paper notices
+            request = self.context.get('request', None)
+            if request and is_internal(request):
+                for doc in obj.documents.all():
+                    url = '<a href="{}" target="_blank">{}</a>'.format(doc._file.url, doc.name)  # + viewed_text
+                    url_list.append(url)
+        urls = '<br />'.join(url_list)
+        return urls
 
     def get_user_action(self, obj):
         return get_user_action(self, obj)
@@ -217,19 +233,20 @@ class OffenceSerializer(serializers.ModelSerializer):
         return offenders_list
 
     def get_allocated_group(self, obj):
-        allocated_group = [{
-            'email': '',
-            'first_name': '',
-            'full_name': '',
-            'id': None,
-            'last_name': '',
-            'title': '',
-        }]
-        returned_allocated_group = CompliancePermissionGroupMembersSerializer(instance=obj.allocated_group)
-        for member in returned_allocated_group.data['members']:
-            allocated_group.append(member)
+        return ''
+        #allocated_group = [{
+        #    'email': '',
+        #    'first_name': '',
+        #    'full_name': '',
+        #    'id': None,
+        #    'last_name': '',
+        #    'title': '',
+        #}]
+        #returned_allocated_group = CompliancePermissionGroupMembersSerializer(instance=obj.allocated_group)
+        #for member in returned_allocated_group.data['members']:
+        #    allocated_group.append(member)
 
-        return allocated_group
+        #return allocated_group
 
     def get_user_in_group(self, obj):
         user_id = self.context.get('request', {}).user.id

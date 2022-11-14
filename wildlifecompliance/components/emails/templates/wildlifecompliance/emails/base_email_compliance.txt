@@ -1,0 +1,19 @@
+{% block greetings %}
+Dear Wildlife System User,
+{% endblock %}
+
+{% block content %}
+{% endblock %}
+
+{% block signature %}
+Yours sincerely,
+
+Wildlife System Admin
+{% endblock %}
+
+
+
+{% block reply_statement %}
+Further information please call the Wildcare Helpline - (08) 9474 9055.
+{% endblock %}
+

@@ -42,7 +42,7 @@ from wildlifecompliance.components.offence.serializers import (
     UpdateAllegedCommittedOffenceSerializer)
 from wildlifecompliance.components.section_regulation.serializers import SectionRegulationSerializer
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, AllegedCommittedOffence
-from wildlifecompliance.components.users.models import CompliancePermissionGroup
+#from wildlifecompliance.components.users.models import CompliancePermissionGroup
 from wildlifecompliance.helpers import is_internal
 
 
@@ -233,21 +233,19 @@ class OffenceViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
+    #@list_route(methods=['GET', ])
+    #def can_user_create(self, request, *args, **kwargs):
+    #    # Determine permissions which allow the holder to create new offence
+    #    codename_who_can_create = 'officer'
+    #    compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
+    #    permissions = Permission.objects.filter(codename=codename_who_can_create, content_type_id=compliance_content_type.id)
 
-    @list_route(methods=['GET', ])
-    def can_user_create(self, request, *args, **kwargs):
-        # Determine permissions which allow the holder to create new offence
-        codename_who_can_create = 'officer'
-        compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
-        permissions = Permission.objects.filter(codename=codename_who_can_create, content_type_id=compliance_content_type.id)
-
-        # Find groups which has permissions determined above
-        allowed_groups = CompliancePermissionGroup.objects.filter(permissions__in=permissions)
-        for allowed_group in allowed_groups.all():
-            if request.user in allowed_group.members:
-                return Response(True)
-        return Response(False)
-
+    #    # Find groups which has permissions determined above
+    #    allowed_groups = CompliancePermissionGroup.objects.filter(permissions__in=permissions)
+    #    for allowed_group in allowed_groups.all():
+    #        if request.user in allowed_group.members:
+    #            return Response(True)
+    #    return Response(False)
 
     @list_route(methods=['GET', ])
     def optimised(self, request, *args, **kwargs):
@@ -515,6 +513,8 @@ class OffenceViewSet(viewsets.ModelViewSet):
 
                 # 2. Create Offence
                 request_data['status'] = 'open'
+                request_data['region_id'] = int(request_data['region_id']) if request_data['region_id'] else None
+                request_data['district_id'] = int(request_data['district_id']) if request_data['district_id'] else None
                 serializer = SaveOffenceSerializer(data=request_data)
                 serializer.is_valid(raise_exception=True)
                 saved_offence_instance = serializer.save()  # Here, relations between this offence and location, and this offence and call_email/inspection are created
@@ -529,7 +529,21 @@ class OffenceViewSet(viewsets.ModelViewSet):
 
                 # 2.2. Update parents
                 self.update_parent(request, saved_offence_instance)
-                
+
+                # Handle documents
+                from wildlifecompliance.components.main.models import TemporaryDocumentCollection
+                from wildlifecompliance.components.main.process_document import save_default_document_obj
+                temporary_document_collection_dict = request_data.get('temporary_document_collection_id', None)
+                if temporary_document_collection_dict:
+                    temporary_document_collection_id = temporary_document_collection_dict.get('temp_doc_id', None)
+                    if temporary_document_collection_id:
+                        temp_doc_collection, created = TemporaryDocumentCollection.objects.get_or_create(id=temporary_document_collection_id)
+                        if temp_doc_collection:
+                            for doc in temp_doc_collection.documents.all():
+                                save_default_document_obj(saved_offence_instance, doc)
+                                pass
+                            temp_doc_collection.delete()
+
                 ## 2a. Log it to the call email, if applicable
                 #if saved_offence_instance.call_email:
                 #    saved_offence_instance.call_email.log_user_action(
@@ -684,7 +698,7 @@ class SearchSectionRegulation(viewsets.ModelViewSet):
     queryset = SectionRegulation.objects.all()
     serializer_class = SectionRegulationSerializer
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('act', 'name', 'offence_text',)
+    search_fields = ('act__name', 'name', 'offence_text',)
 
 
 class SearchOrganisation(viewsets.ModelViewSet):

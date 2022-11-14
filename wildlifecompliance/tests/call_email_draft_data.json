@@ -1,0 +1,111 @@
+{
+    "test_data": "NB: This data has been generated for test purposes only",
+    "id": 56,
+    "status": {
+        "id": "draft",
+        "name": "Draft"
+    },
+    "entangled": [],
+    "entangled_other": null,
+    "gender": [],
+    "baby_kangaroo": [],
+    "age": [],
+    "assigned_to_id": null,
+    "allocated_group": [
+        {
+            "email": "",
+            "first_name": "",
+            "full_name": "",
+            "id": null,
+            "last_name": "",
+            "title": ""
+        }
+    ],
+    "allocated_group_id": 11,
+    "location": {
+        "type": "Feature",
+        "properties": {
+            "town_suburb": "",
+            "street": "",
+            "state": "",
+            "postcode": "",
+            "country": ""
+        },
+        "id": null,
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                125.15686059938254,
+                -28.9910245136895
+            ]
+        }
+    },
+    "location_id": null,
+    "classification": null,
+    "classification_id": 7,
+    "schema": null,
+    "lodgement_date": "2022-06-27",
+    "number": "C000056",
+    "caller": null,
+    "call_type": null,
+    "call_type_id": 11,
+    "wildcare_species_type_id": 2,
+    "wildcare_species_sub_type_id": 2,
+    "species_name": null,
+    "dead": null,
+    "euthanise": null,
+    "number_of_animals": null,
+    "brief_nature_of_call": "brief nature of call",
+    "report_type": null,
+    "report_type_id": null,
+    "data": [],
+    "caller_phone_number": null,
+    "anonymous_call": false,
+    "caller_wishes_to_remain_anonymous": false,
+    "occurrence_from_to": false,
+    "occurrence_date_from": null,
+    "occurrence_time_start": null,
+    "occurrence_date_to": null,
+    "occurrence_time_end": null,
+    "date_of_call": "2022-06-27",
+    "time_of_call": "10:20",
+    "referrer": [],
+    "advice_given": false,
+    "advice_details": null,
+    "email_user": {
+        "first_name": "",
+        "last_name": "",
+        "dob": null,
+        "residential_address": {
+            "line1": "",
+            "locality": "",
+            "state": "WA",
+            "postcode": "",
+            "country": "AU"
+        }
+    },
+    "user_in_group": true,
+    "related_items": [],
+    "selected_referrers": [],
+    "user_is_assignee": false,
+    "can_user_action": true,
+    "can_user_edit_form": true,
+    "can_user_search_person": false,
+    "user_is_volunteer": true,
+    "volunteer_list": [
+        {
+            "email": "",
+            "first_name": "",
+            "full_name": "",
+            "id": null,
+            "last_name": "",
+            "title": ""
+        }
+    ],
+    "volunteer_id": 174471,
+    "current_user_id": 174471,
+    "region_gis": "",
+    "district_gis": "",
+    "rendererDocumentUrl": "/api/call_email/56/process_renderer_document/",
+    "commsLogsDocumentUrl": "/api/call_email/56/process_comms_log_document/"
+}
