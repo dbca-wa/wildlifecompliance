@@ -1,0 +1,15 @@
+{
+	"name": "Wildlife Compliance Development",
+	"image": "dbcawa/docker_app_dev:wildlifelcompliance_dev_latest",
+	"remoteUser": "container",
+	"workspaceFolder": "/data/data/projects/wildlifecompliance",
+	"mounts": ["type=bind,source=/data/,target=/data/",
+	           "type=bind,source=/data/data/containerhome/,target=/home/container/"
+	          ],	
+	"appPort": [ "7006:8080","9051:9051","9052:9052","9053:9053","9054:9054","9055:9055","9056:9056","9057:9057","9058:9058","9059:9059" ],
+	"runArgs": ["--env-file","${localEnv:HOME}/vscode-env/wildlifecompliance.env",
+		   "--hostname","boranga-dev"
+		   ],
+	"forwardPorts": [9051,9052,9053,9054,9055,9056,9057,9058,9059],
+	"initializeCommand" : "${localEnv:HOME}/docker-scripts-dev/windows_vbox/postgres_docker_load.sh && ${localEnv:HOME}/docker-scripts-dev/windows_vbox/ledger_docker_load.sh "
+}
