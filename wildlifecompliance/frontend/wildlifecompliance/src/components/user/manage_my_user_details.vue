@@ -503,7 +503,9 @@ export default {
             if (this.current_user.is_compliance_management_approved_external_user) {
                 return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details;
             } else {
-                return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details && this.current_user.identification2;
+                //return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details && this.current_user.identification2 && this.current_user.identification2 != null;
+                return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details;
+
             }
         },
     },
