@@ -10,7 +10,8 @@ from ledger.payments.utils import update_payments
 from ledger.payments.models import Invoice
 from ledger.basket.models import Basket
 from ledger.payments.mixins import InvoiceOwnerMixin
-from oscar.apps.order.models import Order
+#from oscar.apps.order.models import Order
+from ledger.order.models import Order
 import logging
 from wildlifecompliance.components.wc_payments.context_processors import template_context
 from wildlifecompliance.components.wc_payments.models import InfringementPenalty, InfringementPenaltyInvoice
