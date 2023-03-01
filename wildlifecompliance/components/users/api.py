@@ -459,24 +459,77 @@ class UserViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
+    # @detail_route(methods=['POST', ])
+    # def update_address(self, request, *args, **kwargs):
+    #     try:
+    #         instance = self.get_object()
+    #         serializer = UserAddressSerializer(data=request.data)
+    #         serializer.is_valid(raise_exception=True)
+    #         address, created = Address.objects.get_or_create(
+    #             # line1=serializer.validated_data['line1'],
+    #             locality=serializer.validated_data['locality'],
+    #             state=serializer.validated_data['state'],
+    #             country=serializer.validated_data['country'],
+    #             postcode=serializer.validated_data['postcode'],
+    #             user=instance
+    #         )
+    #         address.line1 = serializer.validated_data['line1']
+    #         instance.residential_address = address
+    #         with transaction.atomic():
+    #             address.save()
+    #             instance.save()
+    #             instance.log_user_action(
+    #                 EmailUserAction.ACTION_POSTAL_ADDRESS_UPDATE.format(
+    #                     '{} {} ({})'.format(
+    #                         instance.first_name,
+    #                         instance.last_name,
+    #                         instance.email)),
+    #                 request)
+    #         serializer = FirstTimeUserSerializer(
+    #             instance, context={'request': request}
+    #         )
+    #         return Response(serializer.data)
+    #     except serializers.ValidationError:
+    #         print(traceback.print_exc())
+    #         raise
+    #     except ValidationError as e:
+    #         print(traceback.print_exc())
+    #         raise serializers.ValidationError(repr(e.error_dict))
+    #     except Exception as e:
+    #         print(traceback.print_exc())
+    #         raise serializers.ValidationError(str(e))
+
     @detail_route(methods=['POST', ])
     def update_address(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
             serializer = UserAddressSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            address, created = Address.objects.get_or_create(
-                # line1=serializer.validated_data['line1'],
-                locality=serializer.validated_data['locality'],
-                state=serializer.validated_data['state'],
-                country=serializer.validated_data['country'],
-                postcode=serializer.validated_data['postcode'],
-                user=instance
-            )
-            address.line1 = serializer.validated_data['line1']
-            instance.residential_address = address
-            with transaction.atomic():
+            if instance.residential_address:
+                address = Address.objects.filter(id=instance.residential_address.id)
+                total_addresses=address.count()
+                if total_addresses > 0:
+                    residential_address = Address.objects.get(id=address[0].id) 
+                    residential_address.locality=serializer.validated_data['locality']
+                    residential_address.state=serializer.validated_data['state']
+                    residential_address.country=serializer.validated_data['country']
+                    residential_address.postcode=serializer.validated_data['postcode']
+                    residential_address.line1=serializer.validated_data['line1']
+                    residential_address.save()
+            else:
+                address=Address.objects.create(
+                    line1=serializer.validated_data['line1'],
+                    locality=serializer.validated_data['locality'],
+                    state=serializer.validated_data['state'],
+                    country=serializer.validated_data['country'],
+                    postcode=serializer.validated_data['postcode'],
+                    user=instance
+                )
                 address.save()
+                instance.residential_address = address
+                instance.save()
+            with transaction.atomic():
+                # address.save()
                 instance.save()
                 instance.log_user_action(
                     EmailUserAction.ACTION_POSTAL_ADDRESS_UPDATE.format(

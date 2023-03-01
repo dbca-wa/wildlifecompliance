@@ -29,7 +29,8 @@ from decimal import Decimal
 
 import logging
 
-from oscar.apps.order.models import Order
+#from oscar.apps.order.models import Order
+from ledger.order.models import Order
 
 from wildlifecompliance import settings
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, SanctionOutcomeUserAction
