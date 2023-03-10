@@ -516,6 +516,7 @@ class UserViewSet(viewsets.ModelViewSet):
                     residential_address.postcode=serializer.validated_data['postcode']
                     residential_address.line1=serializer.validated_data['line1']
                     residential_address.save()
+                    instance.residential_address= residential_address
             else:
                 address=Address.objects.create(
                     line1=serializer.validated_data['line1'],
