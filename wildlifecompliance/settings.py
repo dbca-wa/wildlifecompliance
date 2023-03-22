@@ -18,6 +18,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_wc')
 SHOW_DEBUG_TOOLBAR = env('SHOW_DEBUG_TOOLBAR', False)
 APPEND_SOURCE_TO_RICHTEXT_ADMIN = env('APPEND_SOURCE_TO_RICHTEXT_ADMIN', False)
 FILE_UPLOAD_MAX_MEMORY_SIZE = env('FILE_UPLOAD_MAX_MEMORY_SIZE', 2621440) # 2.5MB --> Django Default
+STOP_SQL_LOG = env('STOP_SQL_LOG', False)
 
 
 if SHOW_DEBUG_TOOLBAR:
@@ -219,7 +220,23 @@ LOGGING['loggers']['securebase_manager'] = {
 #     'handlers': ['compliancemanagement'],
 #     'level': 'INFO'
 # }
-print(BASE_DIR)
+if not STOP_SQL_LOG:
+    LOGGING['handlers']['console'] = {
+        'level': 'DEBUG',
+        'class': 'logging.handlers.RotatingFileHandler',
+        'filename': os.path.join(
+            BASE_DIR,
+            'logs',
+            'sql.log'),
+        'formatter': 'verbose',
+        'maxBytes': 5242880   
+    }
+    LOGGING['loggers']['django.db.backends'] = {
+        'handlers': ['console'],
+        'level': 'DEBUG'
+    }
+
+
 STATICFILES_DIRS.append(
     os.path.join(
         os.path.join(
