@@ -1685,6 +1685,12 @@ class MasterlistQuestion(models.Model):
         # ANSWER_TYPE_MULTI,
         ANSWER_TYPE_RADIO,
     ]
+    ANSWER_TYPE_OPTIONS_NEW = [
+        ANSWER_TYPE_CHECKBOX,
+        ANSWER_TYPE_SELECT,
+        ANSWER_TYPE_MULTI,
+        ANSWER_TYPE_RADIO,
+    ]
     ANSWER_TYPE_HEADERS = [
         ANSWER_TYPE_TABLE,
     ]
