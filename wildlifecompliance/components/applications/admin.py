@@ -17,7 +17,8 @@ class AmendmentRequestAdmin(admin.ModelAdmin):
 
 @admin.register(models.ApplicationSelectedActivity)
 class ApplicationSelectedActivity(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('updated_by','assigned_approver','assigned_officer')
+    #pass
 
 
 @admin.register(models.Assessment)
@@ -61,6 +62,7 @@ class ApplicationInvoiceInline(admin.TabularInline):
 @admin.register(models.Application)
 class ApplicationAdmin(VersionAdmin):
     inlines = [ApplicationDocumentInline, ApplicationInvoiceInline]
+    raw_id_fields = ('org_applicant','proxy_applicant','submitter','previous_application')
 
 
 @admin.register(models.ApplicationStandardCondition)
