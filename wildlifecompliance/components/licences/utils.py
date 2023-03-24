@@ -882,10 +882,7 @@ class LicenceSchemaUtility(LicenceUtility):
                     child['expander'] = q_expander_children
 
             elif q.question.answer_type in select_types:
-                '''
-                NOTE: Select type option are defaulted from Masterlist
-                not from the SectionQuestion. Conditions are NOT added.
-                '''
+                
                 if len(q.question.get_options()) > 0:
                     opts = [
                         {
@@ -900,6 +897,13 @@ class LicenceSchemaUtility(LicenceUtility):
                     )
 
                     child['options'] = sq_options
+
+                    if q.question.children_questions.exists():
+
+                        q_conditions = self.get_condition_children2(
+                         q, q.question, section, question_name
+                        )
+                        child['conditions'] = q_conditions
 
             else:
                 if len(q.question.get_options()) > 0:
