@@ -227,6 +227,7 @@ class LicenceSchemaUtility(LicenceUtility):
         options_list = []
         special_types = ['checkbox', ]
         group_types = ['checkbox', 'radiobuttons', 'multi-select']
+        select_types=['select',]
         expander_types = ['expander_table']
         declaration = ['declaration']
         option_count = 0
@@ -241,6 +242,7 @@ class LicenceSchemaUtility(LicenceUtility):
                 options.append(op_dict)
 
         for op in options:
+            #import ipdb; ipdb.set_trace()
             conditions = {}
             op_name = '{}-{}'.format(parent_name, option_count)
             op_dict = {
@@ -260,6 +262,10 @@ class LicenceSchemaUtility(LicenceUtility):
                 option_groupings = []
                 option_repeatable = False
                 condition_question_count = 1
+                #Adding the section question to section group so it will skip the condition questio with same group and them as just conditions
+                #This is to fix the issue where select type question options were not added for group checkbox parent.
+                if section_question.section_group and section_question.section_group not in option_groupings:
+                    option_groupings.append(section_question.section_group)
                 for q in condition_questions:
 
                     question_name = '{}-On-{}'.format(
@@ -289,6 +295,7 @@ class LicenceSchemaUtility(LicenceUtility):
                         #original code end
                         #PA code begin
                         if section_question.section_group:
+                            #Original Code from SS. It skips generating attributes like options etc for condition question with same group as children.
                             if section_question.section_group != q.section_group:
                                 q_group_children = self.get_group_children2(
                                     q, section, question_name)
@@ -301,7 +308,8 @@ class LicenceSchemaUtility(LicenceUtility):
                                 condition_question_count = len(q_group_children)
                                 option_label = q.section_group.group_label
 
-                                option_groupings.append(q.section_group)
+                                option_groupings.append(q.section_group)                        
+
                         else:
                             no_parent_section_group=True
                             q_group_children = self.get_group_children2(
@@ -344,6 +352,24 @@ class LicenceSchemaUtility(LicenceUtility):
 
                         if q_expander_children:
                             child['expander'] = q_expander_children
+                    elif q.question.answer_type in select_types:
+                        if len(q.question.get_options()) > 0:
+                            opts = [
+                            {
+                                'label': o.label,
+                                'value': o.label.replace(" ", "").lower(),
+                                'conditions': ''
+                            } for o in q.question.get_options()
+                            ]
+                            q.set_property_cache_options(opts)
+                            q_options = self.get_options2(q, q.question)
+                            child['options'] = q_options
+
+                        if q.question.children_questions.exists():
+                            q_conditions = self.get_condition_children2(
+                                q, q.question, section, question_name
+                            )
+                            child['conditions'] = q_conditions
 
                     else:
                         if len(q.question.get_options()) > 0:
@@ -363,7 +389,8 @@ class LicenceSchemaUtility(LicenceUtility):
                                     child[t] = 'true'
                             else:
                                 child[t] = 'true'
-
+                    if section_question.section_group in option_groupings:
+                        option_groupings.remove(section_question.section_group)
                     if not option_groupings:
                         option_children.append(child)
                         condition_question_count += 1
