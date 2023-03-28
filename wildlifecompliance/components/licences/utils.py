@@ -264,8 +264,9 @@ class LicenceSchemaUtility(LicenceUtility):
                 condition_question_count = 1
                 #Adding the section question to section group so it will skip the condition questio with same group and them as just conditions
                 #This is to fix the issue where select type question options were not added for group checkbox parent.
-                if section_question.section_group and section_question.section_group not in option_groupings:
-                    option_groupings.append(section_question.section_group)
+                # if section_question.section_group and section_question.section_group not in option_groupings:
+                #     option_groupings.append(section_question.section_group)
+                #import ipdb; ipdb.set_trace()
                 for q in condition_questions:
 
                     question_name = '{}-On-{}'.format(
@@ -275,7 +276,8 @@ class LicenceSchemaUtility(LicenceUtility):
                         'type': q.question.answer_type,
                         'label': q.question.question,
                     }
-
+                    if section_question.section_group and section_question.section_group not in option_groupings:
+                        option_groupings.append(section_question.section_group)
                     # check for Section Groupings.
                     if q.section_group \
                             and q.section_group not in option_groupings:
