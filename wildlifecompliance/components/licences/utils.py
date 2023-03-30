@@ -627,7 +627,8 @@ class LicenceSchemaUtility(LicenceUtility):
                         'type': q.question.answer_type,
                         'label': q.question.question,
                     }
-
+                    if section_question.section_group and section_question.section_group not in option_groupings:
+                        option_groupings.append(section_question.section_group)
                     if q.section_group \
                             and q.section_group not in option_groupings:
                         #original code
@@ -688,8 +689,19 @@ class LicenceSchemaUtility(LicenceUtility):
 
                     else:
                         if len(q.question.get_options()) > 0:
+                            # q_options = self.get_options2(q, q.question)
+                            # child['options'] = q_options
+                            opts = [
+                                {
+                                    'label': o.label,
+                                    'value': o.label.replace(" ", "").lower(),
+                                    'conditions': ''
+                                } for o in q.question.get_options()
+                            ]
+                            q.set_property_cache_options(opts)
                             q_options = self.get_options2(q, q.question)
                             child['options'] = q_options
+
 
                         if q.question.children_questions.exists():
 
@@ -705,7 +717,8 @@ class LicenceSchemaUtility(LicenceUtility):
                                     child[t] = 'true'
                             else:
                                 child[t] = 'true'
-
+                    if section_question.section_group in option_groupings:
+                        option_groupings.remove(section_question.section_group)
                     if not option_groupings:
                         option_children.append(child)
                         condition_question_count += 1
