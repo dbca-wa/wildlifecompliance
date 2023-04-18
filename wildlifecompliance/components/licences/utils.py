@@ -1311,7 +1311,11 @@ class LicenceSchemaUtility(LicenceUtility):
                                 if sq.question.answer_type not in group_types:
                                     sc[t] = 'true'
                             else:
-                                sc[t] = 'true'
+                                if t == 'isRepeatable':
+                                    if(sc['type'] != SectionGroup.TYPE_GROUP2):
+                                        sc[t]='true'
+                                else:       
+                                    sc[t] = 'true'
 
                     section_children.append(sc)
                     sq_count += 1
