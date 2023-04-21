@@ -1223,6 +1223,7 @@ class LicenceSchemaUtility(LicenceUtility):
 
                         if sq.section_group.repeatable:
                             sq.tag = ['isRepeatable']
+                            sc['isRepeatable'] = 'true'
 
                         groupings.append(sq.section_group)
 
@@ -1316,6 +1317,7 @@ class LicenceSchemaUtility(LicenceUtility):
                                         sc[t]='true'
                                 else:       
                                     sc[t] = 'true'
+                                # sc[t] = 'true'
 
                     section_children.append(sc)
                     sq_count += 1
