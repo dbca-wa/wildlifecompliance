@@ -17,7 +17,7 @@ class LicenceCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(models.LicenceActivity)
 class LicenceActivityAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('licence_category',)
 
 
 @admin.register(models.WildlifeLicence)
@@ -26,6 +26,7 @@ class WildlifeLicence(admin.ModelAdmin):
         'verify_expired_licence',
         'verify_licence_renewal',
     ]
+    raw_id_fields = ('licence_document', 'replaced_by', 'licence_category', 'current_application')
 
     def verify_expired_licence(self, request, queryset):
         from wildlifecompliance.components.licences.services import (
@@ -77,6 +78,7 @@ class LicencePurposeAdmin(admin.ModelAdmin):
     ordering = ('name', '-version')
     list_filter = ('name',)
     readonly_fields = ('licence_purpose_actions',)
+    raw_id_fields = ('licence_category', 'licence_activity', 'replaced_by')
 
     def get_urls(self):
         urls = super().get_urls()
@@ -255,6 +257,7 @@ class SectionQuestionAdmin(admin.ModelAdmin):
         SectionQuestionConditionInline,
     ]
     form = forms.SectionQuestionAdminForm
+    raw_id_fields = ('section', 'section_group', 'question')
 
     def section_question(self, obj):
         trim_text = obj.question.question

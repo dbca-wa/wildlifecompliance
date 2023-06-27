@@ -14,6 +14,7 @@ class ReturnTypeAdmin(admin.ModelAdmin):
     inlines = [
         RegulatedSpeciesInline,
     ]
+    raw_id_fields = ('replaced_by',)
 
     def get_inline_instances(self, request, obj=None):
         return [
@@ -26,6 +27,7 @@ class ReturnTypeAdmin(admin.ModelAdmin):
 @admin.register(models.Return)
 class ReturnAdmin(admin.ModelAdmin):
     actions = ['verify_due_returns']
+    raw_id_fields = ('application', 'licence', 'assigned_to', 'condition', 'submitter', 'return_type')
 
     def verify_due_returns(self, request, queryset):
         '''
@@ -38,19 +40,19 @@ class ReturnAdmin(admin.ModelAdmin):
 
 @admin.register(models.ReturnTable)
 class ReturnTable(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('ret',)
 
 
 @admin.register(models.ReturnRow)
 class ReturnRow(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('return_table',)
 
 
 @admin.register(models.ReturnUserAction)
 class ReturnUserActionAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('who', 'return_obj')
 
 
 @admin.register(models.ReturnLogEntry)
 class ReturnLogEntryAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('customer', 'staff', 'return_obj')

@@ -7,6 +7,7 @@ from wildlifecompliance.components.sanction_outcome_due.models import SanctionOu
 @admin.register(SanctionOutcome)
 class SanctionOutcomeAdmin(admin.ModelAdmin):
     filter_horizontal = ('alleged_offences',)
+    raw_id_fields = ('offence', 'offender', 'assigned_to', 'responsible_officer', 'registration_holder', 'driver')
 
 
 @admin.register(SanctionOutcomeDueDateConfiguration)
