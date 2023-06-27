@@ -13,22 +13,23 @@ class ApplicationDocumentInline(admin.TabularInline):
 @admin.register(models.AmendmentRequest)
 class AmendmentRequestAdmin(admin.ModelAdmin):
     list_display = ['application', 'licence_activity']
+    raw_id_fields = ('application', 'officer', 'licence_activity')
 
 
 @admin.register(models.ApplicationSelectedActivity)
 class ApplicationSelectedActivity(admin.ModelAdmin):
-    raw_id_fields = ('updated_by','assigned_approver','assigned_officer')
+    raw_id_fields = ('application', 'licence_activity', 'updated_by', 'assigned_approver', 'assigned_officer')
     #pass
 
 
 @admin.register(models.Assessment)
 class Assessment(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('application', 'officer', 'assessor_group', 'licence_activity', 'actioned_by', 'assigned_assessor')
 
 
 @admin.register(models.ApplicationCondition)
 class ApplicationCondition(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('standard_condition', 'default_condition', 'application', 'licence_activity', 'return_type', 'licence_purpose', 'source_group')
 
 
 @admin.register(models.DefaultCondition)
@@ -38,6 +39,7 @@ class DefaultCondition(admin.ModelAdmin):
         'licence_activity',
         'licence_purpose'
         ]
+    raw_id_fields = ('standard_condition',  'licence_activity')
 
 
 @admin.register(models.ActivityPermissionGroup)
@@ -61,16 +63,19 @@ class ApplicationInvoiceInline(admin.TabularInline):
 
 @admin.register(models.Application)
 class ApplicationAdmin(VersionAdmin):
+    list_display = ['id', 'application_type', 'lodgement_number', 'lodgement_date']
     inlines = [ApplicationDocumentInline, ApplicationInvoiceInline]
-    raw_id_fields = ('org_applicant','proxy_applicant','submitter','previous_application')
+    raw_id_fields = ('org_applicant','proxy_applicant','submitter',  'licence', 'licence_document', 'previous_application')
 
 
 @admin.register(models.ApplicationStandardCondition)
 class ApplicationStandardConditionAdmin(admin.ModelAdmin):
     list_display = ['id', 'code', 'short_description', 'obsolete']
+    raw_id_fields = ('return_type',)
 
 
 @admin.register(models.ApplicationSelectedActivityPurpose)
 class ApplicationSelectedActivityPurposeAdmin(admin.ModelAdmin):
     list_display = ['id', 'purpose', 'purpose_status']
+    raw_id_fields = ('selected_activity', 'purpose')
 

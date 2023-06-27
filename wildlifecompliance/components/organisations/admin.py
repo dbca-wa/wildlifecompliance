@@ -5,24 +5,26 @@ from wildlifecompliance.components.organisations import models
 
 @admin.register(models.Organisation)
 class OrganisationAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('organisation',)
 
 
 @admin.register(models.OrganisationRequest)
 class OrganisationRequestAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('requester', 'assigned_officer')
+    list_display = ['id', 'name', 'lodgement_number', 'lodgement_date']
 
 
 @admin.register(models.OrganisationContact)
 class OrganisationContactAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('organisation',)
 
 
 @admin.register(models.UserDelegation)
 class UserDelegationAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('organisation', 'user')
+    list_display = ['organisation', 'user']
 
 
 @admin.register(models.OrganisationAction)
 class UOrganisationActionAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('who', 'organisation')
