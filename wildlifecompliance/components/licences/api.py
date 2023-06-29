@@ -55,20 +55,19 @@ class LicenceFilterBackend(DatatablesFilterBackend):
                 search_text = search_text.lower()
                 # join queries for the search_text search
                 search_text_licence_ids = []
-                for wildlifelicence in queryset:
-                    if (search_text in wildlifelicence.current_application.licence_category.lower()
-                        or search_text in wildlifelicence.current_application.applicant.lower()
-                    ):
-                        search_text_licence_ids.append(wildlifelicence.id)
-                    # if applicant is not an organisation, also search against the user's email address
-                    if (wildlifelicence.current_application.applicant_type == Application.APPLICANT_TYPE_PROXY and
-                        search_text in wildlifelicence.current_application.proxy_applicant.email.lower()):
-                            search_text_licence_ids.append(wildlifelicence.id)
-                    if (wildlifelicence.current_application.applicant_type == Application.APPLICANT_TYPE_SUBMITTER and
-                        search_text in wildlifelicence.current_application.submitter.email.lower()):
-                            search_text_licence_ids.append(wildlifelicence.id)
-                # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
-                # (otherwise they will filter on top of each other)
+                search_text_licence_ids = WildlifeLicence.objects.filter(
+                    Q(current_application__submitter__email__icontains=search_text) |
+                    Q(current_application__submitter__first_name__icontains=search_text) |
+                    Q(current_application__submitter__first_name__icontains=search_text) |
+                    Q(current_application__proxy_applicant__email__icontains=search_text) |
+                    Q(current_application__proxy_applicant__first_name__icontains=search_text) |
+                    Q(current_application__proxy_applicant__last_name__icontains=search_text) |
+                    Q(current_application__org_applicant__organisation__name__icontains=search_text)
+                ).values('id')
+                print("search_text_licence_ids")
+       
+                # # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
+                # # (otherwise they will filter on top of each other)
                 queryset = queryset.filter(id__in=search_text_licence_ids).distinct() | super_queryset
 
             # apply user selected filters

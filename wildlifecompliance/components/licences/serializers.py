@@ -9,7 +9,7 @@ from wildlifecompliance.components.licences.models import (
     LicenceDocument,
 )
 from wildlifecompliance.components.licences.utils import LicencePurposeUtil
-
+from wildlifecompliance import settings
 from wildlifecompliance.components.applications.models import (
     ApplicationSelectedActivity,
     ApplicationSelectedActivityPurpose,
@@ -164,23 +164,15 @@ class DTInternalWildlifeLicenceSerializer(WildlifeLicenceSerializer):
 
     def get_invoice_url(self, obj):
         url = None
-        try:
-            licence_activity = ApplicationSelectedActivity.objects.filter(
-                application_id=obj.current_application_id)
-            activity_inv = ActivityInvoice.objects.filter(
-                activity_id=licence_activity[0].id).first()
-            latest_invoice = Invoice.objects.get(
-                reference=activity_inv.invoice_reference)
+        if obj.current_application.get_property_cache_key('latest_invoice_ref')['latest_invoice_ref']:
+            url = '{0}{1}'.format(
+            settings.WC_PAYMENT_SYSTEM_URL_PDF,
+            obj.current_application.get_property_cache_key(
+                    'latest_invoice_ref'
+            )['latest_invoice_ref']
+            )
 
-            url = reverse(
-                'payments:invoice-pdf',
-                kwargs={'reference': latest_invoice.reference})
-
-            return url
-
-        except Exception:
-            return None
-
+        return url
 
 class DTExternalWildlifeLicenceSerializer(WildlifeLicenceSerializer):
     licence_document = serializers.SerializerMethodField(read_only=True)
