@@ -6,8 +6,8 @@ ENV DEBUG=True
 ENV TZ=Australia/Perth
 ENV EMAIL_HOST="smtp.corporateict.domain"
 ENV DEFAULT_FROM_EMAIL='no-reply@dbca.wa.gov.au'
-ENV NOTIFICATION_EMAIL='jawaid.mushtaq@dbca.wa.gov.au'
-ENV NON_PROD_EMAIL='brendan.blackford@dbca.wa.gov.au, walter.genuit@dbca.wa.gov.au, katsufumi.shibata@dbca.wa.gov.au, mohammed.ahmed@dbca.wa.gov.au, test_licensing@dpaw.wa.gov.au, jawaid.mushtaq@dbca.wa.gov.au, shayne.sharpe@dbca.wa.gov.au'
+ENV NOTIFICATION_EMAIL='no-reply@dbca.wa.gov.au'
+ENV NON_PROD_EMAIL='no-reply@dbca.wa.gov.au'
 ENV PRODUCTION_EMAIL=False
 ENV EMAIL_INSTANCE='DEV'
 ENV SECRET_KEY="ThisisNotRealKey"
@@ -49,6 +49,7 @@ RUN apt-get install --no-install-recommends -y npm bzip2
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt-get update
 RUN apt-get install --no-install-recommends -y python3.7 python3.7-dev python3.7-distutils
+RUN apt-get install --no-install-recommends -y graphviz libgraphviz-dev pkg-config
 
 RUN ln -s /usr/bin/python3.7 /usr/bin/python 
     # ln -s /usr/bin/pip3 /usr/bin/pip
