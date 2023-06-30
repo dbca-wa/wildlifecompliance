@@ -30,6 +30,8 @@ from wildlifecompliance.components.applications.models import (
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 from rest_framework_datatables.filters import DatatablesFilterBackend
 from rest_framework_datatables.renderers import DatatablesRenderer
+from django.db.models import CharField, Value, Case, When
+from django.db.models.functions import Concat
 
 
 class LicenceFilterBackend(DatatablesFilterBackend):
@@ -52,20 +54,39 @@ class LicenceFilterBackend(DatatablesFilterBackend):
             # search_text filter, join all custom search columns
             # where ('searchable: false' in the datatable definition)
             if search_text:
-                search_text = search_text.lower()
+                search_text = search_text.lower().strip()
                 # join queries for the search_text search
                 search_text_licence_ids = []
-                search_text_licence_ids = WildlifeLicence.objects.filter(
-                    Q(current_application__submitter__email__icontains=search_text) |
-                    Q(current_application__submitter__first_name__icontains=search_text) |
-                    Q(current_application__submitter__first_name__icontains=search_text) |
-                    Q(current_application__proxy_applicant__email__icontains=search_text) |
-                    Q(current_application__proxy_applicant__first_name__icontains=search_text) |
-                    Q(current_application__proxy_applicant__last_name__icontains=search_text) |
-                    Q(current_application__org_applicant__organisation__name__icontains=search_text)
+                search_text_licence_ids = WildlifeLicence.objects.annotate(
+                    applicant_name=Case(
+                        When(
+                            current_application__proxy_applicant__isnull=False,
+                            then=Concat(
+                                'current_application__proxy_applicant__first_name',
+                                Value(' '),
+                                'current_application__proxy_applicant__last_name',
+                                Value(''),
+                            )
+                        ),
+                        default=Concat(
+                            'current_application__submitter__first_name',
+                            Value(' '),
+                            'current_application__submitter__last_name',
+                            Value(''),
+                        ),
+                        output_field=CharField(),
+                    )
+                ).filter(
+                Q(applicant_name__icontains=search_text) |
+                Q(current_application__submitter__email__icontains=search_text) |
+                Q(current_application__submitter__first_name__icontains=search_text) |
+                Q(current_application__submitter__first_name__icontains=search_text) |
+                Q(current_application__proxy_applicant__email__icontains=search_text) |
+                Q(current_application__proxy_applicant__first_name__icontains=search_text) |
+                Q(current_application__proxy_applicant__last_name__icontains=search_text) |
+                Q(current_application__org_applicant__organisation__name__icontains=search_text)
                 ).values('id')
-                print("search_text_licence_ids")
-       
+
                 # # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
                 # # (otherwise they will filter on top of each other)
                 queryset = queryset.filter(id__in=search_text_licence_ids).distinct() | super_queryset
