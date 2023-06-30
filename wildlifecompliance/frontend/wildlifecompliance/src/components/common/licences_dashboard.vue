@@ -255,6 +255,9 @@ export default {
                             vm.$refs.licence_datatable.vmDataTable.search( this.value ).draw();
                         }
                     }, 0)));
+                    $searchInput.bind('blur', vm.delay(function() {
+                        vm.$refs.licence_datatable.vmDataTable.search(this.value).draw();
+                    }, 0));
 
                     // Grab Category from the data in the table
                     var titleColumn = vm.$refs.licence_datatable.vmDataTable.columns(vm.getColumnIndex('category'));
