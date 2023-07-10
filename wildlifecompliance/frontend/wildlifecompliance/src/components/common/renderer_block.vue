@@ -173,14 +173,14 @@
 
         <div class="form-group" v-if="component.type === 'radiobuttons'">
             <label :id="element_id()" class="inline">{{component.label}}</label>
-                <HelpText :help_text="help_text"/>
+                 <!-- <HelpText :help_text="help_text"/> -->
                 <HelpTextUrl :help_text_url="help_text_url"/>
                 <CommentBlock 
                     :label="component.label"
                     :name="component_name"
                     :field_data="value"
-                    />
-
+                    /> 
+                <div class="form-group-options">
                 <Radio v-for="(option, index) in component.options"
                     :name="component_name"
                     :label="option.label"
@@ -192,7 +192,7 @@
                     :conditions="component.conditions"
                     :readonly="is_readonly"
                     v-bind:key="`radio_${component_name}_${index}`"/>
- 
+                </div>
                 <Conditions
                     :conditions="component.conditions"
                     :name="component_name"
@@ -203,6 +203,7 @@
         </div>
 
         <div class="form-group" v-if="component.type === 'checkbox'">
+            <div class="form-group-options">
             <Checkbox
                 :group="component.group"
                 :name="component_name"
@@ -215,6 +216,7 @@
                 :conditions="component.conditions"
                 :readonly="is_readonly"
                 :isRequired="component.isRequired"/>
+            </div>
             <Conditions
                 :conditions="component.conditions"
                 :name="component_name"
@@ -526,3 +528,12 @@ const RendererBlock = {
 }
 export default RendererBlock;
 </script>
+<style>
+.form-group {
+  margin-bottom: 2.6rem; 
+}
+
+.form-group-options {
+  margin-top: -1rem; 
+}
+</style>
