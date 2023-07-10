@@ -1233,7 +1233,7 @@ class LicenceSchemaUtility(LicenceUtility):
 
                     elif sq.question.answer_type in expander_types:
 
-                        sc['label'] = ''
+                        sc['label'] = sq.question.question
                         sc['help_text_url'] = sq.question.help_text_url
                         q_header_children = self.get_header_children2(
                             sq, sq.question, section, sq_name
