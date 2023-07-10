@@ -48,6 +48,7 @@ import {
 from '@/utils/hooks';
 import CommentBlock from './comment_block.vue';
 import HelpText from './help_text.vue';
+import HelpTextUrl from './help_text_url.vue';
 import { mapGetters } from 'vuex';
 export default {
     props:{
@@ -74,8 +75,9 @@ export default {
         isRepeatable:Boolean,
         readonly:Boolean,
         docsUrl: String,
+        help_text_url: String,
     },
-    components: {CommentBlock, HelpText},
+    components: {CommentBlock, HelpText, HelpTextUrl},
     data:function(){
         return {
             repeat:1,
@@ -83,7 +85,6 @@ export default {
             show_spinner: false,
             documents:[],
             filename:null,
-            help_text_url:'',
         }
     },
     computed: {
