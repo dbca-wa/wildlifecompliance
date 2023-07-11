@@ -15,7 +15,7 @@ class MasterlistQuestionAdminForm(forms.ModelForm):
             'question',
             'option',
             'answer_type',
-            # 'help_text_url',
+            'help_text_url',
             # 'help_text_assessor_url',
             # 'help_text',
             # 'help_text_assessor'

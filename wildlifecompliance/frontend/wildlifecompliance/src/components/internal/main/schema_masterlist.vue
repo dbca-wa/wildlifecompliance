@@ -83,6 +83,15 @@
 
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="control-label pull-left" >Help text url</label>
+                        </div>
+                        <div class="col-md-9">
+                            <textarea class="form-control" name="help_text_url" v-model="masterlist.help_text_url"></textarea>
+                        </div>
+                    </div>
+
                 </form>
             </div>
         </div>
@@ -223,6 +232,7 @@ export default {
                 options: null,
                 headers: null,
                 expanders: null,
+                help_text_url: '',
             },
             answerTypes: [],
             addedHeaders: [],
@@ -378,7 +388,7 @@ export default {
             this.addedOptions = [];
             this.addedHeaders = [];
             this.addedExpanders = [];
-
+            this.masterlist.help_text_url='';
             this.showOptions = false;
             this.isModalOpen = true;
         },
@@ -396,6 +406,7 @@ export default {
                 self.addedOptions = self.$refs.schema_masterlist_table.row_of_data.data().options;
                 self.addedHeaders = self.$refs.schema_masterlist_table.row_of_data.data().headers;       
                 self.addedExpanders = self.$refs.schema_masterlist_table.row_of_data.data().expanders;
+                self.masterlist.help_text_url = self.$refs.schema_masterlist_table.row_of_data.data().help_text_url;
 
                 $(self.$refs.select_answer_type).val(self.masterlist.answer_type).trigger('change');
                 self.setShowAdditional(self.masterlist.answer_type)

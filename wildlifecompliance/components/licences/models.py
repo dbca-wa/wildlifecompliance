@@ -1715,6 +1715,7 @@ class MasterlistQuestion(models.Model):
         choices=ANSWER_TYPE_CHOICES,
         default=ANSWER_TYPE_CHOICES[0][0],
     )
+    help_text_url = models.CharField(max_length=200, null=True, blank=True)
     property_cache = JSONField(null=True, blank=True, default={})
 
     class Meta:

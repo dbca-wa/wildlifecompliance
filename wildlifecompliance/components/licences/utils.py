@@ -275,6 +275,7 @@ class LicenceSchemaUtility(LicenceUtility):
                         'name': question_name,
                         'type': q.question.answer_type,
                         'label': q.question.question,
+                        'help_text_url': q.question.help_text_url
                     }
                     if section_question.section_group and section_question.section_group not in option_groupings:
                         option_groupings.append(section_question.section_group)
@@ -626,6 +627,7 @@ class LicenceSchemaUtility(LicenceUtility):
                         'name': question_name,
                         'type': q.question.answer_type,
                         'label': q.question.question,
+                        'help_text_url': q.question.help_text_url
                     }
                     if section_question.section_group and section_question.section_group not in option_groupings:
                         option_groupings.append(section_question.section_group)
@@ -863,6 +865,7 @@ class LicenceSchemaUtility(LicenceUtility):
                 'name': question_name,
                 'type': q.question.answer_type,
                 'label': q.question.question,
+                'help_text_url': q.question.help_text_url
             }
 
             if q.parent_answer and not no_parent_section_group:
@@ -1177,6 +1180,7 @@ class LicenceSchemaUtility(LicenceUtility):
         # instead of question.
         group_types = ['checkbox', 'radiobuttons', 'multi-select']
         groupings = []
+        text_types = ['number', 'email', 'text', 'string', 'text_area', 'date']
 
         for section in self.licence_sections:
             section_name = 'Section{}'.format(section_count)
@@ -1229,8 +1233,8 @@ class LicenceSchemaUtility(LicenceUtility):
 
                     elif sq.question.answer_type in expander_types:
 
-                        sc['label'] = ''
-
+                        sc['label'] = sq.question.question
+                        sc['help_text_url'] = sq.question.help_text_url
                         q_header_children = self.get_header_children2(
                             sq, sq.question, section, sq_name
                         )
@@ -1254,6 +1258,7 @@ class LicenceSchemaUtility(LicenceUtility):
 
                         sc['children'] = sq_opt_children
                         sc['type'] = 'group'
+                        sc['help_text_url'] = sq.question.help_text_url
 
                     elif sq.question.answer_type in select_types:
                         '''
@@ -1275,8 +1280,13 @@ class LicenceSchemaUtility(LicenceUtility):
 
                             sc['options'] = sq_options
                             sc['type'] = sq.question.answer_type
+                            sc['help_text_url'] = sq.question.help_text_url
+
+                    elif sq.question.answer_type in text_types:
+                        sc['help_text_url'] = sq.question.help_text_url
 
                     else:
+                        sc['help_text_url'] = sq.question.help_text_url
 
                         if len(sq.question.get_options()) > 0:
                             sq_options = self.get_options2(sq, sq.question)
@@ -1305,6 +1315,7 @@ class LicenceSchemaUtility(LicenceUtility):
                         )
                         if sq_children:
                             sc['conditions'] = sq_children
+                            sc['help_text_url'] = sq.question.help_text_url
 
                     if sq.tag:
                         for t in sq.tag:

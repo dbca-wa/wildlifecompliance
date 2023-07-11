@@ -12,7 +12,7 @@ search and calls the server api with a filtered_list_url.
             </template>
 
             <template v-if="help_text_url">
-                <HelpText :help_text_url="help_text_url" />
+                <HelpTextUrl :help_text_url="help_text_url" />
             </template>
 
             <CommentBlock 
