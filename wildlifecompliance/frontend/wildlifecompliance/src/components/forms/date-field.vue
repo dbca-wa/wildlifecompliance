@@ -92,6 +92,6 @@ export default {
         box-shadow:none;
     }
 .date-class {
-    margin-top: -28px;
+    margin-top: -20px;
 }
 </style>
