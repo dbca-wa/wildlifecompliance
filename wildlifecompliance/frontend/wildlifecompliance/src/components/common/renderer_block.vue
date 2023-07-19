@@ -180,7 +180,6 @@
                     :name="component_name"
                     :field_data="value"
                     /> 
-                <div class="form-group-options">
                 <Radio v-for="(option, index) in component.options"
                     :name="component_name"
                     :label="option.label"
@@ -192,7 +191,6 @@
                     :conditions="component.conditions"
                     :readonly="is_readonly"
                     v-bind:key="`radio_${component_name}_${index}`"/>
-                </div>
                 <Conditions
                     :conditions="component.conditions"
                     :name="component_name"
@@ -203,7 +201,6 @@
         </div>
 
         <div class="form-group" v-if="component.type === 'checkbox'">
-            <div class="form-group-options">
             <Checkbox
                 :group="component.group"
                 :name="component_name"
@@ -216,7 +213,6 @@
                 :conditions="component.conditions"
                 :readonly="is_readonly"
                 :isRequired="component.isRequired"/>
-            </div>
             <Conditions
                 :conditions="component.conditions"
                 :name="component_name"
@@ -263,7 +259,8 @@
             :readonly="is_readonly"
             :help_text="help_text"
             :isRequired="component.isRequired"
-            :help_text_url="help_text_url"/>
+            :help_text_url="help_text_url"
+            :isTableField="isTableField" />
 
         <GridBlock v-if="component.type === 'grid'"
             :name="component.name"
@@ -392,6 +389,10 @@ const RendererBlock = {
       instance: {
           type: String,
           default: null
+      },
+      isTableField:{
+        type: Boolean,
+        required: false
       }
   },
   computed: {
@@ -528,12 +529,3 @@ const RendererBlock = {
 }
 export default RendererBlock;
 </script>
-<style>
-.form-group {
-  margin-bottom: 2.6rem; 
-}
-
-.form-group-options {
-  margin-top: -1rem; 
-}
-</style>
