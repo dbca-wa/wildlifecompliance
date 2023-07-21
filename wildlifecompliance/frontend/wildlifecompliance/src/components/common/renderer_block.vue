@@ -249,7 +249,8 @@
             :docsUrl="documents_url"
             :application_id="application_id"
             :isRequired="component.isRequired"
-            :help_text_url="help_text_url"/>
+            :help_text_url="help_text_url"
+            :isTableField="isTableField"/>
 
         <DateField v-if="component.type === 'date'"
             :name="component_name"

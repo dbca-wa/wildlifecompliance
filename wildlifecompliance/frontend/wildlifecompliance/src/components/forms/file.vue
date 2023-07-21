@@ -16,7 +16,7 @@
                 :field_data="field_data"
                 />
 
-            <div v-if="files">
+            <div v-if="files" :class="getClass">
                 <div v-for="v in documents">
                     <p>
                         File: <a :href="v.file" target="_blank">{{v.name}}</a> &nbsp;
@@ -76,6 +76,7 @@ export default {
         readonly:Boolean,
         docsUrl: String,
         help_text_url: String,
+        isTableField: Boolean
     },
     components: {CommentBlock, HelpText, HelpTextUrl},
     data:function(){
@@ -96,6 +97,10 @@ export default {
         },
         value: function() {
             return this.field_data.value;
+        },
+        getClass: function (){
+            const file_class = this.isTableField ? "file-class" : "";
+            return file_class;
         }
     },
 
@@ -248,4 +253,7 @@ export default {
     input {
         box-shadow:none;
     }
+.file-class {
+    margin-top: -20px;
+}
 </style>

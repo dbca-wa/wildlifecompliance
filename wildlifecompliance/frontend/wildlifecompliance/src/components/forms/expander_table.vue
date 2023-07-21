@@ -17,7 +17,7 @@
         <div class="horizontal-scrollable"> 
             <div class="row header-titles-row">
             
-                <div class="col-xs-2 truncate-text"
+                <div :class="`col-xs-${getColXSValue} truncate-text`"
                     v-for="(header, index) in component.header"
                     v-bind:key="`expander_header_${component.name}_${index}`">
                         {{ header.label }}
@@ -25,7 +25,7 @@
             </div>
             <div class="expander-table" v-for="(table, tableIdx) in expanderTables">
                 <div class="row header-row">
-                    <div class="col-xs-2"
+                    <div :class="`col-xs-${getColXSValue}`"
                         v-for="(header, index) in component.header"
                         v-bind:key="`expander_header_${component.name}_${index}`">
                             <span v-if="index===0 && component.expander && component.expander.length>0" :class="`expand-icon ${isExpanded(table) ? 'collapse' : ''}`"
@@ -190,6 +190,10 @@ const ExpanderTable = {
         showExpanderIcon: function() {
             return false
         },
+        getColXSValue: function (){
+            const value = this.component.header.length > 4 ? 2 : Math.floor(12 / this.component.header.length);
+            return value;
+        }
     }
 }
 
@@ -199,9 +203,6 @@ export default ExpanderTable;
 .horizontal-scrollable {
     overflow-x: auto;
     white-space: nowrap;
-    background-color: #efefef;
-}
-.horizontal-scrollable > .row {
     background-color: #efefef;
 }
 .horizontal-scrollable > .row > .col-xs-2 {
