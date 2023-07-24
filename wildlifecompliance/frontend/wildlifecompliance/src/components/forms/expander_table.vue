@@ -16,7 +16,7 @@
             :name="name"
             :field_data="field_data"
             />
-        <div class="horizontal-scrollable"> 
+        <div :class="tableClass"> 
             <div class="row header-titles-row">
             
                 <div :class="`col-xs-${getColXSValue} truncate-text`"
@@ -195,6 +195,10 @@ const ExpanderTable = {
         getColXSValue: function (){
             const value = this.component.header.length > 4 ? 2 : Math.floor(12 / this.component.header.length);
             return value;
+        },
+        tableClass: function(){
+            const class_name = this.component.header.length > 5 ? "horizontal-scrollable" : "no-scroll-background";
+            return class_name;
         }
     }
 }
@@ -202,6 +206,9 @@ const ExpanderTable = {
 export default ExpanderTable;
 </script>
 <style>
+.no-scroll-background {
+    background-color: #efefef;
+}
 .horizontal-scrollable {
     overflow-x: auto;
     white-space: nowrap;

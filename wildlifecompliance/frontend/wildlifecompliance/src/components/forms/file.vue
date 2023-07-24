@@ -17,7 +17,7 @@
             <div v-if="files" :class="getClass">
                 <div v-for="v in documents">
                     <p>
-                        File: <a :href="v.file" target="_blank">{{v.name}}</a> &nbsp;
+                        File: <a :href="v.file" target="_blank" :title="v.name.toString()">{{ truncatedName(v.name) }}</a>
                         <span v-if="!readonly && v.can_delete">
                             <a @click="delete_document(v)" class="fa fa-trash-o" title="Remove file" :filename="v.name" style="cursor: pointer; color:red;"></a>
                         </span>
@@ -143,6 +143,14 @@ export default {
             }
 
             vm.show_spinner = false;
+        },
+        truncatedName: function (name){
+            if(name.length > 10){
+                return name.substring(0, 6) + '...';
+            }
+            else{
+                return name;
+            }
         },
 
         /*
