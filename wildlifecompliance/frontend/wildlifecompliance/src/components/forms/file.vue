@@ -1,14 +1,12 @@
 <template lang="html">
     <div>
         <div class="form-group">
-            <label :id="id" :num_files="num_documents()">{{label}}</label>
+            <label :id="id" :num_files="num_documents()" style="white-space: pre-line;">{{label}} <HelpTextUrl :help_text_url="help_text_url" /></label>
             <template v-if="help_text">
                 <HelpText :help_text="help_text" />
             </template>
 
-            <template v-if="help_text_url">
-                <HelpTextUrl :help_text_url="help_text_url" />
-            </template>
+            
 
             <CommentBlock 
                 :label="label"
