@@ -197,7 +197,7 @@ const ExpanderTable = {
             return value;
         },
         tableClass: function(){
-            const class_name = this.component.header.length > 5 ? "horizontal-scrollable" : "no-scroll-background";
+            const class_name = this.component.header.length > 6 ? "horizontal-scrollable" : "no-scroll-background";
             return class_name;
         }
     }
