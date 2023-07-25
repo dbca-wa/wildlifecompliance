@@ -1180,7 +1180,7 @@ class LicenceSchemaUtility(LicenceUtility):
         # instead of question.
         group_types = ['checkbox', 'radiobuttons', 'multi-select']
         groupings = []
-        text_types = ['number', 'email', 'text', 'string', 'text_area', 'date']
+        text_types = ['number', 'email', 'text', 'string', 'text_area', 'date', 'label']
 
         for section in self.licence_sections:
             section_name = 'Section{}'.format(section_count)

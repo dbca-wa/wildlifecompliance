@@ -1,14 +1,12 @@
 <template lang="html">
     <div>
         <div class="form-group">
-            <label :id="id" :num_files="num_documents()">{{label}}</label>
+            <label :id="id" :num_files="num_documents()" style="white-space: pre-line;">{{label}} <HelpTextUrl :help_text_url="help_text_url" /></label>
             <template v-if="help_text">
                 <HelpText :help_text="help_text" />
             </template>
 
-            <template v-if="help_text_url">
-                <HelpTextUrl :help_text_url="help_text_url" />
-            </template>
+            
 
             <CommentBlock 
                 :label="label"
@@ -19,7 +17,7 @@
             <div v-if="files" :class="getClass">
                 <div v-for="v in documents">
                     <p>
-                        File: <a :href="v.file" target="_blank">{{v.name}}</a> &nbsp;
+                        File: <a :href="v.file" target="_blank" :title="v.name.toString()">{{ truncatedName(v.name) }}</a>
                         <span v-if="!readonly && v.can_delete">
                             <a @click="delete_document(v)" class="fa fa-trash-o" title="Remove file" :filename="v.name" style="cursor: pointer; color:red;"></a>
                         </span>
@@ -145,6 +143,14 @@ export default {
             }
 
             vm.show_spinner = false;
+        },
+        truncatedName: function (name){
+            if(name.length > 10){
+                return name.substring(0, 6) + '...';
+            }
+            else{
+                return name;
+            }
         },
 
         /*
