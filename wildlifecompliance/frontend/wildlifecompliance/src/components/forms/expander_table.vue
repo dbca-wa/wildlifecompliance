@@ -19,21 +19,21 @@
         <div :class="tableClass"> 
             <div class="row header-titles-row">
             
-                <div :class="`col-xs-${getColXSValue} truncate-text`"
-                    v-for="(header, index) in component.header"
+                <div v-for="(header, index) in component.header"
+                    :class="`col-xs-${getColXSValue(header.colSize)} truncate-text`"
                     v-bind:key="`expander_header_${component.name}_${index}`">
                         {{ header.label }}
                 </div>
             </div>
             <div class="expander-table" v-for="(table, tableIdx) in expanderTables">
                 <div class="row header-row">
-                    <div :class="`col-xs-${getColXSValue}`"
-                        v-for="(header, index) in component.header"
+                    <div v-for="(header, index) in component.header"
+                        :class="`col-xs-${getColXSValue(header.colSize)}`"
                         v-bind:key="`expander_header_${component.name}_${index}`">
                             <span v-if="index===0 && component.expander && component.expander.length>0" :class="`expand-icon ${isExpanded(table) ? 'collapse' : ''}`"
                                 v-on:click="toggleTableVisibility(table)"></span>
 
-                            <span class="header-contents" :title="value">
+                            <span class="header-contents" :title="value.toString()">
                                 <renderer-block
                                 :component="removeLabel(header)"
                                 :json_data="value"
@@ -161,6 +161,14 @@ const ExpanderTable = {
             delete newHeader['label'];
             return newHeader;
         },
+        getColXSValue: function (colSize){
+            const fixedValue = this.component.header.length > 4 ? 2 : Math.floor(12 / this.component.header.length);
+            const hasNullSize = this.component.header.some(obj => obj.colSize ? obj.colSize === null : true);
+            if(hasNullSize){
+                return fixedValue;
+            }
+            return colSize;
+        },
     },
     computed:{
         ...mapGetters([
@@ -191,10 +199,6 @@ const ExpanderTable = {
         },
         showExpanderIcon: function() {
             return false
-        },
-        getColXSValue: function (){
-            const value = this.component.header.length > 4 ? 2 : Math.floor(12 / this.component.header.length);
-            return value;
         },
         tableClass: function(){
             const class_name = this.component.header.length > 6 ? "horizontal-scrollable" : "no-scroll-background";

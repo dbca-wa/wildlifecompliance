@@ -238,7 +238,8 @@ export default {
             addedHeaders: [],
             addedHeader: {
                 label: '',
-                value: ''
+                value: '',
+                colSize: ''
             },
             addedExpanders: [],
             addedExpander: {
@@ -407,6 +408,7 @@ export default {
                 self.addedHeaders = self.$refs.schema_masterlist_table.row_of_data.data().headers;       
                 self.addedExpanders = self.$refs.schema_masterlist_table.row_of_data.data().expanders;
                 self.masterlist.help_text_url = self.$refs.schema_masterlist_table.row_of_data.data().help_text_url;
+                console.log("self.addedHeaders: ", self.addedHeaders);
 
                 $(self.$refs.select_answer_type).val(self.masterlist.answer_type).trigger('change');
                 self.setShowAdditional(self.masterlist.answer_type)

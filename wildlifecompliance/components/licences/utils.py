@@ -1033,6 +1033,7 @@ class LicenceSchemaUtility(LicenceUtility):
                 'name': question_name,
                 'type': h['value'],
                 'label': h['label'],
+                'colSize': h.get('colSize', None)
             }
 
             header_question_count += 1
