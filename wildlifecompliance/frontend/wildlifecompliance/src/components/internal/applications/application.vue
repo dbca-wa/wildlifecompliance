@@ -654,7 +654,7 @@
         </div>
     </div>
 
-</div>
+
 </template>
 <script>
 import Application from '../../form.vue';
