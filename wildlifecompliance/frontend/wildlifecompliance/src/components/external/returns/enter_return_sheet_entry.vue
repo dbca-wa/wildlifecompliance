@@ -48,7 +48,7 @@
                                 <label class="control-label pull-left" >Quantity:</label>
                             </div>
                             <div class="col-md-3">
-                                <input type='text' v-model='entryQty' >
+                                <input type='number' v-model='entryQty' >
                             </div>
                         </div>
                         <div class="row">
@@ -329,6 +329,13 @@ export default {
           this.missing_fields.push(missing_field)
           is_valid = false;
         }
+        if (this.entryActivity === '0') {
+          const missing_field = {
+            label: 'Activity',
+          }
+          this.missing_fields.push(missing_field)
+          is_valid = false;
+        }
         this.highlightMissingFields();
         var top = ($('#error').offset() || { "top": NaN }).top;
         $('html, body').animate({
@@ -470,8 +477,11 @@ export default {
 
               if (this.isStock(self.entryActivity)) { // Initial Stock entries aggregate from Current Stock.
                   rows[i].total = parseInt(rows[i].total) + (parseInt(self.entryQty) - parseInt(self.currentStock));
-              } else {
+              } else if (self.entryActivity.includes('in') ) {
                   rows[i].total = parseInt(rows[i].total) + (parseInt(self.entryQty) - parseInt(self.initialQty))
+              }
+              else if (self.entryActivity.includes('out')) {
+                  rows[i].total = parseInt(rows[i].total) - (parseInt(self.entryQty) - parseInt(self.initialQty))
               }
           }
         }
