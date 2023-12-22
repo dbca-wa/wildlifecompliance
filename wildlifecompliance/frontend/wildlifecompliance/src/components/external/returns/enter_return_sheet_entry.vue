@@ -10,6 +10,14 @@
                         </li>
                     </ul>
                 </div>
+                <div id="error" v-if="incorrect_entry.length > 0" style="margin: 10px; padding: 5px; color: red; border:1px solid red;">
+                    <b>Error in Quantity</b>
+                    <ul>
+                        <li v-for="error in incorrect_entry">
+                            {{ error.message }}
+                        </li>
+                    </ul>
+                </div>
                 <div class="row">
                 <form class="form-horizontal" name="sheetEntryForm">
                     <alert :show.sync="showError" type="danger"><strong>{{errorString}}</strong></alert>
@@ -170,6 +178,7 @@ export default {
             allowInputToggle:true
         },
         missing_fields: [],
+        incorrect_entry: [],
       }
     },
     watch: {
@@ -242,8 +251,10 @@ export default {
         const self = this;
 
         let is_valid = await this.validateMissingFields();
+        let is_correct = await this.validateUserEntries();
 
-        if (!is_valid){
+
+        if (!is_valid | !is_correct){
           return
         }
 
@@ -529,6 +540,36 @@ export default {
                 }
             });
        },
+       validateUserEntries: async function(){
+        let is_correct = true
+
+        this.incorrect_entry.length = 0;
+        await this.highlightMissingFields();
+
+        if (this.entryQty < 0) {
+          const incorrect_entry = {
+            label: 'Re-enter Quantity',
+            message: 'Please enter a positive number for Quantity.',
+          }
+          this.incorrect_entry.push(incorrect_entry)
+          is_correct = false;
+        }
+        if (this.entryActivity.includes('out') && (parseInt(this.currentStock) - parseInt(this.entryQty)) < 0) {
+          const incorrect_entry = {
+            label: 'Incorrect Quantity',
+            message: 'Please enter Quantity less than or equal to Current Stock.'
+          }
+          this.incorrect_entry.push(incorrect_entry)
+          is_correct = false;
+        }
+        this.highlightMissingFields();
+        var top = ($('#error').offset() || { "top": NaN }).top;
+        $('html, body').animate({
+            scrollTop: top
+        }, 1);        
+
+        return is_correct;
+      }, 
       //Initialise Date Picker
       initDatePicker: function() {
         const vm = this;
