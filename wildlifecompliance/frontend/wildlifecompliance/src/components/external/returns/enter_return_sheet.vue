@@ -13,8 +13,9 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="">Species Available:</label>
-                        <select v-if="returns.species" class="form-control" ref="species_selector" name="species_selector" >
-                            <option class="change-species" v-for="(specie, s_idx) in returns.species_list" :value="s_idx" :selected="s_idx === returns.species" :species_id="s_idx" v-bind:key="`specie_${s_idx}`" >{{specie}}</option>
+                        <select required v-if="returns.species" class="form-control" ref="species_selector" name="species_selector" id="species_selector">
+                          <option v-if="Object.values(returns.species_saved).length === 0" value="" disabled selected></option>
+                          <option class="change-species" v-for="(specie, s_idx) in returns.species_list" :value="s_idx" :selected="s_idx === specie_selection" :species_id="s_idx" v-bind:key="`specie_${s_idx}`" >{{specie}}</option>
                         </select>
                     </div>
                 </div>
@@ -91,6 +92,7 @@ export default {
         readonly: false,
         isModalOpen: false,
         sheetTitle: null,
+        specie_selection: '',
         sheet_total: 0,
         sheet_activity_type: [],
         sheet_headers:["order","Entry Date","Activity","Date","Qty","Total","Action","Supplier","Comments"],
@@ -162,7 +164,12 @@ export default {
                 $(row).addClass('payRecordRow');
             },
             drawCallback: function() {
-              vm.sheetTitle = vm.species_list[vm.returns.sheet_species]
+              if ((vm.specie_selection === '' || null) && Object.values(vm.returns.species_saved).length === 0) {
+                vm.specie_selection = document.getElementById("species_selector").options[document.getElementById("species_selector").selectedIndex].textContent;
+              } else {
+                vm.specie_selection = vm.species_list[vm.returns.sheet_species]
+              }
+              vm.sheetTitle = vm.specie_selection
             },
             footerCallback: function(row, data, start, end, display) {
               var api = this.api(), data;
@@ -229,32 +236,40 @@ export default {
           _value : 0;
     },
     addSheetRow: function () {
-      const self = this;
-      var rows = self.$refs.return_datatable.vmDataTable
-      self.$refs.sheet_entry.entryActivity = Object.keys(self.returns.sheet_activity_list)[0];
-      if (rows.data().length<1) {
-        for (const [key, value] of Object.entries(self.returns.sheet_activity_list)) {
-          self.$refs.sheet_entry.entryActivity = key === 'stock' ? key :  self.$refs.sheet_entry.entryActivity
+      if (document.getElementById("species_selector").value === '' || null) {
+        swal(
+          'Select Specie',
+          'Please select a specie before adding a new entry.',
+          'error'
+        )
+      } else {
+        const self = this;
+        var rows = self.$refs.return_datatable.vmDataTable
+        self.$refs.sheet_entry.entryActivity = Object.keys(self.returns.sheet_activity_list)[0];
+        if (rows.data().length<1) {
+          for (const [key, value] of Object.entries(self.returns.sheet_activity_list)) {
+            self.$refs.sheet_entry.entryActivity = key === 'stock' ? key :  self.$refs.sheet_entry.entryActivity
+          }
+          // self.$refs.sheet_entry.entryActivity = Object.keys(self.returns.sheet_activity_list);
         }
-        // self.$refs.sheet_entry.entryActivity = Object.keys(self.returns.sheet_activity_list);
+        self.$refs.sheet_entry.isAddEntry = true;
+        self.$refs.sheet_entry.return_table = rows;
+        self.$refs.sheet_entry.row_of_data = rows;
+        self.$refs.sheet_entry.activityList = self.returns.sheet_activity_list;
+        self.$refs.sheet_entry.speciesType = self.returns.sheet_species
+        self.$refs.sheet_entry.entrySpecies = self.sheetTitle;
+        self.$refs.sheet_entry.entryTotal = self.sheet_total;
+        self.$refs.sheet_entry.currentStock = self.sheet_total;
+        self.$refs.sheet_entry.initialQty = '0';
+        self.$refs.sheet_entry.entryQty = '0';      // for editing purposes.
+        self.$refs.sheet_entry.entryComment = '';
+        self.$refs.sheet_entry.entryLicence = '';
+        self.$refs.sheet_entry.entryDateTime = '';
+        self.$refs.sheet_entry.entryActivityDate = '';
+        self.$refs.sheet_entry.entrySupplier = '';
+        self.$refs.sheet_entry.isSubmitable = true;
+        self.$refs.sheet_entry.isModalOpen = true;
       }
-      self.$refs.sheet_entry.isAddEntry = true;
-      self.$refs.sheet_entry.return_table = rows;
-      self.$refs.sheet_entry.row_of_data = rows;
-      self.$refs.sheet_entry.activityList = self.returns.sheet_activity_list;
-      self.$refs.sheet_entry.speciesType = self.returns.sheet_species
-      self.$refs.sheet_entry.entrySpecies = self.sheetTitle;
-      self.$refs.sheet_entry.entryTotal = self.sheet_total;
-      self.$refs.sheet_entry.currentStock = self.sheet_total;
-      self.$refs.sheet_entry.initialQty = '0';
-      self.$refs.sheet_entry.entryQty = '0';      // for editing purposes.
-      self.$refs.sheet_entry.entryComment = '';
-      self.$refs.sheet_entry.entryLicence = '';
-      self.$refs.sheet_entry.entryDateTime = '';
-      self.$refs.sheet_entry.entryActivityDate = '';
-      self.$refs.sheet_entry.entrySupplier = '';
-      self.$refs.sheet_entry.isSubmitable = true;
-      self.$refs.sheet_entry.isModalOpen = true;
     },
     addEventListeners: function(){
       let vm = this;
@@ -467,7 +482,7 @@ export default {
         $(vm.$refs.species_selector).select2({
             "theme": "bootstrap",
             minimumInputLength: 2,
-            placeholder:"Select Species..."
+            placeholder:"Select Species...",
         }).
         on("select2:select",function (e) {
             e.stopImmediatePropagation();
