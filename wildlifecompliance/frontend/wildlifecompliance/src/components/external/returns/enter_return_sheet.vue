@@ -14,7 +14,7 @@
                     <div class="form-group">
                         <label for="">Species Available:</label>
                         <select required v-if="returns.species" class="form-control" ref="species_selector" name="species_selector" id="species_selector">
-                          <option value="" disabled selected>Select a specie</option>
+                          <option v-if="Object.values(returns.species_saved).length === 0" value="" disabled selected></option>
                           <option class="change-species" v-for="(specie, s_idx) in returns.species_list" :value="s_idx" :selected="s_idx === specie_selection" :species_id="s_idx" v-bind:key="`specie_${s_idx}`" >{{specie}}</option>
                         </select>
                     </div>
@@ -165,7 +165,7 @@ export default {
             },
             drawCallback: function() {
               if ((vm.specie_selection === '' || null) && Object.values(vm.returns.species_saved).length === 0) {
-                vm.specie_selection = document.getElementById("species_selector").textContent
+                vm.specie_selection = document.getElementById("species_selector").options[document.getElementById("species_selector").selectedIndex].textContent;
               } else {
                 vm.specie_selection = vm.species_list[vm.returns.sheet_species]
               }
