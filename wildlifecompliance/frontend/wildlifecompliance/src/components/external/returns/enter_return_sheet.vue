@@ -508,7 +508,7 @@ export default {
   },
   created: function(){
      this.form = document.forms.enter_return_sheet;
-     this.readonly = !(this.is_external || this.returns.can_current_user_edit)
+     this.readonly = !(this.is_external || this.returns.user_in_officers) || !this.returns.is_draft
      this.select_species_list = this.species_list;
   },
   mounted: function(){
