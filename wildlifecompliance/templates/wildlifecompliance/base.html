@@ -17,6 +17,7 @@
 {% is_external_url as is_external_url %}
 {% RAND_HASH as RAND_HASH %}
 {% system_name_var as system_name_var %}
+{% COMPLIANCE_LINKS_ENABLED as compliance_links_enabled %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -77,17 +78,20 @@
                                             <li><a href="/internal/advices">Advices to CEO</a></li> -->
                                         {% elif is_compliance_internal_login and prefer_compliance_management %}
                                             <a class="navbar-brand" href="/internal/call_email"><div style="inline"><img src="{% static 'wildlifecompliance/img/dpaw_small.png' %}">Home</div></a>
-                                            <!--li><a href="/internal/inspection">Inspections</a></li>
-                                            <li><a href="/internal/offence">Offences</a></li>
-                                            <li><a href="/internal/object">Objects</a></li>
-                                            <li><a href="/internal/sanction_outcome">Sanction Outcomes</a></li>
-                                            <li><a href="/internal/legal_case">Cases</a></li-->
+                                            {% if compliance_links_enabled %}
+                                                <li><a href="/internal/inspection">Inspections</a></li>
+                                                <li><a href="/internal/offence">Offences</a></li>
+                                                <li><a href="/internal/object">Objects</a></li>
+                                                <li><a href="/internal/sanction_outcome">Sanction Outcomes</a></li>
+                                                <li><a href="/internal/legal_case">Cases</a></li>
+                                            {% endif %} 
                                         {% endif %}
 
                                         {% if is_officer_login %}
                                             <li><a href="/internal/organisations/access">Organisation Access Requests</a></li>
                                             <li><a href="/internal/search">Search</a></li>
                                         {% endif %}
+                    
                                     {% endblock %}
                                 </ul>
                                 <ul class="nav navbar-nav navbar-right">
