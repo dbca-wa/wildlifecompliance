@@ -12,7 +12,7 @@
                             <div class="col-sm-9">
                               <select class="form-control col-sm-9" @change.prevent="updateDistricts()" v-model="region_id">
                                 <option  v-for="option in regions" :value="option.id" v-bind:key="option.id">
-                                  {{ option.display_name }} 
+                                  {{ option.name }} 
                                 </option>
                               </select>
                             </div>
@@ -25,8 +25,8 @@
                             </div>
                             <div class="col-sm-9">
                               <select class="form-control" @change.prevent="updateAllocatedGroup()" v-model="district_id">
-                                <option  v-for="option in availableDistricts" :value="option.id" v-bind:key="option.id">
-                                  {{ option.display_name }} 
+                                <option  v-for="option in availableDistricts" :value="option.district_id" v-bind:key="option.district_id">
+                                  {{ option.district_name }} 
                                 </option>
                               </select>
                             </div>
@@ -125,7 +125,6 @@ export default {
             processingDetails: false,
             form: null,
             regions: [],
-            regionDistricts: [],
             availableDistricts: [],
             casePriorities: [],
             inspectionTypes: [],
@@ -138,7 +137,7 @@ export default {
             inspection_type_id: null,
             advice_details: "",
             allocatedGroup: [],
-            allocated_group_id: null,
+            // allocated_group_id: null,
             documentActionUrl: '',
             temporary_document_collection_id: null,
       }
@@ -178,13 +177,6 @@ export default {
               return true;
           }
       },
-      regionDistrictId: function() {
-          if (this.district_id || this.region_id) {
-              return this.district_id ? this.district_id : this.region_id;
-          } else {
-              return null;
-          }
-      },
     },
     filters: {
       formatDate: function(data) {
@@ -210,43 +202,24 @@ export default {
           this.temporary_document_collection_id = val;
       },
       updateDistricts: function() {
-        // this.district_id = null;
         this.availableDistricts = [];
-        for (let record of this.regionDistricts) {
-          if (this.region_id === record.id) {
-            for (let district of record.districts) {
-              for (let district_record of this.regionDistricts) {
-                if (district_record.id === district) {
-                  this.availableDistricts.push(district_record)
-                }
-              }
-            }
+        for (let region of this.regions) {
+          if (this.region_id === region.id) {
+            this.availableDistricts=region.districts
           }
         }
-        // console.log(this.availableDistricts);
-        this.availableDistricts.splice(0, 0, 
-        {
-          id: "", 
-          display_name: "",
-          district: "",
-          districts: [],
-          region: null,
-        });
-        // ensure security group members list is up to date
-        this.updateAllocatedGroup();
       },
       updateAllocatedGroup: async function() {
-          // console.log("updateAllocatedGroup");
           this.errorResponse = "";
-          if (this.regionDistrictId) {
+          if (this.region_id && this.district_id) {
               let allocatedGroupResponse = await this.loadAllocatedGroup({
-              region_district_id: this.regionDistrictId,
-              group_permission: 'officer',
+                workflow_type: 'forward_to_regions',
+                region_id: this.region_id,
+                district_id: this.district_id ? this.district_id : null,
               });
               if (allocatedGroupResponse.ok) {
-                  console.log(allocatedGroupResponse.body.allocated_group);
-                  Vue.set(this, 'allocatedGroup', allocatedGroupResponse.body.allocated_group);
-                  this.allocated_group_id = allocatedGroupResponse.body.group_id;
+                  Vue.set(this, 'allocatedGroup', allocatedGroupResponse.body);
+                  // this.allocated_group_id = allocatedGroupResponse.body.group_id;
               } else {
                   // Display http error response on modal
                   this.errorResponse = allocatedGroupResponse.statusText;
@@ -266,7 +239,6 @@ export default {
           let is_valid_form = this.isValidForm();
           if (is_valid_form) {
               const response = await this.sendData();
-              console.log(response);
               if (response.ok) {
                   const returnedInspection = response.body;
                   // For Inspection Dashboard
@@ -300,7 +272,6 @@ export default {
           }
       },
       isValidForm: function() {
-          console.log("performValidation");
           this.$v.$touch();
           if (this.$v.$invalid) {
               this.errorResponse = 'Invalid form:\n';
@@ -344,7 +315,7 @@ export default {
           this.assigned_to_id ? payload.append('assigned_to_id', this.assigned_to_id) : null;
           this.inspection_type_id ? payload.append('inspection_type_id', this.inspection_type_id) : null;
           this.region_id ? payload.append('region_id', this.region_id) : null;
-          this.allocated_group_id ? payload.append('allocated_group_id', this.allocated_group_id) : null;
+          //this.allocated_group_id ? payload.append('allocated_group_id', this.allocated_group_id) : null;
           this.temporary_document_collection_id ? payload.append('temporary_document_collection_id', this.temporary_document_collection_id.temp_doc_id) : null;
 
           //this.workflow_type ? payload.append('workflow_type', this.workflow_type) : null;
@@ -352,7 +323,6 @@ export default {
 
           try {
               let res = await Vue.http.post(post_url, payload);
-              console.log(res);
               if (res.ok) {
                   return res
               }
@@ -375,25 +345,9 @@ export default {
     },
     created: async function() {
         // regions
-        /*
-        let returned_regions = await cache_helper.getSetCacheList('Regions', '/api/region_district/get_regions/');
+        
+        let returned_regions = await cache_helper.getSetCacheList('Regions', '/api/regions/');
         Object.assign(this.regions, returned_regions);
-        // blank entry allows user to clear selection
-        this.regions.splice(0, 0, 
-            {
-              id: "", 
-              display_name: "",
-              district: "",
-              districts: [],
-              region: null,
-            });
-        // regionDistricts
-        let returned_region_districts = await cache_helper.getSetCacheList(
-            'RegionDistricts', 
-            api_endpoints.region_district
-            );
-        Object.assign(this.regionDistricts, returned_region_districts);
-        */
 
         // inspection_types
         let returned_inspection_types = await cache_helper.getSetCacheList(
@@ -412,21 +366,6 @@ export default {
             this.region_id = this.call_email.region_id;
             this.district_id = this.call_email.district_id;
         }
-        /*
-
-        // If no Region/District selected, initialise region as Kensington
-        if (!this.regionDistrictId) {
-            for (let record of this.regionDistricts) {
-                if (record.district === 'KENSINGTON') {
-                    this.district_id = null;
-                    this.region_id = record.id;
-                }
-            }
-        }
-        // ensure availableDistricts and allocated group is current
-        this.updateDistricts();
-        await this.updateAllocatedGroup();
-        */
     },
 };
 </script>

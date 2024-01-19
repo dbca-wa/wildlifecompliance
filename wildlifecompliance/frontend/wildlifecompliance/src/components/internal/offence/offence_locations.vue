@@ -432,8 +432,6 @@ module.exports = {
             });
         },
         addMarkers(offences){
-            console.log('addMarkers');
-
             let self = this;
             self.mcg.clearLayers();
 

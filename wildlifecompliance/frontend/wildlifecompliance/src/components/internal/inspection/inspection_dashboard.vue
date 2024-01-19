@@ -254,7 +254,6 @@
                 description: "All",
                 inspection_type: "All",
                 });
-            console.log(this)
 
         },
         watch: {
