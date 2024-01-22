@@ -349,6 +349,16 @@ export default {
         let returned_regions = await cache_helper.getSetCacheList('Regions', '/api/regions/');
         Object.assign(this.regions, returned_regions);
 
+        // blank entry allows user to clear selection
+        this.regions.splice(0, 0, 
+            {
+              id: "", 
+              display_name: "",
+              district: "",
+              districts: [],
+              region: null,
+            });
+
         // inspection_types
         let returned_inspection_types = await cache_helper.getSetCacheList(
             'InspectionTypes',
