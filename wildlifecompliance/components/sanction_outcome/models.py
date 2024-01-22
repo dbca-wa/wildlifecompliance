@@ -105,7 +105,6 @@ class SanctionOutcome(models.Model):
                                                         # This is pending closure status
         (STATUS_AWAITING_PRINT_AND_POST, 'Awaiting Print and Post'),
         (STATUS_WITH_DOT, 'With Dep. of Transport'),
-        (STATUS_AWAITING_ISSUANCE, 'Awaiting Issuance'),
         (STATUS_AWAITING_REVIEW, 'Awaiting Review'),
         (STATUS_AWAITING_ISSUANCE, 'Awaiting Issuance'),
         (STATUS_AWAITING_REMEDIATION_ACTIONS, 'Awaiting Remediation Actions'),  # TODO: implement pending closuer of SanctionOutcome with type RemediationActions

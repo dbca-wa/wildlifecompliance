@@ -118,7 +118,8 @@ class SanctionOutcomeFilterBackend(DatatablesFilterBackend):
             q_objects &= Q(district__id=district_id)
 
         # perform filters
-        queryset = queryset.filter(q_objects)
+        if queryset.exists:
+            queryset = queryset.filter(q_objects)
 
         getter = request.query_params.get
         fields = self.get_fields(getter)

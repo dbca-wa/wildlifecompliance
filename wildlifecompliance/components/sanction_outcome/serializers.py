@@ -432,6 +432,8 @@ class SanctionOutcomeDatatableSerializer(serializers.ModelSerializer):
     # remediation_actions = serializers.SerializerMethodField()
     # remediation_actions = RemediationActionSerializer(read_only=True, many=True)  # This is related field
     remediation_actions = serializers.SerializerMethodField()
+    region = serializers.SerializerMethodField()
+
 
     class Meta:
         model = SanctionOutcome
@@ -560,6 +562,9 @@ class SanctionOutcomeDatatableSerializer(serializers.ModelSerializer):
 
         urls = '<br />'.join(url_list)
         return urls
+    
+    def get_region(self,obj):
+        return obj.region_id
 
 
 class RecordFerCaseNumberSerializer(serializers.ModelSerializer):
