@@ -128,7 +128,8 @@ class InspectionFormDataRecordSerializer(serializers.ModelSerializer):
         )
 
 class InspectionSerializer(serializers.ModelSerializer):
-    allocated_group = serializers.SerializerMethodField()
+    # allocated_group = serializers.SerializerMethodField()
+    # allocated_group_id = serializers.SerializerMethodField(required=False)
     inspection_team = serializers.SerializerMethodField()
     all_officers = serializers.SerializerMethodField()
     user_in_group = serializers.SerializerMethodField()
@@ -143,6 +144,8 @@ class InspectionSerializer(serializers.ModelSerializer):
     inspection_report = serializers.SerializerMethodField()
     data = InspectionFormDataRecordSerializer(many=True)
     location = LocationSerializer(read_only=True)
+    region_id = serializers.SerializerMethodField()
+    district_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Inspection
@@ -156,8 +159,8 @@ class InspectionSerializer(serializers.ModelSerializer):
                 'planned_for_time',
                 'party_inspected',
                 'assigned_to_id',
-                'allocated_group',
-                'allocated_group_id',
+                # 'allocated_group',
+                # 'allocated_group_id',
                 'user_in_group',
                 'can_user_action',
                 'user_is_assignee',
@@ -195,10 +198,10 @@ class InspectionSerializer(serializers.ModelSerializer):
             for member in obj.inspection_team.all():
                 if user_id == member.id:
                     return_val = True
-        elif obj.allocated_group:
-           for member in obj.allocated_group.members:
-               if user_id == member.id:
-                  return_val = True
+        # elif obj.allocated_group:
+        #    for member in obj.allocated_group.members:
+        #        if user_id == member.id:
+        #           return_val = True
         return return_val
 
     def get_can_user_action(self, obj):
@@ -211,10 +214,10 @@ class InspectionSerializer(serializers.ModelSerializer):
             for member in obj.inspection_team.all():
                 if user_id == member.id:
                     return_val = True
-        elif obj.allocated_group and not obj.assigned_to_id:
-           for member in obj.allocated_group.members:
-               if user_id == member.id:
-                  return_val = True
+        # elif obj.allocated_group and not obj.assigned_to_id:
+        #    for member in obj.allocated_group.members:
+        #        if user_id == member.id:
+        #           return_val = True
         return return_val
 
     def get_user_is_assignee(self, obj):
@@ -244,8 +247,8 @@ class InspectionSerializer(serializers.ModelSerializer):
             team.append(member)
         return team
 
-    def get_allocated_group(self, obj):
-        return ''
+    # def get_allocated_group(self, obj):
+    #     return ''
         #allocated_group = [{
         #    'email': '',
         #    'first_name': '',
@@ -287,6 +290,12 @@ class InspectionSerializer(serializers.ModelSerializer):
 
     def get_inspection_report(self, obj):
         return [[r.name, r._file.url] for r in obj.report.all()]
+    
+    def get_region_id(self, obj):
+        return obj.region_id
+    
+    def get_district_id(self, obj):
+        return obj.district_id
 
 class SaveInspectionSerializer(serializers.ModelSerializer):
     assigned_to_id = serializers.IntegerField(
@@ -410,11 +419,11 @@ class InspectionDatatableSerializer(serializers.ModelSerializer):
             for member in obj.inspection_team.all():
                 if user_id == member.id:
                     returned_url = process_url
-        elif (obj.allocated_group
-                and not obj.assigned_to_id):
-            for member in obj.allocated_group.members:
-                if user_id == member.id:
-                    returned_url = process_url
+        # elif (obj.allocated_group
+        #         and not obj.assigned_to_id):
+        #     for member in obj.allocated_group.members:
+        #         if user_id == member.id:
+        #             returned_url = process_url
 
         if not returned_url:
             returned_url = view_url

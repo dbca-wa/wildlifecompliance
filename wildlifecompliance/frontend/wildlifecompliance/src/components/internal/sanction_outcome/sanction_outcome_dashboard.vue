@@ -51,27 +51,17 @@
         <div class="row">
             <div class="col-md-3">
                 <label class="">Region:</label>
-                                  <!-- <select class="form-control col-sm-9" v-on:change.prevent="sanction_outcome.region_id=$event.target.value; updateDistricts('updatefromUI')" v-bind:value="sanction_outcome.region_id">
-                                    <option  v-for="option in regions" :value="option.id" v-bind:key="option.id">
-                                      {{ option.display_name }}
-                                    </option>
-                                  </select> -->
-                <select class="form-control" v-on:change.prevent="filterRegionId=$event.target.value; updateDistricts('updatefromUI')" v-bind:value="filterRegionId">
-                    <option v-for="option in sanction_outcome_regions" :value="option.id" v-bind:key="option.id">
-                        {{ option.display_name }}
-                    </option>
-                </select>
+                    <select class="form-control" v-on:change.prevent="filterRegionId=$event.target.value; updateDistricts(updateFromUI)" v-bind:value="filterRegionId">
+                        <option v-for="option in sanction_outcome_regions" :value="option.id" v-bind:key="option.id">
+                            {{ option.name }}
+                        </option>
+                    </select>
             </div>
             <div class="col-md-3">
                 <label class="">District:</label>
-                                  <!-- <select class="form-control" v-model="sanction_outcome.district_id">
-                                    <option  v-for="option in availableDistricts" :value="option.id" v-bind:key="option.id">
-                                      {{ option.display_name }}
-                                    </option>
-                                  </select> -->
-                <select class="form-control" v-model="filterDistrictId">
-                    <option v-for="option in sanction_outcome_availableDistricts" :value="option.id" v-bind:key="option.id">
-                        {{ option.display_name }}
+                <select  class="form-control" v-model="filterDistrictId">
+                    <option v-for="option in sanction_outcome_availableDistricts" :value="option.district_id" v-bind:key="option.district_id">
+                        {{ option.district_name }}
                     </option>
                 </select>
             </div>
@@ -281,15 +271,8 @@ export default {
             vm.addEventListeners();
         });
     },
-    computed: {
-        current_region_id: function() {
-            return this.filterRegionId;
-        },
-    },
     watch: {
-        current_region_id: function() {
-            this.updateDistricts();
-        },
+
         filterType: function () {
             this.$refs.sanction_outcome_table.vmDataTable.draw();
         },
@@ -317,26 +300,20 @@ export default {
         this.constructOptionsStatus();
         this.constructOptionsPaymentStatus();
         this.constructOptionsRegion();
-        this.constructOptionsDistrict();
+        // this.constructOptionsDistrict();
     },
     methods: {
         updateDistricts: function(updateFromUI) {
             this.sanction_outcome_availableDistricts = []; // This is a list of options for district
-            for (let record of this.sanction_outcome_regionDistricts) {
-                if (this.filterRegionId == record.id) {
-                    for (let district_id of record.districts) {
-                        for (let district_record of this.sanction_outcome_regionDistricts) {
-                            if (district_record.id == district_id) {
-                                this.sanction_outcome_availableDistricts.push(district_record);
-                            }
-                        }
-                    }
+            for (let region of this.sanction_outcome_regions) {
+                if (region.id == this.filterRegionId) {
+                    this.sanction_outcome_availableDistricts = region.districts
                 }
             }
 
             this.sanction_outcome_availableDistricts.splice(0, 0, {
-                id: "all",
-                display_name: "All",
+                district_id: "all",
+                district_name: "All",
                 district: "",
                 districts: [],
                 region: null
@@ -413,25 +390,22 @@ export default {
         constructOptionsRegion: async function() {
             let returned_regions = await cache_helper.getSetCacheList(
                 "Regions",
-                "/api/region_district/get_regions/"
+                "/api/regions/"
             );
             Object.assign(this.sanction_outcome_regions, returned_regions);
             this.sanction_outcome_regions.splice(0, 0, {
                 id: "all",
-                display_name: "All",
-                district: "",
-                districts: [],
-                region: null
+                name: "All",
             });
         },
-        constructOptionsDistrict: async function() {
-            let returned_region_districts = await cache_helper.getSetCacheList(
-                "RegionDistricts",
-                api_endpoints.region_district
-            );
-            Object.assign(this.sanction_outcome_regionDistricts, returned_region_districts);
-            this.updateDistricts();
-        },
+        // constructOptionsDistrict: async function() {
+        //     let returned_region_districts = [];
+        //     for (let region in this.sanction_outcome_regions){
+        //         returned_region_districts.append(region.districts)
+        //     }
+        //     Object.assign(this.sanction_outcome_regionDistricts, returned_region_districts);
+        //     this.updateDistricts();
+        // },
     },
     components: {
         datatable,

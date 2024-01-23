@@ -154,6 +154,9 @@ class OffenceSerializer(serializers.ModelSerializer):
     related_items = serializers.SerializerMethodField()
     in_editable_status = serializers.SerializerMethodField()
     user_action = serializers.SerializerMethodField()
+    region_id = serializers.SerializerMethodField()
+    district_id = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Offence
@@ -286,7 +289,12 @@ class OffenceSerializer(serializers.ModelSerializer):
 
     def get_related_items(self, obj):
         return get_related_items(obj)
+    
+    def get_region_id(self, obj):
+        return obj.region_id
 
+    def get_district_id(self, obj):
+        return obj.district_id
 
 class UpdateAllegedCommittedOffenceSerializer(serializers.ModelSerializer):
 

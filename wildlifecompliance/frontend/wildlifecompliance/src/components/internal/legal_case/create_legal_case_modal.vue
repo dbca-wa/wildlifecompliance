@@ -12,7 +12,7 @@
                             <div class="col-sm-9">
                               <select class="form-control col-sm-9" @change.prevent="updateDistricts()" v-model="region_id">
                                 <option  v-for="option in regions" :value="option.id" v-bind:key="option.id">
-                                  {{ option.display_name }} 
+                                  {{ option.name }} 
                                 </option>
                               </select>
                             </div>
@@ -25,8 +25,8 @@
                             </div>
                             <div class="col-sm-9">
                               <select class="form-control" @change.prevent="updateAllocatedGroup()" v-model="district_id">
-                                <option  v-for="option in availableDistricts" :value="option.id" v-bind:key="option.id">
-                                  {{ option.display_name }} 
+                                <option  v-for="option in availableDistricts" :value="option.district_id" v-bind:key="option.district_id">
+                                  {{ option.district_name }} 
                                 </option>
                               </select>
                             </div>
@@ -147,7 +147,7 @@ export default {
             assigned_to_id: null,
             advice_details: "",
             allocatedGroup: [],
-            allocated_group_id: null,
+            // allocated_group_id: null,
             documentActionUrl: '',
             temporary_document_collection_id: null,
             legal_case_priority_id: null,
@@ -211,18 +211,11 @@ export default {
       updateDistricts: function() {
         // this.district_id = null;
         this.availableDistricts = [];
-        for (let record of this.regionDistricts) {
-          if (this.region_id === record.id) {
-            for (let district of record.districts) {
-              for (let district_record of this.regionDistricts) {
-                if (district_record.id === district) {
-                  this.availableDistricts.push(district_record)
-                }
-              }
-            }
+        for (let region of this.regions) {
+          if (this.region_id === region.id) {
+            this.availableDistricts=region.districts
           }
         }
-        console.log(this.availableDistricts);
         this.availableDistricts.splice(0, 0, 
         {
           id: "", 
@@ -235,18 +228,16 @@ export default {
         this.updateAllocatedGroup();
       },
       updateAllocatedGroup: async function() {
-          console.log("updateAllocatedGroup");
           this.errorResponse = "";
-          if (this.regionDistrictId) {
+          if (this.region_id && this.district_id) {
               let allocatedGroupResponse = await this.loadAllocatedGroup({
-              region_district_id: this.regionDistrictId,
-              group_permission: 'officer',
+                workflow_type: 'forward_to_regions',
+                region_id: this.region_id,
+                district_id: this.district_id ? this.district_id : null,
               });
               if (allocatedGroupResponse.ok) {
-                  console.log(allocatedGroupResponse.body.allocated_group);
-                  //this.allocatedGroup = Object.assign({}, allocatedGroupResponse.body.allocated_group);
-                  Vue.set(this, 'allocatedGroup', allocatedGroupResponse.body.allocated_group);
-                  this.allocated_group_id = allocatedGroupResponse.body.group_id;
+                  Vue.set(this, 'allocatedGroup', allocatedGroupResponse.body);
+                  // this.allocated_group_id = allocatedGroupResponse.body.group_id;
               } else {
                   // Display http error response on modal
                   this.errorResponse = allocatedGroupResponse.statusText;
@@ -266,7 +257,6 @@ export default {
           let is_valid_form = this.isValidForm();
           if (is_valid_form) {
               const response = await this.sendData();
-              console.log(response);
               if (response.ok) {
                   // For LegalCase Dashboard
                   if (this.$parent.$refs.legal_case_table) {
@@ -287,7 +277,6 @@ export default {
           }
       },
       isValidForm: function() {
-          console.log("performValidation");
           this.$v.$touch();
           if (this.$v.$invalid) {
               this.errorResponse = 'Invalid form:\n';
@@ -330,7 +319,7 @@ export default {
           this.assigned_to_id ? payload.append('assigned_to_id', this.assigned_to_id) : null;
           this.inspection_type_id ? payload.append('legal_case_priority_id', this.legal_case_priority_id) : null;
           this.region_id ? payload.append('region_id', this.region_id) : null;
-          this.allocated_group_id ? payload.append('allocated_group_id', this.allocated_group_id) : null;
+          // this.allocated_group_id ? payload.append('allocated_group_id', this.allocated_group_id) : null;
           this.temporary_document_collection_id ? payload.append('temporary_document_collection_id', this.temporary_document_collection_id.temp_doc_id) : null;
 
           //this.workflow_type ? payload.append('workflow_type', this.workflow_type) : null;
@@ -361,7 +350,7 @@ export default {
     },
     created: async function() {
         // regions
-        let returned_regions = await cache_helper.getSetCacheList('Regions', '/api/region_district/get_regions/');
+        let returned_regions = await cache_helper.getSetCacheList('Regions', '/api/regions/');
         Object.assign(this.regions, returned_regions);
         // blank entry allows user to clear selection
         this.regions.splice(0, 0, 
@@ -372,7 +361,6 @@ export default {
               districts: [],
               region: null,
             });
-        // regionDistricts
         let returned_region_districts = await cache_helper.getSetCacheList(
             'RegionDistricts', 
             api_endpoints.region_district

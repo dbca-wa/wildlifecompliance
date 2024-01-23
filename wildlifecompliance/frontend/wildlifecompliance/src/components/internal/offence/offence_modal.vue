@@ -29,9 +29,9 @@
                                     <label class="control-label pull-left">Region</label>
                                 </div>
                                 <div class="col-sm-7">
-                                  <select class="form-control col-sm-9" v-on:change.prevent="offence.region_id=$event.target.value; updateDistricts('updatefromUI')" v-bind:value="offence.region_id">
+                                  <select class="form-control col-sm-9" v-on:change.prevent="offence.region_id=$event.target.value; updateDistricts(updateFromUI)" v-bind:value="offence.region_id">
                                     <option  v-for="option in regions" :value="option.id" v-bind:key="option.id">
-                                      {{ option.display_name }} 
+                                      {{ option.name }} 
                                     </option>
                                   </select>
                                 </div>
@@ -43,8 +43,8 @@
                                 </div>
                                 <div class="col-sm-7">
                                   <select class="form-control" v-model="offence.district_id">
-                                    <option  v-for="option in availableDistricts" :value="option.id" v-bind:key="option.id">
-                                      {{ option.display_name }} 
+                                    <option  v-for="option in availableDistricts" :value="option.district_id" v-bind:key="option.district_id">
+                                      {{ option.district_name }} 
                                     </option>
                                   </select>
                                 </div>
@@ -428,19 +428,19 @@ export default {
     //CreateNewPerson
   },
     props:{
-        region_id: {
-            required: false,
-            default: null,
-        },
-        district_id: {
-            required: false,
-            default: null,
-        },
-        allocated_group_id: {
-            required: false,
-            default: null,
-        },
-    },
+      region_id: {
+          required: false,
+          default: null,
+      },
+      district_id: {
+          required: false,
+          default: null,
+      },
+      // allocated_group_id: {
+      //     required: false,
+      //     default: null,
+      // },
+  },
   computed: {
     ...mapGetters("offenceStore", {
       offence: "offence"
@@ -507,7 +507,7 @@ export default {
       setCallEmailId: "setCallEmailId",
       setRegionId: "setRegionId",
       setDistrictId: "setDistrictId",
-      setAllocatedGroupId: "setAllocatedGroupId",
+      // setAllocatedGroupId: "setAllocatedGroupId",
       setInspectionId: "setInspectionId",
       setLegalCaseId: "setLegalCaseId",
       createOffence: "createOffence",
@@ -535,21 +535,21 @@ export default {
     constructRegionsAndDistricts: async function() {
         let returned_regions = await cache_helper.getSetCacheList(
             "Regions",
-            "/api/region_district/get_regions/"
+            "/api/regions/"
         );
         Object.assign(this.regions, returned_regions);
         this.regions.splice(0, 0, {
             id: "",
-            display_name: "",
+            name: "",
             district: "",
             districts: [],
             region: null
         });
-        let returned_region_districts = await cache_helper.getSetCacheList(
-            "RegionDistricts",
-            api_endpoints.region_district
-        );
-        Object.assign(this.regionDistricts, returned_region_districts);
+        // let returned_region_districts = await cache_helper.getSetCacheList(
+        //     "RegionDistricts",
+        //     api_endpoints.region_district
+        // );
+        // Object.assign(this.regionDistricts, returned_region_districts);
     },
     newPersonCreated: function(obj) {
       if(obj.person){
@@ -1104,21 +1104,15 @@ export default {
       }
 
       this.availableDistricts = []; // This is a list of options for district
-      for (let record of this.regionDistricts) {
-        if (this.offence.region_id == record.id) {
-          for (let district_id of record.districts) {
-            for (let district_record of this.regionDistricts) {
-              if (district_record.id == district_id) {
-                this.availableDistricts.push(district_record);
-              }
-            }
-          }
+      for (let region of this.regions) {
+        if (region.id == this.offence.region_id) {
+          this.availableDistricts = region.districts
         }
       }
 
       this.availableDistricts.splice(0, 0, {
-        id: "",
-        display_name: "",
+        district_id: "",
+        district_name: "",
         district: "",
         districts: [],
         region: null
@@ -1132,12 +1126,10 @@ export default {
         self.$nextTick(function() {
             self.initAwesompleteAllegedOffence();
         });
-        /*
         await this.constructRegionsAndDistricts();
         this.setRegionId(this.region_id);
         this.setDistrictId(this.district_id);
-        this.setAllocatedGroupId(this.allocated_group_id);
-        */
+        // this.setAllocatedGroupId(this.allocated_group_id);
     },
     mounted: function() {
         this.$nextTick(() => {

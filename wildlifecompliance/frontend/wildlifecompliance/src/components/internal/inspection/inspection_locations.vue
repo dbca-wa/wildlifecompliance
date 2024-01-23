@@ -200,7 +200,6 @@ module.exports = {
         this.status_choices.splice(0, 0, {id: 'all', display: 'All'});
 
         let returned_inspection_types = await cache_helper.getSetCacheList('InspectionTypes', api_endpoints.inspection_types);
-        console.log(returned_inspection_types);
         Object.assign(this.type_choices, returned_inspection_types);
         this.type_choices.splice(0, 0, {id: 'all', inspection_type: 'All'});
 
@@ -224,7 +223,6 @@ module.exports = {
             this.loadLocations();
         },
         filterDateFrom: function(){
-            console.log('filterDateFrom');
             if (!this.filterDateFrom){
                 /* When empty string */
                 this.loadLocations();
@@ -239,7 +237,6 @@ module.exports = {
             }
         },
         filterDateTo: function(){
-            console.log('filterDateTo');
             if (!this.filterDateTo){
                 /* When empty string */
                 this.loadLocations();
@@ -364,8 +361,6 @@ module.exports = {
             this.cursor_location = null;
         },
         initMap(){
-            console.log('Start initMap()');
-
             this.map = L.map('mapLeaf').setView([-24.9505, 122.8605], 5);
             this.tileLayer = L.tileLayer(
                 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -437,8 +432,6 @@ module.exports = {
             });
         },
         addMarkers(inspections){
-            console.log('addMarkers');
-
             let self = this;
             self.mcg.clearLayers();
 
