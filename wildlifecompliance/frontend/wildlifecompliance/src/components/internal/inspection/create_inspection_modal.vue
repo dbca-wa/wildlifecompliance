@@ -208,6 +208,16 @@ export default {
             this.availableDistricts=region.districts
           }
         }
+        this.availableDistricts.splice(0, 0, 
+        {
+          district_id: "", 
+          district_name: "",
+          district: "",
+          districts: [],
+          region: null,
+        });
+        // ensure security group members list is up to date
+        this.updateAllocatedGroup();
       },
       updateAllocatedGroup: async function() {
           this.errorResponse = "";
@@ -376,6 +386,20 @@ export default {
             this.region_id = this.call_email.region_id;
             this.district_id = this.call_email.district_id;
         }
+        /*
+        // If no Region/District selected, initialise region as Kensington
+        if (!this.regionDistrictId) {
+            for (let record of this.regionDistricts) {
+                if (record.district === 'KENSINGTON') {
+                    this.district_id = null;
+                    this.region_id = record.id;
+                }
+            }
+        }
+        // ensure availableDistricts and allocated group is current
+        this.updateDistricts();
+        await this.updateAllocatedGroup();
+        */
     },
 };
 </script>
