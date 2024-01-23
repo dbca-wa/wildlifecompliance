@@ -38,7 +38,8 @@
                         </span>
                     </div>
                 </div>
-                <div class="col-md-3 pull-right" v-if="visibilityCreateNewButton">
+                <div class="col-md-3 pull-right">
+                    <!--  v-if="visibilityCreateNewButton" -->
                     <button @click.prevent="createOffence" class="btn btn-primary pull-right">New Offence</button>
                 </div>    
             </div>
@@ -196,17 +197,11 @@ export default {
             offence_bind_id = 'offence' + parseInt(this.uuid);
             return offence_bind_id;
         },
-        current_region_id: function() {
-            return this.filterRegionId;
-        },
         visibilityCreateNewButton: function() {
             return this.canUserCreateNewOffence;
         }
     },
     watch: {
-        current_region_id: function() {
-            this.updateDistricts();
-        },
         filterType: function () {
             this.$refs.offence_table.vmDataTable.draw();
         },

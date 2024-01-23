@@ -51,7 +51,7 @@
         <div class="row">
             <div class="col-md-3">
                 <label class="">Region:</label>
-                    <select class="form-control" v-on:change.prevent="filterRegionId=$event.target.value; updateDistricts()" v-bind:value="filterRegionId">
+                    <select class="form-control" v-on:change.prevent="filterRegionId=$event.target.value; updateDistricts(updateFromUI)" v-bind:value="filterRegionId">
                         <option v-for="option in sanction_outcome_regions" :value="option.id" v-bind:key="option.id">
                             {{ option.name }}
                         </option>
@@ -303,7 +303,7 @@ export default {
         // this.constructOptionsDistrict();
     },
     methods: {
-        updateDistricts: function() {
+        updateDistricts: function(updateFromUI) {
             this.sanction_outcome_availableDistricts = []; // This is a list of options for district
             for (let region of this.sanction_outcome_regions) {
                 if (region.id == this.filterRegionId) {
