@@ -29,7 +29,7 @@
                                     <label class="control-label pull-left">Region</label>
                                 </div>
                                 <div class="col-sm-7">
-                                  <select class="form-control col-sm-9" v-on:change.prevent="offence.region_id=$event.target.value; updateDistricts(updateFromUI)" v-bind:value="offence.region_id">
+                                  <select class="form-control col-sm-9" v-on:change.prevent="offence.region_id=$event.target.value; updateDistricts('updateFromUI')" v-bind:value="offence.region_id">
                                     <option  v-for="option in regions" :value="option.id" v-bind:key="option.id">
                                       {{ option.name }} 
                                     </option>
@@ -285,7 +285,7 @@ export default {
 
       temporary_document_collection_id: null,
 
-      regionDistricts: [],
+      // regionDistricts: [],
       regions: [], // this is the list of options
       availableDistricts: [], // this is generated from the regionDistricts[] above
 

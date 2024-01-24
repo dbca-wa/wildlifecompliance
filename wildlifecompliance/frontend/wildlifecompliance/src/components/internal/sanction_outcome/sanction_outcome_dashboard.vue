@@ -92,7 +92,7 @@ export default {
             sanction_outcome_statuses: [],
             sanction_outcome_payment_statuses: [],
             sanction_outcome_regions: [],  //this is the list of options
-            sanction_outcome_regionDistricts: [],
+            // sanction_outcome_regionDistricts: [],
             sanction_outcome_availableDistricts: [], // this is generated from the regionDistricts[] above
 
             filterType: 'all',

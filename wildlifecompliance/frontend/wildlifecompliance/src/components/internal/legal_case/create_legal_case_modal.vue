@@ -135,7 +135,7 @@ export default {
             processingDetails: false,
             form: null,
             regions: [],
-            regionDistricts: [],
+            // regionDistricts: [],
             availableDistricts: [],
             legalCasePriorities: [],
             externalOrganisations: [],
@@ -361,11 +361,11 @@ export default {
               districts: [],
               region: null,
             });
-        let returned_region_districts = await cache_helper.getSetCacheList(
-            'RegionDistricts', 
-            api_endpoints.region_district
-            );
-        Object.assign(this.regionDistricts, returned_region_districts);
+        // let returned_region_districts = await cache_helper.getSetCacheList(
+        //     'RegionDistricts', 
+        //     api_endpoints.region_district
+        //     );
+        // Object.assign(this.regionDistricts, returned_region_districts);
 
         // legal_case_priorities
         let returned_legal_case_priorities = await cache_helper.getSetCacheList(
