@@ -616,7 +616,7 @@ export default {
       referrersSelected: [],
       //allocated_group: [],
       current_schema: [],
-      regionDistricts: [],
+      // regionDistricts: [],
       reportAdviceUrl: '',
       sectionLabel: "Details",
       sectionIndex: 1,
@@ -1274,11 +1274,11 @@ export default {
     }
 
     // regionDistricts
-    let returned_region_districts = await cache_helper.getSetCacheList(
-      'RegionDistricts', 
-      api_endpoints.region_district
-      );
-    Object.assign(this.regionDistricts, returned_region_districts);
+    // let returned_region_districts = await cache_helper.getSetCacheList(
+    //   'RegionDistricts', 
+    //   api_endpoints.region_district
+    //   );
+    // Object.assign(this.regionDistricts, returned_region_districts);
     
     // Apply current timestamp to date and time of call
     if (!this.call_email.date_of_call && this.call_email.can_user_edit_form) {
