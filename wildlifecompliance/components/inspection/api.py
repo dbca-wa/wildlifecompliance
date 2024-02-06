@@ -216,7 +216,7 @@ class InspectionPaginatedViewSet(viewsets.ModelViewSet):
 
 
 class InspectionViewSet(viewsets.ModelViewSet):
-    queryset = Inspection.objects.all()
+    queryset = Inspection.objects.none()
     serializer_class = InspectionSerializer
 
     def get_queryset(self):
@@ -894,7 +894,7 @@ class InspectionViewSet(viewsets.ModelViewSet):
 
 
 class InspectionTypeViewSet(viewsets.ModelViewSet):
-   queryset = InspectionType.objects.all()
+   queryset = InspectionType.objects.none()
    serializer_class = InspectionTypeSerializer
 
    def get_queryset(self):

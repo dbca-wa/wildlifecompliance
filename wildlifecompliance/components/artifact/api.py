@@ -91,7 +91,7 @@ from reversion.models import Version
 
 
 class DocumentArtifactViewSet(viewsets.ModelViewSet):
-    queryset = DocumentArtifact.objects.all()
+    queryset = DocumentArtifact.objects.none()
     serializer_class = DocumentArtifactSerializer
 
     def get_queryset(self):
@@ -332,7 +332,7 @@ class DocumentArtifactViewSet(viewsets.ModelViewSet):
 
 
 class PhysicalArtifactViewSet(viewsets.ModelViewSet):
-    queryset = PhysicalArtifact.objects.all()
+    queryset = PhysicalArtifact.objects.none()
     serializer_class = PhysicalArtifactSerializer
 
     def get_queryset(self):
@@ -671,7 +671,7 @@ class ArtifactPaginatedViewSet(viewsets.ModelViewSet):
 
 
 class ArtifactViewSet(viewsets.ModelViewSet):
-    queryset = Artifact.objects.all()
+    queryset = Artifact.objects.none()
     serializer_class = ArtifactSerializer
 
     def get_queryset(self):
@@ -872,7 +872,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
    #        raise serializers.ValidationError(str(e))
 
 class PhysicalArtifactTypeViewSet(viewsets.ModelViewSet):
-   queryset = PhysicalArtifactType.objects.all()
+   queryset = PhysicalArtifactType.objects.none()
    serializer_class = PhysicalArtifactTypeSerializer
 
    def get_queryset(self):
@@ -903,7 +903,7 @@ class PhysicalArtifactTypeViewSet(viewsets.ModelViewSet):
 
 
 class PhysicalArtifactDisposalMethodViewSet(viewsets.ModelViewSet):
-   queryset = PhysicalArtifactDisposalMethod.objects.all()
+   queryset = PhysicalArtifactDisposalMethod.objects.none()
    serializer_class = PhysicalArtifactDisposalMethodSerializer
 
    def get_queryset(self):

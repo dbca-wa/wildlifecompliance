@@ -259,7 +259,7 @@ class LicencePaginatedViewSet(viewsets.ModelViewSet):
 
 
 class LicenceViewSet(viewsets.ModelViewSet):
-    queryset = WildlifeLicence.objects.all()
+    queryset = WildlifeLicence.objects.none()
     serializer_class = DTExternalWildlifeLicenceSerializer
 
     def get_queryset(self):
@@ -735,16 +735,28 @@ class LicenceViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 class LicenceCategoryViewSet(viewsets.ModelViewSet):
-    queryset = LicenceCategory.objects.all()
+    queryset = LicenceCategory.objects.none()
     serializer_class = LicenceCategorySerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated():
+            return LicenceCategory.objects.all()
+        return LicenceCategory.objects.none()
 
 
 class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ModelViewSet):
     # Filters to only return purposes that are
     # available for selection when applying for
     # a new application
-    queryset = LicenceCategory.objects.all()
+    queryset = LicenceCategory.objects.none()
     serializer_class = LicenceCategorySerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated():
+            return LicenceCategory.objects.all()
+        return LicenceCategory.objects.none()
 
     def list(self, request, *args, **kwargs):
         """

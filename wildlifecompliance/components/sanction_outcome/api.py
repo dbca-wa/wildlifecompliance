@@ -51,7 +51,7 @@ from wildlifecompliance.components.sanction_outcome.serializers import SanctionO
     SanctionOutcomeDocumentAccessLogSerializer
 #from wildlifecompliance.components.users.models import CompliancePermissionGroup
 from wildlifecompliance.components.wc_payments.models import InfringementPenalty, InfringementPenaltyInvoice
-from wildlifecompliance.helpers import is_authorised_to_modify, is_internal
+from wildlifecompliance.helpers import is_authorised_to_modify, is_internal, is_customer
 from wildlifecompliance.components.main.models import TemporaryDocumentCollection
 from wildlifecompliance.settings import SO_TYPE_CHOICES, SO_TYPE_REMEDIATION_NOTICE, SO_TYPE_INFRINGEMENT_NOTICE, \
     SO_TYPE_LETTER_OF_ADVICE, SO_TYPE_CAUTION_NOTICE
@@ -244,7 +244,7 @@ class SanctionOutcomePaginatedViewSet(viewsets.ModelViewSet):
 
 
 class RemediationActionViewSet(viewsets.ModelViewSet):
-    queryset = RemediationAction.objects.all()
+    queryset = RemediationAction.objects.none()
     serializer_class = RemediationActionSerializer
 
     @detail_route(methods=['POST'])
@@ -416,13 +416,14 @@ class RemediationActionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if is_internal(self.request):
             return RemediationAction.objects.all()
-        else:
+        elif is_customer(self.request):
             return RemediationAction.objects_for_external.filter(
                 (Q(sanction_outcome__offender__person=self.request.user) & Q(sanction_outcome__registration_holder__isnull=True) & Q(sanction_outcome__driver__isnull=True)) |
                 (Q(sanction_outcome__offender__isnull=True) & Q(sanction_outcome__registration_holder=self.request.user) & Q(sanction_outcome__driver__isnull=True)) |
                 (Q(sanction_outcome__offender__isnull=True) & Q(sanction_outcome__driver=self.request.user))
             )
             # return RemediationAction.objects_for_external.filter(sanction_outcome__offender__person=self.request.user)
+        return RemediationAction.objects.none()
 
     def retrieve(self, request, *args, **kwargs):
         """
@@ -513,7 +514,7 @@ class RemediationActionViewSet(viewsets.ModelViewSet):
 
 
 class SanctionOutcomeViewSet(viewsets.ModelViewSet):
-    queryset = SanctionOutcome.objects.all()
+    queryset = SanctionOutcome.objects.none()
     serializer_class = SanctionOutcomeSerializer
 
     @detail_route(methods=['GET',])
@@ -559,7 +560,7 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
         # user = self.request.user
         if is_internal(self.request):
             return SanctionOutcome.objects.all()
-        else:
+        elif is_customer(self.request):
             return SanctionOutcome.objects_for_external.filter(
                 (Q(offender__person=self.request.user) & Q(registration_holder__isnull=True) & Q(driver__isnull=True)) |
                 (Q(offender__isnull=True) & Q(registration_holder=self.request.user) & Q(driver__isnull=True)) |

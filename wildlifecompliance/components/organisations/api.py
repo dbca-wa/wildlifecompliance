@@ -171,7 +171,7 @@ class OrganisationPaginatedViewSet(viewsets.ModelViewSet):
 
 
 class OrganisationViewSet(viewsets.ModelViewSet):
-    queryset = Organisation.objects.all()
+    queryset = Organisation.objects.none()
     serializer_class = OrganisationSerializer
 
     def get_queryset(self):
@@ -798,7 +798,7 @@ class OrganisationRequestsPaginatedViewSet(viewsets.ModelViewSet):
 
 
 class OrganisationRequestsViewSet(viewsets.ModelViewSet):
-    queryset = OrganisationRequest.objects.all()
+    queryset = OrganisationRequest.objects.none()
     serializer_class = OrganisationRequestSerializer
 
     def get_queryset(self):
@@ -1107,7 +1107,7 @@ class OrganisationAccessGroupMembers(views.APIView):
 
 class OrganisationContactViewSet(viewsets.ModelViewSet):
     serializer_class = OrganisationContactSerializer
-    queryset = OrganisationContact.objects.all()
+    queryset = OrganisationContact.objects.none()
 
     def get_queryset(self):
         user = self.request.user
@@ -1122,7 +1122,7 @@ class OrganisationContactViewSet(viewsets.ModelViewSet):
 
 
 class MyOrganisationsViewSet(viewsets.ModelViewSet):
-    queryset = Organisation.objects.all()
+    queryset = Organisation.objects.none()
     serializer_class = MyOrganisationsSerializer
 
     def get_queryset(self):
@@ -1135,9 +1135,17 @@ class MyOrganisationsViewSet(viewsets.ModelViewSet):
 
 
 class OrganisationComplianceManagementViewSet(viewsets.ModelViewSet):
-    queryset = Organisation.objects.all()
+    queryset = Organisation.objects.none()
     serializer_class = ComplianceManagementOrganisationSerializer
     
+    def get_queryset(self):
+        user = self.request.user
+        if is_internal(self.request):
+            return Organisation.objects.all()
+        elif is_customer(self.request):
+            return user.wildlifecompliance_organisations.all()
+        return Organisation.objects.none()
+
     def create(self, request, *args, **kwargs):
         print("create org")
         print(request.data)

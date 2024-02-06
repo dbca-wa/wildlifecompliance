@@ -864,7 +864,7 @@ class CallEmailViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 class ClassificationViewSet(viewsets.ModelViewSet):
-    queryset = Classification.objects.all()
+    queryset = Classification.objects.none()
     serializer_class = ClassificationSerializer
 
     def get_queryset(self):
@@ -886,7 +886,7 @@ class ClassificationViewSet(viewsets.ModelViewSet):
 
 
 class LOVCollectionViewSet(viewsets.ModelViewSet):
-    queryset = CallEmail.objects.all()
+    queryset = CallEmail.objects.none()
     serializer_class = CallEmailSerializer
 
     def get_queryset(self):
@@ -966,7 +966,7 @@ class LOVCollectionViewSet(viewsets.ModelViewSet):
 
 
 class ReferrerViewSet(viewsets.ModelViewSet):
-    queryset = Referrer.objects.all()
+    queryset = Referrer.objects.none()
     serializer_class = ReferrerSerializer
 
     def get_queryset(self):
@@ -978,7 +978,7 @@ class ReferrerViewSet(viewsets.ModelViewSet):
 
 
 class ReportTypeViewSet(viewsets.ModelViewSet):
-    queryset = ReportType.objects.all()
+    queryset = ReportType.objects.none()
     serializer_class = ReportTypeSerializer
 
     def get_queryset(self):
@@ -1029,7 +1029,7 @@ class ReportTypeViewSet(viewsets.ModelViewSet):
 
 # TODO: check if the class below is used or not.  If no, remove.
 class LocationViewSet(viewsets.ModelViewSet):
-    queryset = Location.objects.all()
+    queryset = Location.objects.none()
     serializer_class = LocationSerializer
 
     def get_queryset(self):
@@ -1072,7 +1072,7 @@ class LocationViewSet(viewsets.ModelViewSet):
 
 
 class EmailUserViewSet(viewsets.ModelViewSet):
-    queryset = EmailUser.objects.all()
+    queryset = EmailUser.objects.none()
     serializer_class = EmailUserSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('first_name', 'last_name', 'email', 'phone_number', 'mobile_number', 'organisation')

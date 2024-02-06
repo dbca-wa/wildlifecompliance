@@ -254,7 +254,7 @@ class LegalCasePaginatedViewSet(viewsets.ModelViewSet):
 
 
 class LegalCaseViewSet(viewsets.ModelViewSet):
-    queryset = LegalCase.objects.all()
+    queryset = LegalCase.objects.none()
     serializer_class = BaseLegalCaseSerializer
 
     def get_queryset(self):
@@ -1358,7 +1358,7 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
 
 
 class LegalCasePriorityViewSet(viewsets.ModelViewSet):
-   queryset = LegalCasePriority.objects.all()
+   queryset = LegalCasePriority.objects.none()
    serializer_class = LegalCasePrioritySerializer
 
    def get_queryset(self):

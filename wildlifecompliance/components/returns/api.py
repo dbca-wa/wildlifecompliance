@@ -203,7 +203,7 @@ class ReturnPaginatedViewSet(viewsets.ModelViewSet):
 
 class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ReturnSerializer
-    queryset = Return.objects.all()
+    queryset = Return.objects.none()
 
     def get_queryset(self):
         user = self.request.user
@@ -735,7 +735,7 @@ class ReturnTypeViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ReturnAmendmentRequestViewSet(viewsets.ModelViewSet):
-    queryset = ReturnRequest.objects.all()
+    queryset = ReturnRequest.objects.none()
     serializer_class = ReturnRequestSerializer
 
     def get_queryset(self):

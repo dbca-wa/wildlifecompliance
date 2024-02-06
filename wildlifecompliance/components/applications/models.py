@@ -4002,13 +4002,16 @@ class Application(RevisionedMixin):
         proxy_details = Application.get_request_user_proxy_details(request)
         proxy_id = proxy_details.get('proxy_id')
         organisation_id = proxy_details.get('organisation_id')
-        return Application.objects.filter(
-            Q(org_applicant_id=organisation_id) if organisation_id
-            else (
-                Q(submitter=proxy_id) | Q(proxy_applicant=proxy_id)
-            ) if proxy_id
-            else Q(submitter=request.user, proxy_applicant=None, org_applicant=None)
-        )
+        if request.user.is_authenticated():
+            return Application.objects.filter(
+                Q(org_applicant_id=organisation_id) if organisation_id
+                else (
+                    Q(submitter=proxy_id) | Q(proxy_applicant=proxy_id)
+                ) if proxy_id
+                else Q(submitter=request.user, proxy_applicant=None, org_applicant=None)
+            )
+        else:
+            return Application.objects.none()
 
 
 class ApplicationInvoice(models.Model):

@@ -158,7 +158,7 @@ class UserProfileCompleted(views.APIView):
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
+    queryset = Profile.objects.none()
     serializer_class = UserProfileSerializer
 
     def get_queryset(self):
@@ -190,12 +190,13 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 
 class MyProfilesViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
+    queryset = Profile.objects.none()
     serializer_class = UserProfileSerializer
 
     def get_queryset(self):
-        queryset = self.queryset
-        query_set = queryset.filter(user=self.request.user)
+        user = self.request.user
+        if user.is_authenticated():
+            query_set = Profile.objects.filter(user=self.request.user)
         return query_set
 
 
@@ -254,7 +255,7 @@ class UserPaginatedViewSet(viewsets.ModelViewSet):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = EmailUser.objects.all()
+    queryset = EmailUser.objects.none()
     serializer_class = UserSerializer
 
     def get_queryset(self):
@@ -730,9 +731,9 @@ class UserViewSet(viewsets.ModelViewSet):
                 raise serializers.ValidationError(str(e))
 
 class ComplianceManagementUserViewSet(viewsets.ModelViewSet):
-    queryset = EmailUser.objects.all()
+    queryset = EmailUser.objects.none()
     serializer_class = UserSerializer
-    renderer_classes = [JSONRenderer, ]
+    #renderer_classes = [JSONRenderer, ]
 
     def get_queryset(self):
         """
@@ -877,7 +878,7 @@ class ComplianceManagementUserViewSet(viewsets.ModelViewSet):
 
 
 class EmailIdentityViewSet(viewsets.ModelViewSet):
-    queryset = EmailIdentity.objects.all()
+    queryset = EmailIdentity.objects.none()
     serializer_class = EmailIdentitySerializer
 
     def get_queryset(self):

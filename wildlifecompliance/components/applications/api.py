@@ -489,7 +489,7 @@ class ApplicationPaginatedViewSet(viewsets.ModelViewSet):
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):
-    queryset = Application.objects.all()
+    queryset = Application.objects.none()
     serializer_class = ApplicationSerializer
 
     def get_queryset(self):
@@ -2233,7 +2233,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
 
 class ApplicationConditionViewSet(viewsets.ModelViewSet):
-    queryset = ApplicationCondition.objects.all()
+    queryset = ApplicationCondition.objects.none()
     serializer_class = ApplicationConditionSerializer
 
     def get_queryset(self):
@@ -2375,7 +2375,7 @@ class ApplicationConditionViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 class ApplicationSelectedActivityViewSet(viewsets.ModelViewSet):
-    queryset = ApplicationSelectedActivity.objects.all()
+    queryset = ApplicationSelectedActivity.objects.none()
     serializer_class = ApplicationSelectedActivitySerializer
 
     def get_queryset(self):
@@ -2409,7 +2409,7 @@ class ApplicationSelectedActivityViewSet(viewsets.ModelViewSet):
 
 
 class ApplicationStandardConditionViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = ApplicationStandardCondition.objects.all()
+    queryset = ApplicationStandardCondition.objects.none()
     serializer_class = ApplicationStandardConditionSerializer
 
     def get_queryset(self):
@@ -2468,7 +2468,7 @@ class AssessmentPaginatedViewSet(viewsets.ModelViewSet):
 
 
 class AssessmentViewSet(viewsets.ModelViewSet):
-    queryset = Assessment.objects.all()
+    queryset = Assessment.objects.none()
     serializer_class = AssessmentSerializer
 
     def get_queryset(self):
@@ -2608,7 +2608,7 @@ class AssessmentViewSet(viewsets.ModelViewSet):
 class AssessorGroupViewSet(viewsets.ModelViewSet):
     queryset = ActivityPermissionGroup.objects.none()
     serializer_class = ActivityPermissionGroupSerializer
-    renderer_classes = [JSONRenderer, ]
+    #renderer_classes = [JSONRenderer, ]
 
     def get_queryset(self, application=None):
         if is_internal(self.request):
@@ -2632,7 +2632,7 @@ class AssessorGroupViewSet(viewsets.ModelViewSet):
 
 
 class AmendmentRequestViewSet(viewsets.ModelViewSet):
-    queryset = AmendmentRequest.objects.all()
+    queryset = AmendmentRequest.objects.none()
     serializer_class = AmendmentRequestSerializer
 
     def get_queryset(self):
