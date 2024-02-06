@@ -141,20 +141,20 @@ class SchemaMasterlistFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class SchemaMasterlistRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and \
-                hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = \
-                renderer_context['view']._datatables_total_count
-        return super(SchemaMasterlistRenderer, self).render(
-            data, accepted_media_type, renderer_context)
+#class SchemaMasterlistRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and \
+#                hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = \
+#                renderer_context['view']._datatables_total_count
+#        return super(SchemaMasterlistRenderer, self).render(
+#            data, accepted_media_type, renderer_context)
 
 
 class SchemaMasterlistPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (SchemaMasterlistFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (SchemaMasterlistRenderer,)
+    #renderer_classes = (SchemaMasterlistRenderer,)
     queryset = MasterlistQuestion.objects.none()
     serializer_class = DTSchemaMasterlistSerializer
     page_size = 10
@@ -396,20 +396,20 @@ class SchemaPurposeFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class SchemaPurposeRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and \
-                hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = \
-                renderer_context['view']._datatables_total_count
-        return super(SchemaPurposeRenderer, self).render(
-            data, accepted_media_type, renderer_context)
+#class SchemaPurposeRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and \
+#                hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = \
+#                renderer_context['view']._datatables_total_count
+#        return super(SchemaPurposeRenderer, self).render(
+#            data, accepted_media_type, renderer_context)
 
 
 class SchemaPurposePaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (SchemaPurposeFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (SchemaPurposeRenderer,)
+    #renderer_classes = (SchemaPurposeRenderer,)
     queryset = LicencePurposeSection.objects.none()
     serializer_class = DTSchemaPurposeSerializer
     page_size = 10
@@ -646,20 +646,20 @@ class SchemaGroupFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class SchemaGroupRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and \
-                hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = \
-                renderer_context['view']._datatables_total_count
-        return super(SchemaGroupRenderer, self).render(
-            data, accepted_media_type, renderer_context)
+#class SchemaGroupRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and \
+#                hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = \
+#                renderer_context['view']._datatables_total_count
+#        return super(SchemaGroupRenderer, self).render(
+#            data, accepted_media_type, renderer_context)
 
 
 class SchemaGroupPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (SchemaGroupFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (SchemaGroupRenderer,)
+    #renderer_classes = (SchemaGroupRenderer,)
     queryset = SectionGroup.objects.none()
     serializer_class = DTSchemaGroupSerializer
     page_size = 10
@@ -916,20 +916,20 @@ class SchemaQuestionFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class SchemaQuestionRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and \
-                hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = \
-                renderer_context['view']._datatables_total_count
-        return super(SchemaQuestionRenderer, self).render(
-            data, accepted_media_type, renderer_context)
+#class SchemaQuestionRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and \
+#                hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = \
+#                renderer_context['view']._datatables_total_count
+#        return super(SchemaQuestionRenderer, self).render(
+#            data, accepted_media_type, renderer_context)
 
 
 class SchemaQuestionPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (SchemaQuestionFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (SchemaQuestionRenderer,)
+    #renderer_classes = (SchemaQuestionRenderer,)
     queryset = SectionQuestion.objects.none()
     serializer_class = DTSchemaQuestionSerializer
     page_size = 10

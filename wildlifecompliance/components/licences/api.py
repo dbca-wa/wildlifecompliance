@@ -166,7 +166,7 @@ class LicenceRenderer(DatatablesRenderer):
 class LicencePaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (LicenceFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (LicenceRenderer,)
+    #renderer_classes = (LicenceRenderer,)
     queryset = WildlifeLicence.objects.none()
     serializer_class = DTExternalWildlifeLicenceSerializer
     page_size = 10

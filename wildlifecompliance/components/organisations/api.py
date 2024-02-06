@@ -137,17 +137,17 @@ class OrganisationFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class OrganisationRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-        return super(OrganisationRenderer, self).render(data, accepted_media_type, renderer_context)
+#class OrganisationRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
+#        return super(OrganisationRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
 class OrganisationPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (OrganisationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (OrganisationRenderer,)
+    #renderer_classes = (OrganisationRenderer,)
     queryset = Organisation.objects.none()
     serializer_class = DTOrganisationSerializer
     page_size = 10
@@ -774,7 +774,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 class OrganisationRequestsPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (OrganisationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (OrganisationRenderer,)
+    #renderer_classes = (OrganisationRenderer,)
     queryset = OrganisationRequest.objects.none()
     serializer_class = OrganisationRequestDTSerializer
     page_size = 10

@@ -174,7 +174,7 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
         fields = self.get_fields(getter)
         ordering = self.get_ordering(getter, fields)
         if len(ordering):
-           for num, item in enumerate(ordering):
+            for num, item in enumerate(ordering):
                 if item == 'status__name':
                     ordering.pop(num)
                     ordering.insert(num, 'status')
@@ -182,26 +182,26 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
                     ordering.pop(num)
                     ordering.insert(num, '-status')
 
-           queryset = queryset.order_by(*ordering)
+            queryset = queryset.order_by(*ordering)
         else:
-            queryset = queryset.order_by(['-number'])
+            queryset = queryset.order_by('-number')
 
 
         setattr(view, '_datatables_total_count', total_count)
         return queryset
 
 
-class CallEmailRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-        return super(CallEmailRenderer, self).render(data, accepted_media_type, renderer_context)
+#class CallEmailRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
+#        return super(CallEmailRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
 class CallEmailPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (CallEmailFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (CallEmailRenderer,)
+    #renderer_classes = (CallEmailRenderer,)
     queryset = CallEmail.objects.none()
     serializer_class = CallEmailDatatableSerializer
     page_size = 10

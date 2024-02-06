@@ -393,17 +393,17 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class ApplicationRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-        return super(ApplicationRenderer, self).render(data, accepted_media_type, renderer_context)
+#class ApplicationRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
+#        return super(ApplicationRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
 class ApplicationPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (ApplicationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (ApplicationRenderer,)
+    #renderer_classes = (ApplicationRenderer,)
     queryset = Application.objects.none()
     serializer_class = DTExternalApplicationSerializer
     page_size = 10
@@ -2431,7 +2431,7 @@ class ApplicationStandardConditionViewSet(viewsets.ReadOnlyModelViewSet):
 class AssessmentPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (ApplicationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (ApplicationRenderer,)
+    #renderer_classes = (ApplicationRenderer,)
     queryset = Assessment.objects.none()
     serializer_class = DTAssessmentSerializer
     page_size = 10

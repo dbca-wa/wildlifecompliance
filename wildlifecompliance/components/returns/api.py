@@ -97,20 +97,20 @@ class ReturnFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class ReturnRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and \
-                hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = \
-                renderer_context['view']._datatables_total_count
-        return super(ReturnRenderer, self).render(
-            data, accepted_media_type, renderer_context)
+#class ReturnRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and \
+#                hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = \
+#                renderer_context['view']._datatables_total_count
+#        return super(ReturnRenderer, self).render(
+#            data, accepted_media_type, renderer_context)
 
 
 class ReturnPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (ReturnFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (ReturnRenderer,)
+    #renderer_classes = (ReturnRenderer,)
     queryset = Return.objects.none()
     serializer_class = DTExternalReturnSerializer
     page_size = 10

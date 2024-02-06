@@ -152,7 +152,7 @@ class SanctionOutcomeFilterBackend(DatatablesFilterBackend):
 class SanctionOutcomePaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (SanctionOutcomeFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    queryset = SanctionOutcome.objects.none()
+    #queryset = SanctionOutcome.objects.none()
     serializer_class = SanctionOutcomeDatatableSerializer
     page_size = 10
 

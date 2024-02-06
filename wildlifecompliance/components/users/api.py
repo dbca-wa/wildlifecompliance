@@ -196,8 +196,8 @@ class MyProfilesViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated():
-            query_set = Profile.objects.filter(user=self.request.user)
-        return query_set
+            return Profile.objects.filter(user=self.request.user)
+        return Profile.objects.none()
 
 
 class UserFilterBackend(DatatablesFilterBackend):
@@ -223,17 +223,17 @@ class UserFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class UserRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-        return super(UserRenderer, self).render(data, accepted_media_type, renderer_context)
+#class UserRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
+#        return super(UserRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
 class UserPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (UserFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (UserRenderer,)
+    #renderer_classes = (UserRenderer,)
     queryset = EmailUser.objects.none()
     serializer_class = DTUserSerializer
     page_size = 10
