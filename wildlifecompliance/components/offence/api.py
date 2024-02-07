@@ -43,7 +43,7 @@ from wildlifecompliance.components.offence.serializers import (
 from wildlifecompliance.components.section_regulation.serializers import SectionRegulationSerializer
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, AllegedCommittedOffence
 #from wildlifecompliance.components.users.models import CompliancePermissionGroup
-from wildlifecompliance.helpers import is_internal
+from wildlifecompliance.helpers import is_internal, is_customer
 
 
 class OffenceFilterBackend(DatatablesFilterBackend):
@@ -717,6 +717,8 @@ class SearchOrganisation(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated():
-            return Organisation.objects.all() #TODO: sensitive?
+        if is_internal(self.request):
+            return Organisation.objects.all()
+        elif is_customer(self.request):
+            return user.wildlifecompliance_organisations.all()
         return Organisation.objects.none()
