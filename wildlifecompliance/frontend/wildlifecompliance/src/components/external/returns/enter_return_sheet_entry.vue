@@ -44,7 +44,7 @@
                             </div>
                             <div class="col-md-6">
                               <div class="input-group date" ref="activityDateToPicker" name="activityDateToPicker" required="true">
-                                  <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="entryActivityDate">
+                                  <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="entryActivityDate" id="entryActivityDate">
                                   <span class="input-group-addon">
                                       <span class="glyphicon glyphicon-calendar"></span>
                                   </span>
@@ -574,16 +574,9 @@ export default {
       initDatePicker: function() {
         const vm = this;
         $(vm.$refs.activityDateToPicker).datetimepicker(vm.datepickerOptions);
-        $(vm.$refs.activityDateToPicker).on('dp.change', function(e){
-            if ($(vm.$refs.activityDateToPicker).data('DateTimePicker') && $(vm.$refs.activityDateToPicker).data('DateTimePicker').date()) {
-                vm.entryActivityDate =  e.date.format('DD/MM/YYYY');
-            }
-            else if ($(vm.$refs.activityDateToPicker).data('date') === "") {
-                vm.entryActivityDate = "";
-            }
+        $('#entryActivityDate').blur(function(e){
+            vm.entryActivityDate =  $(this).val();
           });
-
-
       }
     },
     mounted: function() {
