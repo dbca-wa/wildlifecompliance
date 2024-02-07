@@ -503,10 +503,28 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                 proxy_applicant=user) | Q(submitter=user))
         return Application.objects.none()
 
+    #TODO:  this method and others like it should be reviewed - the error handling should be more graceful
+    def get_serializer_class(self):
+        try:
+            application = self.get_object()
+            return ApplicationSerializer
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            if hasattr(e,'error_dict'):
+                raise serializers.ValidationError(repr(e.error_dict))
+            else:
+                if hasattr(e,'message'):
+                    raise serializers.ValidationError(e.message)
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
+
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        serializer = BaseApplicationSerializer(
-            queryset, many=True, context={'request': request})
+        #serializer = BaseApplicationSerializer(queryset, many=True, context={'request': request})
+        serializer = self.get_serializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
     @detail_route(methods=['POST'])

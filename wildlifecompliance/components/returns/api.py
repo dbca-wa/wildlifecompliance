@@ -218,6 +218,25 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(current_application__submitter=user))]
             return Return.objects.filter(Q(licence_id__in=user_licences))
         return Return.objects.none()
+    
+    def get_serializer_class(self):
+        try:
+            return_obj = self.get_object()
+            return ReturnSerializer
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            if hasattr(e,'error_dict'):
+                raise serializers.ValidationError(repr(e.error_dict))
+            else:
+                if hasattr(e,'message'):
+                    raise serializers.ValidationError(e.message)
+        except AssertionError as e:
+            raise serializers.ValidationError(str(e))
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()

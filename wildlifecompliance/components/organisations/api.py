@@ -179,7 +179,9 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         if is_internal(self.request):
             return Organisation.objects.all()
         elif is_customer(self.request):
-            return user.wildlifecompliance_organisations.all()
+            org_contacts = OrganisationContact.objects.filter(is_admin=True).filter(email=user.email)
+            user_admin_orgs = [org.organisation.id for org in org_contacts]
+            return Organisation.objects.filter(id__in=user_admin_orgs)
         return Organisation.objects.none()
 
     @detail_route(methods=['GET'])
@@ -1114,10 +1116,11 @@ class OrganisationContactViewSet(viewsets.ModelViewSet):
         if is_internal(self.request):
             return OrganisationContact.objects.all()
         elif is_customer(self.request):
-            user_orgs = [
-                org.id for org in user.wildlifecompliance_organisations.all()]
-            return OrganisationContact.objects.filter(
-                Q(organisation_id__in=user_orgs))
+
+            org_contacts = OrganisationContact.objects.filter(is_admin=True).filter(email=user.email)
+            user_admin_orgs = [org.organisation.id for org in org_contacts]
+            return OrganisationContact.objects.filter(Q(organisation_id__in=user_admin_orgs) | Q(email=user.email))
+
         return OrganisationContact.objects.none()
 
 
