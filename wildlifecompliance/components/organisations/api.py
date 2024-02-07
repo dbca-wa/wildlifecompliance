@@ -173,10 +173,11 @@ class OrganisationPaginatedViewSet(viewsets.ModelViewSet):
 class OrganisationViewSet(viewsets.ModelViewSet):
     queryset = Organisation.objects.none()
     serializer_class = OrganisationSerializer
+    allow_external = False #TODO: review this - workaround for allowing organisations to be accessed when unlinking users
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request) or self.allow_external:
             return Organisation.objects.all()
         elif is_customer(self.request):
             org_contacts = OrganisationContact.objects.filter(is_admin=True).filter(email=user.email)
@@ -458,6 +459,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['POST', ])
     def unlink_user(self, request, *args, **kwargs):
         try:
+            self.allow_external = True
             instance = self.get_object()
             request.data.update([('org_id', instance.id)])
             serializer = OrgUserCheckSerializer(data=request.data)
