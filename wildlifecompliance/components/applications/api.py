@@ -393,17 +393,17 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class ApplicationRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-        return super(ApplicationRenderer, self).render(data, accepted_media_type, renderer_context)
+#class ApplicationRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
+#        return super(ApplicationRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
 class ApplicationPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (ApplicationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (ApplicationRenderer,)
+    #renderer_classes = (ApplicationRenderer,)
     queryset = Application.objects.none()
     serializer_class = DTExternalApplicationSerializer
     page_size = 10
@@ -489,7 +489,7 @@ class ApplicationPaginatedViewSet(viewsets.ModelViewSet):
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):
-    queryset = Application.objects.all()
+    queryset = Application.objects.none()
     serializer_class = ApplicationSerializer
 
     def get_queryset(self):
@@ -503,10 +503,28 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                 proxy_applicant=user) | Q(submitter=user))
         return Application.objects.none()
 
+    #TODO:  this method and others like it should be reviewed - the error handling should be more graceful
+    def get_serializer_class(self):
+        try:
+            application = self.get_object()
+            return ApplicationSerializer
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            if hasattr(e,'error_dict'):
+                raise serializers.ValidationError(repr(e.error_dict))
+            else:
+                if hasattr(e,'message'):
+                    raise serializers.ValidationError(e.message)
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
+
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        serializer = BaseApplicationSerializer(
-            queryset, many=True, context={'request': request})
+        #serializer = BaseApplicationSerializer(queryset, many=True, context={'request': request})
+        serializer = self.get_serializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
     @detail_route(methods=['POST'])
@@ -2233,7 +2251,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
 
 class ApplicationConditionViewSet(viewsets.ModelViewSet):
-    queryset = ApplicationCondition.objects.all()
+    queryset = ApplicationCondition.objects.none()
     serializer_class = ApplicationConditionSerializer
 
     def get_queryset(self):
@@ -2375,7 +2393,7 @@ class ApplicationConditionViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 class ApplicationSelectedActivityViewSet(viewsets.ModelViewSet):
-    queryset = ApplicationSelectedActivity.objects.all()
+    queryset = ApplicationSelectedActivity.objects.none()
     serializer_class = ApplicationSelectedActivitySerializer
 
     def get_queryset(self):
@@ -2409,7 +2427,7 @@ class ApplicationSelectedActivityViewSet(viewsets.ModelViewSet):
 
 
 class ApplicationStandardConditionViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = ApplicationStandardCondition.objects.all()
+    queryset = ApplicationStandardCondition.objects.none()
     serializer_class = ApplicationStandardConditionSerializer
 
     def get_queryset(self):
@@ -2431,7 +2449,7 @@ class ApplicationStandardConditionViewSet(viewsets.ReadOnlyModelViewSet):
 class AssessmentPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (ApplicationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (ApplicationRenderer,)
+    #renderer_classes = (ApplicationRenderer,)
     queryset = Assessment.objects.none()
     serializer_class = DTAssessmentSerializer
     page_size = 10
@@ -2468,7 +2486,7 @@ class AssessmentPaginatedViewSet(viewsets.ModelViewSet):
 
 
 class AssessmentViewSet(viewsets.ModelViewSet):
-    queryset = Assessment.objects.all()
+    queryset = Assessment.objects.none()
     serializer_class = AssessmentSerializer
 
     def get_queryset(self):
@@ -2608,7 +2626,7 @@ class AssessmentViewSet(viewsets.ModelViewSet):
 class AssessorGroupViewSet(viewsets.ModelViewSet):
     queryset = ActivityPermissionGroup.objects.none()
     serializer_class = ActivityPermissionGroupSerializer
-    renderer_classes = [JSONRenderer, ]
+    #renderer_classes = [JSONRenderer, ]
 
     def get_queryset(self, application=None):
         if is_internal(self.request):
@@ -2632,7 +2650,7 @@ class AssessorGroupViewSet(viewsets.ModelViewSet):
 
 
 class AmendmentRequestViewSet(viewsets.ModelViewSet):
-    queryset = AmendmentRequest.objects.all()
+    queryset = AmendmentRequest.objects.none()
     serializer_class = AmendmentRequestSerializer
 
     def get_queryset(self):

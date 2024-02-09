@@ -174,7 +174,7 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
         fields = self.get_fields(getter)
         ordering = self.get_ordering(getter, fields)
         if len(ordering):
-           for num, item in enumerate(ordering):
+            for num, item in enumerate(ordering):
                 if item == 'status__name':
                     ordering.pop(num)
                     ordering.insert(num, 'status')
@@ -182,26 +182,26 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
                     ordering.pop(num)
                     ordering.insert(num, '-status')
 
-           queryset = queryset.order_by(*ordering)
+            queryset = queryset.order_by(*ordering)
         else:
-            queryset = queryset.order_by(['-number'])
+            queryset = queryset.order_by('-number')
 
 
         setattr(view, '_datatables_total_count', total_count)
         return queryset
 
 
-class CallEmailRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-        return super(CallEmailRenderer, self).render(data, accepted_media_type, renderer_context)
+#class CallEmailRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
+#        return super(CallEmailRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
 class CallEmailPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (CallEmailFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (CallEmailRenderer,)
+    #renderer_classes = (CallEmailRenderer,)
     queryset = CallEmail.objects.none()
     serializer_class = CallEmailDatatableSerializer
     page_size = 10
@@ -864,7 +864,7 @@ class CallEmailViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 class ClassificationViewSet(viewsets.ModelViewSet):
-    queryset = Classification.objects.all()
+    queryset = Classification.objects.none()
     serializer_class = ClassificationSerializer
 
     def get_queryset(self):
@@ -886,7 +886,7 @@ class ClassificationViewSet(viewsets.ModelViewSet):
 
 
 class LOVCollectionViewSet(viewsets.ModelViewSet):
-    queryset = CallEmail.objects.all()
+    queryset = CallEmail.objects.none()
     serializer_class = CallEmailSerializer
 
     def get_queryset(self):
@@ -966,7 +966,7 @@ class LOVCollectionViewSet(viewsets.ModelViewSet):
 
 
 class ReferrerViewSet(viewsets.ModelViewSet):
-    queryset = Referrer.objects.all()
+    queryset = Referrer.objects.none()
     serializer_class = ReferrerSerializer
 
     def get_queryset(self):
@@ -978,7 +978,7 @@ class ReferrerViewSet(viewsets.ModelViewSet):
 
 
 class ReportTypeViewSet(viewsets.ModelViewSet):
-    queryset = ReportType.objects.all()
+    queryset = ReportType.objects.none()
     serializer_class = ReportTypeSerializer
 
     def get_queryset(self):
@@ -1029,7 +1029,7 @@ class ReportTypeViewSet(viewsets.ModelViewSet):
 
 # TODO: check if the class below is used or not.  If no, remove.
 class LocationViewSet(viewsets.ModelViewSet):
-    queryset = Location.objects.all()
+    queryset = Location.objects.none()
     serializer_class = LocationSerializer
 
     def get_queryset(self):
@@ -1072,7 +1072,7 @@ class LocationViewSet(viewsets.ModelViewSet):
 
 
 class EmailUserViewSet(viewsets.ModelViewSet):
-    queryset = EmailUser.objects.all()
+    queryset = EmailUser.objects.none()
     serializer_class = EmailUserSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('first_name', 'last_name', 'email', 'phone_number', 'mobile_number', 'organisation')

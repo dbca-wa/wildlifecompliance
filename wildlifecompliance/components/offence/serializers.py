@@ -171,7 +171,7 @@ class OffenceSerializer(serializers.ModelSerializer):
             'district_id',
             'assigned_to_id',
             'allocated_group',
-            'allocated_group_id',
+            #'allocated_group_id',
             'user_in_group',
             'can_user_action',
             # 'can_user_edit',

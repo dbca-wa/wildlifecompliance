@@ -166,7 +166,7 @@ class LicenceRenderer(DatatablesRenderer):
 class LicencePaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (LicenceFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (LicenceRenderer,)
+    #renderer_classes = (LicenceRenderer,)
     queryset = WildlifeLicence.objects.none()
     serializer_class = DTExternalWildlifeLicenceSerializer
     page_size = 10
@@ -259,7 +259,7 @@ class LicencePaginatedViewSet(viewsets.ModelViewSet):
 
 
 class LicenceViewSet(viewsets.ModelViewSet):
-    queryset = WildlifeLicence.objects.all()
+    queryset = WildlifeLicence.objects.none()
     serializer_class = DTExternalWildlifeLicenceSerializer
 
     def get_queryset(self):
@@ -280,6 +280,26 @@ class LicenceViewSet(viewsets.ModelViewSet):
                 Q(current_application__submitter=user)
             ).filter(current_application__in=asa_accepted.values_list('application_id', flat=True))
         return WildlifeLicence.objects.none()
+    
+    #TODO:  this method and others like it should be reviewed - the error handling should be more graceful
+    def get_serializer_class(self):
+        try:
+            licence = self.get_object()
+            return DTExternalWildlifeLicenceSerializer
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            if hasattr(e,'error_dict'):
+                raise serializers.ValidationError(repr(e.error_dict))
+            else:
+                if hasattr(e,'message'):
+                    raise serializers.ValidationError(e.message)
+        except AssertionError as e:
+            raise serializers.ValidationError(str(e))
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
 
     def list(self, request, pk=None, *args, **kwargs):
         queryset = self.get_queryset()
@@ -735,16 +755,28 @@ class LicenceViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 class LicenceCategoryViewSet(viewsets.ModelViewSet):
-    queryset = LicenceCategory.objects.all()
+    queryset = LicenceCategory.objects.none()
     serializer_class = LicenceCategorySerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated():
+            return LicenceCategory.objects.all()
+        return LicenceCategory.objects.none()
 
 
 class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ModelViewSet):
     # Filters to only return purposes that are
     # available for selection when applying for
     # a new application
-    queryset = LicenceCategory.objects.all()
+    queryset = LicenceCategory.objects.none()
     serializer_class = LicenceCategorySerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated():
+            return LicenceCategory.objects.all()
+        return LicenceCategory.objects.none()
 
     def list(self, request, *args, **kwargs):
         """

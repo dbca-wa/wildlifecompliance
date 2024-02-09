@@ -137,17 +137,17 @@ class OrganisationFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class OrganisationRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-        return super(OrganisationRenderer, self).render(data, accepted_media_type, renderer_context)
+#class OrganisationRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
+#        return super(OrganisationRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
 class OrganisationPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (OrganisationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (OrganisationRenderer,)
+    #renderer_classes = (OrganisationRenderer,)
     queryset = Organisation.objects.none()
     serializer_class = DTOrganisationSerializer
     page_size = 10
@@ -171,15 +171,18 @@ class OrganisationPaginatedViewSet(viewsets.ModelViewSet):
 
 
 class OrganisationViewSet(viewsets.ModelViewSet):
-    queryset = Organisation.objects.all()
+    queryset = Organisation.objects.none()
     serializer_class = OrganisationSerializer
+    allow_external = False #TODO: review this - workaround for allowing organisations to be accessed when unlinking users
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request) or self.allow_external:
             return Organisation.objects.all()
         elif is_customer(self.request):
-            return user.wildlifecompliance_organisations.all()
+            org_contacts = OrganisationContact.objects.filter(is_admin=True).filter(email=user.email)
+            user_admin_orgs = [org.organisation.id for org in org_contacts]
+            return Organisation.objects.filter(id__in=user_admin_orgs)
         return Organisation.objects.none()
 
     @detail_route(methods=['GET'])
@@ -456,6 +459,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['POST', ])
     def unlink_user(self, request, *args, **kwargs):
         try:
+            self.allow_external = True
             instance = self.get_object()
             request.data.update([('org_id', instance.id)])
             serializer = OrgUserCheckSerializer(data=request.data)
@@ -774,7 +778,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 class OrganisationRequestsPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (OrganisationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (OrganisationRenderer,)
+    #renderer_classes = (OrganisationRenderer,)
     queryset = OrganisationRequest.objects.none()
     serializer_class = OrganisationRequestDTSerializer
     page_size = 10
@@ -798,7 +802,7 @@ class OrganisationRequestsPaginatedViewSet(viewsets.ModelViewSet):
 
 
 class OrganisationRequestsViewSet(viewsets.ModelViewSet):
-    queryset = OrganisationRequest.objects.all()
+    queryset = OrganisationRequest.objects.none()
     serializer_class = OrganisationRequestSerializer
 
     def get_queryset(self):
@@ -1107,22 +1111,23 @@ class OrganisationAccessGroupMembers(views.APIView):
 
 class OrganisationContactViewSet(viewsets.ModelViewSet):
     serializer_class = OrganisationContactSerializer
-    queryset = OrganisationContact.objects.all()
+    queryset = OrganisationContact.objects.none()
 
     def get_queryset(self):
         user = self.request.user
         if is_internal(self.request):
             return OrganisationContact.objects.all()
         elif is_customer(self.request):
-            user_orgs = [
-                org.id for org in user.wildlifecompliance_organisations.all()]
-            return OrganisationContact.objects.filter(
-                Q(organisation_id__in=user_orgs))
+
+            org_contacts = OrganisationContact.objects.filter(is_admin=True).filter(email=user.email)
+            user_admin_orgs = [org.organisation.id for org in org_contacts]
+            return OrganisationContact.objects.filter(Q(organisation_id__in=user_admin_orgs) | Q(email=user.email))
+
         return OrganisationContact.objects.none()
 
 
 class MyOrganisationsViewSet(viewsets.ModelViewSet):
-    queryset = Organisation.objects.all()
+    queryset = Organisation.objects.none()
     serializer_class = MyOrganisationsSerializer
 
     def get_queryset(self):
@@ -1135,9 +1140,17 @@ class MyOrganisationsViewSet(viewsets.ModelViewSet):
 
 
 class OrganisationComplianceManagementViewSet(viewsets.ModelViewSet):
-    queryset = Organisation.objects.all()
+    queryset = Organisation.objects.none()
     serializer_class = ComplianceManagementOrganisationSerializer
     
+    def get_queryset(self):
+        user = self.request.user
+        if is_internal(self.request):
+            return Organisation.objects.all()
+        elif is_customer(self.request):
+            return user.wildlifecompliance_organisations.all()
+        return Organisation.objects.none()
+
     def create(self, request, *args, **kwargs):
         print("create org")
         print(request.data)

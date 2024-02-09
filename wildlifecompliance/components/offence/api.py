@@ -43,7 +43,7 @@ from wildlifecompliance.components.offence.serializers import (
 from wildlifecompliance.components.section_regulation.serializers import SectionRegulationSerializer
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, AllegedCommittedOffence
 #from wildlifecompliance.components.users.models import CompliancePermissionGroup
-from wildlifecompliance.helpers import is_internal
+from wildlifecompliance.helpers import is_internal, is_customer
 
 
 class OffenceFilterBackend(DatatablesFilterBackend):
@@ -68,27 +68,29 @@ class OffenceFilterBackend(DatatablesFilterBackend):
                          Q(offender__organisation__organisation__abn__icontains=search_text) | \
                          Q(offender__organisation__organisation__trading_name__icontains=search_text)
 
-        type = request.GET.get('type',).lower()
+        type = str(request.GET.get('type',)).lower()
         if type and type != 'all':
             # q_objects &= Q(type=type)
             offence_ids = SanctionOutcome.objects.filter(type=type).values_list('offence__id', flat=True).distinct()
             q_objects &= Q(id__in=offence_ids)
 
-        status = request.GET.get('status',).lower()
+        status = str(request.GET.get('status',)).lower()
         if status and status != 'all':
             q_objects &= Q(status=status)
 
         timezone = pytz.timezone(TIME_ZONE)
 
-        date_from = request.GET.get('date_from',).lower()
+        date_from = request.GET.get('date_from',)
         if date_from:
+            date_from = str(request.GET.get('date_from',)).lower()
             date_from = datetime.strptime(date_from, '%d/%m/%Y')
             date_from = timezone.localize(date_from)
             q_objects &= Q(occurrence_datetime_from__gte=date_from)
             q_objects &= Q(occurrence_datetime_to__gte=date_from)
 
-        date_to = request.GET.get('date_to',).lower()
+        date_to = request.GET.get('date_to',)
         if date_to:
+            date_to = str(request.GET.get('date_to',)).lower()
             date_to = datetime.strptime(date_to, '%d/%m/%Y')
             date_to = timezone.localize(date_to)
             q_objects &= Q(occurrence_datetime_from__lte=date_to)
@@ -695,15 +697,28 @@ class OffenceViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 class SearchSectionRegulation(viewsets.ModelViewSet):
-    queryset = SectionRegulation.objects.all()
+    queryset = SectionRegulation.objects.none()
     serializer_class = SectionRegulationSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('act__name', 'name', 'offence_text',)
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated():
+            return SectionRegulation.objects.all()
+        return SectionRegulation.objects.none()
+
 
 class SearchOrganisation(viewsets.ModelViewSet):
-    queryset = Organisation.objects.all()
+    queryset = Organisation.objects.none()
     serializer_class = OrganisationSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('organisation__abn', 'organisation__name',)
 
+    def get_queryset(self):
+        user = self.request.user
+        if is_internal(self.request):
+            return Organisation.objects.all()
+        elif is_customer(self.request):
+            return user.wildlifecompliance_organisations.all()
+        return Organisation.objects.none()
