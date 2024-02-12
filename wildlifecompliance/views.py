@@ -145,8 +145,11 @@ class HealthCheckView(TemplateView):
         return context
 
 
-class ManagementCommandsView(LoginRequiredMixin, TemplateView):
+class ManagementCommandsView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'wildlifecompliance/mgt-commands.html'
+
+    def test_func(self):
+        return is_internal(self.request)
 
     def post(self, request):
         from wildlifecompliance.components.returns.services import (
