@@ -97,20 +97,20 @@ class ReturnFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class ReturnRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and \
-                hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = \
-                renderer_context['view']._datatables_total_count
-        return super(ReturnRenderer, self).render(
-            data, accepted_media_type, renderer_context)
+#class ReturnRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and \
+#                hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = \
+#                renderer_context['view']._datatables_total_count
+#        return super(ReturnRenderer, self).render(
+#            data, accepted_media_type, renderer_context)
 
 
 class ReturnPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (ReturnFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (ReturnRenderer,)
+    #renderer_classes = (ReturnRenderer,)
     queryset = Return.objects.none()
     serializer_class = DTExternalReturnSerializer
     page_size = 10
@@ -203,7 +203,7 @@ class ReturnPaginatedViewSet(viewsets.ModelViewSet):
 
 class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ReturnSerializer
-    queryset = Return.objects.all()
+    queryset = Return.objects.none()
 
     def get_queryset(self):
         user = self.request.user
@@ -218,6 +218,25 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(current_application__submitter=user))]
             return Return.objects.filter(Q(licence_id__in=user_licences))
         return Return.objects.none()
+    
+    def get_serializer_class(self):
+        try:
+            return_obj = self.get_object()
+            return ReturnSerializer
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            if hasattr(e,'error_dict'):
+                raise serializers.ValidationError(repr(e.error_dict))
+            else:
+                if hasattr(e,'message'):
+                    raise serializers.ValidationError(e.message)
+        except AssertionError as e:
+            raise serializers.ValidationError(str(e))
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -735,7 +754,7 @@ class ReturnTypeViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ReturnAmendmentRequestViewSet(viewsets.ModelViewSet):
-    queryset = ReturnRequest.objects.all()
+    queryset = ReturnRequest.objects.none()
     serializer_class = ReturnRequestSerializer
 
     def get_queryset(self):

@@ -202,17 +202,17 @@ class LegalCaseFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class LegalCaseRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-        return super(LegalCaseRenderer, self).render(data, accepted_media_type, renderer_context)
+#class LegalCaseRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
+#        return super(LegalCaseRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
 class LegalCasePaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (LegalCaseFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (LegalCaseRenderer,)
+    #renderer_classes = (LegalCaseRenderer,)
     queryset = LegalCase.objects.none()
     serializer_class = LegalCaseDatatableSerializer
     page_size = 10
@@ -254,7 +254,7 @@ class LegalCasePaginatedViewSet(viewsets.ModelViewSet):
 
 
 class LegalCaseViewSet(viewsets.ModelViewSet):
-    queryset = LegalCase.objects.all()
+    queryset = LegalCase.objects.none()
     serializer_class = BaseLegalCaseSerializer
 
     def get_queryset(self):
@@ -1358,7 +1358,7 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
 
 
 class LegalCasePriorityViewSet(viewsets.ModelViewSet):
-   queryset = LegalCasePriority.objects.all()
+   queryset = LegalCasePriority.objects.none()
    serializer_class = LegalCasePrioritySerializer
 
    def get_queryset(self):

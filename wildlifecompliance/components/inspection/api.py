@@ -181,17 +181,17 @@ class InspectionFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class InspectionRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-        return super(InspectionRenderer, self).render(data, accepted_media_type, renderer_context)
+#class InspectionRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
+#        return super(InspectionRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
 class InspectionPaginatedViewSet(viewsets.ModelViewSet):
     filter_backends = (InspectionFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (InspectionRenderer,)
+    #renderer_classes = (InspectionRenderer,)
     queryset = Inspection.objects.none()
     serializer_class = InspectionDatatableSerializer
     page_size = 10
@@ -216,7 +216,7 @@ class InspectionPaginatedViewSet(viewsets.ModelViewSet):
 
 
 class InspectionViewSet(viewsets.ModelViewSet):
-    queryset = Inspection.objects.all()
+    queryset = Inspection.objects.none()
     serializer_class = InspectionSerializer
 
     def get_queryset(self):
@@ -894,7 +894,7 @@ class InspectionViewSet(viewsets.ModelViewSet):
 
 
 class InspectionTypeViewSet(viewsets.ModelViewSet):
-   queryset = InspectionType.objects.all()
+   queryset = InspectionType.objects.none()
    serializer_class = InspectionTypeSerializer
 
    def get_queryset(self):
