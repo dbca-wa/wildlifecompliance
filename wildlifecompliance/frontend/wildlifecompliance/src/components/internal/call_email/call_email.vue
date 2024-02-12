@@ -104,7 +104,7 @@
                           </div>
                         </div>
                         <!-- Following 3 actions are temporarily commented out  -->
-                        <!--div v-if="statusId ==='open' && canUserAction" class="row action-button">
+                        <div v-if="statusId ==='open' && canUserAction" class="row action-button">
                           <div class="col-sm-12">
                                 <a ref="allocateForFollowUp" @click="addWorkflow('allocate_for_follow_up')" class="btn btn-primary btn-block" >
                                   Allocate for Follow Up
@@ -124,7 +124,7 @@
                                   Allocate for Case
                                 </a>
                           </div>
-                        </div-->
+                        </div>
                         <div v-if="closeButtonVisibility && canUserAction" class="row action-button">
                           <div class="col-sm-12">
                                 <a ref="close" @click="addWorkflow('close')" class="btn btn-primary btn-block">
