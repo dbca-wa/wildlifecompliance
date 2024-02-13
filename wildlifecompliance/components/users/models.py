@@ -5,6 +5,9 @@ from django.contrib.auth.models import Group
 from ledger.accounts.models import EmailUser
 from wildlifecompliance.components.main.models import Document, Region, District
 
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
 
 #class RegionDistrict(models.Model):
 #
@@ -164,7 +167,7 @@ class ComplianceManagementUserPreferences(models.Model):
 
 class ComplianceUserIntelligenceDocument(Document):
     email_user = models.ForeignKey(EmailUser, related_name='intelligence_documents')
-    _file = models.FileField(max_length=255,)
+    _file = models.FileField(max_length=255,storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'

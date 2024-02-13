@@ -31,6 +31,9 @@ from wildlifecompliance.components.organisations.emails import (
 )
 from wildlifecompliance.components.main.models import Document
 
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
 
 @python_2_unicode_compatible
 class Organisation(models.Model):
@@ -580,7 +583,7 @@ class Organisation(models.Model):
 
 class OrganisationIntelligenceDocument(Document):
     organisation = models.ForeignKey(Organisation, related_name='intelligence_documents')
-    _file = models.FileField(max_length=255,)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'

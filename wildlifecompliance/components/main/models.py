@@ -16,6 +16,10 @@ from wildlifecompliance.components.section_regulation.models import Act
 from wildlifecompliance.settings import SO_TYPE_CHOICES
 from smart_selects.db_fields import ChainedForeignKey
 
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
+
 logger = logging.getLogger(__name__)
 
 
@@ -276,7 +280,7 @@ def update_sanction_outcome_word_filename(instance, filename):
 class SanctionOutcomeWordTemplate(models.Model):
     sanction_outcome_type = models.CharField(max_length=30, choices=SO_TYPE_CHOICES, blank=True,)
     act = models.CharField(max_length=30, choices=Act.NAME_CHOICES, blank=True,)
-    _file = models.FileField(upload_to=update_sanction_outcome_word_filename, max_length=255)
+    _file = models.FileField(upload_to=update_sanction_outcome_word_filename, max_length=255, storage=private_storage)
     uploaded_date = models.DateTimeField(auto_now_add=True, editable=False)
     description = models.TextField(blank=True, verbose_name='description', help_text='')
 

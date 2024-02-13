@@ -267,3 +267,31 @@ def getLedgerSeniorCardFile(request, emailuser_id):
     except:
         messages.error(request, 'Unable to find the document')
         return redirect('wc_home')
+
+def is_authorised_to_access_document(request):
+
+    if is_internal(request):
+        return True
+    elif is_customer(request):
+        pass
+    else:
+        return False
+
+def getPrivateFile(request):
+
+    if is_authorised_to_access_document(request):
+        file_name_path =  request.path
+        full_file_path= settings.BASE_DIR+file_name_path
+        if os.path.isfile(full_file_path) is True:
+            extension = file_name_path.split(".")[-1]
+            the_file = open(full_file_path, 'rb')
+            the_data = the_file.read()
+            the_file.close()
+            if extension == 'msg':
+                return HttpResponse(the_data, content_type="application/vnd.ms-outlook")
+            if extension == 'eml':
+                return HttpResponse(the_data, content_type="application/vnd.ms-outlook")
+
+            return HttpResponse(the_data, content_type=mimetypes.types_map['.'+str(extension)])
+
+    return HttpResponse()

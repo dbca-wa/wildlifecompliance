@@ -28,6 +28,10 @@ from wildlifecompliance.components.main.models import (
     Document
 )
 
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
+
 logger = logging.getLogger(__name__)
 # logger = logging
 
@@ -38,7 +42,7 @@ def update_licence_doc_filename(instance, filename):
 
 
 class LicenceDocument(Document):
-    _file = models.FileField(upload_to=update_licence_doc_filename)
+    _file = models.FileField(upload_to=update_licence_doc_filename, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'

@@ -15,6 +15,9 @@ from wildlifecompliance.components.section_regulation.models import SectionRegul
 #from wildlifecompliance.components.users.models import CompliancePermissionGroup
 from wildlifecompliance.components.organisations.models import Organisation
 
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
 
 class Offence(RevisionedMixin):
     WORKFLOW_CREATE = 'create'
@@ -188,7 +191,7 @@ def update_offence_doc_filename(instance, filename):
 
 class OffenceDocument(Document):
     offence = models.ForeignKey(Offence, related_name='documents')
-    _file = models.FileField(max_length=255, upload_to=update_offence_doc_filename)
+    _file = models.FileField(max_length=255, upload_to=update_offence_doc_filename, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -306,7 +309,7 @@ class OffenceUserAction(models.Model):
 
 class OffenceCommsLogDocument(Document):
     log_entry = models.ForeignKey('OffenceCommsLogEntry', related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'

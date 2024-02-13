@@ -24,6 +24,10 @@ from treebeard.mp_tree import MP_Node
 from datetime import datetime, timedelta, date
 from django.utils import timezone
 
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
+
 logger = logging.getLogger(__name__)
 
 
@@ -526,7 +530,7 @@ class LegalCaseCommsLogDocument(Document):
     log_entry = models.ForeignKey(
         LegalCaseCommsLogEntry,
         related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -572,7 +576,7 @@ class LegalCaseUserAction(models.Model):
 
 class LegalCaseDocument(Document):
     legal_case = models.ForeignKey(LegalCase, related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
@@ -588,7 +592,7 @@ class LegalCaseDocument(Document):
 
 class ProsecutionNoticeDocument(Document):
     legal_case = models.ForeignKey(LegalCase, related_name='prosecution_notices')
-    _file = models.FileField(max_length=255,)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -598,7 +602,7 @@ class ProsecutionNoticeDocument(Document):
 
 class CourtHearingNoticeDocument(Document):
     legal_case = models.ForeignKey(LegalCase, related_name='court_hearing_notices')
-    _file = models.FileField(max_length=255,)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -608,7 +612,7 @@ class CourtHearingNoticeDocument(Document):
 
 class BriefOfEvidenceDocument(Document):
     brief_of_evidence = models.ForeignKey(BriefOfEvidence, related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
@@ -622,7 +626,7 @@ class BriefOfEvidenceDocument(Document):
 
 class ProsecutionBriefDocument(Document):
     prosecution_brief = models.ForeignKey(ProsecutionBrief, related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
@@ -637,7 +641,7 @@ class ProsecutionBriefDocument(Document):
 
 class LegalCaseGeneratedDocument(Document):
     legal_case = models.ForeignKey(LegalCase, related_name='generated_documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -651,7 +655,7 @@ def update_court_outcome_doc_filename(instance, filename):
 
 class CourtOutcomeDocument(Document):
     court_proceedings = models.ForeignKey(CourtProceedings, related_name='court_outcome_documents')
-    _file = models.FileField(max_length=255, upload_to=update_court_outcome_doc_filename)
+    _file = models.FileField(max_length=255, upload_to=update_court_outcome_doc_filename, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
