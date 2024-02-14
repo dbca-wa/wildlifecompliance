@@ -808,7 +808,8 @@ class OrganisationRequest(models.Model):
     identification = models.FileField(
         upload_to='wildlifecompliance/organisation/requests/%Y/%m/%d',
         null=True,
-        blank=True)
+        blank=True,
+        storage=private_storage)
     status = models.CharField(
         max_length=100,
         choices=STATUS_CHOICES,

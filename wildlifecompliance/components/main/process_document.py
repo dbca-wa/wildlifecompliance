@@ -1,9 +1,7 @@
-from django.core.files.storage import default_storage 
-import os
 from django.core.files.base import ContentFile
 import traceback
 from wildlifecompliance.components.main.models import TemporaryDocument
-
+from wildlifecompliance.components.applications import models
 
 def process_generic_document(request, instance, document_type=None, *args, **kwargs):
     try:
@@ -296,7 +294,8 @@ def save_document(request, instance, comms_instance, document_type, input_name=N
 
             document = instance.renderer_documents.get_or_create(
                 input_name=input_name, name=filename)[0]
-            path = default_storage.save(
+            path = private_storage = models.private_storage
+            path = private_storage.save(
                 'wildlifecompliance/{}/{}/renderer_documents/{}/{}'.format(
                     instance._meta.model_name, instance.id, input_name, filename), ContentFile(
                     _file.read()))
@@ -307,16 +306,19 @@ def save_document(request, instance, comms_instance, document_type, input_name=N
         elif document_type == 'issuance_documents' and 'filename' in request.data:
             filename = request.data.get('filename')
             _file = request.data.get('_file')
-
+            
             parent_application = instance.application
             document = instance.issuance_documents.get_or_create(
                 name=filename)[0]
-            path = default_storage.save(
+
+            private_storage = models.private_storage
+            path = private_storage.save(
                 'wildlifecompliance/{}/{}/{}/{}/{}'.format(
                     'applications', parent_application.id, instance._meta.model_name, instance.id, filename), ContentFile(
                     _file.read()))
 
             document._file = path
+            
             document.save()
         # inspection report save
         elif document_type == 'inspection_report' and 'filename' in request.data:
@@ -325,7 +327,8 @@ def save_document(request, instance, comms_instance, document_type, input_name=N
 
             document = instance.report.get_or_create(
                 name=filename)[0]
-            path = default_storage.save(
+            path = private_storage = models.private_storage
+            path = private_storage.save(
                 'wildlifecompliance/{}/{}/report/{}'.format(
                     instance._meta.model_name, instance.id, filename), ContentFile(
                     _file.read()))
@@ -339,7 +342,8 @@ def save_document(request, instance, comms_instance, document_type, input_name=N
 
             document = instance.generated_documents.get_or_create(
                 name=filename)[0]
-            path = default_storage.save(
+            path = private_storage = models.private_storage
+            path = private_storage.save(
                 'wildlifecompliance/{}/{}/generated_documents/{}'.format(
                     instance._meta.model_name, instance.id, filename), ContentFile(
                     _file.read()))
@@ -354,7 +358,8 @@ def save_document(request, instance, comms_instance, document_type, input_name=N
 
             document = instance.court_proceedings.court_outcome_documents.get_or_create(
                 name=filename)[0]
-            path = default_storage.save(
+            path = private_storage = models.private_storage
+            path = private_storage.save(
                 'wildlifecompliance/{}/{}/court_outcome_documents/{}'.format(
                     instance._meta.model_name, instance.id, filename), ContentFile(
                     _file.read()))
@@ -369,7 +374,8 @@ def save_document(request, instance, comms_instance, document_type, input_name=N
 
             document = instance.prosecution_notices.get_or_create(
                 name=filename)[0]
-            path = default_storage.save(
+            path = private_storage = models.private_storage
+            path = private_storage.save(
                 'wildlifecompliance/{}/{}/prosecution_notices/{}'.format(
                     instance._meta.model_name, instance.id, filename), ContentFile(
                     _file.read()))
@@ -384,7 +390,8 @@ def save_document(request, instance, comms_instance, document_type, input_name=N
 
             document = instance.court_hearing_notices.get_or_create(
                 name=filename)[0]
-            path = default_storage.save(
+            path = private_storage = models.private_storage
+            path = private_storage.save(
                 'wildlifecompliance/{}/{}/court_hearing_notices/{}'.format(
                     instance._meta.model_name, instance.id, filename), ContentFile(
                     _file.read()))
@@ -399,7 +406,8 @@ def save_document(request, instance, comms_instance, document_type, input_name=N
 
             document = instance.intelligence_documents.get_or_create(
                 name=filename)[0]
-            path = default_storage.save(
+            path = private_storage = models.private_storage
+            path = private_storage.save(
                 'wildlifecompliance/{}/{}/intelligence_documents/{}'.format(
                     instance._meta.model_name, instance.id, filename), ContentFile(
                     _file.read()))
@@ -414,7 +422,8 @@ def save_document(request, instance, comms_instance, document_type, input_name=N
 
             document = comms_instance.documents.get_or_create(
                 name=filename)[0]
-            path = default_storage.save(
+            path = private_storage = models.private_storage
+            path = private_storage.save(
                 'wildlifecompliance/{}/{}/communications/{}/documents/{}'.format(
                     instance._meta.model_name, instance.id, comms_instance.id, filename), ContentFile(
                     _file.read()))
@@ -429,7 +438,8 @@ def save_document(request, instance, comms_instance, document_type, input_name=N
 
             document = instance.documents.get_or_create(
                 name=filename)[0]
-            path = default_storage.save(
+            path = private_storage = models.private_storage
+            path = private_storage.save(
                 'wildlifecompliance/{}/{}/documents/{}'.format(
                     instance._meta.model_name, instance.id, filename), ContentFile(
                     _file.read()))
@@ -442,7 +452,8 @@ def save_document(request, instance, comms_instance, document_type, input_name=N
 def save_comms_log_document_obj(instance, comms_instance, temp_document):
     document = comms_instance.documents.get_or_create(
         name=temp_document.name)[0]
-    path = default_storage.save(
+    path = private_storage = models.private_storage
+    path = private_storage.save(
         'wildlifecompliance/{}/{}/communications/{}/documents/{}'.format(
             instance._meta.model_name, 
             instance.id, 
@@ -460,7 +471,8 @@ def save_comms_log_document_obj(instance, comms_instance, temp_document):
 def save_default_document_obj(instance, temp_document):
     document = instance.documents.get_or_create(
         name=temp_document.name)[0]
-    path = default_storage.save(
+    path = private_storage = models.private_storage
+    path = private_storage.save(
         'wildlifecompliance/{}/{}/documents/{}'.format(
             instance._meta.model_name, 
             instance.id, 
@@ -477,7 +489,8 @@ def save_default_document_obj(instance, temp_document):
 def save_issuance_document_obj(instance, temp_document):
     document = instance.issuance_documents.get_or_create(
         name=temp_document.name)[0]
-    path = default_storage.save(
+    path = private_storage = models.private_storage
+    path = private_storage.save(
         'wildlifecompliance/applications/{}/{}/{}/{}'.format(
             instance.application_id,
             instance._meta.model_name,
@@ -495,7 +508,8 @@ def save_renderer_document_obj(instance, temp_document, input_name):
     document = instance.renderer_documents.get_or_create(
             input_name=input_name,
             name=temp_document.name)[0]
-    path = default_storage.save(
+    path = private_storage = models.private_storage
+    path = private_storage.save(
         'wildlifecompliance/{}/{}/renderer_documents/{}/{}'.format(
             instance._meta.model_name,
             instance.id,
