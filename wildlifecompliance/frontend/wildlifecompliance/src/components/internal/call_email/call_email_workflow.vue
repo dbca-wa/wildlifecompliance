@@ -141,7 +141,7 @@ export default {
             case_priority_id: null,
             advice_details: "",
             allocatedGroup: [],
-            allocated_group_id: null,
+            // allocated_group_id: null,
             files: [
                     {
                         'file': null,
@@ -270,7 +270,7 @@ export default {
                       district_id: this.districtId ? this.districtId : null,
                   });
                   Vue.set(this, 'allocatedGroup', allocatedGroupResponse.body);
-                  this.allocated_group_id = allocatedGroupResponse.body.group_id;
+                  // this.allocated_group_id = allocatedGroupResponse.body.group_id;
               } catch(error) {
                   // Display http error response on modal
                   this.errorResponse = error.body[0];
@@ -420,13 +420,13 @@ export default {
               id: "", 
               name: "",
             });
-    },
-    mounted: function() {
-        this.form = document.forms.forwardForm;
         this.$nextTick(async() => {
             this.addEventListeners();
             await this.updateAllocatedGroup();
         });
+    },
+    mounted: function() {
+        this.form = document.forms.forwardForm;
     }
 };
 </script>
