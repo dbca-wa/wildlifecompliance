@@ -229,7 +229,7 @@ class TemporaryDocument(Document):
     temp_document_collection = models.ForeignKey(
         TemporaryDocumentCollection,
         related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     # input_name = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:

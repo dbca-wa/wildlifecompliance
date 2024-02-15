@@ -84,7 +84,6 @@ from wildlifecompliance.components.main.models import (
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
-print(private_storage.__dict__)
 logger = logging.getLogger(__name__)
 # logger = logging
 
@@ -116,10 +115,6 @@ def replace_special_chars(input_str, new_char='_'):
 def update_application_comms_log_filename(instance, filename):
     return 'wildlifecompliance/applications/{}/communications/{}/{}'.format(
         instance.log_entry.application.id, instance.id, filename)
-
-def update_application_selected_activity_filename(instance, filename):
-    return 'wildlifecompliance/applications/{}/applicationselectedactivity/{}/{}'.format(
-        instance.selected_activity.application.id, instance.selected_activity.id, filename)
 
 
 def get_temporary_document_collection(collection_id):
@@ -6862,7 +6857,7 @@ class ApplicationSelectedActivityPurpose(models.Model):
 
 
 class IssuanceDocument(Document):
-    _file = models.FileField(upload_to="test/", storage=private_storage)
+    _file = models.FileField(max_length=255, storage=private_storage)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
     selected_activity = models.ForeignKey(

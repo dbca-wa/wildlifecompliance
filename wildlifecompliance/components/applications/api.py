@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from django.db.models import Q
 from django.db import transaction
 from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
 from django.core.exceptions import ValidationError
 from rest_framework import viewsets, serializers, status, views
 from rest_framework.decorators import (
@@ -44,6 +43,7 @@ from wildlifecompliance.components.applications.models import (
     ApplicationFormDataRecord,
     ApplicationInvoice,
     ApplicationSelectedActivityPurpose,
+    private_storage,
 )
 from wildlifecompliance.components.applications.services import (
     ApplicationService,
@@ -558,7 +558,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
                 document = instance.documents.get_or_create(
                     input_name=section, name=filename)[0]
-                path = default_storage.save(
+                path = private_storage.save(
                     'applications/{}/documents/{}'.format(
                         application_id, filename), ContentFile(
                         _file.read()))
