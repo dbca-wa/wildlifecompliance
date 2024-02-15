@@ -464,9 +464,7 @@ class CallEmail(RevisionedMixin):
     def allocate_for_follow_up(self, request):
         region_id = None if not request.data.get('region_id') else request.data.get('region_id')
         district_id = None if not request.data.get('district_id') else request.data.get('district_id')
-        if district_id:
-            region_id = None
-        self.allocated_group = OfficerGroup.objects.get(region_id=region_id, district_id=district_id)
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id)
         self.status = self.STATUS_OPEN_FOLLOWUP
         self.log_user_action(
                 CallEmailUserAction.ACTION_ALLOCATE_FOR_FOLLOWUP.format(self.number),
@@ -476,9 +474,7 @@ class CallEmail(RevisionedMixin):
     def allocate_for_inspection(self, request):
         region_id = None if not request.data.get('region_id') else request.data.get('region_id')
         district_id = None if not request.data.get('district_id') else request.data.get('district_id')
-        if district_id:
-            region_id = None
-        self.allocated_group = OfficerGroup.objects.get(region_id=region_id, district_id=district_id)
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id)
         self.status = self.STATUS_OPEN_INSPECTION
         self.log_user_action(
                 CallEmailUserAction.ACTION_ALLOCATE_FOR_INSPECTION.format(self.number),
@@ -488,9 +484,7 @@ class CallEmail(RevisionedMixin):
     def allocate_for_case(self, request):
         region_id = None if not request.data.get('region_id') else request.data.get('region_id')
         district_id = None if not request.data.get('district_id') else request.data.get('district_id')
-        if district_id:
-            region_id = None
-        self.allocated_group = OfficerGroup.objects.get(region_id=region_id, district_id=district_id)
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id)
         self.status = self.STATUS_OPEN_CASE
         self.log_user_action(
                 CallEmailUserAction.ACTION_ALLOCATE_FOR_CASE.format(self.number),
