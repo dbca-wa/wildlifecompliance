@@ -360,16 +360,20 @@ class ComplianceManagementSystemGroupPermission(models.Model):
 
     def __str__(self):
         return str(self.group)
-
+    
+class GroupNotFoundError(Exception):
+    pass
 
 def get_group_members(workflow_type, region_id=None, district_id=None):
-    if workflow_type == 'forward_to_regions':
-        #return CallEmailTriageGroup.objects.get(region_id=region_id, district_id=district_id).members
-        return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_CALL_EMAIL_TRIAGE, region_id=region_id, district_id=district_id).get_members()
-    elif workflow_type == 'forward_to_wildlife_protection_branch':
-        return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_CALL_EMAIL_TRIAGE, region=Region.objects.get(head_office=True)).get_members()
-    elif workflow_type == 'allocate_for_follow_up' or  workflow_type == 'allocate_for_inspection' or workflow_type == 'allocate_for_case':
-       return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id).get_members()
+    try:
+        if workflow_type == 'forward_to_regions':
+            return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_CALL_EMAIL_TRIAGE, region_id=region_id, district_id=district_id).get_members()
+        elif workflow_type == 'forward_to_wildlife_protection_branch':
+            return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_CALL_EMAIL_TRIAGE, region=Region.objects.get(head_office=True)).get_members()
+        elif (workflow_type == 'allocate_for_follow_up' or  workflow_type == 'allocate_for_inspection' or workflow_type == 'allocate_for_case'):
+            return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id).get_members()
+    except ComplianceManagementSystemGroup.DoesNotExist:
+        raise GroupNotFoundError(f"Error: Group not found \n Please generate a group for the selected Region and District in admin settings")
 
 
 import reversion

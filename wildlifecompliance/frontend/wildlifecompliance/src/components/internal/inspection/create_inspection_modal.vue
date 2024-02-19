@@ -137,7 +137,7 @@ export default {
             inspection_type_id: null,
             advice_details: "",
             allocatedGroup: [],
-            // allocated_group_id: null,
+            allocated_group_id: null,
             documentActionUrl: '',
             temporary_document_collection_id: null,
       }
@@ -229,7 +229,7 @@ export default {
               });
               if (allocatedGroupResponse.ok) {
                   Vue.set(this, 'allocatedGroup', allocatedGroupResponse.body);
-                  // this.allocated_group_id = allocatedGroupResponse.body.group_id;
+                  this.allocated_group_id = allocatedGroupResponse.body.group_id;
               } else {
                   // Display http error response on modal
                   this.errorResponse = allocatedGroupResponse.statusText;
@@ -325,11 +325,11 @@ export default {
           this.assigned_to_id ? payload.append('assigned_to_id', this.assigned_to_id) : null;
           this.inspection_type_id ? payload.append('inspection_type_id', this.inspection_type_id) : null;
           this.region_id ? payload.append('region_id', this.region_id) : null;
-          //this.allocated_group_id ? payload.append('allocated_group_id', this.allocated_group_id) : null;
+          this.allocated_group_id ? payload.append('allocated_group_id', this.allocated_group_id) : null;
           this.temporary_document_collection_id ? payload.append('temporary_document_collection_id', this.temporary_document_collection_id.temp_doc_id) : null;
 
-          //this.workflow_type ? payload.append('workflow_type', this.workflow_type) : null;
-          //!payload.has('allocated_group') ? payload.append('allocated_group', this.allocatedGroup) : null;
+          this.workflow_type ? payload.append('workflow_type', this.workflow_type) : null;
+          !payload.has('allocated_group') ? payload.append('allocated_group', this.allocatedGroup) : null;
 
           try {
               let res = await Vue.http.post(post_url, payload);
@@ -407,6 +407,7 @@ export default {
         //         }
         //     }
         // }
+        
         // ensure availableDistricts and allocated group is current
         this.updateDistricts();
         await this.updateAllocatedGroup();
