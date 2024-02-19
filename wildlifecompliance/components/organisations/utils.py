@@ -5,8 +5,8 @@ import random
 def can_manage_org(organisation, user):
     from wildlifecompliance.components.organisations.models import UserDelegation
     try:
-        UserDelegation.objects.get(organisation=organisation, user=user)
-        return True
+        UserDelegation.objects.get(organisation=organisation,user=user)
+        return can_admin_org(organisation, user)
     except UserDelegation.DoesNotExist:
         pass
     if user.has_perm('wildlifecompliance.system_administrator'):
