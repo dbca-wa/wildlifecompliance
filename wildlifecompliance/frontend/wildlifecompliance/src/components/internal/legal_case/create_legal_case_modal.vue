@@ -229,7 +229,7 @@ export default {
       },
       updateAllocatedGroup: async function() {
           this.errorResponse = "";
-          if (this.region_id && this.district_id) {
+          if (this.region_id) {
               let allocatedGroupResponse = await this.loadAllocatedGroup({
                 workflow_type: 'allocate_for_case',
                 region_id: this.region_id,

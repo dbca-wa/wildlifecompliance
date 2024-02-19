@@ -221,7 +221,8 @@ export default {
       },
       updateAllocatedGroup: async function() {
           this.errorResponse = "";
-          if (this.region_id && this.district_id) {
+          Vue.set(this, 'allocatedGroup', []);
+          if (this.region_id) {
               let allocatedGroupResponse = await this.loadAllocatedGroup({
                 workflow_type: 'allocate_for_inspection',
                 region_id: this.region_id,
