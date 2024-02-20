@@ -85,7 +85,7 @@ def get_user_action(self, obj):
     elif user_id == obj.assigned_to_id:
         returned_url = process_url
     elif obj.allocated_group and not obj.assigned_to_id:
-        if user_id in [member.id for member in obj.allocated_group.members]:
+        if user_id in [member.id for member in obj.allocated_group.get_members()]:
             returned_url = process_url
 
     if not returned_url:
@@ -255,7 +255,7 @@ class OffenceSerializer(serializers.ModelSerializer):
         user_id = self.context.get('request', {}).user.id
 
         if obj.allocated_group:
-            for member in obj.allocated_group.members:
+            for member in obj.allocated_group.get_members():
                 if user_id == member.id:
                     return True
         return False
@@ -275,7 +275,7 @@ class OffenceSerializer(serializers.ModelSerializer):
         if user_id == obj.assigned_to_id:
             return True
         elif obj.allocated_group and not obj.assigned_to_id:
-            if user_id in [member.id for member in obj.allocated_group.members]:
+            if user_id in [member.id for member in obj.allocated_group.get_members()]:
                 return True
 
         return False
