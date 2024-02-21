@@ -49,7 +49,7 @@ from wildlifecompliance.components.sanction_outcome.serializers import SanctionO
     RemediationActionSerializer, RemediationActionUpdateStatusSerializer, AmendmentRequestReasonSerializer, \
     SaveAmendmentRequestForRemediationAction, AllegedCommittedOffenceCreateSerializer, \
     SanctionOutcomeDocumentAccessLogSerializer
-#from wildlifecompliance.components.users.models import CompliancePermissionGroup
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.wc_payments.models import InfringementPenalty, InfringementPenaltyInvoice
 from wildlifecompliance.helpers import is_authorised_to_modify, is_internal, is_customer
 from wildlifecompliance.components.main.models import TemporaryDocumentCollection
@@ -266,7 +266,7 @@ class RemediationActionViewSet(viewsets.ModelViewSet):
                 # Email to the offender
                 to_address = [ra.sanction_outcome.get_offender()[0].email, ]
                 cc = None
-                bcc = [member.email for member in ra.sanction_outcome.allocated_group.members]
+                bcc = [member.email for member in ra.sanction_outcome.allocated_group.get_members()]
                 email_data = send_remediation_action_request_amendment_mail(to_address, ra, request, cc, bcc)
 
                 # Comms log to the sanction outcome
@@ -315,7 +315,7 @@ class RemediationActionViewSet(viewsets.ModelViewSet):
                 # Email to the offender
                 to_address = [ra.sanction_outcome.get_offender()[0].email, ]
                 cc = None
-                bcc = [member.email for member in ra.sanction_outcome.allocated_group.members]
+                bcc = [member.email for member in ra.sanction_outcome.allocated_group.get_members()]
                 email_data = send_remediation_action_accepted_notice(to_address, ra, request, cc, bcc)
 
                 # Comms log to the sanction outcome
@@ -364,7 +364,7 @@ class RemediationActionViewSet(viewsets.ModelViewSet):
                 serializer.save()
 
                 # Email
-                to_address = [member.email for member in ra.sanction_outcome.allocated_group.members]
+                to_address = [member.email for member in ra.sanction_outcome.allocated_group.get_members()]
                 cc = None
                 bcc = None
                 email_data = send_remediation_action_submitted_notice(to_address, ra, request, cc, bcc)
@@ -606,27 +606,25 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
         """
         return super(SanctionOutcomeViewSet, self).retrieve(request, *args, **kwargs)
 
-    #def get_compliance_permission_groups(self, region_district_id, workflow_type):
-    #    """
-    #    Determine which CompliancePermissionGroup this sanction outcome should belong to
-    #    :param region_district_id: The regionDistrict id this sanction outcome is in
-    #    :param workflow_type: string like 'send_to_manager', 'return_to_officer', ...
-    #    :return: CompliancePermissionGroup quersyet
-    #    """
-    #    # 1. Determine regionDistrict of this sanction outcome
-    #    region_district = RegionDistrict.objects.filter(id=region_district_id)
+    # TO DO: This function needs to be reviewed and uncommented
 
-    #    # 2. Determine which permission(s) is going to be apllied
-    #    compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
-    #    codename = 'officer'
+    # def get_allocated_group(self, workflow_type, region_id, district_id):
+    #    """
+    #    Determine which ComplianceManagementSystemGroup this sanction outcome should belong to
+    #    :param region_id and district_id sanction outcome is in
+    #    :param workflow_type: string like 'send_to_manager', 'return_to_officer', ...
+    #    :return: ComplianceManagementSystemGroup quersyet
+
+    #    """
+    #    codename = 'Officer'
     #    if workflow_type == SanctionOutcome.WORKFLOW_SEND_TO_MANAGER:
-    #        codename = 'manager'
+    #        codename = 'Manager'
     #    elif workflow_type == SanctionOutcome.WORKFLOW_DECLINE:
     #        codename = '---'
     #    elif workflow_type == SanctionOutcome.WORKFLOW_ENDORSE:
-    #        codename = 'infringement_notice_coordinator'
+    #        codename = 'Infringement Notice Coordinator'
     #    elif workflow_type == SanctionOutcome.WORKFLOW_RETURN_TO_OFFICER:
-    #        codename = 'officer'
+    #        codename = 'Officer'
     #    elif workflow_type == SanctionOutcome.WORKFLOW_WITHDRAW:
     #        codename = '---'
     #    elif workflow_type == SanctionOutcome.WORKFLOW_CLOSE:
@@ -636,12 +634,9 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
     #        # instance.save()
     #        pass
 
-    #    permissions = Permission.objects.filter(codename=codename, content_type_id=compliance_content_type.id)
+    #    group = ComplianceManagementSystemGroup.objects.get(workflow_type=codename, region_id=region_id, district_id=district_id)
 
-    #    # 3. Find groups which has the permission(s) determined above in the regionDistrict.
-    #    groups = CompliancePermissionGroup.objects.filter(region_district__in=region_district, permissions__in=permissions)
-
-    #    return groups
+    #    return group
 
     @detail_route(methods=['POST', ])
     @renderer_classes((JSONRenderer,))
@@ -830,12 +825,10 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
                 workflow_type = request_data.get('workflow_type', '')
 
                 # allocated group
-                regionDistrictId = request_data['district_id'] if request_data['district_id'] else request_data['region_id']
-                groups = self.get_compliance_permission_groups(regionDistrictId, workflow_type)
-                if groups.count() == 1:
-                    group = groups.first()
-                elif groups.count() > 1:
-                    group = groups.first()
+                region_id = int(request_data['region_id']) if request_data['region_id'] else None
+                district_id = int(request_data['district_id']) if request_data['district_id'] else None
+                # TO DO: get_allocated_group function to be reviewed
+                group = self.get_allocated_group(region_id, district_id, workflow_type)
                 request_data['allocated_group_id'] = group.id
 
                 # Count number of files uploaded
