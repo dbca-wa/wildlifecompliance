@@ -4,6 +4,7 @@ import traceback
 from datetime import datetime
 
 import pytz
+from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
@@ -42,7 +43,7 @@ from wildlifecompliance.components.offence.serializers import (
     UpdateAllegedCommittedOffenceSerializer)
 from wildlifecompliance.components.section_regulation.serializers import SectionRegulationSerializer
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, AllegedCommittedOffence
-#from wildlifecompliance.components.users.models import CompliancePermissionGroup
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.helpers import is_internal, is_customer
 
 
@@ -235,19 +236,16 @@ class OffenceViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    #@list_route(methods=['GET', ])
-    #def can_user_create(self, request, *args, **kwargs):
-    #    # Determine permissions which allow the holder to create new offence
-    #    codename_who_can_create = 'officer'
-    #    compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
-    #    permissions = Permission.objects.filter(codename=codename_who_can_create, content_type_id=compliance_content_type.id)
+    @list_route(methods=['GET', ])
+    def can_user_create(self, request, *args, **kwargs):
+    # TO DO: Check logic with the business
 
-    #    # Find groups which has permissions determined above
-    #    allowed_groups = CompliancePermissionGroup.objects.filter(permissions__in=permissions)
-    #    for allowed_group in allowed_groups.all():
-    #        if request.user in allowed_group.members:
-    #            return Response(True)
-    #    return Response(False)
+       # Find groups which has permissions determined above
+       allowed_groups = ComplianceManagementSystemGroup.objects.filter(name=settings.GROUP_OFFICER)
+       for allowed_group in allowed_groups:
+           if request.user in allowed_group.get_members():
+               return Response(True)
+       return Response(False)
 
     @list_route(methods=['GET', ])
     def optimised(self, request, *args, **kwargs):
@@ -522,7 +520,7 @@ class OffenceViewSet(viewsets.ModelViewSet):
                 saved_offence_instance = serializer.save()  # Here, relations between this offence and location, and this offence and call_email/inspection are created
 
                 # 2.1. Determine allocated group and save it
-                new_group = Offence.get_compliance_permission_group(saved_offence_instance.regionDistrictId)
+                new_group = Offence.get_allocated_group(region_id= saved_offence_instance.region_id, district_id= saved_offence_instance.district_id)
                 saved_offence_instance.allocated_group = new_group
                 saved_offence_instance.assigned_to = None
                 saved_offence_instance.responsible_officer = request.user

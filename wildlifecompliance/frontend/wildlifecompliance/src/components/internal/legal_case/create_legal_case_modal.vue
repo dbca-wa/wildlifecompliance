@@ -147,7 +147,7 @@ export default {
             assigned_to_id: null,
             advice_details: "",
             allocatedGroup: [],
-            // allocated_group_id: null,
+            allocated_group_id: null,
             documentActionUrl: '',
             temporary_document_collection_id: null,
             legal_case_priority_id: null,
@@ -180,13 +180,13 @@ export default {
               return true;
           }
       },
-      regionDistrictId: function() {
-          if (this.district_id || this.region_id) {
-              return this.district_id ? this.district_id : this.region_id;
-          } else {
-              return null;
-          }
-      },
+      // regionDistrictId: function() {
+      //     if (this.district_id || this.region_id) {
+      //         return this.district_id ? this.district_id : this.region_id;
+      //     } else {
+      //         return null;
+      //     }
+      // },
     },
     filters: {
       formatDate: function(data) {
@@ -229,15 +229,15 @@ export default {
       },
       updateAllocatedGroup: async function() {
           this.errorResponse = "";
-          if (this.region_id && this.district_id) {
+          if (this.region_id) {
               let allocatedGroupResponse = await this.loadAllocatedGroup({
-                workflow_type: 'forward_to_regions',
+                workflow_type: 'allocate_for_case',
                 region_id: this.region_id,
                 district_id: this.district_id ? this.district_id : null,
               });
               if (allocatedGroupResponse.ok) {
                   Vue.set(this, 'allocatedGroup', allocatedGroupResponse.body);
-                  // this.allocated_group_id = allocatedGroupResponse.body.group_id;
+                  this.allocated_group_id = allocatedGroupResponse.body.group_id;
               } else {
                   // Display http error response on modal
                   this.errorResponse = allocatedGroupResponse.statusText;
@@ -319,7 +319,7 @@ export default {
           this.assigned_to_id ? payload.append('assigned_to_id', this.assigned_to_id) : null;
           this.inspection_type_id ? payload.append('legal_case_priority_id', this.legal_case_priority_id) : null;
           this.region_id ? payload.append('region_id', this.region_id) : null;
-          // this.allocated_group_id ? payload.append('allocated_group_id', this.allocated_group_id) : null;
+          this.allocated_group_id ? payload.append('allocated_group_id', this.allocated_group_id) : null;
           this.temporary_document_collection_id ? payload.append('temporary_document_collection_id', this.temporary_document_collection_id.temp_doc_id) : null;
 
           //this.workflow_type ? payload.append('workflow_type', this.workflow_type) : null;
@@ -381,19 +381,30 @@ export default {
             });
         // If exists, get parent component details from vuex
         if (this.parent_call_email) {
-            this.region_id = this.call_email.region_id;
-            this.district_id = this.call_email.district_id;
+             // Set regionId and districtId based on GIS lookup
+          if (this.call_email && this.call_email.region_gis) {
+              const region = this.regions.find(obj => obj.name === this.call_email.region_gis)
+              if (region) {
+                  this.region_id = region.id
+                  if (this.call_email.district_gis) {
+                      const district = region.districts.find(obj => obj.district_name === this.call_email.district_gis)
+                      if (district) {
+                          this.district_id = district.district_id
+                      }
+                  }
+              }
+          }
         }
 
         // If no Region/District selected, initialise region as Kensington
-        if (!this.regionDistrictId) {
-            for (let record of this.regionDistricts) {
-                if (record.district === 'KENSINGTON') {
-                    this.district_id = null;
-                    this.region_id = record.id;
-                }
-            }
-        }
+        // if (!this.regionDistrictId) {
+        //     for (let record of this.regionDistricts) {
+        //         if (record.district === 'KENSINGTON') {
+        //             this.district_id = null;
+        //             this.region_id = record.id;
+        //         }
+        //     }
+        // }
         // ensure availableDistricts and allocated group is current
         this.updateDistricts();
         await this.updateAllocatedGroup();

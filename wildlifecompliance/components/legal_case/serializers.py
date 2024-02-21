@@ -591,7 +591,7 @@ class LegalCaseNoRunningSheetSerializer(serializers.ModelSerializer):
                 'case_created_time',
                 'assigned_to_id',
                 'allocated_group',
-                'allocated_group_id',
+                # 'allocated_group_id',
                 'user_in_group',
                 'can_user_action',
                 'user_is_assignee',
@@ -1359,11 +1359,11 @@ class LegalCaseDatatableSerializer(serializers.ModelSerializer):
             returned_url = view_url
         elif user_id == obj.assigned_to_id:
             returned_url = process_url
-        # elif (obj.allocated_group
-        #         and not obj.assigned_to_id):
-        #     for member in obj.allocated_group.members:
-        #         if user_id == member.id:
-        #             returned_url = process_url
+        elif (obj.allocated_group
+                and not obj.assigned_to_id):
+            for member in obj.allocated_group.get_members():
+                if user_id == member.id:
+                    returned_url = process_url
 
         if not returned_url:
             returned_url = view_url

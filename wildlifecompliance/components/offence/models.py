@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -12,7 +13,7 @@ from wildlifecompliance.components.inspection.models import Inspection
 from wildlifecompliance.components.main.models import Document, CommunicationsLogEntry, Region, District
 from wildlifecompliance.components.main.related_item import can_close_record
 from wildlifecompliance.components.section_regulation.models import SectionRegulation
-#from wildlifecompliance.components.users.models import CompliancePermissionGroup
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.organisations.models import Organisation
 
 
@@ -85,11 +86,11 @@ class Offence(RevisionedMixin):
         related_name='offence_assigned_to',
         null=True
     )
-    #allocated_group = models.ForeignKey(
-    #    CompliancePermissionGroup,
-    #    related_name='offence_allocated_group',
-    #    null=True
-    #)
+    allocated_group = models.ForeignKey(
+       ComplianceManagementSystemGroup,
+       related_name='offence_allocated_group',
+       null=True
+    )
     region = models.ForeignKey(Region, related_name='offence_region', null=True,)
     district = models.ForeignKey(District, related_name='offence_district', null=True,)
 
@@ -121,25 +122,23 @@ class Offence(RevisionedMixin):
         #return '{}'.format(self.identifier)
         return self.lodgement_number
 
-    # @staticmethod
+    @staticmethod
     # Rewrite for Region District models
-    # def get_compliance_permission_group(regionDistrictId):
-    #     #region_district = RegionDistrict.objects.filter(id=regionDistrictId)
+    def get_allocated_group(region_id, district_id):
+        #region_district = RegionDistrict.objects.filter(id=regionDistrictId)
 
-    #     # 2. Determine which permission(s) is going to be applied
-    #     compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
-    #     codename = 'officer'
-    #     per_district = True
+        # 2. Determine which permission(s) is going to be applied
+        # compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
+        # codename = 'officer'
+        # per_district = True
 
-    #     permissions = Permission.objects.filter(codename=codename, content_type_id=compliance_content_type.id)
+        # permissions = Permission.objects.filter(codename=codename, content_type_id=compliance_content_type.id)
 
-    #     # 3. Find groups which has the permission(s) determined above in the regionDistrict.
-    #     if per_district:
-    #         groups = CompliancePermissionGroup.objects.filter(region_district__in=region_district, permissions__in=permissions)
-    #     else:
-    #         groups = CompliancePermissionGroup.objects.filter(permissions__in=permissions)
-
-    #     return groups.first()
+        # 3. Find groups which has the permission(s) determined above in the regionDistrict.
+        
+        group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id)
+        
+        return group
 
     @property
     # Rewrite for Region District models
