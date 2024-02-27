@@ -21,6 +21,7 @@ from django.shortcuts import redirect, render
 from wildlifecompliance.components.applications.utils import (
     SchemaParser,
     MissingFieldsException,
+    get_application_applicant_address,
 )
 from wildlifecompliance.components.main.utils import (
     checkout,
@@ -1792,6 +1793,11 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     def final_decision_data(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+
+            #check if the application applicant has an address, if not then reject the application 
+            if not (get_application_applicant_address(instance)):
+                raise serializers.ValidationError("Applicant has no address.")
+            
             with transaction.atomic():
                 checkbox = CheckboxAndRadioButtonVisitor(
                     instance, request.data
