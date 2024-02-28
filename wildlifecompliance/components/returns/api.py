@@ -88,11 +88,11 @@ class ReturnFilterBackend(DatatablesFilterBackend):
             if date_from:
                 date_from = datetime.strptime(
                     date_from, '%Y-%m-%d') + timedelta(days=1)
-                queryset = queryset.filter(lodgement_date__gte=date_from)
+                queryset = queryset.filter(due_date__gte=date_from)
             if date_to:
                 date_to = datetime.strptime(
                     date_to, '%Y-%m-%d') + timedelta(days=1)
-                queryset = queryset.filter(lodgement_date__lte=date_to)
+                queryset = queryset.filter(due_date__lte=date_to)
 
         return queryset
 
