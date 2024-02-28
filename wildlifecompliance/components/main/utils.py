@@ -531,8 +531,9 @@ def search_reference(reference_number):
     from wildlifecompliance.components.inspection.models import Inspection
     from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome
     from wildlifecompliance.components.artifact.models import Artifact
-    application_list = Application.objects.all().computed_exclude(processing_status__in=[
-        Application.PROCESSING_STATUS_DISCARDED])
+    application_list = Application.objects.all()
+    #this makes the ref search go from under a second to up to 2 minutes - it is better to allow discarded applications to be searched
+    #.computed_exclude(processing_status__in=[Application.PROCESSING_STATUS_DISCARDED])
     licence_list = WildlifeLicence.objects.all().order_by('licence_number').distinct('licence_number')
     returns_list = Return.objects.all().exclude(processing_status__in=[Return.RETURN_PROCESSING_STATUS_FUTURE])
     org_access_request_list = OrganisationRequest.objects.all()
@@ -542,43 +543,53 @@ def search_reference(reference_number):
     result = application_list.filter(lodgement_number=reference_number)
     if result:
         url_string = {'url_string': '/internal/application/' + str(result[0].id)}
+        return url_string
     # Licence
     result = licence_list.filter(licence_number=reference_number)
     if result and not url_string:
         url_string = {'url_string': result[0].licence_document._file.url}
+        return url_string
     # Returns
     result = returns_list.filter(lodgement_number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/return/' + str(result[0].id)}
+        return url_string
     #import ipdb; ipdb.set_trace()
     # Org access reqeust
     result = org_access_request_list.filter(lodgement_number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/organisations/access/' + str(result[0].id)}
+        return url_string
     # CallEmail
     result = CallEmail.objects.filter(number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/call_email/' + str(result[0].id)}
+        return url_string
     # Offence
     result = Offence.objects.filter(lodgement_number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/offence/' + str(result[0].id)}
+        return url_string
     # Legal Case
     result = LegalCase.objects.filter(number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/legal_case/' + str(result[0].id)}
+        return url_string
     # Inspection
     result = Inspection.objects.filter(number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/inspection/' + str(result[0].id)}
+        return url_string
     # Sanction Outcome
     result = SanctionOutcome.objects.filter(lodgement_number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/sanction_outcome/' + str(result[0].id)}
+        return url_string
     # Offence
     result = Artifact.objects.filter(number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/object/' + str(result[0].id)}
+        return url_string
 
     if url_string:
         return url_string
