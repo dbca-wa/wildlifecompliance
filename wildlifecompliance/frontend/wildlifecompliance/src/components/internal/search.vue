@@ -90,8 +90,10 @@
                     <div class="row">
                       <div class="col-lg-12">
                         <div>
-                          <input :disabled="!hasSearchKeywords" type="button" @click.prevent="searchKeyword" class="btn btn-primary" style="margin-bottom: 5px"value="Search"/>
-                          <input type="reset" @click.prevent="clearKeywordSearch" class="btn btn-primary" style="margin-bottom: 5px"value="Clear"/>
+                          <button  v-if="searching" type="button" class="btn btn-primary" style="margin-bottom: 5px" value="Search" disabled>
+                            Search<i class="fa fa-circle-o-notch fa-spin fa-fw"></i></button>
+                          <input v-else type="button" @click.prevent="searchKeyword" class="btn btn-primary" style="margin-bottom: 5px" value="Search" :disabled="!hasSearchKeywords"/>
+                          <input type="reset" @click.prevent="clearKeywordSearch" class="btn btn-primary" style="margin-bottom: 5px" value="Clear"/>
                         </div>
                       </div>
                     </div>
@@ -191,6 +193,7 @@ export default {
             searchReturn: false,
             referenceWord: '',
             keyWord: null,
+            searching:false,
             results: [],
             errors: false,
             errorString: '',
@@ -400,6 +403,7 @@ export default {
           let vm = this;
           if(this.searchKeywords.length > 0)
           {
+            vm.searching=true;
             vm.$http.post('/api/search_keywords.json',{
               searchKeywords: vm.searchKeywords,
               searchApplication: vm.searchApplication,
@@ -411,9 +415,11 @@ export default {
               vm.$refs.keyword_search_datatable.vmDataTable.clear()
               vm.$refs.keyword_search_datatable.vmDataTable.rows.add(vm.results);
               vm.$refs.keyword_search_datatable.vmDataTable.draw();
+              vm.searching=false;
             },
             err => {
               console.log(err);
+              vm.searching=false;
             });
           }
         },
