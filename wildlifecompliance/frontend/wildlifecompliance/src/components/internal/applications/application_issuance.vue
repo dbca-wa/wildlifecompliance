@@ -606,12 +606,8 @@ export default {
             });
 
             var applicantHasAddress = false;
-            console.log(vm.applicantType);
             if (vm.applicantType == 'org')
             {
-                console.log(vm.application);
-                console.log(vm.application.org_applicant);
-                console.log(vm.application.org_applicant.address);
                 if (vm.application.org_applicant.address)
                 {
                     applicantHasAddress = true;

@@ -216,14 +216,14 @@ export const applicationStore = {
         },
         revertApplication({ dispatch, commit, state }) {
             commit(UPDATE_APPLICATION, state.original_application);
-            //dispatch('refreshAddresses');
+            //dispatch('refreshAddresses'); 
         },
         setOriginalApplication({ commit }, application) {
             commit(UPDATE_ORIGINAL_APPLICATION, application);
         },
         setApplication({ dispatch, commit }, application) {
             commit(UPDATE_APPLICATION, application);
-            //dispatch('refreshAddresses');
+            //dispatch('refreshAddresses'); this would cause the organisation/proxy address to be removed from json response body, so has been commented out for now
         },
         refreshApplicationFees({ dispatch, state, getters, rootGetters }) {
             Vue.http.post('/api/application/estimate_price/', {
