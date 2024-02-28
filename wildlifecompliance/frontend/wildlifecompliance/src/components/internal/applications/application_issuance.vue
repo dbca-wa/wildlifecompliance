@@ -222,7 +222,10 @@
                         </div>
                     </div>
 
-                    <p>Click <a href="#" @click.prevent="preview()">here</a> to preview the licence document.</p>
+                    <p v-if="(applicantType == 'org' && application.org_applicant.address) 
+                    || (applicantType == 'proxy' && application.proxy_applicant.residential_address) 
+                    || (applicantType == 'submitter' && application.submitter.residential_address)">Click <a href="#"  @click.prevent="preview()">here</a> to preview the licence document.</p>
+                    <p v-else >Preview not available - applicant address not set</p>
 
                     <div class="row" style="margin-bottom:50px;">
                         <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
@@ -263,6 +266,7 @@ export default {
     props: {
         application: Object,
         licence_activity_tab:Number,
+        applicantType:String,
         final_view_conditions: {
             type: Boolean,
             default: false,
@@ -553,7 +557,7 @@ export default {
         ok: async function () {
             let vm = this;
 
-            this.spinner = true;
+            
             let selected = []
             let activity_pickedPurposes = []
             let confirmations = []
@@ -601,39 +605,84 @@ export default {
                 }
             });
 
-            this.setApplicationWorkflowState({bool: true});
-            await this.finalDecisionData({ url: `/api/application/${this.application.id}/final_decision_data.json` }).then( async response => {
+            var applicantHasAddress = false;
+            console.log(vm.applicantType);
+            if (vm.applicantType == 'org')
+            {
+                console.log(vm.application);
+                console.log(vm.application.org_applicant);
+                console.log(vm.application.org_applicant.address);
+                if (vm.application.org_applicant.address)
+                {
+                    applicantHasAddress = true;
+                }
+            }
+            else if(vm.applicantType == 'proxy')
+            {
+                if (vm.application.proxy_applicant.residential_address)
+                {
+                    applicantHasAddress = true;
+                }
+            }
+            else if(vm.applicantType == 'submitter')
+            {
+                if (vm.application.submitter.residential_address)
+                {
+                    applicantHasAddress = true;
+                }
+            }
+            else
+            {
+                swal({
+                    text:'Unable to determine application type.',
+                    title:'Application type missing',
+                    type:'error'
+                })
+            }
 
-                await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/final_decision'),JSON.stringify(licence),{
-                            emulateJSON:true,
+            if(applicantHasAddress) {
+                this.spinner = true;
+                this.setApplicationWorkflowState({bool: true});
+                await this.finalDecisionData({ url: `/api/application/${this.application.id}/final_decision_data.json` }).then( async response => {
 
-                        }).then((response)=>{
-                            this.spinner = false
-                            this.setApplicationWorkflowState({bool: false});
-                            vm.$router.push({ name:"internal-dash", });
+                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/final_decision'),JSON.stringify(licence),{
+                                emulateJSON:true,
 
-                        },(error)=>{
-                            this.spinner = false
-                            this.setApplicationWorkflowState({bool: false});
-                            swal(
-                                'Application Error',
-                                helpers.apiVueResourceError(error),
-                                'error'
-                            )
+                            }).then((response)=>{
+                                this.spinner = false
+                                this.setApplicationWorkflowState({bool: false});
+                                vm.$router.push({ name:"internal-dash", });
 
-                        });
+                            },(error)=>{
+                                this.spinner = false
+                                this.setApplicationWorkflowState({bool: false});
+                                swal(
+                                    'Application Error',
+                                    helpers.apiVueResourceError(error),
+                                    'error'
+                                )
 
-            },(error)=>{
-                this.spinner = false
-                this.setApplicationWorkflowState({bool: false});
-                swal(
-                    'Application Error',
-                    helpers.apiVueResourceError(error),
-                    'error'
-                )
+                            });
 
-            });
+                },(error)=>{
+                    this.spinner = false
+                    this.setApplicationWorkflowState({bool: false});
+                    swal(
+                        'Application Error',
+                        helpers.apiVueResourceError(error),
+                        'error'
+                    )
 
+                });
+            }
+            else
+            {
+                swal({
+                    text:'Applicant address missing, please ensure the applicant organisation/submitter address details are set.',
+                    title:'Applicant address missing',
+                    type:'error'
+                })
+            }
         },
         getActivity: function(id) {
             const activity = this.licence.activity.find(activity => activity.id == id);
