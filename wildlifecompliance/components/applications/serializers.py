@@ -1001,7 +1001,7 @@ class BaseApplicationSerializer(serializers.ModelSerializer):
         return self.context['request'].user.is_superuser
 
     def get_documents_url(self, obj):
-        return '/media/applications/{}/documents/'.format(obj.id)
+        return '/private-media/applications/{}/documents/'.format(obj.id)
 
     def get_readonly(self, obj):
         return False

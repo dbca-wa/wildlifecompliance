@@ -10,7 +10,6 @@ from django.db.models import Q, Min, Max
 from django.db import transaction
 from django.http import HttpResponse
 from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
 from django.core.exceptions import ValidationError
 from django.conf import settings
 

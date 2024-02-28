@@ -302,14 +302,17 @@ urlpatterns = [
     url(r'^ledger-private/identification/(?P<emailuser_id>\d+)', views.getLedgerIdentificationFile, name='view_ledger_identification_file'),
     url(r'^ledger-private/senior-card/(?P<emailuser_id>\d+)', views.getLedgerSeniorCardFile, name='view_ledger_senior_card_file'),
 
-] + ledger_patterns + media_serv_patterns
+    url(r'^private-media/', views.getPrivateFile, name='view_private_file'),
+
+] + ledger_patterns #+ media_serv_patterns
 
 if not are_migrations_running():
     DefaultDataManager()
     CollectorManager()
 
 # whitenoise
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.SHOW_DEBUG_TOOLBAR:
     import debug_toolbar

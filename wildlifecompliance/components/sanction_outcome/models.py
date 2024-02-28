@@ -23,6 +23,10 @@ from wildlifecompliance.management.classes.unpaid_infringement_file import Unpai
 from wildlifecompliance.settings import SO_TYPE_CHOICES, SO_TYPE_INFRINGEMENT_NOTICE, SO_TYPE_CAUTION_NOTICE, \
     SO_TYPE_LETTER_OF_ADVICE, SO_TYPE_REMEDIATION_NOTICE
 
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
+
 logger = logging.getLogger(__name__)
 
 
@@ -881,7 +885,7 @@ def update_compliance_doc_filename(instance, filename):
 
 class SanctionOutcomeDocument(Document):
     sanction_outcome = models.ForeignKey(SanctionOutcome, related_name='documents')
-    _file = models.FileField(max_length=255, upload_to=update_compliance_doc_filename)
+    _file = models.FileField(max_length=255, upload_to=update_compliance_doc_filename, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -902,7 +906,7 @@ class SanctionOutcomeDocumentAccessLog(models.Model):
 
 class SanctionOutcomeCommsLogDocument(Document):
     log_entry = models.ForeignKey('SanctionOutcomeCommsLogEntry', related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -1009,7 +1013,7 @@ class UnpaidInfringementFile(models.Model):
 
 class ActionTakenDocument(Document):
     remediation_action = models.ForeignKey(RemediationAction, related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'

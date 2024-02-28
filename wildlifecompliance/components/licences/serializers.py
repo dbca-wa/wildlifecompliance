@@ -492,7 +492,7 @@ class LicenceDocumentHistorySerializer(serializers.ModelSerializer):
     def get_history_document_url(self, obj):
         doc_id = obj['id']
         pdf = obj['name']
-        url = '/media/wildlifecompliance/licences/{0}/documents/{1}'.format(
+        url = '/private-media/wildlifecompliance/licences/{0}/documents/{1}'.format(
             doc_id, pdf
         )
         return url

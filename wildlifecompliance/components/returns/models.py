@@ -23,6 +23,10 @@ from wildlifecompliance.components.returns.email import (
 import logging
 import reversion
 
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
+
 logger = logging.getLogger(__name__)
 
 
@@ -907,7 +911,7 @@ class ReturnLogEntry(CommunicationsLogEntry):
 
 class ReturnLogDocument(Document):
     log_entry = models.ForeignKey('ReturnLogEntry', related_name='documents')
-    _file = models.FileField(upload_to=update_returns_comms_log_filename)
+    _file = models.FileField(upload_to=update_returns_comms_log_filename, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'

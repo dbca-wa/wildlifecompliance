@@ -80,6 +80,10 @@ from wildlifecompliance.components.licences.models import (
 from wildlifecompliance.components.main.models import (
     TemporaryDocumentCollection
 )
+
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
 logger = logging.getLogger(__name__)
 # logger = logging
 
@@ -181,7 +185,7 @@ class ActivityPermissionGroup(Group):
 
 class ApplicationDocument(Document):
     application = models.ForeignKey('Application', related_name='documents')
-    _file = models.FileField(upload_to=update_application_doc_filename)
+    _file = models.FileField(upload_to=update_application_doc_filename, storage=private_storage)
     input_name = models.CharField(max_length=255, null=True, blank=True)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
@@ -4076,7 +4080,7 @@ class ApplicationLogDocument(Document):
     log_entry = models.ForeignKey(
         'ApplicationLogEntry',
         related_name='documents')
-    _file = models.FileField(upload_to=update_application_comms_log_filename)
+    _file = models.FileField(upload_to=update_application_comms_log_filename, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -6853,13 +6857,13 @@ class ApplicationSelectedActivityPurpose(models.Model):
 
 
 class IssuanceDocument(Document):
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
     selected_activity = models.ForeignKey(
         'ApplicationSelectedActivity',
         related_name='issuance_documents')
-
+    
     class Meta:
         app_label = 'wildlifecompliance'
 
