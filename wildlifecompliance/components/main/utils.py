@@ -428,18 +428,32 @@ def search_keywords(search_words, search_application, search_licence, search_ret
     application_list = []
     licence_list = []
     return_list = []
-    if is_internal:
-        application_list = Application.objects.all()\
-            .computed_exclude(processing_status__in=[
-                Application.PROCESSING_STATUS_DISCARDED
-            ])\
-            .order_by('lodgement_number', '-id')
-        licence_list = WildlifeLicence.objects.all()\
-            .order_by('licence_number', '-id')\
-            .distinct('licence_number')
-        return_list = Return.objects.all()\
-            .order_by('lodgement_number', '-id')
     if search_words:
+        search_words_regex = "(?:"
+        for i in range(0,len(search_words)):
+            search_words_regex = search_words_regex + search_words[i]
+            if i == len(search_words)-1:
+                search_words_regex = search_words_regex + ")"
+            else:
+                search_words_regex = search_words_regex + "|"
+
+        #filter_regex = ".*\".*\":\s\"(\\\\\"|[^\"])*"+search_words_regex+"(\\\\\"|[^\"])*\".*"
+        if is_internal:
+            application_list = Application.objects.all().filter(form_data_records__value__iregex=search_words_regex)\
+            .order_by('lodgement_number', '-id')\
+            .distinct('lodgement_number') 
+                #.computed_exclude(processing_status__in=[
+                #    Application.PROCESSING_STATUS_DISCARDED
+                #])\
+            licence_list = WildlifeLicence.objects\
+            .filter(licence_number__iregex=search_words_regex)\
+            .order_by('licence_number', '-id')\
+            .distinct('licence_number')  
+            return_list = Return.objects.all()\
+            .filter(lodgement_number__iregex=search_words_regex)\
+            .order_by('lodgement_number', '-id')\
+            .distinct('lodgement_number') 
+            
         if search_application:
             for app in application_list:
                 if app.data:
@@ -447,14 +461,17 @@ def search_keywords(search_words, search_application, search_licence, search_ret
                         app_data = {'data': []}
                         for record in app.data:
                             if 'thead' in record.value:
-                                app_data.get('data').append({'value': ast.literal_eval(record.value).get('tbody')})
+                                try:
+                                    app_data.get('data').append({'value': ast.literal_eval(record.value).get('tbody')})
+                                except:
+                                    app_data.get('data').append({'value': record.value})
                             else:
                                 app_data.get('data').append({'value': record.value})
                         results = search(app_data, search_words)
                         final_results = {}
                         if results:
                             for r in results:
-                                for key, value in r.iteritems():
+                                for key, value in r.items():
                                     final_results.update({'key': key, 'value': value})
                             res = {
                                 'number': app.lodgement_number,
@@ -479,7 +496,7 @@ def search_keywords(search_words, search_application, search_licence, search_ret
                             })
                     if results:
                         for r in results:
-                            for key, value in r.iteritems():
+                            for key, value in r.items():
                                 final_results.update({'key': key, 'value': value})
                         res = {
                             'number': lic.licence_number,
@@ -504,7 +521,7 @@ def search_keywords(search_words, search_application, search_licence, search_ret
                             })
                     if results:
                         for r in results:
-                            for key, value in r.iteritems():
+                            for key, value in r.items():
                                 final_results.update({'key': key, 'value': value})
                         res = {
                             'number': ret.lodgement_number,
@@ -531,8 +548,9 @@ def search_reference(reference_number):
     from wildlifecompliance.components.inspection.models import Inspection
     from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome
     from wildlifecompliance.components.artifact.models import Artifact
-    application_list = Application.objects.all().computed_exclude(processing_status__in=[
-        Application.PROCESSING_STATUS_DISCARDED])
+    application_list = Application.objects.all()
+    #this makes the ref search go from under a second to up to 2 minutes - it is better to allow discarded applications to be searched
+    #.computed_exclude(processing_status__in=[Application.PROCESSING_STATUS_DISCARDED])
     licence_list = WildlifeLicence.objects.all().order_by('licence_number').distinct('licence_number')
     returns_list = Return.objects.all().exclude(processing_status__in=[Return.RETURN_PROCESSING_STATUS_FUTURE])
     org_access_request_list = OrganisationRequest.objects.all()
@@ -542,43 +560,53 @@ def search_reference(reference_number):
     result = application_list.filter(lodgement_number=reference_number)
     if result:
         url_string = {'url_string': '/internal/application/' + str(result[0].id)}
+        return url_string
     # Licence
     result = licence_list.filter(licence_number=reference_number)
     if result and not url_string:
         url_string = {'url_string': result[0].licence_document._file.url}
+        return url_string
     # Returns
     result = returns_list.filter(lodgement_number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/return/' + str(result[0].id)}
+        return url_string
     #import ipdb; ipdb.set_trace()
     # Org access reqeust
     result = org_access_request_list.filter(lodgement_number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/organisations/access/' + str(result[0].id)}
+        return url_string
     # CallEmail
     result = CallEmail.objects.filter(number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/call_email/' + str(result[0].id)}
+        return url_string
     # Offence
     result = Offence.objects.filter(lodgement_number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/offence/' + str(result[0].id)}
+        return url_string
     # Legal Case
     result = LegalCase.objects.filter(number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/legal_case/' + str(result[0].id)}
+        return url_string
     # Inspection
     result = Inspection.objects.filter(number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/inspection/' + str(result[0].id)}
+        return url_string
     # Sanction Outcome
     result = SanctionOutcome.objects.filter(lodgement_number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/sanction_outcome/' + str(result[0].id)}
+        return url_string
     # Offence
     result = Artifact.objects.filter(number=reference_number)
     if result and not url_string:
         url_string = {'url_string': '/internal/object/' + str(result[0].id)}
+        return url_string
 
     if url_string:
         return url_string
