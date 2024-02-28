@@ -5566,7 +5566,7 @@ class ApplicationSelectedActivity(models.Model):
                 '%Y-%m-%d'
             )
 
-            is_reissued = False if idtime == o_dtime else True
+            is_reissued = False if i_dtime == o_dtime else True
 
         except BaseException as e:
             logger.error('ASA.is_reissued(): {0}'.format(e))
@@ -6558,7 +6558,7 @@ class ApplicationSelectedActivityPurpose(models.Model):
                 '%Y-%m-%d'
             )
 
-            is_reissued = False if idtime == o_dtime else True
+            is_reissued = False if i_dtime == o_dtime else True
 
         except BaseException as e:
             print(e)

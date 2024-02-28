@@ -192,7 +192,7 @@
         <div class="col-md-8">
             <div class="row">
                 <template v-if="canIssueDecline && isofficerfinalisation">
-                    <IssueLicence :application="application" :licence_activity_tab="selected_activity_tab_id" @action-tab="actionTabListener" />
+                    <IssueLicence :application="application" :licence_activity_tab="selected_activity_tab_id" :applicantType="applicantType" @action-tab="actionTabListener" />
                 </template>
 
                 <ApplicationAssessments @action-tab="actionTabListener" v-if="isSendingToAssessor || showingConditions" />
