@@ -158,7 +158,7 @@ def search_weak_links(request_data):
                 Q(lodgement_number__icontains=search_text) |
                 Q(identifier__icontains=search_text) |
                 Q(details__icontains=search_text) |
-                Q(alleged_offences__act__icontains=search_text) |
+                Q(alleged_offences__act__name__icontains=search_text) |
                 Q(alleged_offences__name__icontains=search_text) |
                 Q(offender__person__first_name__icontains=search_text) |
                 Q(offender__person__last_name__icontains=search_text)
@@ -168,7 +168,7 @@ def search_weak_links(request_data):
                 Q(lodgement_number__icontains=search_text) |
                 Q(identifier__icontains=search_text) |
                 Q(description__icontains=search_text) |
-                Q(offence__alleged_offences__act__icontains=search_text) |
+                Q(offence__alleged_offences__act__name__icontains=search_text) |
                 Q(offence__alleged_offences__name__icontains=search_text) |
                 Q(offender__person__first_name__icontains=search_text) |
                 Q(offender__person__last_name__icontains=search_text)

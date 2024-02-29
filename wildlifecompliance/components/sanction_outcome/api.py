@@ -606,7 +606,8 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
         """
         return super(SanctionOutcomeViewSet, self).retrieve(request, *args, **kwargs)
 
-    # TO DO: This function needs to be reviewed and uncommented
+    #TODO: This function needs to be reviewed and uncommented
+    #alternatively, use the SanctionOutcome get_compliance_permission_group method if the out is to be the same
 
     # def get_allocated_group(self, workflow_type, region_id, district_id):
     #    """
@@ -827,8 +828,8 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
                 # allocated group
                 region_id = int(request_data['region_id']) if request_data['region_id'] else None
                 district_id = int(request_data['district_id']) if request_data['district_id'] else None
-                # TO DO: get_allocated_group function to be reviewed
-                group = self.get_allocated_group(region_id, district_id, workflow_type)
+                #TODO: get_allocated_group function to be reviewed (or use this function instead)
+                group = SanctionOutcome.get_compliance_permission_group(region_id, district_id, workflow_type)
                 request_data['allocated_group_id'] = group.id
 
                 # Count number of files uploaded
@@ -935,8 +936,8 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
 
                 if workflow_type == SanctionOutcome.WORKFLOW_SEND_TO_MANAGER:
                     # email_data = prepare_mail(request, instance, workflow_entry, send_mail)
-                    #compliance_group = CompliancePermissionGroup.objects.get(id=request.data.get('allocated_group_id'))
-                    to_address = [user.email for user in compliance_group.members.all()]
+                    compliance_group = ComplianceManagementSystemGroup.objects.get(id=request.data.get('allocated_group_id'))
+                    to_address = [user.email for user in compliance_group.get_members()]
                     cc = [request.user.email,]
                     bcc = None
                     email_data = send_to_manager_email(to_address, instance, workflow_entry, request, cc, bcc)

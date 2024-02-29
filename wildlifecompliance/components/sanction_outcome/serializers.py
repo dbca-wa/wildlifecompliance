@@ -364,7 +364,7 @@ class SanctionOutcomeSerializer(serializers.ModelSerializer):
         user_id = self.context.get('request', {}).user.id
 
         if obj.allocated_group:
-            for member in obj.allocated_group.members:
+            for member in obj.allocated_group.get_members():
                 if user_id == member.id:
                     return True
         return False
@@ -377,7 +377,7 @@ class SanctionOutcomeSerializer(serializers.ModelSerializer):
         if user_id == obj.assigned_to_id:
             return True
         elif obj.allocated_group and not obj.assigned_to_id:
-            if user_id in [member.id for member in obj.allocated_group.members]:
+            if user_id in [member.id for member in obj.allocated_group.get_members()]:
                 return True
 
         return False
@@ -529,7 +529,7 @@ class SanctionOutcomeDatatableSerializer(serializers.ModelSerializer):
                 if user.id == obj.assigned_to_id:
                     # if user is assigned to the object, the user can process it
                     url_list.append(process_url)
-                elif (obj.allocated_group and not obj.assigned_to_id) and user.id in [member.id for member in obj.allocated_group.members]:
+                elif (obj.allocated_group and not obj.assigned_to_id) and user.id in [member.id for member in obj.allocated_group.get_members()]:
                     # if user belongs to the same group of the object
                     # and no one is assigned to the object,
                     # the user can process it
@@ -564,7 +564,7 @@ class SanctionOutcomeDatatableSerializer(serializers.ModelSerializer):
         return urls
     
     def get_region(self,obj):
-        return obj.region_id
+        return obj.offence.region_id if obj.offence else None
 
 
 class RecordFerCaseNumberSerializer(serializers.ModelSerializer):
@@ -590,9 +590,9 @@ class RecordFerCaseNumberSerializer(serializers.ModelSerializer):
 class SaveSanctionOutcomeSerializer(serializers.ModelSerializer):
     offence_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
     offender_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
-    region_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
-    district_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
-    allocated_group_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
+    #region_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
+    #district_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
+    #allocated_group_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
     registration_holder_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
     driver_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
 
@@ -604,9 +604,9 @@ class SaveSanctionOutcomeSerializer(serializers.ModelSerializer):
             'identifier',
             'offence_id',
             'offender_id',
-            'region_id',
-            'district_id',
-            'allocated_group_id',
+            #'region_id',
+            #'district_id',
+            #'allocated_group_id',
             'issued_on_paper',
             'paper_id',
             'description',
@@ -622,8 +622,8 @@ class SaveSanctionOutcomeSerializer(serializers.ModelSerializer):
         field_errors = {}
         non_field_errors = []
 
-        if not data['region_id']:
-            non_field_errors.append('Sanction Outcome must have a region')
+        #if not data['region_id']:
+        #    non_field_errors.append('Sanction Outcome must have a region')
 
         if data['issued_on_paper']:
             if not data['paper_id']:

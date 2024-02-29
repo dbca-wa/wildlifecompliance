@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import logging
+from wildlifecompliance import settings
 from django.db import models
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields.jsonb import JSONField
@@ -224,7 +225,7 @@ class LegalCase(RevisionedMixin):
             LegalCaseUserAction.ACTION_STATUS_WITH_PROSECUTION_COORDINATOR.format(self.number), 
             request)
         # set allocated group to 
-        self.allocated_group = CompliancePermissionGroup.objects.get(permissions__codename="prosecution_coordinator")
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_COORDINATOR)
         self.save()
 
     def back_to_prosecution_coordinator(self, request):
@@ -234,7 +235,7 @@ class LegalCase(RevisionedMixin):
             LegalCaseUserAction.ACTION_STATUS_WITH_PROSECUTION_COORDINATOR_PROSECUTION_BRIEF.format(self.number), 
             request)
         # set allocated group to 
-        self.allocated_group = CompliancePermissionGroup.objects.get(permissions__codename="prosecution_coordinator")
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_COORDINATOR)
         self.save()
 
     def send_to_prosecution_council(self, request):
@@ -244,7 +245,7 @@ class LegalCase(RevisionedMixin):
             LegalCaseUserAction.ACTION_STATUS_WITH_PROSECUTION_COUNCIL.format(self.number), 
             request)
         # set allocated group to 
-        self.allocated_group = CompliancePermissionGroup.objects.get(permissions__codename="prosecution_council")
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_COUNCIL)
         self.save()
 
     def approve_for_court(self, request):
@@ -254,7 +255,7 @@ class LegalCase(RevisionedMixin):
             LegalCaseUserAction.ACTION_APPROVE_FOR_COURT.format(self.number), 
             request)
         # set allocated group to 
-        self.allocated_group = CompliancePermissionGroup.objects.get(permissions__codename="prosecution_council")
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_COUNCIL)
         self.save()
 
     def send_to_prosecution_manager(self, request):
@@ -264,7 +265,7 @@ class LegalCase(RevisionedMixin):
             LegalCaseUserAction.ACTION_STATUS_WITH_PROSECUTION_MANAGER.format(self.number), 
             request)
         # set allocated group to 
-        self.allocated_group = CompliancePermissionGroup.objects.get(permissions__codename="prosecution_manager")
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_MANAGER)
         self.save()
 
     def send_to_manager(self, request):
@@ -276,11 +277,16 @@ class LegalCase(RevisionedMixin):
         # set allocated group to 
         #region_district_id = self.district_id if self.district_id else self.region_id
         #region_district = Region.objects.get(id=region_district_id)
-        region_district = self.allocated_group.region_district
-        if type(region_district) is District:
-            self.allocated_group = CompliancePermissionGroup.district_groups.get(district=region_district, permissions__codename="manager")
-        elif type(region_district) is Region:
-            self.allocated_group = CompliancePermissionGroup.district_groups.get(region=region_district, permissions__codename="manager")
+        #region_district = self.allocated_group.region_district
+        region = self.allocated_group.region
+        district = self.allocated_group.district
+
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_MANAGER,district=district,region=region)
+
+        #if type(region_district) is District:
+        #    self.allocated_group = CompliancePermissionGroup.district_groups.get(district=region_district, permissions__codename="manager")
+        #elif type(region_district) is Region:
+        #    self.allocated_group = CompliancePermissionGroup.district_groups.get(region=region_district, permissions__codename="manager")
         #self.allocated_group = CompliancePermissionGroup.objects.get(region_district=region_district, permissions__codename="manager")
         self.save()
 
