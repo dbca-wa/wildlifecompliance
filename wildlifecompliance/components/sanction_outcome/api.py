@@ -28,7 +28,7 @@ from wildlifecompliance.components.main.process_document import (
         )
 from wildlifecompliance.components.call_email.models import CallEmail, CallEmailUserAction
 from wildlifecompliance.components.inspection.models import Inspection, InspectionUserAction
-from wildlifecompliance.components.offence.models import AllegedOffence
+from wildlifecompliance.components.offence.models import AllegedOffence, Offence
 from wildlifecompliance.components.sanction_outcome.email import send_infringement_notice, \
     send_due_date_extended_mail, send_return_to_officer_email, send_to_manager_email, send_withdraw_by_manager_email, \
     send_withdraw_by_branch_manager_email, send_return_to_infringement_notice_coordinator_email, send_decline_email, \
@@ -829,7 +829,9 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
                 region_id = int(request_data['region_id']) if request_data['region_id'] else None
                 district_id = int(request_data['district_id']) if request_data['district_id'] else None
                 #TODO: get_allocated_group function to be reviewed (or use this function instead)
-                group = SanctionOutcome.get_compliance_permission_group(region_id, district_id, workflow_type)
+                #group = SanctionOutcome.get_compliance_permission_group(region_id, district_id, workflow_type)
+                #however, until we have determined whether or not sanction outcome will have its own allocated_group col, use the offence group instead
+                group = Offence.objects.get(id=request_data['offence_id']).allocated_group
                 request_data['allocated_group_id'] = group.id
 
                 # Count number of files uploaded

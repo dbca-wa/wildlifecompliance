@@ -208,6 +208,9 @@ class LegalCase(RevisionedMixin):
         self.log_user_action(
             LegalCaseUserAction.ACTION_STATUS_BRIEF_OF_EVIDENCE.format(self.number), 
             request)
+        
+        #set allocated_group
+
         self.save()
 
     def set_status_generate_prosecution_brief(self, request):
@@ -216,6 +219,9 @@ class LegalCase(RevisionedMixin):
         self.log_user_action(
             LegalCaseUserAction.ACTION_GENERATE_PROSECUTION_BRIEF.format(self.number), 
             request)
+        
+        #set allocated_group
+
         self.save()
 
     def send_to_prosecution_coordinator(self, request):
@@ -292,6 +298,7 @@ class LegalCase(RevisionedMixin):
 
     def back_to_case(self, request):
         self.assigned_to = None
+        #self.allocated_group = 
         self.status = self.STATUS_OPEN
         self.log_user_action(
             LegalCaseUserAction.ACTION_BACK_TO_CASE.format(self.number), 
@@ -308,11 +315,8 @@ class LegalCase(RevisionedMixin):
         #region_district_id = self.district_id if self.district_id else self.region_id
         #region_district = RegionDistrict.objects.get(id=region_district_id)
         #self.allocated_group = CompliancePermissionGroup.objects.get(region_district=region_district, permissions__codename="officer")
-        region_district = self.allocated_group.region_district
-        if type(region_district) is District:
-            self.allocated_group = CompliancePermissionGroup.district_groups.get(district=region_district, permissions__codename="officer")
-        elif type(region_district) is Region:
-            self.allocated_group = CompliancePermissionGroup.district_groups.get(region=region_district, permissions__codename="officer")
+        #region_district = self.allocated_group.region_district
+        self.allocated_group = ComplianceManagementSystemGroup.get(district=self.district, region=self.region, name=settings.GROUP_OFFICER)
         self.save()
 
 
