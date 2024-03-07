@@ -592,7 +592,7 @@ class SaveSanctionOutcomeSerializer(serializers.ModelSerializer):
     offender_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
     #region_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
     #district_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
-    #allocated_group_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
+    allocated_group_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
     registration_holder_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
     driver_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
 
@@ -606,7 +606,7 @@ class SaveSanctionOutcomeSerializer(serializers.ModelSerializer):
             'offender_id',
             #'region_id',
             #'district_id',
-            #'allocated_group_id',
+            'allocated_group_id',
             'issued_on_paper',
             'paper_id',
             'description',

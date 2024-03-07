@@ -142,7 +142,11 @@ class SanctionOutcome(models.Model):
     description = models.TextField(blank=True)
 
     assigned_to = models.ForeignKey(EmailUser, related_name='sanction_outcome_assigned_to', null=True)
-    #allocated_group = models.ForeignKey(CompliancePermissionGroup, related_name='sanction_outcome_allocated_group', null=True)
+    allocated_group = models.ForeignKey(
+       ComplianceManagementSystemGroup,
+       related_name='sanction_outcome_allocated_group',
+       null=True
+    )
     # This field is used as recipient when manager returns a sanction outcome for amendment
     # Updated whenever the sanction outcome is sent to the manager
     responsible_officer = models.ForeignKey(EmailUser, related_name='sanction_outcome_responsible_officer', null=True)
@@ -370,11 +374,6 @@ class SanctionOutcome(models.Model):
     @property
     def district(self):
         return self.offence.district if self.offence else None
-    
-    #TODO remove this IF santion outcome is to have its own allocated_group column
-    @property
-    def allocated_group(self):
-        return self.offence.allocated_group if self.offence else None
 
     @property
     def regionDistrictName(self):
@@ -442,7 +441,7 @@ class SanctionOutcome(models.Model):
         else:
             self.status = self.STATUS_AWAITING_REVIEW
         new_group = SanctionOutcome.get_compliance_permission_group(self.region, self.district, SanctionOutcome.WORKFLOW_SEND_TO_MANAGER)
-        #self.allocated_group = new_group TODO check if sanction outcome is to have its own allocated_group or if it is tied to the offence group
+        self.allocated_group = new_group
         self.assigned_to = None
         self.responsible_officer = request.user
         self.log_user_action(SanctionOutcomeUserAction.ACTION_SEND_TO_MANAGER.format(self.lodgement_number), request)
@@ -503,7 +502,7 @@ class SanctionOutcome(models.Model):
             # if self.is_issuable(raise_exception=True):
             self.status = SanctionOutcome.STATUS_WITH_DOT
             new_group = SanctionOutcome.get_compliance_permission_group(self.region, self.district, SanctionOutcome.WORKFLOW_ENDORSE)
-            #self.allocated_group = new_group TODO check if sanction outcome is to have its own allocated_group or if it is tied to the offence group
+            self.allocated_group = new_group
             self.save()
         else:
             # Should not reach here
@@ -519,7 +518,7 @@ class SanctionOutcome(models.Model):
                 self.create_due_dates()
 
         new_group = SanctionOutcome.get_compliance_permission_group(self.region, self.district, SanctionOutcome.WORKFLOW_ENDORSE)
-        #self.allocated_group = new_group TODO check if sanction outcome is to have its own allocated_group or if it is tied to the offence group
+        self.allocated_group = new_group
         self.save()
 
     def mark_document_posted(self, request):
@@ -529,7 +528,7 @@ class SanctionOutcome(models.Model):
             self.set_penalty_amounts()
             self.create_due_dates()
             new_group = SanctionOutcome.get_compliance_permission_group(self.region, self.district, SanctionOutcome.WORKFLOW_ENDORSE)
-            #self.allocated_group = new_group TODO check if sanction outcome is to have its own allocated_group or if it is tied to the offence group
+            self.allocated_group = new_group
         elif self.type == SO_TYPE_CAUTION_NOTICE:
             self.status = SanctionOutcome.STATUS_CLOSED
         elif self.type == SO_TYPE_LETTER_OF_ADVICE:
@@ -538,7 +537,7 @@ class SanctionOutcome(models.Model):
             self.status = SanctionOutcome.STATUS_AWAITING_REMEDIATION_ACTIONS
             # new_group = SanctionOutcome.get_compliance_permission_group(self.region, self.district, SanctionOutcome.WORKFLOW_ENDORSE)
             new_group = SanctionOutcome.get_compliance_permission_group(self.region, self.district, SanctionOutcome.WORKFLOW_RETURN_TO_OFFICER)
-            #self.allocated_group = new_group TODO check if sanction outcome is to have its own allocated_group or if it is tied to the offence group
+            self.allocated_group = new_group
 
         self.save()
 
@@ -561,7 +560,7 @@ class SanctionOutcome(models.Model):
                     # self.create_due_dates()
                     new_group = SanctionOutcome.get_compliance_permission_group(self.region, self.district,
                                                                                 SanctionOutcome.WORKFLOW_MARK_DOCUMENT_POSTED)
-            #self.allocated_group = new_group TODO check if sanction outcome is to have its own allocated_group or if it is tied to the offence group
+            self.allocated_group = new_group
 
         elif self.type in SO_TYPE_CAUTION_NOTICE:
             self.confirm_date_time_issue(raise_exception=True)
@@ -578,7 +577,7 @@ class SanctionOutcome(models.Model):
                 # self.status = SanctionOutcome.STATUS_AWAITING_REMEDIATION_ACTIONS
                 self.status = SanctionOutcome.STATUS_AWAITING_PRINT_AND_POST
                 new_group = SanctionOutcome.get_compliance_permission_group(self.region, self.district, SanctionOutcome.WORKFLOW_RETURN_TO_OFFICER)
-                #self.allocated_group = new_group TODO check if sanction outcome is to have its own allocated_group or if it is tied to the offence group
+                self.allocated_group = new_group
 
             id_suffix = 1
             for remediation_action in self.remediation_actions.all():
@@ -622,35 +621,35 @@ class SanctionOutcome(models.Model):
     def decline(self, request):
         self.status = self.STATUS_DECLINED
         new_group = SanctionOutcome.get_compliance_permission_group(self.region, self.district, SanctionOutcome.WORKFLOW_DECLINE)
-        #self.allocated_group = new_group TODO check if sanction outcome is to have its own allocated_group or if it is tied to the offence group
+        self.allocated_group = new_group
         self.log_user_action(SanctionOutcomeUserAction.ACTION_DECLINE.format(self.lodgement_number), request)
         self.save()
 
     def return_to_officer(self, request):
         self.status = self.STATUS_DRAFT
         new_group = SanctionOutcome.get_compliance_permission_group(self.region, self.district, SanctionOutcome.WORKFLOW_RETURN_TO_OFFICER)
-        #self.allocated_group = new_group TODO check if sanction outcome is to have its own allocated_group or if it is tied to the offence group
+        self.allocated_group = new_group
         self.log_user_action(SanctionOutcomeUserAction.ACTION_RETURN_TO_OFFICER.format(self.lodgement_number), request)
         self.save()
 
     def escalate_for_withdrawal(self, request):
         self.status = self.STATUS_ESCALATED_FOR_WITHDRAWAL
         new_group = SanctionOutcome.get_compliance_permission_group(self.region, self.district, SanctionOutcome.WORKFLOW_ESCALATE_FOR_WITHDRAWAL)
-        #self.allocated_group = new_group TODO check if sanction outcome is to have its own allocated_group or if it is tied to the offence group
+        self.allocated_group = new_group
         self.log_user_action(SanctionOutcomeUserAction.ACTION_ESCALATE_FOR_WITHDRAWAL.format(self.lodgement_number), request)
         self.save()
 
     def withdraw_by_manager(self, request):
         self.status = self.STATUS_WITHDRAWN
         new_group = SanctionOutcome.get_compliance_permission_group(self.region, self.district, SanctionOutcome.WORKFLOW_WITHDRAW_BY_MANAGER)
-        #self.allocated_group = new_group TODO check if sanction outcome is to have its own allocated_group or if it is tied to the offence group
+        self.allocated_group = new_group
         self.log_user_action(SanctionOutcomeUserAction.ACTION_WITHDRAW.format(self.lodgement_number), request)
         self.save()
 
     def withdraw_by_branch_manager(self, request):
         self.status = self.STATUS_WITHDRAWN
         new_group = SanctionOutcome.get_compliance_permission_group(self.region, self.district, SanctionOutcome.WORKFLOW_WITHDRAW_BY_BRANCH_MANAGER)
-        #self.allocated_group = new_group TODO check if sanction outcome is to have its own allocated_group or if it is tied to the offence group
+        self.allocated_group = new_group
         self.log_user_action(SanctionOutcomeUserAction.ACTION_WITHDRAW.format(self.lodgement_number), request)
         self.save()
 
@@ -658,7 +657,7 @@ class SanctionOutcome(models.Model):
         self.status = self.STATUS_AWAITING_PAYMENT
         self.payment_status = SanctionOutcome.PAYMENT_STATUS_UNPAID
         new_group = SanctionOutcome.get_compliance_permission_group(self.region, self.district, SanctionOutcome.WORKFLOW_RETURN_TO_INFRINGEMENT_NOTICE_COORDINATOR)
-        #self.allocated_group = new_group TODO check if sanction outcome is to have its own allocated_group or if it is tied to the offence group
+        self.allocated_group = new_group
         self.log_user_action(SanctionOutcomeUserAction.ACTION_RETURN_TO_INFRINGEMENT_NOTICE_COORDINATOR.format(self.lodgement_number), request)
         self.save()
 

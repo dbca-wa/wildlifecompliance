@@ -606,8 +606,8 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
         """
         return super(SanctionOutcomeViewSet, self).retrieve(request, *args, **kwargs)
 
-    #TODO: This function needs to be reviewed and uncommented
-    #alternatively, use the SanctionOutcome get_compliance_permission_group method if the out is to be the same
+    #TODO: This function needs to be reviewed and uncommented - it may also be redundant
+    #alternatively, use the SanctionOutcome get_compliance_permission_group method if the outcome is to be the same
 
     # def get_allocated_group(self, workflow_type, region_id, district_id):
     #    """
@@ -828,10 +828,7 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
                 # allocated group
                 region_id = int(request_data['region_id']) if request_data['region_id'] else None
                 district_id = int(request_data['district_id']) if request_data['district_id'] else None
-                #TODO: get_allocated_group function to be reviewed (or use this function instead)
-                #group = SanctionOutcome.get_compliance_permission_group(region_id, district_id, workflow_type)
-                #however, until we have determined whether or not sanction outcome will have its own allocated_group col, use the offence group instead
-                group = Offence.objects.get(id=request_data['offence_id']).allocated_group
+                group = SanctionOutcome.get_compliance_permission_group(region_id, district_id, workflow_type)
                 request_data['allocated_group_id'] = group.id
 
                 # Count number of files uploaded
