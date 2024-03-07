@@ -287,7 +287,7 @@ class LegalCase(RevisionedMixin):
         region = self.allocated_group.region
         district = self.allocated_group.district
 
-        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_MANAGER,district=district,region=region)
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_MANAGER,district=district,region=region)
 
         #if type(region_district) is District:
         #    self.allocated_group = CompliancePermissionGroup.district_groups.get(district=region_district, permissions__codename="manager")
@@ -316,7 +316,7 @@ class LegalCase(RevisionedMixin):
         #region_district = RegionDistrict.objects.get(id=region_district_id)
         #self.allocated_group = CompliancePermissionGroup.objects.get(region_district=region_district, permissions__codename="officer")
         #region_district = self.allocated_group.region_district
-        self.allocated_group = ComplianceManagementSystemGroup.get(district=self.district, region=self.region, name=settings.GROUP_OFFICER)
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(district=self.district, region=self.region, name=settings.GROUP_OFFICER)
         self.save()
 
 

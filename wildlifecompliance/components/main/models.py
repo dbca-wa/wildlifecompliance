@@ -344,7 +344,7 @@ class ComplianceManagementSystemGroup(models.Model):
         return "{}, {}, {}".format(self.get_name_display(), self.region, self.district)
 
     def get_members(self):
-        return [perm.emailuser for perm in self.compliancemanagementsystemgrouppermission_set.all()]
+        return [perm.emailuser for perm in self.compliancemanagementsystemgrouppermission_set.exclude(emailuser=None)]
 
     def add_member(self, user):
         ComplianceManagementSystemGroupPermission.objects.create(group=self,emailuser=user)

@@ -647,7 +647,7 @@ class LegalCaseNoRunningSheetSerializer(serializers.ModelSerializer):
         return_val = False
         user_id = self.context.get('request', {}).user.id
         if obj.allocated_group:
-           for member in obj.allocated_group.members:
+           for member in obj.allocated_group.get_members():
                if user_id == member.id:
                   return_val = True
         return return_val
@@ -658,7 +658,7 @@ class LegalCaseNoRunningSheetSerializer(serializers.ModelSerializer):
         if user_id == obj.assigned_to_id:
             return_val = True
         elif obj.allocated_group and not obj.assigned_to_id:
-           for member in obj.allocated_group.members:
+           for member in obj.allocated_group.get_members():
                if user_id == member.id:
                   return_val = True
         return return_val
@@ -772,7 +772,7 @@ class BaseLegalCaseSerializer(serializers.ModelSerializer):
         return_val = False
         user_id = self.context.get('request', {}).user.id
         if obj.allocated_group:
-           for member in obj.allocated_group.members:
+           for member in obj.allocated_group.get_members():
                if user_id == member.id:
                   return_val = True
         return return_val
@@ -783,7 +783,7 @@ class BaseLegalCaseSerializer(serializers.ModelSerializer):
         if user_id == obj.assigned_to_id:
             return_val = True
         elif obj.allocated_group and not obj.assigned_to_id:
-           for member in obj.allocated_group.members:
+           for member in obj.allocated_group.get_members():
                if user_id == member.id:
                   return_val = True
         return return_val

@@ -37,7 +37,7 @@ def can_user_approve(obj, user):
     if user.id == offence.assigned_to_id:
         return True
     elif offence.allocated_group and not offence.assigned_to_id:
-        if user.id in [member.id for member in offence.allocated_group.members]:
+        if user.id in [member.id for member in offence.allocated_group.get_members()]:
             return True
     return False
 

@@ -1245,7 +1245,7 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
                     instance.send_to_manager(request)
 
                     # Email to manager
-                    to_address = [member.email for member in instance.allocated_group.members]
+                    to_address = [member.email for member in instance.allocated_group.get_members()]
                     cc = [instance.responsible_officer.email,] if instance.responsible_officer else None
                     bcc = None
                     email_data = send_to_manager_email(to_address, instance, workflow_entry, request, cc, bcc)
@@ -1353,7 +1353,7 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
                     instance.escalate_for_withdrawal(request)
 
                     # Email to branch manager,
-                    to_address = [member.email for member in instance.allocated_group.members]
+                    to_address = [member.email for member in instance.allocated_group.get_members()]
                     cc = [request.user.email,] if request.user else None
                     bcc = None
                     email_data = send_escalate_for_withdrawal_email(to_address, instance, workflow_entry, request, cc, bcc)
@@ -1386,7 +1386,7 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
                     instance.return_to_infringement_notice_coordinator(request)
 
                     # Email to Infringement Notice Coordinator
-                    to_address = [member.email for member in instance.allocated_group.members]
+                    to_address = [member.email for member in instance.allocated_group.get_members()]
                     cc = [instance.responsible_officer.email, request.user.email]
                     bcc = None
                     email_data = send_return_to_infringement_notice_coordinator_email(to_address, instance, workflow_entry, request, cc, bcc)
