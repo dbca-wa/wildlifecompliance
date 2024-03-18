@@ -359,7 +359,7 @@ def _create_licence(licence_buffer, licence, application):
             date_values.insert(
                 0,
                 Paragraph(
-                    issued_purpose.original_issue_date,
+                    issued_purpose.original_issue_date.strftime('%d/%m/%Y'),
                     styles['Left']))
 
         delegation.append(
