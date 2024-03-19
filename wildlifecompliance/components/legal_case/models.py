@@ -210,7 +210,7 @@ class LegalCase(RevisionedMixin):
             request)
         
         #set allocated_group
-
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(district=self.district, region=self.region, name=settings.GROUP_OFFICER)
         self.save()
 
     def set_status_generate_prosecution_brief(self, request):
@@ -221,7 +221,7 @@ class LegalCase(RevisionedMixin):
             request)
         
         #set allocated_group
-
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_COORDINATOR)
         self.save()
 
     def send_to_prosecution_coordinator(self, request):
