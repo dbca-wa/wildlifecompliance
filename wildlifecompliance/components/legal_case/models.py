@@ -261,7 +261,7 @@ class LegalCase(RevisionedMixin):
             LegalCaseUserAction.ACTION_APPROVE_FOR_COURT.format(self.number), 
             request)
         # set allocated group to 
-        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_COUNCIL)
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_COORDINATOR)
         self.save()
 
     def send_to_prosecution_manager(self, request):
@@ -298,6 +298,7 @@ class LegalCase(RevisionedMixin):
 
     def back_to_case(self, request):
         self.assigned_to = None
+        #TODO determine what this should be (if it needs to change)
         #self.allocated_group = 
         self.status = self.STATUS_OPEN
         self.log_user_action(
