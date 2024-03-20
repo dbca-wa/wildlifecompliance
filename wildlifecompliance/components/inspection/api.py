@@ -794,6 +794,7 @@ class InspectionViewSet(viewsets.ModelViewSet):
                     instance.district_id = None if not request.data.get('district_id') else request.data.get('district_id')
                     instance.assigned_to_id = None if not request.data.get('assigned_to_id') else request.data.get('assigned_to_id')
                     instance.inspection_type_id = None if not request.data.get('inspection_type_id') else request.data.get('inspection_type_id')
+                    #TODO assign to inspection officer group once inspection officer group created
                     instance.allocated_group_id = None if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
                     instance.call_email_id = None if not request.data.get('call_email_id') else request.data.get('call_email_id')
                     instance.legal_case_id = None if not request.data.get('legal_case_id') else request.data.get('legal_case_id')

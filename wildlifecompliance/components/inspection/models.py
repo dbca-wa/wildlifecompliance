@@ -216,6 +216,7 @@ class Inspection(RevisionedMixin):
 
     def send_to_manager(self, request):
         self.status = self.STATUS_AWAIT_ENDORSEMENT
+        #TODO set allocated group? to manager?
         self.log_user_action(
             InspectionUserAction.ACTION_SEND_TO_MANAGER.format(self.number), 
             request)
@@ -223,6 +224,7 @@ class Inspection(RevisionedMixin):
 
     def request_amendment(self, request):
         self.status = self.STATUS_OPEN
+        #TODO set allocated group to inspection officers
         self.log_user_action(
             InspectionUserAction.ACTION_REQUEST_AMENDMENT.format(self.number), 
             request)

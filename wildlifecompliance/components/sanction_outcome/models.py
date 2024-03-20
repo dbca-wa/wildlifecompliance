@@ -396,7 +396,7 @@ class SanctionOutcome(models.Model):
             codename = 'infringement_notice_coordinator'
             per_district = False
         elif workflow_type == SanctionOutcome.WORKFLOW_MARK_DOCUMENT_POSTED:
-            codename = 'officer'
+            codename = 'officer' #TODO: should this be infringement_notice_coordinator?
             per_district = True
         elif workflow_type == SanctionOutcome.WORKFLOW_RETURN_TO_OFFICER:
             codename = 'officer'
