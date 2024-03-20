@@ -49,7 +49,8 @@ from wildlifecompliance.components.main.serializers import (
     DistrictSerializer,
 )
 from wildlifecompliance.components.main.models import (
-    TemporaryDocumentCollection, Region, District, get_group_members
+    TemporaryDocumentCollection, Region, District, get_group_members,
+    ComplianceManagementSystemGroup
 )
 from wildlifecompliance.components.users.serializers import ComplianceUserDetailsSerializer
 from wildlifecompliance.components.main.process_document import save_document
@@ -1418,19 +1419,26 @@ class AllocatedGroupMembers(views.APIView):
 
     def post(self, request, format=None):
         try:
-            region_id = request.data.get('region_id')
-            district_id = request.data.get('district_id')
-            workflow_type = request.data.get('workflow_type')
-            members = get_group_members(workflow_type, region_id, district_id)
+            members = []
 
-            allocated_group = [{
-                'email': '',
-                'first_name': '',
-                'full_name': '',
-                'id': None,
-                'last_name': '',
-                'title': '',
-                }]
+            if request.data.get('id'):
+                id = request.data.get('id')
+                members = ComplianceManagementSystemGroup.objects.get(id=id).get_members()
+            else:
+                region_id = request.data.get('region_id')
+                district_id = request.data.get('district_id')
+                workflow_type = request.data.get('workflow_type')
+                
+                members = get_group_members(workflow_type, region_id, district_id)
+
+            allocated_group = []#[{
+            #    'email': '',
+            #    'first_name': '',
+            #    'full_name': '',
+            #    'id': None,
+            #    'last_name': '',
+            #    'title': '',
+            #    }]
             #serializer = ComplianceUserDetailsOptimisedSerializer(group.members, many=True)
             data = ComplianceUserDetailsSerializer(members, many=True).data
             for member in data:
