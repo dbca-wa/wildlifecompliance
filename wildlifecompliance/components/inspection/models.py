@@ -216,7 +216,7 @@ class Inspection(RevisionedMixin):
 
     def send_to_manager(self, request):
         self.status = self.STATUS_AWAIT_ENDORSEMENT
-        #TODO set allocated group? to manager?
+        self.allocated_group = self.get_compliance_permission_group(self.region,self.district,self.status)
         self.log_user_action(
             InspectionUserAction.ACTION_SEND_TO_MANAGER.format(self.number), 
             request)
@@ -224,7 +224,7 @@ class Inspection(RevisionedMixin):
 
     def request_amendment(self, request):
         self.status = self.STATUS_OPEN
-        #TODO set allocated group to inspection officers
+        self.allocated_group = self.get_compliance_permission_group(self.region,self.district,self.status)
         self.log_user_action(
             InspectionUserAction.ACTION_REQUEST_AMENDMENT.format(self.number), 
             request)
@@ -232,6 +232,7 @@ class Inspection(RevisionedMixin):
 
     def endorse(self, request):
         self.status = self.STATUS_CLOSED
+        self.allocated_group = self.get_compliance_permission_group(self.region,self.district,self.status)
         self.log_user_action(
             InspectionUserAction.ACTION_ENDORSEMENT.format(self.number, request.user), 
             request)
@@ -250,12 +251,35 @@ class Inspection(RevisionedMixin):
             self.log_user_action(
                     InspectionUserAction.ACTION_PENDING_CLOSURE.format(self.number), 
                     request)
+        self.allocated_group = self.get_compliance_permission_group(self.region,self.district,self.status)
         self.save()
         # Call close() on any parent with pending_closure status
         if parents and self.status == 'closed':
             for parent in parents:
                 if parent.status == 'pending_closure':
                     parent.close(request)
+
+    @staticmethod
+    def get_compliance_permission_group(region, district, status):
+        codename = 'inspection_officer'
+        if status == Inspection.STATUS_OPEN:
+            codename = 'inspection_officer'
+            per_district = True
+        elif status == Inspection.STATUS_AWAIT_ENDORSEMENT:
+            codename = 'manager'
+            per_district = True
+        elif status == Inspection.STATUS_CLOSED or \
+            status == Inspection.STATUS_PENDING_CLOSURE or \
+            status == Inspection.STATUS_DISCARDED:
+            codename = '---'
+            per_district = False
+
+        if per_district:
+            groups = ComplianceManagementSystemGroup.objects.filter(region=region, district=district, name=codename)
+        else:
+            groups = ComplianceManagementSystemGroup.objects.filter(name=codename)
+
+        return groups.first()
 
 class InspectionReportDocument(Document):
     log_entry = models.ForeignKey(

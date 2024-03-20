@@ -794,8 +794,7 @@ class InspectionViewSet(viewsets.ModelViewSet):
                     instance.district_id = None if not request.data.get('district_id') else request.data.get('district_id')
                     instance.assigned_to_id = None if not request.data.get('assigned_to_id') else request.data.get('assigned_to_id')
                     instance.inspection_type_id = None if not request.data.get('inspection_type_id') else request.data.get('inspection_type_id')
-                    #TODO assign to inspection officer group once inspection officer group created
-                    instance.allocated_group_id = None if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
+                    #instance.allocated_group_id = None if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
                     instance.call_email_id = None if not request.data.get('call_email_id') else request.data.get('call_email_id')
                     instance.legal_case_id = None if not request.data.get('legal_case_id') else request.data.get('legal_case_id')
                     instance.details = None if not request.data.get('details') else request.data.get('details')
@@ -803,9 +802,10 @@ class InspectionViewSet(viewsets.ModelViewSet):
                  #   instance.assigned_to_id = None if not request.data.get('assigned_to_id') else request.data.get('assigned_to_id')
                 else:
                     instance.assigned_to_id = None
-                    instance.allocated_group_id = None if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
+                    #instance.allocated_group_id = None if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
                     #recipient_id = instance.inspection_team_lead_id
 
+                instance.allocated_group = instance.get_compliance_permission_group(instance.region,instance.district,instance.status)
                 instance.save()
                 
                 # Needed for create inspection

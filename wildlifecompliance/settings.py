@@ -326,6 +326,7 @@ HTTP_HOST_FOR_TEST = env('HTTP_HOST_FOR_TEST', 'localhost:8123')
 
 GROUP_CALL_EMAIL_TRIAGE = "call_email_triage"
 GROUP_OFFICER = "officer"
+GROUP_INSPECTION_OFFICER = "inspection_officer"
 GROUP_MANAGER = "manager"
 GROUP_VOLUNTEER = "volunteer"
 GROUP_INFRINGEMENT_NOTICE_COORDINATOR = "infringement_notice_coordinator"
@@ -340,6 +341,7 @@ GROUP_LICENSING_ADMIN = "licensing_admin"
 GROUP_NAME_CHOICES = (
     (GROUP_CALL_EMAIL_TRIAGE, "Call Email Triage"),
     (GROUP_OFFICER, "Officer"),
+    (GROUP_INSPECTION_OFFICER, "Inspection Officer"),
     (GROUP_MANAGER, "Manager"),
     (GROUP_VOLUNTEER, "Volunteer"),
     (GROUP_INFRINGEMENT_NOTICE_COORDINATOR, "Infringement Notice Coordinator"),
