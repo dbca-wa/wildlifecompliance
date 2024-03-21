@@ -146,7 +146,7 @@ class OffenceSerializer(serializers.ModelSerializer):
     location = LocationSerializer(read_only=True)
     alleged_offences = serializers.SerializerMethodField()
     offenders = serializers.SerializerMethodField()
-    allocated_group = serializers.SerializerMethodField()
+    #allocated_group = serializers.SerializerMethodField()
     user_in_group = serializers.SerializerMethodField()
     can_user_action = serializers.SerializerMethodField()
     # can_user_edit = serializers.SerializerMethodField()

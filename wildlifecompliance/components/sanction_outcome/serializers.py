@@ -281,7 +281,7 @@ class SanctionOutcomeSerializer(serializers.ModelSerializer):
     alleged_committed_offences = serializers.SerializerMethodField()
     offender = OffenderSerializer(read_only=True,)
     offence = OffenceSerializer(read_only=True,)
-    allocated_group = serializers.SerializerMethodField()
+    #allocated_group = serializers.SerializerMethodField()
     user_in_group = serializers.SerializerMethodField()
     can_user_action = serializers.SerializerMethodField()
     user_is_assignee = serializers.SerializerMethodField()

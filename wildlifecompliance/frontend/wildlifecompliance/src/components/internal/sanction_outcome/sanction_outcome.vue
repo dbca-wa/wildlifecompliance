@@ -21,28 +21,15 @@
                                 </div>
                             </div>
 
-                            <div v-if="sanction_outcome.allocated_group" class="form-group">
-                            <div class="row">
-                                <div class="col-sm-12 top-buffer-s">
-                                <strong>Currently assigned to</strong><br/>
-                                </div>
+                            <Assignment 
+                            :key="assignmentKey" 
+                            @update-assigned-to-id="updateAssignedToId" 
+                            :user_is_assignee="sanction_outcome.user_is_assignee"
+                            :allocated_group_id="sanction_outcome.allocated_group"
+                            :user_in_group="sanction_outcome.user_in_group" 
+                            :assigned_to_id="sanction_outcome.assigned_to_id" 
+                            :assign_url="assign_url"/>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <select :disabled="!sanction_outcome.user_in_group" class="form-control" v-model="sanction_outcome.assigned_to_id" @change="updateAssignedToId()">
-                                        <option  v-for="option in sanction_outcome.allocated_group" :value="option.id" v-bind:key="option.id">
-                                        {{ option.full_name }}
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                            </div>
-                            <div v-if="sanction_outcome.user_in_group">
-                                <a @click="updateAssignedToId('current_user')" class="btn pull-right">
-                                    Assign to me
-                                </a>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -481,6 +468,7 @@ import datatable from '@vue-utils/datatable.vue'
 import utils from "@/components/external/utils";
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
+import Assignment from "../assignment.vue";
 import CommsLogs from "@common-components/comms_logs.vue";
 import filefield from '@/components/common/compliance_file.vue';
 import SanctionOutcomeWorkflow from '@/components/internal/sanction_outcome/sanction_outcome_workflow';
@@ -564,6 +552,11 @@ export default {
                 api_endpoints.sanction_outcome,
                 this.$route.params.sanction_outcome_id + "/action_log"
             ),
+            assign_url: helpers.add_endpoint_join(
+                api_endpoints.sanction_outcome,
+                this.$route.params.sanction_outcome_id + '/update_assigned_to_id/'
+            ),
+            assignmentKey: 0,
             dtHeadersRemediationActions: [
                 "id",
                 "Due Date",
@@ -727,6 +720,7 @@ export default {
         AcceptRemediationAction,
         RequestAmendmentRemediationAction,
         Driver,
+        Assignment,
     },
     created: async function() {
         if (this.$route.params.sanction_outcome_id) {
@@ -1051,6 +1045,7 @@ export default {
         ...mapActions('sanctionOutcomeStore', {
             loadSanctionOutcome: 'loadSanctionOutcome',
             saveSanctionOutcome: 'saveSanctionOutcome',
+            setSanctionOutcome: 'setSanctionOutcome',
             setAssignedToId: 'setAssignedToId',
             setCanUserAction: 'setCanUserAction',
             setRelatedItems: 'setRelatedItems',
@@ -1359,26 +1354,12 @@ export default {
                 this.workflowBindId = timeNow.toString();
             }
         },
-        updateAssignedToId: async function (user) {
-            let url = helpers.add_endpoint_join(
-                api_endpoints.sanction_outcome,
-                this.sanction_outcome.id + '/update_assigned_to_id/'
-                );
-            let payload = null;
-            if (user === 'current_user' && this.sanction_outcome.user_in_group) {
-                payload = {'current_user': true};
-            } else if (user === 'blank') {
-                payload = {'blank': true};
-            } else {
-                payload = { 'assigned_to_id': this.sanction_outcome.assigned_to_id };
-            }
-            let res = await Vue.http.post(
-                url,
-                payload
-            );
-            this.setAssignedToId(res.body.assigned_to_id);
-            this.setCanUserAction(res.body.can_user_action);
+        updateAssignedToId: async function (body) {
+            this.setSanctionOutcome(body);
+            //this.setAssignedToId(body.assigned_to_id);
+            //this.setCanUserAction(body.can_user_action);
             this.updateObjectHash();
+            this.assignmentKey += 1;
         },
     }
 }

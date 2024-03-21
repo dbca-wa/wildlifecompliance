@@ -691,7 +691,7 @@ class LegalCaseNoRunningSheetSerializer(serializers.ModelSerializer):
 class BaseLegalCaseSerializer(serializers.ModelSerializer):
     running_sheet_entries = LegalCaseRunningSheetEntrySerializer(many=True)
     legal_case_person = EmailUserSerializer(many=True)
-    allocated_group = serializers.SerializerMethodField()
+    #allocated_group = serializers.SerializerMethodField()
     user_in_group = serializers.SerializerMethodField()
     can_user_action = serializers.SerializerMethodField()
     user_is_assignee = serializers.SerializerMethodField()
