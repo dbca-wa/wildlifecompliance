@@ -24,6 +24,7 @@
                         <Assignment 
                         :key="assignmentKey" 
                         @update-assigned-to-id="updateAssignedToId" 
+                        :user_is_assignee="inspection.user_is_assignee"
                         :allocated_group_id="inspection.allocated_group"
                         :user_in_group="inspection.user_in_group" 
                         :assigned_to_id="inspection.assigned_to_id" 
@@ -1028,8 +1029,8 @@ export default {
         obj.renderer_form_data = copiedRendererFormData;
         return obj;
     },
-    updateAssignedToId: async function (user) {
-        await this.setInspection(res.body);
+    updateAssignedToId: async function (body) {
+        await this.setInspection(body);
         this.$nextTick(() => {
             this.constructInspectionTeamTable();
         });

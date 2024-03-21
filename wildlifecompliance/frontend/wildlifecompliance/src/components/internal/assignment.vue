@@ -7,14 +7,16 @@
             </div>
             </div>
             <div class="row">
-                <select @click="getAllocatedGroup()" :disabled="!user_in_group" class="form-control" v-model="assigned_to_id" @change="updateAssignedToId()">
-                <option  v-for="option in allocated_group" :value="option.id" v-bind:key="option.id">
+                <div class="col-sm-9">
+                <select :disabled="!user_in_group" class="form-control" v-model="assigned_to_id" @change="updateAssignedToId()">
+                <option  v-for="option in allocated_group" :value="option.id" v-bind:key="option.id" :selected="option.id==assigned_to_id">
                     {{ option.full_name }}
                 </option>
                 </select>
+                </div>
             </div>
         </div>
-        <div v-if="user_in_group">
+        <div v-if="user_in_group && !user_is_assignee">
             <a @click="updateAssignedToId('current_user')" class="btn pull-right">
                 Assign to me
             </a>
@@ -28,6 +30,10 @@ export default {
     name: 'Assignment',
     props: {
         user_in_group:{
+            type: Boolean,
+            required: true
+        },
+        user_is_assignee:{
             type: Boolean,
             required: true
         },
@@ -47,12 +53,12 @@ export default {
     data: function() {
         let vm = this;
         return {
-            allocated_group: [],
+            allocated_group: this.getAllocatedGroup(this.allocated_group_id),
         }         
     },
     components:{
     },
-    computed: {        
+    computed: {       
     },
     methods:{
         updateAssignedToId: async function (user) {
@@ -69,18 +75,28 @@ export default {
                 url,
                 payload
             );
-            this.$emit('update-assigned-to-id');
+            this.$emit('update-assigned-to-id', res.body);
         },
-        getAllocatedGroup: async function() {
+        getAllocatedGroup: async function(id) {
+            Vue.set(this, 'allocated_group', []);
             let allocatedGroupResponse = await Vue.http.post(
             api_endpoints.allocated_group_members,
             {
-                'id': this.allocated_group_id,
+                'id': id,
             });
             if (allocatedGroupResponse.ok) {
-                this.allocated_group = allocatedGroupResponse.body;
+                Vue.set(this, 'allocated_group', allocatedGroupResponse.body);
+            } 
+        },        
+    },
+    watch: 
+    {
+        allocated_group_id(after,before) {
+            if (before === undefined && after !== undefined) {
+                console.log("ALLOCATED GROUP ID:"+this.allocated_group_id);
+                this.getAllocatedGroup(this.allocated_group_id);
             }
-        },
+        }
     },
 }
 </script>
