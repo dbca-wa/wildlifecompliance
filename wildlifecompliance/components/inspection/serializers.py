@@ -203,16 +203,16 @@ class InspectionSerializer(serializers.ModelSerializer):
         return_val = False
         user_id = self.context.get('request', {}).user.id
 
-        if user_id == obj.assigned_to_id:
+        if obj.allocated_group and user_id == obj.assigned_to_id and user_id in [member.id for member in obj.allocated_group.get_members()]:
             return_val = True
-        if obj.status == 'open' and obj.inspection_team and not obj.assigned_to_id:
+        if obj.status == 'open' and obj.inspection_team: # and not obj.assigned_to_id:
             for member in obj.inspection_team.all():
                 if user_id == member.id:
                     return_val = True
-        elif obj.allocated_group and not obj.assigned_to_id:
-           for member in obj.allocated_group.get_members():
-               if user_id == member.id:
-                  return_val = True
+        #elif obj.allocated_group and not obj.assigned_to_id:
+        #   for member in obj.allocated_group.get_members():
+        #       if user_id == member.id:
+        #          return_val = True
         return return_val
 
     def get_user_is_assignee(self, obj):

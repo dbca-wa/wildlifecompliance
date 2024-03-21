@@ -374,11 +374,11 @@ class SanctionOutcomeSerializer(serializers.ModelSerializer):
         # when user is assigned to the target object or
         # when user is a member of the allocated group and no one is assigned to the target object
         user_id = self.context.get('request', {}).user.id
-        if user_id == obj.assigned_to_id:
+        if obj.allocated_group and user_id == obj.assigned_to_id and user_id in [member.id for member in obj.allocated_group.get_members()]:
             return True
-        elif obj.allocated_group and not obj.assigned_to_id:
-            if user_id in [member.id for member in obj.allocated_group.get_members()]:
-                return True
+        #elif obj.allocated_group and not obj.assigned_to_id:
+        #    if user_id in [member.id for member in obj.allocated_group.get_members()]:
+        #        return True
 
         return False
 
