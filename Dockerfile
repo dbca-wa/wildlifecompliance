@@ -110,6 +110,10 @@ RUN chmod 755 /startup.sh
 # IPYTHONDIR - Will allow shell_plus (in Docker) to remember history between sessions
 RUN export IPYTHONDIR=/app/logs/.ipython/
 
+# Health checks for kubernetes 
+RUN wget https://raw.githubusercontent.com/dbca-wa/wagov_utils/main/wagov_utils/bin/health_check.sh -O /bin/health_check.sh
+RUN chmod 755 /bin/health_check.sh
+
 EXPOSE 8080
 HEALTHCHECK --interval=1m --timeout=5s --start-period=10s --retries=3 CMD ["wget", "-q", "-O", "-", "http://localhost:8080/"]
 CMD ["/startup.sh"]
