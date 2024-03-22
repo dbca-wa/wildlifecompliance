@@ -186,6 +186,7 @@ class InspectionSerializer(serializers.ModelSerializer):
         return get_related_items(obj)
 
     def get_user_in_group(self, obj):
+        #TODO adjust if needed (may need present in-group regardless of region/district)
         return_val = False
         user_id = self.context.get('request', {}).user.id
         # inspection team should apply if status is 'open'
@@ -193,13 +194,15 @@ class InspectionSerializer(serializers.ModelSerializer):
             for member in obj.inspection_team.all():
                 if user_id == member.id:
                     return_val = True
-        elif obj.allocated_group:
+        if not return_val and obj.allocated_group:
            for member in obj.allocated_group.get_members():
                if user_id == member.id:
                   return_val = True
         return return_val
 
     def get_can_user_action(self, obj):
+        return True #STRICTLY FOR TESTING, REMEMBER TO REMOVE THIS
+        #TODO adjust if needed (may need to allow all officers/managers to create/update regardless of region)
         return_val = False
         user_id = self.context.get('request', {}).user.id
 

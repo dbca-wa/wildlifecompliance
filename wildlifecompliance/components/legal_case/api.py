@@ -457,6 +457,10 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def update(self, request, workflow=False, *args, **kwargs):
         try:
+
+            #TODO
+            #check if user authorised to update - must be in allocated group and assigned
+
             with transaction.atomic():
                 instance = self.get_object()
                 # Running Sheet
@@ -744,6 +748,8 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def process_brief_of_evidence_document(self, request, *args, **kwargs):
         try:
+
+            #TODO auth
             instance = self.get_object()
             if hasattr(instance, 'brief_of_evidence'):
                 returned_data = process_generic_document(request, instance.brief_of_evidence)
@@ -834,6 +840,9 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def process_court_hearing_notice_document(self, request, *args, **kwargs):
         try:
+
+            #TODO auth
+
             instance = self.get_object()
             # process docs
             returned_data = process_generic_document(request, instance, 'court_hearing_notice')
@@ -867,6 +876,9 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def process_prosecution_notice_document(self, request, *args, **kwargs):
         try:
+
+            #TODO auth
+
             instance = self.get_object()
             # process docs
             returned_data = process_generic_document(request, instance, 'prosecution_notice')
@@ -900,6 +912,9 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def process_prosecution_brief_document(self, request, *args, **kwargs):
         try:
+
+            #TODO auth
+
             instance = self.get_object()
             if hasattr(instance, 'prosecution_brief'):
                 returned_data = process_generic_document(request, instance.prosecution_brief)
@@ -924,6 +939,9 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def process_default_document(self, request, *args, **kwargs):
         try:
+
+            #TODO auth
+
             instance = self.get_object()
             returned_data = process_generic_document(request, instance)
             if returned_data:
@@ -948,6 +966,9 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def process_court_outcome_document(self, request, *args, **kwargs):
         try:
+
+            #TODO auth
+
             instance = self.get_object()
             returned_data = process_generic_document(request, instance, document_type='court_outcome')
             if returned_data:
@@ -1259,6 +1280,9 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def create_journal_entry(self, request, *args, **kwargs):
         try:
+
+            #TODO auth
+
             instance = self.get_object()
             request_data = {
                             "court_proceedings_id": request.data.get('court_proceedings_id'),
@@ -1328,6 +1352,9 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def create_running_sheet_entry(self, request, *args, **kwargs):
         try:
+
+            #TODO auth
+
             instance = self.get_object()
             request_data = {
                             "legal_case_id": instance.id,

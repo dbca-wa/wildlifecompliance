@@ -730,6 +730,10 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
         Update existing sanction outcome
         """
         try:
+
+            #TODO
+            #check if user authorised to update - must be in allocated group and assigned
+
             with transaction.atomic():
                 instance = self.get_object()
                 request_data = request.data
@@ -804,6 +808,10 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
         Create new sanction outcome from the modal
         """
         try:
+
+            #TODO
+            #to create make sure user is in appropriate group (officer or manager in region)
+
             with transaction.atomic():
                 res_json = {}
 
@@ -977,6 +985,9 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
         print(request.data)
         try:
             instance = self.get_object()
+
+            #TODO check if this needs auth
+
             # process docs
             returned_data = process_generic_document(request, instance)
             # delete Sanction Outcome if user cancels modal
@@ -1057,6 +1068,9 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def send_parking_infringement(self, request, instance=None, *args, **kwargs):
         try:
+
+            #TODO check if this needs auth
+
             with transaction.atomic():
 
                 instance = self.get_object() if not instance else instance

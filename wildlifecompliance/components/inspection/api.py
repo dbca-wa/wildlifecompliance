@@ -40,7 +40,7 @@ from datetime import datetime, timedelta, date
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from wildlifecompliance.components.main.api import save_location
-from wildlifecompliance.components.main.models import TemporaryDocumentCollection
+from wildlifecompliance.components.main.models import TemporaryDocumentCollection, ComplianceManagementSystemGroupPermission
 from wildlifecompliance.components.main.process_document import (
         process_generic_document, 
         save_comms_log_document_obj
@@ -353,11 +353,61 @@ class InspectionViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
+    def check_authorised_to_update(self,request,inspection_team_allowed=False):
+        print("check_authorised_to_update")
+        #TODO adjust auth if needed (may need to allow all officers/managers to create/update regardless of region)
+        instance = self.get_object()
+        user = self.request.user
+        user_auth_groups = ComplianceManagementSystemGroupPermission.objects.filter(emailuser=user)
+
+        if instance.assigned_to_id == user.id and user_auth_groups.filter(group=instance.allocated_group).exists():
+            return True
+        elif inspection_team_allowed:
+            return (user in instance.inspection_team.all() or user == instance.inspection_team_lead)
+        else:
+            return False
+        
+    def check_authorised_to_create(self,request):
+        print("check_authorised_to_create")
+        #TODO adjust auth if needed (may need to allow all officers/managers to create/update regardless of region)
+        region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+        district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+        user = self.request.user
+        #check that request user is an (inspection) officer or manager in the specified region and district
+        if not ComplianceManagementSystemGroupPermission.objects.filter(
+            emailuser=user, 
+            group__region_id=region_id, 
+            group__district_id=district_id
+            ).filter(
+                Q(group__name=settings.GROUP_INSPECTION_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+
+        assigned_to_id = None if not request.data.get('assigned_to_id') else request.data.get('assigned_to_id')
+        if not ComplianceManagementSystemGroupPermission.objects.filter(
+            emailuser=assigned_to_id, 
+            group__region_id=region_id, 
+            group__district_id=district_id
+            ).filter(
+                Q(group__name=settings.GROUP_INSPECTION_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            raise serializers.ValidationError(str("Specified user does not belong to appropriate authorisation group for the specified region/district"))
+
+        return True
+
     @detail_route(methods=['POST', ])
     @renderer_classes((JSONRenderer,))
-    def modify_inspection_team(self, request, instance=None, workflow=False, user_id=None, *args, **kwargs):
+    def modify_inspection_team(self, request, instance=None, workflow=False, user_id=None, new=False, *args, **kwargs):
         try:
             with transaction.atomic():
+
+                if not new: #we do not need to check this for newly created inspections as it has already been checked
+                    #check if user authorised to update - must be in allocated group and assigned
+                    if not self.check_authorised_to_update(request):
+                        return Response(
+                            status=status.HTTP_401_UNAUTHORIZED,
+                        )
+                
                 if not instance:
                     instance = self.get_object()
                 if workflow:
@@ -491,6 +541,13 @@ class InspectionViewSet(viewsets.ModelViewSet):
     #def inspection_save(self, request, workflow=False, *args, **kwargs):
     def update(self, request, workflow=False, *args, **kwargs):
         try:
+
+            #check if user authorised to update - must be in allocated group and assigned OR on inspection team
+            if not self.check_authorised_to_update(request, True):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+            
             with transaction.atomic():
                 # 1. Save Location
                 if (
@@ -663,6 +720,15 @@ class InspectionViewSet(viewsets.ModelViewSet):
     def process_inspection_report_document(self, request, *args, **kwargs):
         print("process_inspection_report_document")
         try:
+            #if the action if anything other than list, check auth
+            action = request.data.get('action')
+            if action != 'list':
+                #in-group and assigned OR on inspection team
+                if not self.check_authorised_to_update(request, True):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+                
             instance = self.get_object()
             returned_data = process_generic_document(
                 request, 
@@ -698,6 +764,14 @@ class InspectionViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         try:
+
+            #TODO
+            #to create make sure user is in appropriate group (inspection officer or manager in region)
+            if not self.check_authorised_to_create(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             with transaction.atomic():
                 # 1. Save Location
                 if (
@@ -810,7 +884,7 @@ class InspectionViewSet(viewsets.ModelViewSet):
                 
                 # Needed for create inspection
                 if create_inspection:
-                    instance = self.modify_inspection_team(request, instance, workflow=True, user_id=instance.assigned_to_id)
+                    instance = self.modify_inspection_team(request, instance, workflow=True, new=True, user_id=instance.assigned_to_id)
 
                 # send email
                 if workflow_type == 'send_to_manager':

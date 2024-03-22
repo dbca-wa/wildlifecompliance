@@ -238,7 +238,7 @@ class OffenceViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['GET', ])
     def can_user_create(self, request, *args, **kwargs):
-    # TO DO: Check logic with the business
+    #TODO: Check logic with the business
 
        # Find groups which has permissions determined above
        allowed_groups = ComplianceManagementSystemGroup.objects.filter(name=settings.GROUP_OFFICER)
@@ -366,6 +366,10 @@ class OffenceViewSet(viewsets.ModelViewSet):
     # @renderer_classes((JSONRenderer,))
     def update(self, request, *args, **kwargs):
         try:
+
+            #TODO
+            #check if user authorised to update - must be in allocated group and assigned
+
             with transaction.atomic():
                 instance = self.get_object()
                 request_data = request.data
@@ -497,6 +501,10 @@ class OffenceViewSet(viewsets.ModelViewSet):
     # def offence_save(self, request, *args, **kwargs):
     def create(self, request, *args, **kwargs):
         try:
+
+            #TODO
+            #to create make sure user is in appropriate group (officer or manager in region)
+
             with transaction.atomic():
                 request_data = request.data
 
