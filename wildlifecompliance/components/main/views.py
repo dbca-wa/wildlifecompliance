@@ -109,8 +109,7 @@ class CreateWeakLinkView(views.APIView):
                 can_user_action = request.data.get('can_user_action')
                 comment = request.data.get('comment')
                 
-                #TODO this requires auth
-                #POST request data can be made on the client-side and there is NO auth check here at all
+                #TODO the first object should be checked by the user to ensure they can update it
                 if is_internal(self.request) and can_user_action:
                     # transform request data to create new Weak Links obj
                     second_object_id_int = int(second_object_id)
@@ -180,8 +179,7 @@ class RemoveWeakLinkView(views.APIView):
                 calling_instance = None
                 paired_instance = None
 
-                #TODO this requires auth
-                #POST request data can be made on the client-side and there is NO auth check here at all
+                #TODO the first object should be checked by the user to ensure they can update it
                 if is_internal(self.request) and can_user_action:
                     # transform request data to search for Weak Link obj to delete
                     second_object_id_int = int(second_object_id)

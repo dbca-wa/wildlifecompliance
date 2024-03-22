@@ -14,7 +14,7 @@ from django.db.models import Q
 from django.http import HttpResponse, FileResponse, HttpResponseNotFound
 from ledger.payments.invoice.models import Invoice
 from ledger.accounts.models import EmailUser
-
+from django.conf import settings
 from rest_framework import viewsets, serializers, status
 from rest_framework.decorators import list_route, detail_route, renderer_classes
 from rest_framework.renderers import JSONRenderer
@@ -52,7 +52,7 @@ from wildlifecompliance.components.sanction_outcome.serializers import SanctionO
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.wc_payments.models import InfringementPenalty, InfringementPenaltyInvoice
 from wildlifecompliance.helpers import is_authorised_to_modify, is_internal, is_customer
-from wildlifecompliance.components.main.models import TemporaryDocumentCollection
+from wildlifecompliance.components.main.models import TemporaryDocumentCollection, ComplianceManagementSystemGroupPermission
 from wildlifecompliance.settings import SO_TYPE_CHOICES, SO_TYPE_REMEDIATION_NOTICE, SO_TYPE_INFRINGEMENT_NOTICE, \
     SO_TYPE_LETTER_OF_ADVICE, SO_TYPE_CAUTION_NOTICE
 
@@ -723,6 +723,33 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
+
+    def check_authorised_to_update(self,request):
+        print("check_authorised_to_update")
+        #TODO adjust auth if needed (may need to allow all officers/managers to create/update regardless of region)
+        instance = self.get_object()
+        user = self.request.user
+        user_auth_groups = ComplianceManagementSystemGroupPermission.objects.filter(emailuser=user)
+
+        return instance.assigned_to_id == user.id and user_auth_groups.filter(group=instance.allocated_group).exists()
+        
+    def check_authorised_to_create(self,request):
+        print("check_authorised_to_create")
+        #TODO adjust auth if needed (may need to allow all officers/managers to create/update regardless of region)
+        region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+        district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+        user = self.request.user
+        #check that request user is an (inspection) officer or manager in the specified region and district
+        if not ComplianceManagementSystemGroupPermission.objects.filter(
+            emailuser=user, 
+            group__region_id=region_id, 
+            group__district_id=district_id
+            ).filter(
+                Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+
+        return True
 
     def update(self, request, *args, **kwargs):
         # raise serializers.ValidationError('This is ValidationError in the update()')

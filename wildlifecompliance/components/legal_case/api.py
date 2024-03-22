@@ -5,6 +5,7 @@ import traceback
 import os
 import base64
 import geojson
+
 from django.db.models import Q, Min, Max
 from django.db import transaction
 from django.http import HttpResponse
@@ -39,7 +40,7 @@ from datetime import datetime, timedelta, date
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from wildlifecompliance.components.main.api import save_location
-from wildlifecompliance.components.main.models import TemporaryDocumentCollection
+from wildlifecompliance.components.main.models import TemporaryDocumentCollection, ComplianceManagementSystemGroupPermission
 from wildlifecompliance.components.main.process_document import (
         process_generic_document, 
         save_comms_log_document_obj
@@ -453,6 +454,43 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
                 if email_user not in instance.associated_persons.all():
                         instance.associated_persons.add(email_user)
                         instance.save()
+
+    def check_authorised_to_update(self,request):
+        print("check_authorised_to_update")
+        #TODO adjust auth if needed (may need to allow all officers/managers to create/update regardless of region)
+        instance = self.get_object()
+        user = self.request.user
+        user_auth_groups = ComplianceManagementSystemGroupPermission.objects.filter(emailuser=user)
+
+        return instance.assigned_to_id == user.id and user_auth_groups.filter(group=instance.allocated_group).exists()
+        
+    def check_authorised_to_create(self,request):
+        print("check_authorised_to_create")
+        #TODO adjust auth if needed (may need to allow all officers/managers to create/update regardless of region)
+        region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+        district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+        user = self.request.user
+        #check that request user is an (inspection) officer or manager in the specified region and district
+        if not ComplianceManagementSystemGroupPermission.objects.filter(
+            emailuser=user, 
+            group__region_id=region_id, 
+            group__district_id=district_id
+            ).filter(
+                Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+
+        assigned_to_id = None if not request.data.get('assigned_to_id') else request.data.get('assigned_to_id')
+        if not ComplianceManagementSystemGroupPermission.objects.filter(
+            emailuser=assigned_to_id, 
+            group__region_id=region_id, 
+            group__district_id=district_id
+            ).filter(
+                Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            raise serializers.ValidationError(str("Specified user does not belong to appropriate authorisation group for the specified region/district"))
+
+        return True
 
     @renderer_classes((JSONRenderer,))
     def update(self, request, workflow=False, *args, **kwargs):

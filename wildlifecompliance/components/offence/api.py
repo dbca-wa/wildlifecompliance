@@ -43,7 +43,7 @@ from wildlifecompliance.components.offence.serializers import (
     UpdateAllegedCommittedOffenceSerializer)
 from wildlifecompliance.components.section_regulation.serializers import SectionRegulationSerializer
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, AllegedCommittedOffence
-from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup, ComplianceManagementSystemGroupPermission
 from wildlifecompliance.helpers import is_internal, is_customer
 
 
@@ -236,16 +236,17 @@ class OffenceViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['GET', ])
-    def can_user_create(self, request, *args, **kwargs):
-    #TODO: Check logic with the business
+    #use check_authorised_to_create instead
+    #@list_route(methods=['GET', ])
+    #def can_user_create(self, request, *args, **kwargs):
+    ##TODO: Check logic with the business
 
-       # Find groups which has permissions determined above
-       allowed_groups = ComplianceManagementSystemGroup.objects.filter(name=settings.GROUP_OFFICER)
-       for allowed_group in allowed_groups:
-           if request.user in allowed_group.get_members():
-               return Response(True)
-       return Response(False)
+    #   # Find groups which has permissions determined above
+    #   allowed_groups = ComplianceManagementSystemGroup.objects.filter(name=settings.GROUP_OFFICER)
+    #   for allowed_group in allowed_groups:
+    #       if request.user in allowed_group.get_members():
+    #           return Response(True)
+    #   return Response(False)
 
     @list_route(methods=['GET', ])
     def optimised(self, request, *args, **kwargs):
@@ -345,6 +346,34 @@ class OffenceViewSet(viewsets.ModelViewSet):
         serializer = OffenceSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
+    def check_authorised_to_update(self,request):
+        print("check_authorised_to_update")
+        #TODO adjust auth if needed (may need to allow all officers/managers to create/update regardless of region)
+        instance = self.get_object()
+        user = self.request.user
+        user_auth_groups = ComplianceManagementSystemGroupPermission.objects.filter(emailuser=user)
+
+        return instance.assigned_to_id == user.id and user_auth_groups.filter(group=instance.allocated_group).exists()
+        
+    def check_authorised_to_create(self,request):
+        print("check_authorised_to_create")
+        #TODO adjust auth if needed (may need to allow all officers/managers to create/update regardless of region)
+        region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+        district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+        user = self.request.user
+        #check that request user is an (inspection) officer or manager in the specified region and district
+        if not ComplianceManagementSystemGroupPermission.objects.filter(
+            emailuser=user, 
+            group__region_id=region_id, 
+            group__district_id=district_id
+            ).filter(
+                Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+
+        return True
+
+
     def update_parent(self, request, instance, *args, **kwargs):
         # Log parent actions and update status, if required
         # If CallEmail
@@ -367,8 +396,11 @@ class OffenceViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         try:
 
-            #TODO
             #check if user authorised to update - must be in allocated group and assigned
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
 
             with transaction.atomic():
                 instance = self.get_object()
@@ -501,9 +533,11 @@ class OffenceViewSet(viewsets.ModelViewSet):
     # def offence_save(self, request, *args, **kwargs):
     def create(self, request, *args, **kwargs):
         try:
-
-            #TODO
             #to create make sure user is in appropriate group (officer or manager in region)
+            if not self.check_authorised_to_create(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
 
             with transaction.atomic():
                 request_data = request.data
