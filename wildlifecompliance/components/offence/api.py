@@ -190,6 +190,12 @@ class OffenceViewSet(viewsets.ModelViewSet):
     def workflow_action(self, request, instance=None, *args, **kwargs):
         try:
             with transaction.atomic():
+
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+
                 if not instance:
                     instance = self.get_object()
 

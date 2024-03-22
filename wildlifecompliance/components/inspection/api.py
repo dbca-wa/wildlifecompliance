@@ -833,6 +833,12 @@ class InspectionViewSet(viewsets.ModelViewSet):
                 # email recipient
                 #recipient_id = None
 
+                if not create_inspection:
+                    if not self.check_authorised_to_update(request):
+                        return Response(
+                            status=status.HTTP_401_UNAUTHORIZED,
+                        )
+
                 if not instance:
                     instance = self.get_object()
 
