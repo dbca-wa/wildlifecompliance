@@ -363,6 +363,7 @@ class OffenceViewSet(viewsets.ModelViewSet):
         
     def check_authorised_to_create(self,request):
         print("check_authorised_to_create")
+
         #TODO adjust auth if needed (may need to allow all officers/managers to create/update regardless of region)
         region_id = None if not request.data.get('region_id') else request.data.get('region_id')
         district_id = None if not request.data.get('district_id') else request.data.get('district_id')

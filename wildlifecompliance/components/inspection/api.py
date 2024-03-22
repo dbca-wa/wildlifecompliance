@@ -720,7 +720,7 @@ class InspectionViewSet(viewsets.ModelViewSet):
     def process_inspection_report_document(self, request, *args, **kwargs):
         print("process_inspection_report_document")
         try:
-            #if the action if anything other than list, check auth
+            #if the action is anything other than list, check auth
             action = request.data.get('action')
             if action != 'list':
                 #in-group and assigned OR on inspection team

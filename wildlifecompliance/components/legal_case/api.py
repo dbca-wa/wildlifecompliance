@@ -341,7 +341,7 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     def status_choices(self, request, *args, **kwargs):
         res_obj = [] 
         for choice in LegalCase.STATUS_CHOICES:
-            res_obj.append({'id': choice[0], 'display': choice[1]});
+            res_obj.append({'id': choice[0], 'display': choice[1]})
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
@@ -496,8 +496,10 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     def update(self, request, workflow=False, *args, **kwargs):
         try:
 
-            #TODO
-            #check if user authorised to update - must be in allocated group and assigned
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
 
             with transaction.atomic():
                 instance = self.get_object()
@@ -787,7 +789,14 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     def process_brief_of_evidence_document(self, request, *args, **kwargs):
         try:
 
-            #TODO auth
+            #if the action is anything other than list, check auth
+            action = request.data.get('action')
+            if action != 'list':
+                #in-group and assigned OR on inspection team
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
             instance = self.get_object()
             if hasattr(instance, 'brief_of_evidence'):
                 returned_data = process_generic_document(request, instance.brief_of_evidence)
@@ -879,7 +888,14 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     def process_court_hearing_notice_document(self, request, *args, **kwargs):
         try:
 
-            #TODO auth
+            #if the action is anything other than list, check auth
+            action = request.data.get('action')
+            if action != 'list':
+                #in-group and assigned OR on inspection team
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
 
             instance = self.get_object()
             # process docs
@@ -915,7 +931,14 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     def process_prosecution_notice_document(self, request, *args, **kwargs):
         try:
 
-            #TODO auth
+            #if the action is anything other than list, check auth
+            action = request.data.get('action')
+            if action != 'list':
+                #in-group and assigned OR on inspection team
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
 
             instance = self.get_object()
             # process docs
@@ -951,7 +974,14 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     def process_prosecution_brief_document(self, request, *args, **kwargs):
         try:
 
-            #TODO auth
+            #if the action is anything other than list, check auth
+            action = request.data.get('action')
+            if action != 'list':
+                #in-group and assigned OR on inspection team
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
 
             instance = self.get_object()
             if hasattr(instance, 'prosecution_brief'):
@@ -978,7 +1008,14 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     def process_default_document(self, request, *args, **kwargs):
         try:
 
-            #TODO auth
+            #if the action is anything other than list, check auth
+            action = request.data.get('action')
+            if action != 'list':
+                #in-group and assigned OR on inspection team
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
 
             instance = self.get_object()
             returned_data = process_generic_document(request, instance)
@@ -1005,7 +1042,14 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     def process_court_outcome_document(self, request, *args, **kwargs):
         try:
 
-            #TODO auth
+            #if the action is anything other than list, check auth
+            action = request.data.get('action')
+            if action != 'list':
+                #in-group and assigned OR on inspection team
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
 
             instance = self.get_object()
             returned_data = process_generic_document(request, instance, document_type='court_outcome')
@@ -1058,6 +1102,13 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         try:
+
+            #to create make sure user is in appropriate group (officer or manager in region)
+            if not self.check_authorised_to_create(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+            
             with transaction.atomic():
                 serializer = SaveLegalCaseSerializer(
                         data=request.data, 
@@ -1108,6 +1159,11 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
             with transaction.atomic():
                 # email recipient
                 #recipient_id = None
+                if not create_legal_case:
+                    if not self.check_authorised_to_update(request):
+                        return Response(
+                            status=status.HTTP_401_UNAUTHORIZED,
+                        )
 
                 if not instance:
                     instance = self.get_object()
@@ -1282,6 +1338,12 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def delete_reinstate_journal_entry(self, request, *args, **kwargs):
         try:
+
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             instance = self.get_object()
             journal_entry_id = request.data.get("journal_entry_id")
             deleted = request.data.get("deleted")
@@ -1319,7 +1381,10 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     def create_journal_entry(self, request, *args, **kwargs):
         try:
 
-            #TODO auth
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
 
             instance = self.get_object()
             request_data = {
@@ -1354,6 +1419,12 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def delete_reinstate_running_sheet_entry(self, request, *args, **kwargs):
         try:
+
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+            
             instance = self.get_object()
             running_sheet_id = request.data.get("running_sheet_id")
             deleted = request.data.get("deleted")
@@ -1391,7 +1462,10 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     def create_running_sheet_entry(self, request, *args, **kwargs):
         try:
 
-            #TODO auth
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
 
             instance = self.get_object()
             request_data = {
