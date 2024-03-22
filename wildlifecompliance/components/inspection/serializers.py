@@ -201,7 +201,6 @@ class InspectionSerializer(serializers.ModelSerializer):
         return return_val
 
     def get_can_user_action(self, obj):
-        return True #STRICTLY FOR TESTING, REMEMBER TO REMOVE THIS
         #TODO adjust if needed (may need to allow all officers/managers to create/update regardless of region)
         return_val = False
         user_id = self.context.get('request', {}).user.id
