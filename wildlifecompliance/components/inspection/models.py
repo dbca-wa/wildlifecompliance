@@ -3,7 +3,7 @@ import logging
 from django.db import models
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields.jsonb import JSONField
-from django.db.models import Max
+from django.db.models import Q
 from django.utils.encoding import python_2_unicode_compatible
 from ledger.accounts.models import EmailUser, RevisionedMixin
 from ledger.licence.models import LicenceType
@@ -19,6 +19,7 @@ from wildlifecompliance.components.main.related_item import can_close_record
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.main.models import Region, District
 from django.core.exceptions import ValidationError
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -190,6 +191,20 @@ class Inspection(RevisionedMixin):
     def data(self):
         """ returns a queryset of form data records attached to Inspection (shortcut to InspectionFormDataRecord related_name). """
         return self.form_data_records.all()
+
+    @property
+    def allowed_groups(self):
+        if not self.allocated_group:
+            return []
+        groups = [self.allocated_group.id]
+        if not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED:
+            groups = groups + list(ComplianceManagementSystemGroup.objects.filter(name=self.allocated_group.name).values_list('id',flat=True))
+        elif settings.SUPER_AUTH_GROUPS_ENABLED:
+            queryset = ComplianceManagementSystemGroup.objects
+            groups = groups + list(ComplianceManagementSystemGroup.objects.filter(
+                (Q(name=self.allocated_group.name) & Q(region=None)) | 
+                (Q(name=self.allocated_group.name) & Q(region=self.allocated_group.region) & Q(district=None))).values_list('id',flat=True))
+        return list(set(groups))
 
     #def log_user_action(self, action, request):
      #   return InspectionUserAction.log_action(self, action, request.user)

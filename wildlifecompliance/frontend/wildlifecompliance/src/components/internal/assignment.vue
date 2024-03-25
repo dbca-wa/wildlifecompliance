@@ -9,7 +9,7 @@
             <div class="row">
                 <div class="col-sm-9">
                 <select :disabled="!user_in_group" class="form-control" v-model="assigned_to_id" @change="updateAssignedToId()">
-                <option  v-for="option in allocated_group" :value="option.id" v-bind:key="option.id" :selected="option.id==assigned_to_id">
+                <option  v-for="option in allowed_groups" :value="option.id" v-bind:key="option.id" :selected="option.id==assigned_to_id">
                     {{ option.full_name }}
                 </option>
                 </select>
@@ -41,8 +41,8 @@ export default {
             type: String,
             required: false
         },
-        allocated_group_id:{
-            type: String,
+        allowed_group_ids:{
+            type: Array,
             required: false
         },
         assign_url:{
@@ -53,7 +53,7 @@ export default {
     data: function() {
         let vm = this;
         return {
-            allocated_group: this.getAllocatedGroup(this.allocated_group_id),
+            allowed_groups: this.getAllocatedGroup(this.allowed_group_ids),
         }         
     },
     components:{
@@ -77,24 +77,23 @@ export default {
             );
             this.$emit('update-assigned-to-id', res.body);
         },
-        getAllocatedGroup: async function(id) {
-            Vue.set(this, 'allocated_group', []);
+        getAllocatedGroup: async function(id_list) {
+            Vue.set(this, 'allowed_groups', []);
             let allocatedGroupResponse = await Vue.http.post(
             api_endpoints.allocated_group_members,
             {
-                'id': id,
+                'id_list': id_list,
             });
             if (allocatedGroupResponse.ok) {
-                Vue.set(this, 'allocated_group', allocatedGroupResponse.body);
+                Vue.set(this, 'allowed_groups', allocatedGroupResponse.body);
             } 
         },        
     },
     watch: 
     {
-        allocated_group_id(after,before) {
+        allowed_group_ids(after,before) {
             if (before === undefined && after !== undefined) {
-                console.log("ALLOCATED GROUP ID:"+this.allocated_group_id);
-                this.getAllocatedGroup(this.allocated_group_id);
+                this.getAllocatedGroup(this.allowed_group_ids);
             }
         }
     },

@@ -6,7 +6,7 @@ from wsgiref.util import FileWrapper
 from django.http import HttpResponse
 from django.db import transaction
 from django.core.exceptions import ValidationError
-
+from ledger.accounts.models import EmailUser
 from rest_framework import viewsets, serializers, views, status
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
@@ -50,7 +50,8 @@ from wildlifecompliance.components.main.serializers import (
 )
 from wildlifecompliance.components.main.models import (
     TemporaryDocumentCollection, Region, District, get_group_members,
-    ComplianceManagementSystemGroup
+    ComplianceManagementSystemGroup,
+    ComplianceManagementSystemGroupPermission
 )
 from wildlifecompliance.components.users.serializers import ComplianceUserDetailsSerializer
 from wildlifecompliance.components.main.process_document import save_document
@@ -1421,9 +1422,9 @@ class AllocatedGroupMembers(views.APIView):
         try:
             members = []
 
-            if request.data.get('id'):
-                id = request.data.get('id')
-                members = ComplianceManagementSystemGroup.objects.get(id=id).get_members()
+            if request.data.get('id_list'):
+                id_list = request.data.get('id_list')
+                members = EmailUser.objects.filter(id__in=ComplianceManagementSystemGroupPermission.objects.filter(group__id__in=id_list).values_list("emailuser",flat=True))
             else:
                 region_id = request.data.get('region_id')
                 district_id = request.data.get('district_id')

@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.urls import reverse
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroupPermission
 from ledger.payments.helpers import is_payment_admin
 from wildlifecompliance.components.call_email.serializers import EmailUserSerializer
 from wildlifecompliance.components.inspection.serializers import IndividualSerializer
@@ -315,6 +315,7 @@ class SanctionOutcomeSerializer(serializers.ModelSerializer):
             'time_of_issue',
             'assigned_to_id',
             'allocated_group',
+            'allowed_groups',
             #'allocated_group_id',
             'user_in_group',
             'can_user_action',
@@ -362,19 +363,20 @@ class SanctionOutcomeSerializer(serializers.ModelSerializer):
 
     def get_user_in_group(self, obj):
         user_id = self.context.get('request', {}).user.id
-
+        return_val = False
         if obj.allocated_group:
-            for member in obj.allocated_group.get_members():
-                if user_id == member.id:
-                    return True
-        return False
+           #for member in obj.allocated_group.get_members():
+           #    if user_id == member.id:
+           #       return_val = True
+           return_val = ComplianceManagementSystemGroupPermission.objects.filter(emailuser__id=user_id).filter(group__id__in=obj.allowed_groups).exists()
+        return return_val
 
     def get_can_user_action(self, obj):
         # User can have action buttons
         # when user is assigned to the target object or
         # when user is a member of the allocated group and no one is assigned to the target object
         user_id = self.context.get('request', {}).user.id
-        if obj.allocated_group and user_id == obj.assigned_to_id and user_id in [member.id for member in obj.allocated_group.get_members()]:
+        if obj.allocated_group and user_id == obj.assigned_to_id and self.get_user_in_group(obj):
             return True
         #elif obj.allocated_group and not obj.assigned_to_id:
         #    if user_id in [member.id for member in obj.allocated_group.get_members()]:

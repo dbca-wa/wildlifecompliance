@@ -3,6 +3,7 @@ import traceback
 from rest_framework.fields import CharField
 from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeometryField
 
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroupPermission
 from ledger.accounts.models import EmailUser, Address
 from wildlifecompliance.components.call_email.serializers import LocationSerializer, LocationSerializerOptimized
 from wildlifecompliance.components.inspection.models import (
@@ -156,6 +157,7 @@ class InspectionSerializer(serializers.ModelSerializer):
                 'party_inspected',
                 'assigned_to_id',
                 'allocated_group',
+                'allowed_groups',
                 'user_in_group',
                 'can_user_action',
                 'user_is_assignee',
@@ -186,7 +188,6 @@ class InspectionSerializer(serializers.ModelSerializer):
         return get_related_items(obj)
 
     def get_user_in_group(self, obj):
-        #TODO adjust if needed (may need present in-group regardless of region/district)
         return_val = False
         user_id = self.context.get('request', {}).user.id
         # inspection team should apply if status is 'open'
@@ -195,16 +196,17 @@ class InspectionSerializer(serializers.ModelSerializer):
                 if user_id == member.id:
                     return_val = True
         if not return_val and obj.allocated_group:
-           for member in obj.allocated_group.get_members():
-               if user_id == member.id:
-                  return_val = True
+           #for member in obj.allocated_group.get_members():
+           #    if user_id == member.id:
+           #       return_val = True
+           return_val = ComplianceManagementSystemGroupPermission.objects.filter(emailuser__id=user_id).filter(group__id__in=obj.allowed_groups).exists()
         return return_val
 
     def get_can_user_action(self, obj):
         return_val = False
         user_id = self.context.get('request', {}).user.id
 
-        if obj.allocated_group and user_id == obj.assigned_to_id and user_id in [member.id for member in obj.allocated_group.get_members()]:
+        if obj.allocated_group and user_id == obj.assigned_to_id and self.get_user_in_group(obj):
             return_val = True
         if obj.status == 'open' and obj.inspection_team: # and not obj.assigned_to_id:
             for member in obj.inspection_team.all():

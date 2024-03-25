@@ -10,7 +10,7 @@ from django.db.models import Q
 from django.db.models.signals import post_save
 from ledger.accounts.models import EmailUser, RevisionedMixin
 from rest_framework import serializers
-
+from wildlifecompliance import settings
 from wildlifecompliance.components.main.models import Document, CommunicationsLogEntry, Region, District
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.main.related_item import can_close_record
@@ -222,6 +222,20 @@ class SanctionOutcome(models.Model):
                     is_parking_offence = True
 
         return is_parking_offence
+
+    @property
+    def allowed_groups(self):
+        if not self.allocated_group:
+            return []
+        groups = [self.allocated_group.id]
+        if not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED:
+            groups = groups + list(ComplianceManagementSystemGroup.objects.filter(name=self.allocated_group.name).values_list('id',flat=True))
+        elif settings.SUPER_AUTH_GROUPS_ENABLED:
+            queryset = ComplianceManagementSystemGroup.objects
+            groups = groups + list(ComplianceManagementSystemGroup.objects.filter(
+                (Q(name=self.allocated_group.name) & Q(region=None)) | 
+                (Q(name=self.allocated_group.name) & Q(region=self.allocated_group.region) & Q(district=None))).values_list('id',flat=True))
+        return list(set(groups))
 
     def get_content_for_uin(self):
         offender = self.get_offender()[0]

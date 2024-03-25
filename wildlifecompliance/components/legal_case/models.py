@@ -4,7 +4,7 @@ from wildlifecompliance import settings
 from django.db import models
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields.jsonb import JSONField
-from django.db.models import Max
+from django.db.models import Q, Max
 from django.utils.encoding import python_2_unicode_compatible
 from ledger.accounts.models import EmailUser, RevisionedMixin
 from ledger.licence.models import LicenceType
@@ -182,6 +182,20 @@ class LegalCase(RevisionedMixin):
     def get_related_items_descriptor(self):
         #return '{0}, {1}'.format(self.title, self.details)
         return self.title
+    
+    @property
+    def allowed_groups(self):
+        if not self.allocated_group:
+            return []
+        groups = [self.allocated_group.id]
+        if not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED:
+            groups = groups + list(ComplianceManagementSystemGroup.objects.filter(name=self.allocated_group.name).values_list('id',flat=True))
+        elif settings.SUPER_AUTH_GROUPS_ENABLED:
+            queryset = ComplianceManagementSystemGroup.objects
+            groups = groups + list(ComplianceManagementSystemGroup.objects.filter(
+                (Q(name=self.allocated_group.name) & Q(region=None)) | 
+                (Q(name=self.allocated_group.name) & Q(region=self.allocated_group.region) & Q(district=None))).values_list('id',flat=True))
+        return list(set(groups))
 
     def close(self, request=None):
         close_record, parents = can_close_legal_case(self, request)

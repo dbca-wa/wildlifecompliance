@@ -24,7 +24,7 @@
                         :key="assignmentKey" 
                         @update-assigned-to-id="updateAssignedToId" 
                         :user_is_assignee="legal_case.user_is_assignee"
-                        :allocated_group_id="legal_case.allocated_group"
+                        :allowed_group_ids="legal_case.allowed_groups"
                         :user_in_group="legal_case.user_in_group" 
                         :assigned_to_id="legal_case.assigned_to_id" 
                         :assign_url="assign_url"/>

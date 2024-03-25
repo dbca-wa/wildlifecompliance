@@ -299,6 +299,9 @@ RENEWAL_PERIOD_DAYS = env('RENEWAL_PERIOD_DAYS', 30)
 GEOCODING_ADDRESS_SEARCH_TOKEN = env('GEOCODING_ADDRESS_SEARCH_TOKEN', 'ACCESS_TOKEN_NOT_FOUND')
 DOT_EMAIL_ADDRESS = env('DOT_EMAIL_ADDRESS')
 
+SUPER_AUTH_GROUPS_ENABLED = env('SUPER_AUTH_GROUPS_ENABLED',False) #allows officers (or equivalent group type) without specified region access all regions, and officers without specified district to access all districts within a specified region
+AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED = env('AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED',False) #restricts officers (or equivalent group type) to only their specified region/district (with exceptions if SUPER_AUTH_GROUPS_ENABLED)
+
 # Details for Threathened Species and Communities server.
 TSC_URL = env('TSC_URL', 'https://tsc.dbca.wa.gov.au')
 TSC_AUTH = env('TSC_AUTH', 'NO_AUTH')

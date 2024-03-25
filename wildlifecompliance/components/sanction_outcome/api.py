@@ -727,27 +727,37 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
 
     def check_authorised_to_update(self,request):
         print("check_authorised_to_update")
-        #TODO adjust auth if needed (may need to allow all officers/managers to create/update regardless of region)
         instance = self.get_object()
         user = self.request.user
         user_auth_groups = ComplianceManagementSystemGroupPermission.objects.filter(emailuser=user)
 
-        return instance.assigned_to_id == user.id and user_auth_groups.filter(group=instance.allocated_group).exists()
-        
+        return instance.assigned_to_id == user.id and user_auth_groups.filter(group__id__in=instance.allowed_groups).exists()        
+    
     def check_authorised_to_create(self,request):
         print("check_authorised_to_create")
-        #TODO adjust auth if needed (may need to allow all officers/managers to create/update regardless of region)
         region_id = None if not request.data.get('region_id') else request.data.get('region_id')
         district_id = None if not request.data.get('district_id') else request.data.get('district_id')
         user = self.request.user
-        #check that request user is an (inspection) officer or manager in the specified region and district
-        if not ComplianceManagementSystemGroupPermission.objects.filter(
+        #check that request user is an officer or manager in the specified region and district
+        if settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and settings.SUPER_AUTH_GROUPS_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+            Q(emailuser=user) & 
+            (Q(group__region_id=region_id) | Q(group__region_id=None))
+            ).filter(
+                Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+        elif settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
             emailuser=user, 
             group__region_id=region_id, 
             group__district_id=district_id
             ).filter(
                 Q(group__name=settings.GROUP_OFFICER) | 
                 Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+        elif not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+                Q(emailuser=user) & 
+                (Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER))).exists():
             return False
 
         return True
