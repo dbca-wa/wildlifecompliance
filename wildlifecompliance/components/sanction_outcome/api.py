@@ -881,6 +881,10 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
                 region_id = int(request_data['region_id']) if request_data['region_id'] else None
                 district_id = int(request_data['district_id']) if request_data['district_id'] else None
                 group = SanctionOutcome.get_compliance_permission_group(region_id, district_id, workflow_type)
+
+                if not group:
+                    raise serializers.ValidationError("No allocated group for specified region/district")
+                
                 request_data['allocated_group_id'] = group.id
 
                 # Count number of files uploaded

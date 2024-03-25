@@ -579,6 +579,8 @@ class OffenceViewSet(viewsets.ModelViewSet):
 
                 # 2.1. Determine allocated group and save it
                 new_group = Offence.get_allocated_group(region_id= saved_offence_instance.region_id, district_id= saved_offence_instance.district_id)
+                if not new_group:
+                    raise serializers.ValidationError("No allocated group for specified region/district")
                 saved_offence_instance.allocated_group = new_group
                 saved_offence_instance.assigned_to = None
                 saved_offence_instance.responsible_officer = request.user
