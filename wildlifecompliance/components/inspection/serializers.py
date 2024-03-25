@@ -13,6 +13,8 @@ from wildlifecompliance.components.inspection.models import (
     InspectionType,
     InspectionFormDataRecord,
     )
+from django.db.models import Q
+from django.conf import settings
 from wildlifecompliance.components.main.related_item import get_related_items
 from wildlifecompliance.components.main.serializers import CommunicationLogEntrySerializer
 from wildlifecompliance.components.users.serializers import (
@@ -262,7 +264,28 @@ class InspectionSerializer(serializers.ModelSerializer):
         #return allocated_group
 
     def get_all_officers(self, obj):
-        return []
+
+        #allowing all officer types and managers
+        group_users = list(ComplianceManagementSystemGroupPermission.objects.filter(
+            Q(group__name=settings.GROUP_OFFICER) |
+            Q(group__name=settings.GROUP_INSPECTION_OFFICER) |
+            Q(group__name=settings.GROUP_MANAGER)
+        ).distinct("emailuser").order_by("emailuser").values_list("emailuser__id",flat=True))
+
+        all_officers = EmailUser.objects.filter(id__in=group_users)
+
+        serialized_officers = IndividualSerializer(all_officers, many=True)
+        returned_data = serialized_officers.data
+
+        blank_field = [{
+            'dob': '',
+            'email': '',
+            'full_name': '',
+            'id': None,
+            }]
+        returned_data.insert(0, blank_field)
+
+        return returned_data
         #all_officer_objs = []
         #compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
         #permission = Permission.objects.filter(codename='officer').filter(content_type_id=compliance_content_type.id).first()
