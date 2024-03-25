@@ -106,11 +106,11 @@ class CreateWeakLinkView(views.APIView):
                 first_object_id = request.data.get('first_object_id')
                 second_content_type_str = request.data.get('second_content_type')
                 second_object_id = request.data.get('second_object_id')
-                can_user_action = request.data.get('can_user_action')
+                #can_user_action = request.data.get('can_user_action')
                 comment = request.data.get('comment')
                 
                 #the first object should be checked by the user to ensure they can update it
-                if is_internal(self.request) and can_user_action and checkWeakLinkAuth(request,first_content_type_str,first_object_id):
+                if is_internal(self.request) and checkWeakLinkAuth(request,first_content_type_str,first_object_id):
                     # transform request data to create new Weak Links obj
                     second_object_id_int = int(second_object_id)
                     first_content_type = ContentType.objects.get(
@@ -175,12 +175,12 @@ class RemoveWeakLinkView(views.APIView):
                 first_object_id = request.data.get('first_object_id')
                 second_content_type_str = request.data.get('second_content_type')
                 second_object_id = request.data.get('second_object_id')
-                can_user_action = request.data.get('can_user_action')
+                #can_user_action = request.data.get('can_user_action')
                 calling_instance = None
                 paired_instance = None
 
                 #TODO the first object should be checked by the user to ensure they can update it
-                if is_internal(self.request) and can_user_action and checkWeakLinkAuth(request,first_content_type_str,first_object_id):
+                if is_internal(self.request) and checkWeakLinkAuth(request,first_content_type_str,first_object_id):
                     # transform request data to search for Weak Link obj to delete
                     second_object_id_int = int(second_object_id)
                     first_content_type = ContentType.objects.get(
