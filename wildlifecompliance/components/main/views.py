@@ -17,7 +17,8 @@ from wildlifecompliance.components.main.serializers import (
 from wildlifecompliance.components.main.related_item import (
         RelatedItemsSerializer,
         WeakLinks,
-        get_related_items, 
+        get_related_items,
+        checkWeakLinkAuth, 
         format_model_name,
         search_weak_links
        )
@@ -95,7 +96,6 @@ class SearchWeakLinksView(views.APIView):
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED,)
 
-
 class CreateWeakLinkView(views.APIView):
     renderer_classes = [JSONRenderer]
 
@@ -109,8 +109,8 @@ class CreateWeakLinkView(views.APIView):
                 can_user_action = request.data.get('can_user_action')
                 comment = request.data.get('comment')
                 
-                #TODO the first object should be checked by the user to ensure they can update it
-                if is_internal(self.request) and can_user_action:
+                #the first object should be checked by the user to ensure they can update it
+                if is_internal(self.request) and can_user_action and checkWeakLinkAuth(request,first_content_type_str,first_object_id):
                     # transform request data to create new Weak Links obj
                     second_object_id_int = int(second_object_id)
                     first_content_type = ContentType.objects.get(
@@ -180,7 +180,7 @@ class RemoveWeakLinkView(views.APIView):
                 paired_instance = None
 
                 #TODO the first object should be checked by the user to ensure they can update it
-                if is_internal(self.request) and can_user_action:
+                if is_internal(self.request) and can_user_action and checkWeakLinkAuth(request,first_content_type_str,first_object_id):
                     # transform request data to search for Weak Link obj to delete
                     second_object_id_int = int(second_object_id)
                     first_content_type = ContentType.objects.get(

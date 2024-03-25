@@ -5,6 +5,11 @@ from rest_framework.renderers import JSONRenderer
 from django.core.exceptions import ValidationError
 #from wildlifecompliance.components.offence.models import Offender
 from wildlifecompliance.components.organisations.models import Organisation
+
+from wildlifecompliance.components.main.models import (
+    ComplianceManagementSystemGroupPermission
+)
+
 #from ledger.accounts.models import EmailUser
 from wildlifecompliance.components.main.models import ComplianceManagementEmailUser as EmailUser
 from django.db import models
@@ -104,10 +109,12 @@ class RelatedItem:
 
 def search_weak_links(request_data):
     from wildlifecompliance.components.call_email.models import CallEmail
+    from wildlifecompliance.components.artifact.models import DocumentArtifact,PhysicalArtifact
     from wildlifecompliance.components.inspection.models import Inspection
     from wildlifecompliance.components.offence.models import Offence
     from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome
     from wildlifecompliance.components.legal_case.models import LegalCase
+
     qs = []
     related_items = []
     entity = None
@@ -176,8 +183,8 @@ def search_weak_links(request_data):
     elif 'legal_case' in components_selected:
         qs = LegalCase.objects.filter(
                 Q(number__icontains=search_text) |
-                Q(identifier__icontains=search_text) |
-                Q(description__icontains=search_text) 
+                #Q(identifier__icontains=search_text) |
+                Q(details__icontains=search_text) 
                 )
     elif 'document_artifact' in components_selected:
         qs = DocumentArtifact.objects.filter(
@@ -314,6 +321,44 @@ def get_related_offenders(entity, **kwargs):
                 organisation = Organisation.objects.get(id=offender.organisation.id)
                 offender_list.append(organisation)
     return offender_list
+
+def checkWeakLinkAuth(request,content_type_str,object_id):
+    from wildlifecompliance.components.inspection.models import Inspection
+    from wildlifecompliance.components.offence.models import Offence
+    from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome
+    from wildlifecompliance.components.legal_case.models import LegalCase
+
+    user_id = request.user
+    all_groups_allowed = ['physicalartifact','documentartifact','callemail']
+
+    if (content_type_str in all_groups_allowed):
+        return True
+    else:
+        user_groups = list(ComplianceManagementSystemGroupPermission.objects.filter(emailuser=user_id).values_list("group__id",flat=True))
+        if (content_type_str == "inspection"):
+            qs = Inspection.objects.filter(id=object_id)#.filter(assigned_to=user_id)
+            if qs.exists():
+                if user_id in qs[0].inspection_team.all().values_list("id",flat=True):
+                    return True
+                elif bool(set(qs[0].allowed_groups) & set(user_groups)):
+                    return True
+        else:
+            qs = None
+            if (content_type_str == "offence"):
+                qs = Offence.objects.filter(id=object_id).filter(assigned_to=user_id)
+                if bool(set(qs[0].allowed_groups) & set(user_groups)):
+                    return True
+            elif (content_type_str == "sanctionoutcome"):
+                qs = SanctionOutcome.objects.filter(id=object_id).filter(assigned_to=user_id)
+                if bool(set(qs[0].allowed_groups) & set(user_groups)):
+                    return True
+            elif (content_type_str == "legalcase"):
+                qs = LegalCase.objects.filter(id=object_id).filter(assigned_to=user_id)
+                if bool(set(qs[0].allowed_groups) & set(user_groups)):
+                    return True
+            else:
+                return False
+        return False
 
 def get_related_items(entity, pending_closure=False, **kwargs):
     try:
