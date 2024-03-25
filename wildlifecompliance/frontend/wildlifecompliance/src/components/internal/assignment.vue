@@ -78,7 +78,9 @@ export default {
             this.$emit('update-assigned-to-id', res.body);
         },
         getAllocatedGroup: async function(id_list) {
+            if (this.allowed_groups == null) {
             Vue.set(this, 'allowed_groups', []);
+            }
             let allocatedGroupResponse = await Vue.http.post(
             api_endpoints.allocated_group_members,
             {
