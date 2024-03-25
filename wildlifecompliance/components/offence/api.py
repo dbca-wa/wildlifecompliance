@@ -242,17 +242,16 @@ class OffenceViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    #use check_authorised_to_create instead
-    #@list_route(methods=['GET', ])
-    #def can_user_create(self, request, *args, **kwargs):
-    ##TODO: Check logic with the business
+    @list_route(methods=['GET', ])
+    def can_user_create(self, request, *args, **kwargs):
+    #TODO: Check logic with the business
 
-    #   # Find groups which has permissions determined above
-    #   allowed_groups = ComplianceManagementSystemGroup.objects.filter(name=settings.GROUP_OFFICER)
-    #   for allowed_group in allowed_groups:
-    #       if request.user in allowed_group.get_members():
-    #           return Response(True)
-    #   return Response(False)
+       # Find groups which has permissions determined above
+       allowed_groups = ComplianceManagementSystemGroup.objects.filter(Q(name=settings.GROUP_OFFICER)|Q(name=settings.GROUP_MANAGER))
+       for allowed_group in allowed_groups:
+           if request.user in allowed_group.get_members():
+               return Response(True)
+       return Response(False)
 
     @list_route(methods=['GET', ])
     def optimised(self, request, *args, **kwargs):
