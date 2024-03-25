@@ -368,7 +368,7 @@ class InspectionViewSet(viewsets.ModelViewSet):
         
     def check_authorised_to_create(self,request):
         print("check_authorised_to_create")
-        #TODO adjust auth if needed (may need to allow all officers/managers to create/update regardless of region)
+
         region_id = None if not request.data.get('region_id') else request.data.get('region_id')
         district_id = None if not request.data.get('district_id') else request.data.get('district_id')
         user = self.request.user
@@ -789,7 +789,6 @@ class InspectionViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         try:
 
-            #TODO
             #to create make sure user is in appropriate group (inspection officer or manager in region)
             if not self.check_authorised_to_create(request):
                 return Response(
@@ -909,7 +908,10 @@ class InspectionViewSet(viewsets.ModelViewSet):
                     #instance.allocated_group_id = None if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
                     #recipient_id = instance.inspection_team_lead_id
 
-                instance.allocated_group = instance.get_compliance_permission_group(instance.region,instance.district,instance.status)
+                allocated_group = instance.get_compliance_permission_group(instance.region,instance.district,instance.status)
+                if not allocated_group:
+                    raise serializers.ValidationError("No allocated group for specified region/district")
+                instance.allocated_group = allocated_group
                 instance.save()
                 
                 # Needed for create inspection
