@@ -14,7 +14,7 @@ from django.db.models import Q
 from django.http import HttpResponse, FileResponse, HttpResponseNotFound
 from ledger.payments.invoice.models import Invoice
 from ledger.accounts.models import EmailUser
-
+from django.conf import settings
 from rest_framework import viewsets, serializers, status
 from rest_framework.decorators import list_route, detail_route, renderer_classes
 from rest_framework.renderers import JSONRenderer
@@ -28,7 +28,7 @@ from wildlifecompliance.components.main.process_document import (
         )
 from wildlifecompliance.components.call_email.models import CallEmail, CallEmailUserAction
 from wildlifecompliance.components.inspection.models import Inspection, InspectionUserAction
-from wildlifecompliance.components.offence.models import AllegedOffence
+from wildlifecompliance.components.offence.models import AllegedOffence, Offence
 from wildlifecompliance.components.sanction_outcome.email import send_infringement_notice, \
     send_due_date_extended_mail, send_return_to_officer_email, send_to_manager_email, send_withdraw_by_manager_email, \
     send_withdraw_by_branch_manager_email, send_return_to_infringement_notice_coordinator_email, send_decline_email, \
@@ -52,7 +52,7 @@ from wildlifecompliance.components.sanction_outcome.serializers import SanctionO
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.wc_payments.models import InfringementPenalty, InfringementPenaltyInvoice
 from wildlifecompliance.helpers import is_authorised_to_modify, is_internal, is_customer
-from wildlifecompliance.components.main.models import TemporaryDocumentCollection
+from wildlifecompliance.components.main.models import TemporaryDocumentCollection, ComplianceManagementSystemGroupPermission
 from wildlifecompliance.settings import SO_TYPE_CHOICES, SO_TYPE_REMEDIATION_NOTICE, SO_TYPE_INFRINGEMENT_NOTICE, \
     SO_TYPE_LETTER_OF_ADVICE, SO_TYPE_CAUTION_NOTICE
 
@@ -485,6 +485,7 @@ class RemediationActionViewSet(viewsets.ModelViewSet):
         print(request.data)
         try:
             instance = self.get_object()
+            
             # process docs
             returned_data = process_generic_document(request, instance)
             # delete Sanction Outcome if user cancels modal
@@ -606,7 +607,8 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
         """
         return super(SanctionOutcomeViewSet, self).retrieve(request, *args, **kwargs)
 
-    # TO DO: This function needs to be reviewed and uncommented
+    #TODO: This function needs to be reviewed and uncommented - it may also be redundant
+    #alternatively, use the SanctionOutcome get_compliance_permission_group method if the outcome is to be the same
 
     # def get_allocated_group(self, workflow_type, region_id, district_id):
     #    """
@@ -723,12 +725,56 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
+    def check_authorised_to_update(self,request):
+        print("check_authorised_to_update")
+        instance = self.get_object()
+        user = self.request.user
+        user_auth_groups = ComplianceManagementSystemGroupPermission.objects.filter(emailuser=user)
+
+        return instance.assigned_to_id == user.id and user_auth_groups.filter(group__id__in=instance.allowed_groups).exists()        
+    
+    def check_authorised_to_create(self,request):
+        print("check_authorised_to_create")
+        region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+        district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+        user = self.request.user
+        #check that request user is an officer or manager in the specified region and district
+        if settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and settings.SUPER_AUTH_GROUPS_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+            Q(emailuser=user) & 
+            (Q(group__region_id=region_id) | Q(group__region_id=None))
+            ).filter(
+                Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+        elif settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+            emailuser=user, 
+            group__region_id=region_id, 
+            group__district_id=district_id
+            ).filter(
+                Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+        elif not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+                Q(emailuser=user) & 
+                (Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER))).exists():
+            return False
+
+        return True
+
     def update(self, request, *args, **kwargs):
         # raise serializers.ValidationError('This is ValidationError in the update()')
         """
         Update existing sanction outcome
         """
         try:
+
+            #check if user authorised to update - must be in allocated group and assigned
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             with transaction.atomic():
                 instance = self.get_object()
                 request_data = request.data
@@ -803,6 +849,13 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
         Create new sanction outcome from the modal
         """
         try:
+
+            #to create make sure user is in appropriate group (officer or manager in region)
+            if not self.check_authorised_to_create(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             with transaction.atomic():
                 res_json = {}
 
@@ -827,8 +880,11 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
                 # allocated group
                 region_id = int(request_data['region_id']) if request_data['region_id'] else None
                 district_id = int(request_data['district_id']) if request_data['district_id'] else None
-                # TO DO: get_allocated_group function to be reviewed
-                group = self.get_allocated_group(region_id, district_id, workflow_type)
+                group = SanctionOutcome.get_compliance_permission_group(region_id, district_id, workflow_type)
+
+                if not group:
+                    raise serializers.ValidationError("No allocated group for specified region/district")
+                
                 request_data['allocated_group_id'] = group.id
 
                 # Count number of files uploaded
@@ -935,8 +991,8 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
 
                 if workflow_type == SanctionOutcome.WORKFLOW_SEND_TO_MANAGER:
                     # email_data = prepare_mail(request, instance, workflow_entry, send_mail)
-                    #compliance_group = CompliancePermissionGroup.objects.get(id=request.data.get('allocated_group_id'))
-                    to_address = [user.email for user in compliance_group.members.all()]
+                    compliance_group = ComplianceManagementSystemGroup.objects.get(id=request.data.get('allocated_group_id'))
+                    to_address = [user.email for user in compliance_group.get_members()]
                     cc = [request.user.email,]
                     bcc = None
                     email_data = send_to_manager_email(to_address, instance, workflow_entry, request, cc, bcc)
@@ -977,6 +1033,16 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
         print(request.data)
         try:
             instance = self.get_object()
+
+            #if the action is anything other than list, check auth
+            action = request.data.get('action')
+            if action != 'list':
+                #in-group and assigned OR on inspection team
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+
             # process docs
             returned_data = process_generic_document(request, instance)
             # delete Sanction Outcome if user cancels modal
@@ -1057,6 +1123,13 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def send_parking_infringement(self, request, instance=None, *args, **kwargs):
         try:
+
+            #in-group and assigned OR on inspection team
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             with transaction.atomic():
 
                 instance = self.get_object() if not instance else instance
@@ -1120,6 +1193,12 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def record_fer_case_number(self, request, instance=None, *args, **kwargs):
         try:
+
+            #in-group and assigned OR on inspection team
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
             with transaction.atomic():
                 instance = self.get_object() if not instance else instance
                 data_requested = request.data.get('fer_case_number_1st', '') + '/' + request.data.get('fer_case_number_2nd', '')
@@ -1157,6 +1236,13 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def extend_due_date(self, request, instance=None, *args, **kwargs):
         try:
+
+            #in-group and assigned OR on inspection team
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+            
             with transaction.atomic():
                 if not instance:
                     instance = self.get_object()
@@ -1226,6 +1312,12 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def workflow_action(self, request, instance=None, *args, **kwargs):
         try:
+            #in-group and assigned OR on inspection team
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             with transaction.atomic():
                 if not instance:
                     instance = self.get_object()
@@ -1245,7 +1337,7 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
                     instance.send_to_manager(request)
 
                     # Email to manager
-                    to_address = [member.email for member in instance.allocated_group.members]
+                    to_address = [member.email for member in instance.allocated_group.get_members()]
                     cc = [instance.responsible_officer.email,] if instance.responsible_officer else None
                     bcc = None
                     email_data = send_to_manager_email(to_address, instance, workflow_entry, request, cc, bcc)
@@ -1353,7 +1445,7 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
                     instance.escalate_for_withdrawal(request)
 
                     # Email to branch manager,
-                    to_address = [member.email for member in instance.allocated_group.members]
+                    to_address = [member.email for member in instance.allocated_group.get_members()]
                     cc = [request.user.email,] if request.user else None
                     bcc = None
                     email_data = send_escalate_for_withdrawal_email(to_address, instance, workflow_entry, request, cc, bcc)
@@ -1386,7 +1478,7 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
                     instance.return_to_infringement_notice_coordinator(request)
 
                     # Email to Infringement Notice Coordinator
-                    to_address = [member.email for member in instance.allocated_group.members]
+                    to_address = [member.email for member in instance.allocated_group.get_members()]
                     cc = [instance.responsible_officer.email, request.user.email]
                     bcc = None
                     email_data = send_return_to_infringement_notice_coordinator_email(to_address, instance, workflow_entry, request, cc, bcc)

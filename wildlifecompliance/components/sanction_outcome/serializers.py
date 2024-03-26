@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.urls import reverse
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroupPermission
 from ledger.payments.helpers import is_payment_admin
 from wildlifecompliance.components.call_email.serializers import EmailUserSerializer
 from wildlifecompliance.components.inspection.serializers import IndividualSerializer
@@ -37,7 +37,7 @@ def can_user_approve(obj, user):
     if user.id == offence.assigned_to_id:
         return True
     elif offence.allocated_group and not offence.assigned_to_id:
-        if user.id in [member.id for member in offence.allocated_group.members]:
+        if user.id in [member.id for member in offence.allocated_group.get_members()]:
             return True
     return False
 
@@ -281,7 +281,7 @@ class SanctionOutcomeSerializer(serializers.ModelSerializer):
     alleged_committed_offences = serializers.SerializerMethodField()
     offender = OffenderSerializer(read_only=True,)
     offence = OffenceSerializer(read_only=True,)
-    allocated_group = serializers.SerializerMethodField()
+    #allocated_group = serializers.SerializerMethodField()
     user_in_group = serializers.SerializerMethodField()
     can_user_action = serializers.SerializerMethodField()
     user_is_assignee = serializers.SerializerMethodField()
@@ -315,6 +315,7 @@ class SanctionOutcomeSerializer(serializers.ModelSerializer):
             'time_of_issue',
             'assigned_to_id',
             'allocated_group',
+            'allowed_groups',
             #'allocated_group_id',
             'user_in_group',
             'can_user_action',
@@ -362,23 +363,24 @@ class SanctionOutcomeSerializer(serializers.ModelSerializer):
 
     def get_user_in_group(self, obj):
         user_id = self.context.get('request', {}).user.id
-
+        return_val = False
         if obj.allocated_group:
-            for member in obj.allocated_group.members:
-                if user_id == member.id:
-                    return True
-        return False
+           #for member in obj.allocated_group.get_members():
+           #    if user_id == member.id:
+           #       return_val = True
+           return_val = ComplianceManagementSystemGroupPermission.objects.filter(emailuser__id=user_id).filter(group__id__in=obj.allowed_groups).exists()
+        return return_val
 
     def get_can_user_action(self, obj):
         # User can have action buttons
         # when user is assigned to the target object or
         # when user is a member of the allocated group and no one is assigned to the target object
         user_id = self.context.get('request', {}).user.id
-        if user_id == obj.assigned_to_id:
+        if obj.allocated_group and user_id == obj.assigned_to_id and self.get_user_in_group(obj):
             return True
-        elif obj.allocated_group and not obj.assigned_to_id:
-            if user_id in [member.id for member in obj.allocated_group.members]:
-                return True
+        #elif obj.allocated_group and not obj.assigned_to_id:
+        #    if user_id in [member.id for member in obj.allocated_group.get_members()]:
+        #        return True
 
         return False
 
@@ -529,7 +531,7 @@ class SanctionOutcomeDatatableSerializer(serializers.ModelSerializer):
                 if user.id == obj.assigned_to_id:
                     # if user is assigned to the object, the user can process it
                     url_list.append(process_url)
-                elif (obj.allocated_group and not obj.assigned_to_id) and user.id in [member.id for member in obj.allocated_group.members]:
+                elif (obj.allocated_group and not obj.assigned_to_id) and user.id in [member.id for member in obj.allocated_group.get_members()]:
                     # if user belongs to the same group of the object
                     # and no one is assigned to the object,
                     # the user can process it
@@ -564,7 +566,7 @@ class SanctionOutcomeDatatableSerializer(serializers.ModelSerializer):
         return urls
     
     def get_region(self,obj):
-        return obj.region_id
+        return obj.offence.region_id if obj.offence else None
 
 
 class RecordFerCaseNumberSerializer(serializers.ModelSerializer):
@@ -590,8 +592,8 @@ class RecordFerCaseNumberSerializer(serializers.ModelSerializer):
 class SaveSanctionOutcomeSerializer(serializers.ModelSerializer):
     offence_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
     offender_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
-    region_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
-    district_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
+    #region_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
+    #district_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
     allocated_group_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
     registration_holder_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
     driver_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
@@ -604,8 +606,8 @@ class SaveSanctionOutcomeSerializer(serializers.ModelSerializer):
             'identifier',
             'offence_id',
             'offender_id',
-            'region_id',
-            'district_id',
+            #'region_id',
+            #'district_id',
             'allocated_group_id',
             'issued_on_paper',
             'paper_id',
@@ -622,8 +624,8 @@ class SaveSanctionOutcomeSerializer(serializers.ModelSerializer):
         field_errors = {}
         non_field_errors = []
 
-        if not data['region_id']:
-            non_field_errors.append('Sanction Outcome must have a region')
+        #if not data['region_id']:
+        #    non_field_errors.append('Sanction Outcome must have a region')
 
         if data['issued_on_paper']:
             if not data['paper_id']:

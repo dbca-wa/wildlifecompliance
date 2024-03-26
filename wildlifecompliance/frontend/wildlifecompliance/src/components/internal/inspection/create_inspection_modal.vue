@@ -217,7 +217,7 @@ export default {
           region: null,
         });
         // ensure security group members list is up to date
-        // this.updateAllocatedGroup();
+        this.updateAllocatedGroup();
       },
       updateAllocatedGroup: async function() {
           this.errorResponse = "";

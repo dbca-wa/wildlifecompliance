@@ -6,7 +6,7 @@ from wsgiref.util import FileWrapper
 from django.http import HttpResponse
 from django.db import transaction
 from django.core.exceptions import ValidationError
-
+from ledger.accounts.models import EmailUser
 from rest_framework import viewsets, serializers, views, status
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
@@ -49,7 +49,9 @@ from wildlifecompliance.components.main.serializers import (
     DistrictSerializer,
 )
 from wildlifecompliance.components.main.models import (
-    TemporaryDocumentCollection, Region, District, get_group_members
+    TemporaryDocumentCollection, Region, District, get_group_members,
+    ComplianceManagementSystemGroup,
+    ComplianceManagementSystemGroupPermission
 )
 from wildlifecompliance.components.users.serializers import ComplianceUserDetailsSerializer
 from wildlifecompliance.components.main.process_document import save_document
@@ -1418,19 +1420,26 @@ class AllocatedGroupMembers(views.APIView):
 
     def post(self, request, format=None):
         try:
-            region_id = request.data.get('region_id')
-            district_id = request.data.get('district_id')
-            workflow_type = request.data.get('workflow_type')
-            members = get_group_members(workflow_type, region_id, district_id)
+            members = []
 
-            allocated_group = [{
-                'email': '',
-                'first_name': '',
-                'full_name': '',
-                'id': None,
-                'last_name': '',
-                'title': '',
-                }]
+            if request.data.get('id_list'):
+                id_list = request.data.get('id_list')
+                members = EmailUser.objects.filter(id__in=ComplianceManagementSystemGroupPermission.objects.filter(group__id__in=id_list).values_list("emailuser",flat=True))
+            else:
+                region_id = request.data.get('region_id')
+                district_id = request.data.get('district_id')
+                workflow_type = request.data.get('workflow_type')
+                
+                members = get_group_members(workflow_type, region_id, district_id)
+
+            allocated_group = []#[{
+            #    'email': '',
+            #    'first_name': '',
+            #    'full_name': '',
+            #    'id': None,
+            #    'last_name': '',
+            #    'title': '',
+            #    }]
             #serializer = ComplianceUserDetailsOptimisedSerializer(group.members, many=True)
             data = ComplianceUserDetailsSerializer(members, many=True).data
             for member in data:

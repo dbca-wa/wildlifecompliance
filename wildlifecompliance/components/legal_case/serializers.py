@@ -5,6 +5,7 @@ import pytz
 from rest_framework.fields import CharField
 
 from ledger.accounts.models import EmailUser, Address
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroupPermission
 from wildlifecompliance.components.legal_case.models import (
     LegalCase,
     LegalCaseUserAction,
@@ -566,7 +567,7 @@ class ProsecutionBriefSerializer(serializers.ModelSerializer):
 class LegalCaseNoRunningSheetSerializer(serializers.ModelSerializer):
     #running_sheet_entries = LegalCaseRunningSheetEntrySerializer(many=True)
     legal_case_person = EmailUserSerializer(many=True)
-    allocated_group = serializers.SerializerMethodField()
+    #allocated_group = serializers.SerializerMethodField()
     user_in_group = serializers.SerializerMethodField()
     can_user_action = serializers.SerializerMethodField()
     user_is_assignee = serializers.SerializerMethodField()
@@ -591,6 +592,7 @@ class LegalCaseNoRunningSheetSerializer(serializers.ModelSerializer):
                 'case_created_time',
                 'assigned_to_id',
                 'allocated_group',
+                'allowed_groups',
                 # 'allocated_group_id',
                 'user_in_group',
                 'can_user_action',
@@ -647,20 +649,23 @@ class LegalCaseNoRunningSheetSerializer(serializers.ModelSerializer):
         return_val = False
         user_id = self.context.get('request', {}).user.id
         if obj.allocated_group:
-           for member in obj.allocated_group.members:
-               if user_id == member.id:
-                  return_val = True
+           #for member in obj.allocated_group.get_members():
+           #    if user_id == member.id:
+           #       return_val = True
+           return_val = ComplianceManagementSystemGroupPermission.objects.filter(emailuser__id=user_id).filter(group__id__in=obj.allowed_groups).exists()
         return return_val
 
     def get_can_user_action(self, obj):
         return_val = False
         user_id = self.context.get('request', {}).user.id
-        if user_id == obj.assigned_to_id:
+        if obj.allocated_group and user_id == obj.assigned_to_id and self.get_user_in_group(obj):
             return_val = True
-        elif obj.allocated_group and not obj.assigned_to_id:
-           for member in obj.allocated_group.members:
-               if user_id == member.id:
-                  return_val = True
+        #if user_id == obj.assigned_to_id:
+        #    return_val = True
+        #elif obj.allocated_group and not obj.assigned_to_id:
+        #   for member in obj.allocated_group.get_members():
+        #       if user_id == member.id:
+        #          return_val = True
         return return_val
 
     def get_user_is_assignee(self, obj):
@@ -691,7 +696,7 @@ class LegalCaseNoRunningSheetSerializer(serializers.ModelSerializer):
 class BaseLegalCaseSerializer(serializers.ModelSerializer):
     running_sheet_entries = LegalCaseRunningSheetEntrySerializer(many=True)
     legal_case_person = EmailUserSerializer(many=True)
-    allocated_group = serializers.SerializerMethodField()
+    #allocated_group = serializers.SerializerMethodField()
     user_in_group = serializers.SerializerMethodField()
     can_user_action = serializers.SerializerMethodField()
     user_is_assignee = serializers.SerializerMethodField()
@@ -716,6 +721,7 @@ class BaseLegalCaseSerializer(serializers.ModelSerializer):
                 'case_created_time',
                 'assigned_to_id',
                 'allocated_group',
+                'allowed_groups',
                 #'allocated_group_id',
                 'user_in_group',
                 'can_user_action',
@@ -772,20 +778,21 @@ class BaseLegalCaseSerializer(serializers.ModelSerializer):
         return_val = False
         user_id = self.context.get('request', {}).user.id
         if obj.allocated_group:
-           for member in obj.allocated_group.members:
-               if user_id == member.id:
-                  return_val = True
+           #for member in obj.allocated_group.get_members():
+           #    if user_id == member.id:
+           #       return_val = True
+           return_val = ComplianceManagementSystemGroupPermission.objects.filter(emailuser__id=user_id).filter(group__id__in=obj.allowed_groups).exists()
         return return_val
 
     def get_can_user_action(self, obj):
         return_val = False
         user_id = self.context.get('request', {}).user.id
-        if user_id == obj.assigned_to_id:
+        if obj.allocated_group and user_id == obj.assigned_to_id and self.get_user_in_group(obj):
             return_val = True
-        elif obj.allocated_group and not obj.assigned_to_id:
-           for member in obj.allocated_group.members:
-               if user_id == member.id:
-                  return_val = True
+        #elif obj.allocated_group and not obj.assigned_to_id:
+        #   for member in obj.allocated_group.get_members():
+        #       if user_id == member.id:
+        #          return_val = True
         return return_val
 
     def get_user_is_assignee(self, obj):
@@ -815,7 +822,7 @@ class BaseLegalCaseSerializer(serializers.ModelSerializer):
 
 class LegalCaseBriefOfEvidenceSerializer(BaseLegalCaseSerializer):
     running_sheet_entries = LegalCaseRunningSheetEntrySerializer(many=True)
-    allocated_group = serializers.SerializerMethodField()
+    #allocated_group = serializers.SerializerMethodField()
     user_in_group = serializers.SerializerMethodField()
     can_user_action = serializers.SerializerMethodField()
     user_is_assignee = serializers.SerializerMethodField()
@@ -853,6 +860,7 @@ class LegalCaseBriefOfEvidenceSerializer(BaseLegalCaseSerializer):
                 'case_created_time',
                 'assigned_to_id',
                 'allocated_group',
+                'allowed_groups',
                 'allocated_group_id',
                 'user_in_group',
                 'can_user_action',
@@ -1041,7 +1049,7 @@ class LegalCaseBriefOfEvidenceSerializer(BaseLegalCaseSerializer):
 #class LegalCaseProsecutionBriefSerializer(BaseLegalCaseSerializer):
 class LegalCaseProsecutionBriefSerializer(LegalCaseBriefOfEvidenceSerializer):
     running_sheet_entries = LegalCaseRunningSheetEntrySerializer(many=True)
-    allocated_group = serializers.SerializerMethodField()
+    #allocated_group = serializers.SerializerMethodField()
     user_in_group = serializers.SerializerMethodField()
     can_user_action = serializers.SerializerMethodField()
     user_is_assignee = serializers.SerializerMethodField()
@@ -1078,6 +1086,7 @@ class LegalCaseProsecutionBriefSerializer(LegalCaseBriefOfEvidenceSerializer):
                 'case_created_time',
                 'assigned_to_id',
                 'allocated_group',
+                'allowed_groups',
                 'allocated_group_id',
                 'user_in_group',
                 'can_user_action',

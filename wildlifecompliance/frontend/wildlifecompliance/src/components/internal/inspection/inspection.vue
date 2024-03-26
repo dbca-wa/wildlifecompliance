@@ -21,35 +21,14 @@
                                 {{ statusDisplay }}<br/>
                             </div>
                         </div>
-
-                        <div v-if="inspection.allocated_group" class="form-group">
-                          <div class="row">
-                            <div class="col-sm-12 top-buffer-s">
-                              <strong>Currently assigned to</strong><br/>
-                            </div>
-                          </div>
-                          <div class="row">
-                            <div v-if="statusId === 'open'" class="col-sm-12">
-                              <select :disabled="!inspection.user_in_group" class="form-control" v-model="inspection.assigned_to_id" @change="updateAssignedToId()">
-                                <option  v-for="option in inspection.inspection_team" :value="option.id" v-bind:key="option.id">
-                                  {{ option.full_name }}
-                                </option>
-                              </select>
-                            </div>
-                            <div v-else class="col-sm-12">
-                              <select :disabled="!inspection.user_in_group" class="form-control" v-model="inspection.assigned_to_id" @change="updateAssignedToId()">
-                                <option  v-for="option in inspection.allocated_group" :value="option.id" v-bind:key="option.id">
-                                  {{ option.full_name }}
-                                </option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                        <div v-if="inspection.user_in_group">
-                            <a @click="updateAssignedToId('current_user')" class="btn pull-right">
-                                Assign to me
-                            </a>
-                        </div>
+                        <Assignment 
+                        :key="assignmentKey" 
+                        @update-assigned-to-id="updateAssignedToId" 
+                        :user_is_assignee="inspection.user_is_assignee"
+                        :allowed_group_ids="inspection.allowed_groups"
+                        :user_in_group="inspection.user_in_group" 
+                        :assigned_to_id="inspection.assigned_to_id" 
+                        :assign_url="assign_url"/>
                     </div>
                 </div>
             </div>
@@ -394,6 +373,7 @@ import FormSection from "@/components/forms/section_toggle.vue";
 import SearchPersonOrganisation from "@/components/common/search_person_or_organisation.vue";
 //import CreateNewPerson from "@common-components/create_new_person.vue";
 //import CreateNewOrganisation from "@common-components/create_new_organisation.vue";
+import Assignment from "../assignment.vue";
 import CommsLogs from "@common-components/comms_logs.vue";
 import datatable from '@vue-utils/datatable.vue'
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
@@ -488,6 +468,11 @@ export default {
         api_endpoints.inspection,
         this.$route.params.inspection_id + "/action_log"
       ),
+      assign_url: helpers.add_endpoint_join(
+        api_endpoints.inspection,
+        this.$route.params.inspection_id + '/update_assigned_to_id/'
+      ),
+      assignmentKey: 0,
       sanctionOutcomeInitialised: false,
       offenceInitialised: false,
       hashAttributeWhitelist: [
@@ -520,6 +505,7 @@ export default {
     InspectionWorkflow,
     RelatedItems,
     MapLocation,
+    Assignment,
   },
   computed: {
     ...mapGetters('inspectionStore', {
@@ -1043,27 +1029,12 @@ export default {
         obj.renderer_form_data = copiedRendererFormData;
         return obj;
     },
-    updateAssignedToId: async function (user) {
-        let url = helpers.add_endpoint_join(
-            api_endpoints.inspection,
-            this.inspection.id + '/update_assigned_to_id/'
-            );
-        let payload = null;
-        if (user === 'current_user' && this.inspection.user_in_group) {
-            payload = {'current_user': true};
-        } else if (user === 'blank') {
-            payload = {'blank': true};
-        } else {
-            payload = { 'assigned_to_id': this.inspection.assigned_to_id };
-        }
-        let res = await Vue.http.post(
-            url,
-            payload
-        );
-        await this.setInspection(res.body);
+    updateAssignedToId: async function (body) {
+        await this.setInspection(body);
         this.$nextTick(() => {
             this.constructInspectionTeamTable();
         });
+        this.assignmentKey += 1;
     },
   },
   created: async function() {

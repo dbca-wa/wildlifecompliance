@@ -54,7 +54,7 @@ class Command(BaseCommand):
 
                         to_address = [ra.sanction_outcome.get_offender()[0].email,]
                         cc = None
-                        bcc = [member.email for member in ra.sanction_outcome.allocated_group.members]
+                        bcc = [member.email for member in ra.sanction_outcome.allocated_group.get_members()]
                         attachments = []
                         email_data = send_notification_close_to_due_remediation_action(to_address, ra.sanction_outcome, workflow_entry, cc, bcc, attachments)
 

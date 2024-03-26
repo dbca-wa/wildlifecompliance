@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
                         to_address = [ra.sanction_outcome.get_offender()[0].email,]
                         cc = None
-                        bcc = [ra.sanction_outcome.responsible_officer.email] if ra.sanction_outcome.responsible_officer else [member.email for member in ra.sanction_outcome.allocated_group.members]
+                        bcc = [ra.sanction_outcome.responsible_officer.email] if ra.sanction_outcome.responsible_officer else [member.email for member in ra.sanction_outcome.allocated_group.get_members()]
                         attachments = []
                         email_data = send_notification_overdue_remediation_action(to_address, ra.sanction_outcome, cc, bcc, attachments)
 

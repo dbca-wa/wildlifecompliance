@@ -17,7 +17,8 @@ from wildlifecompliance.components.main.serializers import (
 from wildlifecompliance.components.main.related_item import (
         RelatedItemsSerializer,
         WeakLinks,
-        get_related_items, 
+        get_related_items,
+        checkWeakLinkAuth, 
         format_model_name,
         search_weak_links
        )
@@ -32,6 +33,7 @@ from wildlifecompliance.helpers import (
         is_compliance_management_callemail_readonly_user,
         prefer_compliance_management,
         )
+from wildlifecompliance.helpers import is_internal
 
 logger = logging.getLogger(__name__)
 
@@ -66,28 +68,33 @@ class SearchKeywordsView(views.APIView):
     renderer_classes = [JSONRenderer]
 
     def post(self, request, format=None):
-        qs = []
-        search_words = request.data.get('searchKeywords')
-        search_application = request.data.get('searchApplication')
-        search_licence = request.data.get('searchLicence')
-        search_returns = request.data.get('searchReturn')
-        is_internal = request.data.get('is_internal')
-        if search_words:
-            qs = search_keywords(search_words, search_application, search_licence, search_returns, is_internal)
-        serializer = SearchKeywordSerializer(qs, many=True)
-        return Response(serializer.data)
+        if request.user.is_authenticated():
+            qs = []
+            search_words = request.data.get('searchKeywords')
+            search_application = request.data.get('searchApplication')
+            search_licence = request.data.get('searchLicence')
+            search_returns = request.data.get('searchReturn')
+            is_internal = request.data.get('is_internal')
+            if search_words:
+                qs = search_keywords(search_words, search_application, search_licence, search_returns, is_internal)
+            serializer = SearchKeywordSerializer(qs, many=True)
+            return Response(serializer.data)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED,)
 
 
 class SearchWeakLinksView(views.APIView):
     renderer_classes = [JSONRenderer]
 
     def post(self, request, format=None):
-        qs = []
-        if request.data.get('searchText'): # modify as appropriate
-            qs = search_weak_links(request.data)
-        return_qs = qs[:10]
-        return Response(return_qs)
-
+        if request.user.is_authenticated():
+            qs = []
+            if request.data.get('searchText'): # modify as appropriate
+                qs = search_weak_links(request.data)
+            return_qs = qs[:10]
+            return Response(return_qs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED,)
 
 class CreateWeakLinkView(views.APIView):
     renderer_classes = [JSONRenderer]
@@ -99,10 +106,11 @@ class CreateWeakLinkView(views.APIView):
                 first_object_id = request.data.get('first_object_id')
                 second_content_type_str = request.data.get('second_content_type')
                 second_object_id = request.data.get('second_object_id')
-                can_user_action = request.data.get('can_user_action')
+                #can_user_action = request.data.get('can_user_action')
                 comment = request.data.get('comment')
                 
-                if can_user_action:
+                #the first object should be checked by the user to ensure they can update it
+                if is_internal(self.request) and checkWeakLinkAuth(request,first_content_type_str,first_object_id):
                     # transform request data to create new Weak Links obj
                     second_object_id_int = int(second_object_id)
                     first_content_type = ContentType.objects.get(
@@ -167,11 +175,12 @@ class RemoveWeakLinkView(views.APIView):
                 first_object_id = request.data.get('first_object_id')
                 second_content_type_str = request.data.get('second_content_type')
                 second_object_id = request.data.get('second_object_id')
-                can_user_action = request.data.get('can_user_action')
+                #can_user_action = request.data.get('can_user_action')
                 calling_instance = None
                 paired_instance = None
 
-                if can_user_action:
+                #TODO the first object should be checked by the user to ensure they can update it
+                if is_internal(self.request) and checkWeakLinkAuth(request,first_content_type_str,first_object_id):
                     # transform request data to search for Weak Link obj to delete
                     second_object_id_int = int(second_object_id)
                     first_content_type = ContentType.objects.get(
@@ -260,14 +269,18 @@ class SearchReferenceView(views.APIView):
     renderer_classes = [JSONRenderer]
 
     def post(self, request, format=None):
+        #TODO not clear is this should be internal only or not, but at least should be authed
         try:
-            #qs = []
-            reference_number = request.data.get('reference_number')
-            if reference_number:
-                result = search_reference(reference_number)
-            #serializer = SearchReferenceSerializer(qs)
-            #return Response(serializer.data)
-            return Response(result)
+            if request.user.is_authenticated():
+                #qs = []
+                reference_number = request.data.get('reference_number')
+                if reference_number:
+                    result = search_reference(reference_number)
+                #serializer = SearchReferenceSerializer(qs)
+                #return Response(serializer.data)
+                return Response(result)
+            else:
+                return Response(status=status.HTTP_401_UNAUTHORIZED,)
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise

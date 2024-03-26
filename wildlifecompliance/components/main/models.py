@@ -11,7 +11,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from ledger.accounts.models import EmailUser
 import os
 from django.utils.translation import ugettext_lazy as _
-
+from django.db.models import Q
 from wildlifecompliance.components.section_regulation.models import Act
 from wildlifecompliance.settings import SO_TYPE_CHOICES
 from smart_selects.db_fields import ChainedForeignKey
@@ -344,7 +344,7 @@ class ComplianceManagementSystemGroup(models.Model):
         return "{}, {}, {}".format(self.get_name_display(), self.region, self.district)
 
     def get_members(self):
-        return [perm.emailuser for perm in self.compliancemanagementsystemgrouppermission_set.all()]
+        return [perm.emailuser for perm in self.compliancemanagementsystemgrouppermission_set.exclude(emailuser=None)]
 
     def add_member(self, user):
         ComplianceManagementSystemGroupPermission.objects.create(group=self,emailuser=user)
@@ -370,8 +370,32 @@ def get_group_members(workflow_type, region_id=None, district_id=None):
             return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_CALL_EMAIL_TRIAGE, region_id=region_id, district_id=district_id).get_members()
         elif workflow_type == 'forward_to_wildlife_protection_branch':
             return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_CALL_EMAIL_TRIAGE, region=Region.objects.get(head_office=True)).get_members()
-        elif (workflow_type == 'allocate_for_follow_up' or  workflow_type == 'allocate_for_inspection' or workflow_type == 'allocate_for_case'):
-            return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id).get_members()
+        else:
+            if not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED:
+                if (workflow_type == 'allocate_for_follow_up' or workflow_type == 'allocate_for_case'):
+                    id_list = ComplianceManagementSystemGroup.objects.filter(name=settings.GROUP_OFFICER).values_list("id",flat=True)
+                    return EmailUser.objects.filter(id__in=ComplianceManagementSystemGroupPermission.objects.filter(group__id__in=id_list).values_list("emailuser",flat=True))
+                elif workflow_type == 'allocate_for_inspection':
+                    id_list = ComplianceManagementSystemGroup.objects.filter(name=settings.GROUP_INSPECTION_OFFICER).values_list("id",flat=True)
+                    return EmailUser.objects.filter(id__in=ComplianceManagementSystemGroupPermission.objects.filter(group__id__in=id_list).values_list("emailuser",flat=True))
+            elif settings.SUPER_AUTH_GROUPS_ENABLED:
+                if (workflow_type == 'allocate_for_follow_up' or workflow_type == 'allocate_for_case'):
+                    id_list = ComplianceManagementSystemGroup.objects.filter(
+                        Q(name=settings.GROUP_OFFICER) &
+                        (Q(region_id=region_id) | Q(region_id=None))
+                    ).values_list("id",flat=True)
+                    return EmailUser.objects.filter(id__in=ComplianceManagementSystemGroupPermission.objects.filter(group__id__in=id_list).values_list("emailuser",flat=True))
+                elif workflow_type == 'allocate_for_inspection':
+                    id_list = ComplianceManagementSystemGroup.objects.filter(
+                        Q(name=settings.GROUP_INSPECTION_OFFICER) &
+                        (Q(region_id=region_id) | Q(region_id=None))
+                    ).values_list("id",flat=True)
+                    return EmailUser.objects.filter(id__in=ComplianceManagementSystemGroupPermission.objects.filter(group__id__in=id_list).values_list("emailuser",flat=True))
+            else:
+                if (workflow_type == 'allocate_for_follow_up' or workflow_type == 'allocate_for_case'):
+                    return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id).get_members()
+                elif workflow_type == 'allocate_for_inspection':
+                    return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_INSPECTION_OFFICER, region_id=region_id, district_id=district_id).get_members()
     except ComplianceManagementSystemGroup.DoesNotExist:
         raise GroupNotFoundError(f"Error: Group not found \n Please generate a group for the selected Region and District in admin settings")
 

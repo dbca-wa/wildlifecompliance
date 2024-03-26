@@ -43,7 +43,7 @@ from wildlifecompliance.components.offence.serializers import (
     UpdateAllegedCommittedOffenceSerializer)
 from wildlifecompliance.components.section_regulation.serializers import SectionRegulationSerializer
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, AllegedCommittedOffence
-from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup, ComplianceManagementSystemGroupPermission
 from wildlifecompliance.helpers import is_internal, is_customer
 
 
@@ -190,6 +190,12 @@ class OffenceViewSet(viewsets.ModelViewSet):
     def workflow_action(self, request, instance=None, *args, **kwargs):
         try:
             with transaction.atomic():
+
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+
                 if not instance:
                     instance = self.get_object()
 
@@ -238,10 +244,10 @@ class OffenceViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['GET', ])
     def can_user_create(self, request, *args, **kwargs):
-    # TO DO: Check logic with the business
+    #TODO: Check logic with the business
 
        # Find groups which has permissions determined above
-       allowed_groups = ComplianceManagementSystemGroup.objects.filter(name=settings.GROUP_OFFICER)
+       allowed_groups = ComplianceManagementSystemGroup.objects.filter(Q(name=settings.GROUP_OFFICER)|Q(name=settings.GROUP_MANAGER))
        for allowed_group in allowed_groups:
            if request.user in allowed_group.get_members():
                return Response(True)
@@ -345,6 +351,45 @@ class OffenceViewSet(viewsets.ModelViewSet):
         serializer = OffenceSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
+    def check_authorised_to_update(self,request):
+        print("check_authorised_to_update")
+        instance = self.get_object()
+        user = self.request.user
+        user_auth_groups = ComplianceManagementSystemGroupPermission.objects.filter(emailuser=user)
+
+        return instance.assigned_to_id == user.id and user_auth_groups.filter(group__id__in=instance.allowed_groups).exists()
+        
+    def check_authorised_to_create(self,request):
+        print("check_authorised_to_create")
+
+        region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+        district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+        user = self.request.user
+        #check that request user is an officer or manager in the specified region and district
+        if settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and settings.SUPER_AUTH_GROUPS_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+            Q(emailuser=user) & 
+            (Q(group__region_id=region_id) | Q(group__region_id=None))
+            ).filter(
+                Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+        elif settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+            emailuser=user, 
+            group__region_id=region_id, 
+            group__district_id=district_id
+            ).filter(
+                Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+        elif not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+                Q(emailuser=user) & 
+                (Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER))).exists():
+            return False
+
+        return True
+
+
     def update_parent(self, request, instance, *args, **kwargs):
         # Log parent actions and update status, if required
         # If CallEmail
@@ -366,6 +411,13 @@ class OffenceViewSet(viewsets.ModelViewSet):
     # @renderer_classes((JSONRenderer,))
     def update(self, request, *args, **kwargs):
         try:
+
+            #check if user authorised to update - must be in allocated group and assigned
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             with transaction.atomic():
                 instance = self.get_object()
                 request_data = request.data
@@ -497,6 +549,12 @@ class OffenceViewSet(viewsets.ModelViewSet):
     # def offence_save(self, request, *args, **kwargs):
     def create(self, request, *args, **kwargs):
         try:
+            #to create make sure user is in appropriate group (officer or manager in region)
+            if not self.check_authorised_to_create(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             with transaction.atomic():
                 request_data = request.data
 
@@ -521,6 +579,8 @@ class OffenceViewSet(viewsets.ModelViewSet):
 
                 # 2.1. Determine allocated group and save it
                 new_group = Offence.get_allocated_group(region_id= saved_offence_instance.region_id, district_id= saved_offence_instance.district_id)
+                if not new_group:
+                    raise serializers.ValidationError("No allocated group for specified region/district")
                 saved_offence_instance.allocated_group = new_group
                 saved_offence_instance.assigned_to = None
                 saved_offence_instance.responsible_officer = request.user
