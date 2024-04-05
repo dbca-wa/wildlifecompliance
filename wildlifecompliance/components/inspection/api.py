@@ -909,7 +909,8 @@ class InspectionViewSet(viewsets.ModelViewSet):
                     #recipient_id = instance.inspection_team_lead_id
 
                 allocated_group = instance.get_compliance_permission_group(instance.region,instance.district,instance.status)
-                if not allocated_group:
+                if not allocated_group and not instance.status in [Inspection.STATUS_CLOSED,
+                    Inspection.STATUS_PENDING_CLOSURE,Inspection.STATUS_DISCARDED]:
                     raise serializers.ValidationError("No allocated group for specified region/district")
                 instance.allocated_group = allocated_group
                 instance.save()
