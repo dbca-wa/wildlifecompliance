@@ -40,7 +40,7 @@ from datetime import datetime, timedelta, date
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from wildlifecompliance.components.main.api import save_location
-from wildlifecompliance.components.main.models import TemporaryDocumentCollection, ComplianceManagementSystemGroupPermission
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup,TemporaryDocumentCollection, ComplianceManagementSystemGroupPermission
 from wildlifecompliance.components.main.process_document import (
         process_generic_document, 
         save_comms_log_document_obj
@@ -528,6 +528,16 @@ class InspectionViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
         raise serializers.ValidationError(str(e))
 
+
+    @list_route(methods=['GET', ])
+    def can_user_create(self, request, *args, **kwargs):
+
+       # Find groups which has permissions determined above
+       allowed_groups = ComplianceManagementSystemGroup.objects.filter(Q(name=settings.GROUP_INSPECTION_OFFICER)|Q(name=settings.GROUP_MANAGER))
+       for allowed_group in allowed_groups:
+           if request.user in allowed_group.get_members():
+               return Response(True)
+       return Response(False)
 
     @list_route(methods=['GET', ])
     def optimised(self, request, *args, **kwargs):
