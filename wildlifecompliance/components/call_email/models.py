@@ -22,6 +22,10 @@ from wildlifecompliance.components.main.related_item import can_close_record
 #from wildlifecompliance.components.users.models import CompliancePermissionGroup
 from wildlifecompliance.components.main.models import Region, District
 
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
+
 logger = logging.getLogger(__name__)
 
 def update_compliance_doc_filename(instance, filename):
@@ -650,7 +654,7 @@ class ComplianceFormDataRecord(models.Model):
 class CallEmailDocument(Document):
     call_email = models.ForeignKey('CallEmail', related_name='documents')
     #_file = models.FileField(max_length=255, upload_to=update_call_email_doc_filename)
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
@@ -678,7 +682,7 @@ class CallEmailLogDocument(Document):
     #input_name = models.CharField(max_length=255, blank=True, null=True)
     #version_comment = models.CharField(max_length=255, blank=True, null=True)
     #_file = models.FileField(max_length=255, upload_to=update_call_email_comms_log_filename)
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'

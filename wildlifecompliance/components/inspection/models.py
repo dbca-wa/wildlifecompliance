@@ -21,6 +21,10 @@ from wildlifecompliance.components.main.models import Region, District
 from django.core.exceptions import ValidationError
 from django.conf import settings
 
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
+
 logger = logging.getLogger(__name__)
 
 def update_inspection_comms_log_filename(instance, filename):
@@ -300,14 +304,14 @@ class InspectionReportDocument(Document):
     log_entry = models.ForeignKey(
         'Inspection',
         related_name='report')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
 
 
 class InspectionTypeApprovalDocument(Document):
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -317,7 +321,7 @@ class InspectionCommsLogDocument(Document):
     log_entry = models.ForeignKey(
         'InspectionCommsLogEntry',
         related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -372,7 +376,7 @@ class InspectionUserAction(models.Model):
 
 class InspectionDocument(Document):
     inspection = models.ForeignKey('Inspection', related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)

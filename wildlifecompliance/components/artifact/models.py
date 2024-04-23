@@ -28,6 +28,10 @@ from wildlifecompliance.components.main.email import prepare_mail
 from django.core.exceptions import ValidationError
 from wildlifecompliance.components.main.utils import FakeRequest
 
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
+
 logger = logging.getLogger(__name__)
 
 
@@ -693,7 +697,7 @@ class ArtifactCommsLogDocument(Document):
     log_entry = models.ForeignKey(
         ArtifactCommsLogEntry,
         related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -735,7 +739,7 @@ class ArtifactDocument(Document):
     artifact = models.ForeignKey(
             Artifact, 
             related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
@@ -753,7 +757,7 @@ class RendererDocument(Document):
     physical_artifact = models.ForeignKey(
         PhysicalArtifact,
         related_name='renderer_documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
