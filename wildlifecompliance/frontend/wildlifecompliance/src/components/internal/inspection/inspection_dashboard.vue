@@ -49,7 +49,7 @@
                 </div>
             </div>
             <div class="col-md-3 pull-right">
-                <button @click.prevent="createInspection"
+                <button v-if="visibilityCreateNewButton" @click.prevent="createInspection"
                     class="btn btn-primary pull-right">New Inspection</button>
             </div>    
         </div>
@@ -103,6 +103,9 @@
                 
                 dateFormat: 'DD/MM/YYYY',
                 inspectionInitialised: false,
+                
+                canUserCreateNewInspection: false,
+
                 createInspectionBindId: '',
                 // datepickerOptions: {
                 //     format: 'DD/MM/YYYY',
@@ -232,6 +235,7 @@
         },
         
         created: async function() {
+            this.getUserCanCreate();
             // Status choices
             let returned_status_choices = await cache_helper.getSetCacheList(
                 'Inspection_StatusChoices', 
@@ -280,6 +284,9 @@
             MapLocations,
         },
         computed: {
+            visibilityCreateNewButton: function() {
+                return this.canUserCreateNewInspection;
+            }
         },
         methods: {
             ...mapActions('inspectionStore', {
@@ -295,6 +302,11 @@
             setCreateInspectionBindId: function() {
                 let timeNow = Date.now()
                 this.createInspectionBindId = 'inspection' + timeNow.toString();
+            },
+            getUserCanCreate: async function() {
+                let url = helpers.add_endpoint_join(api_endpoints.inspection, 'can_user_create/');
+                let res = await Vue.http.get(url);
+                this.canUserCreateNewInspection = res.body;
             },
             createInspectionUrl: async function () {
                 const newInspectionId = await this.saveInspection({ create: true });
