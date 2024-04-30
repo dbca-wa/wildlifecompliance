@@ -370,10 +370,16 @@ class GroupNotFoundError(Exception):
 
 def get_group_members(workflow_type, region_id=None, district_id=None):
     try:
+        
         if workflow_type == 'forward_to_regions':
             return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_CALL_EMAIL_TRIAGE, region_id=region_id, district_id=district_id).get_members()
         elif workflow_type == 'forward_to_wildlife_protection_branch':
             return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_CALL_EMAIL_TRIAGE, region=Region.objects.get(head_office=True)).get_members()
+        #for any allocations for case/inspection creation, only allow group members regardless of settings
+        elif (workflow_type == 'allocate_for_follow_up' or workflow_type == 'allocate_for_case'):
+            return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id).get_members()
+        elif workflow_type == 'allocate_for_inspection':
+            return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_INSPECTION_OFFICER, region_id=region_id, district_id=district_id).get_members()
         else:
             if not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED:
                 if (workflow_type == 'allocate_for_follow_up' or workflow_type == 'allocate_for_case'):
@@ -395,13 +401,14 @@ def get_group_members(workflow_type, region_id=None, district_id=None):
                         (Q(region_id=region_id) | Q(region_id=None))
                     ).values_list("id",flat=True)
                     return EmailUser.objects.filter(id__in=ComplianceManagementSystemGroupPermission.objects.filter(group__id__in=id_list).values_list("emailuser",flat=True))
-            else:
-                if (workflow_type == 'allocate_for_follow_up' or workflow_type == 'allocate_for_case'):
-                    return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id).get_members()
-                elif workflow_type == 'allocate_for_inspection':
-                    return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_INSPECTION_OFFICER, region_id=region_id, district_id=district_id).get_members()
+            #else:
+            #    if (workflow_type == 'allocate_for_follow_up' or workflow_type == 'allocate_for_case'):
+            #        return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id).get_members()
+            #    elif workflow_type == 'allocate_for_inspection':
+            #        return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_INSPECTION_OFFICER, region_id=region_id, district_id=district_id).get_members()
     except ComplianceManagementSystemGroup.DoesNotExist:
-        raise GroupNotFoundError(f"Error: Group not found \n Please generate a group for the selected Region and District in admin settings")
+        #raise GroupNotFoundError(f"Error: Group not found \n Please generate a group for the selected Region and District in admin settings")
+        return EmailUser.objects.none()
 
 
 import reversion

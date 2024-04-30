@@ -238,7 +238,7 @@ export default {
               // Display empty group error on modal
               if (!this.errorResponse &&
                   this.allocatedGroup &&
-                  this.allocatedGroup.length <= 1) {
+                  this.allocatedGroup.length < 1) {
                   this.errorResponse = 'This group has no members';
               }
           } else {
