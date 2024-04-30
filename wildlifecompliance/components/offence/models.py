@@ -152,10 +152,10 @@ class Offence(RevisionedMixin):
         # permissions = Permission.objects.filter(codename=codename, content_type_id=compliance_content_type.id)
 
         # 3. Find groups which has the permission(s) determined above in the regionDistrict.
-        
-        group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id)
-        
-        return group
+        try:
+            return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id)
+        except:
+            return None
 
     @property
     # Rewrite for Region District models

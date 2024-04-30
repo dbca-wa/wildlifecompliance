@@ -338,7 +338,7 @@ export default {
                   return res
               }
           } catch(err) {
-                  this.errorResponse = 'Error:' + err.statusText;
+                  this.errorResponse = 'Error:' + err.bodyText;
               }
           
       },

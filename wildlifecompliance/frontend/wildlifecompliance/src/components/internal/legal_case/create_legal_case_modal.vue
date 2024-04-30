@@ -209,7 +209,7 @@ export default {
           this.temporary_document_collection_id = val;
       },
       updateDistricts: function() {
-        // this.district_id = null;
+        this.district_id = null;
         this.availableDistricts = [];
         for (let region of this.regions) {
           if (this.region_id === region.id) {
@@ -332,8 +332,9 @@ export default {
                   return res
               }
           } catch(err) {
-                  this.errorResponse = 'Error:' + err.statusText;
-              }
+              console.log(err);
+              this.errorResponse = 'Error:' + err.bodyText;
+          }
           
       },
       //createDocumentActionUrl: async function(done) {
