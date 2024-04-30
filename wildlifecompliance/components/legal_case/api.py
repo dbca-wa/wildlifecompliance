@@ -456,7 +456,6 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
                         instance.save()
 
     def check_authorised_to_update(self,request):
-        print("check_authorised_to_update")
         instance = self.get_object()
         user = self.request.user
         user_auth_groups = ComplianceManagementSystemGroupPermission.objects.filter(emailuser=user)
@@ -464,8 +463,6 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
         return instance.assigned_to_id == user.id and user_auth_groups.filter(group__id__in=instance.allowed_groups).exists()        
     
     def check_authorised_to_create(self,request):
-        print("check_authorised_to_create")
-        #TODO adjust auth if needed (may need to allow all officers/managers to create/update regardless of region)
         region_id = None if not request.data.get('region_id') else request.data.get('region_id')
         district_id = None if not request.data.get('district_id') else request.data.get('district_id')
         user = self.request.user
@@ -1207,6 +1204,14 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
                                 save_comms_log_document_obj(instance, workflow_entry, doc)
                             temp_doc_collection.delete()
 
+                try:
+                    region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+                    district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+                    allocated_group = ComplianceManagementSystemGroup.objects.get(district_id=district_id, region_id=region_id, name=settings.GROUP_OFFICER)
+                except Exception as e:
+                    error_str = "No " + settings.GROUP_OFFICER + " group exists for provided region/district"
+                    raise serializers.ValidationError(error_str)
+
                 ## Set Inspection status depending on workflow type
                 workflow_type = request.data.get('workflow_type')
                 if workflow_type == 'close':
@@ -1238,7 +1243,7 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
                     instance.district_id = None if not request.data.get('district_id') else request.data.get('district_id')
                     instance.assigned_to_id = None if not request.data.get('assigned_to_id') else request.data.get('assigned_to_id')
                     instance.legal_case_priority_id = None if not request.data.get('legal_case_priority_id') else request.data.get('legal_case_priority_id')
-                    instance.allocated_group = ComplianceManagementSystemGroup.objects.get(district=instance.district, region=instance.region, name=settings.GROUP_OFFICER) if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
+                    instance.allocated_group = allocated_group if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
                     instance.call_email_id = None if not request.data.get('call_email_id') else request.data.get('call_email_id')
                     instance.details = None if not request.data.get('details') else request.data.get('details')
 
