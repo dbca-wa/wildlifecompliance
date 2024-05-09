@@ -51,10 +51,14 @@ def is_internal(context):
 
 @register.simple_tag(takes_context=True)
 def is_model_backend(context):
-    # Return True if user logged in via single sign-on (or False via
-    # social_auth i.e. an external user signing in with a login-token)
-    request = context['request']
-    return wildlifecompliance_helpers.is_model_backend(request)
+    ''' Return True if user logged in via single sign-on (or False via
+        social_auth i.e. an external user signing in with a login-token)
+
+        Now replaced by Auth2 Pin Code - jm 
+    '''
+    #request = context['request']
+    #return wildlifecompliance_helpers.is_model_backend(request)
+    return True
 
 @register.simple_tag(takes_context=True)
 def is_compliance_management_user(context):

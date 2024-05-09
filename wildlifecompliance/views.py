@@ -89,7 +89,6 @@ class WildlifeComplianceRoutingView(TemplateView):
             print('email: {}'.format(self.request.user.email))
             print("is_authenticated: True")
             print('is_superuser: {}'.format(self.request.user.is_superuser))
-            print('is_model_backend: {}'.format(is_model_backend(self.request)))
             print('is_dbca_domain: {}'.format(in_dbca_domain(self.request)))
             print('is_compliance_internal_user: {}'.format(is_compliance_internal_user(self.request)))
             print('is_wildlifecompliance_admin: {}'.format(is_wildlifecompliance_admin(self.request)))
