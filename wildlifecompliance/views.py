@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 
 from datetime import datetime, timedelta
 
-from wildlifecompliance.helpers import is_internal, prefer_compliance_management, is_model_backend, in_dbca_domain, \
+from wildlifecompliance.helpers import is_internal, prefer_compliance_management, in_dbca_domain, \
     is_compliance_internal_user, is_wildlifecompliance_admin, is_compliance_management_callemail_readonly_user, belongs_to, \
     is_compliance_management_approved_external_user, is_customer
 from wildlifecompliance.forms import *
