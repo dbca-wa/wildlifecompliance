@@ -61,24 +61,23 @@ def belongs_to_list(user, group_names):
     return user.groups.filter(name__in=group_names).exists()
 
 
-def is_model_backend(request):
-    # Return True if user logged in via single sign-on (i.e. an internal)
-    logger.debug(
-        'helpers.is_model_backend(): {0}'.format(
-            request.session.get('_auth_user_backend')
-        ))
-    return 'ModelBackend' in request.session.get('_auth_user_backend')
+#def is_model_backend(request):
+#    # Return True if user logged in via single sign-on (i.e. an internal)
+#    logger.debug(
+#        'helpers.is_model_backend(): {0}'.format(
+#            request.session.get('_auth_user_backend')
+#        ))
+#    return 'ModelBackend' in request.session.get('_auth_user_backend')
 
 
-def is_email_auth_backend(request):
-    # Return True if user logged in via social_auth (i.e. an external user
-    # signing in with a login-token)
-    return 'EmailAuth' in request.session.get('_auth_user_backend')
+#def is_email_auth_backend(request):
+#    # Return True if user logged in via social_auth (i.e. an external user
+#    # signing in with a login-token)
+#    return 'EmailAuth' in request.session.get('_auth_user_backend')
 
 
 def is_wildlifecompliance_admin(request):
     return request.user.is_authenticated() and \
-           is_model_backend(request) and \
            in_dbca_domain(request) and \
            (
                request.user.has_perm('wildlifecompliance.system_administrator') or
@@ -100,7 +99,6 @@ def is_wildlifecompliance_payment_officer(request):
     PAYMENTS_GROUP_NAME = 'Wildlife Compliance - Payment Officers'
 
     is_payment_officer = request.user.is_authenticated() and \
-        is_model_backend(request) and \
         in_dbca_domain(request) and \
         (
             request.user.groups.filter(name__in=[PAYMENTS_GROUP_NAME]).exists()
@@ -125,7 +123,7 @@ def in_dbca_domain(request):
 
 def is_departmentUser(request):
     return request.user.is_authenticated() and (
-            ((is_model_backend(request) or settings.ALLOW_EMAIL_ADMINS) and in_dbca_domain(request)) or
+            (settings.ALLOW_EMAIL_ADMINS and in_dbca_domain(request)) or
             is_compliance_management_approved_external_user(request)
             )
 
@@ -146,7 +144,8 @@ def is_reception(request):
 
 
 def is_customer(request):
-    return request.user.is_authenticated() and is_email_auth_backend(request)
+    #return request.user.is_authenticated() and is_email_auth_backend(request)
+    return request.user.is_authenticated() and not request.user.is_staff
 
 
 def is_internal(request):

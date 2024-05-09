@@ -35,14 +35,7 @@
                         </strong></p>
                         -->
                         {% bootstrap_messages %}
-                        <form method="post" action="{% url "social:complete" backend="email" %}">
-                            {% csrf_token %}
-                            {% bootstrap_form form %}
-                            <div id="submit-container">
-                                {% bootstrap_button 'Submit' button_class='btn-primary' %}
-                            </div>
-                        </form>
-                        <p>Submit your email to login or start the new-user registration process.</p>
+			<a class="btn btn-primary" href="{{ request.get_full_path }}ssologin">Login</a>
                         <hr>
                         <h4>
                             Wildlife Licensing Password-less Logins
@@ -50,7 +43,7 @@
                         <p>
                             At the Department of Biodiversity, Conservation and Attractions, we employ a password-less authentication system, meaning you never need to remember
                             a password. When you need to login to a site, such as Wildlife Licensing, simply enter your email and an
-                            authentication link will be sent to your registered email address. From there, simply follow the link to complete the login process.
+                            authentication code will be sent to your registered email address. From there, enter the code on screen to complete the login process.
                         </p>
                     </div>
                 {% endif %}
