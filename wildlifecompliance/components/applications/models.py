@@ -1465,6 +1465,7 @@ class Application(RevisionedMixin):
         from wildlifecompliance.components.licences.models import LicenceActivity
 
         with transaction.atomic():
+            #import ipdb; ipdb.set_trace()
             requires_refund = self.requires_refund_at_submit()
             if self.can_user_edit:
                 if not self.application_fee_paid and not requires_refund \

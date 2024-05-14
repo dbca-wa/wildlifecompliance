@@ -1386,7 +1386,6 @@ class IncreaseRenewalFeeFieldElement(SpecialFieldElement):
         if self.is_refreshing:
             # No user update with a page refesh.
             return
-
         if set([self.NAME]).issubset(component) \
                 or set([self.LICENCE]).issubset(component):
 
@@ -1400,9 +1399,18 @@ class IncreaseRenewalFeeFieldElement(SpecialFieldElement):
                 logger.debug('fees[field] = {}'.format(fees[field]))
                 return True
 
+            #Original
+            # def adjusted_fee(field, amount):
+            #     amount = D(amount).quantize(D('0.01'), rounding=ROUND_DOWN)
+            #     if field == 'application':
+            #         self.adjusted_fee += amount
+            #     return True
+
             def adjusted_fee(field, amount):
                 amount = D(amount).quantize(D('0.01'), rounding=ROUND_DOWN)
-                if field == 'application':
+                if field == 'licence':
+                    self.adjusted_licence_fee += amount
+                elif field == 'application':
                     self.adjusted_fee += amount
                 return True
 
@@ -1522,6 +1530,7 @@ class IncreaseApplicationFeeFieldElement(SpecialFieldElement):
         self._data_source = application_form_visitor._data_source
         # Add relevant Fee policy to impact the Increase Application Fee.
         logger.debug('IncreaseApplicationFeeFieldElement.accept() #2')
+        #import ipdb; ipdb.set_trace()
         self.fee_policy = ApplicationFeePolicy.get_fee_policy_for(self._app)
         if not self._data_source:  # No form data set fee from application fee.
             self.fee_policy.set_application_fee()
