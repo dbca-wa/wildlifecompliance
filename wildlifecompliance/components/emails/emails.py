@@ -44,7 +44,8 @@ class TemplateEmailBase(object):
             context=None,
             attachments=None,
             cc=None,
-            bcc=None):
+            bcc=None,
+            headers=None):
         """
         Send an email using EmailMultiAlternatives with text and html.
         :param to_addresses: a string or a list of addresses
@@ -57,6 +58,10 @@ class TemplateEmailBase(object):
         :param cc:
         :return:
         """
+        headers = {}
+        email_instance = 'DEV'
+        if hasattr(settings, 'EMAIL_INSTANCE'):  
+            email_instance = settings.EMAIL_INSTANCE
         # The next line will throw a TemplateDoesNotExist if html template
         # cannot be found
         html_template = loader.get_template(self.html_template)
@@ -89,6 +94,7 @@ class TemplateEmailBase(object):
                 _attachments.append((filename, content, mime))
             else:
                 _attachments.append(attachment)
+        headers['System-Environment'] = email_instance
         msg = EmailMultiAlternatives(
             self.subject,
             txt_body,
@@ -96,7 +102,8 @@ class TemplateEmailBase(object):
             to=to_addresses,
             attachments=_attachments,
             cc=cc,
-            bcc=bcc)
+            bcc=bcc,
+            headers=headers)
         msg.attach_alternative(html_body, 'text/html')
         try:
             msg.send(fail_silently=False)
