@@ -187,7 +187,8 @@ def prefer_compliance_management(request):
     return ret_value
 
 def is_wildlife_compliance_officer(request):
-    wildlife_compliance_user = False
+    wildlife_compliance_user = request.user.has_perm('wildlifecompliance.system_administrator') or \
+               request.user.is_superuser
 
     if request.user.is_authenticated() and (
             Group.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).filter(id=request.user.id)
@@ -198,7 +199,7 @@ def is_wildlife_compliance_officer(request):
 
 #TODO should other groups be in this?
 def is_compliance_management_user(request):
-    compliance_user = False
+    compliance_user = is_wildlifecompliance_admin(request)
     if request.user.is_authenticated() and (
             is_compliance_management_readonly_user(request) or 
             is_compliance_management_callemail_readonly_user(request)
@@ -208,7 +209,7 @@ def is_compliance_management_user(request):
 
 
 def is_compliance_internal_user(request):
-    compliance_user = False
+    compliance_user = is_wildlifecompliance_admin(request)
     if request.user.is_authenticated() and (
             is_compliance_management_officer(request) or 
             is_compliance_management_manager(request) or
