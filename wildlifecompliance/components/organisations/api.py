@@ -15,7 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.db.models import Value
 from django.db.models.functions import Concat
-from rest_framework import viewsets, serializers, status, generics, views
+from rest_framework import viewsets, serializers, status, generics, views, mixins
 from rest_framework.decorators import detail_route, list_route, renderer_classes
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
@@ -27,7 +27,7 @@ from django.core.cache import cache
 from ledger.accounts.models import EmailUser, OrganisationAddress, Organisation as ledger_organisation
 from ledger.address.models import Country
 from datetime import datetime, timedelta, date
-from wildlifecompliance.helpers import is_customer, is_internal
+from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
 from wildlifecompliance.components.organisations.models import (
     Organisation,
     OrganisationContact,
@@ -172,7 +172,7 @@ class OrganisationFilterBackend(DatatablesFilterBackend):
 #        return super(OrganisationRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class OrganisationPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
+class OrganisationPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (OrganisationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (OrganisationRenderer,)
@@ -181,10 +181,10 @@ class OrganisationPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     page_size = 10
 
     def get_queryset(self):
-        if is_internal(self.request):
+        if is_wildlife_compliance_officer(self.request):
             return Organisation.objects.all() #TODO auth group
-        elif is_customer(self.request):
-            return Organisation.objects.none()
+        #elif is_customer(self.request):
+        #    return Organisation.objects.none()
         return Organisation.objects.none()
 
     @list_route(methods=['GET', ])
@@ -198,16 +198,15 @@ class OrganisationPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class OrganisationViewSet(viewsets.ModelViewSet): #TODO constrain
+class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = Organisation.objects.none()
     serializer_class = OrganisationSerializer
-    allow_external = False #TODO: review this - workaround for allowing organisations to be accessed when unlinking users
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request) or self.allow_external: #TODO auth group - considered removing allow_external
+        if is_wildlife_compliance_officer(self.request):
             return Organisation.objects.all() 
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             #org_contacts = OrganisationContact.objects.filter(is_admin=True).filter(email=user.email)
             #user_admin_orgs = [org.organisation.id for org in org_contacts]
             #return Organisation.objects.filter(id__in=user_admin_orgs)
@@ -488,7 +487,6 @@ class OrganisationViewSet(viewsets.ModelViewSet): #TODO constrain
     @detail_route(methods=['POST', ])
     def unlink_user(self, request, *args, **kwargs):
         try:
-            self.allow_external = True #TODO needed? the user should be able to unlink themselves before they are removed, so return accordingly? (test)
             instance = self.get_object()
             request.data.update([('org_id', instance.id)])
             serializer = OrgUserCheckSerializer(data=request.data)
@@ -804,7 +802,7 @@ class OrganisationViewSet(viewsets.ModelViewSet): #TODO constrain
             raise serializers.ValidationError(str(e))
 
 
-class OrganisationRequestsPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
+class OrganisationRequestsPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (OrganisationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (OrganisationRenderer,)
@@ -813,10 +811,10 @@ class OrganisationRequestsPaginatedViewSet(viewsets.ModelViewSet): #TODO constra
     page_size = 10
 
     def get_queryset(self):
-        if is_internal(self.request): #TODO auth group
+        if is_wildlife_compliance_officer(self.request):
             return OrganisationRequest.objects.all()
-        elif is_customer(self.request):
-            return OrganisationRequest.objects.none()
+        #elif is_customer(self.request):
+        #    return OrganisationRequest.objects.none()
         return OrganisationRequest.objects.none()
 
     @list_route(methods=['GET', ])
@@ -830,15 +828,15 @@ class OrganisationRequestsPaginatedViewSet(viewsets.ModelViewSet): #TODO constra
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class OrganisationRequestsViewSet(viewsets.ModelViewSet): #TODO constrain
+class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = OrganisationRequest.objects.none()
     serializer_class = OrganisationRequestSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request): #TODO auth group (?)
+        if is_wildlife_compliance_officer(self.request):
             return OrganisationRequest.objects.all() 
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             return user.organisationrequest_set.all()
         return OrganisationRequest.objects.none()
 

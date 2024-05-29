@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.postgres.fields.jsonb import JSONField
 from ledger.accounts.models import Organisation as ledger_organisation
 from ledger.accounts.models import EmailUser
+from django.contrib.auth.models import Group
 from wildlifecompliance.components.main.models import UserAction, CommunicationsLogEntry
 from wildlifecompliance.components.organisations.utils import random_generator, get_officer_email_list
 from wildlifecompliance.components.organisations.emails import (
@@ -34,6 +35,17 @@ from wildlifecompliance.components.main.models import Document
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
+
+def is_wildlife_compliance_officer(request):
+    wildlife_compliance_user = request.user.has_perm('wildlifecompliance.system_administrator') or \
+               request.user.is_superuser
+
+    if request.user.is_authenticated() and (
+            Group.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).user_set.filter(id=request.user.id)
+        ):
+        wildlife_compliance_user = True
+
+    return wildlife_compliance_user
 
 @python_2_unicode_compatible
 class Organisation(models.Model):
@@ -835,13 +847,14 @@ class OrganisationRequest(models.Model):
 
     def accept(self, request):
         with transaction.atomic():
-            self.status = OrganisationRequest.ORG_REQUEST_STATUS_APPROVED
-            self.save()
-            self.log_user_action(
-                OrganisationRequestUserAction.ACTION_ACCEPT_REQUEST.format(
-                    self.id), request)
-            # Continue with remaining logic
-            self.__accept(request)
+            if is_wildlife_compliance_officer(request):
+                self.status = OrganisationRequest.ORG_REQUEST_STATUS_APPROVED
+                self.save()
+                self.log_user_action(
+                    OrganisationRequestUserAction.ACTION_ACCEPT_REQUEST.format(
+                        self.id), request)
+                # Continue with remaining logic
+                self.__accept(request)
 
     def __accept(self, request):
         from wildlifecompliance.components.applications.models import ActivityPermissionGroup
