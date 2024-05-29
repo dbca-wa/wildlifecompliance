@@ -48,7 +48,7 @@ from wildlifecompliance.components.users.serializers import (
     UserAddressSerializer,
     ComplianceUserDetailsSerializer,
 )
-from wildlifecompliance.helpers import is_customer, is_internal, is_compliance_internal_user
+from wildlifecompliance.helpers import is_customer, is_internal, is_compliance_management_user
 from wildlifecompliance.components.call_email.models import (
     CallEmail,
     Classification,
@@ -206,8 +206,7 @@ class CallEmailPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     page_size = 10
     
     def get_queryset(self):
-        #if is_internal(self.request) or is_compliance_internal_user(self.request):
-        if is_compliance_internal_user(self.request):
+        if is_compliance_management_user(self.request): 
             return CallEmail.objects.all()
         return CallEmail.objects.none()
 
@@ -228,7 +227,7 @@ class CallEmailViewSet(viewsets.ModelViewSet): #TODO constrain
     serializer_class = CallEmailSerializer
 
     def get_queryset(self):
-        if is_compliance_internal_user(self.request):
+        if is_compliance_management_user(self.request):
             return CallEmail.objects.all()
         return CallEmail.objects.none()
 
@@ -869,7 +868,7 @@ class ClassificationViewSet(viewsets.ModelViewSet): #TODO constrain
     def get_queryset(self):
         #user = self.request.user
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request): #TODO review auth group
+        if is_internal(self.request) or is_compliance_management_user(self.request): #TODO review auth group
             return Classification.objects.all()
         return Classification.objects.none()
 
@@ -971,7 +970,7 @@ class ReferrerViewSet(viewsets.ModelViewSet): #TODO constrain
     def get_queryset(self):
         #user = self.request.user
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request): #TODO review auth group
+        if is_internal(self.request) or is_compliance_management_user(self.request): #TODO review auth group
             return Referrer.objects.all()
         return Referrer.objects.none()
 
@@ -983,7 +982,7 @@ class ReportTypeViewSet(viewsets.ModelViewSet): #TODO constrain
     def get_queryset(self):
         #user = self.request.user
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request): #TODO review auth group
+        if is_internal(self.request) or is_compliance_management_user(self.request): #TODO review auth group
             return ReportType.objects.all()
         return ReportType.objects.none()
 
@@ -993,7 +992,7 @@ class ReportTypeViewSet(viewsets.ModelViewSet): #TODO constrain
         user = self.request.user
         return_list = []
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_internal(self.request) or is_compliance_management_user(self.request):
             valid_records = ReportType.objects.values('report_type').annotate(Max('version'))
             for record in valid_records:
                 qs_record = ReportType.objects \
@@ -1034,7 +1033,7 @@ class LocationViewSet(viewsets.ModelViewSet): #TODO constrain
     def get_queryset(self):
         #user = self.request.user
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request): #TODO review auth group
+        if is_internal(self.request) or is_compliance_management_user(self.request): #TODO review auth group
             return Location.objects.all()
         return Location.objects.none()
 
@@ -1079,7 +1078,7 @@ class EmailUserViewSet(viewsets.ModelViewSet): #TODO constrain
     def get_queryset(self):
         exclude_staff = self.request.GET.get('exclude_staff')
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request): #TODO review auth group
+        if is_internal(self.request) or is_compliance_management_user(self.request): #TODO review auth group
             if exclude_staff == 'true':
                 return EmailUser.objects.filter(is_staff=False)
             else:
@@ -1094,7 +1093,7 @@ class MapLayerViewSet(viewsets.ModelViewSet): #TODO constrain
     def get_queryset(self):
         #user = self.request.user
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request): #TODO review auth group
+        if is_internal(self.request) or is_compliance_management_user(self.request): #TODO review auth group
             return MapLayer.objects.filter(availability__exact=True)
         return MapLayer.objects.none()
 
