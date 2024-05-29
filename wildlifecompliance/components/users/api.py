@@ -157,13 +157,13 @@ class UserProfileCompleted(views.APIView):
         return HttpResponse('OK')
 
 
-class ProfileViewSet(viewsets.ModelViewSet):
+class ProfileViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = Profile.objects.none()
     serializer_class = UserProfileSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return Profile.objects.all()
         elif is_customer(self.request):
             return Profile.objects.filter(user=user)
@@ -189,7 +189,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class MyProfilesViewSet(viewsets.ModelViewSet):
+class MyProfilesViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = Profile.objects.none()
     serializer_class = UserProfileSerializer
 
@@ -230,7 +230,7 @@ class UserFilterBackend(DatatablesFilterBackend):
 #        return super(UserRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class UserPaginatedViewSet(viewsets.ModelViewSet):
+class UserPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (UserFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (UserRenderer,)
@@ -239,7 +239,7 @@ class UserPaginatedViewSet(viewsets.ModelViewSet):
     page_size = 10
 
     def get_queryset(self):
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return EmailUser.objects.all()
         return EmailUser.objects.none()
 
@@ -254,7 +254,7 @@ class UserPaginatedViewSet(viewsets.ModelViewSet):
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = EmailUser.objects.none()
     serializer_class = UserSerializer
 
@@ -267,7 +267,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 - email
         """
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             queryset = EmailUser.objects.all()
         elif is_customer(self.request):
             queryset = EmailUser.objects.filter(id=user.id)
@@ -730,7 +730,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 print(traceback.print_exc())
                 raise serializers.ValidationError(str(e))
 
-class ComplianceManagementUserViewSet(viewsets.ModelViewSet):
+class ComplianceManagementUserViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = EmailUser.objects.none()
     serializer_class = UserSerializer
     #renderer_classes = [JSONRenderer, ]
@@ -744,7 +744,7 @@ class ComplianceManagementUserViewSet(viewsets.ModelViewSet):
                 - email
         """
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             queryset = EmailUser.objects.all()
         elif is_customer(self.request):
             queryset = EmailUser.objects.filter(id=user.id)
@@ -877,7 +877,7 @@ class ComplianceManagementUserViewSet(viewsets.ModelViewSet):
                 raise serializers.ValidationError(str(e))
 
 
-class EmailIdentityViewSet(viewsets.ModelViewSet):
+class EmailIdentityViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = EmailIdentity.objects.none()
     serializer_class = EmailIdentitySerializer
 
@@ -887,7 +887,7 @@ class EmailIdentityViewSet(viewsets.ModelViewSet):
                 - email
         """
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             queryset = EmailIdentity.objects.all()
         elif is_customer(self.request):
             queryset = user.emailidentity_set.all()
@@ -1087,6 +1087,10 @@ class GetPersonOrg(views.APIView):
     renderer_classes = [JSONRenderer,]
 
     def get(self, request, format=None):
+
+        #TODO auth? right now this is not secured - however that may be acceptable depending on the intended use case (applying for organisation?)
+        # investigate and act accordingly - ideally user should at least be authenticated
+
         search_term = request.GET.get('term', '')
         if search_term:
             data_transform = []
@@ -1130,6 +1134,9 @@ class StaffMemberLookup(views.APIView):
     renderer_classes = [JSONRenderer,]
 
     def get(self, request, format=None):
+
+        #TODO auth - check use cases and apply auth accordingly (no serious PII, but should be controlled)
+
         search_term = request.GET.get('term', '')
         if search_term:
             data_transform = []

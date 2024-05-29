@@ -107,7 +107,7 @@ class ReturnFilterBackend(DatatablesFilterBackend):
 #            data, accepted_media_type, renderer_context)
 
 
-class ReturnPaginatedViewSet(viewsets.ModelViewSet):
+class ReturnPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (ReturnFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (ReturnRenderer,)
@@ -118,7 +118,7 @@ class ReturnPaginatedViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return Return.objects.all()
 
         elif is_customer(self.request):
@@ -207,7 +207,7 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return Return.objects.all()
         elif is_customer(self.request):
             user_orgs = [
@@ -743,7 +743,7 @@ class ReturnTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ReturnType.objects.none()
 
     def get_queryset(self):
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return ReturnType.objects.all()
         return ReturnType.objects.none()
 
@@ -753,13 +753,13 @@ class ReturnTypeViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class ReturnAmendmentRequestViewSet(viewsets.ModelViewSet):
+class ReturnAmendmentRequestViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = ReturnRequest.objects.none()
     serializer_class = ReturnRequestSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return ReturnRequest.objects.all()
         elif is_customer(self.request):
             user_orgs = [

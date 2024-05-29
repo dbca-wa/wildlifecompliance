@@ -401,7 +401,7 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
 #        return super(ApplicationRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class ApplicationPaginatedViewSet(viewsets.ModelViewSet):
+class ApplicationPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (ApplicationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (ApplicationRenderer,)
@@ -411,7 +411,7 @@ class ApplicationPaginatedViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return Application.objects.all()\
                 .exclude(application_type=Application.APPLICATION_TYPE_SYSTEM_GENERATED)
         elif is_customer(self.request):
@@ -489,14 +489,14 @@ class ApplicationPaginatedViewSet(viewsets.ModelViewSet):
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class ApplicationViewSet(viewsets.ModelViewSet):
+class ApplicationViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = Application.objects.none()
     serializer_class = ApplicationSerializer
 
     def get_queryset(self):
         user = self.request.user
         if is_internal(self.request):
-            return Application.objects.all()
+            return Application.objects.all() #TODO auth group
         elif is_customer(self.request):
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
@@ -2256,14 +2256,14 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         })
 
 
-class ApplicationConditionViewSet(viewsets.ModelViewSet):
+class ApplicationConditionViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = ApplicationCondition.objects.none()
     serializer_class = ApplicationConditionSerializer
 
     def get_queryset(self):
         user = self.request.user
         if is_internal(self.request):
-            return ApplicationCondition.objects.all()
+            return ApplicationCondition.objects.all() #TODO auth group
         elif is_customer(self.request):
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
@@ -2398,13 +2398,13 @@ class ApplicationConditionViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-class ApplicationSelectedActivityViewSet(viewsets.ModelViewSet):
+class ApplicationSelectedActivityViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = ApplicationSelectedActivity.objects.none()
     serializer_class = ApplicationSelectedActivitySerializer
 
     def get_queryset(self):
         if is_internal(self.request):
-            return ApplicationSelectedActivity.objects.all()
+            return ApplicationSelectedActivity.objects.all() #TODO auth group
         elif is_customer(self.request):
             return ApplicationSelectedActivity.objects.none()
         return ApplicationSelectedActivity.objects.none()
@@ -2438,7 +2438,7 @@ class ApplicationStandardConditionViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         if is_internal(self.request):
-            return ApplicationStandardCondition.objects.all()
+            return ApplicationStandardCondition.objects.all() #TODO auth group
         elif is_customer(self.request):
             return ApplicationStandardCondition.objects.none()
         return ApplicationStandardCondition.objects.none()
@@ -2452,7 +2452,7 @@ class ApplicationStandardConditionViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class AssessmentPaginatedViewSet(viewsets.ModelViewSet):
+class AssessmentPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (ApplicationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (ApplicationRenderer,)
@@ -2461,7 +2461,7 @@ class AssessmentPaginatedViewSet(viewsets.ModelViewSet):
     page_size = 10
 
     def get_queryset(self):
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return Assessment.objects.all()
         elif is_customer(self.request):
             return Assessment.objects.none()
@@ -2491,12 +2491,12 @@ class AssessmentPaginatedViewSet(viewsets.ModelViewSet):
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class AssessmentViewSet(viewsets.ModelViewSet):
+class AssessmentViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = Assessment.objects.none()
     serializer_class = AssessmentSerializer
 
-    def get_queryset(self):
-        if is_internal(self.request):
+    def get_queryset(self): 
+        if is_internal(self.request): #TODO auth group
             return Assessment.objects.all()
         elif is_customer(self.request):
             return Assessment.objects.none()
@@ -2629,15 +2629,15 @@ class AssessmentViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class AssessorGroupViewSet(viewsets.ModelViewSet):
+class AssessorGroupViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = ActivityPermissionGroup.objects.none()
     serializer_class = ActivityPermissionGroupSerializer
     #renderer_classes = [JSONRenderer, ]
 
     def get_queryset(self, application=None):
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             if application is not None:
-                return application.get_permission_groups('assessor')
+                return application.get_permission_groups('assessor') 
             return ActivityPermissionGroup.objects.filter(
                 permissions__codename='assessor'
             )
@@ -2655,14 +2655,14 @@ class AssessorGroupViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class AmendmentRequestViewSet(viewsets.ModelViewSet):
+class AmendmentRequestViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = AmendmentRequest.objects.none()
     serializer_class = AmendmentRequestSerializer
 
     def get_queryset(self):
         user = self.request.user
         if is_internal(self.request):
-            return AmendmentRequest.objects.all()
+            return AmendmentRequest.objects.all() #TODO auth group
         elif is_customer(self.request):
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]

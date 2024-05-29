@@ -153,7 +153,7 @@ class SchemaMasterlistFilterBackend(DatatablesFilterBackend):
 #            data, accepted_media_type, renderer_context)
 
 
-class SchemaMasterlistPaginatedViewSet(viewsets.ModelViewSet):
+class SchemaMasterlistPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (SchemaMasterlistFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (SchemaMasterlistRenderer,)
@@ -183,7 +183,7 @@ class SchemaMasterlistPaginatedViewSet(viewsets.ModelViewSet):
         return response
 
 
-class SchemaMasterlistViewSet(viewsets.ModelViewSet):
+class SchemaMasterlistViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = MasterlistQuestion.objects.none()
     serializer_class = SchemaMasterlistSerializer
 
@@ -408,7 +408,7 @@ class SchemaPurposeFilterBackend(DatatablesFilterBackend):
 #            data, accepted_media_type, renderer_context)
 
 
-class SchemaPurposePaginatedViewSet(viewsets.ModelViewSet):
+class SchemaPurposePaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (SchemaPurposeFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (SchemaPurposeRenderer,)
@@ -439,7 +439,7 @@ class SchemaPurposePaginatedViewSet(viewsets.ModelViewSet):
         return response
 
 
-class SchemaPurposeViewSet(viewsets.ModelViewSet):
+class SchemaPurposeViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = LicencePurposeSection.objects.none()
     serializer_class = SchemaPurposeSerializer
 
@@ -658,7 +658,7 @@ class SchemaGroupFilterBackend(DatatablesFilterBackend):
 #            data, accepted_media_type, renderer_context)
 
 
-class SchemaGroupPaginatedViewSet(viewsets.ModelViewSet):
+class SchemaGroupPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (SchemaGroupFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (SchemaGroupRenderer,)
@@ -689,7 +689,7 @@ class SchemaGroupPaginatedViewSet(viewsets.ModelViewSet):
         return response
 
 
-class SchemaGroupViewSet(viewsets.ModelViewSet):
+class SchemaGroupViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = SectionGroup.objects.none()
     serializer_class = SchemaGroupSerializer
 
@@ -928,7 +928,7 @@ class SchemaQuestionFilterBackend(DatatablesFilterBackend):
 #            data, accepted_media_type, renderer_context)
 
 
-class SchemaQuestionPaginatedViewSet(viewsets.ModelViewSet):
+class SchemaQuestionPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (SchemaQuestionFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (SchemaQuestionRenderer,)
@@ -959,7 +959,7 @@ class SchemaQuestionPaginatedViewSet(viewsets.ModelViewSet):
         return response
 
 
-class SchemaQuestionViewSet(viewsets.ModelViewSet):
+class SchemaQuestionViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = SectionQuestion.objects.none()
     serializer_class = SchemaQuestionSerializer
 
@@ -1237,14 +1237,14 @@ class SchemaQuestionViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class TemporaryDocumentCollectionViewSet(viewsets.ModelViewSet):
+class TemporaryDocumentCollectionViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = TemporaryDocumentCollection.objects.none()
     serializer_class = TemporaryDocumentCollectionSerializer
 
     def get_queryset(self):
         # import ipdb; ipdb.set_trace()
         # user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return TemporaryDocumentCollection.objects.all()
         return TemporaryDocumentCollection.objects.none()
 
@@ -1394,23 +1394,23 @@ class OracleJob(views.APIView):
             raise serializers.ValidationError(str(e[0]))
 
 
-class RegionViewSet(viewsets.ModelViewSet):
+class RegionViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = Region.objects.none()
     serializer_class = RegionSerializer
 
     def get_queryset(self):
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group (?)
             #return Region.objects.all()
             return Region.objects.filter(head_office=False)
         return Region.objects.none()
 
 
-class DistrictViewSet(viewsets.ModelViewSet):
+class DistrictViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = District.objects.none()
     serializer_class = DistrictSerializer
 
     def get_queryset(self):
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group (?)
             return District.objects.all()
         return District.objects.none()
 
@@ -1419,6 +1419,12 @@ class AllocatedGroupMembers(views.APIView):
     renderer_classes = [JSONRenderer, ]
 
     def post(self, request, format=None):
+
+        #auth
+        #TODO auth group (?)
+        if not is_internal(self.request):
+            return Response()
+
         try:
             members = []
 

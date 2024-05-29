@@ -203,7 +203,7 @@ class LicenceRenderer(DatatablesRenderer):
         return super(LicenceRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class LicencePaginatedViewSet(viewsets.ModelViewSet):
+class LicencePaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (LicenceFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (LicenceRenderer,)
@@ -219,7 +219,7 @@ class LicencePaginatedViewSet(viewsets.ModelViewSet):
             processing_status__in=[
                 ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED,
                 ApplicationSelectedActivity.PROCESSING_STATUS_OFFICER_FINALISATION])
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return WildlifeLicence.objects.filter(
                 current_application__in=asa_accepted.values_list(
                     'application_id', flat=True))
@@ -298,7 +298,7 @@ class LicencePaginatedViewSet(viewsets.ModelViewSet):
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class LicenceViewSet(viewsets.ModelViewSet):
+class LicenceViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = WildlifeLicence.objects.none()
     serializer_class = DTExternalWildlifeLicenceSerializer
 
@@ -308,7 +308,7 @@ class LicenceViewSet(viewsets.ModelViewSet):
         # ApplicationSelectedActivity that has been ACCEPTED
         asa_accepted = ApplicationSelectedActivity.objects.filter(
             processing_status=ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED)
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return WildlifeLicence.objects.filter(
                 current_application__in=asa_accepted.values_list('application_id', flat=True))
         elif is_customer(self.request):
@@ -794,7 +794,7 @@ class LicenceViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-class LicenceCategoryViewSet(viewsets.ModelViewSet):
+class LicenceCategoryViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = LicenceCategory.objects.none()
     serializer_class = LicenceCategorySerializer
 
@@ -805,7 +805,7 @@ class LicenceCategoryViewSet(viewsets.ModelViewSet):
         return LicenceCategory.objects.none()
 
 
-class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ModelViewSet):
+class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ModelViewSet): #TODO constrain
     # Filters to only return purposes that are
     # available for selection when applying for
     # a new application

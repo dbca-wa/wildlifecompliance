@@ -172,7 +172,7 @@ class OrganisationFilterBackend(DatatablesFilterBackend):
 #        return super(OrganisationRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class OrganisationPaginatedViewSet(viewsets.ModelViewSet):
+class OrganisationPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (OrganisationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (OrganisationRenderer,)
@@ -182,7 +182,7 @@ class OrganisationPaginatedViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if is_internal(self.request):
-            return Organisation.objects.all()
+            return Organisation.objects.all() #TODO auth group
         elif is_customer(self.request):
             return Organisation.objects.none()
         return Organisation.objects.none()
@@ -198,15 +198,15 @@ class OrganisationPaginatedViewSet(viewsets.ModelViewSet):
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class OrganisationViewSet(viewsets.ModelViewSet):
+class OrganisationViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = Organisation.objects.none()
     serializer_class = OrganisationSerializer
     allow_external = False #TODO: review this - workaround for allowing organisations to be accessed when unlinking users
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request) or self.allow_external:
-            return Organisation.objects.all()
+        if is_internal(self.request) or self.allow_external: #TODO auth group - considered removing allow_external
+            return Organisation.objects.all() 
         elif is_customer(self.request):
             #org_contacts = OrganisationContact.objects.filter(is_admin=True).filter(email=user.email)
             #user_admin_orgs = [org.organisation.id for org in org_contacts]
@@ -488,7 +488,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['POST', ])
     def unlink_user(self, request, *args, **kwargs):
         try:
-            self.allow_external = True
+            self.allow_external = True #TODO needed? the user should be able to unlink themselves before they are removed, so return accordingly? (test)
             instance = self.get_object()
             request.data.update([('org_id', instance.id)])
             serializer = OrgUserCheckSerializer(data=request.data)
@@ -804,7 +804,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class OrganisationRequestsPaginatedViewSet(viewsets.ModelViewSet):
+class OrganisationRequestsPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (OrganisationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (OrganisationRenderer,)
@@ -813,7 +813,7 @@ class OrganisationRequestsPaginatedViewSet(viewsets.ModelViewSet):
     page_size = 10
 
     def get_queryset(self):
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return OrganisationRequest.objects.all()
         elif is_customer(self.request):
             return OrganisationRequest.objects.none()
@@ -830,14 +830,14 @@ class OrganisationRequestsPaginatedViewSet(viewsets.ModelViewSet):
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class OrganisationRequestsViewSet(viewsets.ModelViewSet):
+class OrganisationRequestsViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = OrganisationRequest.objects.none()
     serializer_class = OrganisationRequestSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
-            return OrganisationRequest.objects.all()
+        if is_internal(self.request): #TODO auth group (?)
+            return OrganisationRequest.objects.all() 
         elif is_customer(self.request):
             return user.organisationrequest_set.all()
         return OrganisationRequest.objects.none()
@@ -881,8 +881,7 @@ class OrganisationRequestsViewSet(viewsets.ModelViewSet):
     @list_route(methods=['GET', ])
     def get_pending_requests(self, request, *args, **kwargs):
         try:
-            qs = self.get_queryset().filter(requester=request.user,
-                                            status=OrganisationRequest.ORG_REQUEST_STATUS_WITH_ASSESSOR)
+            qs = self.get_queryset().filter(requester=request.user, status=OrganisationRequest.ORG_REQUEST_STATUS_WITH_ASSESSOR)
             serializer = OrganisationRequestDTSerializer(qs, many=True, context={'request': request})
             return Response(serializer.data)
         except serializers.ValidationError:
@@ -1125,7 +1124,7 @@ class OrganisationAccessGroupMembers(views.APIView):
 
     def get(self, request, format=None):
         members = []
-        if is_internal(request):
+        if is_internal(request): #TODO auth group
             groups = ActivityPermissionGroup.objects.filter(
                 permissions__codename__in=[
                     'organisation_access_request',
@@ -1138,13 +1137,13 @@ class OrganisationAccessGroupMembers(views.APIView):
         return Response(members)
 
 
-class OrganisationContactViewSet(viewsets.ModelViewSet):
+class OrganisationContactViewSet(viewsets.ModelViewSet): #TODO constrain
     serializer_class = OrganisationContactSerializer
     queryset = OrganisationContact.objects.none()
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return OrganisationContact.objects.all()
         elif is_customer(self.request):
 
@@ -1155,26 +1154,26 @@ class OrganisationContactViewSet(viewsets.ModelViewSet):
         return OrganisationContact.objects.none()
 
 
-class MyOrganisationsViewSet(viewsets.ModelViewSet):
+class MyOrganisationsViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = Organisation.objects.none()
     serializer_class = MyOrganisationsSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return Organisation.objects.all()
         elif is_customer(self.request):
             return user.wildlifecompliance_organisations.all()
         return Organisation.objects.none()
 
 
-class OrganisationComplianceManagementViewSet(viewsets.ModelViewSet):
+class OrganisationComplianceManagementViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = Organisation.objects.none()
     serializer_class = ComplianceManagementOrganisationSerializer
     
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return Organisation.objects.all()
         elif is_customer(self.request):
             return user.wildlifecompliance_organisations.all()
