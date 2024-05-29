@@ -197,7 +197,7 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
 #        return super(CallEmailRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class CallEmailPaginatedViewSet(viewsets.ModelViewSet):
+class CallEmailPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (CallEmailFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (CallEmailRenderer,)
@@ -223,7 +223,7 @@ class CallEmailPaginatedViewSet(viewsets.ModelViewSet):
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class CallEmailViewSet(viewsets.ModelViewSet):
+class CallEmailViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = CallEmail.objects.all()
     serializer_class = CallEmailSerializer
 
@@ -862,14 +862,14 @@ class CallEmailViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-class ClassificationViewSet(viewsets.ModelViewSet):
+class ClassificationViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = Classification.objects.none()
     serializer_class = ClassificationSerializer
 
     def get_queryset(self):
         #user = self.request.user
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_internal(self.request) or is_compliance_internal_user(self.request): #TODO review auth group
             return Classification.objects.all()
         return Classification.objects.none()
 
@@ -884,13 +884,13 @@ class ClassificationViewSet(viewsets.ModelViewSet):
         return HttpResponse(res_json, content_type='application/json')
 
 
-class LOVCollectionViewSet(viewsets.ModelViewSet):
+class LOVCollectionViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = CallEmail.objects.none()
     serializer_class = CallEmailSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO review auth group
             return CallEmail.objects.all()
         return CallEmail.objects.none()
 
@@ -964,26 +964,26 @@ class LOVCollectionViewSet(viewsets.ModelViewSet):
         return HttpResponse(res_json, content_type='application/json')
 
 
-class ReferrerViewSet(viewsets.ModelViewSet):
+class ReferrerViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = Referrer.objects.none()
     serializer_class = ReferrerSerializer
 
     def get_queryset(self):
         #user = self.request.user
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_internal(self.request) or is_compliance_internal_user(self.request): #TODO review auth group
             return Referrer.objects.all()
         return Referrer.objects.none()
 
 
-class ReportTypeViewSet(viewsets.ModelViewSet):
+class ReportTypeViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = ReportType.objects.none()
     serializer_class = ReportTypeSerializer
 
     def get_queryset(self):
         #user = self.request.user
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_internal(self.request) or is_compliance_internal_user(self.request): #TODO review auth group
             return ReportType.objects.all()
         return ReportType.objects.none()
 
@@ -1027,14 +1027,14 @@ class ReportTypeViewSet(viewsets.ModelViewSet):
    
 
 # TODO: check if the class below is used or not.  If no, remove.
-class LocationViewSet(viewsets.ModelViewSet):
+class LocationViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = Location.objects.none()
     serializer_class = LocationSerializer
 
     def get_queryset(self):
         #user = self.request.user
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_internal(self.request) or is_compliance_internal_user(self.request): #TODO review auth group
             return Location.objects.all()
         return Location.objects.none()
 
@@ -1070,7 +1070,7 @@ class LocationViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class EmailUserViewSet(viewsets.ModelViewSet):
+class EmailUserViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = EmailUser.objects.none()
     serializer_class = EmailUserSerializer
     filter_backends = (filters.SearchFilter,)
@@ -1079,7 +1079,7 @@ class EmailUserViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         exclude_staff = self.request.GET.get('exclude_staff')
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_internal(self.request) or is_compliance_internal_user(self.request): #TODO review auth group
             if exclude_staff == 'true':
                 return EmailUser.objects.filter(is_staff=False)
             else:
@@ -1087,14 +1087,14 @@ class EmailUserViewSet(viewsets.ModelViewSet):
         return EmailUser.objects.none()
 
 
-class MapLayerViewSet(viewsets.ModelViewSet):
+class MapLayerViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = MapLayer.objects.filter(availability__exact=True)
     serializer_class =  MapLayerSerializer
 
     def get_queryset(self):
         #user = self.request.user
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_internal(self.request) or is_compliance_internal_user(self.request): #TODO review auth group
             return MapLayer.objects.filter(availability__exact=True)
         return MapLayer.objects.none()
 

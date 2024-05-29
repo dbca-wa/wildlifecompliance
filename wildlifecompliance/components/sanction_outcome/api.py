@@ -149,7 +149,7 @@ class SanctionOutcomeFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class SanctionOutcomePaginatedViewSet(viewsets.ModelViewSet):
+class SanctionOutcomePaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (SanctionOutcomeFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #queryset = SanctionOutcome.objects.none()
@@ -158,7 +158,7 @@ class SanctionOutcomePaginatedViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return SanctionOutcome.objects.all()
         return SanctionOutcome.objects.none()
 
@@ -243,7 +243,7 @@ class SanctionOutcomePaginatedViewSet(viewsets.ModelViewSet):
 #             raise serializers.ValidationError(str(e))
 
 
-class RemediationActionViewSet(viewsets.ModelViewSet):
+class RemediationActionViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = RemediationAction.objects.none()
     serializer_class = RemediationActionSerializer
 
@@ -414,7 +414,7 @@ class RemediationActionViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
     def get_queryset(self):
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return RemediationAction.objects.all()
         elif is_customer(self.request):
             return RemediationAction.objects_for_external.filter(
@@ -514,7 +514,7 @@ class RemediationActionViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class SanctionOutcomeViewSet(viewsets.ModelViewSet):
+class SanctionOutcomeViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = SanctionOutcome.objects.none()
     serializer_class = SanctionOutcomeSerializer
 
@@ -559,7 +559,7 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return SanctionOutcome.objects.all()
         elif is_customer(self.request):
             return SanctionOutcome.objects_for_external.filter(

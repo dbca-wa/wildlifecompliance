@@ -187,7 +187,7 @@ class InspectionFilterBackend(DatatablesFilterBackend):
 #        return super(InspectionRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class InspectionPaginatedViewSet(viewsets.ModelViewSet):
+class InspectionPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (InspectionFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (InspectionRenderer,)
@@ -198,7 +198,7 @@ class InspectionPaginatedViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # import ipdb; ipdb.set_trace()
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return Inspection.objects.all()
         return Inspection.objects.none()
 
@@ -214,14 +214,14 @@ class InspectionPaginatedViewSet(viewsets.ModelViewSet):
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class InspectionViewSet(viewsets.ModelViewSet):
+class InspectionViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = Inspection.objects.none()
     serializer_class = InspectionSerializer
 
     def get_queryset(self):
         # import ipdb; ipdb.set_trace()
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return Inspection.objects.all()
         return Inspection.objects.none()
 
@@ -1010,13 +1010,13 @@ class InspectionViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class InspectionTypeViewSet(viewsets.ModelViewSet):
+class InspectionTypeViewSet(viewsets.ModelViewSet): #TODO constrain
    queryset = InspectionType.objects.none()
    serializer_class = InspectionTypeSerializer
 
    def get_queryset(self):
        # user = self.request.user
-       if is_internal(self.request):
+       if is_internal(self.request): #TODO auth group
            return InspectionType.objects.all()
        return InspectionType.objects.none()
 

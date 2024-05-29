@@ -126,7 +126,7 @@ class OffenceFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class OffencePaginatedViewSet(viewsets.ModelViewSet):
+class OffencePaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (OffenceFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     queryset = Offence.objects.none()
@@ -135,7 +135,7 @@ class OffencePaginatedViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return Offence.objects.all()
         return Offence.objects.none()
 
@@ -151,7 +151,7 @@ class OffencePaginatedViewSet(viewsets.ModelViewSet):
         return ret
 
 
-class OffenceViewSet(viewsets.ModelViewSet):
+class OffenceViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = Offence.objects.all()
     serializer_class = OffenceSerializer
 
@@ -160,7 +160,7 @@ class OffenceViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return Offence.objects.all()
         return Offence.objects.none()
 
@@ -754,7 +754,7 @@ class OffenceViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-class SearchSectionRegulation(viewsets.ModelViewSet):
+class SearchSectionRegulation(viewsets.ModelViewSet): #TODO constrain
     queryset = SectionRegulation.objects.none()
     serializer_class = SectionRegulationSerializer
     filter_backends = (filters.SearchFilter,)
@@ -767,7 +767,7 @@ class SearchSectionRegulation(viewsets.ModelViewSet):
         return SectionRegulation.objects.none()
 
 
-class SearchOrganisation(viewsets.ModelViewSet):
+class SearchOrganisation(viewsets.ModelViewSet): #TODO constrain
     queryset = Organisation.objects.none()
     serializer_class = OrganisationSerializer
     filter_backends = (filters.SearchFilter,)
@@ -775,7 +775,7 @@ class SearchOrganisation(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return Organisation.objects.all()
         elif is_customer(self.request):
             return user.wildlifecompliance_organisations.all()

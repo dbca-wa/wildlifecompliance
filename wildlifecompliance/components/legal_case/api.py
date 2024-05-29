@@ -210,7 +210,7 @@ class LegalCaseFilterBackend(DatatablesFilterBackend):
 #        return super(LegalCaseRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class LegalCasePaginatedViewSet(viewsets.ModelViewSet):
+class LegalCasePaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     filter_backends = (LegalCaseFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (LegalCaseRenderer,)
@@ -220,7 +220,7 @@ class LegalCasePaginatedViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return LegalCase.objects.all()
         return LegalCase.objects.none()
 
@@ -254,13 +254,13 @@ class LegalCasePaginatedViewSet(viewsets.ModelViewSet):
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class LegalCaseViewSet(viewsets.ModelViewSet):
+class LegalCaseViewSet(viewsets.ModelViewSet): #TODO constrain
     queryset = LegalCase.objects.none()
     serializer_class = BaseLegalCaseSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO auth group
             return LegalCase.objects.all()
         return LegalCase.objects.none()
 
@@ -1525,13 +1525,13 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class LegalCasePriorityViewSet(viewsets.ModelViewSet):
+class LegalCasePriorityViewSet(viewsets.ModelViewSet): #TODO constrain
    queryset = LegalCasePriority.objects.none()
    serializer_class = LegalCasePrioritySerializer
 
    def get_queryset(self):
        # user = self.request.user
-       if is_internal(self.request):
+       if is_internal(self.request): #TODO auth group
            return LegalCasePriority.objects.all()
        return LegalCasePriority.objects.none()
 
