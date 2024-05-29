@@ -191,7 +191,7 @@ def is_wildlife_compliance_officer(request):
                request.user.is_superuser
 
     if request.user.is_authenticated() and (
-            Group.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).filter(id=request.user.id)
+            Group.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).user_set.filter(id=request.user.id)
         ):
         wildlife_compliance_user = True
 

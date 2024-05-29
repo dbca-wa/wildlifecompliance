@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.db import transaction
 from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
-from rest_framework import viewsets, serializers, status, views
+from rest_framework import viewsets, serializers, status, views, mixins
 from rest_framework.decorators import (
     detail_route, list_route, renderer_classes
 )
@@ -28,7 +28,7 @@ from wildlifecompliance.components.main.utils import (
     set_session_activity,
     delete_session_application
 )
-from wildlifecompliance.helpers import is_customer, is_internal
+from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
 from wildlifecompliance.components.applications.email import (
     send_application_amendment_notification,
 )
@@ -401,7 +401,7 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
 #        return super(ApplicationRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class ApplicationPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
+class ApplicationPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (ApplicationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (ApplicationRenderer,)
@@ -411,10 +411,10 @@ class ApplicationPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request): #TODO auth group
+        if is_wildlife_compliance_officer(self.request):
             return Application.objects.all()\
                 .exclude(application_type=Application.APPLICATION_TYPE_SYSTEM_GENERATED)
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             return Application.objects.filter(Q(org_applicant_id__in=user_orgs) | Q(
@@ -489,15 +489,15 @@ class ApplicationPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class ApplicationViewSet(viewsets.ModelViewSet): #TODO constrain
+class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = Application.objects.none()
     serializer_class = ApplicationSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
-            return Application.objects.all() #TODO auth group
-        elif is_customer(self.request):
+        if is_wildlife_compliance_officer(self.request):
+            return Application.objects.all()
+        elif user.is_authenticated():
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             return Application.objects.filter(Q(org_applicant_id__in=user_orgs) | Q(
@@ -2212,7 +2212,7 @@ class ApplicationViewSet(viewsets.ModelViewSet): #TODO constrain
         return Response({'processing_status': ApplicationSelectedActivity.PROCESSING_STATUS_DISCARDED
                          }, status=http_status)
 
-    @detail_route(methods=['DELETE', ])
+    @detail_route(methods=['DELETE', ]) #TODO: more appropriate as a POST?
     def discard_activity(self, request, *args, **kwargs):
         http_status = status.HTTP_200_OK
         activity_id = request.GET.get('activity_id')
@@ -2256,15 +2256,15 @@ class ApplicationViewSet(viewsets.ModelViewSet): #TODO constrain
         })
 
 
-class ApplicationConditionViewSet(viewsets.ModelViewSet): #TODO constrain
+class ApplicationConditionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = ApplicationCondition.objects.none()
     serializer_class = ApplicationConditionSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
-            return ApplicationCondition.objects.all() #TODO auth group
-        elif is_customer(self.request):
+        if is_wildlife_compliance_officer(self.request):
+            return ApplicationCondition.objects.all()
+        elif user.is_authenticated():
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_applications = [application.id for application in Application.objects.filter(
@@ -2276,6 +2276,11 @@ class ApplicationConditionViewSet(viewsets.ModelViewSet): #TODO constrain
     @detail_route(methods=['DELETE', ])
     def delete(self, request, *args, **kwargs):
         from wildlifecompliance.components.returns.services import ReturnService
+
+        #ensure only wlc officers can delete conditions
+        if not is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to delete application conditions")
+
         try:
             instance = self.get_object()
 
@@ -2398,14 +2403,14 @@ class ApplicationConditionViewSet(viewsets.ModelViewSet): #TODO constrain
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-class ApplicationSelectedActivityViewSet(viewsets.ModelViewSet): #TODO constrain
+class ApplicationSelectedActivityViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = ApplicationSelectedActivity.objects.none()
     serializer_class = ApplicationSelectedActivitySerializer
 
     def get_queryset(self):
-        if is_internal(self.request):
-            return ApplicationSelectedActivity.objects.all() #TODO auth group
-        elif is_customer(self.request):
+        if is_wildlife_compliance_officer(self.request):
+            return ApplicationSelectedActivity.objects.all()
+        elif self.request.user.is_authenticated():
             return ApplicationSelectedActivity.objects.none()
         return ApplicationSelectedActivity.objects.none()
 
@@ -2437,10 +2442,10 @@ class ApplicationStandardConditionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ApplicationStandardConditionSerializer
 
     def get_queryset(self):
-        if is_internal(self.request):
-            return ApplicationStandardCondition.objects.all() #TODO auth group
-        elif is_customer(self.request):
-            return ApplicationStandardCondition.objects.none()
+        if is_wildlife_compliance_officer(self.request):
+            return ApplicationStandardCondition.objects.all()
+        #elif is_customer(self.request):
+        #    return ApplicationStandardCondition.objects.none()
         return ApplicationStandardCondition.objects.none()
 
     def list(self, request, *args, **kwargs):
@@ -2452,7 +2457,7 @@ class ApplicationStandardConditionViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class AssessmentPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
+class AssessmentPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (ApplicationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (ApplicationRenderer,)
@@ -2461,10 +2466,10 @@ class AssessmentPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     page_size = 10
 
     def get_queryset(self):
-        if is_internal(self.request): #TODO auth group
+        if is_wildlife_compliance_officer(self.request):
             return Assessment.objects.all()
-        elif is_customer(self.request):
-            return Assessment.objects.none()
+        #elif is_customer(self.request):
+        #    return Assessment.objects.none()
         return Assessment.objects.none()
 
     @list_route(methods=['GET', ])
@@ -2491,15 +2496,15 @@ class AssessmentPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class AssessmentViewSet(viewsets.ModelViewSet): #TODO constrain
+class AssessmentViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = Assessment.objects.none()
     serializer_class = AssessmentSerializer
 
     def get_queryset(self): 
-        if is_internal(self.request): #TODO auth group
+        if is_wildlife_compliance_officer(self.request):
             return Assessment.objects.all()
-        elif is_customer(self.request):
-            return Assessment.objects.none()
+        #elif is_customer(self.request):
+        #    return Assessment.objects.none()
         return Assessment.objects.none()
 
     @list_route(methods=['GET', ])
@@ -2629,20 +2634,20 @@ class AssessmentViewSet(viewsets.ModelViewSet): #TODO constrain
             raise serializers.ValidationError(str(e))
 
 
-class AssessorGroupViewSet(viewsets.ModelViewSet): #TODO constrain
+class AssessorGroupViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = ActivityPermissionGroup.objects.none()
     serializer_class = ActivityPermissionGroupSerializer
     #renderer_classes = [JSONRenderer, ]
 
     def get_queryset(self, application=None):
-        if is_internal(self.request): #TODO auth group
+        if is_wildlife_compliance_officer(self.request):
             if application is not None:
                 return application.get_permission_groups('assessor') 
             return ActivityPermissionGroup.objects.filter(
                 permissions__codename='assessor'
             )
-        elif is_customer(self.request):
-            return ActivityPermissionGroup.objects.none()
+        #elif is_customer(self.request):
+        #    return ActivityPermissionGroup.objects.none()
         return ActivityPermissionGroup.objects.none()
 
     @list_route(methods=['POST', ])
@@ -2655,15 +2660,15 @@ class AssessorGroupViewSet(viewsets.ModelViewSet): #TODO constrain
         return Response(serializer.data)
 
 
-class AmendmentRequestViewSet(viewsets.ModelViewSet): #TODO constrain
+class AmendmentRequestViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = AmendmentRequest.objects.none()
     serializer_class = AmendmentRequestSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
-            return AmendmentRequest.objects.all() #TODO auth group
-        elif is_customer(self.request):
+        if is_wildlife_compliance_officer(self.request):
+            return AmendmentRequest.objects.all()
+        elif user.is_authenticated():
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_applications = [application.id for application in Application.objects.filter(
