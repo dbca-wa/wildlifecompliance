@@ -359,6 +359,7 @@ GROUP_NAME_CHOICES = (
 )
 
 GROUP_WILDLIFE_COMPLIANCE_OFFICERS = "Wildlife Compliance Officers"
+GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS = "Wildlife Compliance - Payment Officers"
 
 AUTH_GROUP_COMPLIANCE_BUSINESS_ADMIN = 'Wildlife Compliance - Compliance Business Admin'
 CUSTOM_AUTH_GROUPS = [

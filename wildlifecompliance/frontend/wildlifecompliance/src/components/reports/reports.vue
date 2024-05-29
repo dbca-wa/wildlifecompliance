@@ -333,43 +333,43 @@ export default {
                 })
             }
         },
-        getBookingSettlementsReport(){
-            let vm = this;
+        //getBookingSettlementsReport(){
+        //    let vm = this;
 
-            if (vm.booking_settlements_form.valid()){
-                let data = vm.bookingSettlementsDatePicker.data("DateTimePicker").date()
-                console.log('=== data ===');
-                console.log(data);
-                data = data.format('DD/MM/YYYY');
-                var url = '/api/reports/booking_settlements?date='+data; 
-                window.location.assign(url);
-                /*vm.$http.get(url).then((response) => {
-                },(error) => {
-                    swal({
-                        type: 'error',
-                        title: 'BPOINT Settlement Report Error', 
-                        text: helpers.apiVueResourceError(error), 
-                    })
-                })*/
-            }
-        },
-        getBookingsReport(){
-            let vm = this;
+        //    if (vm.booking_settlements_form.valid()){
+        //        let data = vm.bookingSettlementsDatePicker.data("DateTimePicker").date()
+        //        console.log('=== data ===');
+        //        console.log(data);
+        //        data = data.format('DD/MM/YYYY');
+        //        var url = '/api/reports/booking_settlements?date='+data; 
+        //        window.location.assign(url);
+        //        /*vm.$http.get(url).then((response) => {
+        //        },(error) => {
+        //            swal({
+        //                type: 'error',
+        //                title: 'BPOINT Settlement Report Error', 
+        //                text: helpers.apiVueResourceError(error), 
+        //            })
+        //        })*/
+        //    }
+        //},
+        //getBookingsReport(){
+        //    let vm = this;
 
-            if (vm.bookings_form.valid()){
-                let data = vm.bookingsDatePicker.data("DateTimePicker").date().format('DD/MM/YYYY');
-                var url = '/api/reports/bookings?date='+data; 
-                window.location.assign(url);
-                /*vm.$http.get(url).then((response) => {
-                },(error) => {
-                    swal({
-                        type: 'error',
-                        title: 'BPOINT Settlement Report Error', 
-                        text: helpers.apiVueResourceError(error), 
-                    })
-                })*/
-            }
-        },
+        //    if (vm.bookings_form.valid()){
+        //        let data = vm.bookingsDatePicker.data("DateTimePicker").date().format('DD/MM/YYYY');
+        //        var url = '/api/reports/bookings?date='+data; 
+        //        window.location.assign(url);
+        //        /*vm.$http.get(url).then((response) => {
+        //        },(error) => {
+        //            swal({
+        //                type: 'error',
+        //                title: 'BPOINT Settlement Report Error', 
+        //                text: helpers.apiVueResourceError(error), 
+        //            })
+        //        })*/
+        //    }
+        //},
         fetchRegions:function () {
             let vm = this;
             $.get('/ledger/payments/api/regions?format=json',function (data) {

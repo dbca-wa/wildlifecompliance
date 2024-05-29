@@ -197,6 +197,17 @@ def is_wildlife_compliance_officer(request):
 
     return wildlife_compliance_user
 
+def is_wildlife_compliance_payment_officer(request):
+    wildlife_compliance_user = request.user.has_perm('wildlifecompliance.system_administrator') or \
+               request.user.is_superuser
+
+    if request.user.is_authenticated() and (
+            Group.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS).user_set.filter(id=request.user.id)
+        ):
+        wildlife_compliance_user = True
+
+    return wildlife_compliance_user
+
 #TODO should other groups be in this?
 def is_compliance_management_user(request):
     compliance_user = is_wildlifecompliance_admin(request)
