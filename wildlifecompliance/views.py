@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 
 from wildlifecompliance.helpers import is_internal, prefer_compliance_management, in_dbca_domain, \
     is_compliance_internal_user, is_wildlifecompliance_admin, is_compliance_management_callemail_readonly_user, belongs_to, \
-    is_compliance_management_approved_external_user, is_customer
+    is_compliance_management_approved_external_user, is_customer, is_wildlife_compliance_officer
 from wildlifecompliance.forms import *
 from wildlifecompliance.components.applications.models import Application,ApplicationSelectedActivity
 from wildlifecompliance.components.call_email.models import CallEmail
@@ -332,9 +332,9 @@ def get_file_path_id(check_str,file_path):
 
 def is_authorised_to_access_document(request):
 
-    if is_internal(request):
+    if is_wildlife_compliance_officer(request):
         return True
-    elif is_customer(request):
+    elif request.user.is_authenticated():
         a_document_id = get_file_path_id("applications",request.path)
         if a_document_id:
             return is_authorised_to_access_application_document(request,a_document_id)
