@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.db import transaction
 from django.http import HttpResponse
 from django.core.exceptions import ValidationError
-from rest_framework import viewsets, serializers, views, status
+from rest_framework import viewsets, serializers, views, status, mixins
 #from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
@@ -27,6 +27,7 @@ from wildlifecompliance.helpers import (
         is_customer, is_internal, is_compliance_management_callemail_readonly_user,
         is_compliance_management_volunteer, is_compliance_management_readonly_user, 
         is_compliance_management_callemail_readonly_user, prefer_compliance_management,
+        is_wildlife_compliance_officer, is_compliance_internal_user,
         )
 from wildlifecompliance.components.users.serializers import (
     UserSerializer,
@@ -157,15 +158,15 @@ class UserProfileCompleted(views.APIView):
         return HttpResponse('OK')
 
 
-class ProfileViewSet(viewsets.ModelViewSet): #TODO constrain
+class ProfileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = Profile.objects.none()
     serializer_class = UserProfileSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request): #TODO auth group
+        if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
             return Profile.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             return Profile.objects.filter(user=user)
         return Profile.objects.none()
 
@@ -189,7 +190,7 @@ class ProfileViewSet(viewsets.ModelViewSet): #TODO constrain
             raise serializers.ValidationError(str(e))
 
 
-class MyProfilesViewSet(viewsets.ModelViewSet): #TODO constrain
+class MyProfilesViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = Profile.objects.none()
     serializer_class = UserProfileSerializer
 
@@ -230,7 +231,7 @@ class UserFilterBackend(DatatablesFilterBackend):
 #        return super(UserRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class UserPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
+class UserPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (UserFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (UserRenderer,)
@@ -239,7 +240,7 @@ class UserPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     page_size = 10
 
     def get_queryset(self):
-        if is_internal(self.request): #TODO auth group
+        if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
             return EmailUser.objects.all()
         return EmailUser.objects.none()
 
@@ -254,7 +255,7 @@ class UserPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class UserViewSet(viewsets.ModelViewSet): #TODO constrain
+class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = EmailUser.objects.none()
     serializer_class = UserSerializer
 
@@ -267,9 +268,9 @@ class UserViewSet(viewsets.ModelViewSet): #TODO constrain
                 - email
         """
         user = self.request.user
-        if is_internal(self.request): #TODO auth group
+        if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
             queryset = EmailUser.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             queryset = EmailUser.objects.filter(id=user.id)
         else:
             queryset = EmailUser.objects.none()
@@ -730,7 +731,7 @@ class UserViewSet(viewsets.ModelViewSet): #TODO constrain
                 print(traceback.print_exc())
                 raise serializers.ValidationError(str(e))
 
-class ComplianceManagementUserViewSet(viewsets.ModelViewSet): #TODO constrain
+class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = EmailUser.objects.none()
     serializer_class = UserSerializer
     #renderer_classes = [JSONRenderer, ]
@@ -744,12 +745,12 @@ class ComplianceManagementUserViewSet(viewsets.ModelViewSet): #TODO constrain
                 - email
         """
         user = self.request.user
-        if is_internal(self.request): #TODO auth group
+        if is_compliance_internal_user(self.request):
             queryset = EmailUser.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             queryset = EmailUser.objects.filter(id=user.id)
-        else:
-            queryset = EmailUser.objects.none()
+        #else:
+        #    queryset = EmailUser.objects.none()
         first_name = self.request.query_params.get('first_name', None)
         last_name = self.request.query_params.get('last_name', None)
         dob = self.request.query_params.get('dob', None)
@@ -877,7 +878,7 @@ class ComplianceManagementUserViewSet(viewsets.ModelViewSet): #TODO constrain
                 raise serializers.ValidationError(str(e))
 
 
-class EmailIdentityViewSet(viewsets.ModelViewSet): #TODO constrain
+class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = EmailIdentity.objects.none()
     serializer_class = EmailIdentitySerializer
 
@@ -887,9 +888,9 @@ class EmailIdentityViewSet(viewsets.ModelViewSet): #TODO constrain
                 - email
         """
         user = self.request.user
-        if is_internal(self.request): #TODO auth group
+        if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
             queryset = EmailIdentity.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             queryset = user.emailidentity_set.all()
         else:
             queryset = EmailIdentity.objects.none()
@@ -1084,12 +1085,12 @@ class EmailIdentityViewSet(viewsets.ModelViewSet): #TODO constrain
 #            raise serializers.ValidationError(str(e))
 
 class GetPersonOrg(views.APIView):
-    renderer_classes = [JSONRenderer,]
+    #renderer_classes = [JSONRenderer,]
 
     def get(self, request, format=None):
 
-        #TODO auth? right now this is not secured - however that may be acceptable depending on the intended use case (applying for organisation?)
-        # investigate and act accordingly - ideally user should at least be authenticated
+        if not (is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request)):
+            return Response()
 
         search_term = request.GET.get('term', '')
         if search_term:
@@ -1135,7 +1136,8 @@ class StaffMemberLookup(views.APIView):
 
     def get(self, request, format=None):
 
-        #TODO auth - check use cases and apply auth accordingly (no serious PII, but should be controlled)
+        if not (is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request)):
+            return Response()
 
         search_term = request.GET.get('term', '')
         if search_term:

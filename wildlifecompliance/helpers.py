@@ -227,8 +227,8 @@ def is_compliance_internal_user(request):
             is_compliance_management_infringement_notice_coordinator(request) or
             is_cm_compliance_admin(request) or
             is_cm_licensing_admin(request) or
-            is_compliance_management_inspection_officer or
-            is_compliance_management_prosecution_officer
+            is_compliance_management_inspection_officer(request) or
+            is_compliance_management_prosecution_officer(request)
             ):
         compliance_user = True
     return compliance_user
