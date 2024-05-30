@@ -694,11 +694,11 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             raise serializers.ValidationError(str(e))
 
     @list_route(methods=['POST', ])
-    def existance(self, request, *args, **kwargs):
+    def existence(self, request, *args, **kwargs):
         try:
             serializer = OrganisationCheckSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            data = Organisation.existance(serializer.validated_data['abn'])
+            data = Organisation.existence(serializer.validated_data['abn'])
             # Check request user cannot be relinked to org.
             data.update([('user', request.user.id)])
             data.update([('abn', request.data['abn'])])
@@ -912,6 +912,8 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     @detail_route(methods=['GET', ])
     def assign_to_me(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to assign organisation request")
             instance = self.get_object()
             user = request.user
             if not request.user.has_perm('wildlifecompliance.organisation_access_request'):
@@ -934,6 +936,9 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     @detail_route(methods=['POST', ])
     def assign_officer(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to assign organisation request")
+
             instance = self.get_object()
             user_id = request.data.get('officer_id', None)
             user = None
@@ -947,6 +952,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             if not request.user.has_perm('wildlifecompliance.organisation_access_request'):
                 raise serializers.ValidationError(
                     'You do not have permission to process organisation access requests')
+
             instance.assign_officer(user, request)
             serializer = OrganisationRequestSerializer(
                 instance, context={'request': request})
@@ -964,6 +970,9 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     @detail_route(methods=['GET', ])
     def unassign_officer(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to unassign organisation request")
+
             instance = self.get_object()
             instance.unassign_officer(request)
             serializer = OrganisationRequestSerializer(
@@ -982,6 +991,9 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     @detail_route(methods=['GET', ])
     def accept(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to accept organisation request")
+            
             instance = self.get_object()
             instance.accept(request)
             serializer = OrganisationRequestSerializer(
@@ -1000,6 +1012,9 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     @detail_route(methods=['GET', ])
     def amendment_request(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to create amendemnt request for organisation request")
+            
             instance = self.get_object()
             instance.amendment_request(request)
             serializer = OrganisationRequestSerializer(
@@ -1018,7 +1033,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     @detail_route(methods=['PUT', ])
     def reupload_identification_amendment_request(
             self, request, *args, **kwargs):
-        try:
+        try:            
             instance = self.get_object()
             instance.reupload_identification_amendment_request(request)
             serializer = OrganisationRequestSerializer(
@@ -1037,6 +1052,9 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     @detail_route(methods=['GET', ])
     def decline(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to decline organisation request")
+            
             instance = self.get_object()
             instance.decline(request)
             serializer = OrganisationRequestSerializer(
@@ -1093,7 +1111,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             serializer.validated_data['requester'] = request.user
             if request.data['role'] == OrganisationRequest.ORG_REQUEST_ROLE_CONSULTANT:
                 # Check if consultant can be relinked to org.
-                data = Organisation.existance(request.data['abn'])
+                data = Organisation.existence(request.data['abn'])
                 data.update([('user', request.user.id)])
                 data.update([('abn', request.data['abn'])])
                 existing_org = OrganisationCheckExistSerializer(data=data)
@@ -1122,7 +1140,7 @@ class OrganisationAccessGroupMembers(views.APIView):
 
     def get(self, request, format=None):
         members = []
-        if is_internal(request): #TODO auth group
+        if is_wildlife_compliance_officer(request):
             groups = ActivityPermissionGroup.objects.filter(
                 permissions__codename__in=[
                     'organisation_access_request',
@@ -1135,15 +1153,15 @@ class OrganisationAccessGroupMembers(views.APIView):
         return Response(members)
 
 
-class OrganisationContactViewSet(viewsets.ModelViewSet): #TODO constrain
+class OrganisationContactViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = OrganisationContactSerializer
     queryset = OrganisationContact.objects.none()
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request): #TODO auth group
+        if is_wildlife_compliance_officer(self.request):
             return OrganisationContact.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
 
             org_contacts = OrganisationContact.objects.filter(is_admin=True).filter(email=user.email)
             user_admin_orgs = [org.organisation.id for org in org_contacts]
@@ -1152,31 +1170,32 @@ class OrganisationContactViewSet(viewsets.ModelViewSet): #TODO constrain
         return OrganisationContact.objects.none()
 
 
-class MyOrganisationsViewSet(viewsets.ModelViewSet): #TODO constrain
+class MyOrganisationsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Organisation.objects.none()
     serializer_class = MyOrganisationsSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request): #TODO auth group
+        if is_wildlife_compliance_officer(self.request):
             return Organisation.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             return user.wildlifecompliance_organisations.all()
         return Organisation.objects.none()
 
 
-class OrganisationComplianceManagementViewSet(viewsets.ModelViewSet): #TODO constrain
+class OrganisationComplianceManagementViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = Organisation.objects.none()
     serializer_class = ComplianceManagementOrganisationSerializer
     
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request): #TODO auth group
+        if is_wildlife_compliance_officer(self.request):
             return Organisation.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             return user.wildlifecompliance_organisations.all()
         return Organisation.objects.none()
 
+    #TODO: consider removing - it does appear to be in use
     def create(self, request, *args, **kwargs):
         print("create org")
         print(request.data)
@@ -1213,7 +1232,8 @@ class OrganisationComplianceManagementViewSet(viewsets.ModelViewSet): #TODO cons
                         saved_address = address_serializer.save()
                         print("address saved") 
                 # WC only cares about the postal address
-                saved_address = update_or_create_postal_address(address, ledger_org)
+                #saved_address = update_or_create_postal_address(address, ledger_org)
+                saved_address = self.update_postal_address(address, ledger_org) #NOTE: this would have been broken for some time
                 ledger_org_data = {'name': request.data.get('name'),
                         'abn': request.data.get('abn'),
                         'postal_address_id': saved_address.id
@@ -1259,7 +1279,7 @@ class OrganisationComplianceManagementViewSet(viewsets.ModelViewSet): #TODO cons
             address = request.data.get('address')
             if address:
                 address_serializer = ComplianceManagementSaveOrganisationAddressSerializer(
-                        instance=ledger_org_address, 
+                        instance=postal_address, 
                         data=address)
                 address_serializer.is_valid(raise_exception=True)
                 if address_serializer.is_valid:

@@ -475,7 +475,7 @@ class Organisation(models.Model):
                 officer_list, self, contact_email, applications, request)
 
     @staticmethod
-    def existance(abn):
+    def existence(abn):
         exists = True
         org = None
         l_org = None
@@ -857,101 +857,105 @@ class OrganisationRequest(models.Model):
                 self.__accept(request)
 
     def __accept(self, request):
-        from wildlifecompliance.components.applications.models import ActivityPermissionGroup
+        if is_wildlife_compliance_officer(request):
+            from wildlifecompliance.components.applications.models import ActivityPermissionGroup
 
-        # Check if orgsanisation exists in ledger
-        ledger_org = None
-        try:
-            ledger_org = ledger_organisation.objects.get(abn=self.abn)
-        except ledger_organisation.DoesNotExist:
-            ledger_org = ledger_organisation.objects.create(
-                name=self.name, abn=self.abn)
-        # Create Organisation in wildlifecompliance
-        org, created = Organisation.objects.get_or_create(
-            organisation=ledger_org)
-        # org.generate_pins()
-        # Link requester to organisation
-        delegate = UserDelegation.objects.create(
-            user=self.requester, organisation=org)
-        # log who approved the request
-        # org.log_user_action(OrganisationAction.ACTION_REQUEST_APPROVED.format(self.id),request)
-        # log who created the link
-        org.log_user_action(
-            OrganisationAction.ACTION_LINK.format(
-                '{} {}({})'.format(
-                    delegate.user.first_name,
-                    delegate.user.last_name,
-                    delegate.user.email)),
-            request)
+            # Check if orgsanisation exists in ledger
+            ledger_org = None
+            try:
+                ledger_org = ledger_organisation.objects.get(abn=self.abn)
+            except ledger_organisation.DoesNotExist:
+                ledger_org = ledger_organisation.objects.create(
+                    name=self.name, abn=self.abn)
+            # Create Organisation in wildlifecompliance
+            org, created = Organisation.objects.get_or_create(
+                organisation=ledger_org)
+            # org.generate_pins()
+            # Link requester to organisation
+            delegate, created = UserDelegation.objects.get_or_create(
+                user=self.requester, organisation=org)
+            
+            # log who approved the request
+            # org.log_user_action(OrganisationAction.ACTION_REQUEST_APPROVED.format(self.id),request)
+            # log who created the link
+            org.log_user_action(
+                OrganisationAction.ACTION_LINK.format(
+                    '{} {}({})'.format(
+                        delegate.user.first_name,
+                        delegate.user.last_name,
+                        delegate.user.email)),
+                request)
 
-        if self.role == OrganisationRequest.ORG_REQUEST_ROLE_CONSULTANT:
-            role = OrganisationContact.ORG_CONTACT_ROLE_CONSULTANT
-        else:
-            role = OrganisationContact.ORG_CONTACT_ROLE_ADMIN
-        # Create contact person
+            if self.role == OrganisationRequest.ORG_REQUEST_ROLE_CONSULTANT:
+                role = OrganisationContact.ORG_CONTACT_ROLE_CONSULTANT
+            else:
+                role = OrganisationContact.ORG_CONTACT_ROLE_ADMIN
+            # Create contact person
 
-        OrganisationContact.objects.create(
-            organisation=org,
-            first_name=self.requester.first_name,
-            last_name=self.requester.last_name,
-            mobile_number=self.requester.mobile_number,
-            phone_number=self.requester.phone_number,
-            fax_number=self.requester.fax_number,
-            email=self.requester.email,
-            user_role=role,
-            user_status=OrganisationContact.ORG_CONTACT_STATUS_ACTIVE,
-            is_admin=True
+            OrganisationContact.objects.get_or_create(
+                organisation=org,
+                first_name=self.requester.first_name,
+                last_name=self.requester.last_name,
+                mobile_number=self.requester.mobile_number,
+                phone_number=self.requester.phone_number,
+                fax_number=self.requester.fax_number,
+                email=self.requester.email,
+                user_role=role,
+                user_status=OrganisationContact.ORG_CONTACT_STATUS_ACTIVE,
+                is_admin=True
+            )
 
-        )
-
-        # send email to requester
-        send_organisation_request_accept_email_notification(self, org, request)
-        # Notify other Organisation Access Group members of acceptance.
-        groups = ActivityPermissionGroup.objects.filter(
-            permissions__codename='organisation_access_request'
-        )
-        for group in groups:
-            recipients = [member.email for member in group.members.exclude(
-                          email=request.user.email)]
-            if recipients:
-                send_organisation_request_accept_admin_email_notification(
-                    self, request, recipients)
+            # send email to requester
+            send_organisation_request_accept_email_notification(self, org, request)
+            # Notify other Organisation Access Group members of acceptance.
+            groups = ActivityPermissionGroup.objects.filter(
+                permissions__codename='organisation_access_request'
+            )
+            for group in groups:
+                recipients = [member.email for member in group.members.exclude(
+                            email=request.user.email)]
+                if recipients:
+                    send_organisation_request_accept_admin_email_notification(
+                        self, request, recipients)
 
     def amendment_request(self, request):
         with transaction.atomic():
-            self.status = OrganisationRequest.ORG_REQUEST_STATUS_AMENDMENT_REQUESTED
-            self.save()
-            self.log_user_action(
-                OrganisationRequestUserAction.ACTION_AMENDMENT_REQUEST.format(
-                    self.id), request)
-            # Continue with remaining logic
-            self.__amendment_request(request)
+            if is_wildlife_compliance_officer(request):
+                self.status = OrganisationRequest.ORG_REQUEST_STATUS_AMENDMENT_REQUESTED
+                self.save()
+                self.log_user_action(
+                    OrganisationRequestUserAction.ACTION_AMENDMENT_REQUEST.format(
+                        self.id), request)
+                # Continue with remaining logic
+                self.__amendment_request(request)
 
     def __amendment_request(self, request):
-        # Check if orgsanisation exists in ledger
-        ledger_org = None
-        try:
-            ledger_org = ledger_organisation.objects.get(abn=self.abn)
-        except ledger_organisation.DoesNotExist:
-            ledger_org = ledger_organisation.objects.create(
-                name=self.name, abn=self.abn)
-        # Create Organisation in wildlifecompliance
-        org, created = Organisation.objects.get_or_create(
-            organisation=ledger_org)
-        # send email to original requester
-        send_organisation_request_amendment_requested_email_notification(
-            self, org, request)
+        if is_wildlife_compliance_officer(request):
+            # Check if orgsanisation exists in ledger
+            ledger_org = None
+            try:
+                ledger_org = ledger_organisation.objects.get(abn=self.abn)
+            except ledger_organisation.DoesNotExist:
+                ledger_org = ledger_organisation.objects.create(
+                    name=self.name, abn=self.abn)
+            # Create Organisation in wildlifecompliance
+            org, created = Organisation.objects.get_or_create(
+                organisation=ledger_org)
+            # send email to original requester
+            send_organisation_request_amendment_requested_email_notification(
+                self, org, request)
 
     def reupload_identification_amendment_request(self, request):
         with transaction.atomic():
-            self.status = OrganisationRequest.ORG_REQUEST_STATUS_WITH_ASSESSOR
-            self.identification = request.data.dict()['identification']
-            self.save()
-            self.log_user_action(
-                OrganisationRequestUserAction.ACTION_REUPLOAD_IDENTIFICATION_AMENDMENT_REQUEST.format(
-                    self.id), request)
-            # Continue with remaining logic
-            self.__reupload_identification_amendment_request(request)
+            if self.status == OrganisationRequest.ORG_REQUEST_STATUS_AMENDMENT_REQUESTED:
+                self.status = OrganisationRequest.ORG_REQUEST_STATUS_WITH_ASSESSOR
+                self.identification = request.data.dict()['identification']
+                self.save()
+                self.log_user_action(
+                    OrganisationRequestUserAction.ACTION_REUPLOAD_IDENTIFICATION_AMENDMENT_REQUEST.format(
+                        self.id), request)
+                # Continue with remaining logic
+                self.__reupload_identification_amendment_request(request)
 
     def __reupload_identification_amendment_request(self, request):
         # Check if orgsanisation exists in ledger
@@ -970,48 +974,51 @@ class OrganisationRequest(models.Model):
 
     def assign_officer(self, user, request):
         with transaction.atomic():
-            self.assigned_officer = user
-            self.save()
-            self.log_user_action(
-                OrganisationRequestUserAction.ACTION_ASSIGN_TO.format(
-                    user.get_full_name()), request)
+            if is_wildlife_compliance_officer(request):
+                self.assigned_officer = user
+                self.save()
+                self.log_user_action(
+                    OrganisationRequestUserAction.ACTION_ASSIGN_TO.format(
+                        user.get_full_name()), request)
 
     def unassign_officer(self, request):
         with transaction.atomic():
-            self.assigned_officer = None
-            self.save()
-            self.log_user_action(
-                OrganisationRequestUserAction.ACTION_UNASSIGN, request)
+            if is_wildlife_compliance_officer(request):
+                self.assigned_officer = None
+                self.save()
+                self.log_user_action(
+                    OrganisationRequestUserAction.ACTION_UNASSIGN, request)
 
     def decline(self, request):
         from wildlifecompliance.components.applications.models import ActivityPermissionGroup
 
         with transaction.atomic():
-            self.status = OrganisationRequest.ORG_REQUEST_STATUS_DECLINED
-            self.save()
-            OrganisationRequestDeclinedDetails.objects.create(
-                officer=request.user,
-                reason=OrganisationRequest.ORG_REQUEST_STATUS_DECLINED,
-                request=self
-            )
-            self.log_user_action(
-                OrganisationRequestUserAction.ACTION_DECLINE_REQUEST.format(
-                    '{} {}({})'.format(
-                        request.user.first_name,
-                        request.user.last_name,
-                        request.user.email)),
-                request)
-            send_organisation_request_decline_email_notification(self, request)
-            # Notify other members of organisation access group of decline.
-            groups = ActivityPermissionGroup.objects.filter(
-                permissions__codename='organisation_access_request'
-            )
-            for group in groups:
-                recipients = [member.email for member in group.members.exclude(
-                              email=request.user.email)]
-                if recipients:
-                    send_organisation_request_decline_admin_email_notification(
-                        self, request, recipients)
+            if is_wildlife_compliance_officer(request):
+                self.status = OrganisationRequest.ORG_REQUEST_STATUS_DECLINED
+                self.save()
+                OrganisationRequestDeclinedDetails.objects.create(
+                    officer=request.user,
+                    reason=OrganisationRequest.ORG_REQUEST_STATUS_DECLINED,
+                    request=self
+                )
+                self.log_user_action(
+                    OrganisationRequestUserAction.ACTION_DECLINE_REQUEST.format(
+                        '{} {}({})'.format(
+                            request.user.first_name,
+                            request.user.last_name,
+                            request.user.email)),
+                    request)
+                send_organisation_request_decline_email_notification(self, request)
+                # Notify other members of organisation access group of decline.
+                groups = ActivityPermissionGroup.objects.filter(
+                    permissions__codename='organisation_access_request'
+                )
+                for group in groups:
+                    recipients = [member.email for member in group.members.exclude(
+                                email=request.user.email)]
+                    if recipients:
+                        send_organisation_request_decline_admin_email_notification(
+                            self, request, recipients)
 
     def send_organisation_request_email_notification(self, request):
         from wildlifecompliance.components.applications.models import ActivityPermissionGroup
