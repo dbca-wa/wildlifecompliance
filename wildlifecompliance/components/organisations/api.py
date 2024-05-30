@@ -1153,7 +1153,7 @@ class OrganisationAccessGroupMembers(views.APIView):
         return Response(members)
 
 
-class OrganisationContactViewSet(viewsets.ReadOnlyModelViewSet):
+class OrganisationContactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     serializer_class = OrganisationContactSerializer
     queryset = OrganisationContact.objects.none()
 
@@ -1168,6 +1168,30 @@ class OrganisationContactViewSet(viewsets.ReadOnlyModelViewSet):
             return OrganisationContact.objects.filter(Q(organisation_id__in=user_admin_orgs) | Q(email=user.email))
 
         return OrganisationContact.objects.none()
+    
+    @detail_route(methods=['DELETE', ])
+    def delete(self, request, *args, **kwargs):
+        # only allowed to remove organisation contacts if their status is in draft
+        try:
+            instance = self.get_object()
+            with transaction.atomic():
+                if instance.user_status == 'draft':
+                    instance.delete()
+                else:
+                    return Response("Cannot delete this organisation contact.")
+
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(repr(e.error_dict))
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
 
 
 class MyOrganisationsViewSet(viewsets.ReadOnlyModelViewSet):
@@ -1181,7 +1205,6 @@ class MyOrganisationsViewSet(viewsets.ReadOnlyModelViewSet):
         elif user.is_authenticated():
             return user.wildlifecompliance_organisations.all()
         return Organisation.objects.none()
-
 
 class OrganisationComplianceManagementViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = Organisation.objects.none()
