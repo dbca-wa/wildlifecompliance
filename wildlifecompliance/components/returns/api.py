@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.db.models import Q
 from django.db import transaction
 from django.core.exceptions import ValidationError
-from rest_framework import viewsets, serializers, status, views
+from rest_framework import viewsets, serializers, status, views, mixins
 from rest_framework.decorators import (
     detail_route,
     list_route,
@@ -19,7 +19,7 @@ from rest_framework_datatables.renderers import DatatablesRenderer
 
 from ledger.checkout.utils import calculate_excl_gst
 
-from wildlifecompliance.helpers import is_customer, is_internal
+from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
 from wildlifecompliance.components.returns.utils import (
     SpreadSheet,
     checkout,
@@ -107,7 +107,7 @@ class ReturnFilterBackend(DatatablesFilterBackend):
 #            data, accepted_media_type, renderer_context)
 
 
-class ReturnPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
+class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (ReturnFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (ReturnRenderer,)
@@ -118,10 +118,10 @@ class ReturnPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     def get_queryset(self):
         user = self.request.user
 
-        if is_internal(self.request): #TODO auth group
+        if is_wildlife_compliance_officer(self.request):
             return Return.objects.all()
 
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_licences = [wildlifelicence.id for wildlifelicence in WildlifeLicence.objects.filter(
@@ -201,15 +201,15 @@ class ReturnPaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
+class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     serializer_class = ReturnSerializer
     queryset = Return.objects.none()
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request): #TODO auth group
+        if is_wildlife_compliance_officer(self.request):
             return Return.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_licences = [wildlifelicence.id for wildlifelicence in WildlifeLicence.objects.filter(
@@ -268,6 +268,9 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(methods=['POST', ])
     def accept(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to accept return")
+
             logger.debug('ReturnViewSet.accept() - start')
             instance = self.get_object()
             # instance.accept(request)
@@ -534,6 +537,8 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(methods=['POST', ])
     def discard(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to discard return")
             instance = self.get_object()
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
@@ -568,6 +573,8 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(methods=['POST', ])
     def assign_to_me(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to assign return")
             instance = self.get_object()
             user = request.user
 
@@ -593,6 +600,8 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
     def assign_officer(self, request, *args, **kwargs):
         from ledger.accounts.models import EmailUser
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to assign return")
             instance = self.get_object()
             user_id = request.data.get('officer_id', None)
             user = None
@@ -636,6 +645,8 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(methods=['POST', ])
     def unassign_officer(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to assign return")
             instance = self.get_object()
 
             ReturnService.unassign_officer_request(request, instance)
@@ -743,7 +754,7 @@ class ReturnTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ReturnType.objects.none()
 
     def get_queryset(self):
-        if is_internal(self.request): #TODO auth group
+        if is_wildlife_compliance_officer(self.request):
             return ReturnType.objects.all()
         return ReturnType.objects.none()
 
@@ -753,15 +764,15 @@ class ReturnTypeViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class ReturnAmendmentRequestViewSet(viewsets.ModelViewSet): #TODO constrain
+class ReturnAmendmentRequestViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = ReturnRequest.objects.none()
     serializer_class = ReturnRequestSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request): #TODO auth group
+        if is_wildlife_compliance_officer(self.request):
             return ReturnRequest.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_applications = [application.id for application in Application.objects.filter(
