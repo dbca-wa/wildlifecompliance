@@ -701,7 +701,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         return Response(
             email_user_serializer.data,
             status=status.HTTP_201_CREATED,
-            headers=self.get_success_headers(email_user_serializer.data)
+            #headers=self.get_success_headers(email_user_serializer.data)
         )
 
     @detail_route(methods=['POST', ])
@@ -731,7 +731,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 print(traceback.print_exc())
                 raise serializers.ValidationError(str(e))
 
-class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.CreateModelMixin):
     queryset = EmailUser.objects.none()
     serializer_class = UserSerializer
     #renderer_classes = [JSONRenderer, ]

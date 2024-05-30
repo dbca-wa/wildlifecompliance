@@ -208,12 +208,13 @@ def is_wildlife_compliance_payment_officer(request):
 
     return wildlife_compliance_user
 
-#TODO should other groups be in this?
 def is_compliance_management_user(request):
     compliance_user = is_wildlifecompliance_admin(request)
     if request.user.is_authenticated() and (
             is_compliance_management_readonly_user(request) or 
-            is_compliance_management_callemail_readonly_user(request)
+            is_compliance_management_callemail_readonly_user(request) or
+            is_compliance_management_approved_external_user(request) or
+            is_compliance_management_volunteer(request)
             ):
         compliance_user = True
     return compliance_user
