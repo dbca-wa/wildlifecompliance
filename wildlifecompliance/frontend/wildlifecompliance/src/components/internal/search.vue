@@ -256,16 +256,16 @@ export default {
         UserDashTable,
         OrganisationDashTable
     },
-    beforeRouteEnter:function(to,from,next){
-        let initialisers = [
-            utils.fetchOrganisations(),
-        ]
-        Promise.all(initialisers).then(data => {
-            next(vm => {
-                vm.organisations = data[0].results;
-            });
-        });
-    },
+    //beforeRouteEnter:function(to,from,next){
+        //let initialisers = [
+        //    utils.fetchOrganisations(),
+        //]
+        //Promise.all(initialisers).then(data => {
+        //    next(vm => {
+        //        vm.organisations = data[0].results;
+        //    });
+        //});
+    //},
     computed: {
         isLoading: function () {
             return this.loading.length == 0;
