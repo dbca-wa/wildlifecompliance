@@ -12,7 +12,7 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.db.models import Q
 from ledger.settings_base import TIME_ZONE
-from rest_framework import viewsets, filters, serializers, status
+from rest_framework import viewsets, filters, serializers, status, mixins
 from rest_framework.decorators import detail_route, list_route, renderer_classes
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -44,7 +44,7 @@ from wildlifecompliance.components.offence.serializers import (
 from wildlifecompliance.components.section_regulation.serializers import SectionRegulationSerializer
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, AllegedCommittedOffence
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup, ComplianceManagementSystemGroupPermission
-from wildlifecompliance.helpers import is_internal, is_customer
+from wildlifecompliance.helpers import is_internal, is_customer, is_compliance_internal_user, is_wildlife_compliance_officer
 
 
 class OffenceFilterBackend(DatatablesFilterBackend):
@@ -126,7 +126,7 @@ class OffenceFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class OffencePaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
+class OffencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (OffenceFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     queryset = Offence.objects.none()
@@ -135,7 +135,7 @@ class OffencePaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
 
     def get_queryset(self):
         # user = self.request.user
-        if is_internal(self.request): #TODO auth group
+        if is_compliance_internal_user(self.request):
             return Offence.objects.all()
         return Offence.objects.none()
 
@@ -151,7 +151,7 @@ class OffencePaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
         return ret
 
 
-class OffenceViewSet(viewsets.ModelViewSet): #TODO constrain
+class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
     queryset = Offence.objects.all()
     serializer_class = OffenceSerializer
 
@@ -160,7 +160,7 @@ class OffenceViewSet(viewsets.ModelViewSet): #TODO constrain
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request): #TODO auth group
+        if is_compliance_internal_user(self.request):
             return Offence.objects.all()
         return Offence.objects.none()
 
@@ -754,7 +754,8 @@ class OffenceViewSet(viewsets.ModelViewSet): #TODO constrain
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-class SearchSectionRegulation(viewsets.ModelViewSet): #TODO constrain
+
+class SearchSectionRegulation(viewsets.ReadOnlyModelViewSet):
     queryset = SectionRegulation.objects.none()
     serializer_class = SectionRegulationSerializer
     filter_backends = (filters.SearchFilter,)
@@ -767,7 +768,7 @@ class SearchSectionRegulation(viewsets.ModelViewSet): #TODO constrain
         return SectionRegulation.objects.none()
 
 
-class SearchOrganisation(viewsets.ModelViewSet): #TODO constrain
+class SearchOrganisation(viewsets.ReadOnlyModelViewSet):
     queryset = Organisation.objects.none()
     serializer_class = OrganisationSerializer
     filter_backends = (filters.SearchFilter,)
@@ -775,8 +776,8 @@ class SearchOrganisation(viewsets.ModelViewSet): #TODO constrain
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request): #TODO auth group
+        if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
             return Organisation.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             return user.wildlifecompliance_organisations.all()
         return Organisation.objects.none()
