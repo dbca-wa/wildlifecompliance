@@ -214,7 +214,8 @@ def is_compliance_management_user(request):
             is_compliance_management_readonly_user(request) or 
             is_compliance_management_callemail_readonly_user(request) or
             is_compliance_management_approved_external_user(request) or
-            is_compliance_management_volunteer(request)
+            is_compliance_management_volunteer(request) or
+            is_compliance_internal_user(request) #TODO make sure this is ok
             ):
         compliance_user = True
     return compliance_user
