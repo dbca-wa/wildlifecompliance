@@ -489,6 +489,13 @@ class CallEmailViewSet(viewsets.ModelViewSet): #TODO constrain
 
     def create(self, request, *args, **kwargs):
         try:
+
+            if not is_compliance_management_user(self.request):
+                return Response(
+                    "user not authorised to create call email",
+                    status=status.HTTP_401_UNAUTHORIZED,
+                    )
+
             with transaction.atomic():
                 request_data = request.data
                 # Create location then include in request to create new Call/Email
@@ -1044,6 +1051,13 @@ class LocationViewSet(viewsets.ModelViewSet): #TODO constrain
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
+
+        if not is_compliance_management_user(self.request):
+            return Response(
+                "user not authorised to create call email",
+                status=status.HTTP_401_UNAUTHORIZED,
+                )
+        
         try:
             serializer = LocationSerializer(data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)

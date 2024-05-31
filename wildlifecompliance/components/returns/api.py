@@ -784,6 +784,11 @@ class ReturnAmendmentRequestViewSet(viewsets.GenericViewSet, mixins.RetrieveMode
     def create(self, request, *args, **kwargs):
         # DRAFT = Return.RETURN_PROCESSING_STATUS_DRAFT
         DUE = Return.RETURN_PROCESSING_STATUS_DUE
+
+        if not is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to create",
+            status=status.HTTP_401_UNAUTHORIZED)
+
         try:
 
             with transaction.atomic():

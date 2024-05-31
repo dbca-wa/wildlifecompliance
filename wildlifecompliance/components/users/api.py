@@ -638,6 +638,11 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @list_route(methods=['POST', ])
     def create_new_person(self, request, *args, **kwargs):
         print("create_new_person")
+
+        if not is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to create new person",
+            status=status.HTTP_401_UNAUTHORIZED)
+
         with transaction.atomic():
             try:
                 email_user_id_requested = request.data.get('id', {})
@@ -768,6 +773,11 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
     def create(self, request, *args, **kwargs):
         print("cm user create")
         print(request.data)
+        
+        if not is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to create new person",
+            status=status.HTTP_401_UNAUTHORIZED)
+        
         with transaction.atomic():
             try:
                 request_data = request.data

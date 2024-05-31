@@ -2279,7 +2279,8 @@ class ApplicationConditionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
 
         #ensure only wlc officers can delete conditions
         if not is_wildlife_compliance_officer(self.request):
-            return Response("user not authorised to delete application conditions")
+            return Response("user not authorised to delete application conditions",
+            status=status.HTTP_401_UNAUTHORIZED)
 
         try:
             instance = self.get_object()
@@ -2336,6 +2337,12 @@ class ApplicationConditionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             raise serializers.ValidationError(str(e))
 
     def create(self, request, *args, **kwargs):
+
+        #ensure only wlc officers can create conditions
+        if not is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to create application conditions",
+            status=status.HTTP_401_UNAUTHORIZED)
+        
         try:
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -2539,6 +2546,10 @@ class AssessmentViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @renderer_classes((JSONRenderer,))
     def create(self, request, *args, **kwargs):
+        if not is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to create assessment",
+            status=status.HTTP_401_UNAUTHORIZED)
+
         try:
             serializer = SaveAssessmentSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -2678,6 +2689,11 @@ class AmendmentRequestViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin
         return AmendmentRequest.objects.none()
 
     def create(self, request, *args, **kwargs):
+
+        if not is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to create amendments",
+            status=status.HTTP_401_UNAUTHORIZED)
+        
         try:
             amend_data = self.request.data
             reason = amend_data.pop('reason')

@@ -1222,6 +1222,12 @@ class OrganisationComplianceManagementViewSet(viewsets.GenericViewSet, mixins.Re
     def create(self, request, *args, **kwargs):
         print("create org")
         print(request.data)
+
+        #auth, in case it is used
+        if not is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to create",
+            status=status.HTTP_401_UNAUTHORIZED)
+
         try:
             with transaction.atomic():
                 abn = request.data.get('abn')

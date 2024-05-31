@@ -101,6 +101,13 @@ class DocumentArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
 
     def create(self, request, *args, **kwargs):
         try:
+
+            if not is_compliance_internal_user(self.request):
+                return Response(
+                    "user not authorised to create artifact",
+                    status=status.HTTP_401_UNAUTHORIZED,
+                    )
+            
             with transaction.atomic():
                 request_data = request.data
                 instance, headers = self.common_save(request_data)
