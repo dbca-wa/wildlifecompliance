@@ -381,6 +381,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    #TODO should external users be able to request an inspection on their own licence? Not a high risk, but odd
     @detail_route(methods=['POST', ])
     def add_licence_inspection(self, request, pk=None, *args, **kwargs):
         try:
