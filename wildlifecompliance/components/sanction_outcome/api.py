@@ -15,7 +15,7 @@ from django.http import HttpResponse, FileResponse, HttpResponseNotFound
 from ledger.payments.invoice.models import Invoice
 from ledger.accounts.models import EmailUser
 from django.conf import settings
-from rest_framework import viewsets, serializers, status
+from rest_framework import viewsets, serializers, status, mixins
 from rest_framework.decorators import list_route, detail_route, renderer_classes
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -51,7 +51,7 @@ from wildlifecompliance.components.sanction_outcome.serializers import SanctionO
     SanctionOutcomeDocumentAccessLogSerializer
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.wc_payments.models import InfringementPenalty, InfringementPenaltyInvoice
-from wildlifecompliance.helpers import is_authorised_to_modify, is_internal, is_customer
+from wildlifecompliance.helpers import is_authorised_to_modify, is_internal, is_customer, is_compliance_internal_user
 from wildlifecompliance.components.main.models import TemporaryDocumentCollection, ComplianceManagementSystemGroupPermission
 from wildlifecompliance.settings import SO_TYPE_CHOICES, SO_TYPE_REMEDIATION_NOTICE, SO_TYPE_INFRINGEMENT_NOTICE, \
     SO_TYPE_LETTER_OF_ADVICE, SO_TYPE_CAUTION_NOTICE
@@ -149,7 +149,7 @@ class SanctionOutcomeFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class SanctionOutcomePaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
+class SanctionOutcomePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (SanctionOutcomeFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #queryset = SanctionOutcome.objects.none()
@@ -157,9 +157,11 @@ class SanctionOutcomePaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
     page_size = 10
 
     def get_queryset(self):
-        # user = self.request.user
-        if is_internal(self.request): #TODO auth group
+        user = self.request.user
+        if is_compliance_internal_user(self.request):
             return SanctionOutcome.objects.all()
+        elif user.is_authenticated():
+            return SanctionOutcome.objects_for_external.filter(offender__person=user)
         return SanctionOutcome.objects.none()
 
     @list_route(methods=['GET', ])
@@ -242,8 +244,8 @@ class SanctionOutcomePaginatedViewSet(viewsets.ModelViewSet): #TODO constrain
 #             print(traceback.print_exc())
 #             raise serializers.ValidationError(str(e))
 
-
-class RemediationActionViewSet(viewsets.ModelViewSet): #TODO constrain
+#TODO the external side of this and sanction outcomes do not appear to be use - will need to be secured if this changes
+class RemediationActionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = RemediationAction.objects.none()
     serializer_class = RemediationActionSerializer
 
@@ -325,11 +327,11 @@ class RemediationActionViewSet(viewsets.ModelViewSet): #TODO constrain
                     serializer.is_valid(raise_exception=True)
                     serializer.save()
 
-                headers = self.get_success_headers(serializer.data)
+                #headers = self.get_success_headers(serializer.data)
                 return Response(
                     {},
                     status=status.HTTP_200_OK,
-                    headers=headers
+                    #headers=headers
                 )
 
         except serializers.ValidationError:
@@ -392,11 +394,11 @@ class RemediationActionViewSet(viewsets.ModelViewSet): #TODO constrain
                 user_action_serializer = SanctionOutcomeUserActionSerializer(user_action)
                 data_returned = user_action_serializer.data
 
-                headers = self.get_success_headers(serializer.data)
+                #headers = self.get_success_headers(serializer.data)
                 return Response(
                     data_returned,
                     status=status.HTTP_200_OK,
-                    headers=headers
+                    #headers=headers
                 )
 
         except serializers.ValidationError:
@@ -414,9 +416,9 @@ class RemediationActionViewSet(viewsets.ModelViewSet): #TODO constrain
             raise serializers.ValidationError(str(e))
 
     def get_queryset(self):
-        if is_internal(self.request): #TODO auth group
+        if is_compliance_internal_user(self.request):
             return RemediationAction.objects.all()
-        elif is_customer(self.request):
+        elif self.user.is_authenticated():
             return RemediationAction.objects_for_external.filter(
                 (Q(sanction_outcome__offender__person=self.request.user) & Q(sanction_outcome__registration_holder__isnull=True) & Q(sanction_outcome__driver__isnull=True)) |
                 (Q(sanction_outcome__offender__isnull=True) & Q(sanction_outcome__registration_holder=self.request.user) & Q(sanction_outcome__driver__isnull=True)) |
@@ -450,11 +452,11 @@ class RemediationActionViewSet(viewsets.ModelViewSet): #TODO constrain
             with transaction.atomic():
                 serializer = self._update_instance(request)
 
-                headers = self.get_success_headers(serializer.data)
+                #headers = self.get_success_headers(serializer.data)
                 return Response(
                     {},
                     status=status.HTTP_200_OK,
-                    headers=headers
+                    #headers=headers
                 )
 
         except serializers.ValidationError:
@@ -514,7 +516,7 @@ class RemediationActionViewSet(viewsets.ModelViewSet): #TODO constrain
             raise serializers.ValidationError(str(e))
 
 
-class SanctionOutcomeViewSet(viewsets.ModelViewSet): #TODO constrain
+class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
     queryset = SanctionOutcome.objects.none()
     serializer_class = SanctionOutcomeSerializer
 
@@ -559,7 +561,7 @@ class SanctionOutcomeViewSet(viewsets.ModelViewSet): #TODO constrain
 
     def get_queryset(self):
         # user = self.request.user
-        if is_internal(self.request): #TODO auth group
+        if is_compliance_internal_user(self.request):
             return SanctionOutcome.objects.all()
         elif is_customer(self.request):
             return SanctionOutcome.objects_for_external.filter(
