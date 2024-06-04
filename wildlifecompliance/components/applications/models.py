@@ -6003,12 +6003,13 @@ class ApplicationSelectedActivity(models.Model):
 
                     document.name = str(attachment.name)
 
+                    #TODO look in to this - does not appear to work and may need review
                     if document._file and os.path.isfile(document._file.path):
                         os.remove(document._file.path)
                     document.application_id = self.application_id
                     document.selected_activity_id = self.licence_activity_id
 
-                    path = default_storage.save(
+                    path = private_storage.save(
                       'wildlifecompliance/applications/{}/documents/{}'.format(
                           self.application_id), ContentFile(
                           attachment._file.read()))

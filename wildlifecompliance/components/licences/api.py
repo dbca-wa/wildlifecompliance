@@ -1,12 +1,12 @@
 import traceback
 from django.db.models import Q
 from django.core.exceptions import ValidationError
-from rest_framework import viewsets, serializers
+from rest_framework import viewsets, serializers, mixins
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
 from datetime import datetime, timedelta
 import pytz
-from wildlifecompliance.helpers import is_customer, is_internal
+from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
 from wildlifecompliance.components.licences.services import LicenceService
 from wildlifecompliance.components.licences.models import (
     WildlifeLicence,
@@ -203,7 +203,7 @@ class LicenceRenderer(DatatablesRenderer):
         return super(LicenceRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class LicencePaginatedViewSet(viewsets.ModelViewSet):
+class LicencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (LicenceFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (LicenceRenderer,)
@@ -219,11 +219,11 @@ class LicencePaginatedViewSet(viewsets.ModelViewSet):
             processing_status__in=[
                 ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED,
                 ApplicationSelectedActivity.PROCESSING_STATUS_OFFICER_FINALISATION])
-        if is_internal(self.request):
+        if is_wildlife_compliance_officer(self.request):
             return WildlifeLicence.objects.filter(
                 current_application__in=asa_accepted.values_list(
                     'application_id', flat=True))
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             return WildlifeLicence.objects.filter(
@@ -298,7 +298,7 @@ class LicencePaginatedViewSet(viewsets.ModelViewSet):
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class LicenceViewSet(viewsets.ModelViewSet):
+class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = WildlifeLicence.objects.none()
     serializer_class = DTExternalWildlifeLicenceSerializer
 
@@ -308,10 +308,10 @@ class LicenceViewSet(viewsets.ModelViewSet):
         # ApplicationSelectedActivity that has been ACCEPTED
         asa_accepted = ApplicationSelectedActivity.objects.filter(
             processing_status=ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED)
-        if is_internal(self.request):
+        if is_wildlife_compliance_officer(self.request):
             return WildlifeLicence.objects.filter(
                 current_application__in=asa_accepted.values_list('application_id', flat=True))
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             return WildlifeLicence.objects.filter(
@@ -381,6 +381,7 @@ class LicenceViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    #TODO should external users be able to request an inspection on their own licence? Not a high risk, but odd
     @detail_route(methods=['POST', ])
     def add_licence_inspection(self, request, pk=None, *args, **kwargs):
         try:
@@ -794,7 +795,7 @@ class LicenceViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-class LicenceCategoryViewSet(viewsets.ModelViewSet):
+class LicenceCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = LicenceCategory.objects.none()
     serializer_class = LicenceCategorySerializer
 
@@ -805,7 +806,7 @@ class LicenceCategoryViewSet(viewsets.ModelViewSet):
         return LicenceCategory.objects.none()
 
 
-class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ModelViewSet):
+class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ReadOnlyModelViewSet):
     # Filters to only return purposes that are
     # available for selection when applying for
     # a new application

@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from ledger.accounts.models import EmailUser
-from rest_framework import viewsets, serializers, views, status
+from rest_framework import viewsets, serializers, views, status, mixins
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 # from rest_framework import generics
@@ -58,7 +58,12 @@ from wildlifecompliance.components.main.process_document import save_document
 from wildlifecompliance.components.main.process_document import cancel_document
 from wildlifecompliance.components.main.process_document import delete_document
 from wildlifecompliance.components.wc_payments import reports
-from wildlifecompliance.helpers import is_internal
+from wildlifecompliance.helpers import (
+    is_internal,
+    is_wildlife_compliance_officer,
+    is_wildlife_compliance_payment_officer,
+    is_compliance_internal_user,
+)
 
 logger = logging.getLogger(__name__)
 # logger = logging
@@ -153,7 +158,7 @@ class SchemaMasterlistFilterBackend(DatatablesFilterBackend):
 #            data, accepted_media_type, renderer_context)
 
 
-class SchemaMasterlistPaginatedViewSet(viewsets.ModelViewSet):
+class SchemaMasterlistPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (SchemaMasterlistFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (SchemaMasterlistRenderer,)
@@ -183,7 +188,7 @@ class SchemaMasterlistPaginatedViewSet(viewsets.ModelViewSet):
         return response
 
 
-class SchemaMasterlistViewSet(viewsets.ModelViewSet):
+class SchemaMasterlistViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = MasterlistQuestion.objects.none()
     serializer_class = SchemaMasterlistSerializer
 
@@ -196,7 +201,7 @@ class SchemaMasterlistViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['GET', ])
     def get_masterlist_selects(self, request, *args, **kwargs):
         '''
-        Get independant Select lists associated with Schema Masterlist.
+        Get independent Select lists associated with Schema Masterlist.
         '''
         try:
 
@@ -276,6 +281,10 @@ class SchemaMasterlistViewSet(viewsets.ModelViewSet):
         Delete Masterlist record.
         '''
         try:
+            #ensure only wlc officers can delete
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to delete masterlist")
+            
             instance = self.get_object()
 
             with transaction.atomic():
@@ -308,6 +317,10 @@ class SchemaMasterlistViewSet(viewsets.ModelViewSet):
         Save Masterlist record.
         '''
         try:
+            #ensure only wlc officers can save
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to alter masterlist")
+            
             instance = self.get_object()
 
             with transaction.atomic():
@@ -408,7 +421,7 @@ class SchemaPurposeFilterBackend(DatatablesFilterBackend):
 #            data, accepted_media_type, renderer_context)
 
 
-class SchemaPurposePaginatedViewSet(viewsets.ModelViewSet):
+class SchemaPurposePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (SchemaPurposeFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (SchemaPurposeRenderer,)
@@ -439,7 +452,7 @@ class SchemaPurposePaginatedViewSet(viewsets.ModelViewSet):
         return response
 
 
-class SchemaPurposeViewSet(viewsets.ModelViewSet):
+class SchemaPurposeViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = LicencePurposeSection.objects.none()
     serializer_class = SchemaPurposeSerializer
 
@@ -453,7 +466,7 @@ class SchemaPurposeViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['GET', ])
     def get_purpose_selects(self, request, *args, **kwargs):
         '''
-        Get independant Select lists associated with Schema Section Purpose.
+        Get independent Select lists associated with Schema Section Purpose.
         '''
         try:
 
@@ -527,6 +540,10 @@ class SchemaPurposeViewSet(viewsets.ModelViewSet):
         Delete Licence Purpose Section record.
         '''
         try:
+            #ensure only wlc officers can delete
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to delete purpose record")
+            
             instance = self.get_object()
 
             with transaction.atomic():
@@ -559,6 +576,10 @@ class SchemaPurposeViewSet(viewsets.ModelViewSet):
         Save Licence Purpose Section record.
         '''
         try:
+            #ensure only wlc officers can save
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to alter purpose record")
+            
             instance = self.get_object()
 
             with transaction.atomic():
@@ -658,7 +679,7 @@ class SchemaGroupFilterBackend(DatatablesFilterBackend):
 #            data, accepted_media_type, renderer_context)
 
 
-class SchemaGroupPaginatedViewSet(viewsets.ModelViewSet):
+class SchemaGroupPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (SchemaGroupFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (SchemaGroupRenderer,)
@@ -689,7 +710,7 @@ class SchemaGroupPaginatedViewSet(viewsets.ModelViewSet):
         return response
 
 
-class SchemaGroupViewSet(viewsets.ModelViewSet):
+class SchemaGroupViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = SectionGroup.objects.none()
     serializer_class = SchemaGroupSerializer
 
@@ -702,7 +723,7 @@ class SchemaGroupViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['GET', ])
     def get_group_selects(self, request, *args, **kwargs):
         '''
-        Get independant Select lists associated with Section Groups.
+        Get independent Select lists associated with Section Groups.
         '''
         try:
 
@@ -783,6 +804,10 @@ class SchemaGroupViewSet(viewsets.ModelViewSet):
         Delete Section Group record.
         '''
         try:
+            #ensure only wlc officers can delete
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to delete group record")
+            
             instance = self.get_object()
 
             with transaction.atomic():
@@ -815,6 +840,10 @@ class SchemaGroupViewSet(viewsets.ModelViewSet):
         Save Section Group record.
         '''
         try:
+            #ensure only wlc officers can save
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to alter group record")
+
             instance = self.get_object()
 
             with transaction.atomic():
@@ -928,7 +957,7 @@ class SchemaQuestionFilterBackend(DatatablesFilterBackend):
 #            data, accepted_media_type, renderer_context)
 
 
-class SchemaQuestionPaginatedViewSet(viewsets.ModelViewSet):
+class SchemaQuestionPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (SchemaQuestionFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (SchemaQuestionRenderer,)
@@ -959,7 +988,7 @@ class SchemaQuestionPaginatedViewSet(viewsets.ModelViewSet):
         return response
 
 
-class SchemaQuestionViewSet(viewsets.ModelViewSet):
+class SchemaQuestionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = SectionQuestion.objects.none()
     serializer_class = SchemaQuestionSerializer
 
@@ -1110,7 +1139,7 @@ class SchemaQuestionViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['GET', ])
     def get_question_selects(self, request, *args, **kwargs):
         '''
-        Get independant Select lists associated with Schema Questions.
+        Get independent Select lists associated with Schema Questions.
         '''
         try:
 
@@ -1170,6 +1199,11 @@ class SchemaQuestionViewSet(viewsets.ModelViewSet):
         Delete Section Question record.
         '''
         try:
+
+            #ensure only wlc officers can delete
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to delete question record")
+            
             instance = self.get_object()
 
             with transaction.atomic():
@@ -1202,6 +1236,10 @@ class SchemaQuestionViewSet(viewsets.ModelViewSet):
         Save Section Question record.
         '''
         try:
+            #ensure only wlc officers can save
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to alter question record")
+            
             instance = self.get_object()
 
             with transaction.atomic():
@@ -1237,14 +1275,14 @@ class SchemaQuestionViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class TemporaryDocumentCollectionViewSet(viewsets.ModelViewSet):
+class TemporaryDocumentCollectionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = TemporaryDocumentCollection.objects.none()
     serializer_class = TemporaryDocumentCollectionSerializer
 
     def get_queryset(self):
         # import ipdb; ipdb.set_trace()
         # user = self.request.user
-        if is_internal(self.request):
+        if is_internal(self.request): #TODO review auth group
             return TemporaryDocumentCollection.objects.all()
         return TemporaryDocumentCollection.objects.none()
 
@@ -1318,40 +1356,40 @@ class TemporaryDocumentCollectionViewSet(viewsets.ModelViewSet):
             raise e
 
 
-class BookingSettlementReportView(views.APIView):
-    renderer_classes = (JSONRenderer,)
-
-    def get(self, request, format=None):
-        try:
-            # http_status = status.HTTP_200_OK
-            # parse and validate data
-            report = None
-            data = {
-                "date": request.GET.get('date'),
-            }
-            serializer = BookingSettlementReportSerializer(data=data)
-            serializer.is_valid(raise_exception=True)
-            filename = 'Booking Settlement Report-{}'.format(
-                str(serializer.validated_data['date'])
-            )
-            # Generate Report
-            report = reports.booking_bpoint_settlement_report(
-                serializer.validated_data['date']
-            )
-            if report:
-                response = HttpResponse(
-                    FileWrapper(report), content_type='text/csv'
-                )
-                response[
-                    'Content-Disposition'
-                ] = 'attachment; filename="{}.csv"'.format(filename)
-                return response
-            else:
-                raise serializers.ValidationError('No report was generated.')
-        except serializers.ValidationError:
-            raise
-        except Exception:
-            traceback.print_exc()
+#class BookingSettlementReportView(views.APIView):
+#    renderer_classes = (JSONRenderer,)
+#
+#    def get(self, request, format=None):
+#        try:
+#            # http_status = status.HTTP_200_OK
+#            # parse and validate data
+#            report = None
+#            data = {
+#                "date": request.GET.get('date'),
+#            }
+#            serializer = BookingSettlementReportSerializer(data=data)
+#            serializer.is_valid(raise_exception=True)
+#            filename = 'Booking Settlement Report-{}'.format(
+#                str(serializer.validated_data['date'])
+#            )
+#            # Generate Report
+#            report = reports.booking_bpoint_settlement_report(
+#                serializer.validated_data['date']
+#            )
+#            if report:
+#                response = HttpResponse(
+#                    FileWrapper(report), content_type='text/csv'
+#                )
+#                response[
+#                    'Content-Disposition'
+#                ] = 'attachment; filename="{}.csv"'.format(filename)
+#                return response
+#            else:
+#                raise serializers.ValidationError('No report was generated.')
+#        except serializers.ValidationError:
+#            raise
+#        except Exception:
+#            traceback.print_exc()
 
 
 def oracle_integration(date, override):
@@ -1368,6 +1406,10 @@ class OracleJob(views.APIView):
     renderer_classes = [JSONRenderer, ]
 
     def get(self, request, format=None):
+        
+        if not is_wildlife_compliance_payment_officer(request):
+            return Response()
+
         try:
             data = {
                 "date": request.GET.get("date"),
@@ -1394,7 +1436,7 @@ class OracleJob(views.APIView):
             raise serializers.ValidationError(str(e[0]))
 
 
-class RegionViewSet(viewsets.ModelViewSet):
+class RegionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Region.objects.none()
     serializer_class = RegionSerializer
 
@@ -1405,7 +1447,7 @@ class RegionViewSet(viewsets.ModelViewSet):
         return Region.objects.none()
 
 
-class DistrictViewSet(viewsets.ModelViewSet):
+class DistrictViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = District.objects.none()
     serializer_class = DistrictSerializer
 
@@ -1419,6 +1461,11 @@ class AllocatedGroupMembers(views.APIView):
     renderer_classes = [JSONRenderer, ]
 
     def post(self, request, format=None):
+
+        #auth only used by internal compliance users
+        if not is_compliance_internal_user(self.request):
+            return Response()
+
         try:
             members = []
 

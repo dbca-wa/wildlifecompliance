@@ -18,7 +18,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from rest_framework import viewsets, serializers, status, generics, views, filters
+from rest_framework import viewsets, serializers, status, generics, views, filters, mixins
 import rest_framework.exceptions as rest_exceptions
 from rest_framework.decorators import (
     detail_route,
@@ -48,7 +48,7 @@ from wildlifecompliance.components.users.serializers import (
     UserAddressSerializer,
     ComplianceUserDetailsSerializer,
 )
-from wildlifecompliance.helpers import is_customer, is_internal, is_compliance_internal_user
+from wildlifecompliance.helpers import is_customer, is_internal, is_compliance_management_user
 from wildlifecompliance.components.call_email.models import (
     CallEmail,
     Classification,
@@ -89,7 +89,7 @@ from wildlifecompliance.components.call_email.serializers import (
     SaveUserAddressSerializer,
     #InspectionTypeSerializer,
     # ExternalOrganisationSerializer,
-    #CallEmailAllocatedGroupSerializer,
+    CallEmailAllocatedGroupSerializer,
     UpdateAssignedToIdSerializer
     )
 # from utils import SchemaParser
@@ -197,7 +197,7 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
 #        return super(CallEmailRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class CallEmailPaginatedViewSet(viewsets.ModelViewSet):
+class CallEmailPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (CallEmailFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (CallEmailRenderer,)
@@ -206,8 +206,7 @@ class CallEmailPaginatedViewSet(viewsets.ModelViewSet):
     page_size = 10
     
     def get_queryset(self):
-        #if is_internal(self.request) or is_compliance_internal_user(self.request):
-        if is_compliance_internal_user(self.request):
+        if is_compliance_management_user(self.request): 
             return CallEmail.objects.all()
         return CallEmail.objects.none()
 
@@ -223,12 +222,12 @@ class CallEmailPaginatedViewSet(viewsets.ModelViewSet):
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class CallEmailViewSet(viewsets.ModelViewSet):
+class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
     queryset = CallEmail.objects.all()
     serializer_class = CallEmailSerializer
 
     def get_queryset(self):
-        if is_compliance_internal_user(self.request):
+        if is_compliance_management_user(self.request):
             return CallEmail.objects.all()
         return CallEmail.objects.none()
 
@@ -291,7 +290,7 @@ class CallEmailViewSet(viewsets.ModelViewSet):
     def entangled_choices(self, request, *args, **kwargs):
         res_obj = []
         for choice in CallEmail.ENTANGLED_CHOICES:
-            res_obj.append({'id': choice[0], 'display': choice[1]});
+            res_obj.append({'id': choice[0], 'display': choice[1]})
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
@@ -299,7 +298,7 @@ class CallEmailViewSet(viewsets.ModelViewSet):
     def gender_choices(self, request, *args, **kwargs):
         res_obj = []
         for choice in CallEmail.GENDER_CHOICES:
-            res_obj.append({'id': choice[0], 'display': choice[1]});
+            res_obj.append({'id': choice[0], 'display': choice[1]})
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
@@ -490,6 +489,13 @@ class CallEmailViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         try:
+
+            if not is_compliance_management_user(self.request):
+                return Response(
+                    "user not authorised to create call email",
+                    status=status.HTTP_401_UNAUTHORIZED,
+                    )
+
             with transaction.atomic():
                 request_data = request.data
                 # Create location then include in request to create new Call/Email
@@ -862,14 +868,14 @@ class CallEmailViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-class ClassificationViewSet(viewsets.ModelViewSet):
+class ClassificationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Classification.objects.none()
     serializer_class = ClassificationSerializer
 
     def get_queryset(self):
         #user = self.request.user
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_compliance_management_user(self.request):
             return Classification.objects.all()
         return Classification.objects.none()
 
@@ -884,13 +890,13 @@ class ClassificationViewSet(viewsets.ModelViewSet):
         return HttpResponse(res_json, content_type='application/json')
 
 
-class LOVCollectionViewSet(viewsets.ModelViewSet):
+class LOVCollectionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = CallEmail.objects.none()
     serializer_class = CallEmailSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_management_user(self.request):
             return CallEmail.objects.all()
         return CallEmail.objects.none()
 
@@ -964,26 +970,26 @@ class LOVCollectionViewSet(viewsets.ModelViewSet):
         return HttpResponse(res_json, content_type='application/json')
 
 
-class ReferrerViewSet(viewsets.ModelViewSet):
+class ReferrerViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Referrer.objects.none()
     serializer_class = ReferrerSerializer
 
     def get_queryset(self):
         #user = self.request.user
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_compliance_management_user(self.request): 
             return Referrer.objects.all()
         return Referrer.objects.none()
 
 
-class ReportTypeViewSet(viewsets.ModelViewSet):
+class ReportTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ReportType.objects.none()
     serializer_class = ReportTypeSerializer
 
     def get_queryset(self):
         #user = self.request.user
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_compliance_management_user(self.request):
             return ReportType.objects.all()
         return ReportType.objects.none()
 
@@ -993,7 +999,7 @@ class ReportTypeViewSet(viewsets.ModelViewSet):
         user = self.request.user
         return_list = []
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_internal(self.request) or is_compliance_management_user(self.request):
             valid_records = ReportType.objects.values('report_type').annotate(Max('version'))
             for record in valid_records:
                 qs_record = ReportType.objects \
@@ -1027,14 +1033,14 @@ class ReportTypeViewSet(viewsets.ModelViewSet):
    
 
 # TODO: check if the class below is used or not.  If no, remove.
-class LocationViewSet(viewsets.ModelViewSet):
+class LocationViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
     queryset = Location.objects.none()
     serializer_class = LocationSerializer
 
     def get_queryset(self):
         #user = self.request.user
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_compliance_management_user(self.request): 
             return Location.objects.all()
         return Location.objects.none()
 
@@ -1045,6 +1051,13 @@ class LocationViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
+
+        if not is_compliance_management_user(self.request):
+            return Response(
+                "user not authorised to create call email",
+                status=status.HTTP_401_UNAUTHORIZED,
+                )
+        
         try:
             serializer = LocationSerializer(data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
@@ -1070,7 +1083,7 @@ class LocationViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class EmailUserViewSet(viewsets.ModelViewSet):
+class EmailUserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = EmailUser.objects.none()
     serializer_class = EmailUserSerializer
     filter_backends = (filters.SearchFilter,)
@@ -1079,7 +1092,7 @@ class EmailUserViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         exclude_staff = self.request.GET.get('exclude_staff')
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_compliance_management_user(self.request):
             if exclude_staff == 'true':
                 return EmailUser.objects.filter(is_staff=False)
             else:
@@ -1087,14 +1100,14 @@ class EmailUserViewSet(viewsets.ModelViewSet):
         return EmailUser.objects.none()
 
 
-class MapLayerViewSet(viewsets.ModelViewSet):
+class MapLayerViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = MapLayer.objects.filter(availability__exact=True)
     serializer_class =  MapLayerSerializer
 
     def get_queryset(self):
         #user = self.request.user
         #if is_internal(self.request):
-        if is_internal(self.request) or is_compliance_internal_user(self.request):
+        if is_compliance_management_user(self.request):
             return MapLayer.objects.filter(availability__exact=True)
         return MapLayer.objects.none()
 

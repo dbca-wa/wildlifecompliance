@@ -734,7 +734,7 @@ export default {
                     return;
                 }
             }
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,'existance'),JSON.stringify(this.newOrg),{
+            vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,'existence'),JSON.stringify(this.newOrg),{
                 emulateJSON:true
             }).then((response) => {
                 this.newOrg.exists = response.body.exists;

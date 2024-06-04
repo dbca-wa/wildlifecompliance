@@ -17,7 +17,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from rest_framework import viewsets, serializers, status, generics, views, filters
+from rest_framework import viewsets, serializers, status, generics, views, filters, mixins
 import rest_framework.exceptions as rest_exceptions
 from rest_framework.decorators import (
     detail_route,
@@ -49,7 +49,7 @@ from wildlifecompliance.components.users.serializers import (
     UserAddressSerializer,
     ComplianceUserDetailsSerializer,
 )
-from wildlifecompliance.helpers import is_customer, is_internal
+from wildlifecompliance.helpers import is_customer, is_internal, is_compliance_internal_user
 from wildlifecompliance.components.legal_case.models import (
     LegalCase,
     LegalCaseUserAction,
@@ -210,7 +210,7 @@ class LegalCaseFilterBackend(DatatablesFilterBackend):
 #        return super(LegalCaseRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class LegalCasePaginatedViewSet(viewsets.ModelViewSet):
+class LegalCasePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (LegalCaseFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (LegalCaseRenderer,)
@@ -220,7 +220,7 @@ class LegalCasePaginatedViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request):
             return LegalCase.objects.all()
         return LegalCase.objects.none()
 
@@ -254,13 +254,13 @@ class LegalCasePaginatedViewSet(viewsets.ModelViewSet):
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class LegalCaseViewSet(viewsets.ModelViewSet):
+class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
     queryset = LegalCase.objects.none()
     serializer_class = BaseLegalCaseSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request):
             return LegalCase.objects.all()
         return LegalCase.objects.none()
 
@@ -1442,7 +1442,6 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-###########
     @detail_route(methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def delete_reinstate_running_sheet_entry(self, request, *args, **kwargs):
@@ -1525,13 +1524,13 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class LegalCasePriorityViewSet(viewsets.ModelViewSet):
+class LegalCasePriorityViewSet(viewsets.ReadOnlyModelViewSet):
    queryset = LegalCasePriority.objects.none()
    serializer_class = LegalCasePrioritySerializer
 
    def get_queryset(self):
        # user = self.request.user
-       if is_internal(self.request):
+       if is_compliance_internal_user(self.request):
            return LegalCasePriority.objects.all()
        return LegalCasePriority.objects.none()
 

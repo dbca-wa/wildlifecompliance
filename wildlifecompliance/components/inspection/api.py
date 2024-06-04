@@ -17,7 +17,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from rest_framework import viewsets, serializers, status, generics, views, filters
+from rest_framework import viewsets, serializers, status, generics, views, filters, mixins
 import rest_framework.exceptions as rest_exceptions
 from rest_framework.decorators import (
     detail_route,
@@ -49,7 +49,7 @@ from wildlifecompliance.components.users.serializers import (
     UserAddressSerializer,
     ComplianceUserDetailsSerializer,
 )
-from wildlifecompliance.helpers import is_customer, is_internal
+from wildlifecompliance.helpers import is_customer, is_internal, is_compliance_internal_user
 from wildlifecompliance.components.inspection.models import (
     Inspection,
     InspectionUserAction,
@@ -187,7 +187,7 @@ class InspectionFilterBackend(DatatablesFilterBackend):
 #        return super(InspectionRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class InspectionPaginatedViewSet(viewsets.ModelViewSet):
+class InspectionPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (InspectionFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (InspectionRenderer,)
@@ -198,7 +198,7 @@ class InspectionPaginatedViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # import ipdb; ipdb.set_trace()
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request):
             return Inspection.objects.all()
         return Inspection.objects.none()
 
@@ -214,14 +214,14 @@ class InspectionPaginatedViewSet(viewsets.ModelViewSet):
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class InspectionViewSet(viewsets.ModelViewSet):
+class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
     queryset = Inspection.objects.none()
     serializer_class = InspectionSerializer
 
     def get_queryset(self):
         # import ipdb; ipdb.set_trace()
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request):
             return Inspection.objects.all()
         return Inspection.objects.none()
 
@@ -1010,13 +1010,13 @@ class InspectionViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class InspectionTypeViewSet(viewsets.ModelViewSet):
+class InspectionTypeViewSet(viewsets.ReadOnlyModelViewSet):
    queryset = InspectionType.objects.none()
    serializer_class = InspectionTypeSerializer
 
    def get_queryset(self):
        # user = self.request.user
-       if is_internal(self.request):
+       if is_compliance_internal_user(self.request):
            return InspectionType.objects.all()
        return InspectionType.objects.none()
 

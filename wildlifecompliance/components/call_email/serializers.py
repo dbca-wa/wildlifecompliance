@@ -425,15 +425,16 @@ class CallEmailOptimisedSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', )
 
 
-#class CallEmailAllocatedGroupSerializer(serializers.ModelSerializer):
-#    #allocated_group = CompliancePermissionGroupMembersSerializer()
-#    allocated_group = ComplianceSystemGroupMembersSerializer()
-#
-#    class Meta:
-#        model = CallEmail
-#        fields = (
-#            'allocated_group',
-#        )
+class CallEmailAllocatedGroupSerializer(serializers.ModelSerializer):
+    #allocated_group = CompliancePermissionGroupMembersSerializer()
+    #allocated_group = ComplianceSystemGroupMembersSerializer()
+
+    #TODO: fix this to be useful if needed, otherwise consider complete removal (endpoints were still using this serializer)
+    class Meta:
+        model = CallEmail
+        fields = (
+            'allocated_group',
+        )
 
 
 class CallEmailSerializer(serializers.ModelSerializer):
@@ -557,6 +558,7 @@ class CallEmailSerializer(serializers.ModelSerializer):
     def get_current_user_id(self, obj):
         return self.context.get('request', {}).user.id
 
+    #TODO optimise this
     def get_user_in_group(self, obj):
         user_id = self.context.get('request', {}).user.id
 
@@ -567,6 +569,7 @@ class CallEmailSerializer(serializers.ModelSerializer):
         
         return False
 
+    #TODO optimise this
     def get_can_user_action(self, obj):
         user_id = self.context.get('request', {}).user.id
 
