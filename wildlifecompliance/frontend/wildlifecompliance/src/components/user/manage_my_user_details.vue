@@ -30,15 +30,21 @@
                   <div class="panel-body collapse in" :id="pBody">
                       <form class="form-horizontal" name="personal_form" method="post">
                           <div class="form-group">
+                            <label for="" class="col-sm-3 control-label"></label>
+                            <div class="col-sm-6">
+                            <b>To update your account name please <a href='/sso/setting'>click here</a>:</b>
+                            </div>
+                          </div>
+                          <div class="form-group">
                             <label for="" class="col-sm-3 control-label">Given name(s)</label>
                             <div class="col-sm-6">
-                                <input type="text" class="form-control" name="first_name" placeholder="" v-model="current_user.first_name">
+                                <input disabled type="text" class="form-control" name="first_name" placeholder="" v-model="current_user.first_name">
                             </div>
                           </div>
                           <div class="form-group">
                             <label for="" class="col-sm-3 control-label" >Surname</label>
                             <div class="col-sm-6">
-                                <input type="text" class="form-control" name="last_name" placeholder="" v-model="current_user.last_name">
+                                <input disabled type="text" class="form-control" name="last_name" placeholder="" v-model="current_user.last_name">
                             </div>
                           </div>
                           <div class="form-group">
