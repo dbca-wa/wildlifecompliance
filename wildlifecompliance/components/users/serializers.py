@@ -627,8 +627,8 @@ class PersonalSerializer(serializers.ModelSerializer):
         model = EmailUser
         fields = (
             'id',
-            'last_name',
-            'first_name',
+            #'last_name',
+            #'first_name',
             'dob',
         )
 
