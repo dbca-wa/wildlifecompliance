@@ -40,7 +40,6 @@ if SHOW_DEBUG_TOOLBAR:
     ]
     INSTALLED_APPS += (
         'debug_toolbar',
-        'appmonitor_client',
     )
     #INTERNAL_IPS = ('127.0.0.1', 'localhost', get_ip())
     INTERNAL_IPS = ('127.0.0.1', 'localhost')
@@ -77,6 +76,7 @@ INSTALLED_APPS += [
     'rest_framework_datatables',
     'smart_selects',
     'ckeditor',
+    'appmonitor_client',
 ]
 
 CKEDITOR_BASEPATH = '/static/ckeditor/ckeditor/'
