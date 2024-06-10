@@ -40,6 +40,7 @@ if SHOW_DEBUG_TOOLBAR:
     ]
     INSTALLED_APPS += (
         'debug_toolbar',
+        'appmonitor_client',
     )
     #INTERNAL_IPS = ('127.0.0.1', 'localhost', get_ip())
     INTERNAL_IPS = ('127.0.0.1', 'localhost')
@@ -176,6 +177,7 @@ CACHES = {
 }
 CRON_CLASSES = [
     'wildlifecompliance.cron.OracleIntegrationCronJob',
+    'appmonitor_client.cron.CronJobAppMonitorClient',
 ]
 
 # Additional logging for wildlifecompliance
