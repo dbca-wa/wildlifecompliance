@@ -36,7 +36,7 @@ jsontableschema==0.10.1
 python-dateutil==2.6.1
 py4j==0.10.2.1
 djangorestframework==3.8.2
-djangorestframework-gis==0.13
+djangorestframework-gis==0.14
 djangorestframework-csv==2.0.0
 pycountry==17.1.8
 six>=1.10.0
