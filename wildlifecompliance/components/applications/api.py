@@ -1122,7 +1122,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def accept_id_check(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            instance.accept_id_check(request)
+
+            if is_wildlife_compliance_officer(self.request):
+                instance.accept_id_check(request)
 
             return Response(
                 {'id_check_status': instance.id_check_status},
@@ -1142,7 +1144,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def reset_id_check(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            instance.reset_id_check(request)
+
+            if is_wildlife_compliance_officer(self.request):
+                instance.reset_id_check(request)
 
             return Response(
                 {'id_check_status': instance.id_check_status},
@@ -1162,7 +1166,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def request_id_check(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            instance.request_id_check(request)
+
+            if is_wildlife_compliance_officer(self.request):
+                instance.request_id_check(request)
 
             return Response(
                 {'id_check_status': instance.id_check_status},
@@ -1206,7 +1212,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def accept_character_check(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            instance.accept_character_check(request)
+
+            if is_wildlife_compliance_officer(self.request):
+                instance.accept_character_check(request)
 
             return Response(
                 {'character_check_status': instance.character_check_status},
@@ -1226,7 +1234,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def reset_character_check(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            instance.reset_character_check(request)
+
+            if is_wildlife_compliance_officer(self.request):
+                instance.reset_character_check(request)
 
             return Response(
                 {'character_check_status': instance.character_check_status},
@@ -1246,7 +1256,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def accept_return_check(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            instance.accept_return_check(request)
+
+            if is_wildlife_compliance_officer(self.request):
+                instance.accept_return_check(request)
 
             return Response(
                 {'return_check_status': instance.return_check_status},
@@ -1266,7 +1278,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def reset_return_check(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            instance.reset_return_check(request)
+
+            if is_wildlife_compliance_officer(self.request):
+                instance.reset_return_check(request)
 
             return Response(
                 {'return_check_status': instance.return_check_status},
