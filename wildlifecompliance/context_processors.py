@@ -1,6 +1,6 @@
 from django.conf import settings
 from wildlifecompliance.helpers import (is_wildlife_compliance_officer,
-is_compliance_management_user,prefer_compliance_management)
+is_compliance_management_user,prefer_compliance_management, is_customer)
 from wildlifecompliance.components.users.models import (ComplianceManagementUserPreferences)
 
 def authorised_index(request):
@@ -19,6 +19,8 @@ def authorised_index(request):
             preferences.prefer_compliance_management = True
             preferences.save()
 
+        return {"authorised_index":"app"}
+    elif is_customer(request):
         return {"authorised_index":"app"}
     else:
         return ""
