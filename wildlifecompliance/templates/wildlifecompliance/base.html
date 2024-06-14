@@ -7,11 +7,12 @@
 {% get_instance_type as instance_type %}
 {% is_internal as is_internal_login %}
 {% is_officer as is_officer_login %}
+{% is_wildlifecompliance_officer as is_wildlifecompliance_officer %}
 {% is_wildlifecompliance_admin as is_wildlifecompliance_admin_login %}
 {% is_wildlifecompliance_payment_officer as is_payment_officer %}
 {% is_compliance_internal_user as is_compliance_internal_login %}
 {% prefer_compliance_management as prefer_compliance_management %}
-{% is_compliance_management_readonly_user as is_compliance_management_readonly_user %}
+{% is_compliance_management_user as is_compliance_management_user %}
 {% is_compliance_management_callemail_readonly_user as is_compliance_management_callemail_readonly_user %}
 {% system_maintenance_due as system_maintenance_due %}
 {% is_external_url as is_external_url %}
@@ -49,7 +50,7 @@
             {% endblock %}
         </header>
         {% if is_internal_login and not is_external_url %}
-            {% if not is_compliance_management_callemail_readonly_user and not is_compliance_internal_login and not is_officer_login %}
+            {% if not is_compliance_management_user and not is_compliance_internal_login and not is_wildlifecompliance_officer %}
             <div class="alert alert-danger"><strong>Access Forbidden</strong></div>
             {% endif %} 
         {% endif %}        
@@ -69,13 +70,13 @@
                             <div id="navbar" class="navbar-collapse collapse">
                                 <ul class="nav navbar-nav">
                                     {% block left_menu_items %}
-                                        {% if is_compliance_management_callemail_readonly_user and not is_external_url %}
+                                        {% if is_compliance_management_user and not is_compliance_internal_login and not is_external_url %}
                                             <a class="navbar-brand" href="/internal/call_email"><div style="inline"><img src="{% static 'wildlifecompliance/img/dpaw_small.png' %}">Home</div></a>
                                         {% elif is_external_url %}
                                             <!-- External user -->
                                             <a class="navbar-brand" href="/external/"><div style="inline"><img src="{% static 'wildlifecompliance/img/dpaw_small.png' %}">Home</div></a>
                                             <li><a href="/external/sanction_outcome">Sanction Outcome</a></li>
-                                        {% elif is_officer_login and not prefer_compliance_management %}
+                                        {% elif is_wildlifecompliance_officer and not prefer_compliance_management %}
                                             <a class="navbar-brand" href="{% url 'wc_home' %}"><div style="inline"><img src="{% static 'wildlifecompliance/img/dpaw_small.png' %}">Home</div></a>
                                             <li><a href="/internal/licences">Licences</a></li>
                                             <li><a href="/internal/returns">Returns</a></li>
