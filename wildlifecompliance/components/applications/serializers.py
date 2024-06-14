@@ -1696,7 +1696,7 @@ class InternalApplicationSerializer(BaseApplicationSerializer):
     user_roles = serializers.SerializerMethodField(read_only=True)
     assessments = AssessmentSerializer(many=True)
     licence_approvers = EmailUserAppViewSerializer(many=True)
-    permit = serializers.CharField(source='licence_document._file.url')
+    permit = serializers.SerializerMethodField()
     total_paid_amount = serializers.SerializerMethodField()
     adjusted_paid_amount = serializers.SerializerMethodField()
     is_return_check_accept = serializers.SerializerMethodField(read_only=True)
@@ -1861,7 +1861,10 @@ class InternalApplicationSerializer(BaseApplicationSerializer):
             on_active = True
 
         return on_active
-
+    
+    def get_permit(self, obj):
+        if obj.licence_document and obj.licence_document._file:
+            return obj.licence_document._file.url
 
 class ApplicationUserActionSerializer(serializers.ModelSerializer):
     who = serializers.CharField(source='who.get_full_name')

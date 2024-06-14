@@ -157,6 +157,11 @@ TEMPLATES[0]['DIRS'].append(
         'components',
         'emails',
         'templates'))
+
+TEMPLATES[0]["OPTIONS"]["context_processors"].append(
+    "wildlifecompliance.context_processors.authorised_index"
+)
+
 del BOOTSTRAP3['css_url']
 #BOOTSTRAP3 = {
 #    'jquery_url': '//static.dbca.wa.gov.au/static/libs/jquery/2.2.1/jquery.min.js',
