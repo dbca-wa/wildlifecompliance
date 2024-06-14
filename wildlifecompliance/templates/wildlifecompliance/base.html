@@ -48,6 +48,11 @@
                 {% include 'wildlifecompliance/header.html' with instance_type=instance_type %}
             {% endblock %}
         </header>
+        {% if is_internal_login and not is_external_url %}
+            {% if not is_compliance_management_callemail_readonly_user and not is_compliance_internal_login and not is_officer_login %}
+            <div class="alert alert-danger"><strong>Access Forbidden</strong></div>
+            {% endif %} 
+        {% endif %}        
         {% block menu %}
             <div class="container-fluid">
                 <div class="row">
@@ -70,7 +75,7 @@
                                             <!-- External user -->
                                             <a class="navbar-brand" href="/external/"><div style="inline"><img src="{% static 'wildlifecompliance/img/dpaw_small.png' %}">Home</div></a>
                                             <li><a href="/external/sanction_outcome">Sanction Outcome</a></li>
-                                        {% elif is_internal_login and not prefer_compliance_management %}
+                                        {% elif is_officer_login and not prefer_compliance_management %}
                                             <a class="navbar-brand" href="{% url 'wc_home' %}"><div style="inline"><img src="{% static 'wildlifecompliance/img/dpaw_small.png' %}">Home</div></a>
                                             <li><a href="/internal/licences">Licences</a></li>
                                             <li><a href="/internal/returns">Returns</a></li>
