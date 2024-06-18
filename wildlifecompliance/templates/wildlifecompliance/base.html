@@ -65,7 +65,7 @@
                             <div id="navbar" class="navbar-collapse collapse">
                                 <ul class="nav navbar-nav">
                                     {% block left_menu_items %}
-                                        {% if is_compliance_management_user and not is_compliance_internal_login and not is_external_url %}
+                                        {% if is_compliance_management_user and not is_compliance_internal_login %}
                                             <a class="navbar-brand" href="/external/"><div style="inline"><img src="{% static 'wildlifecompliance/img/dpaw_small.png' %}">Home</div></a>
                                             <li><a href="/internal/call_email">Call/Emails</a></li>                            
                                         {% elif is_wildlifecompliance_officer and not prefer_compliance_management %}
