@@ -93,13 +93,13 @@ class WildlifeComplianceRoutingView(TemplateView):
             print('is_compliance_internal_user: {}'.format(is_compliance_internal_user(self.request)))
             print('is_wildlifecompliance_admin: {}'.format(is_wildlifecompliance_admin(self.request)))
             print('prefer compliance management: {}'.format(prefer_compliance_management(self.request)))
-            if (
-                    (is_internal(self.request) and prefer_compliance_management(self.request)) or
-                    is_compliance_management_approved_external_user(self.request)
-                    ):
-                return redirect('internal')
-            elif is_internal(self.request):
-                return redirect('internal')
+            #if (
+            #        (is_internal(self.request) and prefer_compliance_management(self.request)) or
+            #        is_compliance_management_approved_external_user(self.request)
+            #        ):
+                #return redirect('internal')
+            #elif is_internal(self.request):
+                #return redirect('internal')
             return redirect('external')
         kwargs['form'] = LoginForm
         return super(WildlifeComplianceRoutingView, self).get(*args, **kwargs)
