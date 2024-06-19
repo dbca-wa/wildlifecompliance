@@ -1,6 +1,6 @@
 from django.conf import settings
 from wildlifecompliance.helpers import (is_wildlife_compliance_officer,
-is_compliance_management_user,prefer_compliance_management, is_external_url)
+is_compliance_management_user,prefer_compliance_management, is_external_url, is_first_time_url)
 from wildlifecompliance.components.users.models import (ComplianceManagementUserPreferences)
 
 def authorised_index(request):
@@ -20,7 +20,7 @@ def authorised_index(request):
             preferences.save()
 
         return {"authorised_index":"app"}
-    elif is_external_url(request):
+    elif is_external_url(request) and is_first_time_url(request):
         return {"authorised_index":"app"}
     else:
         return ""
