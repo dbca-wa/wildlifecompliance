@@ -223,7 +223,7 @@ urlpatterns = [
     url(r'^external/return/(?P<return_pk>\d+)/$', views.ExternalReturnView.as_view(), name='external-return-detail'),
     url(r'^firsttime/$', views.first_time, name='first_time'),
     url(r'^account/$', views.ExternalView.as_view(), name='manage-account'),
-    url(r'^profiles/', views.ExternalView.as_view(), name='manage-profiles'),
+    #url(r'^profiles/', views.ExternalView.as_view(), name='manage-profiles'),
     # url(r'^external/organisations/manage/$', views.ExternalView.as_view(), name='manage-org'),
     url(r'^application/$',
         application_views.ApplicationView.as_view(),

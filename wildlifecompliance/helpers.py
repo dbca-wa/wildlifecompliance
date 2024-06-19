@@ -172,11 +172,11 @@ def is_external_url(request):
         external = True
     return external
 
-def is_first_time_url(request):
-    first_time = False
-    if request.path[:11] == '/firsttime/':
-        first_time = True
-    return first_time
+def is_internal_url(request):
+    internal = False
+    if request.path[:10] == '/internal/':
+        internal = True
+    return internal
 
 def prefer_compliance_management(request):
     ret_value = False
