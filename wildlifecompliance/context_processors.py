@@ -20,7 +20,7 @@ def authorised_index(request):
             preferences.save()
 
         return {"authorised_index":"app"}
-    elif is_external_url(request) and is_first_time_url(request):
+    elif is_external_url(request) or is_first_time_url(request):
         return {"authorised_index":"app"}
     else:
         return ""
