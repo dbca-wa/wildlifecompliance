@@ -16,6 +16,7 @@
 {% is_compliance_management_callemail_readonly_user as is_compliance_management_callemail_readonly_user %}
 {% system_maintenance_due as system_maintenance_due %}
 {% is_external_url as is_external_url %}
+{% is_internal_url as is_internal_url %}
 {% RAND_HASH as RAND_HASH %}
 {% system_name_var as system_name_var %}
 {% COMPLIANCE_LINKS_ENABLED as compliance_links_enabled %}
@@ -184,7 +185,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-12">
-                        {% if is_internal_login and not is_external_url %}
+                        {% if is_internal_login and is_internal_url %}
                             {% if not is_compliance_management_user and not is_compliance_internal_login and not is_wildlifecompliance_officer %}
                             <div class="alert alert-danger"><strong>Access Forbidden</strong></div>
                             {% endif %} 
