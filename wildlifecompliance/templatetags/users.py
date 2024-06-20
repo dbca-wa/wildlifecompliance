@@ -100,6 +100,11 @@ def is_external_url(context):
     request = context['request']
     return wildlifecompliance_helpers.is_external_url(request)
 
+@register.simple_tag(takes_context=True)
+def is_internal_url(context):
+    request = context['request']
+    return wildlifecompliance_helpers.is_internal_url(request)
+
 @register.simple_tag()
 def system_maintenance_due():
     '''
