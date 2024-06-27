@@ -61,7 +61,7 @@ class ReturnConditionSerializer(serializers.ModelSerializer):
             'condition',
             'licence_activity',
             'return_type',)
-        readonly_fields = ('order', 'condition')
+        read_only_fields = ('order', 'condition')
 
     def get_due_date(self, obj):
         return obj.due_date.strftime('%d/%m/%Y') if obj.due_date else ''
@@ -307,7 +307,8 @@ class ReturnSerializer(serializers.ModelSerializer):
         ).order_by('-id').first()
         requests.append(request)
 
-        return ReturnRequestSerializer(requests, many=True).data
+        if request != None:
+            return ReturnRequestSerializer(requests, many=True).data
 
     def get_is_draft(self, _return):
         '''
