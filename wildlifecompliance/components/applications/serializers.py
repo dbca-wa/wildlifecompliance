@@ -1923,7 +1923,7 @@ class ApplicationConditionSerializer(serializers.ModelSerializer):
             'source_name',
             'require_return',
             )
-        readonly_fields = ('order', 'condition')
+        read_only_fields = ('order', 'condition')
 
     def get_purpose_name(self, obj):
         return obj.licence_purpose.short_name if obj.licence_purpose else None
