@@ -2,3 +2,4 @@
 30 2 * * * root eval $(grep -v '^#' /etc/.cronenv | xargs -d "\n" -I {} echo export \"{}\" ) && cd /app && python manage_wc.py cron_tasks > logs/run_cron_tasks.log 2>&1
 45 2 * * * root eval $(grep -v '^#' /etc/.cronenv | xargs -d "\n" -I {} echo export \"{}\" ) && cd /app && python manage_wc.py runcrons > logs/runcrons.log 2>&1
 15 9 * * * root eval $(grep -v '^#' /etc/.cronenv | xargs -d "\n" -I {} echo export \"{}\" ) && python3 /app/manage_wc.py bpoint_ledger_payment_audit_report >> /app/logs/bpoint_ledger_payment_audit_report.log 2>&1
+10 9 * * 0 root eval $(grep -v '^#' /etc/.cronenv | xargs -d "\n" -I {} echo export \"{}\" ) && cd /app && python manage_wc.py appmonitor_check >> logs/appmonitor_check.log 2>&1

@@ -182,7 +182,6 @@ CACHES = {
 }
 CRON_CLASSES = [
     'wildlifecompliance.cron.OracleIntegrationCronJob',
-    'appmonitor_client.cron.CronJobAppMonitorClient',
 ]
 
 # Additional logging for wildlifecompliance
