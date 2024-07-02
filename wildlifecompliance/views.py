@@ -80,6 +80,14 @@ class ExternalView(LoginRequiredMixin, TemplateView):
         #context['build_tag'] = settings.BUILD_TAG
         return context
 
+class InfringementView(TemplateView):
+    template_name = 'wildlifecompliance/infringement.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(InfringementView, self).get_context_data(**kwargs)
+        context['wc_pay_infr_url'] = settings.WC_PAY_INFR_URL
+        return context
+
 
 class WildlifeComplianceRoutingView(TemplateView):
     template_name = 'wildlifecompliance/index.html'
