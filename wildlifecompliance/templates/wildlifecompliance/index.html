@@ -7,6 +7,7 @@
 {% block left_menu_items %}
     <li><a href="{% url 'wc_contact' %}">Contact Us</a></li>
     <li><a href="{% url 'wc_further_info' %}">Further Information</a></li>
+    <li><a href="{% url 'wc_infringement' %}">Infringement</a></li>
 {% endblock %}
 
 {% block messages %}
@@ -35,7 +36,7 @@
                         </strong></p>
                         -->
                         {% bootstrap_messages %}
-			<a class="btn btn-primary" href="{{ BASE_URL }}ssologin">Login</a>
+			    <a class="btn btn-primary" href="{{ BASE_URL }}ssologin">Login</a>
                         <hr>
                         <h4>
                             Wildlife Licensing Password-less Logins

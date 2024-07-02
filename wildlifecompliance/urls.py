@@ -303,6 +303,7 @@ urlpatterns = [
     url(r'^ledger-private/senior-card/(?P<emailuser_id>\d+)', views.getLedgerSeniorCardFile, name='view_ledger_senior_card_file'),
 
     url(r'^private-media/', views.getPrivateFile, name='view_private_file'),
+    url(r'infringement/', views.InfringementView.as_view(), name='wc_infringement'),
 
 ] + ledger_patterns #+ media_serv_patterns
 

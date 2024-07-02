@@ -1,0 +1,146 @@
+{% extends 'wildlifecompliance/base.html' %}
+
+{% load bootstrap3 %}
+{% load static %}
+
+{% block messages %}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Infringement Notices</h2>
+                <p>
+                    DBCA is committed to protecting Western Australia's parks, forests and reserves for wildlife conservation, sustainable recreation, and tourism. 
+                    Our officers may issue infringement notices for alleged contraventions of the Conservation and Land Management Act 1984, Biodiversity Conservation Act 2016 or Swan and Canning Rivers Management Act 2006. 
+                    These laws cover a wide range of issues such as unlawful camping practices, license breaches, unlawful taking of flora and bringing animals into prohibited areas.
+                    <br><br>
+                </p>
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="position: relative;">
+                            <h4 class="panel-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <a data-toggle="collapse" href="#collapse1" style="flex: 1; display: flex; justify-content: space-between; align-items: center; width: 100%; text-decoration: none;">
+                                    What is an infringement notice?
+                                    <span class="glyphicon glyphicon-plus" style="margin-left: auto;"></span>
+                                </a>
+                            </h4>
+                        </div>    
+                        <div id="collapse1" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                An infringement notice is a notice issued by DBCA setting out the particulars of an alleged contravention. The amount payable in an infringement notice is significantly lower than the penalty that a court could impose in relation to the alleged contravention upon conviction. 
+                            <br><br> A person who is given an infringement notice can choose to pay the amount specified in the infringement notice as an alternative to court proceedings. If the person does not choose to pay the amount, further costs may be incurred, or court proceedings can be brought against them in relation to the alleged contravention.
+                            <br><br>If you pay the penalty in full and on time, your liability for the alleged contravention is discharged. Paying an infringement notice is not regarded as an admission for the purposes of any civil or criminal court case.
+                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="position: relative;">
+                            <h4 class="panel-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <a data-toggle="collapse" href="#collapse2" style="flex: 1; display: flex; justify-content: space-between; align-items: center; width: 100%; text-decoration: none;">
+                                    Pay an infringement notice
+                                    <span class="glyphicon glyphicon-plus" style="margin-left: auto;"></span>
+                                </a>
+                            </h4>
+                        </div>    
+                        <div id="collapse2" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <p>
+                                Payment for infringement notices issued by DBCA officers must be received with 28 days from the date of issue to avoid further enforcement costs.<br>
+                                </p>
+                                <p>
+                                <a class="btn btn-primary"  href='{{wc_pay_infr_url}}'>Pay Infringement Notice</a><br>
+                                </p>
+                                <p>
+                                Alternatively, payment can be made in person at any DBCA office, or via phone on 08 9219 9000 during office hours.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="position: relative;">
+                            <h4 class="panel-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <a data-toggle="collapse" href="#collapse3" style="flex: 1; display: flex; justify-content: space-between; align-items: center; width: 100%; text-decoration: none;">
+                                    What happens if I don’t deal with the infringement notice?
+                                    <span class="glyphicon glyphicon-plus" style="margin-left: auto;"></span>
+                                </a>
+                            </h4>
+                        </div>    
+                        <div id="collapse3" class="panel-collapse collapse">
+                            <div class="panel-body">If full payment is not received in 28 days, a Final Demand Notice will be sent to you with added costs. The Final Demand Notice must be paid within 28 days of the issue date on the notice.
+                                <br><br> If payment is not received by the due date stipulated on the Final Demand Notice, the infringement notice will be registered at the Fine Enforcement Registry, which carries further costs and possible suspension of your vehicle and/or drivers licence.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="position: relative;">
+                            <h4 class="panel-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <a data-toggle="collapse" href="#collapse4" style="flex: 1; display: flex; justify-content: space-between; align-items: center; width: 100%; text-decoration: none;">
+                                    Request a review
+                                    <span class="glyphicon glyphicon-plus" style="margin-left: auto;"></span>
+                                </a>
+                            </h4>
+                        </div>        
+                        <div id="collapse4" class="panel-collapse collapse">
+                            <div class="panel-body">If you believe that the decision to issue you with an infringement notice should be reviewed, you may apply for a review of that decision. 
+                                Reviews should only be submitted if you believe you are subject to special circumstances, medical exemption, or the fine was contrary to law.
+                                <br><br> If you wish to request a review, email 
+                                <a href="mailto:infringementsandcautions@dbca.wa.gov.au">infringementsandcautions@dbca.wa.gov.au</a> 
+                                with your reasoning, infringement number, and full name.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="position: relative;">
+                            <h4 class="panel-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <a data-toggle="collapse" href="#collapse5" style="flex: 1; display: flex; justify-content: space-between; align-items: center; width: 100%; text-decoration: none;">
+                                    Apply for an extension of time
+                                    <span class="glyphicon glyphicon-plus" style="margin-left: auto;"></span>
+                                </a>
+                            </h4>
+                        </div>     
+                        <div id="collapse5" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                If you require an extension of time to pay your infringement notice AND you have not had a previous extension of time to pay, <b>you can apply by emailing infringementsandcautions@dbca.wa.gov.au </b>with your <i>infringement number and full name.</i> If granted, DBCA may allow an additional month for payment to be made.
+                                <br><br>Payment must be received in full. DBCA is not able to accept part payments or enter into payment plans.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="position: relative;">
+                            <h4 class="panel-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <a data-toggle="collapse" href="#collapse6" style="flex: 1; display: flex; justify-content: space-between; align-items: center; width: 100%; text-decoration: none;">
+                                    Elect to take the matter to court
+                                    <span class="glyphicon glyphicon-plus" style="margin-left: auto;"></span>
+                                </a>
+                            </h4>
+                        </div>     
+                        <div id="collapse6" class="panel-collapse collapse">
+                            <div class="panel-body">The person named on the infringement notice can request to have the infringement matter referred to the Magistrates' Court within 28 days after the date of the notice.
+                                <br><br>Before electing to have an infringement dealt with by the Magistrates’ Court, you are encouraged to review the information sheet <a href="https://www.legalaid.wa.gov.au/sites/default/files/inline-files/Infringement_notices.pdf" target="_blank">Infringement_notices.pdf (legalaid.wa.gov.au)</a> published by Legal Aid.
+                                <br><br><b>Requests can be sent to infringementsandcautions@dbca.wa.gov.au stating that you wish for your matter to be heard by a Magistrate in court.</b> You must include the <i>infringement number, your full name, date of birth and your current address at which the summons may be served.</i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+   </div>
+{% endblock %}
+
+{% block custom_js %}
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#accordion').on('show.bs.collapse', function (e) {
+                $(e.target).prev('.panel-heading').find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+            }).on('hide.bs.collapse', function (e) {
+                $(e.target).prev('.panel-heading').find('.glyphicon').removeClass('glyphicon-minus').addClass('glyphicon-plus');
+            });
+        });
+        </script>
+        
+{% endblock %}
