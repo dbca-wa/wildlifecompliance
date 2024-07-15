@@ -277,6 +277,7 @@ class UserSerializer(serializers.ModelSerializer):
     # identification = IdentificationSerializer()
     identification2 = Identification2Serializer()
     dob = serializers.SerializerMethodField()
+    legal_dob = serializers.SerializerMethodField()
 
     class Meta:
         model = EmailUser
@@ -285,7 +286,10 @@ class UserSerializer(serializers.ModelSerializer):
             'id',
             'last_name',
             'first_name',
+            'legal_last_name',
+            'legal_first_name',
             'dob',
+            'legal_dob',
             'email',
             'identification2',
             'residential_address',
@@ -304,6 +308,13 @@ class UserSerializer(serializers.ModelSerializer):
         formatted_date = obj.dob.strftime(
             '%d/%m/%Y'
         ) if obj.dob else None
+
+        return formatted_date
+    
+    def get_legal_dob(self, obj):
+        formatted_date = obj.legal_dob.strftime(
+            '%d/%m/%Y'
+        ) if obj.legal_dob else None
 
         return formatted_date
 
@@ -439,6 +450,9 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
             'last_name',
             'first_name',
             'dob',
+            'legal_last_name',
+            'legal_first_name',
+            'legal_dob',
             'email',
             # 'identification',
             'identification2',
