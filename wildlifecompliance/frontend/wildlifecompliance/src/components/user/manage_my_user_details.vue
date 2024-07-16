@@ -52,8 +52,8 @@
                             <div class="col-sm-6">
                                 <!-- <input type="date" class="form-control" name="dob" placeholder="" max="2100-12-31" v-model="current_user.dob"> -->
                                 <div class="input-group date" ref="dob" style="width: 100%;">
-                                    <input v-if="current_user.legal_dob !== null && current_user.legal_dob !== ''" disabled type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="current_user.legal_dob">
-                                    <input v-else :disabled="!canUpdateDOB" type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="current_user.dob">
+                                    <input v-if="!canUpdateDOB" disabled type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="current_user.legal_dob">
+                                    <input v-else type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="current_user.dob">
                                     <span class="input-group-addon">
                                         <span class="glyphicon glyphicon-calendar"></span>
                                     </span>
@@ -447,7 +447,6 @@ export default {
                 'detailsChecked': false,
                 'exists': false
             },
-            set_dob: null,
             countries: [],
             loading: [],
             registeringOrg: false,
@@ -506,7 +505,7 @@ export default {
     },
     computed: {
         canUpdateDOB: function() {
-            return (this.current_user.legal_dob === null || this.current_user.legal_dob === "") && (this.set_dob === null || this.set_dob === "")
+            return (this.current_user.legal_dob === null || this.current_user.legal_dob === "")
         },
         hasOrgs: function() {
             return this.current_user.wildlifecompliance_organisations && this.current_user.wildlifecompliance_organisations.length > 0 ? true: false;
@@ -617,7 +616,6 @@ export default {
                     }).then(() => {
                         vm.updatingPersonal = false;
                         vm.current_user.personal_details = true;
-                        vm.set_dob = vm.current_user.dob
                         if (vm.completedProfile) {
                             vm.$http.get(api_endpoints.user_profile_completed).then((response) => {
                             },(error) => {
@@ -653,7 +651,6 @@ export default {
                         vm.updatingPersonal = false;
                         vm.current_user.personal_details = true;
                         vm.current_user.personal_details = true;
-                        vm.set_dob = vm.current_user.dob;
                         if (vm.completedProfile) {
                             vm.$http.get(api_endpoints.user_profile_completed).then((response) => {
                             },(error) => {
@@ -1121,7 +1118,6 @@ export default {
             else{
                 next(vm => {
                     vm.current_user = response.body
-                    vm.set_dob = response.body.dob;
                     if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
                     if (vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0) { vm.managesOrg = 'Yes' }
                     if (vm.current_user.identification2){ vm.uploadedID = vm.current_user.identification2; }

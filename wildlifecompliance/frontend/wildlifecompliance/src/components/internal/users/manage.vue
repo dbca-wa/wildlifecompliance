@@ -88,7 +88,7 @@
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label"></label>
                                             <div class="col-sm-6">
-                                            <b>To update this account please <a target="_blank" :href="user.acc_mgmt_url">click here</a></b>
+                                            <b>To update this account please <a class="btn btn-primary" target="_blank" :href="user.acc_mgmt_url">click here</a></b>
                                             </div>
                                           </div>
                                           <!--<div class="form-group">

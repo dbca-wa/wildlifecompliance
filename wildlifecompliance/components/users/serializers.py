@@ -345,7 +345,7 @@ class UserSerializer(serializers.ModelSerializer):
     
     def get_acc_mgmt_url(self,obj):
         request = self.context.get('request')
-        if settings.LEDGER_ACC_MGMT_URL and is_internal(request):
+        if settings.LEDGER_ACC_MGMT_URL and request and is_internal(request):
             return settings.LEDGER_ACC_MGMT_URL + "/" + str(obj.id) + "/change/"
         return ''
 

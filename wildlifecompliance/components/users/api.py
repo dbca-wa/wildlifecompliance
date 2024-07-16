@@ -408,9 +408,6 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         print("update personal")
         try:
             instance = self.get_object()
-            print(instance.dob)
-            if instance.dob != None:
-                raise serializers.ValidationError("Account Date of Birth already set")
             serializer = PersonalSerializer(instance, data=request.data)
             serializer.is_valid(raise_exception=True)
             with transaction.atomic():
