@@ -22,6 +22,9 @@ from wildlifecompliance.components.main.fields import CustomChoiceField
 from rest_framework import serializers, status
 import rest_framework_gis.serializers as gis_serializers
 
+from wildlifecompliance.components.main.utils import (
+    get_full_name
+)
 
 class LedgerOrganisationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -352,7 +355,7 @@ class OrgRequestRequesterSerializer(serializers.ModelSerializer):
         )
 
     def get_full_name(self, obj):
-        return obj.get_full_name()
+        return get_full_name(obj)
 
 
 class OrganisationRequestSerializer(serializers.ModelSerializer):
@@ -417,7 +420,7 @@ class OrganisationRequestDTSerializer(OrganisationRequestSerializer):
         datatables_always_serialize = fields
 
     def get_requester(self, obj):
-        return obj.requester.get_full_name()
+        return get_full_name(obj.requester)
 
 
 class UserOrganisationSerializer(serializers.ModelSerializer):

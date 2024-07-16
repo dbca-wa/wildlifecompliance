@@ -56,6 +56,10 @@ logger = logging.getLogger(__name__)
 
 
 class EmailUserSerializer(serializers.ModelSerializer):
+
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
+
     class Meta:
         model = EmailUser
         fields = (
@@ -65,6 +69,12 @@ class EmailUserSerializer(serializers.ModelSerializer):
             'last_name',
             'title',
             'organisation')
+        
+    def get_first_name(self, obj):
+        return get_first_name(obj)
+    
+    def get_last_name(self, obj):
+        return get_last_name(obj)
 
 
 class LicenceCategorySerializer(serializers.ModelSerializer):
@@ -731,6 +741,8 @@ class EmailUserAppViewSerializer(serializers.ModelSerializer):
     # identification = IdentificationSerializer()
     identification2 = Identification2Serializer()
     dob = serializers.SerializerMethodField(read_only=True)
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
 
     class Meta:
         model = EmailUser
@@ -748,12 +760,16 @@ class EmailUserAppViewSerializer(serializers.ModelSerializer):
                   'mobile_number',)
 
     def get_dob(self, obj):
-
-        formatted_date = obj.dob.strftime(
+        formatted_date = get_dob(obj)
+        return formatted_date.strftime(
             '%d/%m/%Y'
-        ) if obj.dob else None
-
-        return formatted_date
+        ) if formatted_date else None
+    
+    def get_first_name(self, obj):
+        return get_first_name(obj)
+    
+    def get_last_name(self, obj):
+        return get_last_name(obj)
 
 
 class ActivitySerializer(serializers.ModelSerializer):

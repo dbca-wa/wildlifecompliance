@@ -20,6 +20,10 @@ from wildlifecompliance.components.applications.models import (
 from wildlifecompliance.components.licences.models import LicenceActivity
 from rest_framework import serializers
 
+from wildlifecompliance.components.main.utils import (
+    get_first_name,
+    get_last_name,
+)
 
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
@@ -68,6 +72,10 @@ class ReturnConditionSerializer(serializers.ModelSerializer):
 
 
 class EmailUserSerializer(serializers.ModelSerializer):
+
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
+
     class Meta:
         model = EmailUser
         fields = (
@@ -77,6 +85,12 @@ class EmailUserSerializer(serializers.ModelSerializer):
             'last_name',
             'title',
             'organisation')
+        
+    def get_first_name(self, obj):
+        return get_first_name(obj)
+    
+    def get_last_name(self, obj):
+        return get_last_name(obj)
 
 
 class ReturnSerializer(serializers.ModelSerializer):

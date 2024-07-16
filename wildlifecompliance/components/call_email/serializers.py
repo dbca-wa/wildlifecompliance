@@ -36,6 +36,14 @@ from wildlifecompliance.components.main.fields import CustomChoiceField
 from wildlifecompliance.components.users.serializers import UserAddressSerializer
 from django.contrib.auth.models import Permission, ContentType
 
+from wildlifecompliance.components.main.utils import (
+    get_first_name,
+    get_last_name,
+    get_dob,
+    get_full_name,
+)
+
+
 
 class SaveEmailUserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(allow_blank=True)  # We need allow_blank=True otherwise blank is not allowed by blank=False setting in the model
@@ -112,6 +120,9 @@ class SaveUserAddressSerializer(serializers.ModelSerializer):
 class EmailUserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
     residential_address = UserAddressSerializer()
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
+    dob = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = EmailUser
@@ -129,7 +140,19 @@ class EmailUserSerializer(serializers.ModelSerializer):
         )
 
     def get_full_name(self, obj):
-        return obj.get_full_name()
+        return get_full_name(obj)
+    
+    def get_dob(self, obj):
+        formatted_date = get_dob(obj)
+        return formatted_date.strftime(
+            '%d/%m/%Y'
+        ) if formatted_date else None
+    
+    def get_first_name(self, obj):
+        return get_first_name(obj)
+    
+    def get_last_name(self, obj):
+        return get_last_name(obj)
 
 
 class ComplianceFormDataRecordSerializer(serializers.ModelSerializer):

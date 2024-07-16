@@ -26,7 +26,10 @@ from rest_framework.fields import CurrentUserDefault
 from django.contrib.auth.models import Permission
 
 from wildlifecompliance.components.main.utils import (
-    get_full_name
+    get_full_name,
+    get_dob,
+    get_first_name,
+    get_last_name,
 )
 
 class DocumentSerializer(serializers.ModelSerializer):
@@ -245,7 +248,9 @@ class ComplianceManagementUserSerializer(serializers.ModelSerializer):
     residential_address = ComplianceManagementSaveUserAddressSerializer(
             required=False,
             read_only=True)
-    #dob = serializers.SerializerMethodField()
+    dob = serializers.SerializerMethodField()
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
 
     class Meta:
         model = EmailUser
@@ -262,13 +267,17 @@ class ComplianceManagementUserSerializer(serializers.ModelSerializer):
         )
         #read_only_fields = ('id',)
 
-    #def get_dob(self, obj):
-    #    dob = None
-    #    if obj.dob:
-    #        dob = obj.dob.strftime('%d/%m/%Y')
-    #    print("dob")
-    #    print(dob)
-    #    return dob
+    def get_dob(self, obj):
+        formatted_date = get_dob(obj)
+        return formatted_date.strftime(
+            '%d/%m/%Y'
+        ) if formatted_date else None
+    
+    def get_first_name(self, obj):
+        return get_first_name(obj)
+    
+    def get_last_name(self, obj):
+        return get_last_name(obj)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -414,6 +423,10 @@ class FirstTimeUserSerializer(UserSerializer):
 
 class DTUserSerializer(serializers.ModelSerializer):
 
+    dob = serializers.SerializerMethodField(read_only=True)
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
+
     class Meta:
         model = EmailUser
         fields = (
@@ -433,6 +446,18 @@ class DTUserSerializer(serializers.ModelSerializer):
         # defined are requested from the serializer. Use datatables_always_serialize to force render
         # of fields that are not listed as 'data' in the datatable columns
         datatables_always_serialize = fields
+
+    def get_dob(self, obj):
+        formatted_date = get_dob(obj)
+        return formatted_date.strftime(
+            '%d/%m/%Y'
+        ) if formatted_date else None
+    
+    def get_first_name(self, obj):
+        return get_first_name(obj)
+    
+    def get_last_name(self, obj):
+        return get_last_name(obj)
 
 
 class MyUserDetailsSerializer(serializers.ModelSerializer):
@@ -565,6 +590,9 @@ class ComplianceUserDetailsSerializer(serializers.ModelSerializer):
     contact_details = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
     # compliance_permissions = serializers.SerializerMethodField()
+    dob = serializers.SerializerMethodField(read_only=True)
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
 
     class Meta:
         model = EmailUser
@@ -588,7 +616,19 @@ class ComplianceUserDetailsSerializer(serializers.ModelSerializer):
 
     def get_full_name(self, obj):
         #return True if obj.last_name and obj.first_name and obj.dob else False
-        return obj.get_full_name()
+        return get_full_name(obj)
+    
+    def get_dob(self, obj):
+        formatted_date = get_dob(obj)
+        return formatted_date.strftime(
+            '%d/%m/%Y'
+        ) if formatted_date else None
+    
+    def get_first_name(self, obj):
+        return get_first_name(obj)
+    
+    def get_last_name(self, obj):
+        return get_last_name(obj)
 
     def get_personal_details(self, obj):
         return True if obj.last_name and obj.first_name and (obj.dob or obj.legal_dob)  else False
@@ -616,6 +656,8 @@ class ComplianceUserDetailsSerializer(serializers.ModelSerializer):
 
 class ComplianceUserDetailsOptimisedSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
 
     class Meta:
         model = EmailUser
@@ -630,6 +672,12 @@ class ComplianceUserDetailsOptimisedSerializer(serializers.ModelSerializer):
     
     def get_full_name(self, obj):
         return get_full_name(obj)
+    
+    def get_first_name(self, obj):
+        return get_first_name(obj)
+    
+    def get_last_name(self, obj):
+        return get_last_name(obj)
 
 
 class EmailUserActionSerializer(serializers.ModelSerializer):
