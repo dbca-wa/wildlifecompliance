@@ -278,6 +278,7 @@ class UserSerializer(serializers.ModelSerializer):
     identification2 = Identification2Serializer()
     dob = serializers.SerializerMethodField()
     legal_dob = serializers.SerializerMethodField()
+    acc_mgmt_url = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = EmailUser
@@ -301,7 +302,8 @@ class UserSerializer(serializers.ModelSerializer):
             'wildlifecompliance_organisations',
             'personal_details',
             'address_details',
-            'contact_details'
+            'contact_details',
+            'acc_mgmt_url',
         )
 
     def get_dob(self, obj):
@@ -340,6 +342,12 @@ class UserSerializer(serializers.ModelSerializer):
             wildlifecompliance_organisations, many=True, context={
                 'user_id': obj.id}).data
         return serialized_orgs
+    
+    def get_acc_mgmt_url(self,obj):
+        request = self.context.get('request')
+        if settings.LEDGER_ACC_MGMT_URL and is_internal(request):
+            return settings.LEDGER_ACC_MGMT_URL + "/" + str(obj.id) + "/change/"
+        return ''
 
 
 class FirstTimeUserSerializer(UserSerializer):
