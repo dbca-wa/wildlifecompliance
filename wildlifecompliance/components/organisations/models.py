@@ -31,6 +31,11 @@ from wildlifecompliance.components.organisations.emails import (
     send_organisation_contact_consultant_email_notification,
 )
 from wildlifecompliance.components.main.models import Document
+from wildlifecompliance.components.main.utils import (
+    get_first_name,
+    get_last_name,
+    get_full_name,
+)
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -96,8 +101,8 @@ class Organisation(models.Model):
         '''
         OrganisationContact.objects.create(
             organisation=self,
-            first_name=user.first_name,
-            last_name=user.last_name,
+            first_name=get_first_name(user),
+            last_name=get_last_name(user),
             mobile_number=user.mobile_number,
             phone_number=user.phone_number,
             fax_number=user.fax_number,
@@ -112,8 +117,8 @@ class Organisation(models.Model):
         self.log_user_action(
             OrganisationAction.ACTION_CONTACT_ADDED.format(
                 '{} {}({})'.format(
-                    user.first_name,
-                    user.last_name,
+                    get_first_name(user),
+                    get_last_name(user),
                     user.email)),
             request)
 
@@ -138,8 +143,8 @@ class Organisation(models.Model):
             self.log_user_action(
                 OrganisationAction.ACTION_LINK.format(
                     '{} {}({})'.format(
-                        delegate.user.first_name,
-                        delegate.user.last_name,
+                        get_first_name(delegate.user),
+                        get_last_name(delegate.user),
                         delegate.user.email)),
                 request)
             send_organisation_link_email_notification(
@@ -162,8 +167,8 @@ class Organisation(models.Model):
         self.log_user_action(
             OrganisationAction.ACTION_CONTACT_DECLINED.format(
                 '{} {}({})'.format(
-                    user.first_name,
-                    user.last_name,
+                    get_first_name(user),
+                    get_last_name(user),
                     user.email)),
             request)
         send_organisation_contact_decline_email_notification(
@@ -228,8 +233,8 @@ class Organisation(models.Model):
             self.log_user_action(
                 OrganisationAction.ACTION_LINK.format(
                     '{} {}({})'.format(
-                        delegate.user.first_name,
-                        delegate.user.last_name,
+                        get_first_name(delegate.user),
+                        get_last_name(delegate.user),
                         delegate.user.email)),
                 request)
             # send email
@@ -256,8 +261,8 @@ class Organisation(models.Model):
             self.log_user_action(
                 OrganisationAction.ACTION_MAKE_CONTACT_REINSTATE.format(
                     '{} {}({})'.format(
-                        delegate.user.first_name,
-                        delegate.user.last_name,
+                        get_first_name(delegate.user),
+                        get_last_name(delegate.user),
                         delegate.user.email)),
                 request)
             # send email
@@ -293,8 +298,8 @@ class Organisation(models.Model):
             self.log_user_action(
                 OrganisationAction.ACTION_UNLINK.format(
                     '{} {}({})'.format(
-                        delegate.user.first_name,
-                        delegate.user.last_name,
+                        get_first_name(delegate.user),
+                        get_last_name(delegate.user),
                         delegate.user.email)),
                 request)
             # send email
@@ -322,8 +327,8 @@ class Organisation(models.Model):
             self.log_user_action(
                 OrganisationAction.ACTION_MAKE_CONTACT_ADMIN.format(
                     '{} {}({})'.format(
-                        delegate.user.first_name,
-                        delegate.user.last_name,
+                        get_first_name(delegate.user),
+                        get_last_name(delegate.user),
                         delegate.user.email)),
                 request)
             # send email
@@ -351,8 +356,8 @@ class Organisation(models.Model):
             self.log_user_action(
                 OrganisationAction.ACTION_MAKE_CONTACT_USER.format(
                     '{} {}({})'.format(
-                        delegate.user.first_name,
-                        delegate.user.last_name,
+                        get_first_name(delegate.user),
+                        get_last_name(delegate.user),
                         delegate.user.email)),
                 request)
             # send email
@@ -380,8 +385,8 @@ class Organisation(models.Model):
             self.log_user_action(
                 OrganisationAction.ACTION_MAKE_CONTACT_ADMIN.format(
                     '{} {}({})'.format(
-                        delegate.user.first_name,
-                        delegate.user.last_name,
+                        get_first_name(delegate.user),
+                        get_last_name(delegate.user),
                         delegate.user.email)),
                 request)
             # send email
@@ -408,8 +413,8 @@ class Organisation(models.Model):
             self.log_user_action(
                 OrganisationAction.ACTION_MAKE_CONTACT_SUSPEND.format(
                     '{} {}({})'.format(
-                        delegate.user.first_name,
-                        delegate.user.last_name,
+                        get_first_name(delegate.user),
+                        get_last_name(delegate.user),
                         delegate.user.email)),
                 request)
             # send email
@@ -436,8 +441,8 @@ class Organisation(models.Model):
             self.log_user_action(
                 OrganisationAction.ACTION_MAKE_CONTACT_REINSTATE.format(
                     '{} {}({})'.format(
-                        delegate.user.first_name,
-                        delegate.user.last_name,
+                        get_first_name(delegate.user),
+                        get_last_name(delegate.user),
                         delegate.user.email)),
                 request)
             # send email
@@ -541,7 +546,7 @@ class Organisation(models.Model):
                 user_role=OrganisationContact.ORG_CONTACT_ROLE_ADMIN,
                 user_status=OrganisationContact.ORG_CONTACT_STATUS_ACTIVE,
                 is_admin=True):
-            _names += '{0} {1} '.format(user.first_name, user.last_name)
+            _names += get_full_name(user)
 
         return _names
 
@@ -560,17 +565,18 @@ class Organisation(models.Model):
     def has_no_admins(self):
         return self.contacts.filter(user_role=OrganisationContact.ORG_CONTACT_ROLE_ADMIN).count() < 1
 
-    @property
-    def can_contact_user_edit(self):
-        """
-        :return: True if the application is in one of the editable status.
-        """
-        org_contact = OrganisationContact.objects.get(
-            organisation_id=self.id, first_name=request.user.first_name)
+   #not in use and would not work (no request param)
+   #@property
+   #def can_contact_user_edit(self):
+   #    """
+   #    :return: True if the application is in one of the editable status.
+   #    """
+   #    org_contact = OrganisationContact.objects.get(
+   #        organisation_id=self.id, first_name=request.user.first_name)
 
-        return org_contact.is_admin \
-            and org_contact.user_status == OrganisationContact.ORG_CONTACT_STATUS_ACTIVE \
-            and org_contact.user_role == OrganisationContact.ORG_CONTACT_ROLE_ADMIN
+   #    return org_contact.is_admin \
+   #        and org_contact.user_status == OrganisationContact.ORG_CONTACT_STATUS_ACTIVE \
+   #        and org_contact.user_role == OrganisationContact.ORG_CONTACT_ROLE_ADMIN
 
     @property
     def can_user_edit(self, email):
@@ -661,7 +667,7 @@ class OrganisationContact(models.Model):
         unique_together = (('organisation', 'email'),)
 
     def __str__(self):
-        return '{} {}'.format(self.last_name, self.first_name)
+        return get_full_name(self)
 
     @property
     def can_edit(self):
@@ -881,8 +887,8 @@ class OrganisationRequest(models.Model):
             org.log_user_action(
                 OrganisationAction.ACTION_LINK.format(
                     '{} {}({})'.format(
-                        delegate.user.first_name,
-                        delegate.user.last_name,
+                        get_first_name(delegate.user),
+                        get_last_name(delegate.user),
                         delegate.user.email)),
                 request)
 
@@ -894,8 +900,8 @@ class OrganisationRequest(models.Model):
 
             OrganisationContact.objects.get_or_create(
                 organisation=org,
-                first_name=self.requester.first_name,
-                last_name=self.requester.last_name,
+                first_name=get_first_name(self.requester),
+                last_name=get_last_name(self.requester),
                 mobile_number=self.requester.mobile_number,
                 phone_number=self.requester.phone_number,
                 fax_number=self.requester.fax_number,
@@ -1004,8 +1010,8 @@ class OrganisationRequest(models.Model):
                 self.log_user_action(
                     OrganisationRequestUserAction.ACTION_DECLINE_REQUEST.format(
                         '{} {}({})'.format(
-                            request.user.first_name,
-                            request.user.last_name,
+                            get_first_name(request.user),
+                            get_last_name(request.user),
                             request.user.email)),
                     request)
                 send_organisation_request_decline_email_notification(self, request)

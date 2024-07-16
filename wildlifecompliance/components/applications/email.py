@@ -12,6 +12,9 @@ from wildlifecompliance.components.main.utils import (
     get_choice_value,
     add_url_internal_request,
     remove_url_internal_request,
+    get_dob,
+    get_first_name,
+    get_last_name,
 )
 
 from wildlifecompliance.components.emails.emails import TemplateEmailBase
@@ -577,8 +580,8 @@ def send_id_updated_notification(user, applications, assigned_officers, request)
     applications_list_string = ', '.join([str(application.id) for application in applications])
     context = {
         'user': '{first_name} {last_name}'.format(
-            first_name=user.first_name,
-            last_name=user.last_name),
+            first_name=get_first_name(user),
+            last_name=get_last_name(user)),
         'url': add_url_internal_request(request, url),
         'applications': applications_list_string
     }

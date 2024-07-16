@@ -32,7 +32,9 @@ from wildlifecompliance.components.users.serializers import (
 )
 from wildlifecompliance.components.offence.serializers import OrganisationSerializer
 from django.contrib.auth.models import Permission, ContentType
-
+from wildlifecompliance.components.main.utils import (
+    get_full_name
+)
 
 class InspectionTypeSerializer(serializers.ModelSerializer):
    class Meta:
@@ -58,11 +60,7 @@ class IndividualSerializer(serializers.ModelSerializer):
         )
 
     def get_full_name(self, obj):
-        if obj.first_name:
-            return obj.first_name + ' ' + obj.last_name
-        else:
-            return obj.last_name
-
+        return get_full_name(obj)
 
 class EmailUserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
@@ -78,10 +76,7 @@ class EmailUserSerializer(serializers.ModelSerializer):
         )
 
     def get_full_name(self, obj):
-        if obj.first_name:
-            return obj.first_name + ' ' + obj.last_name
-        else:
-            return obj.last_name
+        return get_full_name(obj)
 
     def get_member_role(self, obj):
         inspection_team_lead_id = self.context.get('inspection_team_lead_id')

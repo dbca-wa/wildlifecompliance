@@ -66,6 +66,11 @@ from rest_framework.decorators import (
     parser_classes,
     api_view
 )
+from wildlifecompliance.components.main.utils import (
+    get_first_name,
+    get_last_name,
+    get_dob,
+)
 from django.core.cache import cache
 from wildlifecompliance.components.main.process_document import process_generic_document
 #from wildlifecompliance.components.main.utils import retrieve_department_users
@@ -415,8 +420,8 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 instance.log_user_action(
                     EmailUserAction.ACTION_PERSONAL_DETAILS_UPDATE.format(
                         '{} {} ({})'.format(
-                            instance.first_name,
-                            instance.last_name,
+                            get_first_name(instance),
+                            get_last_name(instance),
                             instance.email)),
                     request)
             serializer = UserSerializer(instance)
@@ -442,8 +447,8 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 instance.log_user_action(
                     EmailUserAction.ACTION_CONTACT_DETAILS_UPDATE.format(
                         '{} {} ({})'.format(
-                            instance.first_name,
-                            instance.last_name,
+                            get_first_name(instance),
+                            get_last_name(instance),
                             instance.email)),
                     request)
 
@@ -538,8 +543,8 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 instance.log_user_action(
                     EmailUserAction.ACTION_POSTAL_ADDRESS_UPDATE.format(
                         '{} {} ({})'.format(
-                            instance.first_name,
-                            instance.last_name,
+                            get_first_name(instance),
+                            get_last_name(instance),
                             instance.email)),
                     request)
             serializer = FirstTimeUserSerializer(
@@ -570,8 +575,8 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 instance.log_user_action(
                     EmailUserAction.ACTION_ID_UPDATE.format(
                         '{} {} ({})'.format(
-                            instance.first_name,
-                            instance.last_name,
+                            get_first_name(instance),
+                            get_last_name(instance),
                             instance.email)),
                     request)
                 # For any of the submitter's applications that have requested ID update,
@@ -1113,9 +1118,11 @@ class GetPersonOrg(views.APIView):
             )[:10]
             for email_user in user_data:
                 if email_user.dob:
-                    text = '{} {} (DOB: {})'.format(email_user.first_name, email_user.last_name, email_user.dob)
+                    text = '{} {} (DOB: {})'.format(get_first_name(email_user),
+                            get_last_name(email_user), get_dob(email_user))
                 else:
-                    text = '{} {}'.format(email_user.first_name, email_user.last_name)
+                    text = '{} {}'.format(get_first_name(email_user),
+                            get_last_name(email_user))
 
                 #serializer = EmailUserAppViewSerializer(email_user)
                 #email_user_data = serializer.data
@@ -1160,9 +1167,11 @@ class StaffMemberLookup(views.APIView):
             )[:10]
             for email_user in user_data:
                 if email_user.dob:
-                    text = '{} {} (DOB: {})'.format(email_user.first_name, email_user.last_name, email_user.dob)
+                    text = '{} {} (DOB: {})'.format(get_first_name(email_user),
+                            get_last_name(email_user), get_dob(email_user))
                 else:
-                    text = '{} {}'.format(email_user.first_name, email_user.last_name)
+                    text = '{} {}'.format(get_first_name(email_user),
+                            get_last_name(email_user))
 
                 email_user_data = {}
                 email_user_data['text'] = text

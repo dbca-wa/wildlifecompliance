@@ -16,6 +16,11 @@ from wildlifecompliance.components.section_regulation.models import SectionRegul
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.organisations.models import Organisation
 
+from wildlifecompliance.components.main.utils import (
+    get_first_name,
+    get_last_name,
+)
+
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
@@ -285,7 +290,7 @@ class Offender(models.Model):
 
     def __str__(self):
         if self.person:
-            return 'First name: {}, Last name: {}'.format(self.person.first_name, self.person.last_name)
+            return 'First name: {}, Last name: {}'.format(get_first_name(self.person), get_last_name(self.person))
         else:
             return '---'
 

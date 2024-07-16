@@ -55,6 +55,11 @@ from wildlifecompliance.components.returns.services import (
     ReturnData,
 )
 
+from wildlifecompliance.components.main.utils import (
+    get_first_name,
+    get_last_name,
+)
+
 logger = logging.getLogger(__name__)
 # logger = logging
 
@@ -375,8 +380,8 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             product_lines = []
 
             return_submission = u'Return submitted by {0} {1} confirmation {2}\
-                '.format(instance.submitter.first_name,
-                         instance.submitter.last_name,
+                '.format(get_first_name(instance.submitter),
+                         get_last_name(instance.submitter),
                          instance.lodgement_number)
             # place return and its table in the session for storing.
             set_session_return(request.session, instance)
@@ -424,8 +429,8 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             product_lines = []
 
             return_submission = u'Return submitted by {0} {1} confirmation {2}\
-                '.format(instance.submitter.first_name,
-                         instance.submitter.last_name,
+                '.format(get_first_name(instance.submitter),
+                         get_last_name(instance.submitter),
                          instance.lodgement_number)
             set_session_return(request.session, instance)
             product_lines = ReturnService.get_product_lines(instance)

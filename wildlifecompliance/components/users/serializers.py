@@ -25,6 +25,9 @@ from django.core.exceptions import ValidationError
 from rest_framework.fields import CurrentUserDefault
 from django.contrib.auth.models import Permission
 
+from wildlifecompliance.components.main.utils import (
+    get_full_name
+)
 
 class DocumentSerializer(serializers.ModelSerializer):
 
@@ -321,7 +324,7 @@ class UserSerializer(serializers.ModelSerializer):
         return formatted_date
 
     def get_personal_details(self, obj):
-        return True if obj.last_name and obj.first_name and obj.dob else False
+        return True if obj.last_name and obj.first_name and (obj.dob or obj.legal_dob) else False
 
     def get_address_details(self, obj):
         return True if obj.residential_address else False
@@ -512,7 +515,7 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
         return formatted_date
 
     def get_personal_details(self, obj):
-        return True if obj.last_name and obj.first_name and obj.dob else False
+        return True if obj.last_name and obj.first_name and (obj.dob or obj.legal_dob)  else False
 
     def get_address_details(self, obj):
         return True if obj.residential_address else False
@@ -588,7 +591,7 @@ class ComplianceUserDetailsSerializer(serializers.ModelSerializer):
         return obj.get_full_name()
 
     def get_personal_details(self, obj):
-        return True if obj.last_name and obj.first_name and obj.dob else False
+        return True if obj.last_name and obj.first_name and (obj.dob or obj.legal_dob)  else False
 
     def get_address_details(self, obj):
         return True if obj.residential_address else False
@@ -626,8 +629,7 @@ class ComplianceUserDetailsOptimisedSerializer(serializers.ModelSerializer):
         )
     
     def get_full_name(self, obj):
-        if obj.first_name and obj.last_name:
-            return obj.first_name + ' ' + obj.last_name
+        return get_full_name(obj)
 
 
 class EmailUserActionSerializer(serializers.ModelSerializer):

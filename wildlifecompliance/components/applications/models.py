@@ -29,7 +29,10 @@ from ledger.payments.invoice.models import Invoice
 from wildlifecompliance.components.main.utils import (
     checkout, set_session_application,
     delete_session_application,
-    flush_checkout_session
+    flush_checkout_session,
+    get_dob,
+    get_first_name,
+    get_last_name,
 )
 
 from wildlifecompliance.components.inspection.models import Inspection
@@ -487,12 +490,14 @@ class Application(RevisionedMixin):
             return self.org_applicant.organisation.name
         elif self.proxy_applicant:
             return "{} {}".format(
-                self.proxy_applicant.first_name,
-                self.proxy_applicant.last_name)
+                get_first_name(self.proxy_applicant),
+                get_last_name(self.proxy_applicant),
+            )
         else:
             return "{} {}".format(
-                self.submitter.first_name,
-                self.submitter.last_name)
+                get_first_name(self.submitter),
+                get_last_name(self.submitter),
+            )
 
     @property
     def applicant_details(self):
@@ -503,13 +508,13 @@ class Application(RevisionedMixin):
                 self.org_applicant.address)
         elif self.proxy_applicant:
             return "{} {}\n{}".format(
-                self.proxy_applicant.first_name,
-                self.proxy_applicant.last_name,
+                get_first_name(self.proxy_applicant),
+                get_last_name(self.proxy_applicant),
                 self.proxy_applicant.addresses.all().first())
         else:
             return "{} {}\n{}".format(
-                self.submitter.first_name,
-                self.submitter.last_name,
+                get_first_name(self.submitter),
+                get_last_name(self.submitter),
                 self.submitter.addresses.all().first())
 
     @property

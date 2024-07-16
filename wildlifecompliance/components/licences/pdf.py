@@ -30,6 +30,9 @@ from wildlifecompliance.components.licences.models import LicenceSpecies
 from wildlifecompliance.components.applications.models import (
     ApplicationSelectedActivityPurpose,
 )
+from wildlifecompliance.components.main.utils import (
+    get_full_name
+)
 
 import logging
 logger = logging.getLogger(__name__)
@@ -485,10 +488,7 @@ def _create_licence(licence_buffer, licence, application):
         # signature block
         elements.append(Spacer(1, SECTION_BUFFER_HEIGHT))
 
-        issue_officer = '{} {}'.format(
-            selected_activity.updated_by.first_name,
-            selected_activity.updated_by.last_name
-            )
+        issue_officer = get_full_name(selected_activity.updated_by)
         elements.append(Paragraph('____________________', styles['Left']))
         elements.append(Paragraph(issue_officer, styles['Left']))
         elements.append(Paragraph('LICENSING OFFICER', styles['Left']))

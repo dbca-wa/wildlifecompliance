@@ -43,6 +43,12 @@ from wildlifecompliance.components.users.serializers import (
 from wildlifecompliance.components.main.fields import CustomChoiceField
 from wildlifecompliance.management.permissions_manager import PermissionUser
 
+from wildlifecompliance.components.main.utils import (
+    get_dob,
+    get_first_name,
+    get_last_name,
+)
+
 from rest_framework import serializers
 
 logger = logging.getLogger(__name__)
@@ -358,13 +364,13 @@ class ApplicationSelectedActivitySerializer(serializers.ModelSerializer):
         with_approver = ['with_officer_finalisation']
         if obj.processing_status in with_officer and obj.assigned_officer:
             name = '{0} {1}'.format(
-                obj.assigned_officer.first_name,
-                obj.assigned_officer.last_name
+                get_first_name(obj.assigned_officer),
+                get_last_name(obj.assigned_officer),
             )
         elif obj.processing_status in with_approver and obj.assigned_approver:
             name = '{0} {1}'.format(
-                obj.assigned_approver.first_name,
-                obj.assigned_approver.last_name
+                get_first_name(obj.assigned_approver),
+                get_last_name(obj.assigned_approver)
             )
         else:
             name = ''
@@ -638,13 +644,13 @@ class DTInternalApplicationSelectedActivitySerializer(
         with_approver = ['with_officer_finalisation']
         if obj.processing_status in with_officer and obj.assigned_officer:
             name = '{0} {1}'.format(
-                obj.assigned_officer.first_name,
-                obj.assigned_officer.last_name
+                get_first_name(obj.assigned_officer),
+                get_last_name(obj.assigned_officer)
             )
         elif obj.processing_status in with_approver and obj.assigned_approver:
             name = '{0} {1}'.format(
-                obj.assigned_approver.first_name,
-                obj.assigned_approver.last_name
+                get_first_name(obj.assigned_approver),
+                get_last_name(obj.assigned_approver)
             )
         else:
             name = ''
