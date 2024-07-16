@@ -4,7 +4,10 @@ from django.conf import settings
 
 from wildlifecompliance.components.organisations.models import Organisation, OrganisationContact
 from ledger.accounts.models import EmailUser
-
+from wildlifecompliance.components.main.utils import (
+    get_first_name,
+    get_last_name,
+)
 
 class OrganisationListener(object):
     """
@@ -38,8 +41,8 @@ class EmailUserUpdateContactListener(object):
             try:
                 OrganisationContact.objects.filter(
                     email=original_instance.email).update(
-                    first_name=instance.first_name,
-                    last_name=instance.last_name,
+                    first_name=get_first_name(instance),
+                    last_name=get_last_name(instance),
                     mobile_number=instance.mobile_number,
                     phone_number=instance.phone_number,
                     fax_number=instance.fax_number,

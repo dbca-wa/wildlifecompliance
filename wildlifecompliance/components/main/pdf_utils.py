@@ -6,6 +6,11 @@ from reportlab.lib.styles import StyleSheet1, ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.platypus import Table, Paragraph, Flowable, Image, TableStyle, Spacer
 
+from wildlifecompliance.components.main.utils import (
+    get_first_name,
+    get_last_name,
+    get_dob
+)
 
 def gap(num):
     ret = ''
@@ -268,10 +273,10 @@ def get_infringement_notice_table(sanction_outcome):
 
     # Alleged offender
     offender = sanction_outcome.get_offender()[0]
-    offender_dob = offender.dob.strftime('%d/%m/%Y') if offender.dob else ''
+    offender_dob = get_dob(offender).strftime('%d/%m/%Y') if offender.dob else ''
     offender_postcode = offender.residential_address.postcode if offender.residential_address else ''
-    data.append([Paragraph('Alleged offender', styles['Bold']), Paragraph('Name: Family name: ' + get_font_str(offender.last_name), styles['Normal']), ''])
-    data.append(['', Paragraph(gap(12) + 'Given names: ' + get_font_str(offender.first_name), styles['Normal']), ''])
+    data.append([Paragraph('Alleged offender', styles['Bold']), Paragraph('Name: Family name: ' + get_font_str(get_last_name(offender)), styles['Normal']), ''])
+    data.append(['', Paragraph(gap(12) + 'Given names: ' + get_font_str(get_first_name(offender)), styles['Normal']), ''])
     data.append(['', Paragraph(gap(12) + 'Date of Birth: ' + get_font_str(offender_dob), styles['Normal']), ''])
     data.append(['', [Paragraph('<strong>or</strong><br />Body corporate name: ', styles['Normal']), Spacer(1, 22)], ''])
     data.append(['',

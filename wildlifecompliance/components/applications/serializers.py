@@ -43,6 +43,12 @@ from wildlifecompliance.components.users.serializers import (
 from wildlifecompliance.components.main.fields import CustomChoiceField
 from wildlifecompliance.management.permissions_manager import PermissionUser
 
+from wildlifecompliance.components.main.utils import (
+    get_dob,
+    get_first_name,
+    get_last_name,
+)
+
 from rest_framework import serializers
 
 logger = logging.getLogger(__name__)
@@ -50,6 +56,10 @@ logger = logging.getLogger(__name__)
 
 
 class EmailUserSerializer(serializers.ModelSerializer):
+
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
+
     class Meta:
         model = EmailUser
         fields = (
@@ -59,6 +69,12 @@ class EmailUserSerializer(serializers.ModelSerializer):
             'last_name',
             'title',
             'organisation')
+        
+    def get_first_name(self, obj):
+        return get_first_name(obj)
+    
+    def get_last_name(self, obj):
+        return get_last_name(obj)
 
 
 class LicenceCategorySerializer(serializers.ModelSerializer):
@@ -358,13 +374,13 @@ class ApplicationSelectedActivitySerializer(serializers.ModelSerializer):
         with_approver = ['with_officer_finalisation']
         if obj.processing_status in with_officer and obj.assigned_officer:
             name = '{0} {1}'.format(
-                obj.assigned_officer.first_name,
-                obj.assigned_officer.last_name
+                get_first_name(obj.assigned_officer),
+                get_last_name(obj.assigned_officer),
             )
         elif obj.processing_status in with_approver and obj.assigned_approver:
             name = '{0} {1}'.format(
-                obj.assigned_approver.first_name,
-                obj.assigned_approver.last_name
+                get_first_name(obj.assigned_approver),
+                get_last_name(obj.assigned_approver)
             )
         else:
             name = ''
@@ -638,13 +654,13 @@ class DTInternalApplicationSelectedActivitySerializer(
         with_approver = ['with_officer_finalisation']
         if obj.processing_status in with_officer and obj.assigned_officer:
             name = '{0} {1}'.format(
-                obj.assigned_officer.first_name,
-                obj.assigned_officer.last_name
+                get_first_name(obj.assigned_officer),
+                get_last_name(obj.assigned_officer)
             )
         elif obj.processing_status in with_approver and obj.assigned_approver:
             name = '{0} {1}'.format(
-                obj.assigned_approver.first_name,
-                obj.assigned_approver.last_name
+                get_first_name(obj.assigned_approver),
+                get_last_name(obj.assigned_approver)
             )
         else:
             name = ''
@@ -725,6 +741,8 @@ class EmailUserAppViewSerializer(serializers.ModelSerializer):
     # identification = IdentificationSerializer()
     identification2 = Identification2Serializer()
     dob = serializers.SerializerMethodField(read_only=True)
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
 
     class Meta:
         model = EmailUser
@@ -742,12 +760,16 @@ class EmailUserAppViewSerializer(serializers.ModelSerializer):
                   'mobile_number',)
 
     def get_dob(self, obj):
-
-        formatted_date = obj.dob.strftime(
+        formatted_date = get_dob(obj)
+        return formatted_date.strftime(
             '%d/%m/%Y'
-        ) if obj.dob else None
-
-        return formatted_date
+        ) if formatted_date else None
+    
+    def get_first_name(self, obj):
+        return get_first_name(obj)
+    
+    def get_last_name(self, obj):
+        return get_last_name(obj)
 
 
 class ActivitySerializer(serializers.ModelSerializer):

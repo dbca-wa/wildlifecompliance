@@ -72,7 +72,7 @@ class FirstTimeDefaultNag(object):
 
             if (not request.user.first_name) or \
                     (not request.user.last_name) or \
-                    (not request.user.dob) or \
+                    (not request.user.dob and not request.user.legal_dob) or \
                     (not request.user.residential_address) or \
                     (not (
                         request.user.phone_number or request.user.mobile_number

@@ -83,6 +83,10 @@ from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 from rest_framework_datatables.filters import DatatablesFilterBackend
 from rest_framework_datatables.renderers import DatatablesRenderer
 
+from wildlifecompliance.components.main.utils import (
+    get_full_name
+)
+
 from wildlifecompliance.components.inspection.email import (
     send_mail)
 
@@ -114,7 +118,7 @@ class InspectionFilterBackend(DatatablesFilterBackend):
                     or search_text in (planned_for_str.lower() if planned_for_str else '')
                     or search_text in (inspection.title.lower() if inspection.title else '')
                     or search_text in (
-                        inspection.assigned_to.first_name.lower() + ' ' + inspection.assigned_to.last_name.lower()
+                        get_full_name(inspection.assigned_to).lower()
                         if inspection.assigned_to else ''
                         )
                     ):

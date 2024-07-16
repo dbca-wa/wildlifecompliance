@@ -690,3 +690,32 @@ def get_district_gis(wkb_geometry):
     except:
         return ''
 
+def get_first_name(obj):
+
+    if hasattr(obj,"legal_first_name") and obj.legal_first_name:
+        return obj.legal_first_name
+    elif hasattr(obj,"first_name") and obj.first_name:
+        return obj.first_name
+
+    return ""
+
+def get_last_name(obj):
+
+    if hasattr(obj,"legal_last_name") and obj.legal_last_name:
+        return obj.legal_last_name
+    elif hasattr(obj,"last_name") and obj.last_name:
+        return obj.last_name
+
+    return ""
+
+def get_full_name(obj):
+    return get_first_name(obj)+" "+get_last_name(obj)
+
+def get_dob(obj):
+
+    if hasattr(obj,"legal_dob") and obj.legal_dob:
+        return obj.legal_dob
+    elif hasattr(obj,"dob") and obj.dob:
+        return obj.dob
+
+    return ""

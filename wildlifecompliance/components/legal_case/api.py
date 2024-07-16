@@ -126,7 +126,9 @@ from wildlifecompliance.components.artifact.utils import (
         update_pb_document_artifacts_ticked,
         copy_brief_of_evidence_artifacts_to_prosecution_brief,
         )
-
+from wildlifecompliance.components.main.utils import (
+    get_full_name
+)
 
 #class FakeRequest():
  #   def __init__(self, data):
@@ -156,7 +158,7 @@ class LegalCaseFilterBackend(DatatablesFilterBackend):
                     or search_text in (case_created_date_str.lower() if case_created_date_str else '')
                     or search_text in (legal_case.title.lower() if legal_case.title else '')
                     or search_text in (
-                        legal_case.assigned_to.first_name.lower() + ' ' + legal_case.assigned_to.last_name.lower()
+                        get_full_name(legal_case.assigned_to).lower()
                         if legal_case.assigned_to else ''
                         )
                     ):

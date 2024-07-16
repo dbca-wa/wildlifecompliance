@@ -94,6 +94,10 @@ from wildlifecompliance.components.call_email.serializers import (
     )
 # from utils import SchemaParser
 
+from wildlifecompliance.components.main.utils import (
+    get_full_name
+)
+
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 from rest_framework_datatables.filters import DatatablesFilterBackend
 from rest_framework_datatables.renderers import DatatablesRenderer
@@ -128,7 +132,7 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
                     or search_text in (lodged_on_str.lower() if lodged_on_str else '')
                     or search_text in (call_email.caller.lower() if call_email.caller else '')
                     or search_text in (
-                        call_email.assigned_to.first_name.lower() + ' ' + call_email.assigned_to.last_name.lower()
+                        get_full_name(call_email.assigned_to).lower()
                         if call_email.assigned_to else ''
                         )
                     or search_text in (call_email.wildcare_species_sub_type.species_sub_name 
@@ -1087,7 +1091,7 @@ class EmailUserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = EmailUser.objects.none()
     serializer_class = EmailUserSerializer
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('first_name', 'last_name', 'email', 'phone_number', 'mobile_number', 'organisation')
+    search_fields = ('first_name', 'last_name', 'legal_first_name', 'legal_last_name', 'email', 'phone_number', 'mobile_number', 'organisation')
 
     def get_queryset(self):
         exclude_staff = self.request.GET.get('exclude_staff')

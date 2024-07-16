@@ -30,6 +30,12 @@ private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/"
 
 logger = logging.getLogger(__name__)
 
+from wildlifecompliance.components.main.utils import (
+    get_first_name,
+    get_last_name,
+    get_dob,
+)
+
 
 class SanctionOutcomeActiveManager(models.Manager):
     def get_queryset(self):
@@ -244,9 +250,9 @@ class SanctionOutcome(models.Model):
     def get_content_for_uin(self):
         offender = self.get_offender()[0]
         uin = UnpaidInfringementFileBody()
-        uin.offenders_surname.set(offender.last_name)
-        uin.offenders_other_names.set(offender.first_name)
-        uin.offenders_date_of_birth.set(offender.dob)
+        uin.offenders_surname.set(get_last_name(offender))
+        uin.offenders_other_names.set(get_first_name(offender))
+        uin.offenders_date_of_birth.set(get_dob(offender))
         uin.offenders_sid.set('')
         uin.offenders_organisation_name.set(offender.organisation)
         uin.party_indicator.set('I')

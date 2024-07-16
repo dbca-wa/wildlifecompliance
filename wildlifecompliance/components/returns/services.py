@@ -38,6 +38,9 @@ from wildlifecompliance.components.returns.models import (
     ReturnUserAction,
     ReturnActivity,
 )
+from wildlifecompliance.components.main.utils import (
+    get_full_name,
+)
 
 logger = logging.getLogger(__name__)
 # logger = logging
@@ -2123,7 +2126,7 @@ class ReturnSheet(object):
 
         product_lines = []
         return_submission = u'Transfer of stock for {} Return {}'.format(
-            u'{} {}'.format(applicant.first_name, applicant.last_name),
+            get_full_name(applicant),
             application.lodgement_number)
         oracle_code = self._return.return_type.oracle_account_code
         product_lines.append({
