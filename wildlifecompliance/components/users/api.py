@@ -1,6 +1,7 @@
 import re
 import traceback
-from django.db.models import Q
+from django.db.models import Q, Value
+from django.db.models.functions import Concat
 from django.db import transaction
 from django.http import HttpResponse
 from django.core.exceptions import ValidationError
@@ -1111,9 +1112,13 @@ class GetPersonOrg(views.APIView):
         search_term = request.GET.get('term', '')
         if search_term:
             data_transform = []
-            user_data = EmailUser.objects.filter(
-                Q(first_name__icontains=search_term) |
-                Q(last_name__icontains=search_term) |
+            user_data = EmailUser.objects.annotate(
+                search_name=Concat('first_name', Value(' '), 'last_name')
+            ).annotate(
+                legal_search_name=Concat('legal_first_name', Value(' '), 'legal_last_name')
+            ).filter(
+                Q(search_name__icontains=search_term) |
+                Q(legal_search_name__icontains=search_term) |
                 Q(email__icontains=search_term)
             )[:10]
             for email_user in user_data:
