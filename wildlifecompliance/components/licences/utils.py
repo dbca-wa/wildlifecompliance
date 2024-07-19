@@ -7,7 +7,9 @@ from wildlifecompliance.components.licences.models import SectionQuestion, Secti
 
 logger = logging.getLogger(__name__)
 # logger = logging
-
+from wildlifecompliance.components.main.utils import (
+    get_dob
+)
 
 class LicenceUtility(ABC):
     '''
@@ -36,8 +38,10 @@ class LicencePurposeUtil(LicenceUtility):
         # calculate age within the year.
         # yy = 1 if ((today.month, today.day) < born.month, born.day)) else 0
         # age = today.year - born.year - yy
-        difference = (today.year - user.dob.year - (
-            (today.month, today.day) < (user.dob.month, user.dob.day)
+        dob = get_dob(user)
+
+        difference = (today.year - dob.year - (
+            (today.month, today.day) < (dob.month, dob.day)
         )) - self.licence.minimum_age
         valid = True if difference > -1 else False
 

@@ -96,7 +96,7 @@ from wildlifecompliance.management.permissions_manager import PermissionUser
 
 logger = logging.getLogger(__name__)
 # logger = logging
-
+from wildlifecompliance.components.licences.utils import LicencePurposeUtil
 
 def application_refund_callback(invoice_ref, bpoint_tid):
     '''
@@ -2008,7 +2008,6 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         from wildlifecompliance.components.applications.payments import (
             ApplicationFeePolicy,
         )
-
         try:
             org_applicant = request.data.get('organisation_id')
             proxy_applicant = request.data.get('proxy_id')
@@ -2050,6 +2049,13 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 licence_purposes_queryset = LicencePurpose.objects.filter(
                     id__in=licence_purposes
                 )
+
+                age_check = licence_purposes_queryset.distinct("minimum_age").order_by("-minimum_age").first()
+                licence_util = LicencePurposeUtil(age_check)
+                if not licence_util.is_valid_age_for(request.user):
+                    raise serializers.ValidationError(
+                        'User does not meet minimum age requirement for licence!')
+
                 licence_category = licence_purposes_queryset.first().licence_category
                 licence_activities = Application.get_active_licence_activities(
                     request, application_type)
@@ -2109,6 +2115,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                         flat=True
                     ).first()
                     data['previous_application'] = previous_application
+
 
                     # cleaned_purpose_ids = set(active_current_purposes) & set(licence_purposes)
 
