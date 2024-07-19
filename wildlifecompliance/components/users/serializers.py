@@ -475,6 +475,7 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
     is_compliance_management_approved_external_user = serializers.SerializerMethodField()
     is_reception = serializers.SerializerMethodField()
     dob = serializers.SerializerMethodField(read_only=True)
+    legal_dob = serializers.SerializerMethodField(read_only=True)
     is_payment_officer = serializers.SerializerMethodField(read_only=True)
     has_complete_first_time = serializers.SerializerMethodField(read_only=True)
 
@@ -536,6 +537,13 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
         formatted_date = obj.dob.strftime(
             '%d/%m/%Y'
         ) if obj.dob else None
+
+        return formatted_date
+    
+    def get_legal_dob(self, obj):
+        formatted_date = obj.legal_dob.strftime(
+            '%d/%m/%Y'
+        ) if obj.legal_dob else None
 
         return formatted_date
 
