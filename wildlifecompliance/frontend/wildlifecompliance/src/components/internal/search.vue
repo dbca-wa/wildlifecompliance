@@ -14,11 +14,7 @@
                 </div>
                 <div class="panel-body collapse in" :id="kBody">
                     <div class="form-group">
-                        <div class="row">
-                            <div class="form-check form-check-inline col-md-3">
-                            <input type="radio" value="contains" v-model="search_option" checked/> 
-                            <label class="form-check-label">Contains</label>
-                            </div>
+                        <div class="row">   
                             <div class="form-check form-check-inline col-md-3">
                             <input type="radio" value="starts_with" v-model="search_option"/> 
                             <label class="form-check-label">Starts with</label>
@@ -26,6 +22,10 @@
                             <div class="form-check form-check-inline col-md-3">
                             <input type="radio" value="ends_with" v-model="search_option"/> 
                             <label class="form-check-label">Ends with</label>
+                            </div>
+                            <div class="form-check form-check-inline col-md-3">
+                            <input type="radio" value="contains" v-model="search_option"/> 
+                            <label class="form-check-label">Contains</label>
                             </div>
                         </div>
                         <div class="row">
@@ -198,7 +198,7 @@ export default {
             cBody: 'cBody' + vm._uid,
             kBody: 'kBody' + vm._uid,
             loading: [],
-            search_option: "contains",
+            search_option: "starts_with",
             searchKeywords: [],
             hasSearchKeywords: false,
             selected_organisation:'',
