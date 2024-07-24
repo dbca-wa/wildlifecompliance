@@ -13,8 +13,22 @@
                     </h3>
                 </div>
                 <div class="panel-body collapse in" :id="kBody">
-                    <div class="row">
-                        <div class="form-group">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="form-check form-check-inline col-md-3">
+                            <input type="radio" value="contains" v-model="search_option" checked/> 
+                            <label class="form-check-label">Contains</label>
+                            </div>
+                            <div class="form-check form-check-inline col-md-3">
+                            <input type="radio" value="starts_with" v-model="search_option"/> 
+                            <label class="form-check-label">Starts with</label>
+                            </div>
+                            <div class="form-check form-check-inline col-md-3">
+                            <input type="radio" value="ends_with" v-model="search_option"/> 
+                            <label class="form-check-label">Ends with</label>
+                            </div>
+                        </div>
+                        <div class="row">
                             <!--label for="person_lookup" class="col-sm-3 control-label">Search</label-->
                             <div class="col-sm-6">
                                 <select 
@@ -33,7 +47,7 @@
                                 />
                             </div>
                         </div>
-                      </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -184,6 +198,7 @@ export default {
             cBody: 'cBody' + vm._uid,
             kBody: 'kBody' + vm._uid,
             loading: [],
+            search_option: "contains",
             searchKeywords: [],
             hasSearchKeywords: false,
             selected_organisation:'',
@@ -309,6 +324,7 @@ export default {
                         console.log(params)
                         var query = {
                             term: params.term,
+                            option: vm.search_option,
                             type: 'public',
                         }
                         return query;
