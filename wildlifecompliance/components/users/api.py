@@ -1151,7 +1151,7 @@ class GetPersonOrg(views.APIView):
             for email_user in user_data:
                 if email_user.dob:
                     text = '{} {} (DOB: {})'.format(get_first_name(email_user),
-                            get_last_name(email_user), get_dob(email_user))
+                            get_last_name(email_user), get_dob(email_user).strftime('%d/%m/%Y'))
                 else:
                     text = '{} {}'.format(get_first_name(email_user),
                             get_last_name(email_user))
@@ -1200,7 +1200,7 @@ class StaffMemberLookup(views.APIView):
             for email_user in user_data:
                 if email_user.dob:
                     text = '{} {} (DOB: {})'.format(get_first_name(email_user),
-                            get_last_name(email_user), get_dob(email_user))
+                            get_last_name(email_user), get_dob(email_user).strftime('%d/%m/%Y'))
                 else:
                     text = '{} {}'.format(get_first_name(email_user),
                             get_last_name(email_user))
