@@ -1110,17 +1110,44 @@ class GetPersonOrg(views.APIView):
             return Response()
 
         search_term = request.GET.get('term', '')
+        search_option = request.GET.get('option', 'contains')
         if search_term:
+
             data_transform = []
-            user_data = EmailUser.objects.annotate(
-                search_name=Concat('first_name', Value(' '), 'last_name')
-            ).annotate(
-                legal_search_name=Concat('legal_first_name', Value(' '), 'legal_last_name')
-            ).filter(
-                Q(search_name__icontains=search_term) |
-                Q(legal_search_name__icontains=search_term) |
-                Q(email__icontains=search_term)
-            )[:10]
+            user_data = []
+            if search_option == 'contains':            
+                user_data = EmailUser.objects.annotate(
+                    search_name=Concat('first_name', Value(' '), 'last_name')
+                ).annotate(
+                    legal_search_name=Concat('legal_first_name', Value(' '), 'legal_last_name')
+                ).filter(
+                    Q(search_name__icontains=search_term) |
+                    Q(legal_search_name__icontains=search_term) |
+                    Q(email__icontains=search_term)
+                )[:40]
+
+            if search_option == 'starts_with':            
+                user_data = EmailUser.objects.annotate(
+                    search_name=Concat('first_name', Value(' '), 'last_name')
+                ).annotate(
+                    legal_search_name=Concat('legal_first_name', Value(' '), 'legal_last_name')
+                ).filter(
+                    Q(search_name__istartswith=search_term) |
+                    Q(legal_search_name__istartswith=search_term) |
+                    Q(email__istartswith=search_term)
+                )[:40]
+
+            if search_option == 'ends_with':            
+                user_data = EmailUser.objects.annotate(
+                    search_name=Concat('first_name', Value(' '), 'last_name')
+                ).annotate(
+                    legal_search_name=Concat('legal_first_name', Value(' '), 'legal_last_name')
+                ).filter(
+                    Q(search_name__iendswith=search_term) |
+                    Q(legal_search_name__iendswith=search_term) |
+                    Q(email__iendswith=search_term)
+                )[:40]
+
             for email_user in user_data:
                 if email_user.dob:
                     text = '{} {} (DOB: {})'.format(get_first_name(email_user),
