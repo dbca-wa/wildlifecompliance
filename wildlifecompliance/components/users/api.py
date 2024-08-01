@@ -1,5 +1,6 @@
 import re
 import traceback
+import pathlib
 from django.db.models import Q, Value
 from django.db.models.functions import Concat
 from django.db import transaction
@@ -572,6 +573,10 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             SecureBaseUtils.timestamp_id_request(request)
             instance.upload_identification2(request)
             with transaction.atomic():
+                private_doc = instance.identification2
+                private_doc.file_group = 1
+                private_doc.extension = "".join(pathlib.Path(request.data.dict()['identification2'].name).suffixes)
+                private_doc.save()
                 instance.save()
                 instance.log_user_action(
                     EmailUserAction.ACTION_ID_UPDATE.format(
