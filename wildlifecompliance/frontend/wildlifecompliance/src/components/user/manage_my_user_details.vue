@@ -32,7 +32,7 @@
                           <div class="form-group">
                             <label for="" class="col-sm-3 control-label"></label>
                             <div class="col-sm-6">
-                            <b>To update your account name please <a :href="current_user.sso_setting_url">click here</a>:</b>
+                            <b>To update your account name please <a :href="current_user.sso_setting_url+'/sso/setting?back='+current_url">click here</a>:</b>
                             </div>
                           </div>
                           <div class="form-group">
@@ -504,6 +504,9 @@ export default {
   
     },
     computed: {
+        current_url: function() {
+            return window.location.href;
+        },
         canUpdateDOB: function() {
             return (this.current_user.legal_dob === null || this.current_user.legal_dob === "")
         },
