@@ -23,6 +23,8 @@ SHOW_ROOT_API = env('SHOW_ROOT_API', False)
 
 LEDGER_UI_URL=env('LEDGER_UI_URL','')
 
+SSO_SETTING_URL=env('SSO_SETTING_URL','')
+
 if SHOW_DEBUG_TOOLBAR:
 #    def get_ip():
 #        import subprocess
