@@ -10,7 +10,7 @@ from rest_framework import viewsets, serializers, views, status, mixins
 #from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from ledger.accounts.models import EmailUser, Address, Profile, EmailIdentity, EmailUserAction
+from ledger.accounts.models import EmailUser, Address, Profile, EmailIdentity, EmailUserAction, PrivateDocument
 from django.contrib.auth.models import Permission, ContentType
 from datetime import datetime
 from django_countries import countries
@@ -575,7 +575,14 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             with transaction.atomic():
                 private_doc = instance.identification2
                 private_doc.file_group = 1
-                private_doc.extension = "".join(pathlib.Path(request.data.dict()['identification2'].name).suffixes)
+                private_doc.name = pathlib.Path(request.data.dict()['identification2'].name).name
+                private_doc.extension = pathlib.Path(
+                    request.data.dict()['identification2'].name
+                    ).suffix if (len(
+                        pathlib.Path(
+                            request.data.dict()['identification2'].name
+                        ).suffix) <= PrivateDocument._meta.get_field('extension').max_length
+                    ) else ""
                 private_doc.save()
                 instance.save()
                 instance.log_user_action(

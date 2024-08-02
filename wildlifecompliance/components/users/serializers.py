@@ -370,6 +370,7 @@ class FirstTimeUserSerializer(UserSerializer):
     has_complete_first_time = serializers.SerializerMethodField(read_only=True)
     prefer_compliance_management = serializers.SerializerMethodField(read_only=True)
     is_compliance_management_approved_external_user = serializers.SerializerMethodField(read_only=True)
+    sso_setting_url = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = EmailUser
@@ -397,6 +398,7 @@ class FirstTimeUserSerializer(UserSerializer):
             'has_complete_first_time',
             'prefer_compliance_management',
             'is_compliance_management_approved_external_user',
+            'sso_setting_url',
         )
 
     def get_has_complete_first_time(self, obj):
@@ -423,6 +425,8 @@ class FirstTimeUserSerializer(UserSerializer):
     def get_is_compliance_management_approved_external_user(self, obj):
         return is_compliance_management_approved_external_user(self.context.get('request'))
 
+    def get_sso_setting_url(self, obj):
+        return settings.SSO_SETTING_URL
 
 class DTUserSerializer(serializers.ModelSerializer):
 
@@ -481,6 +485,7 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
     legal_dob = serializers.SerializerMethodField(read_only=True)
     is_payment_officer = serializers.SerializerMethodField(read_only=True)
     has_complete_first_time = serializers.SerializerMethodField(read_only=True)
+    sso_setting_url = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = EmailUser
@@ -512,6 +517,7 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
             'has_complete_first_time',
             'is_compliance_management_user',
             'is_compliance_management_approved_external_user',
+            'sso_setting_url',
         )
 
     def get_has_complete_first_time(self, obj):
@@ -592,7 +598,9 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
 
     def get_is_reception(self, obj):
         return is_reception(self.context.get('request'))
-
+    
+    def get_sso_setting_url(self, obj):
+        return settings.SSO_SETTING_URL
 
 class ComplianceUserDetailsSerializer(serializers.ModelSerializer):
     residential_address = UserAddressSerializer()
