@@ -36,6 +36,12 @@
                             </div>
                           </div>
                           <div class="form-group">
+                            <label for="" class="col-sm-3 control-label"></label>
+                            <div class="col-sm-6">
+                            <i>Changes will not update until your next login.</i>
+                            </div>
+                          </div>
+                          <div class="form-group">
                             <label for="" class="col-sm-3 control-label">Account Given name(s)</label>
                             <div class="col-sm-6">
                                 <input disabled type="text" class="form-control" name="first_name" placeholder="" v-model="current_user.first_name">
