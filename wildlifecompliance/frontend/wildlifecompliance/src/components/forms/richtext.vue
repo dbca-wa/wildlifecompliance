@@ -58,4 +58,7 @@ export default {
 </script>
 
 <style lang="css">
+  .cke_notifications_area {
+    display: none !important;
+  }
 </style>

@@ -497,4 +497,7 @@ export default {
     br {
         padding-bottom: 5px;
     }
+    .cke_notifications_area {
+        display: none !important;
+    }
 </style>
