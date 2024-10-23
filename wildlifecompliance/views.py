@@ -379,7 +379,7 @@ def getPrivateFile(request):
             if extension == 'eml':
                 return HttpResponse(the_data, content_type="application/vnd.ms-outlook")
             if extension == 'heic':
-                return HttpResponse(the_data, content_type="application/vnd.ms-outlook")
+                return HttpResponse(the_data, content_type="image/heic")
             return HttpResponse(the_data, content_type=mimetypes.types_map['.'+str(extension)])
 
     return HttpResponse()
