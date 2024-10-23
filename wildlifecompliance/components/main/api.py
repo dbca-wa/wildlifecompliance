@@ -198,6 +198,14 @@ class SchemaMasterlistViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin
             return MasterlistQuestion.objects.all()
         return MasterlistQuestion.objects.none()
 
+    def create(self, request, *args, **kwargs):
+        if not is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to alter masterlist")
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
     @detail_route(methods=['GET', ])
     def get_masterlist_selects(self, request, *args, **kwargs):
         '''
@@ -462,6 +470,13 @@ class SchemaPurposeViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             return LicencePurposeSection.objects.all()
         return LicencePurposeSection.objects.none()
 
+    def create(self, request, *args, **kwargs):
+        if not is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to add purpose record")
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
     @detail_route(methods=['GET', ])
     def get_purpose_selects(self, request, *args, **kwargs):
@@ -719,6 +734,14 @@ class SchemaGroupViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         if user.is_authenticated():
             return SectionGroup.objects.all()
         return SectionGroup.objects.none()
+
+    def create(self, request, *args, **kwargs):
+        if not is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to add group record")
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
     @detail_route(methods=['GET', ])
     def get_group_selects(self, request, *args, **kwargs):
@@ -997,6 +1020,14 @@ class SchemaQuestionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         if user.is_authenticated():
             return SectionQuestion.objects.all()
         return SectionQuestion.objects.none()
+
+    def create(self, request, *args, **kwargs):
+        if not is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to add question record")
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
     @detail_route(methods=['GET', ])
     def get_question_parents(self, request, *args, **kwargs):
