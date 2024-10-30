@@ -158,7 +158,7 @@ def send_assessment_reminder_email(select_group, assessment, request=None):
     email = ApplicationAssessmentReminderEmail()
     url = request.build_absolute_uri(
         reverse(
-            'internal-application-detail',
+            'internal-assessment-detail',
             kwargs={
                 'application_pk': application.id}))
 
@@ -178,8 +178,9 @@ def send_assessment_email_notification(select_group, assessment, request):
     email = ApplicationAssessmentRequestedEmail()
     url = request.build_absolute_uri(
         reverse(
-            'internal-application-detail',
+            'internal-assessment-detail',
             kwargs={
+                ''
                 'application_pk': application.id}))
 
     context = {
@@ -202,7 +203,7 @@ def send_assessment_completed_email(select_group, assessment, request):
     email = ApplicationAssessmentCompletedEmail()
     url = request.build_absolute_uri(
         reverse(
-            'internal-application-detail',
+            'internal-assessment-detail',
             kwargs={
                 'application_pk': application.id}))
 
