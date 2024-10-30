@@ -230,10 +230,12 @@ class SecurePipe(SecureBase):
 
         try:
             self.validate_request()
-
             if SecureBaseUtils.is_wildlifelicensing_request(self.request):
                 response = self.get_http_response_for_wildlifelicensing()
-
+            else:
+                response.content = "Request not allowed"
+                response.status_code = 403  # Forbidden
+            
         except SecureBaseException as e:
             self.log_request(e)
 
@@ -266,7 +268,9 @@ class SecurePipe(SecureBase):
                 # document = self.request.user.identification
                 document = self.request.user.identification2
                 mime = mimetypes.guess_type(document.upload.path)[0]
-
+                
+                if document and document.extension == ".heic":
+                    mime = "image/heic"
                 response = HttpResponse(content_type=mime)
                 response.write(document.upload.read())
 
@@ -274,9 +278,11 @@ class SecurePipe(SecureBase):
                 customer = EmailUser.objects.get(id=int(request_customer_id))
                 # document = customer.identification
                 # mime = mimetypes.guess_type(document.filename)[0]
-                document = customer.identification2
+                document = customer.identification2   
                 mime = mimetypes.guess_type(document.upload.path)[0]
-
+                
+                if document and document.extension == ".heic":
+                    mime = "image/heic"
                 response = HttpResponse(content_type=mime)
                 response.write(document.upload.read())
 
@@ -288,7 +294,9 @@ class SecurePipe(SecureBase):
                 self.validate_request_for_wildlifelicence(licence)
                 document = licence.licence_document
                 mime = mimetypes.guess_type(document._file.name)[0]
-
+                
+                if document and document.extension == ".heic":
+                    mime = "image/heic"
                 response = HttpResponse(content_type=mime)
                 response.write(document._file.read())
 
