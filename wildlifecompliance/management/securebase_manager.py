@@ -269,7 +269,7 @@ class SecurePipe(SecureBase):
                 document = self.request.user.identification2
                 mime = mimetypes.guess_type(document.upload.path)[0]
                 
-                if document and document.extension == ".heic":
+                if document and document.extension.lower() == ".heic":
                     mime = "image/heic"
                 response = HttpResponse(content_type=mime)
                 response.write(document.upload.read())
@@ -281,7 +281,7 @@ class SecurePipe(SecureBase):
                 document = customer.identification2   
                 mime = mimetypes.guess_type(document.upload.path)[0]
                 
-                if document and document.extension == ".heic":
+                if document and document.extension.lower() == ".heic":
                     mime = "image/heic"
                 response = HttpResponse(content_type=mime)
                 response.write(document.upload.read())
