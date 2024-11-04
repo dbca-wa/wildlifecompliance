@@ -294,8 +294,8 @@ class SecurePipe(SecureBase):
                 self.validate_request_for_wildlifelicence(licence)
                 document = licence.licence_document
                 mime = mimetypes.guess_type(document._file.name)[0]
-                
-                if document and document.extension == ".heic":
+                extension = document._file.name.split(".")[-1]
+                if extension.lower() == "heic":
                     mime = "image/heic"
                 response = HttpResponse(content_type=mime)
                 response.write(document._file.read())
