@@ -374,11 +374,11 @@ def getPrivateFile(request):
             the_file = open(full_file_path, 'rb')
             the_data = the_file.read()
             the_file.close()
-            if extension == 'msg':
+            if extension.lower() == 'msg':
                 return HttpResponse(the_data, content_type="application/vnd.ms-outlook")
-            if extension == 'eml':
+            if extension.lower() == 'eml':
                 return HttpResponse(the_data, content_type="application/vnd.ms-outlook")
-            if extension == 'heic':
+            if extension.lower() == 'heic':
                 return HttpResponse(the_data, content_type="image/heic")
             return HttpResponse(the_data, content_type=mimetypes.types_map['.'+str(extension)])
 
