@@ -687,7 +687,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def conditions(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            qs = instance.conditions.all()
+            qs = instance.conditions.all().order_by('order')
             licence_activity = self.request.query_params.get(
                 'licence_activity', None)
             if licence_activity is not None:
