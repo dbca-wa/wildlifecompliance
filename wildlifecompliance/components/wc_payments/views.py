@@ -5,9 +5,9 @@ from django.urls import reverse
 from django.views.generic.base import View, TemplateView
 from django.db import transaction
 from ledger.payments.helpers import is_payment_admin
-from ledger.payments.pdf import create_invoice_pdf_bytes
+from ledger_api_client.pdf import create_invoice_pdf_bytes
 from ledger.payments.utils import update_payments
-from ledger.payments.models import Invoice
+from ledger_api_client.ledger_models import Invoice
 from ledger.basket.models import Basket
 from ledger.payments.mixins import InvoiceOwnerMixin
 #from oscar.apps.order.models import Order

@@ -1,8 +1,7 @@
 from django.db import models
 from django.db.models import Q
 
-from ledger.accounts.models import RevisionedMixin
-
+from wildlifecompliance.components.main.models import RevisionedMixin
 
 class Act(RevisionedMixin):
     NAME_CHOICES =  (
@@ -29,7 +28,7 @@ class Act(RevisionedMixin):
 
 class SectionRegulation(RevisionedMixin):
     #act = models.CharField(max_length=100, blank=True)
-    act = models.ForeignKey(Act, related_name='section_regulations')
+    act = models.ForeignKey(Act, related_name='section_regulations', on_delete=models.CASCADE)
     name = models.CharField(max_length=50, blank=True, verbose_name='Regulation')
     offence_text = models.CharField(max_length=200, blank=True)
     is_parking_offence = models.BooleanField(default=False)
@@ -58,7 +57,7 @@ class PenaltyAmount(RevisionedMixin):
     amount = models.DecimalField(max_digits=8, decimal_places=2, default='0.00')
     amount_after_due = models.DecimalField(max_digits=8, decimal_places=2, default='0.00')
     date_of_enforcement = models.DateField(blank=True, null=True)
-    section_regulation = models.ForeignKey(SectionRegulation, related_name='penalty_amounts')
+    section_regulation = models.ForeignKey(SectionRegulation, related_name='penalty_amounts', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'

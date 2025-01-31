@@ -4,7 +4,7 @@ from django.conf import settings
 import datetime
 from zipfile import ZipFile
 import os
-from ledger.accounts.models import Document, EmailUser, PrivateDocument
+from ledger_api_client.ledger_models import Document, EmailUser, PrivateDocument
 import logging
 logger = logging.getLogger(__name__)
 

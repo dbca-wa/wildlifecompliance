@@ -8,11 +8,11 @@
 # from wildlifecompliance.components.applications.models import Application, ExcelActivity
 # from wildlifecompliance.components.licences.models import DefaultActivity, WildlifeLicence, LicenceCategory, LicencePurpose
 # from wildlifecompliance.components.organisations.models import Organisation
-# from ledger.accounts.models import OrganisationAddress
+# from ledger_api_client.ledger_models import OrganisationAddress
 # from django.contrib.postgres.fields.jsonb import JSONField
 # from wildlifecompliance.utils import SearchUtils, search_multiple_keys
 # from wildlifecompliance.components.licences.models import DefaultPurpose
-# from ledger.accounts.models import EmailUser
+# from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 #
 # import xlsxwriter
 # from xlsxwriter.utility import xl_rowcol_to_cell, xl_cell_to_rowcol, xl_col_to_name

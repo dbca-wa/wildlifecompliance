@@ -7,12 +7,12 @@ from django.conf import settings
 from django.contrib.gis.db.models import MultiPolygonField
 from django.db.models.query import QuerySet
 from django.core.exceptions import ValidationError
-from django.utils.encoding import python_2_unicode_compatible
-from ledger.accounts.models import EmailUser
+from six import python_2_unicode_compatible
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 import os
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
-from wildlifecompliance.components.section_regulation.models import Act
+
 from wildlifecompliance.settings import SO_TYPE_CHOICES
 from smart_selects.db_fields import ChainedForeignKey
 
@@ -22,6 +22,36 @@ private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/"
 
 logger = logging.getLogger(__name__)
 
+class RevisionedMixin(models.Model):
+    """
+    A model tracked by reversion through the save method.
+    """
+
+    def save(self, **kwargs):
+        from reversion import revisions
+
+        if kwargs.pop("no_revision", False):
+            super(RevisionedMixin, self).save(**kwargs)
+        else:
+            with revisions.create_revision():
+                if "version_user" in kwargs:
+                    revisions.set_user(kwargs.pop("version_user", None))
+                if "version_comment" in kwargs:
+                    revisions.set_comment(kwargs.pop("version_comment", ""))
+                super(RevisionedMixin, self).save(**kwargs)
+
+    @property
+    def created_date(self):
+        from reversion.models import Version
+        return Version.objects.get_for_object(self).last().revision.date_created
+
+    @property
+    def modified_date(self):
+        from reversion.models import Version
+        return Version.objects.get_for_object(self).first().revision.date_created
+
+    class Meta:
+        abstract = True
 
 @python_2_unicode_compatible
 class SystemMaintenance(models.Model):
@@ -106,7 +136,7 @@ class District(models.Model):
 
 @python_2_unicode_compatible
 class UserAction(models.Model):
-    who = models.ForeignKey(EmailUser, null=False, blank=False)
+    who = models.ForeignKey(EmailUser, null=False, blank=False, on_delete=models.CASCADE)
     when = models.DateTimeField(null=False, blank=False, auto_now_add=True)
     what = models.TextField(blank=False)
 
@@ -150,8 +180,8 @@ class CommunicationsLogEntry(models.Model):
         blank=True,
         verbose_name="Subject / Description")
     text = models.TextField(blank=True)
-    customer = models.ForeignKey(EmailUser, null=True, related_name='+')
-    staff = models.ForeignKey(EmailUser, null=True, related_name='+')
+    customer = models.ForeignKey(EmailUser, null=True, related_name='+', on_delete=models.CASCADE)
+    staff = models.ForeignKey(EmailUser, null=True, related_name='+', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True, null=False, blank=False)
 
     class Meta:
@@ -228,7 +258,7 @@ class TemporaryDocumentCollection(models.Model):
 class TemporaryDocument(Document):
     temp_document_collection = models.ForeignKey(
         TemporaryDocumentCollection,
-        related_name='documents')
+        related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
     # input_name = models.CharField(max_length=255, null=True, blank=True)
 
@@ -278,6 +308,7 @@ def update_sanction_outcome_word_filename(instance, filename):
 
 
 class SanctionOutcomeWordTemplate(models.Model):
+    from wildlifecompliance.components.section_regulation.models import Act
     sanction_outcome_type = models.CharField(max_length=30, choices=SO_TYPE_CHOICES, blank=True,)
     act = models.CharField(max_length=30, choices=Act.NAME_CHOICES, blank=True,)
     _file = models.FileField(upload_to=update_sanction_outcome_word_filename, max_length=255, storage=private_storage)

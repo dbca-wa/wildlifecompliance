@@ -2,7 +2,7 @@ import datetime
 import logging
 import mimetypes
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from wildlifecompliance.components.emails.emails import TemplateEmailBase
 from wildlifecompliance.components.main.email import prepare_attachments, _extract_email_headers

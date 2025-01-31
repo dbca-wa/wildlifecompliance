@@ -19,13 +19,13 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible
-
+from six import python_2_unicode_compatible
 from smart_selects.db_fields import ChainedForeignKey
 from ckeditor.fields import RichTextField
 
-from ledger.accounts.models import EmailUser, RevisionedMixin
-from ledger.payments.invoice.models import Invoice
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from wildlifecompliance.components.main.models import RevisionedMixin
+from ledger_api_client.ledger_models import Invoice
 from wildlifecompliance.components.main.utils import (
     checkout, set_session_application,
     delete_session_application,
@@ -187,7 +187,7 @@ class ActivityPermissionGroup(Group):
 
 
 class ApplicationDocument(Document):
-    application = models.ForeignKey('Application', related_name='documents')
+    application = models.ForeignKey('Application', related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(upload_to=update_application_doc_filename, storage=private_storage)
     input_name = models.CharField(max_length=255, null=True, blank=True)
     # after initial submit prevent document from being deleted
@@ -356,17 +356,17 @@ class Application(RevisionedMixin):
         Organisation,
         blank=True,
         null=True,
-        related_name='org_applications')
+        related_name='org_applications', on_delete=models.CASCADE)
     proxy_applicant = models.ForeignKey(
         EmailUser,
         blank=True,
         null=True,
-        related_name='wildlifecompliance_proxy')
+        related_name='wildlifecompliance_proxy', on_delete=models.CASCADE)
     submitter = models.ForeignKey(
         EmailUser,
         blank=True,
         null=True,
-        related_name='wildlifecompliance_applications')
+        related_name='wildlifecompliance_applications', on_delete=models.CASCADE)
     id_check_status = models.CharField(
         'Identification Check Status',
         max_length=30,
@@ -390,12 +390,12 @@ class Application(RevisionedMixin):
     licence = models.ForeignKey(
         'wildlifecompliance.WildlifeLicence',
         null=True,
-        blank=True)
+        blank=True, on_delete=models.CASCADE)
     # generated licence for the application.
     licence_document = models.ForeignKey(
         LicenceDocument,
         blank=True,
-        null=True)
+        null=True, on_delete=models.CASCADE)
     previous_application = models.ForeignKey(
         'self', on_delete=models.PROTECT, blank=True, null=True, related_name='parents')
     application_fee = models.DecimalField(
@@ -4040,7 +4040,7 @@ class ApplicationInvoice(models.Model):
         (OTHER_PAYMENT_METHOD_NONE, 'Invoice for No Payment'),
     )
 
-    application = models.ForeignKey(Application, related_name='invoices')
+    application = models.ForeignKey(Application, related_name='invoices', on_delete=models.CASCADE)
     invoice_reference = models.CharField(
         max_length=50, null=True, blank=True, default='')
     invoice_datetime = models.DateTimeField(auto_now=True)
@@ -4070,9 +4070,9 @@ class ApplicationInvoice(models.Model):
 
 class ApplicationInvoiceLine(models.Model):
     invoice = models.ForeignKey(
-        ApplicationInvoice, related_name='application_activity_lines')
+        ApplicationInvoice, related_name='application_activity_lines', on_delete=models.CASCADE)
     licence_activity = models.ForeignKey(
-        'wildlifecompliance.LicenceActivity', null=True)
+        'wildlifecompliance.LicenceActivity', null=True, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=8, decimal_places=2, default='0')
 
     class Meta:
@@ -4085,7 +4085,7 @@ class ApplicationInvoiceLine(models.Model):
 class ApplicationLogDocument(Document):
     log_entry = models.ForeignKey(
         'ApplicationLogEntry',
-        related_name='documents')
+        related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(upload_to=update_application_comms_log_filename, storage=private_storage)
 
     class Meta:
@@ -4093,7 +4093,7 @@ class ApplicationLogDocument(Document):
 
 
 class ApplicationLogEntry(CommunicationsLogEntry):
-    application = models.ForeignKey(Application, related_name='comms_logs')
+    application = models.ForeignKey(Application, related_name='comms_logs', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -4109,10 +4109,10 @@ class ApplicationLogEntry(CommunicationsLogEntry):
             self.subject, self.log_type, self.fromm)
 
 class ApplicationRequest(models.Model):
-    application = models.ForeignKey(Application)
+    application = models.ForeignKey(Application, on_delete=models.CASCADE)
     subject = models.CharField(max_length=200, blank=True)
     text = models.TextField(blank=True)
-    officer = models.ForeignKey(EmailUser, null=True)
+    officer = models.ForeignKey(EmailUser, null=True, on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -4161,7 +4161,7 @@ class AmendmentRequest(ApplicationRequest):
         choices=REASON_CHOICES,
         default=AMENDMENT_REQUEST_REASON_INSUFFICIENT_DETAIL)
     licence_activity = models.ForeignKey(
-        'wildlifecompliance.LicenceActivity', null=True)
+        'wildlifecompliance.LicenceActivity', null=True, on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -4202,17 +4202,17 @@ class Assessment(ApplicationRequest):
         default=STATUS_AWAITING_ASSESSMENT)
     date_last_reminded = models.DateField(null=True, blank=True)
     assessor_group = models.ForeignKey(
-        ActivityPermissionGroup, null=False, default=1)
+        ActivityPermissionGroup, null=False, default=1, on_delete=models.CASCADE)
     licence_activity = models.ForeignKey(
-        'wildlifecompliance.LicenceActivity', null=True)
+        'wildlifecompliance.LicenceActivity', null=True, on_delete=models.CASCADE)
     final_comment = models.TextField(blank=True)
     purpose = models.TextField(blank=True)
-    actioned_by = models.ForeignKey(EmailUser, null=True)
+    actioned_by = models.ForeignKey(EmailUser, null=True, on_delete=models.CASCADE)
     assigned_assessor = models.ForeignKey(
         EmailUser,
         blank=True,
         null=True,
-        related_name='wildlifecompliance_assessor')
+        related_name='wildlifecompliance_assessor', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -4373,9 +4373,9 @@ class AssessmentInspection(models.Model):
     A model represention of an Inspection for an Assessment.
     """
     assessment = models.ForeignKey(
-        Assessment, related_name='inspections')
+        Assessment, related_name='inspections', on_delete=models.CASCADE)
     inspection = models.ForeignKey(
-        Inspection, related_name='wildlifecompliance_inspection')
+        Inspection, related_name='wildlifecompliance_inspection', on_delete=models.CASCADE)
     request_datetime = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -4488,13 +4488,13 @@ class ApplicationSelectedActivity(models.Model):
         max_length=40,
         choices=ACTIVITY_STATUS_CHOICES,
         default=ACTIVITY_STATUS_DEFAULT)
-    application = models.ForeignKey(Application, related_name='selected_activities')
-    updated_by = models.ForeignKey(EmailUser, null=True)
+    application = models.ForeignKey(Application, related_name='selected_activities', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(EmailUser, null=True, on_delete=models.CASCADE)
     reason = models.TextField(blank=True)
     cc_email = models.TextField(null=True)
     activity = JSONField(blank=True, null=True)
     licence_activity = models.ForeignKey(
-        'wildlifecompliance.LicenceActivity', null=True)
+        'wildlifecompliance.LicenceActivity', null=True, on_delete=models.CASCADE)
     additional_info = models.TextField(blank=True, null=True)
     conditions = models.TextField(blank=True, null=True)
     is_inspection_required = models.BooleanField(default=False)
@@ -4511,12 +4511,12 @@ class ApplicationSelectedActivity(models.Model):
         EmailUser,
         blank=True,
         null=True,
-        related_name='wildlifecompliance_officer_finalisation')
+        related_name='wildlifecompliance_officer_finalisation', on_delete=models.CASCADE)
     assigned_officer = models.ForeignKey(
         EmailUser,
         blank=True,
         null=True,
-        related_name='wildlifecompliance_officer')
+        related_name='wildlifecompliance_officer', on_delete=models.CASCADE)
     additional_licence_info = JSONField(default=list)
     # TODO:AYN issue dates and period dates are not required on Activity.
     # remove these status dates and logic.
@@ -6219,9 +6219,9 @@ class ApplicationSelectedActivityPurpose(models.Model):
         choices=PURPOSE_STATUS_CHOICES,
         default=PURPOSE_STATUS_DEFAULT)
     selected_activity = models.ForeignKey(
-        ApplicationSelectedActivity, related_name='proposed_purposes')
+        ApplicationSelectedActivity, related_name='proposed_purposes', on_delete=models.CASCADE)
     purpose = models.ForeignKey(
-        LicencePurpose, related_name='selected_activity_proposed_purpose')
+        LicencePurpose, related_name='selected_activity_proposed_purpose', on_delete=models.CASCADE)
     licence_fee = models.DecimalField(
         max_digits=8, decimal_places=2, default='0')
     application_fee = models.DecimalField(
@@ -6869,7 +6869,7 @@ class IssuanceDocument(Document):
     can_delete = models.BooleanField(default=True)
     selected_activity = models.ForeignKey(
         'ApplicationSelectedActivity',
-        related_name='issuance_documents')
+        related_name='issuance_documents', on_delete=models.CASCADE)
     
     class Meta:
         app_label = 'wildlifecompliance'
@@ -6884,7 +6884,7 @@ class ActivityInvoice(models.Model):
 
     activity = models.ForeignKey(
         ApplicationSelectedActivity,
-        related_name='activity_invoices')
+        related_name='activity_invoices', on_delete=models.CASCADE)
     invoice_reference = models.CharField(
         max_length=50, null=True, blank=True, default='')
     invoice_datetime = models.DateTimeField(auto_now=True)
@@ -6929,11 +6929,11 @@ class ActivityInvoiceLine(models.Model):
         null=True,
         blank=True)
     invoice = models.ForeignKey(
-        ActivityInvoice, related_name='licence_activity_lines')
+        ActivityInvoice, related_name='licence_activity_lines', on_delete=models.CASCADE)
     licence_activity = models.ForeignKey(
-        'wildlifecompliance.LicenceActivity', null=True)
+        'wildlifecompliance.LicenceActivity', null=True, on_delete=models.CASCADE)
     licence_purpose = models.ForeignKey(
-        'wildlifecompliance.LicencePurpose', null=True, blank=True)
+        'wildlifecompliance.LicencePurpose', null=True, blank=True, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=8, decimal_places=2, default='0')
 
     class Meta:
@@ -6993,7 +6993,7 @@ class ApplicationFormDataRecord(models.Model):
     )
 
     application = models.ForeignKey(
-        Application, related_name='form_data_records')
+        Application, related_name='form_data_records', on_delete=models.CASCADE)
     field_name = models.CharField(max_length=512, null=True, blank=True)
     schema_name = models.CharField(max_length=256, null=True, blank=True)
     instance_name = models.CharField(max_length=256, null=True, blank=True)
@@ -7007,9 +7007,9 @@ class ApplicationFormDataRecord(models.Model):
     assessor_comment = models.TextField(blank=True)
     deficiency = models.TextField(blank=True)
     licence_activity = models.ForeignKey(
-        LicenceActivity, related_name='form_data_records')
+        LicenceActivity, related_name='form_data_records', on_delete=models.CASCADE)
     licence_purpose = models.ForeignKey(
-        LicencePurpose, related_name='form_data_records')
+        LicencePurpose, related_name='form_data_records', on_delete=models.CASCADE)
 
     def __str__(self):
         logger.debug('ApplicationFormDataRecord.__str__()')
@@ -7031,7 +7031,7 @@ class ApplicationStandardCondition(RevisionedMixin):
     code = models.CharField(max_length=10, unique=True)
     obsolete = models.BooleanField(default=False)
     return_type = models.ForeignKey(
-        'wildlifecompliance.ReturnType', null=True, blank=True)
+        'wildlifecompliance.ReturnType', null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.code
@@ -7051,15 +7051,15 @@ class DefaultCondition(OrderedModel):
     standard_condition = models.ForeignKey(
         ApplicationStandardCondition,
         related_name='default_condition',
-        null=True)
+        null=True, on_delete=models.CASCADE)
     licence_activity = models.ForeignKey(
         'wildlifecompliance.LicenceActivity',
         related_name='default_activity',
-        null=True)
+        null=True, on_delete=models.CASCADE)
     # licence_purpose = models.ForeignKey(
     #     'wildlifecompliance.LicencePurpose',
     #     related_name='default_purpose',
-    #     null=True)
+    #     null=True, on_delete=models.CASCADE)
     licence_purpose = ChainedForeignKey(
         'wildlifecompliance.LicencePurpose',
         chained_field='licence_activity',
@@ -7084,14 +7084,14 @@ class ApplicationCondition(OrderedModel):
         (APPLICATION_CONDITION_RECURRENCE_YEARLY, 'Yearly')
     )
     standard_condition = models.ForeignKey(
-        ApplicationStandardCondition, null=True, blank=True)
+        ApplicationStandardCondition, null=True, blank=True, on_delete=models.CASCADE)
     free_condition = models.TextField(null=True, blank=True)
     default_condition = models.ForeignKey(
-        DefaultCondition, null=True, blank=True)
+        DefaultCondition, null=True, blank=True, on_delete=models.CASCADE)
     is_default = models.BooleanField(default=False)
     standard = models.BooleanField(default=True)
     is_rendered = models.BooleanField(default=False)
-    application = models.ForeignKey(Application, related_name='conditions')
+    application = models.ForeignKey(Application, related_name='conditions', on_delete=models.CASCADE)
     due_date = models.DateField(null=True, blank=True)
     recurrence = models.BooleanField(default=False)
     recurrence_pattern = models.CharField(
@@ -7100,13 +7100,13 @@ class ApplicationCondition(OrderedModel):
         default=APPLICATION_CONDITION_RECURRENCE_WEEKLY)
     recurrence_schedule = models.IntegerField(null=True, blank=True)
     licence_activity = models.ForeignKey(
-        'wildlifecompliance.LicenceActivity', null=True)
+        'wildlifecompliance.LicenceActivity', null=True, on_delete=models.CASCADE)
     return_type = models.ForeignKey(
-        'wildlifecompliance.ReturnType', null=True, blank=True)
+        'wildlifecompliance.ReturnType', null=True, blank=True, on_delete=models.CASCADE)
     licence_purpose = models.ForeignKey(
-        'wildlifecompliance.LicencePurpose', null=True, blank=True)
+        'wildlifecompliance.LicencePurpose', null=True, blank=True, on_delete=models.CASCADE)
     source_group = models.ForeignKey(
-        ActivityPermissionGroup, blank=True, null=True)
+        ActivityPermissionGroup, blank=True, null=True, on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -7255,7 +7255,7 @@ class ApplicationUserAction(UserAction):
             what=str(action)
         )
 
-    application = models.ForeignKey(Application, related_name='action_logs')
+    application = models.ForeignKey(Application, related_name='action_logs', on_delete=models.CASCADE)
 
 
 @receiver(pre_delete, sender=Application)

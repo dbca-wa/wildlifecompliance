@@ -4,11 +4,11 @@ import mimetypes
 import six
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.template import loader, Template
 from django.utils.html import strip_tags
 
-from ledger.accounts.models import Document
+from ledger_api_client.ledger_models import Document
 
 logger = logging.getLogger('log')
 

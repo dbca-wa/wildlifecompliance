@@ -1,6 +1,7 @@
 import os
 from django.conf import settings
-from ledger.accounts.models import EmailUser, Address, Profile, EmailIdentity, EmailUserAction, Document, PrivateDocument
+from ledger.accounts.models import Profile, EmailUserAction
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address, EmailIdentity, Document, PrivateDocument
 from wildlifecompliance.components.organisations.models import (
     Organisation,
     OrganisationRequest,

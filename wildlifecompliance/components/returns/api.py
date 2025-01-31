@@ -603,7 +603,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @detail_route(methods=['POST', ])
     def assign_officer(self, request, *args, **kwargs):
-        from ledger.accounts.models import EmailUser
+        from ledger_api_client.ledger_models import EmailUserRO as EmailUser
         try:
             if not is_wildlife_compliance_officer(self.request):
                 return Response("user not authorised to assign return")

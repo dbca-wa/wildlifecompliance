@@ -3,7 +3,7 @@ import logging
 import calendar
 import time
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.http import urlquote_plus
@@ -252,7 +252,7 @@ class SecurePipe(SecureBase):
         :return: HttpResponse for a client request.
         '''
         import mimetypes
-        from ledger.accounts.models import EmailUser
+        from ledger_api_client.ledger_models import EmailUserRO as EmailUser
         from wildlifecompliance.components.licences.models import (
             WildlifeLicence,
         )

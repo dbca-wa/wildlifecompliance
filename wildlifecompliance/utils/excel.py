@@ -3,7 +3,7 @@ from openpyxl import load_workbook
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.utils import get_column_letter
 
-from django.utils import six
+import six
 from django.utils.text import Truncator
 from django.http import HttpResponse
 

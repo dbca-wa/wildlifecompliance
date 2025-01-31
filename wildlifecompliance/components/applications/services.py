@@ -497,7 +497,7 @@ class SubmitRequestCommand(ApplicationCommand):
         '''
         Concrete method.
         '''
-        from ledger.accounts.models import EmailUser
+        from ledger_api_client.ledger_models import EmailUserRO as EmailUser
         from wildlifecompliance.components.applications.email import (
             send_application_submit_email_notification,
         )

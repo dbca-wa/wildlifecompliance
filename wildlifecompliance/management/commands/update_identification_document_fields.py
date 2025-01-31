@@ -4,7 +4,7 @@ from django.db.models import Q
 import logging
 import pathlib
 
-from ledger.accounts.models import PrivateDocument
+from ledger_api_client.ledger_models import PrivateDocument
 
 logger = logging.getLogger(__name__)
 

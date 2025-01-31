@@ -1,10 +1,11 @@
 import os
 import confy
+from confy import env
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 confy.read_environment_file(BASE_DIR+"/.env")
 os.environ.setdefault("BASE_DIR", BASE_DIR)
 from django.core.exceptions import ImproperlyConfigured
-from ledger.settings_base import *
+from ledger_api_client.settings_base import *
 
 os.environ['LEDGER_PRODUCT_CUSTOM_FIELDS'] = "('ledger_description','quantity','price_incl_tax','price_excl_tax','oracle_code')"
 os.environ['LEDGER_REFUND_TRANSACTION_CALLBACK_MODULE'] = 'wildlifecompliance:wildlifecompliance.components.applications.api.application_refund_callback'
@@ -81,6 +82,7 @@ INSTALLED_APPS += [
     'smart_selects',
     'ckeditor',
     'appmonitor_client',
+    'ledger_api_client',
 ]
 
 CKEDITOR_BASEPATH = '/static/ckeditor/ckeditor/'

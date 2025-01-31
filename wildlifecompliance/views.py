@@ -22,7 +22,7 @@ from wildlifecompliance.components.organisations.models import Organisation, Org
 from wildlifecompliance.components.main import utils
 from wildlifecompliance.exceptions import BindApplicationException
 from django.core.management import call_command
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 import os
 import mimetypes
 from django.contrib import messages

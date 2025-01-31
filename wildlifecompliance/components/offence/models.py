@@ -6,7 +6,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.signals import post_save
 from django.db.models import Q
-from ledger.accounts.models import RevisionedMixin, EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from wildlifecompliance.components.main.models import RevisionedMixin
 from wildlifecompliance.components.call_email.models import Location, CallEmail
 from wildlifecompliance.components.legal_case.models import LegalCase
 from wildlifecompliance.components.inspection.models import Inspection
@@ -59,25 +60,25 @@ class Offence(RevisionedMixin):
         Location,
         null=True,
         blank=True,
-        related_name="offence_location",
+        related_name="offence_location", on_delete=models.CASCADE
     )
     call_email = models.ForeignKey(
         CallEmail,
         null=True,
         blank=True,
-        related_name='offence_call_eamil',
+        related_name='offence_call_eamil', on_delete=models.CASCADE
     )
     legal_case = models.ForeignKey(
         LegalCase,
         null=True,
         blank=True,
-        related_name='offence_legal_case',
+        related_name='offence_legal_case', on_delete=models.CASCADE
     )
     inspection = models.ForeignKey(
         Inspection,
         null=True,
         blank=True,
-        related_name='offence_inspection',
+        related_name='offence_inspection', on_delete=models.CASCADE
     )
     lodgement_number = models.CharField(max_length=50, blank=True,)
     occurrence_from_to = models.BooleanField(default=False)
@@ -92,15 +93,15 @@ class Offence(RevisionedMixin):
     assigned_to = models.ForeignKey(
         EmailUser,
         related_name='offence_assigned_to',
-        null=True
+        null=True, on_delete=models.CASCADE
     )
     allocated_group = models.ForeignKey(
        ComplianceManagementSystemGroup,
        related_name='offence_allocated_group',
-       null=True
+       null=True, on_delete=models.CASCADE
     )
-    region = models.ForeignKey(Region, related_name='offence_region', null=True,)
-    district = models.ForeignKey(District, related_name='offence_district', null=True,)
+    region = models.ForeignKey(Region, related_name='offence_region', null=True, on_delete=models.CASCADE)
+    district = models.ForeignKey(District, related_name='offence_district', null=True, on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -208,7 +209,7 @@ def update_offence_doc_filename(instance, filename):
 
 
 class OffenceDocument(Document):
-    offence = models.ForeignKey(Offence, related_name='documents')
+    offence = models.ForeignKey(Offence, related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, upload_to=update_offence_doc_filename, storage=private_storage)
 
     class Meta:
@@ -218,14 +219,14 @@ class OffenceDocument(Document):
 
 
 class AllegedOffence(RevisionedMixin):
-    offence = models.ForeignKey(Offence, null=False,)
-    section_regulation = models.ForeignKey(SectionRegulation, null=False, )
+    offence = models.ForeignKey(Offence, null=False, on_delete=models.CASCADE)
+    section_regulation = models.ForeignKey(SectionRegulation, null=False, on_delete=models.CASCADE)
     reason_for_removal = models.TextField(blank=True)
     removed = models.BooleanField(default=False)
     removed_by = models.ForeignKey(
         EmailUser,
         null=True,
-        related_name='alleged_offence_removed_by'
+        related_name='alleged_offence_removed_by', on_delete=models.CASCADE
     )
 
     def __str__(self):
@@ -263,22 +264,22 @@ class Offender(models.Model):
     removed_by = models.ForeignKey(
         EmailUser,
         null=True,
-        related_name='offender_removed_by'
+        related_name='offender_removed_by', on_delete=models.CASCADE
     )
     person = models.ForeignKey(
         EmailUser,
         null=True,
-        related_name='offender_person',
+        related_name='offender_person', on_delete=models.CASCADE
     )
     organisation = models.ForeignKey(
         Organisation,
         null=True,
-        related_name='offender_organisation',
+        related_name='offender_organisation', on_delete=models.CASCADE
     )
     offence = models.ForeignKey(
         Offence,
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.SET_NULL
     )
     active_offenders = ActiveOffenderManager()
     objects = models.Manager()
@@ -307,10 +308,10 @@ class OffenceUserAction(models.Model):
     ACTION_ADD_WEAK_LINK = "Create manual link between {}: {} and {}: {}"
     ACTION_REMOVE_WEAK_LINK = "Remove manual link between {}: {} and {}: {}"
 
-    who = models.ForeignKey(EmailUser, null=True, blank=True)
+    who = models.ForeignKey(EmailUser, null=True, blank=True, on_delete=models.CASCADE)
     when = models.DateTimeField(null=False, blank=False, auto_now_add=True)
     what = models.TextField(blank=False)
-    offence = models.ForeignKey(Offence, related_name='action_logs')
+    offence = models.ForeignKey(Offence, related_name='action_logs', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -326,7 +327,7 @@ class OffenceUserAction(models.Model):
 
 
 class OffenceCommsLogDocument(Document):
-    log_entry = models.ForeignKey('OffenceCommsLogEntry', related_name='documents')
+    log_entry = models.ForeignKey('OffenceCommsLogEntry', related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
@@ -334,7 +335,7 @@ class OffenceCommsLogDocument(Document):
 
 
 class OffenceCommsLogEntry(CommunicationsLogEntry):
-    offence = models.ForeignKey(Offence, related_name='comms_logs')
+    offence = models.ForeignKey(Offence, related_name='comms_logs', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'

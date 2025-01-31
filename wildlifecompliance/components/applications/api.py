@@ -13,7 +13,7 @@ from rest_framework.decorators import (
 )
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from ledger.checkout.utils import calculate_excl_gst
 from django.urls import reverse
 from django.shortcuts import redirect, render

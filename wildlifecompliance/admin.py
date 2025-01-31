@@ -3,7 +3,7 @@ from copy import deepcopy
 from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.contrib.auth.admin import UserAdmin
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from ledger.accounts import admin as ledger_admin
 
 

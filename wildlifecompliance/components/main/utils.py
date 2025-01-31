@@ -6,15 +6,15 @@ import json
 import logging
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
-from ledger.checkout.utils import (
+from ledger_api_client.utils import (
     create_basket_session,
     create_checkout_session,
     place_order_submission
 )
 from django.db import transaction
-from ledger.payments.models import Invoice
+from ledger_api_client.ledger_models import Invoice
 from wildlifecompliance.exceptions import BindApplicationException
 from django.core.cache import cache
 from wildlifecompliance.components.main.models import RegionGIS, DistrictGIS

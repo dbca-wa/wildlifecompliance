@@ -2,10 +2,10 @@ import logging
 
 from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.utils.encoding import smart_text
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
-from ledger.payments.pdf import create_invoice_pdf_bytes
-from ledger.payments.models import Invoice
+from ledger_api_client.pdf import create_invoice_pdf_bytes
+from ledger_api_client.ledger_models import Invoice
 from wildlifecompliance.components.main.utils import get_choice_value
 from wildlifecompliance.components.emails.emails import TemplateEmailBase
 from wildlifecompliance.components.main.email import prepare_attachments, _extract_email_headers

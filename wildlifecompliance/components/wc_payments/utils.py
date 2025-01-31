@@ -1,5 +1,5 @@
 # from django.http import HttpResponseRedirect
-# from django.core.urlresolvers import reverse
+# from django.urls import reverse
 # from django.conf import settings
 # from django.core.exceptions import ValidationError
 # from django.db import transaction
@@ -21,7 +21,7 @@ from django.urls import reverse
 from ledger.checkout.utils import create_basket_session, create_checkout_session
 from ledger.payments.bpoint.models import BpointTransaction
 from ledger.payments.cash.models import CashTransaction
-from ledger.payments.models import Invoice
+from ledger_api_client.ledger_models import Invoice
 # from ledger.payments.utils import oracle_parser
 # import json
 # import ast

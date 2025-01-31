@@ -2,7 +2,7 @@ from django.contrib import admin, messages
 from django.db import transaction
 from django.template.response import TemplateResponse
 from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.html import format_html
 from django.conf.urls import url
 

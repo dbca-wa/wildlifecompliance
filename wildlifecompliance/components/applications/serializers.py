@@ -3,7 +3,7 @@ import datetime
 import logging
 
 from django.urls import reverse
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance import settings
 from wildlifecompliance.helpers import is_internal
 from wildlifecompliance.components.applications.models import (

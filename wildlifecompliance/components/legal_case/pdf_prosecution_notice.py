@@ -22,7 +22,7 @@ from reportlab.lib import colors
 from django.core.files import File
 from django.conf import settings
 
-from ledger.accounts.models import Document
+from ledger_api_client.ledger_models import Document
 from ledger.checkout.utils import calculate_excl_gst
 
 from django.conf import settings

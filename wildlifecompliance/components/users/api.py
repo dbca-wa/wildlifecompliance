@@ -10,7 +10,7 @@ from rest_framework import viewsets, serializers, views, status, mixins
 #from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from ledger.accounts.models import EmailUser, Address, Profile, EmailIdentity, EmailUserAction, PrivateDocument
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address, Profile, EmailIdentity, EmailUserAction, PrivateDocument
 from django.contrib.auth.models import Permission, ContentType
 from datetime import datetime
 from django_countries import countries

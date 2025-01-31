@@ -4,7 +4,7 @@ from rest_framework.fields import CharField
 from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeometryField
 
 from django.conf import settings
-from ledger.accounts.models import EmailUser, Address
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address
 from wildlifecompliance.helpers import is_compliance_management_volunteer
 from wildlifecompliance.components.call_email.models import (
     CallEmail,

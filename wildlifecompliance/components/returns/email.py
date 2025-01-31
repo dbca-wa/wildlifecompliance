@@ -3,9 +3,9 @@ import logging
 from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.utils.encoding import smart_text
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from ledger.payments.pdf import create_invoice_pdf_bytes
-from ledger.payments.models import Invoice
+from django.urls import reverse
+from ledger_api_client.pdf import create_invoice_pdf_bytes
+from ledger_api_client.ledger_models import Invoice
 
 from wildlifecompliance.components.main.utils import (
     remove_url_internal_request,

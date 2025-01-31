@@ -5,7 +5,7 @@ from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.conf import settings
 from datetime import datetime, timedelta
 
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.components.main.models import (
         SystemMaintenance, 
         )

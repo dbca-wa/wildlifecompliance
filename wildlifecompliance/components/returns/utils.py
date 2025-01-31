@@ -2,7 +2,7 @@ import abc
 import logging
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from wildlifecompliance.components.returns.models import (
     Return,
@@ -15,7 +15,7 @@ from ledger.checkout.utils import (
     create_basket_session,
     create_checkout_session,
 )
-from ledger.payments.models import Invoice
+from ledger_api_client.ledger_models import Invoice
 
 logger = logging.getLogger(__name__)
 

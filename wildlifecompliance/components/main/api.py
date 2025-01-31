@@ -6,7 +6,7 @@ from wsgiref.util import FileWrapper
 from django.http import HttpResponse
 from django.db import transaction
 from django.core.exceptions import ValidationError
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from rest_framework import viewsets, serializers, views, status, mixins
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer

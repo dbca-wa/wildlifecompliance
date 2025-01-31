@@ -10,7 +10,7 @@ from wildlifecompliance.components.applications.models import ActivityPermission
 #from wildlifecompliance.components.users.models import CompliancePermissionGroup
 from wildlifecompliance.components.main.models import Region, District
 
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 
 logger = logging.getLogger(__name__)
 

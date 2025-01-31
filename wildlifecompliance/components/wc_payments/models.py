@@ -3,10 +3,11 @@ from __future__ import unicode_literals
 from datetime import datetime, timedelta
 from django.db import models, transaction
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible
+from six import python_2_unicode_compatible
 # from django.utils import timezone
-from ledger.accounts.models import EmailUser, RevisionedMixin
-from ledger.payments.models import Invoice
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from wildlifecompliance.components.main.models import RevisionedMixin
+from ledger_api_client.ledger_models import Invoice
 #from commercialoperator.components.proposals.models import Proposal
 #from commercialoperator.components.main.models import Park
 # from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome

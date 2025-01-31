@@ -5,9 +5,9 @@ from django.db import models
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.db.models import Q, Max
-from django.utils.encoding import python_2_unicode_compatible
-from ledger.accounts.models import EmailUser, RevisionedMixin
-from ledger.licence.models import LicenceType
+from six import python_2_unicode_compatible
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from wildlifecompliance.components.main.models import RevisionedMixin
 from wildlifecompliance.components.organisations.models import Organisation
 from wildlifecompliance.components.call_email.models import CallEmail, Location
 #from wildlifecompliance.components.artifact.utils import build_legal_case_hierarchy
@@ -57,10 +57,10 @@ class CourtProceedings(models.Model):
         'LegalCase',
         null=True,
         blank=True,
-        related_name="court_proceedings",
+        related_name="court_proceedings", on_delete=models.CASCADE
     )
     court_outcome_details = models.TextField(blank=True)
-    court_outcome_type = models.ForeignKey('CourtOutcomeType', null=True, blank=True)
+    court_outcome_type = models.ForeignKey('CourtOutcomeType', null=True, blank=True, on_delete=models.CASCADE)
     court_outcome_fines = models.DecimalField(
         verbose_name="Fines",
         decimal_places=2,
@@ -119,31 +119,31 @@ class LegalCase(RevisionedMixin):
     call_email = models.ForeignKey(
         CallEmail, 
         related_name='legal_case_call_email',
-        null=True
+        null=True, on_delete=models.CASCADE
         )
     assigned_to = models.ForeignKey(
         EmailUser, 
         related_name='legal_case_assigned_to',
-        null=True
+        null=True, on_delete=models.CASCADE
         )
     allocated_group = models.ForeignKey(
        ComplianceManagementSystemGroup,
        related_name='legal_case_allocated_group', 
-       null=True
+       null=True, on_delete=models.CASCADE
        )
     region = models.ForeignKey(
        Region, 
        related_name='legal_case_region', 
-       null=True
+       null=True, on_delete=models.CASCADE
     )
     district = models.ForeignKey(
        District, 
        related_name='legal_case_district', 
-       null=True
+       null=True, on_delete=models.CASCADE
     )
     legal_case_priority = models.ForeignKey(
             LegalCasePriority,
-            null=True
+            null=True, on_delete=models.CASCADE
             )
     associated_persons = models.ManyToManyField(
             EmailUser,
@@ -344,7 +344,7 @@ class BriefOfEvidence(models.Model):
             LegalCase,
             null=True,
             blank=True,
-            related_name="brief_of_evidence",
+            related_name="brief_of_evidence", on_delete=models.CASCADE
             )
     statement_of_facts = models.TextField(blank=True, null=True)
     victim_impact_statement_taken = models.BooleanField(default=False)
@@ -386,7 +386,7 @@ class ProsecutionBrief(models.Model):
             LegalCase,
             null=True,
             blank=True,
-            related_name="prosecution_brief",
+            related_name="prosecution_brief", on_delete=models.CASCADE
             )
     statement_of_facts = models.TextField(blank=True, null=True)
     victim_impact_statement_taken = models.BooleanField(default=False)
@@ -438,10 +438,10 @@ class CourtProceedingsJournalEntryManager(models.Manager):
 
 
 class CourtProceedingsJournalEntry(RevisionedMixin):
-    court_proceedings = models.ForeignKey(CourtProceedings, related_name='journal_entries')
+    court_proceedings = models.ForeignKey(CourtProceedings, related_name='journal_entries', on_delete=models.CASCADE)
     #person = models.ManyToManyField(LegalCasePerson, related_name='journal_entry_person')
     date_modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(EmailUser, related_name='journal_entry_user')
+    user = models.ForeignKey(EmailUser, related_name='journal_entry_user', on_delete=models.CASCADE)
     description = models.TextField(blank=True)
     row_num = models.SmallIntegerField(blank=False, null=False)
     deleted = models.BooleanField(default=False)
@@ -473,7 +473,7 @@ class CourtProceedingsJournalEntry(RevisionedMixin):
         return is_reinstated
 
 class LegalCasePerson(EmailUser):
-    legal_case = models.ForeignKey(LegalCase, related_name='legal_case_person')
+    legal_case = models.ForeignKey(LegalCase, related_name='legal_case_person', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -499,13 +499,13 @@ class LegalCaseRunningSheetEntryManager(models.Manager):
 
 
 class LegalCaseRunningSheetEntry(RevisionedMixin):
-    legal_case = models.ForeignKey(LegalCase, related_name='running_sheet_entries')
+    legal_case = models.ForeignKey(LegalCase, related_name='running_sheet_entries', on_delete=models.CASCADE)
     # TODO: person fk req?  Url links in description instead
     person = models.ManyToManyField(LegalCasePerson, related_name='running_sheet_entry_person')
     #number = models.CharField(max_length=50, blank=True)
     #date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(EmailUser, related_name='running_sheet_entry_user')
+    user = models.ForeignKey(EmailUser, related_name='running_sheet_entry_user', on_delete=models.CASCADE)
     #description = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
     row_num = models.SmallIntegerField(blank=False, null=False)
@@ -545,7 +545,7 @@ class LegalCaseRunningSheetEntry(RevisionedMixin):
 
 
 class LegalCaseCommsLogEntry(CommunicationsLogEntry):
-    legal_case = models.ForeignKey(LegalCase, related_name='comms_logs')
+    legal_case = models.ForeignKey(LegalCase, related_name='comms_logs', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -554,7 +554,7 @@ class LegalCaseCommsLogEntry(CommunicationsLogEntry):
 class LegalCaseCommsLogDocument(Document):
     log_entry = models.ForeignKey(
         LegalCaseCommsLogEntry,
-        related_name='documents')
+        related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
@@ -593,14 +593,14 @@ class LegalCaseUserAction(models.Model):
             what=str(action)
         )
 
-    who = models.ForeignKey(EmailUser, null=True, blank=True)
+    who = models.ForeignKey(EmailUser, null=True, blank=True, on_delete=models.CASCADE)
     when = models.DateTimeField(null=False, blank=False, auto_now_add=True)
     what = models.TextField(blank=False)
-    legal_case = models.ForeignKey(LegalCase, related_name='action_logs')
+    legal_case = models.ForeignKey(LegalCase, related_name='action_logs', on_delete=models.CASCADE)
 
 
 class LegalCaseDocument(Document):
-    legal_case = models.ForeignKey(LegalCase, related_name='documents')
+    legal_case = models.ForeignKey(LegalCase, related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
@@ -616,7 +616,7 @@ class LegalCaseDocument(Document):
 
 
 class ProsecutionNoticeDocument(Document):
-    legal_case = models.ForeignKey(LegalCase, related_name='prosecution_notices')
+    legal_case = models.ForeignKey(LegalCase, related_name='prosecution_notices', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
@@ -626,7 +626,7 @@ class ProsecutionNoticeDocument(Document):
 
 
 class CourtHearingNoticeDocument(Document):
-    legal_case = models.ForeignKey(LegalCase, related_name='court_hearing_notices')
+    legal_case = models.ForeignKey(LegalCase, related_name='court_hearing_notices', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
@@ -636,7 +636,7 @@ class CourtHearingNoticeDocument(Document):
 
 
 class BriefOfEvidenceDocument(Document):
-    brief_of_evidence = models.ForeignKey(BriefOfEvidence, related_name='documents')
+    brief_of_evidence = models.ForeignKey(BriefOfEvidence, related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
@@ -650,7 +650,7 @@ class BriefOfEvidenceDocument(Document):
         app_label = 'wildlifecompliance'
 
 class ProsecutionBriefDocument(Document):
-    prosecution_brief = models.ForeignKey(ProsecutionBrief, related_name='documents')
+    prosecution_brief = models.ForeignKey(ProsecutionBrief, related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
@@ -665,7 +665,7 @@ class ProsecutionBriefDocument(Document):
 
 
 class LegalCaseGeneratedDocument(Document):
-    legal_case = models.ForeignKey(LegalCase, related_name='generated_documents')
+    legal_case = models.ForeignKey(LegalCase, related_name='generated_documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
@@ -679,7 +679,7 @@ def update_court_outcome_doc_filename(instance, filename):
 
 
 class CourtOutcomeDocument(Document):
-    court_proceedings = models.ForeignKey(CourtProceedings, related_name='court_outcome_documents')
+    court_proceedings = models.ForeignKey(CourtProceedings, related_name='court_outcome_documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, upload_to=update_court_outcome_doc_filename, storage=private_storage)
 
     class Meta:
@@ -716,10 +716,10 @@ class CourtOutcomeType(models.Model):
 
 
 class CourtDate(models.Model):
-    court_proceedings = models.ForeignKey(CourtProceedings, related_name='court_dates')
+    court_proceedings = models.ForeignKey(CourtProceedings, related_name='court_dates', on_delete=models.CASCADE)
     court_datetime = models.DateTimeField(blank=True, null=True,)
     comments = models.TextField(blank=True)
-    court = models.ForeignKey(Court, blank=True, null=True)
+    court = models.ForeignKey(Court, blank=True, null=True, on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'

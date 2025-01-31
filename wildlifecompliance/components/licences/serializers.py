@@ -18,7 +18,7 @@ from wildlifecompliance.components.applications.models import (
 from wildlifecompliance.components.applications.serializers import (
     WildlifeLicenceApplicationSerializer,
 )
-from ledger.payments.invoice.models import Invoice
+from ledger_api_client.ledger_models import Invoice
 from rest_framework import serializers
 
 

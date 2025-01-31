@@ -5,7 +5,7 @@ from django.db.models import Q, Max
 from django.utils import timezone
 import logging
 
-from ledger.payments.invoice.models import Invoice
+from ledger_api_client.ledger_models import Invoice
 
 from wildlifecompliance import settings
 from wildlifecompliance.components.sanction_outcome.email import send_unpaid_infringements_file

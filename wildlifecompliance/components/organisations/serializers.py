@@ -1,5 +1,5 @@
 from django.conf import settings
-from ledger.accounts.models import EmailUser, OrganisationAddress
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, OrganisationAddress
 from wildlifecompliance.components.organisations.models import (
     Organisation,
     OrganisationContact,

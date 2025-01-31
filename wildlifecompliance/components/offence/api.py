@@ -19,7 +19,7 @@ from rest_framework.response import Response
 from rest_framework_datatables.filters import DatatablesFilterBackend
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.components.main.email import prepare_mail
 from wildlifecompliance.components.offence.email import send_mail
 from wildlifecompliance.components.organisations.models import Organisation

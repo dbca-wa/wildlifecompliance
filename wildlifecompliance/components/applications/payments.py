@@ -249,7 +249,7 @@ class LicenceFeeClearingInvoice(InvoiceClearable):
         '''
         Calculate balance for invoices on the application.
         '''
-        from ledger.payments.invoice.models import Invoice
+        from ledger_api_client.ledger_models import Invoice
 
         inv_balance_amt = 0                 # total invoice amount owed.
         inv_payment_amt = 0                 # total invoice amount paid.

@@ -24,7 +24,7 @@ from rest_framework.pagination import PageNumberPagination
 from datetime import datetime, timedelta
 from collections import OrderedDict
 from django.core.cache import cache
-from ledger.accounts.models import EmailUser, OrganisationAddress, Organisation as ledger_organisation
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, OrganisationAddress, Organisation as ledger_organisation
 from ledger.address.models import Country
 from datetime import datetime, timedelta, date
 from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer

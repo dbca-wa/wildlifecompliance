@@ -2,7 +2,8 @@ from django.db import models
 from django.db.models import Q
 from rest_framework.exceptions import ValidationError
 
-from ledger.accounts.models import RevisionedMixin, EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from wildlifecompliance.components.main.models import RevisionedMixin
 
 
 class SanctionOutcomeDueDateConfiguration(RevisionedMixin):
@@ -29,8 +30,8 @@ class SanctionOutcomeDueDate(models.Model):
     due_date_2nd = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     reason_for_extension = models.TextField(blank=True)
-    extended_by = models.ForeignKey(EmailUser, null=True)
-    sanction_outcome = models.ForeignKey('SanctionOutcome', null=False, related_name='due_dates')
+    extended_by = models.ForeignKey(EmailUser, null=True, on_delete=models.CASCADE)
+    sanction_outcome = models.ForeignKey('SanctionOutcome', null=False, related_name='due_dates', on_delete=models.CASCADE)
     due_date_term_currently_applied = models.CharField(default='1st', max_length=10)  # This field must be '1st' or '2nd'
 
     class Meta:

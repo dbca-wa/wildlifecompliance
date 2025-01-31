@@ -12,8 +12,8 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, FileResponse, HttpResponseNotFound
-from ledger.payments.invoice.models import Invoice
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import Invoice
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from django.conf import settings
 from rest_framework import viewsets, serializers, status, mixins
 from rest_framework.decorators import list_route, detail_route, renderer_classes

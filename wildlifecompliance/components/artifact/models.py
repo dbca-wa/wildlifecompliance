@@ -4,8 +4,9 @@ from django.db import models
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.db.models import Max
-from django.utils.encoding import python_2_unicode_compatible
-from ledger.accounts.models import EmailUser, RevisionedMixin
+from six import python_2_unicode_compatible
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from wildlifecompliance.components.main.models import RevisionedMixin
 from wildlifecompliance.components.organisations.models import Organisation
 from wildlifecompliance.components.call_email.models import CallEmail, Location
 from wildlifecompliance.components.main.models import (

@@ -31,7 +31,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser, B
 from rest_framework.pagination import PageNumberPagination
 from collections import OrderedDict
 from django.core.cache import cache
-from ledger.accounts.models import EmailUser, Address
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address
 from ledger.address.models import Country
 from ledger.checkout.utils import calculate_excl_gst
 from datetime import datetime, timedelta, date

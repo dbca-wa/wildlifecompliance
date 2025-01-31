@@ -8,7 +8,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.db.models.signals import post_save
-from ledger.accounts.models import EmailUser, RevisionedMixin
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from wildlifecompliance.components.main.models import RevisionedMixin
 from rest_framework import serializers
 from wildlifecompliance import settings
 from wildlifecompliance.components.main.models import Document, CommunicationsLogEntry, Region, District
