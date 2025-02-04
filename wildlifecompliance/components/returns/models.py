@@ -3,7 +3,7 @@ from concurrency.exceptions import RecordModifiedError
 from concurrency.fields import IntegerVersionField
 from django.db import models, transaction
 from django.db.utils import IntegrityError
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models import JSONField
 from django.utils import timezone
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.components.main.models import RevisionedMixin
@@ -297,7 +297,7 @@ class Return(models.Model):
         max_digits=8,
         decimal_places=2,
         default='0')
-    property_cache = JSONField(null=True, blank=True, default={})
+    property_cache = JSONField(null=True, blank=True, default=dict)
 
     class Meta:
         app_label = 'wildlifecompliance'

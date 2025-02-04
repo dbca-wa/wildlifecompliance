@@ -140,6 +140,9 @@ MIDDLEWARE_CLASSES += [
     'wildlifecompliance.middleware.FirstTimeNagScreenMiddleware',
     'wildlifecompliance.middleware.CacheControlMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
 ]
 
 LATEX_GRAPHIC_FOLDER = os.path.join(BASE_DIR,"templates","latex","images")
@@ -382,3 +385,6 @@ CALL_EMAIL_AVAILABLE_STATUS_VALUES = ['draft','open','closed']
 VERSION_NO="1.0.1"
 
 COMPLIANCE_LINKS_ENABLED = env('COMPLIANCE_LINKS_ENABLED', False)
+
+MIDDLEWARE = MIDDLEWARE_CLASSES
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

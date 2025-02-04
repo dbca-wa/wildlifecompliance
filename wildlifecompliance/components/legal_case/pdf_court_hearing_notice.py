@@ -5,8 +5,8 @@ from io import BytesIO
 import pytz
 from django.core.files.storage import default_storage
 from django.http import HttpResponse
-from ledger.payments.pdf import BrokenLine
-from ledger.settings_base import TIME_ZONE
+from ledger_api_client.pdf import BrokenLine
+from ledger_api_client.settings_base import TIME_ZONE
 from reportlab.lib.colors import red, green, blue
 from reportlab.lib.enums import TA_RIGHT, TA_CENTER
 from reportlab.lib.pagesizes import A4

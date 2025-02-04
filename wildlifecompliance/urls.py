@@ -46,7 +46,7 @@ from wildlifecompliance.components.artifact import api as artifact_api
 from wildlifecompliance.management.default_data_manager import DefaultDataManager
 from wildlifecompliance.utils import are_migrations_running
 
-from ledger.urls import urlpatterns as ledger_patterns
+from ledger_api_client.urls import urlpatterns as ledger_patterns
 from django_media_serv.urls import urlpatterns as media_serv_patterns
 
 logger = logging.getLogger(__name__)
@@ -124,19 +124,19 @@ router.register(
     main_api.SchemaMasterlistViewSet
 )
 router.register(
-    r'schema_masterlist_paginated', main_api.SchemaMasterlistPaginatedViewSet)
+    r'schema_masterlist_paginated', main_api.SchemaMasterlistPaginatedViewSet, 'schema_masterlist_paginated')
 router.register(
-    r'schema_purpose', main_api.SchemaPurposeViewSet)
+    r'schema_purpose', main_api.SchemaPurposeViewSet, 'schema_purpose')
 router.register(
-    r'schema_purpose_paginated', main_api.SchemaPurposePaginatedViewSet)
+    r'schema_purpose_paginated', main_api.SchemaPurposePaginatedViewSet, 'schema_purpose_paginated')
 router.register(
-    r'schema_group', main_api.SchemaGroupViewSet)
+    r'schema_group', main_api.SchemaGroupViewSet, 'schema_group')
 router.register(
-    r'schema_group_paginated', main_api.SchemaGroupPaginatedViewSet)
+    r'schema_group_paginated', main_api.SchemaGroupPaginatedViewSet, 'schema_group_paginated')
 router.register(
-    r'schema_question', main_api.SchemaQuestionViewSet)
+    r'schema_question', main_api.SchemaQuestionViewSet, 'schema_question')
 router.register(
-    r'schema_question_paginated', main_api.SchemaQuestionPaginatedViewSet)
+    r'schema_question_paginated', main_api.SchemaQuestionPaginatedViewSet, 'schema_question_paginated')
 
 api_patterns = [url(r'^api/my_user_details/$',
                     users_api.GetMyUserDetails.as_view(),

@@ -9,7 +9,6 @@ from django.http import HttpResponse, FileResponse
 from wsgiref.util import FileWrapper
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from oscar.templatetags.currency_filters import currency
 from reportlab.lib import enums
 from reportlab.lib.colors import Color
 from reportlab.lib.enums import TA_RIGHT, TA_CENTER

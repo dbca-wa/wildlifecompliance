@@ -7,7 +7,7 @@ import pytz
 from django.contrib.auth.models import Group
 from django.contrib.gis.geos import GEOSGeometry, fromfile
 from django.core.exceptions import MultipleObjectsReturned
-from ledger.settings_base import TIME_ZONE
+from ledger_api_client.settings_base import TIME_ZONE
 from django.conf import settings
 
 from wildlifecompliance import settings

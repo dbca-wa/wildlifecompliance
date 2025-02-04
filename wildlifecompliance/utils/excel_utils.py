@@ -9,7 +9,7 @@
 # from wildlifecompliance.components.licences.models import DefaultActivity, WildlifeLicence, LicenceCategory, LicencePurpose
 # from wildlifecompliance.components.organisations.models import Organisation
 # from ledger_api_client.ledger_models import OrganisationAddress
-# from django.contrib.postgres.fields.jsonb import JSONField
+# from django.db.models import JSONField
 # from wildlifecompliance.utils import SearchUtils, search_multiple_keys
 # from wildlifecompliance.components.licences.models import DefaultPurpose
 # from ledger_api_client.ledger_models import EmailUserRO as EmailUser

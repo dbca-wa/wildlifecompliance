@@ -6,7 +6,7 @@ import logging
 
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models import JSONField
 from django.db.models import Max, Q
 from django.db.models.query import QuerySet
 from django.forms.models import model_to_dict
@@ -54,7 +54,7 @@ class LicenceType(RevisionedMixin, ActiveMixin):
     replaced_by = models.ForeignKey(
         'self', on_delete=models.PROTECT, blank=True, null=True)
     is_renewable = models.BooleanField(default=True)
-    keywords = ArrayField(models.CharField(max_length=50), blank=True, default=[])
+    keywords = ArrayField(models.CharField(max_length=50), blank=True, default=list)
 
     def __str__(self):
         return self.display_name
@@ -292,7 +292,7 @@ class PurposeSpecies(models.Model):
     header = models.CharField(max_length=255)
     # details = models.TextField()
     details = RichTextField(config_name='pdf_config')
-    species = models.NullBooleanField()
+    species = models.BooleanField(null=True)
     is_additional_info = models.BooleanField(default=False)
 
     class Meta:
@@ -462,7 +462,7 @@ class WildlifeLicence(models.Model):
     licence_sequence = models.IntegerField(blank=True, default=1)
     licence_category = models.ForeignKey(LicenceCategory, on_delete=models.CASCADE)
     current_application = models.ForeignKey('wildlifecompliance.Application', on_delete=models.CASCADE)
-    property_cache = JSONField(null=True, blank=True, default={})
+    property_cache = JSONField(null=True, blank=True, default=dict)
 
     class Meta:
         unique_together = (
@@ -1753,7 +1753,7 @@ class MasterlistQuestion(models.Model):
         default=ANSWER_TYPE_CHOICES[0][0],
     )
     help_text_url = models.CharField(max_length=200, null=True, blank=True)
-    property_cache = JSONField(null=True, blank=True, default={})
+    property_cache = JSONField(null=True, blank=True, default=dict)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -2020,7 +2020,7 @@ class SectionGroup(models.Model):
         related_name='section_groups',
         on_delete=models.PROTECT
     )
-    property_cache = JSONField(null=True, blank=True, default={})
+    property_cache = JSONField(null=True, blank=True, default=dict)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -2122,7 +2122,7 @@ class SectionQuestion(models.Model):
         default=False,
         help_text='If ticked, select the Save and Continue Editing button.')
     order = models.PositiveIntegerField(default=1)
-    property_cache = JSONField(null=True, blank=True, default={})
+    property_cache = JSONField(null=True, blank=True, default=dict)
 
     class Meta:
         app_label = 'wildlifecompliance'

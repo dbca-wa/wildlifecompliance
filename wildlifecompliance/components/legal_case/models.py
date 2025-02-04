@@ -3,7 +3,7 @@ import logging
 from wildlifecompliance import settings
 from django.db import models
 from django.contrib.gis.db import models
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models import JSONField
 from django.db.models import Q, Max
 from six import python_2_unicode_compatible
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser

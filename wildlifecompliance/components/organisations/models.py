@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from django.db.models.signals import pre_delete, pre_save
 from six import python_2_unicode_compatible
 from django.core.exceptions import ValidationError
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models import JSONField
 
 from ledger_api_client.utils import get_organisation, get_search_organisation
 

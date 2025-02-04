@@ -5,7 +5,7 @@ from wildlifecompliance.components.organisations import models
 
 @admin.register(models.Organisation)
 class OrganisationAdmin(admin.ModelAdmin):
-    raw_id_fields = ('organisation',)
+    list_display = ['organisation_id']
 
 
 @admin.register(models.OrganisationRequest)

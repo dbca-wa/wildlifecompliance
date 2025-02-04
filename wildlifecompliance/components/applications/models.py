@@ -13,7 +13,7 @@ from django.db.models import Q
 from django.db.models.signals import pre_delete
 from django.db.models.query import QuerySet
 from django.dispatch import receiver
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models import JSONField
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
@@ -405,7 +405,7 @@ class Application(RevisionedMixin):
         max_length=30,
         choices=SUBMIT_TYPE_CHOICES,
         default=SUBMIT_TYPE_ONLINE)
-    property_cache = JSONField(null=True, blank=True, default={})
+    property_cache = JSONField(null=True, blank=True, default=dict)
     # is_resubmitted is not used and can be removed.
     # is_resubmitted = models.BooleanField(default=False)
 
@@ -4528,7 +4528,7 @@ class ApplicationSelectedActivity(models.Model):
     proposed_end_date = models.DateField(null=True, blank=True)
     #payment_status = models.CharField(max_length=24, default=ActivityInvoice.PAYMENT_STATUS_UNPAID)
     # payment_status = models.CharField(max_length=24, null=True, blank=True)
-    property_cache = JSONField(null=True, blank=True, default={})
+    property_cache = JSONField(null=True, blank=True, default=dict)
 
     def __str__(self):
         logger.debug('ApplicationSelectedActivity.__str__()')
@@ -6251,8 +6251,8 @@ class ApplicationSelectedActivityPurpose(models.Model):
     additional_fee_text = models.TextField(blank=True, null=True)
     # Additional species header and text taken from licence purpose which can
     # be customised for this selected purpose.
-    purpose_species_json = JSONField(null=True, blank=True, default={})
-    property_cache = JSONField(null=True, blank=True, default={})
+    purpose_species_json = JSONField(null=True, blank=True, default=dict)
+    property_cache = JSONField(null=True, blank=True, default=dict)
 
     def __str__(self):
         logger.debug('ApplicationSelectedActivityPurpose.__str__()')

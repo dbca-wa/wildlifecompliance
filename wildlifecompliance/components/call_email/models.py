@@ -4,7 +4,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.gis.db.models import PointField
 from django.db.models import Manager as GeoManager
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models import JSONField
 from django.db.models import Max
 from django.contrib.auth.models import Permission, ContentType
 from multiselectfield import MultiSelectField
@@ -319,8 +319,8 @@ class CallEmail(RevisionedMixin):
         related_name="wildcare_species_sub_type", on_delete=models.CASCADE
     )
     species_name = models.CharField(max_length=50, blank=True, null=True)
-    dead = models.NullBooleanField()
-    euthanise = models.NullBooleanField()
+    dead = models.BooleanField(null=True)
+    euthanise = models.BooleanField(null=True)
     number_of_animals = models.CharField(max_length=100, blank=True, null=True)
     brief_nature_of_call = models.TextField(blank=True)
     entangled = MultiSelectField(max_length=40, choices=ENTANGLED_CHOICES, blank=True, null=True)

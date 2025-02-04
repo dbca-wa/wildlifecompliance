@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import HttpResponse
 from django.db.models import Q
-from ledger.settings_base import TIME_ZONE
+from ledger_api_client.settings_base import TIME_ZONE
 from rest_framework import viewsets, filters, serializers, status, mixins
 from rest_framework.decorators import action, renderer_classes
 from rest_framework.renderers import JSONRenderer
