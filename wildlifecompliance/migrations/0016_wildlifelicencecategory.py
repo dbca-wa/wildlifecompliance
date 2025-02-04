@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             name='WildlifeLicenceCategory',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('licencetype_id',
+                ('licencetype_ptr_id',
                  #models.OneToOneField(
                  #    auto_created=True,
                  #    on_delete=django.db.models.deletion.CASCADE,

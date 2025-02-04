@@ -33,16 +33,18 @@ class Migration(migrations.Migration):
         ),
         migrations.RenameField(
             model_name='licencecategory',
-            old_name='licencetype_id',
+            old_name='licencetype_ptr_id',
             new_name='licence_type_id',
         ),
-        migrations.RemoveField(
+        migrations.RenameField(
             model_name='inspection',
-            name='organisation_inspected',
+            old_name='organisation_inspected',
+            new_name='organisation_inspected_id'
         ),
-        migrations.RemoveField(
+        migrations.RenameField(
             model_name='offender',
-            name='organisation',
+            old_name='organisation',
+            new_name='organisation_id',
         ),
         migrations.AddField(
             model_name='inspection',
