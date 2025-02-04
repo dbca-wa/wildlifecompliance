@@ -3,13 +3,13 @@
 from __future__ import unicode_literals
 
 from django.db import migrations
-import ledger.accounts.models
+#import ledger.accounts.models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0024_organisation_email'),
+        #('accounts', '0024_organisation_email'),
         ('wildlifecompliance', '0378_merge_20200113_1323'),
     ]
 
@@ -22,8 +22,8 @@ class Migration(migrations.Migration):
                 'proxy': True,
             },
             bases=('accounts.emailuser',),
-            managers=[
-                ('objects', ledger.accounts.models.EmailUserManager()),
-            ],
+            #managers=[
+            #    ('objects', ledger.accounts.models.EmailUserManager()),
+            #],
         ),
     ]

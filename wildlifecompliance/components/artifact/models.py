@@ -143,8 +143,8 @@ class PhysicalArtifactType(models.Model):
             (SURRENDERED_OBJECT,  'Surrendered Object'),
             )
     artifact_type = models.CharField(max_length=50, choices=TYPE_CHOICES, blank=False, null=False, unique=True)
-    details_schema = JSONField(default=[{}])
-    storage_schema = JSONField(default=[{}])
+    details_schema = JSONField(default=list)
+    storage_schema = JSONField(default=list)
     version = models.SmallIntegerField(default=1, blank=False, null=False)
     description = models.CharField(max_length=255, blank=True, null=True)
     replaced_by = models.ForeignKey(

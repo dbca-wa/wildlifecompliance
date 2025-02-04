@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('accounts', '0023_communicationslogentry_log_type'),
+        #('accounts', '0023_communicationslogentry_log_type'),
         ('wildlifecompliance', '0322_auto_20191025_1122'),
     ]
 

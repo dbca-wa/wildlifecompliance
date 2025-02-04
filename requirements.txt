@@ -28,8 +28,7 @@ django-reversion==3.0.0
 django-reversion-compare==0.8.6
 #git+https://github.com/bruth/django-preserialize.git@11f9e822250ea3374d5cfba477a00ca886689d9f#egg=django-preserialize
 git+https://github.com/xzzy/django-preserialize.git#egg=django-preserialize
-#django-countries==3.4.1
-django-countries==6.1.3
+django-countries~=7.6.1
 django-cron==0.5.0
 django-dynamic-fixture==1.9.1
 openpyxl==2.4.8
@@ -43,7 +42,7 @@ djangorestframework-csv==2.0.0
 pycountry==17.1.8
 six>=1.10.0
 django-ical==1.4
-django-taggit==0.21.3
+django-taggit~=4.0.0
 geojson==1.3.3
 unicodecsv==0.14.1
 PyPDF2==1.26.0

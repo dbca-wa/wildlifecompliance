@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('invoice', '0010_invoice_payment_method'),
+        #('invoice', '0010_invoice_payment_method'),
         ('wildlifecompliance', '0397_remove_sanctionoutcome_payment_status'),
     ]
 
