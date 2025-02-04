@@ -2,7 +2,7 @@ import traceback
 from django.db.models import Q
 from django.core.exceptions import ValidationError
 from rest_framework import viewsets, serializers, mixins
-from rest_framework.decorators import list_route, detail_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from datetime import datetime, timedelta
 import pytz
@@ -233,7 +233,7 @@ class LicencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             ).filter(current_application__in=asa_accepted.values_list('application_id', flat=True))
         return WildlifeLicence.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def internal_datatable_list(self, request, *args, **kwargs):
         self.serializer_class = DTInternalWildlifeLicenceSerializer
         queryset = self.get_queryset()
@@ -262,7 +262,7 @@ class LicencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = DTInternalWildlifeLicenceSerializer(result_page, context={'request': request}, many=True)
         return self.paginator.get_paginated_response(serializer.data)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def external_datatable_list(self, request, *args, **kwargs):
         self.serializer_class = DTExternalWildlifeLicenceSerializer
         # Filter for WildlifeLicence objects that have a current application linked with an
@@ -363,7 +363,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             serializer = ExternalApplicationSelectedActivitySerializer(queryset)
         return Response(serializer.data)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def user_list(self, request, *args, **kwargs):
         user_orgs = [
             org.id for org in request.user.wildlifecompliance_organisations.all()]
@@ -382,7 +382,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         return Response(serializer.data)
 
     #TODO should external users be able to request an inspection on their own licence? Not a high risk, but odd
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def add_licence_inspection(self, request, pk=None, *args, **kwargs):
         try:
             if pk:
@@ -408,7 +408,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def reactivate_renew_purposes(self, request, pk=None, *args, **kwargs):
         try:
             purpose_ids_list = request.data.get('purpose_ids_list', None)
@@ -449,7 +449,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def surrender_licence(self, request, pk=None, *args, **kwargs):
         try:
             if pk:
@@ -473,7 +473,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def surrender_purposes(self, request, pk=None, *args, **kwargs):
         try:
             purpose_ids_list = request.data.get('purpose_ids_list', None)
@@ -503,7 +503,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def cancel_licence(self, request, pk=None, *args, **kwargs):
         try:
             if not request.user.has_perm('wildlifecompliance.issuing_officer'):
@@ -530,7 +530,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def cancel_purposes(self, request, pk=None, *args, **kwargs):
         try:
             purpose_ids_list = request.data.get('purpose_ids_list', None)
@@ -560,7 +560,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def suspend_licence(self, request, pk=None, *args, **kwargs):
         try:
             if not request.user.has_perm('wildlifecompliance.issuing_officer'):
@@ -587,7 +587,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def suspend_purposes(self, request, pk=None, *args, **kwargs):
         '''
         Request to suspend purposes.
@@ -621,7 +621,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def reinstate_licence(self, request, pk=None, *args, **kwargs):
         try:
             if not request.user.has_perm('wildlifecompliance.issuing_officer'):
@@ -648,7 +648,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def reinstate_purposes(self, request, pk=None, *args, **kwargs):
         MSG_NOAUTH = 'You are not authorised to reinstate licenced activities'
         # MSG_NOSAME = 'Purposes must all be of the same licence activity'
@@ -679,7 +679,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def reissue_purposes(self, request, pk=None, *args, **kwargs):
         try:
             purpose_ids_list = request.data.get('purpose_ids_list', None)
@@ -717,7 +717,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def regenerate_licence_pdf(self, request, pk=None, *args, **kwargs):
         try:
             if not request.user.has_perm('wildlifecompliance.issuing_officer'):
@@ -741,7 +741,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def get_latest_purposes_for_licence_activity_and_action(
             self, request, *args, **kwargs
     ):
@@ -772,7 +772,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def licence_history(self, request, *args, **kwargs):
         try:
             qs = None

@@ -16,7 +16,7 @@ from django.utils import timezone
 from django.db.models import Value
 from django.db.models.functions import Concat
 from rest_framework import viewsets, serializers, status, generics, views, mixins
-from rest_framework.decorators import detail_route, list_route, renderer_classes
+from rest_framework.decorators import action, renderer_classes
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser, BasePermission
@@ -24,8 +24,8 @@ from rest_framework.pagination import PageNumberPagination
 from datetime import datetime, timedelta
 from collections import OrderedDict
 from django.core.cache import cache
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser, OrganisationAddress, Organisation as ledger_organisation
-from ledger.address.models import Country
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address as OrganisationAddress
+from ledger_api_client.country_models import Country
 from datetime import datetime, timedelta, date
 from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
 from wildlifecompliance.components.organisations.models import (
@@ -59,8 +59,8 @@ from wildlifecompliance.components.organisations.serializers import (
     OrganisationCheckExistSerializer,
     ComplianceManagementSaveOrganisationSerializer,
     ComplianceManagementOrganisationSerializer,
-    ComplianceManagementCreateLedgerOrganisationSerializer,
-    ComplianceManagementUpdateLedgerOrganisationSerializer,
+    #ComplianceManagementCreateLedgerOrganisationSerializer,
+    #ComplianceManagementUpdateLedgerOrganisationSerializer,
     ComplianceManagementSaveOrganisationAddressSerializer,
 )
 from wildlifecompliance.components.applications.serializers import (
@@ -187,7 +187,7 @@ class OrganisationPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         #    return Organisation.objects.none()
         return Organisation.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
         self.serializer_class = DTOrganisationSerializer
         queryset = self.get_queryset()
@@ -213,7 +213,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             return user.wildlifecompliance_organisations.all()
         return Organisation.objects.none()
 
-    @detail_route(methods=['GET'])
+    @action(detail=True, methods=['GET'])
     @renderer_classes((JSONRenderer,))
     def get_intelligence_text(self, request, *args, **kwargs):
         try:
@@ -234,7 +234,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def save_intelligence_text(self, request, *args, **kwargs):
         try:
@@ -257,7 +257,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_intelligence_document(self, request, *args, **kwargs):
         try:
@@ -289,7 +289,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def contacts(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -306,7 +306,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def contacts_linked(self, request, *args, **kwargs):
         try:
             qs = self.get_queryset()
@@ -322,7 +322,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def contacts_exclude(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -339,7 +339,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def add_nonuser_contact(self, request, *args, **kwargs):
         try:
             serializer = OrganisationContactCheckSerializer(data=request.data)
@@ -390,7 +390,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def validate_pins(self, request, *args, **kwargs):
         try:
             instance = Organisation.objects.get(id=request.data.get('id'))
@@ -418,7 +418,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def accept_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -440,7 +440,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def accept_declined_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -462,7 +462,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def decline_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -484,7 +484,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def unlink_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -507,7 +507,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def make_admin_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -529,7 +529,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def make_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -552,7 +552,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def make_consultant(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -575,7 +575,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def suspend_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -598,7 +598,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def reinstate_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -620,7 +620,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def relink_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -642,7 +642,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -659,7 +659,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def applications(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -676,7 +676,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -693,7 +693,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['POST', ])
+    @action(detail=False, methods=['POST', ])
     def existence(self, request, *args, **kwargs):
         try:
             serializer = OrganisationCheckSerializer(data=request.data)
@@ -715,7 +715,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def update_details(self, request, *args, **kwargs):
         try:
             org = self.get_object()
@@ -735,7 +735,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def update_address(self, request, *args, **kwargs):
         try:
             org = self.get_object()
@@ -766,7 +766,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def upload_id(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -817,7 +817,7 @@ class OrganisationRequestsPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         #    return OrganisationRequest.objects.none()
         return OrganisationRequest.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
         self.serializer_class = OrganisationRequestDTSerializer
         queryset = self.get_queryset()
@@ -840,7 +840,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             return user.organisationrequest_set.all()
         return OrganisationRequest.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
         try:
             qs = self.get_queryset()
@@ -857,7 +857,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    # @list_route(methods=['GET',])
+    # @action(detail=False, methods=['GET',])
     # def user_organisation_request_list(self, request, *args, **kwargs):
     #     try:
     #         queryset = self.get_queryset()
@@ -876,7 +876,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     #         print(traceback.print_exc())
     #         raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def get_pending_requests(self, request, *args, **kwargs):
         try:
             qs = self.get_queryset().filter(requester=request.user, status=OrganisationRequest.ORG_REQUEST_STATUS_WITH_ASSESSOR)
@@ -892,7 +892,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def get_amendment_requested_requests(self, request, *args, **kwargs):
         try:
             qs = self.get_queryset().filter(
@@ -909,7 +909,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def assign_to_me(self, request, *args, **kwargs):
         try:
             if not is_wildlife_compliance_officer(self.request):
@@ -933,7 +933,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def assign_officer(self, request, *args, **kwargs):
         try:
             if not is_wildlife_compliance_officer(self.request):
@@ -967,7 +967,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def unassign_officer(self, request, *args, **kwargs):
         try:
             if not is_wildlife_compliance_officer(self.request):
@@ -988,7 +988,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def accept(self, request, *args, **kwargs):
         try:
             if not is_wildlife_compliance_officer(self.request):
@@ -1009,7 +1009,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def amendment_request(self, request, *args, **kwargs):
         try:
             if not is_wildlife_compliance_officer(self.request):
@@ -1030,7 +1030,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['PUT', ])
+    @action(detail=True, methods=['PUT', ])
     def reupload_identification_amendment_request(
             self, request, *args, **kwargs):
         try:            
@@ -1049,7 +1049,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def decline(self, request, *args, **kwargs):
         try:
             if not is_wildlife_compliance_officer(self.request):
@@ -1070,7 +1070,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -1087,7 +1087,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -1169,7 +1169,7 @@ class OrganisationContactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMi
 
         return OrganisationContact.objects.none()
     
-    @detail_route(methods=['DELETE', ])
+    @action(detail=True, methods=['DELETE', ])
     def delete(self, request, *args, **kwargs):
         # only allowed to remove organisation contacts if their status is in draft
         try:
@@ -1237,11 +1237,18 @@ class OrganisationComplianceManagementViewSet(viewsets.GenericViewSet, mixins.Re
 
                 if not abn:
                     return Response({'message': 'ABN must be specified'}, status=status.HTTP_400_BAD_REQUEST)
-                ledger_org_list = ledger_organisation.objects.filter(abn=abn)
+
+                organisation_response = get_search_organisation(None, abn)
+                response_status = organisation_response.get("status", None)
+
+                ledger_org_list = []
+                if response_status == status.HTTP_200_OK:
+                    ledger_org_list = organisation_response.get("data", {})[0]
+
                 if ledger_org_list:
                     ledger_org = ledger_org_list[0]
                 if ledger_org:
-                    wc_org_list = Organisation.objects.filter(organisation=ledger_org)
+                    wc_org_list = Organisation.objects.filter(organisation_id=ledger_org["organisation_id"])
                     if wc_org_list:
                         wc_org = wc_org_list[0]
                         return Response({'message': 'WC org already exists'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1267,25 +1274,27 @@ class OrganisationComplianceManagementViewSet(viewsets.GenericViewSet, mixins.Re
                         'abn': request.data.get('abn'),
                         'postal_address_id': saved_address.id
                         }
-                if ledger_org:
-                    # update existing ledger_org
-                    ledger_serializer = ComplianceManagementUpdateLedgerOrganisationSerializer(instance=ledger_org.id, data=ledger_org_data)
-                else:
-                    # create ledger_org if it doesn't exist
-                    ledger_serializer = ComplianceManagementCreateLedgerOrganisationSerializer(data=ledger_org_data)
-                ledger_serializer.is_valid(raise_exception=True)
-                if ledger_serializer.is_valid:
-                    ledger_org = ledger_serializer.save()
-                    org_serializer = ComplianceManagementSaveOrganisationSerializer(data={'organisation_id': ledger_org.id})
-                    org_serializer.is_valid(raise_exception=True)
-                    if org_serializer.is_valid:
-                        org_serializer.save()
-                        # return serialized data for all objects
-                        content = {'ledger_org': ledger_serializer.data, 
-                                    'wc_org': org_serializer.data,
-                                    'ledger_address': address_serializer.data
-                                    }
-                        return Response(content, status=status.HTTP_201_CREATED)
+                
+                #TODO fix or replace for segregation
+                #if ledger_org:
+                #    # update existing ledger_org
+                #    ledger_serializer = ComplianceManagementUpdateLedgerOrganisationSerializer(instance=ledger_org.id, data=ledger_org_data)
+                #else:
+                #    # create ledger_org if it doesn't exist
+                #    ledger_serializer = ComplianceManagementCreateLedgerOrganisationSerializer(data=ledger_org_data)
+                #ledger_serializer.is_valid(raise_exception=True)
+                #if ledger_serializer.is_valid:
+                #    ledger_org = ledger_serializer.save()
+                #    org_serializer = ComplianceManagementSaveOrganisationSerializer(data={'organisation_id': ledger_org.id})
+                #    org_serializer.is_valid(raise_exception=True)
+                #    if org_serializer.is_valid:
+                #        org_serializer.save()
+                #        # return serialized data for all objects
+                #        content = {'ledger_org': ledger_serializer.data, 
+                #                    'wc_org': org_serializer.data,
+                #                    'ledger_address': address_serializer.data
+                #                    }
+                #        return Response(content, status=status.HTTP_201_CREATED)
 
             return Response({'message': 'No org created'}, status=status.HTTP_400_BAD_REQUEST)
         except serializers.ValidationError:
@@ -1298,7 +1307,7 @@ class OrganisationComplianceManagementViewSet(viewsets.GenericViewSet, mixins.Re
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def update_postal_address(self, request, *args, **kwargs):
         print("create org")
         print(request.data)

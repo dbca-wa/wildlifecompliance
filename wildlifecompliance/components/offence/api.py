@@ -13,7 +13,7 @@ from django.http import HttpResponse
 from django.db.models import Q
 from ledger.settings_base import TIME_ZONE
 from rest_framework import viewsets, filters, serializers, status, mixins
-from rest_framework.decorators import detail_route, list_route, renderer_classes
+from rest_framework.decorators import action, renderer_classes
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework_datatables.filters import DatatablesFilterBackend
@@ -139,7 +139,7 @@ class OffencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             return Offence.objects.all()
         return Offence.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def get_paginated_datatable(self, request, *args, **kwargs):
         queryset = self.get_queryset()
 
@@ -164,7 +164,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             return Offence.objects.all()
         return Offence.objects.none()
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -185,7 +185,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def workflow_action(self, request, instance=None, *args, **kwargs):
         try:
@@ -242,7 +242,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def can_user_create(self, request, *args, **kwargs):
     #TODO: Check logic with the business
 
@@ -253,7 +253,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                return Response(True)
        return Response(False)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def optimised(self, request, *args, **kwargs):
         queryset = self.get_queryset().exclude(location__isnull=True)
 
@@ -287,7 +287,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
         serializer = OffenceOptimisedSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def status_choices(self, request, *args, **kwargs):
         res_obj = []
         for choice in Offence.STATUS_CHOICES:
@@ -295,7 +295,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def types(self, request, *args, **kwargs):
         res_obj = []
         section_regulations = SectionRegulation.objects.all()
@@ -304,7 +304,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def statuses(self, request, *args, **kwargs):
         res_obj = []
         for choice in Offence.STATUS_CHOICES:
@@ -312,7 +312,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def filter_by_call_email(self, request, *args, **kwargs):
         call_email_id = self.request.query_params.get('call_email_id', None)
 
@@ -325,7 +325,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
         serializer = OffenceSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
     
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def filter_by_inspection(self, request, *args, **kwargs):
         inspection_id = self.request.query_params.get('inspection_id', None)
 
@@ -338,7 +338,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
         serializer = OffenceSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def filter_by_legal_case(self, request, *args, **kwargs):
         legal_case_id = self.request.query_params.get('legal_case_id', None)
 
@@ -407,7 +407,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             #instance.inspection.status = 'open_inspection'
             #instance.inspection.save()
 
-    # @detail_route(methods=['POST', ])
+    # @action(detail=True, methods=['POST', ])
     # @renderer_classes((JSONRenderer,))
     def update(self, request, *args, **kwargs):
         try:
@@ -545,7 +545,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    # @list_route(methods=['POST', ])
+    # @action(detail=False, methods=['POST', ])
     # def offence_save(self, request, *args, **kwargs):
     def create(self, request, *args, **kwargs):
         try:
@@ -658,7 +658,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def update_assigned_to_id(self, request, *args, **kwargs):
         try:
@@ -697,7 +697,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -714,7 +714,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def add_comms_log(self, request, instance=None, workflow=False, *args, **kwargs):
         try:

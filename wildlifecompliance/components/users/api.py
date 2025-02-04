@@ -7,10 +7,9 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.core.exceptions import ValidationError
 from rest_framework import viewsets, serializers, views, status, mixins
-#from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address, Profile, EmailIdentity, EmailUserAction, PrivateDocument
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address, EmailIdentity, PrivateDocument
 from django.contrib.auth.models import Permission, ContentType
 from datetime import datetime
 from django_countries import countries
@@ -62,8 +61,7 @@ from rest_framework_datatables.renderers import DatatablesRenderer
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework.decorators import (
-    detail_route,
-    list_route,
+    action,
     renderer_classes,
     parser_classes,
     api_view
@@ -177,7 +175,7 @@ class UserProfileCompleted(views.APIView):
 #            return Profile.objects.filter(user=user)
 #        return Profile.objects.none()
 #
-#    @detail_route(methods=['POST', ])
+#    @action(detail=True, methods=['POST', ])
 #    def update_profile(self, request, *args, **kwargs):
 #        try:
 #            instance = self.get_object()
@@ -251,7 +249,7 @@ class UserPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             return EmailUser.objects.all()
         return EmailUser.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
         self.serializer_class = DTUserSerializer
         queryset = self.get_queryset()
@@ -295,7 +293,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             queryset = queryset.filter(dob=dob)
         return queryset
 
-    @detail_route(methods=['GET'])
+    @action(detail=True, methods=['GET'])
     @renderer_classes((JSONRenderer,))
     def get_intelligence_text(self, request, *args, **kwargs):
         try:
@@ -319,7 +317,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def save_intelligence_text(self, request, *args, **kwargs):
         try:
@@ -343,7 +341,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_intelligence_document(self, request, *args, **kwargs):
         try:
@@ -376,7 +374,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             raise serializers.ValidationError(str(e))
 
     #TODO replace/remove
-    #@detail_route(methods=['GET', ])
+    #@action(detail=True, methods=['GET', ])
     #def action_log(self, request, *args, **kwargs):
     #    try:
     #        instance = self.get_object()
@@ -394,7 +392,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     #        raise serializers.ValidationError(str(e))
 
     #TODO replace/remove
-    #@detail_route(methods=['GET', ])
+    #@action(detail=True, methods=['GET', ])
     #def profiles(self, request, *args, **kwargs):
     #    try:
     #        instance = self.get_object()
@@ -411,7 +409,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     #        print(traceback.print_exc())
     #        raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def update_personal(self, request, *args, **kwargs):
         print("update personal")
         try:
@@ -439,7 +437,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def update_contact(self, request, *args, **kwargs):
         try:
             with transaction.atomic():
@@ -470,7 +468,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    # @detail_route(methods=['POST', ])
+    # @action(detail=True, methods=['POST', ])
     # def update_address(self, request, *args, **kwargs):
     #     try:
     #         instance = self.get_object()
@@ -510,7 +508,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     #         print(traceback.print_exc())
     #         raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def update_address(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -564,7 +562,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def upload_id(self, request, *args, **kwargs):
         from wildlifecompliance.management.securebase_manager import (
             SecureBaseUtils
@@ -635,7 +633,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def pending_org_requests(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -655,7 +653,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['POST', ])
+    @action(detail=False, methods=['POST', ])
     def create_new_person(self, request, *args, **kwargs):
         print("create_new_person")
 
@@ -729,7 +727,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             #headers=self.get_success_headers(email_user_serializer.data)
         )
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def update_system_preference(self, request, *args, **kwargs):
         with transaction.atomic():
             try:
@@ -831,7 +829,7 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
                 print(traceback.print_exc())
                 raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     #@renderer_classes((JSONRenderer,))
     def update_person(self, request, instance=None, *args, **kwargs):
         print("cm user update")
@@ -944,7 +942,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
 #            return CompliancePermissionGroup.objects.none()
 #        return CompliancePermissionGroup.objects.none()
 #
-#    @list_route(methods=['GET', ])
+#    @action(detail=False, methods=['GET', ])
 #    def get_officers(self, request, *args, **kwargs):
 #        try:
 #            officers = EmailUser.objects.filter(groups__in=CompliancePermissionGroup.objects.filter(permissions__in=Permission.objects.filter(codename='officer')))
@@ -960,7 +958,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
 #            print(traceback.print_exc())
 #            raise serializers.ValidationError(str(e))
 #
-#    @list_route(methods=['POST'])
+#    @action(detail=False, methods=['POST'])
 #    def get_users(self, request, *args, **kwargs):
 #        try:
 #            users = (EmailUser.objects.filter(id__in=request.data.get('user_list')))
@@ -976,7 +974,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
 #            print(traceback.print_exc())
 #            raise serializers.ValidationError(str(e))
 #
-#    @list_route(methods=['GET', ])
+#    @action(detail=False, methods=['GET', ])
 #    def get_detailed_list(self, request, *args, **kwargs):
 #        try:
 #            serializer = CompliancePermissionGroupDetailedSerializer(
@@ -994,7 +992,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
 #            print(traceback.print_exc())
 #            raise serializers.ValidationError(str(e))
 #
-#    @list_route(methods=['POST', ])
+#    @action(detail=False, methods=['POST', ])
 #    def get_compliance_group_by_region_district(self, request, *args, **kwargs):
 #        try:
 #            instance = self.get_object()
@@ -1043,7 +1041,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
 #            return RegionDistrict.objects.none()
 #        return RegionDistrict.objects.none()
 #    
-#    @list_route(methods=['GET', ])
+#    @action(detail=False, methods=['GET', ])
 #    def get_regions(self, request, *args, **kwargs):
 #        try:
 #            serializer = RegionDistrictSerializer(
@@ -1062,7 +1060,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
 #            print(traceback.print_exc())
 #            raise serializers.ValidationError(str(e))
 #
-#    @detail_route(methods=['GET', ])
+#    @action(detail=True, methods=['GET', ])
 #    def get_region_districts(self, request, *args, **kwargs):
 #        try:
 #            instance = self.get_object()
@@ -1079,7 +1077,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
 #            print(traceback.print_exc())
 #            raise serializers.ValidationError(str(e))
 #
-#    @detail_route(methods=['POST', ])
+#    @action(detail=True, methods=['POST', ])
 #    def get_compliance_group_by_region_district(self, request, *args, **kwargs):
 #        try:
 #            instance = self.get_object()

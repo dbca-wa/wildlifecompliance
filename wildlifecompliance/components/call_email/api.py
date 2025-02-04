@@ -21,8 +21,7 @@ from django.utils import timezone
 from rest_framework import viewsets, serializers, status, generics, views, filters, mixins
 import rest_framework.exceptions as rest_exceptions
 from rest_framework.decorators import (
-    detail_route,
-    list_route,
+    action,
     renderer_classes,
     parser_classes,
     api_view
@@ -34,7 +33,7 @@ from rest_framework.pagination import PageNumberPagination
 from collections import OrderedDict
 from django.core.cache import cache
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address
-from ledger.address.models import Country
+from ledger_api_client.country_models import Country
 from ledger_api_client.utils import calculate_excl_gst
 from datetime import datetime, timedelta, date
 from django.urls import reverse
@@ -214,7 +213,7 @@ class CallEmailPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             return CallEmail.objects.all()
         return CallEmail.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def get_paginated_datatable(self, request, *args, **kwargs):
         queryset = self.get_queryset()
 
@@ -235,7 +234,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             return CallEmail.objects.all()
         return CallEmail.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def optimised(self, request, *args, **kwargs):
         queryset = self.get_queryset().exclude(location__isnull=True)
 
@@ -263,7 +262,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         serializer = CallEmailOptimisedSerializer(queryset, many=True)
         return Response(serializer.data)
     
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
         try:
             qs = self.get_queryset()
@@ -280,7 +279,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['GET', ])    
+    @action(detail=False, methods=['GET', ])    
     def status_choices(self, request, *args, **kwargs):
         res_obj = [] 
         for choice in CallEmail.STATUS_CHOICES:
@@ -290,7 +289,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def entangled_choices(self, request, *args, **kwargs):
         res_obj = []
         for choice in CallEmail.ENTANGLED_CHOICES:
@@ -298,7 +297,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def gender_choices(self, request, *args, **kwargs):
         res_obj = []
         for choice in CallEmail.GENDER_CHOICES:
@@ -306,7 +305,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def baby_kangaroo_choices(self, request, *args, **kwargs):
         res_obj = []
         for choice in CallEmail.BABY_KANGAROO_CHOICES:
@@ -314,7 +313,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def age_choices(self, request, *args, **kwargs):
         res_obj = []
         for choice in CallEmail.AGE_CHOICES:
@@ -322,7 +321,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     @renderer_classes((JSONRenderer,))
     def get_allocated_group(self, request, *args, **kwargs):
         try:
@@ -340,7 +339,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     @renderer_classes((JSONRenderer,))
     def form_data(self, request, *args, **kwargs):
         try:
@@ -360,7 +359,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
         raise serializers.ValidationError(str(e))
     
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_renderer_document(self, request, *args, **kwargs):
         try:
@@ -384,7 +383,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_comms_log_document(self, request, *args, **kwargs):
         try:
@@ -409,7 +408,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             raise serializers.ValidationError(str(e))
 
     #TODO replace/remove
-    #@detail_route(methods=['GET', ])
+    #@action(detail=True, methods=['GET', ])
     #def action_log(self, request, *args, **kwargs):
     #    try:
     #        instance = self.get_object()
@@ -426,7 +425,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
     #        print(traceback.print_exc())
     #        raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -443,7 +442,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
     
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def add_comms_log(self, request, workflow=False, *args, **kwargs):
         try:
@@ -583,7 +582,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
     
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def call_email_save_person(self, request, *args, **kwargs):
         call_email_instance = self.get_object()
 
@@ -668,7 +667,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def draft(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -679,7 +678,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                         headers=headers
                     )
 
-    #@detail_route(methods=['POST', ])
+    #@action(detail=True, methods=['POST', ])
     #def call_email_save(self, request, *args, **kwargs):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -737,7 +736,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def workflow_action(self, request, *args, **kwargs):
         print("workflow_action")
@@ -826,7 +825,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def update_assigned_to_id(self, request, *args, **kwargs):
         try:
@@ -884,7 +883,7 @@ class ClassificationViewSet(viewsets.ReadOnlyModelViewSet):
             return Classification.objects.all()
         return Classification.objects.none()
 
-    @list_route(methods=['GET', ])    
+    @action(detail=False, methods=['GET', ])    
     def classification_choices(self, request, *args, **kwargs):
         res_obj = [] 
         #for choice in Classification.NAME_CHOICES:
@@ -905,7 +904,7 @@ class LOVCollectionViewSet(viewsets.ReadOnlyModelViewSet):
             return CallEmail.objects.all()
         return CallEmail.objects.none()
 
-    @list_route(methods=['GET', ])    
+    @action(detail=False, methods=['GET', ])    
     def lov_collection_choices(self, request, *args, **kwargs):
         classification_types = [] 
         for choice in Classification.objects.all():
@@ -998,7 +997,7 @@ class ReportTypeViewSet(viewsets.ReadOnlyModelViewSet):
             return ReportType.objects.all()
         return ReportType.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     @renderer_classes((JSONRenderer,))
     def get_distinct_queryset(self, request, *args, **kwargs):
         user = self.request.user
@@ -1015,7 +1014,7 @@ class ReportTypeViewSet(viewsets.ReadOnlyModelViewSet):
                 return_list.append(qs_record)
         return Response(return_list)
 
-    @detail_route(methods=['GET',])
+    @action(detail=True, methods=['GET',])
     @renderer_classes((JSONRenderer,))
     def get_schema(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -1049,7 +1048,7 @@ class LocationViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.R
             return Location.objects.all()
         return Location.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def optimised(self, request, *args, **kwargs):
         queryset = self.get_queryset().exclude(call_location__isnull=True)
         serializer = LocationSerializerOptimized(queryset, many=True)

@@ -54,6 +54,7 @@ def is_wildlife_compliance_officer(request):
 
     return wildlife_compliance_user
 
+#TODO fix for segregation
 @python_2_unicode_compatible
 class Organisation(models.Model):
     intelligence_information_text = models.TextField(blank=True)
@@ -74,6 +75,10 @@ class Organisation(models.Model):
 
     class Meta:
         app_label = 'wildlifecompliance'
+
+    @property
+    def organisation(self):
+        return get_organisation(self.id)
 
     def __str__(self):
         return str(self.organisation)

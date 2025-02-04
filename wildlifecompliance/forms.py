@@ -5,8 +5,11 @@ from crispy_forms.layout import Layout, Submit
 from django.contrib.auth import get_user_model
 from django.forms import Form, ModelForm, CharField, ValidationError, EmailField
 
-from ledger_api_client.ledger_models import Address, Organisation
+from ledger_api_client.ledger_models import Address
 
+from wildlifecompliance.components.organisations.models import (
+    Organisation
+)
 
 User = get_user_model()
 
@@ -92,7 +95,9 @@ class OrganisationForm(OrganisationAdminForm):
 
     class Meta:
         model = Organisation
-        fields = ['name', 'abn', 'identification']
+        #TODO remove/replace
+        #fields = ['name', 'abn', 'identification']
+        fields = []
 
     def __init__(self, *args, **kwargs):
         super(OrganisationForm, self).__init__(*args, **kwargs)

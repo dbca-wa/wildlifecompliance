@@ -6,7 +6,7 @@ from django.urls import reverse
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroupPermission
-from ledger.payments.helpers import is_payment_admin
+from ledger_api_client.helpers import is_payment_admin
 from wildlifecompliance.components.call_email.serializers import EmailUserSerializer
 from wildlifecompliance.components.inspection.serializers import IndividualSerializer
 from wildlifecompliance.components.main.fields import CustomChoiceField

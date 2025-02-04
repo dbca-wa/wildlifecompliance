@@ -12,16 +12,14 @@ from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 # from rest_framework import generics
 # from rest_framework import filters
-from rest_framework.decorators import detail_route
-from rest_framework.decorators import list_route
-from rest_framework.decorators import renderer_classes
+from rest_framework.decorators import action, renderer_classes
 # from rest_framework.decorators import parser_classes
 # from rest_framework.decorators import api_view
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 from rest_framework_datatables.filters import DatatablesFilterBackend
 from rest_framework_datatables.renderers import DatatablesRenderer
 
-from ledger.payments.utils import oracle_parser
+from ledger_api_client.utils import oracle_parser
 
 from wildlifecompliance.settings import WC_PAYMENT_SYSTEM_PREFIX
 # from wildlifecompliance.settings import SYSTEM_NAME
@@ -57,7 +55,6 @@ from wildlifecompliance.components.users.serializers import ComplianceUserDetail
 from wildlifecompliance.components.main.process_document import save_document
 from wildlifecompliance.components.main.process_document import cancel_document
 from wildlifecompliance.components.main.process_document import delete_document
-from wildlifecompliance.components.wc_payments import reports
 from wildlifecompliance.helpers import (
     is_internal,
     is_wildlife_compliance_officer,
@@ -172,7 +169,7 @@ class SchemaMasterlistPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             return MasterlistQuestion.objects.all()
         return MasterlistQuestion.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def schema_masterlist_datatable_list(self, request, *args, **kwargs):
         self.serializer_class = DTSchemaMasterlistSerializer
         queryset = self.get_queryset()
@@ -206,7 +203,7 @@ class SchemaMasterlistViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin
         serializer.save()
         return Response(serializer.data)
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def get_masterlist_selects(self, request, *args, **kwargs):
         '''
         Get independent Select lists associated with Schema Masterlist.
@@ -246,7 +243,7 @@ class SchemaMasterlistViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin
             logger.exception()
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def get_masterlist_options(self, request, *args, **kwargs):
         '''
         Get associated QuestionOption for Schema Masterlist type.
@@ -283,7 +280,7 @@ class SchemaMasterlistViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin
             logger.exception()
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['DELETE', ])
+    @action(detail=True, methods=['DELETE', ])
     def delete_masterlist(self, request, *args, **kwargs):
         '''
         Delete Masterlist record.
@@ -319,7 +316,7 @@ class SchemaMasterlistViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin
             logger.exception()
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def save_masterlist(self, request, *args, **kwargs):
         '''
         Save Masterlist record.
@@ -443,7 +440,7 @@ class SchemaPurposePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             return LicencePurposeSection.objects.all()
         return LicencePurposeSection.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def schema_purpose_datatable_list(self, request, *args, **kwargs):
         self.serializer_class = DTSchemaPurposeSerializer
         queryset = self.get_queryset()
@@ -478,7 +475,7 @@ class SchemaPurposeViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         serializer.save()
         return Response(serializer.data)
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def get_purpose_selects(self, request, *args, **kwargs):
         '''
         Get independent Select lists associated with Schema Section Purpose.
@@ -513,7 +510,7 @@ class SchemaPurposeViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             logger.exception()
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def get_purpose_sections(self, request, *args, **kwargs):
         '''
         Get all Schema Sections associated with Licence Purpose.
@@ -549,7 +546,7 @@ class SchemaPurposeViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             logger.exception()
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['DELETE', ])
+    @action(detail=True, methods=['DELETE', ])
     def delete_purpose(self, request, *args, **kwargs):
         '''
         Delete Licence Purpose Section record.
@@ -585,7 +582,7 @@ class SchemaPurposeViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             logger.exception()
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def save_purpose(self, request, *args, **kwargs):
         '''
         Save Licence Purpose Section record.
@@ -708,7 +705,7 @@ class SchemaGroupPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             return SectionGroup.objects.all()
         return SectionGroup.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def schema_group_datatable_list(self, request, *args, **kwargs):
         self.serializer_class = DTSchemaGroupSerializer
         queryset = self.get_queryset()
@@ -743,7 +740,7 @@ class SchemaGroupViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         serializer.save()
         return Response(serializer.data)
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def get_group_selects(self, request, *args, **kwargs):
         '''
         Get independent Select lists associated with Section Groups.
@@ -785,7 +782,7 @@ class SchemaGroupViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             logger.exception()
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def get_group_sections(self, request, *args, **kwargs):
         '''
         Get all Sections associated with Schema Group with Licence Purpose.
@@ -821,7 +818,7 @@ class SchemaGroupViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             logger.exception()
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['DELETE', ])
+    @action(detail=True, methods=['DELETE', ])
     def delete_group(self, request, *args, **kwargs):
         '''
         Delete Section Group record.
@@ -857,7 +854,7 @@ class SchemaGroupViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             logger.exception()
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def save_group(self, request, *args, **kwargs):
         '''
         Save Section Group record.
@@ -994,7 +991,7 @@ class SchemaQuestionPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             return SectionQuestion.objects.all()
         return SectionQuestion.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def schema_question_datatable_list(self, request, *args, **kwargs):
         self.serializer_class = DTSchemaQuestionSerializer
         queryset = self.get_queryset()
@@ -1029,7 +1026,7 @@ class SchemaQuestionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         serializer.save()
         return Response(serializer.data)
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def get_question_parents(self, request, *args, **kwargs):
         '''
         Get all Parent Question associated with Schema Questions in Section.
@@ -1086,7 +1083,7 @@ class SchemaQuestionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             logger.exception()
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def get_question_sections(self, request, *args, **kwargs):
         '''
         Get all Sections associated with Schema Questions with Licence Purpose.
@@ -1135,7 +1132,7 @@ class SchemaQuestionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             logger.exception()
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def get_question_order(self, request, *args, **kwargs):
         '''
         Get order number for Schema Question using Schema Group.
@@ -1167,7 +1164,7 @@ class SchemaQuestionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             logger.exception()
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def get_question_selects(self, request, *args, **kwargs):
         '''
         Get independent Select lists associated with Schema Questions.
@@ -1224,7 +1221,7 @@ class SchemaQuestionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             logger.exception()
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['DELETE', ])
+    @action(detail=True, methods=['DELETE', ])
     def delete_question(self, request, *args, **kwargs):
         '''
         Delete Section Question record.
@@ -1261,7 +1258,7 @@ class SchemaQuestionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             logger.exception()
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def save_question(self, request, *args, **kwargs):
         '''
         Save Section Question record.
@@ -1347,7 +1344,7 @@ class TemporaryDocumentCollectionViewSet(viewsets.GenericViewSet, mixins.Retriev
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     # Designed for uploading comms_log files within "create" modals when no
     # parent entity instance yet exists
