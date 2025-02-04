@@ -271,10 +271,8 @@ class Offender(models.Model):
         null=True,
         related_name='offender_person', on_delete=models.CASCADE
     )
-    organisation = models.ForeignKey(
-        Organisation,
-        null=True,
-        related_name='offender_organisation', on_delete=models.CASCADE
+    organisation_id = models.IntegerField(
+        unique=True, verbose_name="Ledger Organisation ID", null=True
     )
     offence = models.ForeignKey(
         Offence,

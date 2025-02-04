@@ -17,7 +17,6 @@ ignore_keys = [
         "amendmentrequest",
         "assessment",
         "infringementpenalty",
-        "compliancemanagementemailuser",
         "returntable",
         "returnrow",
         "weaklinks",

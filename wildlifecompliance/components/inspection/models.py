@@ -126,11 +126,9 @@ class Inspection(RevisionedMixin):
         related_name='individual_inspected',
         null=True, on_delete=models.CASCADE
         )
-    organisation_inspected = models.ForeignKey(
-        Organisation, 
-        related_name='organisation_inspected',
-        null=True, on_delete=models.CASCADE
-        )
+    organisation_inspected_id = models.IntegerField(
+        unique=True, verbose_name="Ledger Organisation ID", null=True
+    )
     assigned_to = models.ForeignKey(
         EmailUser, 
         related_name='inspection_assigned_to',

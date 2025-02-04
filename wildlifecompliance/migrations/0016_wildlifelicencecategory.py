@@ -17,14 +17,18 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='WildlifeLicenceCategory',
             fields=[
-                ('licencetype_ptr',
-                 models.OneToOneField(
-                     auto_created=True,
-                     on_delete=django.db.models.deletion.CASCADE,
-                     parent_link=True,
-                     primary_key=True,
-                     serialize=False,
-                     to='licence.LicenceType')),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('licencetype_id',
+                 #models.OneToOneField(
+                 #    auto_created=True,
+                 #    on_delete=django.db.models.deletion.CASCADE,
+                 #    parent_link=True,
+                 #    primary_key=True,
+                 #    serialize=False,
+                 #    to='licence.LicenceType'
+                 #    )
+                 models.IntegerField(unique=True),
+                ),
                 ('licence_category_status',
                  models.CharField(
                      choices=[
@@ -41,8 +45,8 @@ class Migration(migrations.Migration):
                      default='current',
                      max_length=40)),
             ],
-            bases=(
-                'licence.licencetype',
-            ),
+            #bases=(
+            #    'licence.licencetype',
+            #),
         ),
     ]

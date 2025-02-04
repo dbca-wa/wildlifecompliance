@@ -287,20 +287,6 @@ class GlobalSettings(models.Model):
         return "{}, {}".format(self.key, self.value)
 
 
-class ComplianceManagementEmailUser(EmailUser):
-    class Meta:
-        app_label = 'wildlifecompliance'
-        proxy = True
-
-    @property
-    def get_related_items_identifier(self):
-        return self.email
-
-    @property
-    def get_related_items_descriptor(self):
-        return self.get_full_name()
-
-
 def update_sanction_outcome_word_filename(instance, filename):
     cur_time = datetime.now().strftime('%Y%m%d_%H_%M') 
     new_filename = 'sanction_outcome_template_{}'.format(cur_time)

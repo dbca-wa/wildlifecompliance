@@ -6,7 +6,7 @@ from reversion.admin import VersionAdmin
 
 @admin.register(models.Inspection)
 class InspectionAdmin(admin.ModelAdmin):
-    raw_id_fields = ('call_email', 'legal_case', 'location', 'individual_inspected', 'organisation_inspected', 'assigned_to', 'inspection_team_lead', 'inspection_team','inspection_type')
+    raw_id_fields = ('call_email', 'legal_case', 'location', 'individual_inspected', 'assigned_to', 'inspection_team_lead', 'inspection_team','inspection_type')
 
 @admin.register(models.InspectionType)
 class InspectionTypeAdmin(admin.ModelAdmin):

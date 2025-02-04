@@ -14,16 +14,16 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='ComplianceManagementEmailUser',
-            fields=[
-            ],
-            options={
-                'proxy': True,
-            },
-            bases=('accounts.emailuser',),
+        #migrations.CreateModel(
+        #    name='ComplianceManagementEmailUser',
+        #    fields=[
+        #    ],
+        #    options={
+        #        'proxy': True,
+        #    },
+        #    bases=('accounts.emailuser',),
             #managers=[
             #    ('objects', ledger.accounts.models.EmailUserManager()),
             #],
-        ),
+        #),
     ]
