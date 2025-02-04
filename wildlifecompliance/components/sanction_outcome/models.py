@@ -152,19 +152,19 @@ class SanctionOutcome(models.Model):
     paper_id = models.CharField(max_length=50, blank=True,)
     description = models.TextField(blank=True)
 
-    assigned_to = models.ForeignKey(EmailUser, related_name='sanction_outcome_assigned_to', null=True)
+    assigned_to = models.ForeignKey(EmailUser, related_name='sanction_outcome_assigned_to', null=True, on_delete=models.CASCADE)
     allocated_group = models.ForeignKey(
        ComplianceManagementSystemGroup,
        related_name='sanction_outcome_allocated_group',
-       null=True
+       null=True, on_delete=models.CASCADE
     )
     # This field is used as recipient when manager returns a sanction outcome for amendment
     # Updated whenever the sanction outcome is sent to the manager
-    responsible_officer = models.ForeignKey(EmailUser, related_name='sanction_outcome_responsible_officer', null=True)
+    responsible_officer = models.ForeignKey(EmailUser, related_name='sanction_outcome_responsible_officer', null=True, on_delete=models.CASCADE)
 
     registration_number = models.CharField(max_length=10, blank=True)
-    registration_holder = models.ForeignKey(EmailUser, related_name='sanction_outcome_registration_holder', blank=True, null=True)
-    driver = models.ForeignKey(EmailUser, related_name='sanction_outcome_driver', blank=True, null=True)
+    registration_holder = models.ForeignKey(EmailUser, related_name='sanction_outcome_registration_holder', blank=True, null=True, on_delete=models.CASCADE)
+    driver = models.ForeignKey(EmailUser, related_name='sanction_outcome_driver', blank=True, null=True, on_delete=models.CASCADE)
 
     # Only editable when issued on paper. Otherwise pre-filled with date/time when issuing electronically.
     date_of_issue = models.DateField(null=True, blank=True)
@@ -177,7 +177,7 @@ class SanctionOutcome(models.Model):
 
     # This field is used once infringement notice gets overdue
     fer_case_number = models.CharField(max_length=11, blank=True)
-    infringement_penalty = models.OneToOneField(InfringementPenalty, null=True, blank=True, related_name='sanction_outcome')
+    infringement_penalty = models.OneToOneField(InfringementPenalty, null=True, blank=True, related_name='sanction_outcome', on_delete=models.CASCADE)
 
     objects = models.Manager()
     objects_active = SanctionOutcomeActiveManager()
@@ -812,8 +812,8 @@ class SanctionOutcome(models.Model):
 
 
 class AllegedCommittedOffence(RevisionedMixin):
-    alleged_offence = models.ForeignKey(AllegedOffence, null=False,)
-    sanction_outcome = models.ForeignKey(SanctionOutcome, null=False,)
+    alleged_offence = models.ForeignKey(AllegedOffence, null=False, on_delete=models.CASCADE)
+    sanction_outcome = models.ForeignKey(SanctionOutcome, null=False, on_delete=models.CASCADE)
     included = models.BooleanField(default=True)  # True means sanction_outcome is included in the sanction_outcome
 
     @staticmethod
@@ -917,7 +917,7 @@ def update_compliance_doc_filename(instance, filename):
 
 
 class SanctionOutcomeDocument(Document):
-    sanction_outcome = models.ForeignKey(SanctionOutcome, related_name='documents')
+    sanction_outcome = models.ForeignKey(SanctionOutcome, related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, upload_to=update_compliance_doc_filename, storage=private_storage)
 
     class Meta:
@@ -928,8 +928,8 @@ class SanctionOutcomeDocument(Document):
 
 class SanctionOutcomeDocumentAccessLog(models.Model):
     accessed_at = models.DateTimeField(auto_now_add=True)
-    accessed_by = models.ForeignKey(EmailUser,)
-    sanction_outcome_document = models.ForeignKey(SanctionOutcomeDocument, related_name='access_logs')
+    accessed_by = models.ForeignKey(EmailUser, on_delete=models.CASCADE)
+    sanction_outcome_document = models.ForeignKey(SanctionOutcomeDocument, related_name='access_logs', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -938,7 +938,7 @@ class SanctionOutcomeDocumentAccessLog(models.Model):
 
 
 class SanctionOutcomeCommsLogDocument(Document):
-    log_entry = models.ForeignKey('SanctionOutcomeCommsLogEntry', related_name='documents')
+    log_entry = models.ForeignKey('SanctionOutcomeCommsLogEntry', related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
@@ -946,7 +946,7 @@ class SanctionOutcomeCommsLogDocument(Document):
 
 
 class SanctionOutcomeCommsLogEntry(CommunicationsLogEntry):
-    sanction_outcome = models.ForeignKey(SanctionOutcome, related_name='comms_logs')
+    sanction_outcome = models.ForeignKey(SanctionOutcome, related_name='comms_logs', on_delete=models.CASCADE)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         print('=================')
@@ -989,10 +989,10 @@ class SanctionOutcomeUserAction(models.Model):
     # ACTION_PAY_PARTIALLY = "Pay partially for Infringement Penalty of the Infringement {}, Amount: {}, Invoice: {}"
     # ACTION_OVER_PAY = "Over-Pay for Infringement Penalty of the Infringement {}, Amount: {}, Invoice: {}"
 
-    who = models.ForeignKey(EmailUser, null=True, blank=True)
+    who = models.ForeignKey(EmailUser, null=True, blank=True, on_delete=models.CASCADE)
     when = models.DateTimeField(null=False, blank=False, auto_now_add=True)
     what = models.TextField(blank=False)
-    sanction_outcome = models.ForeignKey(SanctionOutcome, related_name='action_logs')
+    sanction_outcome = models.ForeignKey(SanctionOutcome, related_name='action_logs', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -1045,7 +1045,7 @@ class UnpaidInfringementFile(models.Model):
 
 
 class ActionTakenDocument(Document):
-    remediation_action = models.ForeignKey(RemediationAction, related_name='documents')
+    remediation_action = models.ForeignKey(RemediationAction, related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
@@ -1069,7 +1069,7 @@ class AmendmentRequestReason(models.Model):
 
 
 class AmendmentRequestForRemediationAction(models.Model):
-    remediation_action = models.ForeignKey(RemediationAction, related_name='amendment_requests')
+    remediation_action = models.ForeignKey(RemediationAction, related_name='amendment_requests', on_delete=models.CASCADE)
     # The value of this field is copied from the selection of AmendmentRequestReason
     reason = models.CharField(max_length=100, blank=True)
     details = models.TextField(blank=True)
@@ -1090,8 +1090,8 @@ class RemediationActionNotification(models.Model):
     TYPE_OVERDUE = 'overdue'
 
     type = models.CharField(max_length=30, blank=True,)
-    remediation_action = models.ForeignKey(RemediationAction, related_name='notifications')
-    sanction_outcome_comms_log_entry = models.ForeignKey(SanctionOutcomeCommsLogEntry,)
+    remediation_action = models.ForeignKey(RemediationAction, related_name='notifications', on_delete=models.CASCADE)
+    sanction_outcome_comms_log_entry = models.ForeignKey(SanctionOutcomeCommsLogEntry, on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'

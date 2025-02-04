@@ -113,7 +113,7 @@ class LicenceFeeClearingInvoice(InvoiceClearable):
         '''
         Builds a refundable payment line for a payable licence purpose.
         '''
-        from ledger.checkout.utils import calculate_excl_gst
+        from ledger_api_client.utils import calculate_excl_gst
         if not self.is_refundable:
             return None
 
@@ -167,7 +167,7 @@ class LicenceFeeClearingInvoice(InvoiceClearable):
 
         NOTE: display the last invoice number on line.
         '''
-        from ledger.checkout.utils import calculate_excl_gst
+        from ledger_api_client.utils import calculate_excl_gst
 
         if not self.is_refundable:
             return None
@@ -212,7 +212,7 @@ class LicenceFeeClearingInvoice(InvoiceClearable):
 
     #     NOTE: display the last invoice number on line.
     #     '''
-    #     from ledger.checkout.utils import calculate_excl_gst
+    #     from ledger_api_client.utils import calculate_excl_gst
 
     #     if not self.is_refundable:
     #         return None
@@ -327,7 +327,7 @@ class ApplicationFeePolicy(object):
         Gets the checkout product lines for this application which includes
         fee for both the application and licence activities.
         """
-        from ledger.checkout.utils import calculate_excl_gst
+        from ledger_api_client.utils import calculate_excl_gst
 
         product_lines = []
 

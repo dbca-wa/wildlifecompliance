@@ -219,7 +219,7 @@ def create_application_invoice(application, payment_method='cc'):
     from wildlifecompliance.components.applications.services import (
         ApplicationService,
     )
-    from ledger.checkout.utils import createCustomBasket
+    from ledger_api_client.utils import createCustomBasket
     from ledger.payments.invoice.utils import CreateInvoiceBasket
 
     products = ApplicationService.get_product_lines(application)

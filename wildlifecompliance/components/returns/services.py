@@ -12,7 +12,7 @@ from django.db import transaction
 from django.db.utils import IntegrityError
 from django.utils import timezone
 
-from ledger.checkout.utils import calculate_excl_gst
+from ledger_api_client.utils import calculate_excl_gst
 
 from wildlifecompliance.exceptions import ReturnServiceException
 from wildlifecompliance.components.main.utils import checkout, singleton

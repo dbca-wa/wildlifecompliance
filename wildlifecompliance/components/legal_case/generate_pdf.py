@@ -41,7 +41,7 @@ from django.core.files import File
 from django.conf import settings
 
 from ledger_api_client.ledger_models import Document
-from ledger.checkout.utils import calculate_excl_gst
+from ledger_api_client.utils import calculate_excl_gst
 
 from wildlifecompliance.components.artifact.models import BriefOfEvidenceRecordOfInterview
 from wildlifecompliance.components.legal_case import pdf_court_hearing_notice, pdf_prosecution_notice

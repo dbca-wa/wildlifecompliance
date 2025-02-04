@@ -6,10 +6,13 @@
             <div class="col-md-9">
                 <h3>{{ user.first_name }} {{ user.last_name  }} - {{ user.dob }} ({{ user.email }})</h3>
             </div>
-        </div>    
+        </div>
+
+            <!-- TODO replace/remove
             <div class="col-md-3">
                 <CommsLogs :comms_url="comms_url" :logs_url="logs_url" comms_add_url="test"/>
             </div>
+            -->
             <div class="col-md-9">
                 <!--ul class="nav nav-tabs"-->
                 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
@@ -345,7 +348,7 @@ export default {
             DATE_TIME_FORMAT: 'DD/MM/YYYY HH:mm:ss',
             activate_tables: false,
             comms_url: helpers.add_endpoint_json(api_endpoints.users,vm.$route.params.user_id+'/comms_log'),
-            logs_url: helpers.add_endpoint_json(api_endpoints.users,vm.$route.params.user_id+'/action_log'),
+            //logs_url: helpers.add_endpoint_json(api_endpoints.users,vm.$route.params.user_id+'/action_log'),
             applications_url: api_endpoints.applications_paginated+'internal_datatable_list?format=datatables&user_id='+vm.$route.params.user_id,
             licences_url: api_endpoints.licences_paginated+'internal_datatable_list?format=datatables&user_id='+vm.$route.params.user_id,
             returns_url: api_endpoints.returns_paginated+'user_datatable_list?format=datatables&user_id='+vm.$route.params.user_id,

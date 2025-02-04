@@ -11,7 +11,7 @@ from wildlifecompliance.components.returns.models import (
 )
 from wildlifecompliance.components.returns.utils_schema import Schema
 from wildlifecompliance.utils import excel
-from ledger.checkout.utils import (
+from ledger_api_client.utils import (
     create_basket_session,
     create_checkout_session,
 )

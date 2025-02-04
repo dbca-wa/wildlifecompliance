@@ -224,12 +224,12 @@ class DocumentArtifact(Artifact):
     person_providing_statement = models.ForeignKey(
             EmailUser,
             related_name='document_artifact_person_providing_statement',
-            null=True,
+            null=True, on_delete=models.CASCADE
             )
     officer_interviewer = models.ForeignKey(
             EmailUser,
             related_name='document_artifact_officer_interviewer',
-            null=True,
+            null=True, on_delete=models.CASCADE
             )
     people_attending = models.ManyToManyField(
             EmailUser,
@@ -238,12 +238,12 @@ class DocumentArtifact(Artifact):
     offence = models.ForeignKey(
             Offence,
             related_name='document_artifact_offence',
-            null=True,
+            null=True, on_delete=models.CASCADE
             )
     offender = models.ForeignKey(
             Offender,
             related_name='document_artifact_offender',
-            null=True,
+            null=True, on_delete=models.CASCADE
             )
     class Meta:
         app_label = 'wildlifecompliance'
@@ -293,10 +293,10 @@ class DocumentArtifactLegalCasesManager(models.Manager):
 class DocumentArtifactLegalCases(models.Model):
     document_artifact = models.ForeignKey(
             DocumentArtifact,
-            null=False)
+            null=False, on_delete=models.CASCADE)
     legal_case = models.ForeignKey(
             LegalCase,
-            null=False)
+            null=False, on_delete=models.CASCADE)
     primary = models.BooleanField(default=False)
     objects = DocumentArtifactLegalCasesManager()
 
@@ -308,10 +308,10 @@ class DocumentArtifactLegalCases(models.Model):
 
 class BriefOfEvidenceDocumentArtifacts(models.Model):
     legal_case = models.ForeignKey(
-            LegalCase, 
+            LegalCase, on_delete=models.CASCADE 
             )
     document_artifact = models.ForeignKey(
-            DocumentArtifact, 
+            DocumentArtifact, on_delete=models.CASCADE 
             )
     ticked = models.BooleanField(default=False)
 
@@ -339,10 +339,10 @@ class BriefOfEvidenceDocumentArtifacts(models.Model):
 
 class ProsecutionBriefDocumentArtifacts(models.Model):
     legal_case = models.ForeignKey(
-            LegalCase, 
+            LegalCase, on_delete=models.CASCADE 
             )
     document_artifact = models.ForeignKey(
-            DocumentArtifact, 
+            DocumentArtifact, on_delete=models.CASCADE 
             )
     ticked = models.BooleanField(default=False)
 
@@ -371,7 +371,7 @@ class ProsecutionBriefDocumentArtifacts(models.Model):
 class PhysicalArtifact(Artifact):
     physical_artifact_type = models.ForeignKey(
             PhysicalArtifactType,
-            null=True
+            null=True, on_delete=models.CASCADE
             )
     legal_cases = models.ManyToManyField(
             LegalCase,
@@ -382,7 +382,7 @@ class PhysicalArtifact(Artifact):
     officer = models.ForeignKey(
             EmailUser,
             related_name='physical_artifact_officer',
-            null=True,
+            null=True, on_delete=models.CASCADE
             )
     statement = models.ForeignKey(
         DocumentArtifact, 
@@ -394,13 +394,13 @@ class PhysicalArtifact(Artifact):
     custodian = models.ForeignKey(
             EmailUser,
             related_name='physical_artifact_custodian',
-            null=True,
+            null=True, on_delete=models.CASCADE
             )
     disposal_date = models.DateField(null=True)
     disposal_details = models.TextField(blank=True, null=True)
     disposal_method = models.ForeignKey(
             PhysicalArtifactDisposalMethod,
-            null=True
+            null=True, on_delete=models.CASCADE
             )
 
     class Meta:
@@ -501,10 +501,10 @@ class PhysicalArtifactLegalCasesManager(models.Manager):
 class PhysicalArtifactLegalCases(models.Model):
     physical_artifact = models.ForeignKey(
             PhysicalArtifact,
-            null=False)
+            null=False, on_delete=models.CASCADE)
     legal_case = models.ForeignKey(
             LegalCase,
-            null=False)
+            null=False, on_delete=models.CASCADE)
     primary = models.BooleanField(default=False)
     used_within_case = models.BooleanField(default=False)
     sensitive_non_disclosable = models.BooleanField(default=False)
@@ -518,10 +518,10 @@ class PhysicalArtifactLegalCases(models.Model):
 
 class BriefOfEvidencePhysicalArtifacts(models.Model):
     legal_case = models.ForeignKey(
-            LegalCase, 
+            LegalCase, on_delete=models.CASCADE
             )
     physical_artifact = models.ForeignKey(
-            PhysicalArtifact, 
+            PhysicalArtifact, on_delete=models.CASCADE
             )
     ticked = models.BooleanField(default=False)
     reason_sensitive_non_disclosable = models.TextField(blank=True, null=True)
@@ -550,10 +550,10 @@ class BriefOfEvidencePhysicalArtifacts(models.Model):
 
 class ProsecutionBriefPhysicalArtifacts(models.Model):
     legal_case = models.ForeignKey(
-            LegalCase, 
+            LegalCase, on_delete=models.CASCADE 
             )
     physical_artifact = models.ForeignKey(
-            PhysicalArtifact, 
+            PhysicalArtifact, on_delete=models.CASCADE
             )
     ticked = models.BooleanField(default=False)
     reason_sensitive_non_disclosable = models.TextField(blank=True, null=True)
@@ -625,7 +625,7 @@ class PhysicalArtifactFormDataRecord(models.Model):
         (COMPONENT_TYPE_DATE, 'Date'),
     )
 
-    physical_artifact = models.ForeignKey(PhysicalArtifact, related_name='form_data_records')
+    physical_artifact = models.ForeignKey(PhysicalArtifact, related_name='form_data_records', on_delete=models.CASCADE)
     field_name = models.CharField(max_length=512, blank=True, null=True)
     schema_name = models.CharField(max_length=256, blank=True, null=True)
     instance_name = models.CharField(max_length=256, blank=True, null=True)
@@ -688,7 +688,7 @@ class PhysicalArtifactFormDataRecord(models.Model):
 
 
 class ArtifactCommsLogEntry(CommunicationsLogEntry):
-    artifact = models.ForeignKey(Artifact, related_name='comms_logs')
+    artifact = models.ForeignKey(Artifact, related_name='comms_logs', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -697,7 +697,7 @@ class ArtifactCommsLogEntry(CommunicationsLogEntry):
 class ArtifactCommsLogDocument(Document):
     log_entry = models.ForeignKey(
         ArtifactCommsLogEntry,
-        related_name='documents')
+        related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
@@ -711,10 +711,10 @@ class ArtifactUserAction(models.Model):
     ACTION_WAITING_FOR_DISPOSAL = "Mark object {} as waiting for disposal"
     ACTION_ADD_WEAK_LINK = "Create manual link between {}: {} and {}: {}"
     ACTION_REMOVE_WEAK_LINK = "Remove manual link between {}: {} and {}: {}"
-    who = models.ForeignKey(EmailUser, null=True, blank=True)
+    who = models.ForeignKey(EmailUser, null=True, blank=True, on_delete=models.CASCADE)
     when = models.DateTimeField(null=False, blank=False, auto_now_add=True)
     what = models.TextField(blank=False)
-    artifact = models.ForeignKey(Artifact, related_name='action_logs')
+    artifact = models.ForeignKey(Artifact, related_name='action_logs', on_delete=models.CASCADE)
     class Meta:
         app_label = 'wildlifecompliance'
         ordering = ('-when',)
@@ -739,7 +739,7 @@ class ArtifactUserAction(models.Model):
 class ArtifactDocument(Document):
     artifact = models.ForeignKey(
             Artifact, 
-            related_name='documents')
+            related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
@@ -757,7 +757,7 @@ class ArtifactDocument(Document):
 class RendererDocument(Document):
     physical_artifact = models.ForeignKey(
         PhysicalArtifact,
-        related_name='renderer_documents')
+        related_name='renderer_documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, null=True, blank=True)
 
@@ -768,22 +768,22 @@ class RendererDocument(Document):
 class BriefOfEvidenceOtherStatements(models.Model):
     legal_case = models.ForeignKey(
             LegalCase, 
-            related_name='legal_case_boe_other_statements')
+            related_name='legal_case_boe_other_statements', on_delete=models.CASCADE)
     person = models.ForeignKey(
             EmailUser,
-            related_name='email_user_boe_other_statements',
+            related_name='email_user_boe_other_statements', on_delete=models.CASCADE
             )
     statement = models.ForeignKey(
             DocumentArtifact, 
             related_name='statement_boe_other_statements',
             blank=True,
-            null=True
+            null=True, on_delete=models.CASCADE
             )
     associated_doc_artifact = models.ForeignKey(
             DocumentArtifact, 
             related_name='document_artifact_boe_other_statements', 
             blank=True, 
-            null=True)
+            null=True, on_delete=models.CASCADE)
     ticked = models.BooleanField(default=False)
     children = models.ManyToManyField(
             'self',
@@ -848,25 +848,25 @@ class BriefOfEvidenceOtherStatements(models.Model):
 class BriefOfEvidenceRecordOfInterview(models.Model):
     legal_case = models.ForeignKey(
             LegalCase, 
-            related_name='legal_case_boe_roi')
+            related_name='legal_case_boe_roi', on_delete=models.CASCADE)
     offence = models.ForeignKey(
             Offence, 
-            related_name='offence_boe_roi')
+            related_name='offence_boe_roi', on_delete=models.CASCADE)
     offender = models.ForeignKey(
             Offender, 
             related_name='offender_boe_roi', 
             blank=True, 
-            null=True)
+            null=True, on_delete=models.CASCADE)
     record_of_interview = models.ForeignKey(
             DocumentArtifact, 
             related_name='record_of_interview_boe_roi', 
             blank=True, 
-            null=True)
+            null=True, on_delete=models.CASCADE)
     associated_doc_artifact = models.ForeignKey(
             DocumentArtifact, 
             related_name='document_artifact_boe_roi', 
             blank=True, 
-            null=True)
+            null=True, on_delete=models.CASCADE)
     ticked = models.BooleanField(default=False)
     children = models.ManyToManyField(
             'self',
@@ -943,22 +943,22 @@ class BriefOfEvidenceRecordOfInterview(models.Model):
 class ProsecutionBriefOtherStatements(models.Model):
     legal_case = models.ForeignKey(
             LegalCase, 
-            related_name='legal_case_pb_other_statements')
+            related_name='legal_case_pb_other_statements', on_delete=models.CASCADE)
     person = models.ForeignKey(
             EmailUser,
-            related_name='email_user_pb_other_statements',
+            related_name='email_user_pb_other_statements', on_delete=models.CASCADE
             )
     statement = models.ForeignKey(
             DocumentArtifact, 
             related_name='statement_pb_other_statements',
             blank=True,
-            null=True
+            null=True, on_delete=models.CASCADE
             )
     associated_doc_artifact = models.ForeignKey(
             DocumentArtifact, 
             related_name='document_artifact_pb_other_statements', 
             blank=True, 
-            null=True)
+            null=True, on_delete=models.CASCADE)
     ticked = models.BooleanField(default=False)
     children = models.ManyToManyField(
             'self',
@@ -1023,25 +1023,25 @@ class ProsecutionBriefOtherStatements(models.Model):
 class ProsecutionBriefRecordOfInterview(models.Model):
     legal_case = models.ForeignKey(
             LegalCase, 
-            related_name='legal_case_pb_roi')
+            related_name='legal_case_pb_roi', on_delete=models.CASCADE)
     offence = models.ForeignKey(
             Offence, 
-            related_name='offence_pb_roi')
+            related_name='offence_pb_roi', on_delete=models.CASCADE)
     offender = models.ForeignKey(
             Offender, 
             related_name='offender_pb_roi', 
             blank=True, 
-            null=True)
+            null=True, on_delete=models.CASCADE)
     record_of_interview = models.ForeignKey(
             DocumentArtifact, 
             related_name='record_of_interview_pb_roi', 
             blank=True, 
-            null=True)
+            null=True, on_delete=models.CASCADE)
     associated_doc_artifact = models.ForeignKey(
             DocumentArtifact, 
             related_name='document_artifact_pb_roi', 
             blank=True, 
-            null=True)
+            null=True, on_delete=models.CASCADE)
     ticked = models.BooleanField(default=False)
     children = models.ManyToManyField(
             'self',

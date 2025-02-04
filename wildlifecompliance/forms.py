@@ -5,7 +5,7 @@ from crispy_forms.layout import Layout, Submit
 from django.contrib.auth import get_user_model
 from django.forms import Form, ModelForm, CharField, ValidationError, EmailField
 
-from ledger_api_client.ledger_models import Profile, Address, Organisation
+from ledger_api_client.ledger_models import Address, Organisation
 
 
 User = get_user_model()

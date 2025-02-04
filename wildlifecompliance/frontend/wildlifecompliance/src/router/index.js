@@ -22,7 +22,8 @@ const router = new Router({
           name: 'account',
           component: MyUserDetails
         },
-        {
+        //TODO replace/remove
+        /*{
           path: '/profiles',
           component: {
               render(c)
@@ -47,7 +48,7 @@ const router = new Router({
                   name:"profile-detail"
               },
           ]
-        },
+        },*/
         external_routes,
         internal_routes
     ]

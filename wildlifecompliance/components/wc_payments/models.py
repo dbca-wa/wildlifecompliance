@@ -5,14 +5,11 @@ from django.db import models, transaction
 from django.utils import timezone
 from six import python_2_unicode_compatible
 # from django.utils import timezone
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Invoice
 from wildlifecompliance.components.main.models import RevisionedMixin
-from ledger_api_client.ledger_models import Invoice
-#from commercialoperator.components.proposals.models import Proposal
-#from commercialoperator.components.main.models import Park
 # from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome
 from decimal import Decimal as D
-from ledger.checkout.utils import calculate_excl_gst
+from ledger_api_client.utils import calculate_excl_gst
 
 import logging
 logger = logging.getLogger(__name__)
@@ -128,7 +125,7 @@ class InfringementPenalty(Payment):
 
 
 class InfringementPenaltyInvoice(RevisionedMixin):
-    infringement_penalty = models.ForeignKey(InfringementPenalty, related_name='infringement_penalty_invoices')
+    infringement_penalty = models.ForeignKey(InfringementPenalty, related_name='infringement_penalty_invoices', on_delete=models.CASCADE)
     invoice_reference = models.CharField(max_length=50, null=True, blank=True, default='')
 
     def __str__(self):

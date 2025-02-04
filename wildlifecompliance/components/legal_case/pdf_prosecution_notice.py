@@ -23,7 +23,7 @@ from django.core.files import File
 from django.conf import settings
 
 from ledger_api_client.ledger_models import Document
-from ledger.checkout.utils import calculate_excl_gst
+from ledger_api_client.utils import calculate_excl_gst
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage

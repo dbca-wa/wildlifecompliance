@@ -35,7 +35,7 @@ from collections import OrderedDict
 from django.core.cache import cache
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address
 from ledger.address.models import Country
-from ledger.checkout.utils import calculate_excl_gst
+from ledger_api_client.utils import calculate_excl_gst
 from datetime import datetime, timedelta, date
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -72,7 +72,7 @@ from wildlifecompliance.components.call_email.serializers import (
     ComplianceFormDataRecordSerializer,
     CallEmailLogEntrySerializer,
     LocationSerializer,
-    CallEmailUserActionSerializer,
+    #CallEmailUserActionSerializer,
     LocationSerializer,
     ReportTypeSerializer,
     SaveCallEmailSerializer,
@@ -408,22 +408,23 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
-    def action_log(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            qs = instance.action_logs.all()
-            serializer = CallEmailUserActionSerializer(qs, many=True)
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+    #TODO replace/remove
+    #@detail_route(methods=['GET', ])
+    #def action_log(self, request, *args, **kwargs):
+    #    try:
+    #        instance = self.get_object()
+    #        qs = instance.action_logs.all()
+    #        serializer = CallEmailUserActionSerializer(qs, many=True)
+    #        return Response(serializer.data)
+    #    except serializers.ValidationError:
+    #        print(traceback.print_exc())
+    #        raise
+    #    except ValidationError as e:
+    #        print(traceback.print_exc())
+    #        raise serializers.ValidationError(repr(e.error_dict))
+    #    except Exception as e:
+    #        print(traceback.print_exc())
+    #        raise serializers.ValidationError(str(e))
 
     @detail_route(methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
