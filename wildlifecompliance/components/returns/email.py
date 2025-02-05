@@ -130,7 +130,7 @@ def send_return_invoice_notification(returns, invoice_ref, request):
             kwargs={'return_pk': returns.id}))
     invoice_url = request.build_absolute_uri(
         reverse(
-            'payments:invoice-pdf',
+            'invoice-pdf',
             kwargs={
                 'reference': invoice_ref}))
     filename = 'invoice-{}-{}({}).pdf'.format(

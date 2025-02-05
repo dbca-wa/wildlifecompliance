@@ -104,7 +104,7 @@ class ApplicationSuccessView(TemplateView):
 
                 invoice_url = request.build_absolute_uri(
                     reverse(
-                        'payments:invoice-pdf',
+                        'invoice-pdf',
                         kwargs={'reference': invoice_ref}))
 
                 if application.application_fee_paid:
@@ -319,7 +319,7 @@ class LicenceFeeSuccessView(TemplateView):
                 request)
 
             invoice_url = request.build_absolute_uri(
-                reverse('payments:invoice-pdf',
+                reverse('invoice-pdf',
                         kwargs={'reference': invoice_ref}))
 
         except Exception as e:

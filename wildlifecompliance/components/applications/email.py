@@ -229,7 +229,7 @@ def send_application_invoice_email_notification(
                 'application_pk': application.id}))
     invoice_url = request.build_absolute_uri(
         reverse(
-            'payments:invoice-pdf',
+            'invoice-pdf',
             kwargs={
                 'reference': invoice_ref}))
     filename = 'invoice-{}-{}({}).pdf'.format(application.id,
@@ -264,7 +264,7 @@ def send_activity_invoice_email_notification(
                 'application_pk': application.id}))
     invoice_url = request.build_absolute_uri(
         reverse(
-            'payments:invoice-pdf',
+            'invoice-pdf',
             kwargs={
                 'reference': invoice_ref}))
     filename = 'invoice-{}-{}-({}).pdf'.format(

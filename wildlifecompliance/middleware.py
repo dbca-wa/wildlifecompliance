@@ -28,6 +28,7 @@ class FirstTimeNagScreenMiddleware(object):
     '''
     Generic FirstTimeNagScreenMiddleware.
     '''
+    
     def __init__(self, get_response):
         self.get_response = get_response
 
@@ -61,12 +62,11 @@ class FirstTimeNagScreenMiddleware(object):
             first_time_nag = SecureAuthorisationEnforcer(request)
 
         else:
-            first_time_nag = FirstTimeDefaultNag(request)
+            first_time_nag = FirstTimeDefaultNag()
 
-        response = first_time_nag.process_request(request)
-        if not response:
-            return self.get_response(request)
-        return response
+        #TODO replace firsttiemnag
+        #response = first_time_nag.process_request(request)
+        return self.get_response(request)
 
 
 class FirstTimeDefaultNag(object):
@@ -85,6 +85,7 @@ class FirstTimeDefaultNag(object):
             and 'admin' not in request.path 
             and 'ledger-private' not in request.path):
 
+            print(request.user.first_name,request.user.last_name)
             if (not request.user.first_name) or \
                     (not request.user.last_name) or \
                     (not request.user.dob and not request.user.legal_dob) or \
@@ -93,7 +94,7 @@ class FirstTimeDefaultNag(object):
                         request.user.phone_number or request.user.mobile_number
                     )):
                 path_ft = reverse('first_time')
-                path_logout = reverse('accounts:logout')
+                path_logout = reverse('logout')
                 request.session['new_to_wildlifecompliance'] = True
                 if request.path not in (path_ft, path_logout):
                     return redirect(

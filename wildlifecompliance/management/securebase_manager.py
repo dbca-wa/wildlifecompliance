@@ -137,7 +137,7 @@ class SecureAuthorisationEnforcer(SecureBase):
 
             if is_new_to_wildlifelicensing(self.request):
                 path_ft = reverse('first_time')
-                path_logout = reverse('accounts:logout')
+                path_logout = reverse('logout')
                 self.request.session['new_to_wildlifecompliance'] = True
                 if self.request.path not in (path_ft, path_logout):
                     return redirect(

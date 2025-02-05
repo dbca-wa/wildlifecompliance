@@ -261,7 +261,7 @@ class DTExternalWildlifeLicenceSerializer(WildlifeLicenceSerializer):
                 reference=activity_inv.invoice_reference)
 
             url = reverse(
-                'payments:invoice-pdf',
+                'invoice-pdf',
                 kwargs={'reference': latest_invoice.reference})
 
             return url

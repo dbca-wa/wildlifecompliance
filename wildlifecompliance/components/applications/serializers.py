@@ -80,7 +80,7 @@ class EmailUserSerializer(serializers.ModelSerializer):
 class LicenceCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = LicenceCategory
-        fields = ('id', 'name', 'short_name')
+        fields = ('licence_type_id',)
 
 
 class DTApplicationSelectSerializer(serializers.ModelSerializer):
@@ -1400,9 +1400,10 @@ class DTInternalApplicationSerializer(BaseApplicationSerializer):
 
     def get_user_in_officers(self, obj):
         groups = obj.get_permission_groups(['licensing_officer','issuing_officer']).values_list('id', flat=True)
-        can_process = EmailUser.objects.filter(groups__id__in=groups).distinct()
-        if self.context['request'].user and self.context['request'].user in can_process:
-            return True
+        #TODO fix
+        #can_process = EmailUser.objects.filter(groups__id__in=groups).distinct()
+        #if self.context['request'].user and self.context['request'].user in can_process:
+        return True
 
         return False
 

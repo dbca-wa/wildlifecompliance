@@ -78,7 +78,10 @@ class Organisation(models.Model):
 
     @property
     def organisation(self):
-        return get_organisation(self.id)
+        try:
+            return get_organisation(self.id)['data']
+        except:
+            raise ValidationError("Organisation does not exist")
 
     def __str__(self):
         return str(self.organisation)
@@ -521,26 +524,26 @@ class Organisation(models.Model):
 
     @property
     def name(self):
-        return self.organisation.name
+        return self.organisation["organisation_name"]
 
     @property
     def abn(self):
-        return self.organisation.abn
+        return self.organisation["organisation_abn"]
 
     @property
     def address(self):
-        return self.organisation.postal_address
+        return self.organisation["postal_address"]
 
     @property
     def address_string(self):
-        org_address = self.organisation.postal_address
+        org_address = self.organisation["postal_address"]
         if org_address:
             address_string = '{} {} {} {} {}'.format(
-                org_address.line1,
-                org_address.locality,
-                org_address.state,
-                org_address.postcode,
-                org_address.country
+                org_address["line1"],
+                org_address["locality"],
+                org_address["state"],
+                org_address["postcode"],
+                org_address["country"]
             )
             return address_string
         else:
@@ -548,7 +551,7 @@ class Organisation(models.Model):
 
     @property
     def email(self):
-        return self.organisation.email
+        return self.organisation["organisation_email"]
 
     @property
     def first_five(self):

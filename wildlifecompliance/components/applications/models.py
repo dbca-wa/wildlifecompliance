@@ -487,17 +487,21 @@ class Application(RevisionedMixin):
     def applicant(self):
         logger.debug('Application.applicant()')
         if self.org_applicant:
-            return self.org_applicant.organisation.name
+            return self.org_applicant.name
         elif self.proxy_applicant:
-            return "{} {}".format(
+            applicant = "{} {}".format(
                 get_first_name(self.proxy_applicant),
                 get_last_name(self.proxy_applicant),
-            )
+            ).strip()
+
+            return applicant if applicant else None
         else:
-            return "{} {}".format(
+            applicant = "{} {}".format(
                 get_first_name(self.submitter),
                 get_last_name(self.submitter),
-            )
+            ).strip()
+
+            return applicant if applicant else None
 
     @property
     def applicant_details(self):

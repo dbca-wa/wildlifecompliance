@@ -82,8 +82,8 @@ class UserOrganisationContactSerializer(serializers.ModelSerializer):
 
 class UserOrganisationSerializer(serializers.ModelSerializer):
     # Serializer for an Organisation linked with a User
-    name = serializers.CharField(source='organisation.name')
-    abn = serializers.CharField(source='organisation.abn')
+    name = serializers.SerializerMethodField()
+    abn = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
     is_consultant = serializers.SerializerMethodField(read_only=True)
     is_admin = serializers.SerializerMethodField(read_only=True)
@@ -98,6 +98,12 @@ class UserOrganisationSerializer(serializers.ModelSerializer):
             'is_consultant',
             'is_admin'
         )
+
+    def get_name(self, obj):
+        return obj.name
+
+    def get_abn(self,obj):
+        return obj.abn
 
     def get_is_admin(self, obj):
         user = EmailUser.objects.get(id=self.context.get('user_id'))
@@ -288,7 +294,7 @@ class UserSerializer(serializers.ModelSerializer):
     contact_details = serializers.SerializerMethodField()
     wildlifecompliance_organisations = serializers.SerializerMethodField()
     # identification = IdentificationSerializer()
-    identification2 = Identification2Serializer()
+    #identification2 = Identification2Serializer()
     dob = serializers.SerializerMethodField()
     legal_dob = serializers.SerializerMethodField()
     acc_mgmt_url = serializers.SerializerMethodField(read_only=True)
@@ -305,7 +311,7 @@ class UserSerializer(serializers.ModelSerializer):
             'dob',
             'legal_dob',
             'email',
-            'identification2',
+            #'identification2',
             'residential_address',
             'phone_number',
             'mobile_number',
@@ -475,7 +481,7 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
     contact_details = serializers.SerializerMethodField()
     wildlifecompliance_organisations = serializers.SerializerMethodField()
     #identification = IdentificationSerializer()
-    identification2 = Identification2Serializer()
+    #identification2 = Identification2Serializer()
     is_customer = serializers.SerializerMethodField()
     is_internal = serializers.SerializerMethodField()
     prefer_compliance_management = serializers.SerializerMethodField()
@@ -483,7 +489,7 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
     is_compliance_management_approved_external_user = serializers.SerializerMethodField()
     is_reception = serializers.SerializerMethodField()
     dob = serializers.SerializerMethodField(read_only=True)
-    legal_dob = serializers.SerializerMethodField(read_only=True)
+    #legal_dob = serializers.SerializerMethodField(read_only=True)
     is_payment_officer = serializers.SerializerMethodField(read_only=True)
     has_complete_first_time = serializers.SerializerMethodField(read_only=True)
     sso_setting_url = serializers.SerializerMethodField(read_only=True)
@@ -496,12 +502,12 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
             'last_name',
             'first_name',
             'dob',
-            'legal_last_name',
-            'legal_first_name',
-            'legal_dob',
+            #'legal_last_name',
+            #'legal_first_name',
+            #'legal_dob',
             'email',
             # 'identification',
-            'identification2',
+            #'identification2',
             'residential_address',
             'phone_number',
             'mobile_number',
@@ -550,12 +556,11 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
 
         return formatted_date
     
-    def get_legal_dob(self, obj):
-        formatted_date = obj.legal_dob.strftime(
-            '%d/%m/%Y'
-        ) if obj.legal_dob else None
-
-        return formatted_date
+    #def get_legal_dob(self, obj):
+    #    formatted_date = obj.legal_dob.strftime(
+    #        '%d/%m/%Y'
+    #    ) if obj.legal_dob else None
+    #    return formatted_date
 
     def get_personal_details(self, obj):
         return True if obj.last_name and obj.first_name and (obj.dob or obj.legal_dob)  else False

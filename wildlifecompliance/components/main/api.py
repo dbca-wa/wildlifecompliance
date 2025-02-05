@@ -133,9 +133,8 @@ class SchemaMasterlistFilterBackend(DatatablesFilterBackend):
         # queryset joining above also needed to disable ordering for all fields
         # for which data is not an Application model field, as property
         # functions will not work with order_by.
-        getter = request.query_params.get
-        fields = self.get_fields(getter)
-        ordering = self.get_ordering(getter, fields)
+        fields = self.get_fields(request)
+        ordering = self.get_ordering(request, view, fields)
         if len(ordering):
             queryset = queryset.order_by(*ordering)
 
@@ -404,9 +403,8 @@ class SchemaPurposeFilterBackend(DatatablesFilterBackend):
         # queryset joining above also needed to disable ordering for all fields
         # for which data is not an Application model field, as property
         # functions will not work with order_by.
-        getter = request.query_params.get
-        fields = self.get_fields(getter)
-        ordering = self.get_ordering(getter, fields)
+        fields = self.get_fields(request)
+        ordering = self.get_ordering(request, view, fields)
         if len(ordering):
             queryset = queryset.order_by(*ordering)
 
@@ -669,9 +667,8 @@ class SchemaGroupFilterBackend(DatatablesFilterBackend):
         # queryset joining above also needed to disable ordering for all fields
         # for which data is not an Application model field, as property
         # functions will not work with order_by.
-        getter = request.query_params.get
-        fields = self.get_fields(getter)
-        ordering = self.get_ordering(getter, fields)
+        fields = self.get_fields(request)
+        ordering = self.get_ordering(request, view, fields)
         if len(ordering):
             queryset = queryset.order_by(*ordering)
 
@@ -955,9 +952,8 @@ class SchemaQuestionFilterBackend(DatatablesFilterBackend):
         # queryset joining above also needed to disable ordering for all fields
         # for which data is not an Application model field, as property
         # functions will not work with order_by.
-        getter = request.query_params.get
-        fields = self.get_fields(getter)
-        ordering = self.get_ordering(getter, fields)
+        fields = self.get_fields(request)
+        ordering = self.get_ordering(request, view, fields)
         if len(ordering):
             queryset = queryset.order_by(*ordering)
 

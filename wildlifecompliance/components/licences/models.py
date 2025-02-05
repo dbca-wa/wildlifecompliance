@@ -42,39 +42,6 @@ def update_licence_doc_filename(instance, filename):
     return 'wildlifecompliance/licences/{}/documents/{}'.format(
         instance.id, filename)
 
-#TODO copied from ledger, determine if needed
-#class LicenceType(RevisionedMixin, ActiveMixin):
-#    name = models.CharField(max_length=256)
-#    short_name = models.CharField(max_length=30, blank=True, null=True,
-#                                  help_text="The display name that will show in the dashboard")
-#    version = models.SmallIntegerField(default=1, blank=False, null=False)
-#    code = models.CharField(max_length=64)
-#    act = models.CharField(max_length=256, blank=True)
-#    statement = models.TextField(blank=True)
-#    authority = models.CharField(max_length=64, blank=True)
-#    replaced_by = models.ForeignKey(
-#        'self', on_delete=models.PROTECT, blank=True, null=True)
-#    is_renewable = models.BooleanField(default=True)
-#    keywords = ArrayField(models.CharField(max_length=50), blank=True, default=list)
-#
-#    def __str__(self):
-#        return self.display_name
-#
-#    @property
-#    def display_name(self):
-#        result = self.short_name or self.name
-#        if self.replaced_by is None:
-#            return result
-#        else:
-#            return '{} (V{})'.format(result, self.version)
-#
-#    @property
-#    def is_obsolete(self):
-#        return self.replaced_by is not None
-#
-#    class Meta:
-#        unique_together = ('short_name', 'version')
-
 class LicenceDocument(Document):
     _file = models.FileField(upload_to=update_licence_doc_filename, storage=private_storage)
 
@@ -343,6 +310,7 @@ class LicenceActivity(models.Model):
 class LicenceCategory(models.Model):
     licence_type_id = models.IntegerField(
         unique=True,
+        primary_key=True
     )
     activity = models.ManyToManyField(
         LicenceActivity,
@@ -531,7 +499,7 @@ class WildlifeLicence(models.Model):
         """
         logger.debug('WildlifeLicence.purposes_available_to_add() - start')
         available_purpose_records = LicencePurpose.objects.all()
-        licence_category_id = self.licence_category.id
+        licence_category_id = self.licence_category.licence_type_id
         current_activities = self.current_activities
 
         # Exclude any purposes that are linked with CURRENT activities
@@ -717,8 +685,7 @@ class WildlifeLicence(models.Model):
                 current_application__org_applicant=None
             )
         ).filter(
-            licence_category_id=self.licence_category.id
-
+            licence_category_id=self.licence_category.licence_type_id
         ).latest('id') == self
 
         logger.debug('WildlifeLicence.is_latest_in_category() - end')
@@ -990,7 +957,7 @@ class WildlifeLicence(models.Model):
                 proxy_applicant=None,
                 org_applicant=None)
         ).computed_filter(
-            licence_category_id=self.licence_category.id
+            licence_category_id=self.licence_category.licence_type_id
         ).exclude(
             selected_activities__processing_status__in=[
                 ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED,
@@ -1030,7 +997,7 @@ class WildlifeLicence(models.Model):
                 proxy_applicant=None,
                 org_applicant=None)
         ).computed_filter(
-            licence_category_id=self.licence_category.id
+            licence_category_id=self.licence_category.licence_type_id
         ).exclude(
             selected_activities__processing_status__in=[
                 ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED,
@@ -1073,7 +1040,7 @@ class WildlifeLicence(models.Model):
                 proxy_applicant=None,
                 org_applicant=None)
         ).computed_filter(
-            licence_category_id=self.licence_category.id
+            licence_category_id=self.licence_category.licence_type_id
         ).exclude(
             selected_activities__processing_status__in=[
                 ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED,

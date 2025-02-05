@@ -514,8 +514,10 @@ class SanctionOutcomeDatatableSerializer(serializers.ModelSerializer):
         process_url = '<a href=/internal/sanction_outcome/' + str(obj.id) + '>Process</a>'
         view_payment_url = '<a href="/ledger/payments/invoice/payment?invoice=' + inv_ref + '">View Payment</a>' if inv_ref else ''
         cc_payment_url = '<a href="#" data-pay-infringement-penalty="' + str(obj.id) + '">Pay</a>'
-        record_payment_url = '<a href="' + reverse('payments:invoice-payment') + '?invoice={}'.format(inv_ref) + '">Record Payment</a>' if inv_ref \
-            else '<a href="' + reverse('preview_deferred_invoicing', kwargs={'sanction_outcome_pk': obj.id}) + '">Record Payment</a>'
+        
+        #TODO fix
+        record_payment_url = ''#'<a href="' + reverse('invoice-payment') + '?invoice={}'.format(inv_ref) + '">Record Payment</a>' if inv_ref \
+            #else '<a href="' + reverse('preview_deferred_invoicing', kwargs={'sanction_outcome_pk': obj.id}) + '">Record Payment</a>'
 
         if user == obj.get_offender()[0]:
             # If offender

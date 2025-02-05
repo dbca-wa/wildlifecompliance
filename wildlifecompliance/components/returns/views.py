@@ -26,7 +26,7 @@ class ReturnSuccessView(TemplateView):
 
             invoice_ref = request.GET.get('invoice')
             invoice_url = request.build_absolute_uri(
-                reverse('payments:invoice-pdf',
+                reverse('invoice-pdf',
                         kwargs={'reference': invoice_ref})
             )
             context = {
@@ -58,7 +58,7 @@ class ReturnSheetSuccessView(TemplateView):
 
             invoice_ref = request.GET.get('invoice')
             invoice_url = request.build_absolute_uri(
-                reverse('payments:invoice-pdf',
+                reverse('invoice-pdf',
                         kwargs={'reference': invoice_ref})
             )
             context = {

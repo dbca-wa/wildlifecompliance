@@ -100,9 +100,8 @@ class OffenceFilterBackend(DatatablesFilterBackend):
         # perform filters
         queryset = queryset.filter(q_objects)
 
-        getter = request.query_params.get
-        fields = self.get_fields(getter)
-        ordering = self.get_ordering(getter, fields)
+        fields = self.get_fields(request)
+        ordering = self.get_ordering(request, view, fields)
         if len(ordering):
             for num, item in enumerate(ordering):
                 # offender is the foreign key of the sanction outcome

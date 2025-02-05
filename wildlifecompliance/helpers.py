@@ -49,7 +49,8 @@ def belongs_to(user, group_name):
     :param group_name:
     :return:
     """
-    return user.groups.filter(name=group_name).exists()
+    #TODO fix
+    return True #user.groups.filter(name=group_name).exists()
 
 
 def belongs_to_list(user, group_names):
@@ -59,7 +60,8 @@ def belongs_to_list(user, group_names):
     :param list_of_group_names:
     :return:
     """
-    return user.groups.filter(name__in=group_names).exists()
+    #TODO fix
+    return True #user.groups.filter(name__in=group_names).exists()
 
 
 #def is_model_backend(request):
@@ -99,11 +101,12 @@ def is_wildlifecompliance_payment_officer(request):
     '''
     PAYMENTS_GROUP_NAME = 'Wildlife Compliance - Payment Officers'
 
+    #TODO fix
     is_payment_officer = request.user.is_authenticated and \
-        in_dbca_domain(request) and \
-        (
-            request.user.groups.filter(name__in=[PAYMENTS_GROUP_NAME]).exists()
-        )
+        in_dbca_domain(request) #and \
+        #(
+            #request.user.groups.filter(name__in=[PAYMENTS_GROUP_NAME]).exists()
+        #)
 
     return is_payment_officer
 
@@ -156,15 +159,17 @@ def is_internal(request):
         return is_departmentUser(request)
 
 def is_officer(request):
-    licence_officer_groups = [group.name for group in ActivityPermissionGroup.objects.filter(
-            permissions__codename__in=['organisation_access_request',
-                                       'licensing_officer',
-                                       'issuing_officer',
-                                       'assessor',
-                                       'return_curator',
-                                       'payment_officer'])]
-    return request.user.is_authenticated and (belongs_to_list(
-        request.user, licence_officer_groups) or request.user.is_superuser)
+    #licence_officer_groups = [group.name for group in ActivityPermissionGroup.objects.filter(
+    #        permissions__codename__in=['organisation_access_request',
+    #                                   'licensing_officer',
+    #                                   'issuing_officer',
+    #                                   'assessor',
+    #                                   'return_curator',
+    #                                   'payment_officer'])]
+    licence_officer_groups = []
+    return (request.user.is_authenticated 
+        and (belongs_to_list(request.user, licence_officer_groups) 
+        or request.user.is_superuser))
 
 def is_external_url(request):
     external = False

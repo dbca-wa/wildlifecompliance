@@ -384,9 +384,9 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
         # in the super call, but is then clobbered by the custom queryset joining above
         # also needed to disable ordering for all fields for which data is not an
         # Application model field, as property functions will not work with order_by
-        getter = request.query_params.get
-        fields = self.get_fields(getter)
-        ordering = self.get_ordering(getter, fields)
+
+        fields = self.get_fields(request)
+        ordering = self.get_ordering(request, view, fields)
         if len(ordering):
             queryset = queryset.order_by(*ordering)
 
@@ -939,7 +939,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                         request)
                     invoice_url = request.build_absolute_uri(
                         reverse(
-                            'payments:invoice-pdf',
+                            'invoice-pdf',
                             kwargs={'reference': invoice}))
 
                 elif instance.submit_type == Application.SUBMIT_TYPE_MIGRATE:
@@ -2506,15 +2506,16 @@ class AssessmentPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
         # Get the assessor groups the current user is member of
         perm_user = PermissionUser(request.user)
-        assessor_groups = perm_user.get_wildlifelicence_permission_group(
-            'assessor', first=False)
+        #TODO fix
+        #assessor_groups = perm_user.get_wildlifelicence_permission_group(
+        #    'assessor', first=False)
 
         # For each assessor groups get the assessments
         queryset = self.get_queryset().none()
-        for group in assessor_groups:
-            queryset = queryset | Assessment.objects.filter(
-                assessor_group=group) | Assessment.objects.filter(
-                actioned_by=self.request.user)
+        #for group in assessor_groups:
+        #    queryset = queryset | Assessment.objects.filter(
+        #        assessor_group=group) | Assessment.objects.filter(
+        #        actioned_by=self.request.user)
 
         queryset = self.filter_queryset(queryset)
         self.paginator.page_size = queryset.count()
@@ -2554,13 +2555,15 @@ class AssessmentViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def user_list(self, request, *args, **kwargs):
         # Get the assessor groups the current user is member of
         perm_user = PermissionUser(request.user)
-        assessor_groups = perm_user.get_wildlifelicence_permission_group('assessor', first=False)
+
+        #TODO fix
+        #assessor_groups = perm_user.get_wildlifelicence_permission_group('assessor', first=False)
 
         # For each assessor groups get the assessments
         queryset = self.get_queryset().none()
-        for group in assessor_groups:
-            queryset = queryset | Assessment.objects.filter(
-                assessor_group=group)
+        #for group in assessor_groups:
+        #    queryset = queryset | Assessment.objects.filter(
+        #        assessor_group=group)
 
         serializer = DTAssessmentSerializer(queryset, many=True)
         return Response(serializer.data)

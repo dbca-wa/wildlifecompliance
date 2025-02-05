@@ -17,7 +17,6 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='WildlifeLicenceCategory',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('licencetype_ptr_id',
                  #models.OneToOneField(
                  #    auto_created=True,
@@ -27,7 +26,7 @@ class Migration(migrations.Migration):
                  #    serialize=False,
                  #    to='licence.LicenceType'
                  #    )
-                 models.IntegerField(unique=True),
+                 models.IntegerField(unique=True, primary_key=True),
                 ),
                 ('licence_category_status',
                  models.CharField(

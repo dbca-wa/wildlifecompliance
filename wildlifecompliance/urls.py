@@ -213,7 +213,7 @@ urlpatterns = [
             url='https://www.dpaw.wa.gov.au/plants-and-animals/licences-and-permits'),
         name='wc_further_info'),
     url(r'^admin/', wildlifecompliance_admin_site.urls),
-    url(r'^ledger/admin/', admin.site.urls, name='ledger_admin'),
+    #url(r'^ledger/admin/', admin.site.urls, name='ledger_admin'),
     url(r'^chaining/', include('smart_selects.urls')),
     url(r'', include(api_patterns)),
     url(r'^$', views.WildlifeComplianceRoutingView.as_view(), name='wc_home'),
