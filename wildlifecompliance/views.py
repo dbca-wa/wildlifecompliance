@@ -93,7 +93,7 @@ class WildlifeComplianceRoutingView(TemplateView):
     template_name = 'wildlifecompliance/index.html'
 
     def get(self, *args, **kwargs):
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             print('email: {}'.format(self.request.user.email))
             print("is_authenticated: True")
             print('is_superuser: {}'.format(self.request.user.is_superuser))
@@ -342,7 +342,7 @@ def is_authorised_to_access_document(request):
 
     if is_wildlife_compliance_officer(request) or is_compliance_internal_user(request):
         return True
-    elif request.user.is_authenticated():
+    elif request.user.is_authenticated:
         a_document_id = get_file_path_id("applications",request.path)
         if a_document_id:
             return is_authorised_to_access_application_document(request,a_document_id)

@@ -171,7 +171,7 @@ class UserProfileCompleted(views.APIView):
 #        user = self.request.user
 #        if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
 #            return Profile.objects.all()
-#        elif user.is_authenticated():
+#        elif user.is_authenticated:
 #            return Profile.objects.filter(user=user)
 #        return Profile.objects.none()
 #
@@ -201,7 +201,7 @@ class UserProfileCompleted(views.APIView):
 #
 #    def get_queryset(self):
 #        user = self.request.user
-#        if user.is_authenticated():
+#        if user.is_authenticated:
 #            return Profile.objects.filter(user=self.request.user)
 #        return Profile.objects.none()
 
@@ -275,7 +275,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         user = self.request.user
         if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
             queryset = EmailUser.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             queryset = EmailUser.objects.filter(id=user.id)
         else:
             queryset = EmailUser.objects.none()
@@ -770,7 +770,7 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
         user = self.request.user
         if is_compliance_internal_user(self.request):
             queryset = EmailUser.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             queryset = EmailUser.objects.filter(id=user.id)
         #else:
         #    queryset = EmailUser.objects.none()
@@ -918,7 +918,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
         user = self.request.user
         if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
             queryset = EmailIdentity.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             queryset = user.emailidentity_set.all()
         else:
             queryset = EmailIdentity.objects.none()

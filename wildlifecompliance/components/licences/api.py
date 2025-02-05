@@ -223,7 +223,7 @@ class LicencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             return WildlifeLicence.objects.filter(
                 current_application__in=asa_accepted.values_list(
                     'application_id', flat=True))
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             return WildlifeLicence.objects.filter(
@@ -311,7 +311,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         if is_wildlife_compliance_officer(self.request):
             return WildlifeLicence.objects.filter(
                 current_application__in=asa_accepted.values_list('application_id', flat=True))
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             return WildlifeLicence.objects.filter(
@@ -801,7 +801,7 @@ class LicenceCategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             return LicenceCategory.objects.all()
         return LicenceCategory.objects.none()
 
@@ -815,7 +815,7 @@ class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ReadOnlyModelViewSet)
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             return LicenceCategory.objects.all()
         return LicenceCategory.objects.none()
 

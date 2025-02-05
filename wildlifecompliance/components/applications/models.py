@@ -4012,7 +4012,7 @@ class Application(RevisionedMixin):
         proxy_details = Application.get_request_user_proxy_details(request)
         proxy_id = proxy_details.get('proxy_id')
         organisation_id = proxy_details.get('organisation_id')
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             return Application.objects.filter(
                 Q(org_applicant_id=organisation_id) if organisation_id
                 else (

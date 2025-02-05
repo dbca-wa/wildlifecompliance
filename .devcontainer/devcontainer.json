@@ -11,5 +11,5 @@
 		   "--hostname","wildlifecompliance-dev"
 		   ],
 	"forwardPorts": [9051,9052,9053,9054,9055,9056,9057,9058,9059],
-	"initializeCommand" : "${localEnv:HOME}/docker-scripts-dev/windows_vbox/postgres_docker_load.sh"
+	"initializeCommand" : "${localEnv:HOME}/docker-scripts-dev/windows_vbox/postgres_docker_load.sh && ${localEnv:HOME}/docker-scripts-dev/windows_vbox/ledger_docker_load.sh "
 }

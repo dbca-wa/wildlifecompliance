@@ -28,11 +28,17 @@ class FirstTimeNagScreenMiddleware(object):
     '''
     Generic FirstTimeNagScreenMiddleware.
     '''
-    def process_request(self, request):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+
         if 'static' in request.path:
-            return
-        if request.method == 'GET' and request.user.is_authenticated(
-        ) and 'api' not in request.path and 'admin' not in request.path:
+            return self.get_response
+        if (request.method == 'GET' 
+            and request.user.is_authenticated
+            and 'api' not in request.path 
+            and 'admin' not in request.path):
             # add CM Approved External users to CallEmail RO and volunteer groups
             #if is_compliance_management_approved_external_user(request):
             #    if not is_compliance_management_callemail_readonly_user(request):
@@ -55,20 +61,29 @@ class FirstTimeNagScreenMiddleware(object):
             first_time_nag = SecureAuthorisationEnforcer(request)
 
         else:
-            first_time_nag = FirstTimeDefaultNag()
+            first_time_nag = FirstTimeDefaultNag(request)
 
-        return first_time_nag.process_request(request)
+        response = first_time_nag.process_request(request)
+        if not response:
+            return self.get_response(request)
+        return response
 
 
 class FirstTimeDefaultNag(object):
     '''
     A specialised FirstTimeNagScreenMiddleware for non WildlifeLicensing.
     '''
+
     def process_request(self, request):
+
         if 'static' in request.path:
             return
-        if request.method == 'GET' and request.user.is_authenticated(
-        ) and 'api' not in request.path and 'admin' not in request.path and 'ledger-private' not in request.path:
+
+        if (request.method == 'GET' 
+            and request.user.is_authenticated
+            and 'api' not in request.path 
+            and 'admin' not in request.path 
+            and 'ledger-private' not in request.path):
 
             if (not request.user.first_name) or \
                     (not request.user.last_name) or \
@@ -88,8 +103,14 @@ class FirstTimeDefaultNag(object):
                             request.get_full_path()))
 
 
-class CacheControlMiddleware(object):
-    def process_response(self, request, response):
+class CacheControlMiddleware:
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+
         if request.path[:5] == '/api/' or request.path == '/':
             response['Cache-Control'] = 'private, no-store'
         elif request.path[:8] == '/static/':

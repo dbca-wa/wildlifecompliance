@@ -125,7 +125,7 @@ class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         if is_wildlife_compliance_officer(self.request):
             return Return.objects.all()
 
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_licences = [wildlifelicence.id for wildlifelicence in WildlifeLicence.objects.filter(
@@ -213,7 +213,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         user = self.request.user
         if is_wildlife_compliance_officer(self.request):
             return Return.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_licences = [wildlifelicence.id for wildlifelicence in WildlifeLicence.objects.filter(
@@ -776,7 +776,7 @@ class ReturnAmendmentRequestViewSet(viewsets.GenericViewSet, mixins.RetrieveMode
         user = self.request.user
         if is_wildlife_compliance_officer(self.request):
             return ReturnRequest.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_applications = [application.id for application in Application.objects.filter(

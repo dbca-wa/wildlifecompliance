@@ -133,7 +133,7 @@ class SecureAuthorisationEnforcer(SecureBase):
 
         if self.request.method == 'GET' and 'api' not in self.request.path \
                 and 'admin' not in self.request.path \
-                and self.request.user.is_authenticated():
+                and self.request.user.is_authenticated:
 
             if is_new_to_wildlifelicensing(self.request):
                 path_ft = reverse('first_time')

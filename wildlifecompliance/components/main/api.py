@@ -165,7 +165,7 @@ class SchemaMasterlistPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             return MasterlistQuestion.objects.all()
         return MasterlistQuestion.objects.none()
 
@@ -191,7 +191,7 @@ class SchemaMasterlistViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             return MasterlistQuestion.objects.all()
         return MasterlistQuestion.objects.none()
 
@@ -436,7 +436,7 @@ class SchemaPurposePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             return LicencePurposeSection.objects.all()
         return LicencePurposeSection.objects.none()
 
@@ -463,7 +463,7 @@ class SchemaPurposeViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             return LicencePurposeSection.objects.all()
         return LicencePurposeSection.objects.none()
 
@@ -701,7 +701,7 @@ class SchemaGroupPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             return SectionGroup.objects.all()
         return SectionGroup.objects.none()
 
@@ -728,7 +728,7 @@ class SchemaGroupViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             return SectionGroup.objects.all()
         return SectionGroup.objects.none()
 
@@ -987,7 +987,7 @@ class SchemaQuestionPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             return SectionQuestion.objects.all()
         return SectionQuestion.objects.none()
 
@@ -1014,7 +1014,7 @@ class SchemaQuestionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             return SectionQuestion.objects.all()
         return SectionQuestion.objects.none()
 

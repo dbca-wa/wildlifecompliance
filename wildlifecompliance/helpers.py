@@ -78,7 +78,7 @@ def belongs_to_list(user, group_names):
 
 
 def is_wildlifecompliance_admin(request):
-    return request.user.is_authenticated() and \
+    return request.user.is_authenticated and \
            in_dbca_domain(request) and \
            (
                request.user.has_perm('wildlifecompliance.system_administrator') or
@@ -99,7 +99,7 @@ def is_wildlifecompliance_payment_officer(request):
     '''
     PAYMENTS_GROUP_NAME = 'Wildlife Compliance - Payment Officers'
 
-    is_payment_officer = request.user.is_authenticated() and \
+    is_payment_officer = request.user.is_authenticated and \
         in_dbca_domain(request) and \
         (
             request.user.groups.filter(name__in=[PAYMENTS_GROUP_NAME]).exists()
@@ -123,7 +123,7 @@ def in_dbca_domain(request):
 
 
 def is_departmentUser(request):
-    return request.user.is_authenticated() and (
+    return request.user.is_authenticated and (
             (settings.ALLOW_EMAIL_ADMINS and in_dbca_domain(request)) or
             is_compliance_management_approved_external_user(request)
             )
@@ -141,12 +141,12 @@ def is_reception(request):
         email=request.user.email
     ).exists()
 
-    return request.user.is_authenticated() and is_reception_email
+    return request.user.is_authenticated and is_reception_email
 
 
 def is_customer(request):
-    #return request.user.is_authenticated() and is_email_auth_backend(request)
-    return request.user.is_authenticated() and not request.user.is_staff
+    #return request.user.is_authenticated and is_email_auth_backend(request)
+    return request.user.is_authenticated and not request.user.is_staff
 
 
 def is_internal(request):
@@ -163,7 +163,7 @@ def is_officer(request):
                                        'assessor',
                                        'return_curator',
                                        'payment_officer'])]
-    return request.user.is_authenticated() and (belongs_to_list(
+    return request.user.is_authenticated and (belongs_to_list(
         request.user, licence_officer_groups) or request.user.is_superuser)
 
 def is_external_url(request):
@@ -181,7 +181,7 @@ def is_internal_url(request):
 def prefer_compliance_management(request):
     ret_value = False
 
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         preference = ComplianceManagementUserPreferences.objects.get(email_user=request.user)
         #if preference.prefer_compliance_management and (
         #        is_compliance_management_readonly_user(request) or is_compliance_management_callemail_readonly_user(request)
@@ -196,7 +196,7 @@ def is_wildlife_compliance_officer(request):
     wildlife_compliance_user = request.user.has_perm('wildlifecompliance.system_administrator') or \
                request.user.is_superuser
 
-    if request.user.is_authenticated() and (
+    if request.user.is_authenticated and (
             Group.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).user_set.filter(id=request.user.id)
         ):
         wildlife_compliance_user = True
@@ -207,7 +207,7 @@ def is_wildlife_compliance_payment_officer(request):
     wildlife_compliance_user = request.user.has_perm('wildlifecompliance.system_administrator') or \
                request.user.is_superuser
 
-    if request.user.is_authenticated() and (
+    if request.user.is_authenticated and (
             Group.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS).user_set.filter(id=request.user.id)
         ):
         wildlife_compliance_user = True
@@ -217,7 +217,7 @@ def is_wildlife_compliance_payment_officer(request):
 def is_compliance_management_user(request):
 
     compliance_user = is_wildlifecompliance_admin(request)
-    if request.user.is_authenticated() and (
+    if request.user.is_authenticated and (
             is_compliance_management_readonly_user(request) or 
             is_compliance_management_callemail_readonly_user(request) or
             is_compliance_management_approved_external_user(request) or
@@ -230,7 +230,7 @@ def is_compliance_management_user(request):
 
 def is_compliance_internal_user(request):
     compliance_user = is_wildlifecompliance_admin(request)
-    if request.user.is_authenticated() and (
+    if request.user.is_authenticated and (
             is_compliance_management_officer(request) or 
             is_compliance_management_manager(request) or
             is_compliance_management_infringement_notice_coordinator(request) or
@@ -243,44 +243,44 @@ def is_compliance_internal_user(request):
     return compliance_user
 
 def is_compliance_management_readonly_user(request):
-    return request.user.is_authenticated() and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_COMPLIANCE_MANAGEMENT_READ_ONLY).exists()
+    return request.user.is_authenticated and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_COMPLIANCE_MANAGEMENT_READ_ONLY).exists()
 
 def is_compliance_management_callemail_readonly_user(request):
-    return request.user.is_authenticated() and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_COMPLIANCE_MANAGEMENT_CALL_EMAIL_READ_ONLY).exists()
+    return request.user.is_authenticated and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_COMPLIANCE_MANAGEMENT_CALL_EMAIL_READ_ONLY).exists()
 
 def is_compliance_management_approved_external_user(request):
-    return request.user.is_authenticated() and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_COMPLIANCE_MANAGEMENT_APPROVED_EXTERNAL_USER).exists()
+    return request.user.is_authenticated and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_COMPLIANCE_MANAGEMENT_APPROVED_EXTERNAL_USER).exists()
 
 def is_compliance_management_volunteer(request):
-    return request.user.is_authenticated() and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_VOLUNTEER).exists()
+    return request.user.is_authenticated and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_VOLUNTEER).exists()
 
 def is_compliance_management_officer(request):
-    return request.user.is_authenticated() and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_OFFICER).exists()
+    return request.user.is_authenticated and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_OFFICER).exists()
 
 def is_compliance_management_inspection_officer(request):
-    return request.user.is_authenticated() and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_INSPECTION_OFFICER).exists()
+    return request.user.is_authenticated and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_INSPECTION_OFFICER).exists()
 
 def is_compliance_management_prosecution_officer(request):
-    return request.user.is_authenticated() and \
+    return request.user.is_authenticated and \
     request.user.compliancemanagementsystemgrouppermission_set \
         .filter(Q(group__name=settings.GROUP_PROSECUTION_COORDINATOR) |
                 Q(group__name=settings.GROUP_PROSECUTION_MANAGER) |
                 Q(group__name=settings.GROUP_PROSECUTION_COUNCIL)).exists()
 
 def is_compliance_management_manager(request):
-    return request.user.is_authenticated() and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_MANAGER).exists()
+    return request.user.is_authenticated and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_MANAGER).exists()
 
 def is_compliance_management_infringement_notice_coordinator(request):
-    return request.user.is_authenticated() and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_INFRINGEMENT_NOTICE_COORDINATOR).exists()
+    return request.user.is_authenticated and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_INFRINGEMENT_NOTICE_COORDINATOR).exists()
 
 def is_cm_compliance_admin(request):
-    return request.user.is_authenticated() and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_COMPLIANCE_ADMIN).exists()
+    return request.user.is_authenticated and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_COMPLIANCE_ADMIN).exists()
 
 def is_cm_licensing_admin(request):
-    return request.user.is_authenticated() and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_LICENSING_ADMIN).exists()
+    return request.user.is_authenticated and request.user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_LICENSING_ADMIN).exists()
 
 def is_able_to_view_sanction_outcome_pdf(request):
-    return request.user.is_authenticated() if (
+    return request.user.is_authenticated if (
         is_compliance_management_officer(request) or
         is_compliance_management_manager(request) or
         is_compliance_management_infringement_notice_coordinator(request)

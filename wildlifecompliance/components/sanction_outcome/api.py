@@ -160,7 +160,7 @@ class SanctionOutcomePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         user = self.request.user
         if is_compliance_internal_user(self.request):
             return SanctionOutcome.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             return SanctionOutcome.objects_for_external.filter(offender__person=user)
         return SanctionOutcome.objects.none()
 
@@ -418,7 +418,7 @@ class RemediationActionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixi
     def get_queryset(self):
         if is_compliance_internal_user(self.request):
             return RemediationAction.objects.all()
-        elif self.user.is_authenticated():
+        elif self.user.is_authenticated:
             return RemediationAction.objects_for_external.filter(
                 (Q(sanction_outcome__offender__person=self.request.user) & Q(sanction_outcome__registration_holder__isnull=True) & Q(sanction_outcome__driver__isnull=True)) |
                 (Q(sanction_outcome__offender__isnull=True) & Q(sanction_outcome__registration_holder=self.request.user) & Q(sanction_outcome__driver__isnull=True)) |

@@ -763,7 +763,7 @@ class SearchSectionRegulation(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             return SectionRegulation.objects.all()
         return SectionRegulation.objects.none()
 
@@ -778,6 +778,6 @@ class SearchOrganisation(viewsets.ReadOnlyModelViewSet):
         user = self.request.user
         if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
             return Organisation.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             return user.wildlifecompliance_organisations.all()
         return Organisation.objects.none()

@@ -414,7 +414,7 @@ class ApplicationPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         if is_wildlife_compliance_officer(self.request):
             return Application.objects.all()\
                 .exclude(application_type=Application.APPLICATION_TYPE_SYSTEM_GENERATED)
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             return Application.objects.filter(Q(org_applicant_id__in=user_orgs) | Q(
@@ -497,7 +497,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         user = self.request.user
         if is_wildlife_compliance_officer(self.request):
             return Application.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             return Application.objects.filter(Q(org_applicant_id__in=user_orgs) | Q(
@@ -2285,7 +2285,7 @@ class ApplicationConditionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
         user = self.request.user
         if is_wildlife_compliance_officer(self.request):
             return ApplicationCondition.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_applications = [application.id for application in Application.objects.filter(
@@ -2438,7 +2438,7 @@ class ApplicationSelectedActivityViewSet(viewsets.GenericViewSet, mixins.Retriev
     def get_queryset(self):
         if is_wildlife_compliance_officer(self.request):
             return ApplicationSelectedActivity.objects.all()
-        elif self.request.user.is_authenticated():
+        elif self.request.user.is_authenticated:
             return ApplicationSelectedActivity.objects.none()
         return ApplicationSelectedActivity.objects.none()
 
@@ -2700,7 +2700,7 @@ class AmendmentRequestViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin
         user = self.request.user
         if is_wildlife_compliance_officer(self.request):
             return AmendmentRequest.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_applications = [application.id for application in Application.objects.filter(

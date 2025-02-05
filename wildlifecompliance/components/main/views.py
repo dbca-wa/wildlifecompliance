@@ -68,7 +68,7 @@ class SearchKeywordsView(views.APIView):
     renderer_classes = [JSONRenderer]
 
     def post(self, request, format=None):
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             qs = []
             search_words = request.data.get('searchKeywords')
             search_application = request.data.get('searchApplication')
@@ -87,7 +87,7 @@ class SearchWeakLinksView(views.APIView):
     renderer_classes = [JSONRenderer]
 
     def post(self, request, format=None):
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             qs = []
             if request.data.get('searchText'): # modify as appropriate
                 qs = search_weak_links(request.data)
@@ -271,7 +271,7 @@ class SearchReferenceView(views.APIView):
     def post(self, request, format=None):
         #TODO not clear is this should be internal only or not, but at least should be authed
         try:
-            if request.user.is_authenticated():
+            if request.user.is_authenticated:
                 #qs = []
                 reference_number = request.data.get('reference_number')
                 if reference_number:

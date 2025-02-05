@@ -206,7 +206,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         user = self.request.user
         if is_wildlife_compliance_officer(self.request):
             return Organisation.objects.all() 
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             #org_contacts = OrganisationContact.objects.filter(is_admin=True).filter(email=user.email)
             #user_admin_orgs = [org.organisation.id for org in org_contacts]
             #return Organisation.objects.filter(id__in=user_admin_orgs)
@@ -836,7 +836,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
         user = self.request.user
         if is_wildlife_compliance_officer(self.request):
             return OrganisationRequest.objects.all() 
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             return user.organisationrequest_set.all()
         return OrganisationRequest.objects.none()
 
@@ -1161,7 +1161,7 @@ class OrganisationContactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMi
         user = self.request.user
         if is_wildlife_compliance_officer(self.request):
             return OrganisationContact.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
 
             org_contacts = OrganisationContact.objects.filter(is_admin=True).filter(email=user.email)
             user_admin_orgs = [org.organisation.id for org in org_contacts]
@@ -1202,7 +1202,7 @@ class MyOrganisationsViewSet(viewsets.ReadOnlyModelViewSet):
         user = self.request.user
         if is_wildlife_compliance_officer(self.request):
             return Organisation.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             return user.wildlifecompliance_organisations.all()
         return Organisation.objects.none()
 
@@ -1214,7 +1214,7 @@ class OrganisationComplianceManagementViewSet(viewsets.GenericViewSet, mixins.Re
         user = self.request.user
         if is_wildlife_compliance_officer(self.request):
             return Organisation.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             return user.wildlifecompliance_organisations.all()
         return Organisation.objects.none()
 
