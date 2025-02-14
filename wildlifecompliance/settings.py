@@ -58,6 +58,7 @@ if SHOW_DEBUG_TOOLBAR:
 STATIC_URL = '/static/'
 
 INSTALLED_APPS += [
+    'reversion',
     'reversion_compare',
     'django.contrib.humanize',
     'bootstrap3',
