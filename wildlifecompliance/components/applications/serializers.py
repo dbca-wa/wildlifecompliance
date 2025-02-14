@@ -739,7 +739,7 @@ class ExternalApplicationSelectedActivityMergedSerializer(serializers.Serializer
 class EmailUserAppViewSerializer(serializers.ModelSerializer):
     residential_address = UserAddressSerializer()
     # identification = IdentificationSerializer()
-    identification2 = Identification2Serializer()
+    #identification2 = Identification2Serializer() TODO fix
     dob = serializers.SerializerMethodField(read_only=True)
     first_name = serializers.SerializerMethodField()
     last_name = serializers.SerializerMethodField()
@@ -754,7 +754,7 @@ class EmailUserAppViewSerializer(serializers.ModelSerializer):
                   'title',
                   'organisation',
                   'residential_address',
-                  'identification2',
+                  #'identification2',
                   'email',
                   'phone_number',
                   'mobile_number',)

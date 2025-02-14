@@ -228,22 +228,26 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
         if queryset.model is Application:
             # search_text filter, join all custom search columns
             # where ('searchable: false' in the datatable defintion)
+
+            #TODO fix activity search as well...
             if search_text:
                 search_text = search_text.lower()
                 # join queries for the search_text search
                 # search_text_app_ids = []
-                search_text_app_ids = Application.objects.values(
-                    'id'
-                ).filter(
-                    Q(proxy_applicant__first_name__icontains=search_text) |
-                    Q(proxy_applicant__last_name__icontains=search_text)
-                )
+
+                #TODO fix
+                #search_text_app_ids = Application.objects.values(
+                #    'id'
+                #).filter(
+                #    Q(proxy_applicant__first_name__icontains=search_text) |
+                #    Q(proxy_applicant__last_name__icontains=search_text)
+                #)
                 # use pipe to join both custom and built-in DRF datatables
                 # querysets (returned by super call above)
                 # (otherwise they will filter on top of each other)
-                queryset = queryset.filter(
-                    id__in=search_text_app_ids
-                ).distinct() | super_queryset
+                #queryset = queryset.filter(
+                #    id__in=search_text_app_ids
+                #).distinct() | super_queryset
 
             # apply user selected filters
             activity_purpose = \
@@ -331,9 +335,10 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
                 date_to = datetime.strptime(date_to, '%Y-%m-%d') + timedelta(days=1)
                 queryset = queryset.filter(lodgement_date__lte=date_to)
 
-            submitter = submitter.lower() if submitter else 'all'
-            if submitter != 'all':
-                queryset = queryset.filter(submitter__email__iexact=submitter)
+            #TODO fix (?)
+            #submitter = submitter.lower() if submitter else 'all'
+            #if submitter != 'all':
+            #    queryset = queryset.filter(submitter__email__iexact=submitter)
 
         if queryset.model is Assessment:
             # search_text filter, join all custom search columns

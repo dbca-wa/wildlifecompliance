@@ -139,6 +139,8 @@ export default {
             {
                 data: "submitter",
                 visible: false,
+                searchable: false, //TODO backend searching
+                orderable: false,
                 className: "normal-white-space",
                 name: "submitter__first_name, submitter__last_name, submitter__email",
                 mRender:function (data,type,full) {
@@ -247,6 +249,8 @@ export default {
             {
                 data: "submitter",
                 visible: false,
+                searchable: false, //TODO backend searching
+                orderable: false,
                 name: "submitter__first_name, submitter__last_name, submitter__email",
                 mRender:function (data,type,full) {
                     if (data) {

@@ -841,25 +841,26 @@ class Application(RevisionedMixin):
         Authorised licensing officers for this Application.
         """
         logger.debug('Application.licence_officers()')
-        if not self.LICENCE_OFFICERS:
-            groups = self.get_permission_groups(
-                'licensing_officer').values_list('id', flat=True)
-            self.LICENCE_OFFICERS = EmailUser.objects.filter(
-                groups__id__in=groups
-            ).distinct()
+        #TODO fix
+        #if not self.LICENCE_OFFICERS:
+        #    groups = self.get_permission_groups(
+        #        'licensing_officer').values_list('id', flat=True)
+        #    self.LICENCE_OFFICERS = EmailUser.objects.filter(
+        #        groups__id__in=groups
+        #    ).distinct()
         
-        return self.LICENCE_OFFICERS
+        return [] #self.LICENCE_OFFICERS
 
     @property
     def licence_approvers(self):
         logger.debug('Application.licence_approvers() - start')
-        groups = self.get_permission_groups('issuing_officer')\
-            .values_list('id', flat=True)
+        #groups = self.get_permission_groups('issuing_officer')\
+        #    .values_list('id', flat=True)
 
-        approvers = EmailUser.objects.filter(groups__id__in=groups).distinct()
+        #approvers = EmailUser.objects.filter(groups__id__in=groups).distinct()
         logger.debug('Application.licence_approvers() - end')
-
-        return approvers
+        #TODO fix
+        return None #approvers
 
     @property
     def officers_and_assessors(self):
@@ -887,31 +888,55 @@ class Application(RevisionedMixin):
         Used in the presentation for authorised selected licence activities.
         '''
         from wildlifecompliance.components.licences.serializers import (
-            LicenceCategorySerializer
+            LicenceCategorySerializer,
         )
+
         logger.debug('Application.licence_type_data()')
         if not self.LICENCE_TYPE_DATA:
-            serializer = LicenceCategorySerializer(
-                self.licence_purposes.first().licence_category,
-                context={
-                    'purpose_records': self.licence_purposes
-                }
-            )
-            licence_data = serializer.data
-            for activity in licence_data['activity']:
-                selected_activity = self.get_selected_activity(activity['id'])
-                activity['processing_status'] = {
-                    'id': selected_activity.processing_status,
-                    'name': get_choice_value(
-                        selected_activity.processing_status,
-                        ApplicationSelectedActivity.PROCESSING_STATUS_CHOICES
-                    )
-                }
-                # although these fields are retrieved it is not applied for the
-                # authorisation.
-                activity['start_date'] = selected_activity.get_start_date()
-                activity['expiry_date'] = selected_activity.get_expiry_date()
-            self.LICENCE_TYPE_DATA = licence_data
+            #TODO fix serializer if possible...
+            #serializer = LicenceCategorySerializer(
+            #    self.licence_purposes.first().licence_category,
+            #    context={
+            #        'purpose_records': self.licence_purposes
+            #    }
+            #)
+            #licence_data = serializer.data
+            purpose = self.licence_purposes.first()
+            licence_data = purpose.licence_category
+            licence_data_json = {'id':licence_data.licence_type_id, 'activity':[]} #TODO add name and short_name...
+            for activity in licence_data.activity.all():
+                selected_activity = self.get_selected_activity(activity.id, create=False)
+                if selected_activity:
+                    activity_json = {
+                        "id": activity.id,
+                        "name": activity.name,
+                        "purpose": {
+                            "id": purpose.id,
+                            "name": purpose.name,
+                            "base_application_fee": purpose.base_application_fee,
+                            "base_licence_fee": purpose.base_licence_fee,
+                            "short_name": purpose.short_name,
+                            "renewal_application_fee": purpose.renewal_application_fee,
+                            "amendment_application_fee": purpose.amendment_application_fee,
+                            "minimum_age": purpose.minimum_age,
+                            "is_valid_age": purpose.is_valid_age,
+                        },
+                        "short_name": activity.short_name,
+                        "not_for_organisation": activity.not_for_organisation,
+                    }
+                    activity_json['processing_status'] = {
+                        'id': selected_activity.processing_status,
+                        'name': get_choice_value(
+                            selected_activity.processing_status,
+                            ApplicationSelectedActivity.PROCESSING_STATUS_CHOICES
+                        )
+                    }
+                    # although these fields are retrieved it is not applied for the
+                    # authorisation.
+                    activity_json['start_date'] = str(selected_activity.get_start_date())
+                    activity_json['expiry_date'] = str(selected_activity.get_expiry_date())
+                    licence_data_json['activity'].append(activity_json)
+            self.LICENCE_TYPE_DATA = licence_data_json
 
         return self.LICENCE_TYPE_DATA
 
@@ -1148,7 +1173,7 @@ class Application(RevisionedMixin):
         logger.info("Application: %s Activity ID: %s changed activity approver \
             to: %s" % (self.id, activity_id, licence_approver))
 
-    def get_selected_activity(self, activity_id):
+    def get_selected_activity(self, activity_id, create=True):
         '''
         :param activity_id: LicenceActivity ID, used to filter ApplicationSelectedActivity (ASA)
         :return: first ApplicationSelectedActivity record filtered by application id and ASA id
@@ -1162,11 +1187,13 @@ class Application(RevisionedMixin):
             application_id=self.id,
             licence_activity_id=activity_id
         ).first()
-        if not selected_activity:
-            selected_activity = ApplicationSelectedActivity.objects.create(
-                application_id=self.id,
-                licence_activity_id=activity_id
-            )
+        #TODO a get function like this should not be creating records, seperate this functionality as needed
+        if create: #temp fix
+            if not selected_activity:
+                selected_activity = ApplicationSelectedActivity.objects.create(
+                    application_id=self.id,
+                    licence_activity_id=activity_id
+                )
         return selected_activity
 
     def get_licence_category(self):
@@ -5105,20 +5132,22 @@ class ApplicationSelectedActivity(models.Model):
         """
         Authorised licence officers for this Selected Activity.
         """
-        groups = ActivityPermissionGroup.get_groups_for_activities(
-            self.licence_activity, 'licensing_officer')
+        #TODO fix
+        #groups = ActivityPermissionGroup.get_groups_for_activities(
+        #    self.licence_activity, 'licensing_officer')
 
-        return EmailUser.objects.filter(groups__id__in=groups).distinct()
+        return None #EmailUser.objects.filter(groups__id__in=groups).distinct()
 
     @property
     def issuing_officers(self):
         """
         Authorised issuing officers for this Selected Activity.
         """
-        groups = ActivityPermissionGroup.get_groups_for_activities(
-            self.licence_activity, 'issuing_officer')
+        #TODO fix
+        #groups = ActivityPermissionGroup.get_groups_for_activities(
+        #    self.licence_activity, 'issuing_officer')
 
-        return EmailUser.objects.filter(groups__id__in=groups).distinct()
+        return None #EmailUser.objects.filter(groups__id__in=groups).distinct()
 
     @property
     def total_paid_amount(self):
