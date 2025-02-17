@@ -80,7 +80,7 @@ class EmailUserSerializer(serializers.ModelSerializer):
 class LicenceCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = LicenceCategory
-        fields = ('licence_type_id',)
+        fields = ('id','name','short_name')
 
 
 class DTApplicationSelectSerializer(serializers.ModelSerializer):

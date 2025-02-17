@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
         migrations.RenameField(
             model_name='licencecategory',
             old_name='licencetype_ptr_id',
-            new_name='licence_type_id',
+            new_name='id',
         ),
         migrations.RenameField(
             model_name='inspection',

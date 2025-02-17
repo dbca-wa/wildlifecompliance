@@ -306,9 +306,9 @@ class LicenceActivity(models.Model):
         return self.name
 
 
-# #LicenceType
+# #LicenceType NOTE: values from ledger will need to be copied over to this segregated table
 class LicenceCategory(models.Model):
-    licence_type_id = models.IntegerField(
+    id = models.IntegerField(
         unique=True,
         primary_key=True
     )
@@ -317,11 +317,32 @@ class LicenceCategory(models.Model):
         blank=True,
         through='DefaultActivity',
         related_name='wildlifecompliance_activities')
+    
+    name = models.CharField(max_length=256, blank=True, null=True)
+    short_name = models.CharField(max_length=30, blank=True, null=True,
+                                  help_text="The display name that will show in the dashboard")
+    version = models.SmallIntegerField(default=1, blank=False, null=False)
+    code = models.CharField(max_length=64, blank=True, null=True)
+    act = models.CharField(max_length=256, blank=True)
+    statement = models.TextField(blank=True)
+    authority = models.CharField(max_length=64, blank=True)
+    replaced_by = models.ForeignKey(
+        'self', on_delete=models.PROTECT, blank=True, null=True)
+    is_renewable = models.BooleanField(default=True)
+    keywords = ArrayField(models.CharField(max_length=50), blank=True, default=list)
+
+    def __str__(self):
+        return self.display_name
+
+    @property
+    def is_obsolete(self):
+        return self.replaced_by is not None
 
     class Meta:
         app_label = 'wildlifecompliance'
         verbose_name = 'Licence category'
         verbose_name_plural = 'Licence categories'
+        unique_together = ('short_name', 'version')
 
     @property
     # override LicenceType display_name to display name first instead of
@@ -329,9 +350,9 @@ class LicenceCategory(models.Model):
     def display_name(self):
         result = self.name or self.short_name
         if self.replaced_by is None:
-            return result
+            return result if result != None else ""
         else:
-            return '{} (V{})'.format(result, self.version)
+            return '{} (V{})'.format(result if result != None else "", self.version)
 
     def get_activities(self):
         '''
@@ -499,7 +520,7 @@ class WildlifeLicence(models.Model):
         """
         logger.debug('WildlifeLicence.purposes_available_to_add() - start')
         available_purpose_records = LicencePurpose.objects.all()
-        licence_category_id = self.licence_category.licence_type_id
+        licence_category_id = self.licence_category.id
         current_activities = self.current_activities
 
         # Exclude any purposes that are linked with CURRENT activities
@@ -685,7 +706,7 @@ class WildlifeLicence(models.Model):
                 current_application__org_applicant=None
             )
         ).filter(
-            licence_category_id=self.licence_category.licence_type_id
+            licence_category_id=self.licence_category.id
         ).latest('id') == self
 
         logger.debug('WildlifeLicence.is_latest_in_category() - end')
@@ -957,7 +978,7 @@ class WildlifeLicence(models.Model):
                 proxy_applicant=None,
                 org_applicant=None)
         ).computed_filter(
-            licence_category_id=self.licence_category.licence_type_id
+            licence_category_id=self.licence_category.id
         ).exclude(
             selected_activities__processing_status__in=[
                 ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED,
@@ -997,7 +1018,7 @@ class WildlifeLicence(models.Model):
                 proxy_applicant=None,
                 org_applicant=None)
         ).computed_filter(
-            licence_category_id=self.licence_category.licence_type_id
+            licence_category_id=self.licence_category.id
         ).exclude(
             selected_activities__processing_status__in=[
                 ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED,
@@ -1040,7 +1061,7 @@ class WildlifeLicence(models.Model):
                 proxy_applicant=None,
                 org_applicant=None)
         ).computed_filter(
-            licence_category_id=self.licence_category.licence_type_id
+            licence_category_id=self.licence_category.id
         ).exclude(
             selected_activities__processing_status__in=[
                 ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED,

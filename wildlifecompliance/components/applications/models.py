@@ -888,56 +888,31 @@ class Application(RevisionedMixin):
         Used in the presentation for authorised selected licence activities.
         '''
         from wildlifecompliance.components.licences.serializers import (
-            LicenceCategorySerializer,
+            LicenceCategorySerializer
         )
-
         logger.debug('Application.licence_type_data()')
         if not self.LICENCE_TYPE_DATA:
-            #TODO fix serializer if possible...
-            #serializer = LicenceCategorySerializer(
-            #    self.licence_purposes.first().licence_category,
-            #    context={
-            #        'purpose_records': self.licence_purposes
-            #    }
-            #)
-            #licence_data = serializer.data
-            purpose = self.licence_purposes.first()
-            licence = LicencePurposeUtil(purpose)
-            licence_data = purpose.licence_category
-            licence_data_json = {'id':licence_data.licence_type_id, 'activity':[]} #TODO add name and short_name...
-            for activity in licence_data.activity.all():
-                selected_activity = self.get_selected_activity(activity.id, create=False)
-                if selected_activity:
-                    activity_json = {
-                        "id": activity.id,
-                        "name": activity.name,
-                        "purpose": {
-                            "id": purpose.id,
-                            "name": purpose.name,
-                            "base_application_fee": purpose.base_application_fee,
-                            "base_licence_fee": purpose.base_licence_fee,
-                            "short_name": purpose.short_name,
-                            "renewal_application_fee": purpose.renewal_application_fee,
-                            "amendment_application_fee": purpose.amendment_application_fee,
-                            "minimum_age": purpose.minimum_age,
-                            "is_valid_age": licence.is_valid_age_for(self.submitter) if self.submitter else False, #TODO review
-                        },
-                        "short_name": activity.short_name,
-                        "not_for_organisation": activity.not_for_organisation,
-                    }
-                    activity_json['processing_status'] = {
-                        'id': selected_activity.processing_status,
-                        'name': get_choice_value(
-                            selected_activity.processing_status,
-                            ApplicationSelectedActivity.PROCESSING_STATUS_CHOICES
-                        )
-                    }
-                    # although these fields are retrieved it is not applied for the
-                    # authorisation.
-                    activity_json['start_date'] = str(selected_activity.get_start_date())
-                    activity_json['expiry_date'] = str(selected_activity.get_expiry_date())
-                    licence_data_json['activity'].append(activity_json)
-            self.LICENCE_TYPE_DATA = licence_data_json
+            serializer = LicenceCategorySerializer(
+                self.licence_purposes.first().licence_category,
+                context={
+                    'purpose_records': self.licence_purposes
+                }
+            )
+            licence_data = serializer.data
+            for activity in licence_data['activity']:
+                selected_activity = self.get_selected_activity(activity['id'])
+                activity['processing_status'] = {
+                    'id': selected_activity.processing_status,
+                    'name': get_choice_value(
+                        selected_activity.processing_status,
+                        ApplicationSelectedActivity.PROCESSING_STATUS_CHOICES
+                    )
+                }
+                # although these fields are retrieved it is not applied for the
+                # authorisation.
+                activity['start_date'] = selected_activity.get_start_date()
+                activity['expiry_date'] = selected_activity.get_expiry_date()
+            self.LICENCE_TYPE_DATA = licence_data
 
         return self.LICENCE_TYPE_DATA
 
