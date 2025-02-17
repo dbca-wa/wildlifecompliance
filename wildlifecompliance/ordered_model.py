@@ -161,26 +161,35 @@ class OrderedModelBase(models.Model):
         self.save()
         replacement.save()
 
-    def up(self):
+    def up(self, filter_field=None, filter_value=None):
         """
         Move this object up one position.
         """
-        self.swap(
-            self.get_ordering_queryset() .filter(
+        qs = self.get_ordering_queryset() .filter(
                 **{
                     self.order_field_name +
                     '__lt': getattr(
                         self,
                         self.order_field_name)}) .order_by(
                     '-' +
-                self.order_field_name))
+                self.order_field_name)
+        
+        if filter_field:
+            qs = qs.filter(**{filter_field: filter_value})
 
-    def down(self):
+        self.swap(qs)
+
+    def down(self, filter_field=None, filter_value=None):
         """
         Move this object down one position.
         """
-        self.swap(self.get_ordering_queryset().filter(
-            **{self.order_field_name + '__gt': getattr(self, self.order_field_name)}))
+        qs = self.get_ordering_queryset().filter(
+            **{self.order_field_name + '__gt': getattr(self, self.order_field_name)})
+        
+        if filter_field:
+            qs = qs.filter(**{filter_field: filter_value})
+            
+        self.swap(qs)
 
     def to(self, order, extra_update=None):
         """
