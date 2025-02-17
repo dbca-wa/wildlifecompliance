@@ -79,7 +79,7 @@ class Organisation(models.Model):
     @property
     def organisation(self):
         try:
-            return get_organisation(self.id)['data']
+            return get_organisation(self.organisation_id)['data']
         except:
             raise ValidationError("Organisation does not exist")
 
