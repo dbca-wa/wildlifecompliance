@@ -36,7 +36,7 @@ from wildlifecompliance.components.main.utils import (
 )
 
 from wildlifecompliance.components.inspection.models import Inspection
-
+from wildlifecompliance.components.licences.utils import LicencePurposeUtil
 from wildlifecompliance.components.organisations.models import Organisation
 from wildlifecompliance.components.organisations.emails import (
     send_org_id_update_request_notification
@@ -902,6 +902,7 @@ class Application(RevisionedMixin):
             #)
             #licence_data = serializer.data
             purpose = self.licence_purposes.first()
+            licence = LicencePurposeUtil(purpose)
             licence_data = purpose.licence_category
             licence_data_json = {'id':licence_data.licence_type_id, 'activity':[]} #TODO add name and short_name...
             for activity in licence_data.activity.all():
@@ -919,7 +920,7 @@ class Application(RevisionedMixin):
                             "renewal_application_fee": purpose.renewal_application_fee,
                             "amendment_application_fee": purpose.amendment_application_fee,
                             "minimum_age": purpose.minimum_age,
-                            "is_valid_age": purpose.is_valid_age,
+                            "is_valid_age": licence.is_valid_age_for(self.submitter) if self.submitter else False, #TODO review
                         },
                         "short_name": activity.short_name,
                         "not_for_organisation": activity.not_for_organisation,

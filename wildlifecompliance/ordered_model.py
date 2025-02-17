@@ -165,6 +165,7 @@ class OrderedModelBase(models.Model):
         """
         Move this object up one position.
         """
+        #TODO fix swap
         self.swap(
             self.get_ordering_queryset() .filter(
                 **{
