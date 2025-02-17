@@ -2398,7 +2398,7 @@ class ApplicationConditionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     def move_up(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            instance.up()
+            instance.up("application_id",instance.application_id)
             instance.save()
             instance.application.log_user_action(
                 ApplicationUserAction.ACTION_ORDER_CONDITION_UP.format(
@@ -2419,7 +2419,7 @@ class ApplicationConditionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     def move_down(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            instance.down()
+            instance.down("application_id",instance.application_id)
             instance.save()
             instance.application.log_user_action(
                 ApplicationUserAction.ACTION_ORDER_CONDITION_DOWN.format(
