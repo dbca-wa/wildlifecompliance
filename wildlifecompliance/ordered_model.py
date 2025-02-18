@@ -165,12 +165,12 @@ class OrderedModelBase(models.Model):
         """
         Move this object up one position.
         """
-        qs = self.get_ordering_queryset() .filter(
+        qs = self.get_ordering_queryset().filter(
                 **{
                     self.order_field_name +
                     '__lt': getattr(
                         self,
-                        self.order_field_name)}) .order_by(
+                        self.order_field_name)}).order_by(
                     '-' +
                 self.order_field_name)
         
@@ -184,7 +184,8 @@ class OrderedModelBase(models.Model):
         Move this object down one position.
         """
         qs = self.get_ordering_queryset().filter(
-            **{self.order_field_name + '__gt': getattr(self, self.order_field_name)})
+            **{self.order_field_name + '__gt': getattr(self, self.order_field_name)}).order_by(
+            self.order_field_name)
         
         if filter_field:
             qs = qs.filter(**{filter_field: filter_value})
