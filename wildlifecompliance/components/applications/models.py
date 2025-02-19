@@ -149,10 +149,11 @@ class ActivityPermissionGroup(Group):
         verbose_name_plural = 'Activity permission groups'
 
     def __str__(self):
-        return '{} ({} members)'.format(
-            self.name,
-            EmailUser.objects.filter(groups__name=self.name).count()
-        )
+        return self.name
+        #return '{} ({} members)'.format(
+        #    self.name,
+        #    EmailUser.objects.filter(groups__name=self.name).count()
+        #)
 
     @property
     def display_name(self):
