@@ -1400,10 +1400,10 @@ class DTInternalApplicationSerializer(BaseApplicationSerializer):
 
     def get_user_in_officers(self, obj):
         groups = obj.get_permission_groups(['licensing_officer','issuing_officer']).values_list('id', flat=True)
-        #TODO fix
-        #can_process = EmailUser.objects.filter(groups__id__in=groups).distinct()
-        #if self.context['request'].user and self.context['request'].user in can_process:
-        return True
+        #TODO test
+        can_process = EmailUser.objects.filter(groups__id__in=groups).distinct()
+        if self.context['request'].user and self.context['request'].user in can_process:
+            return True
 
         return False
 

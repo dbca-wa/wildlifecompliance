@@ -49,8 +49,8 @@ def belongs_to(user, group_name):
     :param group_name:
     :return:
     """
-    #TODO fix
-    return True #user.groups.filter(name=group_name).exists()
+    #TODO test
+    return user.groups.filter(name=group_name).exists()
 
 
 def belongs_to_list(user, group_names):
@@ -60,8 +60,11 @@ def belongs_to_list(user, group_names):
     :param list_of_group_names:
     :return:
     """
-    #TODO fix
-    return True #user.groups.filter(name__in=group_names).exists()
+    #TODO test
+    for i in group_names:
+        if belongs_to(user, i):
+            return True
+    return False #user.groups().filter(name__in=group_names).exists()
 
 
 #def is_model_backend(request):
@@ -87,6 +90,7 @@ def is_wildlifecompliance_admin(request):
                request.user.is_superuser or
                is_cm_compliance_admin(request) or
                is_cm_licensing_admin(request)
+               #TODO fix
                #request.user.complianceadmingroup_set.exists() or
                #request.user.licensingadmingroup_set.exists()
                #request.user.groups.filter(name__in=['Wildlife Compliance Admin - Licensing', 'Wildlife Compliance Admin - Compliance']).exists()
@@ -101,12 +105,12 @@ def is_wildlifecompliance_payment_officer(request):
     '''
     PAYMENTS_GROUP_NAME = 'Wildlife Compliance - Payment Officers'
 
-    #TODO fix
+    #TODO test
     is_payment_officer = request.user.is_authenticated and \
-        in_dbca_domain(request) #and \
-        #(
-            #request.user.groups.filter(name__in=[PAYMENTS_GROUP_NAME]).exists()
-        #)
+        in_dbca_domain(request) and \
+        (
+            request.user.groups().filter(name=PAYMENTS_GROUP_NAME).exists()
+        )
 
     return is_payment_officer
 
@@ -159,13 +163,13 @@ def is_internal(request):
         return is_departmentUser(request)
 
 def is_officer(request):
-    #licence_officer_groups = [group.name for group in ActivityPermissionGroup.objects.filter(
-    #        permissions__codename__in=['organisation_access_request',
-    #                                   'licensing_officer',
-    #                                   'issuing_officer',
-    #                                   'assessor',
-    #                                   'return_curator',
-    #                                   'payment_officer'])]
+    licence_officer_groups = [group.name for group in ActivityPermissionGroup.objects.filter(
+            permissions__codename__in=['organisation_access_request',
+                                       'licensing_officer',
+                                       'issuing_officer',
+                                       'assessor',
+                                       'return_curator',
+                                       'payment_officer'])]
     licence_officer_groups = []
     return (request.user.is_authenticated 
         and (belongs_to_list(request.user, licence_officer_groups) 

@@ -842,26 +842,26 @@ class Application(RevisionedMixin):
         Authorised licensing officers for this Application.
         """
         logger.debug('Application.licence_officers()')
-        #TODO fix
-        #if not self.LICENCE_OFFICERS:
-        #    groups = self.get_permission_groups(
-        #        'licensing_officer').values_list('id', flat=True)
-        #    self.LICENCE_OFFICERS = EmailUser.objects.filter(
-        #        groups__id__in=groups
-        #    ).distinct()
+        #TODO test
+        if not self.LICENCE_OFFICERS:
+            groups = self.get_permission_groups(
+                'licensing_officer').values_list('id', flat=True)
+            self.LICENCE_OFFICERS = EmailUser.objects.filter(
+                groups__id__in=groups
+            ).distinct()
         
-        return [] #self.LICENCE_OFFICERS
+        return self.LICENCE_OFFICERS
 
     @property
     def licence_approvers(self):
         logger.debug('Application.licence_approvers() - start')
-        #groups = self.get_permission_groups('issuing_officer')\
-        #    .values_list('id', flat=True)
+        groups = self.get_permission_groups('issuing_officer')\
+            .values_list('id', flat=True)
 
-        #approvers = EmailUser.objects.filter(groups__id__in=groups).distinct()
+        approvers = EmailUser.objects.filter(groups__id__in=groups).distinct()
         logger.debug('Application.licence_approvers() - end')
-        #TODO fix
-        return None #approvers
+        #TODO test
+        return approvers
 
     @property
     def officers_and_assessors(self):
@@ -5109,22 +5109,22 @@ class ApplicationSelectedActivity(models.Model):
         """
         Authorised licence officers for this Selected Activity.
         """
-        #TODO fix
-        #groups = ActivityPermissionGroup.get_groups_for_activities(
-        #    self.licence_activity, 'licensing_officer')
+        #TODO test
+        groups = ActivityPermissionGroup.get_groups_for_activities(
+            self.licence_activity, 'licensing_officer')
 
-        return None #EmailUser.objects.filter(groups__id__in=groups).distinct()
+        return EmailUser.objects.filter(groups__id__in=groups).distinct()
 
     @property
     def issuing_officers(self):
         """
         Authorised issuing officers for this Selected Activity.
         """
-        #TODO fix
-        #groups = ActivityPermissionGroup.get_groups_for_activities(
-        #    self.licence_activity, 'issuing_officer')
+        #TODO test
+        groups = ActivityPermissionGroup.get_groups_for_activities(
+            self.licence_activity, 'issuing_officer')
 
-        return None #EmailUser.objects.filter(groups__id__in=groups).distinct()
+        return EmailUser.objects.filter(groups__id__in=groups).distinct()
 
     @property
     def total_paid_amount(self):

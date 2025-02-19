@@ -502,8 +502,8 @@ class Return(models.Model):
             'id', flat=True
         )
 
-        #TODO fix
-        return None #EmailUser.objects.filter(groups__id__in=groups).distinct()
+        #TODO test
+        return EmailUser.objects.filter(groups__id__in=groups).distinct()
 
     @transaction.atomic
     def set_submitted(self, request):

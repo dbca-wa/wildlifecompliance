@@ -64,7 +64,6 @@ class FirstTimeNagScreenMiddleware(object):
         else:
             first_time_nag = FirstTimeDefaultNag()
 
-        #TODO replace firsttiemnag
         #response = first_time_nag.process_request(request)
         return self.get_response(request)
 

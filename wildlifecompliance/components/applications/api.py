@@ -2511,16 +2511,16 @@ class AssessmentPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
         # Get the assessor groups the current user is member of
         perm_user = PermissionUser(request.user)
-        #TODO fix
-        #assessor_groups = perm_user.get_wildlifelicence_permission_group(
-        #    'assessor', first=False)
+        #TODO test
+        assessor_groups = perm_user.get_wildlifelicence_permission_group(
+            'assessor', first=False)
 
         # For each assessor groups get the assessments
         queryset = self.get_queryset().none()
-        #for group in assessor_groups:
-        #    queryset = queryset | Assessment.objects.filter(
-        #        assessor_group=group) | Assessment.objects.filter(
-        #        actioned_by=self.request.user)
+        for group in assessor_groups:
+            queryset = queryset | Assessment.objects.filter(
+                assessor_group=group) | Assessment.objects.filter(
+                actioned_by=self.request.user)
 
         queryset = self.filter_queryset(queryset)
         self.paginator.page_size = queryset.count()
@@ -2561,14 +2561,14 @@ class AssessmentViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         # Get the assessor groups the current user is member of
         perm_user = PermissionUser(request.user)
 
-        #TODO fix
-        #assessor_groups = perm_user.get_wildlifelicence_permission_group('assessor', first=False)
+        #TODO test
+        assessor_groups = perm_user.get_wildlifelicence_permission_group('assessor', first=False)
 
         # For each assessor groups get the assessments
         queryset = self.get_queryset().none()
-        #for group in assessor_groups:
-        #    queryset = queryset | Assessment.objects.filter(
-        #        assessor_group=group)
+        for group in assessor_groups:
+            queryset = queryset | Assessment.objects.filter(
+                assessor_group=group)
 
         serializer = DTAssessmentSerializer(queryset, many=True)
         return Response(serializer.data)
