@@ -18,7 +18,7 @@ from django.db.models.signals import post_save
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse
 
-from ledger_api_client.utils import create_basket_session, create_checkout_session
+from ledger_api_client.utils import create_basket_session, create_checkout_session, get_invoice_properties
 from ledger_api_client.ledger_models import Invoice
 # from ledger.payments.utils import oracle_parser
 # import json
@@ -36,6 +36,14 @@ from wildlifecompliance.components.wc_payments.models import InfringementPenalty
 
 logger = logging.getLogger('payment_checkout')
 
+def get_invoice_payment_status(invoice_id):
+    try:
+        inv_props = get_invoice_properties(invoice_id)
+        invoice_payment_status = inv_props['data']['invoice']['payment_status']
+        return invoice_payment_status
+    except Exception as e:
+        logger.error(f'Error raised when getting the payment status of the invoice (invoice_id: {invoice_id}). exception: [{e}]')
+        return '---'
 
 def get_session_infringement_invoice(session):
     """ Infringement Penalty session ID """

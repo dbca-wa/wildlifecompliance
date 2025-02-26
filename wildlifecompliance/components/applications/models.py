@@ -26,6 +26,7 @@ from ckeditor.fields import RichTextField
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
 from wildlifecompliance.components.main.models import RevisionedMixin
 from ledger_api_client.ledger_models import Invoice
+
 from wildlifecompliance.components.main.utils import (
     checkout, set_session_application,
     delete_session_application,
@@ -664,6 +665,7 @@ class Application(RevisionedMixin):
         '''
         Gets the payment status for this application.
         '''
+        from wildlifecompliance.components.wc_payments.utils import get_invoice_payment_status
         logger.debug('Application.payment_status()')
         if hasattr(self.latest_invoice, 'voided') and self.latest_invoice.voided:
             return ApplicationInvoice.PAYMENT_STATUS_NOT_REQUIRED
@@ -701,7 +703,7 @@ class Application(RevisionedMixin):
             except Invoice.DoesNotExist:
                 return ApplicationInvoice.PAYMENT_STATUS_UNPAID
 
-            return latest_invoice.payment_status
+            return get_invoice_payment_status(latest_invoice.id)
 
     @property
     def latest_invoice(self):
