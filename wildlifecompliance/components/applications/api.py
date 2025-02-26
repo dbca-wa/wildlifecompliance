@@ -13,7 +13,7 @@ from rest_framework.decorators import (
 )
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
 from ledger_api_client.utils import calculate_excl_gst
 from django.urls import reverse
 from django.shortcuts import redirect, render
@@ -2511,7 +2511,6 @@ class AssessmentPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
         # Get the assessor groups the current user is member of
         perm_user = PermissionUser(request.user)
-        #TODO test
         assessor_groups = perm_user.get_wildlifelicence_permission_group(
             'assessor', first=False)
 
@@ -2560,8 +2559,6 @@ class AssessmentViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def user_list(self, request, *args, **kwargs):
         # Get the assessor groups the current user is member of
         perm_user = PermissionUser(request.user)
-
-        #TODO test
         assessor_groups = perm_user.get_wildlifelicence_permission_group('assessor', first=False)
 
         # For each assessor groups get the assessments

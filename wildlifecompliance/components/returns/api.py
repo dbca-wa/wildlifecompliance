@@ -582,7 +582,6 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             instance = self.get_object()
             user = request.user
 
-            #TODO test
             if user not in instance.activity_curators:
                 raise serializers.ValidationError(
                     'You are not in any relevant officer groups.')
@@ -626,7 +625,6 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 raise serializers.ValidationError(
                     'You are not authorised to assign officers')
 
-            #TODO test
             if user not in instance.activity_curators:
                 raise serializers.ValidationError(
                     'User is not in any relevant officer groups')

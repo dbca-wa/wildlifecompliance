@@ -3,7 +3,7 @@ import datetime
 import logging
 
 from django.urls import reverse
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
 from wildlifecompliance import settings
 from wildlifecompliance.helpers import is_internal
 from wildlifecompliance.components.applications.models import (
@@ -1400,8 +1400,9 @@ class DTInternalApplicationSerializer(BaseApplicationSerializer):
 
     def get_user_in_officers(self, obj):
         groups = obj.get_permission_groups(['licensing_officer','issuing_officer']).values_list('id', flat=True)
-        #TODO test
-        can_process = EmailUser.objects.filter(groups__id__in=groups).distinct()
+        can_process = EmailUser.objects.filter(
+            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
+        ).distinct()
         if self.context['request'].user and self.context['request'].user in can_process:
             return True
 

@@ -349,7 +349,6 @@ class ReturnSerializer(serializers.ModelSerializer):
         Check for current user is a returns curator.
         '''
         is_in_officers = False
-        #TODO test
         if self.context['request'].user in _return.activity_curators:
             is_in_officers = True
 

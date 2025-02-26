@@ -4,7 +4,7 @@ import logging
 
 from django.contrib.auth.models import Group
 from rest_framework import serializers
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
 from wildlifecompliance import settings
 from wildlifecompliance.components.applications.models import ActivityPermissionGroup
 from wildlifecompliance.components.users.models import (
@@ -49,8 +49,11 @@ def belongs_to(user, group_name):
     :param group_name:
     :return:
     """
-    #TODO test
-    return user.groups.filter(name=group_name).exists()
+    group = Group.objects.filter(name=group_name)
+    if group.exists():
+        return user.id in list(UsersInGroup.objects.filter(group_id=group.first().id).values_list('emailuser_id', flat=True))
+    else:
+        return False
 
 
 def belongs_to_list(user, group_names):
@@ -60,12 +63,8 @@ def belongs_to_list(user, group_names):
     :param list_of_group_names:
     :return:
     """
-    #TODO test
-    for i in group_names:
-        if belongs_to(user, i):
-            return True
-    return False #user.groups().filter(name__in=group_names).exists()
-
+    groups = Group.objects.filter(name__in=group_names)
+    return user.id in list(UsersInGroup.objects.filter(group_id__in=list(groups.values_list('id',flat=True))).values_list('emailuser_id', flat=True))
 
 #def is_model_backend(request):
 #    # Return True if user logged in via single sign-on (i.e. an internal)
@@ -104,16 +103,12 @@ def is_wildlifecompliance_payment_officer(request):
     :return: boolean
     '''
     PAYMENTS_GROUP_NAME = 'Wildlife Compliance - Payment Officers'
-
-    #TODO test
-    is_payment_officer = request.user.is_authenticated and \
-        in_dbca_domain(request) and \
-        (
-            request.user.groups().filter(name=PAYMENTS_GROUP_NAME).exists()
-        )
-
-    return is_payment_officer
-
+    
+    group = Group.objects.filter(name=PAYMENTS_GROUP_NAME)
+    if group.exists():
+        return request.user.id in list(UsersInGroup.objects.filter(group_id=group.first().id).values_list('emailuser_id', flat=True))
+    else:
+        return False
 
 def in_dbca_domain(request):
     user = request.user

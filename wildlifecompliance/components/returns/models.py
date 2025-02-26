@@ -5,7 +5,7 @@ from django.db import models, transaction
 from django.db.utils import IntegrityError
 from django.db.models import JSONField
 from django.utils import timezone
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
 from wildlifecompliance.components.main.models import RevisionedMixin
 from ledger_api_client.ledger_models import Invoice
 from wildlifecompliance.components.applications.models import (
@@ -502,8 +502,9 @@ class Return(models.Model):
             'id', flat=True
         )
 
-        #TODO test
-        return EmailUser.objects.filter(groups__id__in=groups).distinct()
+        return EmailUser.objects.filter(
+            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
+        ).distinct()
 
     @transaction.atomic
     def set_submitted(self, request):

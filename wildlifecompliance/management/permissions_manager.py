@@ -10,7 +10,7 @@ from wildlifecompliance.components.applications.models import ActivityPermission
 #from wildlifecompliance.components.users.models import CompliancePermissionGroup
 from wildlifecompliance.components.main.models import Region, District
 
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
 
 logger = logging.getLogger(__name__)
 
@@ -374,10 +374,15 @@ class PermissionUser(object):
 
     def has_wildlifelicenceactivity_perm(self, permission_codename, licence_activity_id):
         app_label = get_app_label()
-        group_queryset = self._user.groups.filter(
-            permissions__codename__in=permission_codename if isinstance(
-                permission_codename, (list, models.query.QuerySet)
-            ) else [permission_codename],
+
+        user_id = self._user.id
+        groups_with_permissions = Group.objects.filter(permissions__codename__in=permission_codename if isinstance(
+            permission_codename, (list, models.query.QuerySet)
+        ) else [permission_codename])
+        
+        groups_with_user = UsersInGroup.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
+        group_queryset = Group.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+        group_queryset = group_queryset.filter(
             activitypermissiongroup__licence_activities__id__in=licence_activity_id if isinstance(
                 licence_activity_id, (list, models.query.QuerySet)
             ) else [licence_activity_id]
@@ -388,9 +393,12 @@ class PermissionUser(object):
 
     def get_wildlifelicence_permission_group(self, permission_codename, activity_id=None, first=True):
         app_label = get_app_label()
-        qs = self._user.groups.filter(
-            permissions__codename=permission_codename
-        )
+
+        user_id = self._user.id
+        groups_with_permissions = Group.objects.filter(permissions__codename=permission_codename)
+        groups_with_user = UsersInGroup.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
+        qs = Group.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+
         if activity_id is not None:
             qs = qs.filter(
                 activitypermissiongroup__licence_activities__id__in=activity_id if isinstance(

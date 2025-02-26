@@ -23,7 +23,7 @@ from six import python_2_unicode_compatible
 from smart_selects.db_fields import ChainedForeignKey
 from ckeditor.fields import RichTextField
 
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
 from wildlifecompliance.components.main.models import RevisionedMixin
 from ledger_api_client.ledger_models import Invoice
 from wildlifecompliance.components.main.utils import (
@@ -842,12 +842,11 @@ class Application(RevisionedMixin):
         Authorised licensing officers for this Application.
         """
         logger.debug('Application.licence_officers()')
-        #TODO test
         if not self.LICENCE_OFFICERS:
             groups = self.get_permission_groups(
                 'licensing_officer').values_list('id', flat=True)
             self.LICENCE_OFFICERS = EmailUser.objects.filter(
-                groups__id__in=groups
+                id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
             ).distinct()
         
         return self.LICENCE_OFFICERS
@@ -858,9 +857,10 @@ class Application(RevisionedMixin):
         groups = self.get_permission_groups('issuing_officer')\
             .values_list('id', flat=True)
 
-        approvers = EmailUser.objects.filter(groups__id__in=groups).distinct()
+        approvers = EmailUser.objects.filter(
+            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
+        ).distinct()
         logger.debug('Application.licence_approvers() - end')
-        #TODO test
         return approvers
 
     @property
@@ -5109,22 +5109,24 @@ class ApplicationSelectedActivity(models.Model):
         """
         Authorised licence officers for this Selected Activity.
         """
-        #TODO test
         groups = ActivityPermissionGroup.get_groups_for_activities(
-            self.licence_activity, 'licensing_officer')
+            self.licence_activity, 'licensing_officer').values_list("id", flat=True)
 
-        return EmailUser.objects.filter(groups__id__in=groups).distinct()
+        return EmailUser.objects.filter(
+            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
+        ).distinct()
 
     @property
     def issuing_officers(self):
         """
         Authorised issuing officers for this Selected Activity.
         """
-        #TODO test
         groups = ActivityPermissionGroup.get_groups_for_activities(
-            self.licence_activity, 'issuing_officer')
+            self.licence_activity, 'issuing_officer').values_list("id", flat=True)
 
-        return EmailUser.objects.filter(groups__id__in=groups).distinct()
+        return EmailUser.objects.filter(
+            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
+        ).distinct()
 
     @property
     def total_paid_amount(self):
