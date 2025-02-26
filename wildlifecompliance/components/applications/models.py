@@ -872,7 +872,7 @@ class Application(RevisionedMixin):
              'issuing_officer']
         ).values_list('id', flat=True)
         return EmailUser.objects.filter(
-            groups__id__in=groups
+            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
         ).distinct()
 
     @property

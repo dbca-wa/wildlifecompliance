@@ -269,7 +269,7 @@ export default {
             let vm =this;
             vm.district = '';
             if (vm.region) {
-                vm.selected_region = vm.regions.find(r => (r.code == vm.region));
+                vm.selected_region = vm.regions.find(r => (r.name == vm.region));
             }else{
                 vm.selected_region={
                     code:'',
@@ -372,13 +372,7 @@ export default {
         //},
         fetchRegions:function () {
             let vm = this;
-            $.get('/ledger/payments/api/regions?format=json',function (data) {
-                vm.regions = data;
-            });
-        },
-        fetchRegions:function () {
-            let vm = this;
-            $.get('/ledger/payments/api/regions?format=json',function (data) {
+            $.get('/api/regions?format=json',function (data) {
                 vm.regions = data;
             });
         },
