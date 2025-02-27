@@ -963,7 +963,7 @@ reversion.register(
     Return,
     follow=[
         'application',
-        'submitter',
+        #'submitter', TODO disabled for segregation - check if needed/repairable  
         'assigned_to',
         'condition',
         'licence',

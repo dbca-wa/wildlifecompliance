@@ -118,7 +118,8 @@ class InfringementPenalty(Payment):
 
     def __str__(self):
         # return 'Sanction Outcome {} : Invoice {}'.format(self.sanction_outcome, self.infringement_penalty_invoices.last())
-        return 'Sanction Outcome {} : Invoice {}'.format(self.sanction_outcome, self.invoice)
+        #return 'Sanction Outcome {} : Invoice {}'.format(self.sanction_outcome, self.invoice)
+        return 'Sanction Outcome {}'.format(self.sanction_outcome)
 
     class Meta:
         app_label = 'wildlifecompliance'
