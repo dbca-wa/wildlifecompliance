@@ -1165,7 +1165,16 @@ import reversion
 #reversion.register(OrganisationRequestLogEntry)
 #reversion.register(OrganisationRequestUserAction)
 
-reversion.register(Organisation, follow=['intelligence_documents', 'contacts', 'userdelegation_set', 'action_logs', 'comms_logs', 'organisation_inspected', 'org_applications', 'offender_organisation'])
+reversion.register(Organisation, 
+    follow=['intelligence_documents', 
+            'contacts', 
+            'userdelegation_set', 
+            'action_logs', 
+            'comms_logs', 
+            #'organisation_inspected', 
+            'org_applications', 
+            #'offender_organisation'
+        ])
 reversion.register(OrganisationIntelligenceDocument, follow=[])
 reversion.register(OrganisationContact, follow=['action_logs', 'organisationcontactdeclineddetails_set'])
 reversion.register(OrganisationContactAction, follow=[])

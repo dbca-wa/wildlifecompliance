@@ -7285,17 +7285,20 @@ import reversion
 reversion.register(
     Application,
     follow=[
-        'selected_activities',
+    #    'selected_activities', TODO disabled for segregation - check if needed/repairable  
         'invoices',
+
         # 'form_data_records',
         # 'conditions',
+
         'previous_application',
         'licence_document',
         'licence',
-        'submitter',
+    #    'submitter', TODO disabled for segregation - check if needed/repairable  
         'org_applicant',
         'proxy_applicant',
         'licence_purposes',
+
         # 'action_logs',
         # 'comms_logs',
         ]
