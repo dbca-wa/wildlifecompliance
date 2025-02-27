@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='inspection',
             name='inspection_team',
-            field=models.ManyToManyField(blank=True, to=settings.AUTH_USER_MODEL),
+            field=models.ManyToManyField(blank=True, through='inspection.InspectionTeam', to=settings.AUTH_USER_MODEL),
         ),
     ]

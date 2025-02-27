@@ -60,6 +60,23 @@ class InspectionType(models.Model):
     def __str__(self):
         return '{0}, v.{1}'.format(self.inspection_type, self.version)
 
+class InspectionTeam(models.Model):
+
+    emailuser = models.ForeignKey(
+        EmailUser, 
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+    inspection = models.ForeignKey(
+        'wildlifecompliance.Inspection', 
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        db_table = "wildlifecompliance_inspection_inspection_team"
+        unique_together=('inspection','emailuser')
 
 class Inspection(RevisionedMixin):
     PARTY_INDIVIDUAL = 'individual'
@@ -142,6 +159,8 @@ class Inspection(RevisionedMixin):
     inspection_team = models.ManyToManyField(
         EmailUser,
         # related_name='inspection_team',
+        through=InspectionTeam,
+        through_fields=('inspection', 'emailuser'),
         blank=True
         )
     inspection_team_lead = models.ForeignKey(
