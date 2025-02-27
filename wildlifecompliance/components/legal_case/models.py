@@ -77,6 +77,23 @@ class CourtProceedings(models.Model):
     class Meta:
         app_label = 'wildlifecompliance'
 
+class LegalCaseAssociatedPerson(models.Model):
+
+    emailuser = models.ForeignKey(
+        EmailUser, 
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+    legalcase = models.ForeignKey(
+        'wildlifecompliance.LegalCase', 
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        db_table = "wildlifecompliance_legalcase_associated_persons"
+        unique_together=('legalcase','emailuser')
 
 class LegalCase(RevisionedMixin):
     STATUS_OPEN = 'open'
@@ -148,6 +165,8 @@ class LegalCase(RevisionedMixin):
     associated_persons = models.ManyToManyField(
             EmailUser,
             related_name='legal_case_associated_persons',
+            through=LegalCaseAssociatedPerson,
+            through_fields=('legalcase', 'emailuser'),
             )
 
     class Meta:
@@ -472,7 +491,12 @@ class CourtProceedingsJournalEntry(RevisionedMixin):
             is_reinstated = True
         return is_reinstated
 
-class LegalCasePerson(EmailUser):
+
+class LegalCasePerson(models.Model):
+    id = models.OneToOneField(
+        EmailUser, 
+        on_delete=models.CASCADE, primary_key=True, db_column='id',
+        )
     legal_case = models.ForeignKey(LegalCase, related_name='legal_case_person', on_delete=models.CASCADE)
 
     class Meta:

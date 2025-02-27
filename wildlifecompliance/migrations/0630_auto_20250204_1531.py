@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
         migrations.RenameField(
             model_name='legalcaseperson',
             old_name='emailuser_ptr',
-            new_name='emailuserro_ptr',
+            new_name='id',
         ),
         migrations.RenameField(
             model_name='licencecategory',
