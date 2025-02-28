@@ -926,6 +926,7 @@ class SanctionOutcomeDocument(Document):
         verbose_name_plural = 'CM_SanctionOutcomeDocuments'
 
 
+#TODO determine if this is used
 class SanctionOutcomeDocumentAccessLog(models.Model):
     accessed_at = models.DateTimeField(auto_now_add=True)
     accessed_by = models.ForeignKey(EmailUser, on_delete=models.CASCADE)
@@ -1006,7 +1007,7 @@ class SanctionOutcomeUserAction(models.Model):
             what=str(action)
         )
 
-
+#TODO determine if this is used
 class DotRequestFile(models.Model):
     contents = models.TextField(blank=True)
     filename = models.CharField(max_length=100, blank=True)

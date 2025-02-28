@@ -162,8 +162,9 @@ class ActivityPermissionGroup(Group):
 
     @property
     def members(self):
+        groups = Group.objects.filter(id=self.id)
         return EmailUser.objects.filter(
-            groups__id=self.id
+            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
         ).distinct()
 
     @staticmethod
@@ -1907,9 +1908,10 @@ class Application(RevisionedMixin):
     def get_assessor_permission_group(
                     self, user, activity_id=None, first=True):
         app_label = get_app_label()
-        qs = user.groups.filter(
-            permissions__codename='assessor'
-        )
+        user_id = user.id
+        groups_with_permissions = Group.objects.filter(permissions__codename="assessor")
+        groups_with_user = UsersInGroup.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
+        qs = Group.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
         if activity_id is not None:
            qs = qs.filter(
                 activitypermissiongroup__licence_activities__id__in=activity_id if isinstance(
@@ -4321,7 +4323,8 @@ class Assessment(ApplicationRequest):
 
             except BaseException:
                 raise
-
+    
+    #TODO does not appear to be in use
     def add_inspection(self, request):
         """
         Attaches an Inspection to an Assessment.

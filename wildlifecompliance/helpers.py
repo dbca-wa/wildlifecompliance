@@ -33,7 +33,9 @@ def is_new_to_wildlifelicensing(request=None):
         and request.user.dob \
         and request.user.residential_address \
         and (request.user.phone_number or request.user.mobile_number) \
-        and (request.user.identification2 or prefer_compliance_management(request)) else False 
+        and (prefer_compliance_management(request)) else False 
+        #and (#request.user.identification2 or TODO
+        
 
     if not SecureBaseUtils.is_wildlifelicensing_request(request):
          has_user_details = True

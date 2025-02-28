@@ -657,7 +657,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def create_new_person(self, request, *args, **kwargs):
         print("create_new_person")
 
-        if not is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
+        if not is_compliance_internal_user(self.request): # or is_wildlife_compliance_officer(self.request):
             return Response("user not authorised to create new person",
             status=status.HTTP_401_UNAUTHORIZED)
 
@@ -754,7 +754,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 print(traceback.print_exc())
                 raise serializers.ValidationError(str(e))
 
-class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.CreateModelMixin):
+class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = EmailUser.objects.none()
     serializer_class = UserSerializer
     #renderer_classes = [JSONRenderer, ]
@@ -792,7 +792,7 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
         print("cm user create")
         print(request.data)
         
-        if not is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
+        if not is_compliance_internal_user(self.request): #or is_wildlife_compliance_officer(self.request):
             return Response("user not authorised to create new person",
             status=status.HTTP_401_UNAUTHORIZED)
         
@@ -808,6 +808,8 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
                     request_data.update({'email': email_address})
                 
                 email_user_instance = EmailUser.objects.create_user(email_address, '')
+
+                #TODO this does not work - fix
                 res = self.update_person(request, instance=email_user_instance)
                 return res
                 #print("user_serializer_data")

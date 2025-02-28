@@ -754,7 +754,7 @@ class EmailUserAppViewSerializer(serializers.ModelSerializer):
                   'title',
                   'organisation',
                   'residential_address',
-                  #'identification2',
+                  #'identification2', TODO
                   'email',
                   'phone_number',
                   'mobile_number',)

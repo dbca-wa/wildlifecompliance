@@ -2234,6 +2234,7 @@ class SectionQuestion(models.Model):
             self.property_cache['options'] = data
 
 
+#TODO does not appear to work or be in use
 class SectionQuestionCondition(models.Model):
     '''
     Model representation of a Question Condition required for Question Option.
@@ -2255,7 +2256,7 @@ class SectionQuestionCondition(models.Model):
             self.id
         )
 
-
+#TODO does not appear to be in use
 class LicenceLogEntry(CommunicationsLogEntry):
     licence = models.ForeignKey(WildlifeLicence, related_name='comms_logs', on_delete=models.CASCADE)
 

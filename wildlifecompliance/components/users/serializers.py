@@ -294,9 +294,9 @@ class UserSerializer(serializers.ModelSerializer):
     contact_details = serializers.SerializerMethodField()
     wildlifecompliance_organisations = serializers.SerializerMethodField()
     # identification = IdentificationSerializer()
-    #identification2 = Identification2Serializer()
+    #identification2 = Identification2Serializer() TODO
     dob = serializers.SerializerMethodField()
-    legal_dob = serializers.SerializerMethodField()
+    #legal_dob = serializers.SerializerMethodField()
     acc_mgmt_url = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -306,12 +306,12 @@ class UserSerializer(serializers.ModelSerializer):
             'id',
             'last_name',
             'first_name',
-            'legal_last_name',
-            'legal_first_name',
+            #'legal_last_name',
+            #'legal_first_name',
             'dob',
-            'legal_dob',
+            #'legal_dob',
             'email',
-            #'identification2',
+            #'identification2', TODO
             'residential_address',
             'phone_number',
             'mobile_number',
@@ -332,15 +332,16 @@ class UserSerializer(serializers.ModelSerializer):
 
         return formatted_date
     
-    def get_legal_dob(self, obj):
-        formatted_date = obj.legal_dob.strftime(
-            '%d/%m/%Y'
-        ) if obj.legal_dob else None
-
-        return formatted_date
+    #def get_legal_dob(self, obj):
+    #    formatted_date = obj.legal_dob.strftime(
+    #        '%d/%m/%Y'
+    #    ) if obj.legal_dob else None
+#
+    #    return formatted_date
 
     def get_personal_details(self, obj):
-        return True if obj.last_name and obj.first_name and (obj.dob or obj.legal_dob) else False
+        #(obj.dob or obj.legal_dob)
+        return True if obj.last_name and obj.first_name and (obj.dob) else False
 
     def get_address_details(self, obj):
         return True if obj.residential_address else False
@@ -387,9 +388,9 @@ class FirstTimeUserSerializer(UserSerializer):
             'last_name',
             'first_name',
             'dob',
-            'legal_last_name',
-            'legal_first_name',
-            'legal_dob',
+            #'legal_last_name',
+            #'legal_first_name',
+            #'legal_dob',
             'email',
             'identification',
             'residential_address',
@@ -563,7 +564,8 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
     #    return formatted_date
 
     def get_personal_details(self, obj):
-        return True if obj.last_name and obj.first_name and (obj.dob or obj.legal_dob)  else False
+        #or obj.legal_dob
+        return True if obj.last_name and obj.first_name and (obj.dob)  else False
 
     def get_address_details(self, obj):
         return True if obj.residential_address else False
@@ -656,7 +658,8 @@ class ComplianceUserDetailsSerializer(serializers.ModelSerializer):
         return get_last_name(obj)
 
     def get_personal_details(self, obj):
-        return True if obj.last_name and obj.first_name and (obj.dob or obj.legal_dob)  else False
+        #(obj.dob or obj.legal_dob)
+        return True if obj.last_name and obj.first_name and (obj.dob)  else False
 
     def get_address_details(self, obj):
         return True if obj.residential_address else False

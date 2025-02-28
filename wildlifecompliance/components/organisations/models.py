@@ -7,6 +7,7 @@ from django.db.models.signals import pre_delete, pre_save
 from six import python_2_unicode_compatible
 from django.core.exceptions import ValidationError
 from django.db.models import JSONField
+from rest_framework import status
 
 from ledger_api_client.utils import get_organisation, get_search_organisation
 
@@ -512,14 +513,14 @@ class Organisation(models.Model):
             exists = False
 
         if exists:
-            if has_atleast_one_admin(org):
+            if not org.has_no_admins:
                 return {
                     "exists": exists,
                     "id": org.id,
                     "first_five": org.first_five,
                 }
             else:
-                return {"exists": has_atleast_one_admin(org)}
+                return {"exists": not org.has_no_admins}
         return {"exists": exists}
 
     @property
@@ -704,27 +705,12 @@ class OrganisationContact(models.Model):
         return self.user_status == OrganisationContact.ORG_CONTACT_STATUS_ACTIVE \
             and self.user_role == OrganisationContact.ORG_CONTACT_ROLE_CONSULTANT
 
-    # def unlink_user(self,user,request):
-    #     with transaction.atomic():
-    #         try:
-    #             delegate = UserDelegation.objects.get(organisation=self.organisation_id,user=user)
-    #         except UserDelegation.DoesNotExist:
-    #             raise ValidationError('This user is not a member of {}'.format(str(self.organisation_id)))
-
-    #         # delete delegate
-    #         delegate.delete()
-    #         self.user_status ='unlinked'
-    #         self.save()
-    #         # org = Organisation.objects.get(id=self.organisation_id)
-    #         # log linking
-    #         # self.log_user_action(OrganisationContactAction.ACTION_UNLINK.format('{} {}({})'.format(user.first_name,user.last_name,user.email)),request)
-    #         # send email
-    #         send_organisation_unlink_email_notification(user,request.user,self,request)
-
+    #TODO does not appear to be in use, consider removal
     def log_user_action(self, action, request):
         return OrganisationContactAction.log_action(self, action, request.user)
 
 
+#TODO does not appear to be in use, consider removal
 class OrganisationContactAction(UserAction):
     ACTION_ORGANISATION_CONTACT_ACCEPT = "Accept request {}"
     ACTION_ORGANISATION_CONTACT_DECLINE = "Decline Request {}"
@@ -1154,16 +1140,6 @@ class OrganisationRequestLogEntry(CommunicationsLogEntry):
 NOTE: REGISTER MODELS FOR REVERSION HERE.
 '''
 import reversion
-#reversion.register(Organisation)
-#reversion.register(OrganisationAction)
-#reversion.register(OrganisationContact)
-#reversion.register(OrganisationContactAction)
-#reversion.register(OrganisationContactDeclinedDetails)
-#reversion.register(OrganisationLogEntry)
-#reversion.register(OrganisationRequest)
-#reversion.register(OrganisationRequestDeclinedDetails)
-#reversion.register(OrganisationRequestLogEntry)
-#reversion.register(OrganisationRequestUserAction)
 
 reversion.register(Organisation, 
     follow=['intelligence_documents', 

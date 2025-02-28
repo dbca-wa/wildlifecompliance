@@ -45,6 +45,7 @@ def update_returns_comms_log_filename(instance, filename):
     return 'wildlifecompliance/returns/{}/communications/{}/{}'.format(
         instance.log_entry.return_obj.id, instance.id, filename)
 
+#NOTE many Return models and functions appear to be generally unused.
 
 class ReturnType(models.Model):
     """

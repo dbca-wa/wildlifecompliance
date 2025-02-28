@@ -323,7 +323,7 @@ class OffenceUserAction(models.Model):
             what=str(action)
         )
 
-
+#TODO does not appear to work/be in use (it should be)
 class OffenceCommsLogDocument(Document):
     log_entry = models.ForeignKey('OffenceCommsLogEntry', related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)

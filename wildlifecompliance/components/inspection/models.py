@@ -390,7 +390,7 @@ class InspectionUserAction(models.Model):
 
     inspection = models.ForeignKey(Inspection, related_name='action_logs', on_delete=models.CASCADE)
 
-
+#TODO check if used
 class InspectionDocument(Document):
     inspection = models.ForeignKey('Inspection', related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)

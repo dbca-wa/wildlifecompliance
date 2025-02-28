@@ -491,7 +491,7 @@ class CourtProceedingsJournalEntry(RevisionedMixin):
             is_reinstated = True
         return is_reinstated
 
-
+#TODO may not be in use
 class LegalCasePerson(models.Model):
     id = models.OneToOneField(
         EmailUser, 

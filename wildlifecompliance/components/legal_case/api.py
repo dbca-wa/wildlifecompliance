@@ -562,8 +562,8 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                         for key, entry in court_dates.items():
                             entry_copy = dict(entry)
                             comments = entry_copy.get('comments', '')
-                            ascii_comments = comments.encode('ascii', 'xmlcharrefreplace')
-                            entry_copy.update({'comments': ascii_comments})
+                            #ascii_comments = comments.encode('ascii', 'xmlcharrefreplace')
+                            entry_copy.update({'comments': comments})
                             entry_copy['court_id'] = entry_copy['court']['id'] if entry_copy['court'] else None
                             if entry_copy.get('id'):
                                 # Update existing court_date

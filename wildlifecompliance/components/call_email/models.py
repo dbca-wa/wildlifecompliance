@@ -595,10 +595,13 @@ class ComplianceFormDataRecord(models.Model):
     deficiency = models.TextField(blank=True, null=True)
 
     def __str__(self):
+        value=""
+        if self.value:
+            value=self.value[:8] 
         return "CallEmail {id} record {field}: {value}".format(
             id=self.call_email_id,
             field=self.field_name,
-            value=self.value[:8]
+            value=value
         )
 
     class Meta:
@@ -652,7 +655,7 @@ class ComplianceFormDataRecord(models.Model):
                     form_data_record.deficiency = deficiency
             form_data_record.save()
 
-
+#TODO determine if in use, otherwise remove
 class CallEmailDocument(Document):
     call_email = models.ForeignKey('CallEmail', related_name='documents', on_delete=models.CASCADE)
     #_file = models.FileField(max_length=255, upload_to=update_call_email_doc_filename)

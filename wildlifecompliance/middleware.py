@@ -84,10 +84,11 @@ class FirstTimeDefaultNag(object):
             and 'admin' not in request.path 
             and 'ledger-private' not in request.path):
 
+            #(not request.user.dob and not request.user.legal_dob) or \
             print(request.user.first_name,request.user.last_name)
             if (not request.user.first_name) or \
                     (not request.user.last_name) or \
-                    (not request.user.dob and not request.user.legal_dob) or \
+                    (not request.user.dob ) or \
                     (not request.user.residential_address) or \
                     (not (
                         request.user.phone_number or request.user.mobile_number

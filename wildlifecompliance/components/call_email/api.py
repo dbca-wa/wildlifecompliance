@@ -1090,7 +1090,10 @@ class EmailUserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = EmailUser.objects.none()
     serializer_class = EmailUserSerializer
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('first_name', 'last_name', 'legal_first_name', 'legal_last_name', 'email', 'phone_number', 'mobile_number', 'organisation')
+    search_fields = ('first_name', 'last_name', 
+                     #'legal_first_name', 
+                     #'legal_last_name', 
+                     'email', 'phone_number', 'mobile_number', 'organisation')
 
     def get_queryset(self):
         exclude_staff = self.request.GET.get('exclude_staff')
