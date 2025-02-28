@@ -78,6 +78,7 @@ class SystemMaintenance(models.Model):
         )
 
 
+#TODO does not appear to be in actual use, remove this and all references
 @python_2_unicode_compatible
 class Sequence(models.Model):
 

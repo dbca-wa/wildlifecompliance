@@ -183,6 +183,23 @@ class PhysicalArtifactDisposalMethod(models.Model):
     def __str__(self):
         return '{}, {}'.format(self.disposal_method, self.description)
 
+class DocumentArtifactPeopleAttending(models.Model):
+
+    emailuser = models.ForeignKey(
+        EmailUser, 
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+    documentartifact = models.ForeignKey(
+        'wildlifecompliance.DocumentArtifact', 
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        db_table = "wildlifecompliance_documentartifact_people_attending"
+        unique_together=('documentartifact','emailuser')
 
 class DocumentArtifact(Artifact):
     WITNESS_STATEMENT = 'witness_statement'
@@ -233,6 +250,8 @@ class DocumentArtifact(Artifact):
             )
     people_attending = models.ManyToManyField(
             EmailUser,
+            through=DocumentArtifactPeopleAttending,
+            through_fields=('documentartifact', 'emailuser'),
             related_name='document_artifact_people_attending',
             )
     offence = models.ForeignKey(

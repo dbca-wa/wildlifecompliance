@@ -139,7 +139,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='documentartifact',
             name='people_attending',
-            field=models.ManyToManyField(related_name='document_artifact_people_attending', to=settings.AUTH_USER_MODEL),
+            field=models.ManyToManyField(related_name='document_artifact_people_attending', through='artifact.DocumentArtifactPeopleAttending', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='documentartifact',
