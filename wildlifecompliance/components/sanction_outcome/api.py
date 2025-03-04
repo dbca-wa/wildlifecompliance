@@ -1270,8 +1270,8 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                     second_last = dates[1]
                     instance.log_user_action(SanctionOutcomeUserAction.ACTION_EXTEND_DUE_DATE.format(
                         instance.lodgement_number,
-                        second_last.due_date_applied.strftime('%d/%m/%Y'),
-                        last_date.due_date_applied.strftime('%d/%m/%Y')),
+                        second_last.due_date_applied.strftime('%d/%m/%Y') if second_last.due_date_applied else '',
+                        last_date.due_date_applied.strftime('%d/%m/%Y')) if last_date.due_date_applied else '',
                         request)
 
                 to_address = [instance.get_offender()[0].email,]
