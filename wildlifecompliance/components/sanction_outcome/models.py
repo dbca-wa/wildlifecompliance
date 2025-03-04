@@ -1020,7 +1020,7 @@ class DotRequestFile(models.Model):
         verbose_name = 'CM_DotReguestFile'
         verbose_name_plural = 'CM_DotReguestFiles'
 
-
+#TODO investigate if working (may not be set when it should be)
 class UnpaidInfringementFile(models.Model):
     contents = models.TextField(blank=True)
     filename = models.CharField(max_length=100, blank=True)
@@ -1045,6 +1045,7 @@ class UnpaidInfringementFile(models.Model):
         verbose_name_plural = 'CM_UnpaidInfringementFiles'
 
 
+#TODO remediation action not currently in use
 class ActionTakenDocument(Document):
     remediation_action = models.ForeignKey(RemediationAction, related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)

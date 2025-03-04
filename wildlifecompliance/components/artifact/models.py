@@ -308,7 +308,7 @@ class DocumentArtifactLegalCasesManager(models.Manager):
         link = self.create(legal_case_id=legal_case_id, document_artifact_id=document_artifact_id, primary=set_primary)
         return link
 
-
+#TODO does not appear to be in use
 class DocumentArtifactLegalCases(models.Model):
     document_artifact = models.ForeignKey(
             DocumentArtifact,
@@ -516,7 +516,7 @@ class PhysicalArtifactLegalCasesManager(models.Manager):
         link = self.create(legal_case_id=legal_case_id, physical_artifact_id=physical_artifact_id, primary=set_primary)
         return link
 
-
+#TODO does not appear to be in use
 class PhysicalArtifactLegalCases(models.Model):
     physical_artifact = models.ForeignKey(
             PhysicalArtifact,
@@ -598,7 +598,7 @@ class ProsecutionBriefPhysicalArtifacts(models.Model):
         hyperlink = '/internal/object/' + str(self.physical_artifact.id)
         return hyperlink
 
-    
+#TODO determine if in use
 @python_2_unicode_compatible
 class PhysicalArtifactFormDataRecord(models.Model):
 
@@ -712,7 +712,7 @@ class ArtifactCommsLogEntry(CommunicationsLogEntry):
     class Meta:
         app_label = 'wildlifecompliance'
 
-
+#TODO fix
 class ArtifactCommsLogDocument(Document):
     log_entry = models.ForeignKey(
         ArtifactCommsLogEntry,
@@ -772,7 +772,7 @@ class ArtifactDocument(Document):
     class Meta:
         app_label = 'wildlifecompliance'
 
-
+#TODO deterimine if in use
 class RendererDocument(Document):
     physical_artifact = models.ForeignKey(
         PhysicalArtifact,
@@ -783,7 +783,7 @@ class RendererDocument(Document):
     class Meta:
         app_label = 'wildlifecompliance'
 
-
+#TODO does not appear to be in use
 class BriefOfEvidenceOtherStatements(models.Model):
     legal_case = models.ForeignKey(
             LegalCase, 
@@ -959,6 +959,7 @@ class BriefOfEvidenceRecordOfInterview(models.Model):
                 label_text = 'Associated Document Object: ' + self.associated_doc_artifact.number
         return label_text
 
+#TODO does not appear to be in use
 class ProsecutionBriefOtherStatements(models.Model):
     legal_case = models.ForeignKey(
             LegalCase, 

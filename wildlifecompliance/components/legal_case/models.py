@@ -77,6 +77,7 @@ class CourtProceedings(models.Model):
     class Meta:
         app_label = 'wildlifecompliance'
 
+#TODO may not be in use
 class LegalCaseAssociatedPerson(models.Model):
 
     emailuser = models.ForeignKey(
