@@ -113,7 +113,7 @@ class WildlifeComplianceRoutingView(TemplateView):
         return super(WildlifeComplianceRoutingView, self).get(*args, **kwargs)
 
 
-@login_required(login_url='wc_home')
+@login_required(login_url='home')
 def first_time(request):
     context = {}
     if request.method == 'POST':
@@ -233,10 +233,10 @@ def getLedgerIdentificationFile(request, emailuser_id):
                     return HttpResponse(the_data, content_type=mimetypes.types_map['.'+str(extension)])
         else:
                 messages.error(request, 'Unable to find the document')
-                return redirect('wc_home')
+                return redirect('home')
     except:
         messages.error(request, 'Unable to find the document')
-        return redirect('wc_home')
+        return redirect('home')
 
 def getLedgerSeniorCardFile(request, emailuser_id):
     allow_access = False
@@ -275,10 +275,10 @@ def getLedgerSeniorCardFile(request, emailuser_id):
                     return HttpResponse(the_data, content_type=mimetypes.types_map['.'+str(extension)])
         else:
                 messages.error(request, 'Unable to find the document')
-                return redirect('wc_home')
+                return redirect('home')
     except:
         messages.error(request, 'Unable to find the document')
-        return redirect('wc_home')
+        return redirect('home')
 
 def is_authorised_to_access_application_document(request,document_id):
     if is_internal(request):

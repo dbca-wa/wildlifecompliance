@@ -599,7 +599,7 @@ export default {
                 application_id,
                 activity_id
             }).then(res=>{
-                    window.location.href = "/ledger/checkout/checkout/payment-details/";
+                    window.location.href = res.body;
                 },err=>{
                     swal(
                         'Submit Error',
@@ -610,7 +610,7 @@ export default {
         },
         payApplicationFee: function(application_id) {
             this.$http.post(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/application_fee_checkout/'), application_id).then(res=>{
-                    window.location.href = "/ledger/checkout/checkout/payment-details/";
+                    window.location.href = res.body;
                 },err=>{
                     swal(
                         'Submit Error',

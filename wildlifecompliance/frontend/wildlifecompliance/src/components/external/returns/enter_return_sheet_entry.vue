@@ -409,7 +409,7 @@ export default {
         this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/sheet_pay_transfer'),_data,{
                       emulateJSON:true,
                     }).then((response)=>{
-                            window.location.href = "/ledger/checkout/checkout/payment-details/";
+                            window.location.href = res.body;
                       //let species_id = this.returns.sheet_species;
                       //this.setReturns(response.body);
                       //this.returns.sheet_species = species_id;

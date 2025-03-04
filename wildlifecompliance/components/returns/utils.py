@@ -3,7 +3,7 @@ import logging
 
 from django.conf import settings
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse
 from wildlifecompliance.components.returns.models import (
     Return,
     ReturnTable,
@@ -28,14 +28,16 @@ def checkout(
         vouchers=[],
         internal=False,
         add_checkout_params={}):
+    
     basket_params = {
         'products': lines,
         'vouchers': vouchers,
         'system': settings.WC_PAYMENT_SYSTEM_ID,
         'custom_basket': True,
+        'booking_reference': returns.lodgement_number,
+        'booking_reference_link': returns.lodgement_number,
     }
-    basket, basket_hash = create_basket_session(request, basket_params)
-    request.basket = basket
+    basket_hash = create_basket_session(request, request.user.id, basket_params)
 
     checkout_params = {
         'system': settings.WC_PAYMENT_SYSTEM_ID,
@@ -45,20 +47,17 @@ def checkout(
         'return_preload_url': request.build_absolute_uri('/'),
         'force_redirect': True,
         'proxy': True if internal else False,
-        'invoice_text': invoice_text}
+        'invoice_text': invoice_text,
+        'basket_owner': request.user.id,
+        'session_type': 'ledger_api'
+    }
+
     checkout_params.update(add_checkout_params)
     print(' -------- main utils > checkout > checkout_params ---------- ')
     print(checkout_params)
     create_checkout_session(request, checkout_params)
 
-    response = HttpResponseRedirect(reverse('checkout:index'))
-    # inject the current basket into the redirect response cookies
-    # or else, anonymous users will be directionless
-    response.set_cookie(
-        settings.OSCAR_BASKET_COOKIE_OPEN, basket_hash,
-        max_age=settings.OSCAR_BASKET_COOKIE_LIFETIME,
-        secure=settings.OSCAR_BASKET_COOKIE_SECURE, httponly=True
-    )
+    response = HttpResponse(reverse('ledgergw-payment-details'))
 
     return response
 
