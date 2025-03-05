@@ -26,6 +26,7 @@ from ckeditor.fields import RichTextField
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
 from wildlifecompliance.components.main.models import RevisionedMixin
 from ledger_api_client.ledger_models import Invoice
+from ledger_api_client.utils import get_invoice_properties
 
 from wildlifecompliance.components.main.utils import (
     checkout, set_session_application,
@@ -846,8 +847,8 @@ class Application(RevisionedMixin):
         """
         logger.debug('Application.licence_officers()')
         if not self.LICENCE_OFFICERS:
-            groups = self.get_permission_groups(
-                'licensing_officer').values_list('id', flat=True)
+            groups = list(self.get_permission_groups(
+                'licensing_officer').values_list('id', flat=True))
             self.LICENCE_OFFICERS = EmailUser.objects.filter(
                 id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
             ).distinct()
@@ -857,8 +858,8 @@ class Application(RevisionedMixin):
     @property
     def licence_approvers(self):
         logger.debug('Application.licence_approvers() - start')
-        groups = self.get_permission_groups('issuing_officer')\
-            .values_list('id', flat=True)
+        groups = list(self.get_permission_groups('issuing_officer')\
+            .values_list('id', flat=True))
 
         approvers = EmailUser.objects.filter(
             id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
@@ -869,11 +870,11 @@ class Application(RevisionedMixin):
     @property
     def officers_and_assessors(self):
         logger.debug('Application.officers_and_assessors()')
-        groups = self.get_permission_groups(
+        groups = list(self.get_permission_groups(
             ['licensing_officer',
              'assessor',
              'issuing_officer']
-        ).values_list('id', flat=True)
+        ).values_list('id', flat=True))
         return EmailUser.objects.filter(
             id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
         ).distinct()
@@ -1656,20 +1657,6 @@ class Application(RevisionedMixin):
         self.log_user_action(
             ApplicationUserAction.ACTION_ACCEPT_ID.format(
                 self.id), request)
-        # Create a log entry for the applicant (submitter, organisation or
-        # proxy)
-        if self.org_applicant:
-            self.org_applicant.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_ID.format(
-                    self.id), request)
-        elif self.proxy_applicant:
-            self.proxy_applicant.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_ID.format(
-                    self.id), request)
-        else:
-            self.submitter.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_ID.format(
-                    self.id), request)
 
     def reset_id_check(self, request):
         self.id_check_status = Application.ID_CHECK_STATUS_NOT_CHECKED
@@ -1678,20 +1665,6 @@ class Application(RevisionedMixin):
         self.log_user_action(
             ApplicationUserAction.ACTION_RESET_ID.format(
                 self.id), request)
-        # Create a log entry for the applicant (submitter, organisation or
-        # proxy)
-        if self.org_applicant:
-            self.org_applicant.log_user_action(
-                ApplicationUserAction.ACTION_RESET_ID.format(
-                    self.id), request)
-        elif self.proxy_applicant:
-            self.proxy_applicant.log_user_action(
-                ApplicationUserAction.ACTION_RESET_ID.format(
-                    self.id), request)
-        else:
-            self.submitter.log_user_action(
-                ApplicationUserAction.ACTION_RESET_ID.format(
-                    self.id), request)
 
     def request_id_check(self, request):
         self.id_check_status = Application.ID_CHECK_STATUS_AWAITING_UPDATE
@@ -1700,18 +1673,7 @@ class Application(RevisionedMixin):
         self.log_user_action(
             ApplicationUserAction.ACTION_ID_REQUEST_UPDATE.format(
                 self.id), request)
-        # Create a log entry for the applicant (submitter or organisation only)
-        if self.org_applicant:
-            self.org_applicant.log_user_action(
-                ApplicationUserAction.ACTION_ID_REQUEST_UPDATE.format(
-                    self.id), request)
-        elif self.proxy_applicant:
-            # do nothing if proxy_applicant
-            pass
-        else:
-            self.submitter.log_user_action(
-                ApplicationUserAction.ACTION_ID_REQUEST_UPDATE.format(
-                    self.id), request)
+        
         # send email to submitter or org_applicant admins
         if self.org_applicant:
             send_org_id_update_request_notification(self, request)
@@ -1729,20 +1691,6 @@ class Application(RevisionedMixin):
         self.log_user_action(
             ApplicationUserAction.ACTION_ACCEPT_CHARACTER.format(
                 self.id), request)
-        # Create a log entry for the applicant (submitter, organisation or
-        # proxy)
-        if self.org_applicant:
-            self.org_applicant.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_CHARACTER.format(
-                    self.id), request)
-        elif self.proxy_applicant:
-            self.proxy_applicant.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_CHARACTER.format(
-                    self.id), request)
-        else:
-            self.submitter.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_CHARACTER.format(
-                    self.id), request)
 
     def reset_character_check(self, request):
         self.character_check_status = \
@@ -1753,20 +1701,6 @@ class Application(RevisionedMixin):
         self.log_user_action(
             ApplicationUserAction.ACTION_RESET_CHARACTER.format(
                 self.id), request)
-        # Create a log entry for the applicant (submitter, organisation or
-        # proxy)
-        if self.org_applicant:
-            self.org_applicant.log_user_action(
-                ApplicationUserAction.ACTION_RESET_CHARACTER.format(
-                    self.id), request)
-        elif self.proxy_applicant:
-            self.proxy_applicant.log_user_action(
-                ApplicationUserAction.ACTION_RESET_CHARACTER.format(
-                    self.id), request)
-        else:
-            self.submitter.log_user_action(
-                ApplicationUserAction.ACTION_RESET_CHARACTER.format(
-                    self.id), request)
 
     def accept_return_check(self, request):
         self.return_check_status = Application.RETURN_CHECK_STATUS_ACCEPTED
@@ -1775,20 +1709,6 @@ class Application(RevisionedMixin):
         self.log_user_action(
             ApplicationUserAction.ACTION_ACCEPT_RETURN.format(
                 self.id), request)
-        # Create a log entry for the applicant (submitter, organisation or
-        # proxy)
-        if self.org_applicant:
-            self.org_applicant.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_RETURN.format(
-                    self.id), request)
-        elif self.proxy_applicant:
-            self.proxy_applicant.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_RETURN.format(
-                    self.id), request)
-        else:
-            self.submitter.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_RETURN.format(
-                    self.id), request)
 
     def reset_return_check(self, request):
         self.return_check_status = Application.RETURN_CHECK_STATUS_NOT_CHECKED
@@ -1797,20 +1717,6 @@ class Application(RevisionedMixin):
         self.log_user_action(
             ApplicationUserAction.ACTION_RESET_RETURN.format(
                 self.id), request)
-        # Create a log entry for the applicant (submitter, organisation or
-        # proxy)
-        if self.org_applicant:
-            self.org_applicant.log_user_action(
-                ApplicationUserAction.ACTION_RESET_RETURN.format(
-                    self.id), request)
-        elif self.proxy_applicant:
-            self.proxy_applicant.log_user_action(
-                ApplicationUserAction.ACTION_RESET_RETURN.format(
-                    self.id), request)
-        else:
-            self.submitter.log_user_action(
-                ApplicationUserAction.ACTION_RESET_RETURN.format(
-                    self.id), request)
 
     def assign_officer(self, request, officer):
         """
@@ -1998,22 +1904,6 @@ class Application(RevisionedMixin):
                         ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE
                         .format(assessor_group), request)
 
-                    # Log entry for organisation
-                    if self.org_applicant:
-                        self.org_applicant.log_user_action(
-                            ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE
-                            .format(assessor_group), request)
-
-                    elif self.proxy_applicant:
-                        self.proxy_applicant.log_user_action(
-                            ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE
-                            .format(assessor_group), request)
-
-                    else:
-                        self.submitter.log_user_action(
-                            ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE
-                            .format(assessor_group), request)
-
                     self.check_assessment_complete(
                         assessment.licence_activity_id)
             except BaseException:
@@ -2057,16 +1947,6 @@ class Application(RevisionedMixin):
                 # Log application action
                 self.log_user_action(
                     ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE.format(assessor_group), request)
-                # Log entry for organisation
-                if self.org_applicant:
-                    self.org_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE.format(assessor_group), request)
-                elif self.proxy_applicant:
-                    self.proxy_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE.format(assessor_group), request)
-                else:
-                    self.submitter.log_user_action(
-                        ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE.format(assessor_group), request)
 
                 self.check_assessment_complete(activity_id)
             except BaseException:
@@ -2120,19 +2000,7 @@ class Application(RevisionedMixin):
                 self.log_user_action(
                     ApplicationUserAction.ACTION_PROPOSED_DECLINE.format(
                         self.id), request)
-                # Log entry for organisation
-                if self.org_applicant:
-                    self.org_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_PROPOSED_DECLINE.format(
-                            self.id), request)
-                elif self.proxy_applicant:
-                    self.proxy_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_PROPOSED_DECLINE.format(
-                            self.id), request)
-                else:
-                    self.submitter.log_user_action(
-                        ApplicationUserAction.ACTION_PROPOSED_DECLINE.format(
-                            self.id), request)
+
             except BaseException:
                 raise
 
@@ -3037,19 +2905,6 @@ class Application(RevisionedMixin):
                 self.log_user_action(
                     ApplicationUserAction.ACTION_PROPOSED_LICENCE.format(
                         self.id), request)
-                # Log entry for organisation
-                if self.org_applicant:
-                    self.org_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_PROPOSED_LICENCE.format(
-                            self.id), request)
-                elif self.proxy_applicant:
-                    self.proxy_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_PROPOSED_LICENCE.format(
-                            self.id), request)
-                else:
-                    self.submitter.log_user_action(
-                        ApplicationUserAction.ACTION_PROPOSED_LICENCE.format(
-                            self.id), request)
             except BaseException:
                 raise
 
@@ -3145,19 +3000,6 @@ class Application(RevisionedMixin):
                 self.log_user_action(
                     ApplicationUserAction.ACTION_REISSUE_LICENCE_.format(
                         selected_activity.licence_activity.name), request)
-                # Log entry for organisation
-                if self.org_applicant:
-                    self.org_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_REISSUE_LICENCE_.format(
-                            selected_activity.licence_activity.name), request)
-                elif self.proxy_applicant:
-                    self.proxy_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_REISSUE_LICENCE_.format(
-                            selected_activity.licence_activity.name), request)
-                else:
-                    self.submitter.log_user_action(
-                        ApplicationUserAction.ACTION_REISSUE_LICENCE_.format(
-                            selected_activity.licence_activity.name), request)
 
                 selected_activity.save()
 
@@ -3595,25 +3437,6 @@ class Application(RevisionedMixin):
                             request
                         )
 
-                        # Log entry for organisation
-                        if self.org_applicant:
-                            self.org_applicant.log_user_action(
-                                P_LOG.format(purpose.purpose.name),
-                                request
-                            )
-
-                        elif self.proxy_applicant:
-                            self.proxy_applicant.log_user_action(
-                                P_LOG.format(purpose.purpose.name),
-                                request
-                            )
-
-                        else:
-                            self.submitter.log_user_action(
-                                P_LOG.format(purpose.purpose.name),
-                                request
-                            )
-
                     '''Currently if there is atleast one declined activity then activity status changes to 'decline'.
                     To fix it, if there is atleast one issued purpose on the activity then reverting back to original status so it will be accepted later'''
                     if issued_purpose_exists:
@@ -3690,24 +3513,6 @@ class Application(RevisionedMixin):
                         self.log_user_action(
                             ApplicationUserAction.ACTION_DECLINE_LICENCE_.format(
                                 p.purpose.name), request)
-
-                        # Log entry for org_applicant
-                        if self.org_applicant:
-                            self.org_applicant.log_user_action(
-                                ApplicationUserAction.ACTION_DECLINE_LICENCE_.format(
-                                    p.purpose.name), request)
-
-                        # Log entry for proxy_applicant
-                        elif self.proxy_applicant:
-                            self.proxy_applicant.log_user_action(
-                                ApplicationUserAction.ACTION_DECLINE_LICENCE_.format(
-                                    p.purpose.name), request)
-
-                        # Log entry for submitter
-                        else:
-                            self.submitter.log_user_action(
-                                ApplicationUserAction.ACTION_DECLINE_LICENCE_.format(
-                                    p.purpose.name), request)
 
                     selected_activity.save()
                     declined_activities.append(selected_activity)
@@ -5585,7 +5390,6 @@ class ApplicationSelectedActivity(models.Model):
         return is_reissued
 
     def process_licence_fee_payment(self, request, application):
-        from ledger.payments.models import BpointToken
         from wildlifecompliance.components.applications.payments import (
             ApplicationFeePolicy,
             LicenceFeeClearingInvoice,
@@ -5599,67 +5403,7 @@ class ApplicationSelectedActivity(models.Model):
         if not clear_inv.is_refundable and clear_inv.requires_refund:
             return True     # Officer needs to refund with dashboard link.
 
-        applicant = application.proxy_applicant if application.proxy_applicant else application.submitter
-        card_owner_id = applicant.id
-        card_token = BpointToken.objects.filter(user_id=card_owner_id).order_by('-id').first()
-        if not card_token:
-            logger.error("No card token found for user: %s" % card_owner_id)
-            return False
-        else:
-            logger.error("Cannot make payment with stored card: %s" % card_owner_id)
-            return False
-
-        product_lines = []
-        application_submission = u'Activity licence issued for {} application {}'.format(
-            u'{} {}'.format(applicant.first_name, applicant.last_name), application.lodgement_number)
-        set_session_application(request.session, application)
-
-        price_excl = calculate_excl_gst(self.licence_fee)
-        if ApplicationFeePolicy.GST_FREE:
-            price_excl = self.licence_fee
-
-        product_lines.append({
-            'ledger_description': '{}'.format(self.licence_activity.name),
-            'quantity': 1,
-            'price_incl_tax': str(self.licence_fee),
-            'price_excl_tax': str(price_excl),
-            'oracle_code': self.licence_activity.oracle_account_code
-        })
-        checkout(
-            request, application, lines=product_lines,
-            invoice_text=application_submission,
-            internal=True,
-            add_checkout_params={
-                'basket_owner': request.user.id,
-                'payment_method': 'card',
-                'checkout_token': card_token.id,
-            }
-        )
-        try:
-            '''
-            Requires check for KeyError when an Order has not been successfully created for an Activity Licence. When an Order
-            does not exist the session key 'checkout_invoice' will remain from the token's previous Application payment.
-            Another check is required to check valid invoice details.
-            '''
-            invoice_ref = request.session['checkout_invoice']
-            created_invoice = Invoice.objects.filter(reference=invoice_ref).first()
-            if (created_invoice.text != application_submission):  # text on invoice does not match this payment submission.
-                raise KeyError
-        except KeyError:
-            logger.error("No invoice reference generated for Activity ID: %s" % self.licence_activity_id)
-            return False
-        invoice = ActivityInvoice.objects.get_or_create(
-            activity=self,
-            invoice_reference=invoice_ref
-        )
-        line = ActivityInvoiceLine.object.get_or_create(
-            invoice=invoice[0],
-            licence_activity=self.licence_activity,
-            amount=self.licence_fee
-        )
-        delete_session_application(request.session)
-        flush_checkout_session(request.session)
-        return self.licence_fee_paid and send_activity_invoice_email_notification(application, self, invoice_ref, request)
+        return False
 
     def reactivate_renew(self, request):
         # TODO: this needs work, reactivate renew logic to be clarified and function adjusted
@@ -6382,7 +6126,8 @@ class ApplicationSelectedActivityPurpose(models.Model):
                 reference=self.selected_activity.activity_invoices.latest(
                     'id').invoice_reference,
             )
-            status = latest_invoice.payment_status
+            inv_props = get_invoice_properties(latest_invoice.id)
+            status = inv_props['data']['invoice']['payment_status']
         except Invoice.DoesNotExist:
             status =  ActivityInvoice.PAYMENT_STATUS_UNPAID
         except ActivityInvoice.DoesNotExist:

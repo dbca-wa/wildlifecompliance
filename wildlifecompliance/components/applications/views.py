@@ -224,18 +224,15 @@ class LicenceFeeSuccessView(TemplateView):
     template_name = 'wildlifecompliance/licence_fee_success.html'
 
     def get(self, request, *args, **kwargs):
-        from wildlifecompliance.components.applications.payments import (
-            LicenceFeeClearingInvoice
-        )
         ACCEPTED = ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED
         session_activity = get_session_activity(request.session)
-        invoice_ref = request.GET.get('invoice')
         try:
             application = Application.objects.get(
                 id=session_activity.application_id
             )
 
-            bind_application_to_invoice(application, invoice_ref)
+            invoice_ref = ApplicationInvoice.objects.filter(application=application).order_by('invoice_datetime').last().invoice_reference
+            invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
             activities = ApplicationSelectedActivity.objects.filter(
                 application_id=session_activity.application_id,
                 processing_status=ApplicationSelectedActivity.PROCESSING_STATUS_AWAITING_LICENCE_FEE_PAYMENT)
