@@ -26,6 +26,23 @@ LEDGER_UI_URL=env('LEDGER_UI_URL','')
 
 SSO_SETTING_URL=env('SSO_SETTING_URL','')
 
+TEMPLATE_TITLE = "Wildlife Licensing System"
+TEMPLATE_HEADER_LOGO = "/static/wildlifecompliance/img/dbca-logo.png"
+TEMPLATE_GROUP = "parkswildlifev2"
+
+LEDGER_TEMPLATE = "bootstrap5"
+
+# Use git commit hash for purging cache in browser for deployment changes
+GIT_COMMIT_HASH = os.popen(
+    f"cd {BASE_DIR}; git log -1 --format=%H"
+).read()  
+GIT_COMMIT_DATE = os.popen(
+    f"cd {BASE_DIR}; git log -1 --format=%cd"
+).read()  
+if len(GIT_COMMIT_HASH) == 0:
+    GIT_COMMIT_HASH = os.popen("cat /app/git_hash").read()
+APPLICATION_VERSION = env("APPLICATION_VERSION", "1.0.0") + "-" + GIT_COMMIT_HASH[:7]
+
 if SHOW_DEBUG_TOOLBAR:
 #    def get_ip():
 #        import subprocess
@@ -84,6 +101,7 @@ INSTALLED_APPS += [
     'ckeditor',
     'appmonitor_client',
     'ledger_api_client',
+    'webtemplate_dbca',
 ]
 
 CKEDITOR_BASEPATH = '/static/ckeditor/ckeditor/'
@@ -146,6 +164,9 @@ MIDDLEWARE_CLASSES += [
     'django.contrib.messages.middleware.MessageMiddleware',
 ]
 
+LEDGER_SYSTEM_ID = env('PAYMENT_INTERFACE_SYSTEM_PROJECT_CODE', 'PAYMENT_INTERFACE_SYSTEM_PROJECT_CODE not configured')
+PAYMENT_SYSTEM_ID = LEDGER_SYSTEM_ID.replace('0', 'S')
+
 LATEX_GRAPHIC_FOLDER = os.path.join(BASE_DIR,"templates","latex","images")
 
 TEMPLATES[0]['DIRS'].append(
@@ -171,6 +192,7 @@ TEMPLATES[0]['DIRS'].append(
 TEMPLATES[0]["OPTIONS"]["context_processors"].append(
     "wildlifecompliance.context_processors.authorised_index"
 )
+TEMPLATES[0]["OPTIONS"]["context_processors"].append('wildlifecompliance.context_processors.wildlifecompliance_processor')
 
 del BOOTSTRAP3['css_url']
 #BOOTSTRAP3 = {

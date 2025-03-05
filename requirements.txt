@@ -10,6 +10,7 @@ django-extensions~=3.2.3
 git+https://github.com/dbca-wa/dbca-utils@1.0.0
 git+https://github.com/dbca-wa/ledger_api_client.git
 git+https://github.com/dbca-wa/django5-utils-six.git#egg=django5_six
+git+https://github.com/dbca-wa/webtemplate2.git#egg=webtemplate_dbca
 #psycopg2-binary==2.8.6
 psycopg2==2.8.6
 #git+https://github.com/django-oscar/django-oscar.git@17a1f6b17aba19e3c0b095e90acc654d463e0cf9#egg=django-oscar
