@@ -942,10 +942,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 if instance.submit_type == Application.SUBMIT_TYPE_PAPER:
                     invoice = ApplicationService.cash_payment_submission(
                         request)
-                    invoice_url = request.build_absolute_uri(
-                        reverse(
-                            'invoice-pdf',
-                            kwargs={'reference': invoice}))
+                    invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice.reference}/'
 
                 elif instance.submit_type == Application.SUBMIT_TYPE_MIGRATE:
                     invoice = ApplicationService.none_payment_submission(

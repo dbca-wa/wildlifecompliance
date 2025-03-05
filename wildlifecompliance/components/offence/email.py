@@ -7,7 +7,6 @@ from django.urls import reverse
 from django.conf import settings
 
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
-from ledger_api_client.pdf import create_invoice_pdf_bytes
 from ledger_api_client.ledger_models import Invoice
 from wildlifecompliance.components.main.utils import get_choice_value
 from wildlifecompliance.components.emails.emails import TemplateEmailBase

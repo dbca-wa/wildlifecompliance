@@ -283,9 +283,7 @@ class ReturnSerializer(serializers.ModelSerializer):
         if _return.return_fee_paid:
             latest_invoice = _return.get_latest_invoice()
             if latest_invoice:
-                url = reverse(
-                    'invoice-pdf',
-                    kwargs={'reference': latest_invoice.reference})
+                url = f'/ledger-toolkit-api/invoice-pdf/{latest_invoice.reference}/'
 
         return url
 

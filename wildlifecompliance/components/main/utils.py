@@ -343,7 +343,7 @@ def delete_session_activity(session):
         pass
 
 
-def bind_application_to_invoice(request, application, invoice_ref):
+def bind_application_to_invoice(application, invoice_ref):
     from wildlifecompliance.components.applications.models import ApplicationInvoice, ApplicationInvoiceLine
     logger = logging.getLogger('application_checkout')
     try:
@@ -392,7 +392,7 @@ def bind_application_to_invoice(request, application, invoice_ref):
             )
         application.save()
 
-        request.session['wc_last_application'] = application.id
+        #request.session['wc_last_application'] = application.id
 
         # send out the invoice before the confirmation is sent
         # send_application_invoice(application)

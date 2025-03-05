@@ -260,9 +260,7 @@ class DTExternalWildlifeLicenceSerializer(WildlifeLicenceSerializer):
             latest_invoice = Invoice.objects.get(
                 reference=activity_inv.invoice_reference)
 
-            url = reverse(
-                'invoice-pdf',
-                kwargs={'reference': latest_invoice.reference})
+            url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
 
             return url
 

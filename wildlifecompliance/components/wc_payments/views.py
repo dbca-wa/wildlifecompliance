@@ -5,7 +5,6 @@ from django.urls import reverse
 from django.views.generic.base import View, TemplateView
 from django.db import transaction
 from ledger_api_client.helpers import is_payment_admin
-from ledger_api_client.pdf import create_invoice_pdf_bytes
 from ledger_api_client.utils import update_payments
 from ledger_api_client.ledger_models import Invoice
 from ledger_api_client.ledger_models import Basket
@@ -19,6 +18,8 @@ from wildlifecompliance.components.wc_payments.utils import set_session_infringe
     get_session_infringement_invoice, delete_session_infringement_invoice, checkout, create_other_invoice
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, SanctionOutcomeUserAction
 from wildlifecompliance.settings import PS_PAYMENT_SYSTEM_ID, WC_PAYMENT_SYSTEM_ID
+from django.conf import settings
+import requests
 
 logger = logging.getLogger('payment_checkout')
 
@@ -206,7 +207,10 @@ class InvoicePDFView(InvoiceOwnerMixin, View):
     def get(self, request, *args, **kwargs):
         invoice = get_object_or_404(Invoice, reference=self.kwargs['reference'])
         response = HttpResponse(content_type='application/pdf')
-        response.write(create_invoice_pdf_bytes('invoice.pdf',invoice))
+        api_key = settings.LEDGER_API_KEY
+        url = settings.LEDGER_API_URL+'/ledgergw/invoice-pdf/'+api_key+'/' + invoice.reference
+        invoice_pdf = requests.get(url=url)
+        response.write(invoice_pdf)
         return response
 
     def get_object(self):

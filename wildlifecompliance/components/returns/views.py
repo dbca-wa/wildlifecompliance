@@ -25,10 +25,7 @@ class ReturnSuccessView(TemplateView):
                 ReturnService.invoice_session_return_request(request)
 
             invoice_ref = request.GET.get('invoice')
-            invoice_url = request.build_absolute_uri(
-                reverse('invoice-pdf',
-                        kwargs={'reference': invoice_ref})
-            )
+            invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
             context = {
                 'return': the_return,
                 'invoice_ref': invoice_ref,
@@ -57,10 +54,7 @@ class ReturnSheetSuccessView(TemplateView):
             ReturnService.invoice_session_return_request(request)
 
             invoice_ref = request.GET.get('invoice')
-            invoice_url = request.build_absolute_uri(
-                reverse('invoice-pdf',
-                        kwargs={'reference': invoice_ref})
-            )
+            invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
             context = {
                 'return': the_return,
                 'invoice_ref': invoice_ref,

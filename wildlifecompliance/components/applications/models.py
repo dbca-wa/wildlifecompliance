@@ -1607,7 +1607,7 @@ class Application(RevisionedMixin):
                     licence_activities__purpose__licence_category__id=self.licence_type_data["id"]
                 )
                 group_users = EmailUser.objects.filter(
-                    groups__id__in=officer_groups.values_list('id', flat=True)
+                    id__in=list(UsersInGroup.objects.filter(group_id__in=officer_groups).values_list("emailuser_id",flat=True))
                 ).distinct()
 
                 if self.amendment_requests:
@@ -1625,20 +1625,6 @@ class Application(RevisionedMixin):
                     self.log_user_action(
                         ApplicationUserAction.ACTION_LODGE_APPLICATION.format(
                             self.id), request)
-                    # Create a log entry for the applicant (submitter,
-                    # organisation or proxy)
-                    if self.org_applicant:
-                        self.org_applicant.log_user_action(
-                            ApplicationUserAction.ACTION_LODGE_APPLICATION.format(
-                                self.id), request)
-                    elif self.proxy_applicant:
-                        self.proxy_applicant.log_user_action(
-                            ApplicationUserAction.ACTION_LODGE_APPLICATION.format(
-                                self.id), request)
-                    else:
-                        self.submitter.log_user_action(
-                            ApplicationUserAction.ACTION_LODGE_APPLICATION.format(
-                                self.id), request)
 
                     # notify linked officer groups of submission.
                     if requires_refund:

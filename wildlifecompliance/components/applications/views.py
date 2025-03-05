@@ -93,91 +93,14 @@ class ApplicationSuccessViewPreload(APIView):
 
         try:
             application = Application.objects.get(lodgement_number=lodgement_number)
-            application.submit(request)
+            #application.submit(request)
         except Exception as e:
             print(e)
             traceback.print_exc
         
         try:
             try:
-                bind_application_to_invoice(request, application, invoice_ref)
-
-                if application.application_fee_paid:
-
-                    # record invoice payment for licence activities. Record the
-                    # licence and application fee for refunding purposes.
-                    for activity in application.activities:
-
-                        invoice = ActivityInvoice.objects.get_or_create(
-                            activity=activity,
-                            invoice_reference=invoice_ref
-                        )
-
-                        paid_purposes = [
-                            p for p in activity.proposed_purposes.all()
-                            if p.is_payable
-                        ]
-
-                        inv_lines = []
-
-                        for p in paid_purposes:
-
-                            fee = p.get_payable_licence_fee()
-                            l_type = ActivityInvoiceLine.LINE_TYPE_LICENCE
-
-                            inv_lines.append(ActivityInvoiceLine(
-                                invoice=invoice[0],
-                                licence_activity=activity.licence_activity,
-                                licence_purpose=p.purpose,
-                                invoice_line_type=l_type,
-                                amount=fee
-                            ))
-
-                            fee = p.get_payable_application_fee()
-                            l_type = ActivityInvoiceLine.LINE_TYPE_APPLICATION
-
-                            inv_lines.append(ActivityInvoiceLine(
-                                invoice=invoice[0],
-                                licence_activity=activity.licence_activity,
-                                licence_purpose=p.purpose,
-                                invoice_line_type=l_type,
-                                amount=fee
-                            ))
-
-                            fee = p.additional_fee
-                            l_type = ActivityInvoiceLine.LINE_TYPE_ADDITIONAL
-
-                            inv_lines.append(ActivityInvoiceLine(
-                                invoice=invoice[0],
-                                licence_activity=activity.licence_activity,
-                                licence_purpose=p.purpose,
-                                invoice_line_type=l_type,
-                                amount=fee
-                            ))
-
-                        ActivityInvoiceLine.objects.bulk_create(
-                            inv_lines
-                        )
-
-                    # NOTE: If fee adjustments are paid with the amendment, the
-                    # status needs to be set to DRAFT instead of UnderReview,
-                    # so it can be resubmitted once invoice received.
-                    if application.amendment_requests:
-                        application.customer_status = \
-                            Application.CUSTOMER_STATUS_DRAFT
-
-                    # can only submit again if application is in Draft.
-                    if application.can_user_edit:
-                        application.submit(request)
-                    send_application_invoice_email_notification(
-                        application, invoice_ref, request)
-
-                else:
-                    # TODO: check if this ever occurs from the above code and
-                    # provide error screen for user
-                    # console.log('Invoice remains unpaid')
-                    delete_session_application(request.session)
-                    return redirect(reverse('external'))
+                bind_application_to_invoice(application, invoice_ref)
             except BindApplicationException as e:
                 print(e)
                 traceback.print_exc
@@ -203,6 +126,82 @@ class ApplicationSuccessView(TemplateView):
             application = get_session_application(request.session)
             invoice_ref = ApplicationInvoice.objects.filter(application=application).order_by('invoice_datetime').last().invoice_reference
             invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
+            application.submit(request)
+            if application.application_fee_paid:
+                # record invoice payment for licence activities. Record the
+                # licence and application fee for refunding purposes.
+                for activity in application.activities:
+
+                    invoice = ActivityInvoice.objects.get_or_create(
+                        activity=activity,
+                        invoice_reference=invoice_ref
+                    )
+
+                    paid_purposes = [
+                        p for p in activity.proposed_purposes.all()
+                        if p.is_payable
+                    ]
+
+                    inv_lines = []
+
+                    for p in paid_purposes:
+
+                        fee = p.get_payable_licence_fee()
+                        l_type = ActivityInvoiceLine.LINE_TYPE_LICENCE
+
+                        inv_lines.append(ActivityInvoiceLine(
+                            invoice=invoice[0],
+                            licence_activity=activity.licence_activity,
+                            licence_purpose=p.purpose,
+                            invoice_line_type=l_type,
+                            amount=fee
+                        ))
+
+                        fee = p.get_payable_application_fee()
+                        l_type = ActivityInvoiceLine.LINE_TYPE_APPLICATION
+
+                        inv_lines.append(ActivityInvoiceLine(
+                            invoice=invoice[0],
+                            licence_activity=activity.licence_activity,
+                            licence_purpose=p.purpose,
+                            invoice_line_type=l_type,
+                            amount=fee
+                        ))
+
+                        fee = p.additional_fee
+                        l_type = ActivityInvoiceLine.LINE_TYPE_ADDITIONAL
+
+                        inv_lines.append(ActivityInvoiceLine(
+                            invoice=invoice[0],
+                            licence_activity=activity.licence_activity,
+                            licence_purpose=p.purpose,
+                            invoice_line_type=l_type,
+                            amount=fee
+                        ))
+
+                    ActivityInvoiceLine.objects.bulk_create(
+                        inv_lines
+                    )
+
+                # NOTE: If fee adjustments are paid with the amendment, the
+                # status needs to be set to DRAFT instead of UnderReview,
+                # so it can be resubmitted once invoice received.
+                if application.amendment_requests:
+                    application.customer_status = \
+                        Application.CUSTOMER_STATUS_DRAFT
+
+                # can only submit again if application is in Draft.
+                if application.can_user_edit:
+                    application.submit(request)
+                send_application_invoice_email_notification(
+                    application, invoice_ref, request)
+
+            else:
+                # TODO: check if this ever occurs from the above code and
+                # provide error screen for user
+                # console.log('Invoice remains unpaid')
+                delete_session_application(request.session)
+                return redirect(reverse('external'))
         except Exception as e:
             submit_success = False
             print(e)
@@ -236,7 +235,7 @@ class LicenceFeeSuccessView(TemplateView):
                 id=session_activity.application_id
             )
 
-            bind_application_to_invoice(request, application, invoice_ref)
+            bind_application_to_invoice(application, invoice_ref)
             activities = ApplicationSelectedActivity.objects.filter(
                 application_id=session_activity.application_id,
                 processing_status=ApplicationSelectedActivity.PROCESSING_STATUS_AWAITING_LICENCE_FEE_PAYMENT)
@@ -332,9 +331,7 @@ class LicenceFeeSuccessView(TemplateView):
                 invoice_ref,
                 request)
 
-            invoice_url = request.build_absolute_uri(
-                reverse('invoice-pdf',
-                        kwargs={'reference': invoice_ref}))
+            invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
 
         except Exception as e:
             logger.error('LicenceFeeSuccessView.get() AppID {0} - {1}'.format(

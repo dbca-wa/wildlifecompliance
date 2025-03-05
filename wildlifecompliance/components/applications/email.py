@@ -1,11 +1,10 @@
 import logging
 import mimetypes
-
+import requests
 from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.utils.encoding import smart_text
 from django.urls import reverse
 from django.conf import settings
-from ledger_api_client.pdf import create_invoice_pdf_bytes
 from ledger_api_client.ledger_models import Invoice
 
 from wildlifecompliance.components.main.utils import (
@@ -227,11 +226,7 @@ def send_application_invoice_email_notification(
             'external-application-detail',
             kwargs={
                 'application_pk': application.id}))
-    invoice_url = request.build_absolute_uri(
-        reverse(
-            'invoice-pdf',
-            kwargs={
-                'reference': invoice_ref}))
+    invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
     filename = 'invoice-{}-{}({}).pdf'.format(application.id,
                                               application.licence_type_short_name.replace(" ",
                                                                                           "-"),
@@ -239,7 +234,9 @@ def send_application_invoice_email_notification(
     references = [a.invoice_reference for a in application.invoices.all()]
     invoice = Invoice.objects.filter(
         reference__in=references).order_by('-created')[0]
-    invoice_pdf = create_invoice_pdf_bytes(filename, invoice)
+    api_key = settings.LEDGER_API_KEY
+    url = settings.LEDGER_API_URL+'/ledgergw/invoice-pdf/'+api_key+'/' + invoice.reference
+    invoice_pdf = requests.get(url=url)
 
     context = {
         'application': application,
@@ -262,11 +259,7 @@ def send_activity_invoice_email_notification(
             'external-application-detail',
             kwargs={
                 'application_pk': application.id}))
-    invoice_url = request.build_absolute_uri(
-        reverse(
-            'invoice-pdf',
-            kwargs={
-                'reference': invoice_ref}))
+    invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
     filename = 'invoice-{}-{}-({}).pdf'.format(
         application.id,
         activity.licence_activity.name.replace(" ", ""),
@@ -275,7 +268,9 @@ def send_activity_invoice_email_notification(
     references = [a.invoice_reference for a in activity.activity_invoices.all()]
     invoice = Invoice.objects.filter(
         reference__in=references).order_by('-created')[0]
-    invoice_pdf = create_invoice_pdf_bytes(filename, invoice)
+    api_key = settings.LEDGER_API_KEY
+    url = settings.LEDGER_API_URL+'/ledgergw/invoice-pdf/'+api_key+'/' + invoice.reference
+    invoice_pdf = requests.get(url=url)
 
     context = {
         'application': application,
