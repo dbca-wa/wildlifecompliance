@@ -100,6 +100,7 @@ def checkout(
         'custom_basket': True,
         'booking_reference': application.lodgement_number,
         'booking_reference_link': application.lodgement_number,
+        'no_payment': False,
     }
     print(basket_params)
     basket_hash = create_basket_session(request, request.user.id, basket_params)
@@ -108,9 +109,9 @@ def checkout(
         'system': settings.WC_PAYMENT_SYSTEM_ID,
         'fallback_url': request.build_absolute_uri('/'),
         'return_url': request.build_absolute_uri(reverse('external-application-success-invoice')),
-        'return_preload_url': request.build_absolute_uri('/'),
+        'return_preload_url': settings.WILDLIFECOMPLIANCE_EXTERNAL_URL + reverse('external-application-success-invoice-preload',kwargs={"lodgement_number": application.lodgement_number}),
         'force_redirect': True,
-        'proxy': True if internal else False,
+        #'proxy': True if internal else False,
         'invoice_text': invoice_text,
         'basket_owner': request.user.id,
         'session_type': 'ledger_api',

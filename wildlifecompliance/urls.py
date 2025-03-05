@@ -13,6 +13,7 @@ from wildlifecompliance.components.returns.views import (
 )
 from wildlifecompliance.components.applications.views import (
     ApplicationSuccessView,
+    ApplicationSuccessViewPreload,
     LicenceFeeSuccessView,
 )
 
@@ -259,6 +260,9 @@ urlpatterns = [
         name='internal-application-detail'),
     url(r'^internal/application/assessment/(?P<application_pk>\d+)/$', views.ApplicationView.as_view(),
         name='internal-assessment-detail'),
+    url(r'^application_submit/submit_with_invoice_preload/(?P<lodgement_number>.+)/',
+        ApplicationSuccessViewPreload.as_view(),
+        name='external-application-success-invoice-preload'),
     url(r'^application_submit/submit_with_invoice/',
         ApplicationSuccessView.as_view(),
         name='external-application-success-invoice'),

@@ -9,6 +9,7 @@ from wildlifecompliance.components.applications.utils import SchemaParser
 from wildlifecompliance.components.applications.models import (
     Application,
     ActivityInvoice,
+    ApplicationInvoice,
     ActivityInvoiceLine,
     ApplicationSelectedActivity
 )
@@ -33,6 +34,8 @@ from django.utils import timezone
 import os
 import subprocess
 import traceback
+from rest_framework import status
+from rest_framework.views import APIView
 
 import logging
 logger = logging.getLogger(__name__)
@@ -80,32 +83,24 @@ class ApplicationView(TemplateView):
         except BaseException:
             traceback.print_exc
             return JsonResponse(
-                {error: "something went wrong"}, safe=False, status=400)
+                {"error": "something went wrong"}, safe=False, status=400)
 
+class ApplicationSuccessViewPreload(APIView):
 
-class ApplicationSuccessView(TemplateView):
-    template_name = 'wildlifecompliance/application_success.html'
+    def get(self, request, lodgement_number, format=None):
+        print("ApplicationSuccessViewPreload")
+        invoice_ref = request.GET.get('invoice')
 
-    def get(self, request, *args, **kwargs):
-        submit_success = True
-        application = get_session_application(request.session)
         try:
+            application = Application.objects.get(lodgement_number=lodgement_number)
             application.submit(request)
-
         except Exception as e:
-            submit_success = False
             print(e)
             traceback.print_exc
-
+        
         try:
-            invoice_ref = request.GET.get('invoice')
             try:
                 bind_application_to_invoice(request, application, invoice_ref)
-
-                invoice_url = request.build_absolute_uri(
-                    reverse(
-                        'invoice-pdf',
-                        kwargs={'reference': invoice_ref}))
 
                 if application.application_fee_paid:
 
@@ -193,6 +188,25 @@ class ApplicationSuccessView(TemplateView):
             traceback.print_exc
             delete_session_application(request.session)
             return redirect(reverse('external'))
+
+        return HttpResponse(status=status.HTTP_200_OK)
+
+
+class ApplicationSuccessView(TemplateView):
+    template_name = 'wildlifecompliance/application_success.html'
+
+    def get(self, request, *args, **kwargs):
+        print("ApplicationSuccessView")
+
+        submit_success = True
+        try:
+            application = get_session_application(request.session)
+            invoice_ref = ApplicationInvoice.objects.filter(application=application).order_by('invoice_datetime').last().invoice_reference
+            invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
+        except Exception as e:
+            submit_success = False
+            print(e)
+            traceback.print_exc
 
         if not submit_success:
             delete_session_application(request.session)

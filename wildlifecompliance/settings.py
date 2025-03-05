@@ -32,6 +32,8 @@ TEMPLATE_GROUP = "parkswildlifev2"
 
 LEDGER_TEMPLATE = "bootstrap5"
 
+WILDLIFECOMPLIANCE_EXTERNAL_URL = env('WILDLIFECOMPLIANCE_EXTERNAL_URL','External url not configured')
+
 # Use git commit hash for purging cache in browser for deployment changes
 GIT_COMMIT_HASH = os.popen(
     f"cd {BASE_DIR}; git log -1 --format=%H"

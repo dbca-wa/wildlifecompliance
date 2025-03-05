@@ -1482,8 +1482,6 @@ class Application(RevisionedMixin):
         return True
 
     def submit(self, request):
-        from wildlifecompliance.components.licences.models import LicenceActivity
-
         with transaction.atomic():
             #import ipdb; ipdb.set_trace()
             requires_refund = self.requires_refund_at_submit()
