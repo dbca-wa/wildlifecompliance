@@ -1218,10 +1218,11 @@ class BaseApplicationSerializer(serializers.ModelSerializer):
             for invoice in invoices:
                 invoice_str += '&invoice={}'.format(invoice.invoice_reference)
 
-            url = '{0}payment?invoice={1}'.format(
-                settings.WC_PAYMENT_SYSTEM_URL_INV,
+            url = '{0}/ledger/payments/invoice/payment?invoice_no={1}'.format(
+                settings.LEDGER_UI_URL,
                 invoice_str,
             )
+            print(url)
 
         elif app.requires_refund_amendment():
             # build url for refunding 
@@ -1233,8 +1234,8 @@ class BaseApplicationSerializer(serializers.ModelSerializer):
                 invoice_str += '&invoice={}'.format(
                     invoice.invoice_reference)
 
-            url = '{0}payment?invoice={1}'.format(
-                settings.WC_PAYMENT_SYSTEM_URL_INV,
+            url = '{0}/ledger/payments/invoice/payment?invoice_no={1}'.format(
+                settings.LEDGER_UI_URL,
                 invoice_str,
             )
         logger.debug('BaseApplicationSerializer.all_payments_url() - end')
