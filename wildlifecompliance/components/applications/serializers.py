@@ -1222,7 +1222,6 @@ class BaseApplicationSerializer(serializers.ModelSerializer):
                 settings.LEDGER_UI_URL,
                 invoice_str,
             )
-            print(url)
 
         elif app.requires_refund_amendment():
             # build url for refunding 

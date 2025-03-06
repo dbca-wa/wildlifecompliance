@@ -186,7 +186,8 @@ class OrganisationSerializer(serializers.ModelSerializer):
     address = OrganisationAddressSerializer(read_only=True)
     pins = serializers.SerializerMethodField(read_only=True)
     delegates = DelegateSerializer(many=True, read_only=True)
-    #organisation = LedgerOrganisationSerializer()
+    organisation = serializers.SerializerMethodField(read_only=True)
+    # LedgerOrganisationSerializer()
 
     class Meta:
         model = Organisation
@@ -198,9 +199,13 @@ class OrganisationSerializer(serializers.ModelSerializer):
             'email',
             'organisation_id',
             'pins',
-            'delegates'
+            'delegates',
+            'organisation',
         )
 
+    def get_organisation(self,obj):
+        return obj.organisation
+    
     def get_pins(self, obj):
         try:
             user = self.context['request'].user

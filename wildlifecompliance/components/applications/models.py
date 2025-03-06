@@ -6911,9 +6911,12 @@ class ApplicationCondition(OrderedModel):
 
     def get_assessor_permission_group(self, user, first=True):
         app_label = get_app_label()
-        qs = user.groups.filter(
-            permissions__codename='assessor'
-        )
+
+        user_id = user.id
+        groups_with_permissions = Group.objects.filter(permissions__codename="assessor")
+        groups_with_user = UsersInGroup.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
+        qs = Group.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+
         activity_id = self.licence_activity.id
         qs = qs.filter(
             activitypermissiongroup__licence_activities__id__in=activity_id\
@@ -6926,9 +6929,12 @@ class ApplicationCondition(OrderedModel):
 
     def get_officer_permission_group(self, user, first=True):
         app_label = get_app_label()
-        qs = user.groups.filter(
-            permissions__codename='licensing_officer'
-        )
+
+        user_id = user.id
+        groups_with_permissions = Group.objects.filter(permissions__codename="licensing_officer")
+        groups_with_user = UsersInGroup.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
+        qs = Group.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+
         activity_id = self.licence_activity.id
         qs = qs.filter(
             activitypermissiongroup__licence_activities__id__in=activity_id\
