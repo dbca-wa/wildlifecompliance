@@ -331,6 +331,7 @@ class LicenceFeeSuccessView(TemplateView):
             invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
 
         except Exception as e:
+            print(e)
             logger.error('LicenceFeeSuccessView.get() AppID {0} - {1}'.format(
                 session_activity.application_id, e
             ))

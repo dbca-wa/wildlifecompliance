@@ -372,6 +372,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
+    #TODO: determine when or if this is used, remove or repair as needed
     @action(detail=True, methods=['POST', ])
     def sheet_pay_transfer(self, request, *args, **kwargs):
         try:

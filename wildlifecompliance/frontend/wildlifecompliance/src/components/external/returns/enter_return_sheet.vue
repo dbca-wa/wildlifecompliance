@@ -165,7 +165,7 @@ export default {
             },
             drawCallback: function() {
               if ((vm.specie_selection === '' || null) && Object.values(vm.returns.species_saved).length === 0) {
-                if (document.getElementById("species_selector") != null && document.getElementById("species_selector").hasAttribute(options)) {
+                if (document.getElementById("species_selector") != null && document.getElementById("species_selector").hasAttribute("options")) {
                   vm.specie_selection = document.getElementById("species_selector").options[document.getElementById("species_selector").selectedIndex].textContent;
                 }
               } else {

@@ -306,14 +306,20 @@ def _create_licence(licence_buffer, licence, application):
             address = application.submitter.residential_address
 
         address_paragraphs = [
-            Paragraph(address.line1, styles['Left']),
-            Paragraph(address.line2, styles['Left']),
-            Paragraph(address.line3, styles['Left']),
+            Paragraph(address["line1"], styles['Left']),
+        ]
+        
+        if "line2" in address:
+            address_paragraphs.append(Paragraph(address["line2"], styles['Left']))
+        if "line3" in address:
+            address_paragraphs.append(Paragraph(address["line3"], styles['Left']))
+        
+        address_paragraphs += [
             Paragraph('%s %s %s' % (
-                address.locality, address.state,
-                address.postcode), styles['Left']),
-            Paragraph(address.country.name, styles['Left'])
-            ]
+            address["locality"], address["state"],
+            address["postcode"]), styles['Left']),
+            Paragraph(address["country"], styles['Left'])
+        ]
 
         delegation.append(
             Table([[[Paragraph('Licence Number', styles['BoldLeft']),
