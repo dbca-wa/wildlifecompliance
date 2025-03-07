@@ -88,7 +88,6 @@ def prepare_mail(request, instance, workflow_entry, send_mail, recipient_id=None
             for group in group_list:
                 email_group.append(group.strip())
         elif instance.allocated_group:
-            print("test4")
             print(instance.allocated_group.get_members())
             email_group.extend(instance.allocated_group.get_members())
         else:

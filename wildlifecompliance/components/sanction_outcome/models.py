@@ -767,9 +767,9 @@ class SanctionOutcome(models.Model):
             if self.offence_occurrence_date <= date_payment:
                 # if date_payment <= self.last_due_date_1st:
                 if self.last_due_date.due_date_term_currently_applied == '1st':
-                        return self.penalty_amount_1st
+                        return float(self.penalty_amount_1st)
                 elif self.last_due_date.due_date_term_currently_applied == '2nd':
-                    return self.penalty_amount_2nd
+                    return float(self.penalty_amount_2nd)
                 elif self.last_due_date.due_date_term_currently_applied == '2nd':
                     raise ValidationError('Overdue')
                 else:

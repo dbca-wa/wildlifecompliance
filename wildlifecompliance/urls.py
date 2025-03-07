@@ -284,6 +284,7 @@ urlpatterns = [
 
     # payment related urls
     url(r'^infringement_penalty/(?P<sanction_outcome_id>\d+)/$', payment_views.InfringementPenaltyView.as_view(), name='infringement_penalty'),
+    url(r'^success/fee_preload/(?P<lodgement_number>.+)/$', payment_views.InfringementPenaltySuccessViewPreload.as_view(), name='penalty_success_preload'),
     url(r'^success/fee/$', payment_views.InfringementPenaltySuccessView.as_view(), name='penalty_success'),
 
     # For 'Record Payment'

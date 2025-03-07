@@ -20,6 +20,9 @@ from wildlifecompliance.components.sanction_outcome.models import SanctionOutcom
 from wildlifecompliance.settings import PS_PAYMENT_SYSTEM_ID, WC_PAYMENT_SYSTEM_ID
 from django.conf import settings
 import requests
+from rest_framework import status
+from rest_framework.views import APIView
+from wildlifecompliance.components.wc_payments.utils import get_invoice_payment_status
 
 logger = logging.getLogger('payment_checkout')
 
@@ -46,7 +49,7 @@ class InfringementPenaltyView(TemplateView):
                     sanction_outcome,
                     lines,
                     return_url_ns='penalty_success',
-                    return_preload_url_ns='penalty_success',
+                    return_preload_url_ns='penalty_success_preload',
                     invoice_text='Infringement Notice'
                 )
 
@@ -60,6 +63,22 @@ class InfringementPenaltyView(TemplateView):
             raise
 
 
+class InfringementPenaltySuccessViewPreload(APIView):
+
+    def get(self, request, lodgement_number, format=None):
+        print ("=== Infringement Penalty Preload ===")
+        invoice_ref = request.GET.get('invoice')
+
+        try:
+            infringement_penalty = InfringementPenalty.objects.filter(sanction_outcome__lodgement_number=lodgement_number).order_by('id').last()
+            fee_inv= InfringementPenaltyInvoice.objects.create(infringement_penalty=infringement_penalty, invoice_reference=invoice_ref)
+        except Exception as e:
+            print(e)
+            delete_session_infringement_invoice(request.session)
+            return redirect(reverse('external'))
+
+        return HttpResponse(status=status.HTTP_200_OK)
+
 # from commercialoperator.components.proposals.utils import proposal_submit
 class InfringementPenaltySuccessView(TemplateView):
     template_name = 'wildlifecompliance/wc_payments/success.html'
@@ -70,30 +89,21 @@ class InfringementPenaltySuccessView(TemplateView):
         sanction_outcome = None
         offender = None
         invoice = None
-
+        
         try:
             context = template_context(self.request)
-            basket = None
             infringement_penalty = get_session_infringement_invoice(request.session)  # this raises an error when accessed 2nd time
             sanction_outcome = infringement_penalty.sanction_outcome
+
+            fee_inv = InfringementPenaltyInvoice.objects.filter(infringement_penalty=infringement_penalty).order_by('id').last()
+            invoice = Invoice.objects.get(reference=fee_inv.invoice_reference)
 
             recipient = sanction_outcome.get_offender()[0].email
             submitter = sanction_outcome.get_offender()[0]
 
-            if self.request.user.is_authenticated:
-                basket = Basket.objects.filter(status='Submitted', owner=request.user).order_by('-id')[:1]
-            else:
-                # basket = Basket.objects.filter(status='Submitted', owner=booking.proposal.submitter).order_by('-id')[:1]
-                basket = Basket.objects.filter(status='Submitted', owner=None).order_by('-id')[:1]
-
-            order = Order.objects.get(basket=basket[0])
-            invoice = Invoice.objects.get(order_number=order.number)
-
-            print('invoice.reference: ' + invoice.reference)
-
             # Update status of the infringement notice
             if sanction_outcome.status not in SanctionOutcome.FINAL_STATUSES:
-                inv_payment_status = invoice.payment_status
+                inv_payment_status = get_invoice_payment_status(invoice.id)
                 if inv_payment_status == SanctionOutcome.PAYMENT_STATUS_PAID:
                     sanction_outcome.log_user_action(SanctionOutcomeUserAction.ACTION_PAY_INFRINGEMENT_PENALTY.format(sanction_outcome.lodgement_number, invoice.payment_amount, invoice.reference), request)
                     sanction_outcome.payment_status = SanctionOutcome.PAYMENT_STATUS_PAID
@@ -115,25 +125,8 @@ class InfringementPenaltySuccessView(TemplateView):
                     sanction_outcome.payment_status = SanctionOutcome.PAYMENT_STATUS_OVER_PAID
                     sanction_outcome.save()
 
-            # invoice_ref = invoice.reference
-            fee_inv, created = InfringementPenaltyInvoice.objects.get_or_create(infringement_penalty=infringement_penalty, invoice_reference=invoice.reference)
-            # infringement_penalty.invoice = invoice
-            # infringement_penalty.save()
-
             if infringement_penalty.payment_type == InfringementPenalty.PAYMENT_TYPE_TEMPORARY:
-                try:
-                    # inv = Invoice.objects.get(reference=invoice_ref)
-                    order = Order.objects.get(number=invoice.order_number)
-                    order.user = submitter
-                    order.save()
-                except Invoice.DoesNotExist:
-                    logger.error('{} tried paying an infringement penalty: {} with an incorrect invoice'.format(
-                        'User {} with id {}'.format(request.user.get_full_name(), request.user.id) if request.user else 'An anonymous user',
-                        sanction_outcome.lodgement_number
-                    ))
-                    #return redirect('external', args=(proposal.id,))
-                    return redirect('external')
-
+                
                 if invoice.system not in [WC_PAYMENT_SYSTEM_ID.replace('S', '0'), PS_PAYMENT_SYSTEM_ID,]:
                     logger.error('{} tried paying an infringement penalty with an invoice from another system with reference number {}'.format(
                         'User {} with id {}'.format(request.user.get_full_name(), request.user.id) if request.user else 'An anonymous user',
@@ -145,7 +138,6 @@ class InfringementPenaltySuccessView(TemplateView):
                 # if fee_inv:
                 infringement_penalty.payment_type = InfringementPenalty.PAYMENT_TYPE_INTERNET
                 infringement_penalty.expiry_time = None
-                update_payments(invoice.reference)
 
                 infringement_penalty.save()
                 request.session['wc_last_infringement_invoice'] = infringement_penalty.id

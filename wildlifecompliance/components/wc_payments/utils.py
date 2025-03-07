@@ -89,14 +89,13 @@ def checkout(request, proposal, lines, return_url_ns='public_booking_success', r
         'system': settings.WC_PAYMENT_SYSTEM_ID,
         'fallback_url': request.build_absolute_uri('/'),                          
         'return_url': request.build_absolute_uri(reverse(return_url_ns)),         
-        'return_preload_url': request.build_absolute_uri(reverse(return_url_ns)), 
+        'return_preload_url': settings.WILDLIFECOMPLIANCE_EXTERNAL_URL + reverse(return_preload_url_ns,kwargs={"lodgement_number": proposal.lodgement_number}), 
         'force_redirect': True,
         'proxy': True if internal else False,
         'invoice_text': invoice_text,
         'basket_owner': email_user_id,
         'session_type': 'ledger_api',
     }
-
     create_checkout_session(request, checkout_params)
 
     response = HttpResponse(reverse('ledgergw-payment-details'))

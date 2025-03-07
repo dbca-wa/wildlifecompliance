@@ -10,6 +10,7 @@ from rest_framework import viewsets, serializers, views, status, mixins
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address, EmailIdentity, PrivateDocument
+from ledger_api_client.utils import get_or_create
 from django.contrib.auth.models import Permission, ContentType
 from datetime import datetime
 from django_countries import countries
@@ -788,6 +789,7 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
             queryset = queryset.filter(dob=dob)
         return queryset
 
+
     def create(self, request, *args, **kwargs):
         print("cm user create")
         print(request.data)
@@ -807,9 +809,9 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
                     email_address = generate_dummy_email(first_name, last_name)
                     request_data.update({'email': email_address})
                 
-                email_user_instance = EmailUser.objects.create_user(email_address, '')
+                email_user_instance_id = get_or_create(email_address)['data']['emailuser_id']
+                email_user_instance = EmailUser.objects.get(id=email_user_instance_id)
 
-                #TODO this does not work - fix
                 res = self.update_person(request, instance=email_user_instance)
                 return res
                 #print("user_serializer_data")
@@ -887,14 +889,11 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
                     saved_email_user = user_serializer.save()
                     email_user_refresh = EmailUser.objects.get(id=saved_email_user.id)
                     #return_serializer = UserSerializer(instance=instance)
-                    print("email_user_refresh.residential_address")
-                    print(email_user_refresh.residential_address)
                     return_serializer = ComplianceManagementUserSerializer(instance=email_user_refresh)
                     
                     return Response(
                         return_serializer.data,
                         status=status.HTTP_201_CREATED,
-                        headers=self.get_success_headers(user_serializer.data)
                     )
 
             except serializers.ValidationError:
