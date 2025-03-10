@@ -91,6 +91,8 @@ class OrganisationFilterBackend(DatatablesFilterBackend):
     """
     def filter_queryset(self, request, queryset, view):
 
+        #TODO rework - we cannot search on ledger organisation fields
+
         # Get built-in DRF datatables queryset first to join with search text, then apply additional filters
         super_queryset = super(OrganisationFilterBackend, self).filter_queryset(request, queryset, view).distinct()
 
@@ -172,7 +174,7 @@ class OrganisationFilterBackend(DatatablesFilterBackend):
 
 
 class OrganisationPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
-    filter_backends = (OrganisationFilterBackend,)
+    #filter_backends = (OrganisationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     #renderer_classes = (OrganisationRenderer,)
     queryset = Organisation.objects.none()

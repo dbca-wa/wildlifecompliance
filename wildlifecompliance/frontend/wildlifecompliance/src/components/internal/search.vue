@@ -6,7 +6,8 @@
         <div class="col-sm-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Person and Organisation Search
+                    <!--<h3 class="panel-title">Person and Organisation Search TODO fix to include org-->
+                    <h3 class="panel-title">Person Search
                         <a :href="'#'+rBody" data-toggle="collapse"  data-parent="#personOrgSearch" expanded="true" :aria-controls="rBody">
                             <span class="glyphicon glyphicon-chevron-up pull-right "></span>
                         </a>

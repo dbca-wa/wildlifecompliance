@@ -1130,33 +1130,24 @@ class GetPersonOrg(views.APIView):
             if search_option == 'contains':            
                 user_data = EmailUser.objects.annotate(
                     search_name=Concat('first_name', Value(' '), 'last_name')
-                ).annotate(
-                    legal_search_name=Concat('legal_first_name', Value(' '), 'legal_last_name')
                 ).filter(
                     Q(search_name__icontains=search_term) |
-                    Q(legal_search_name__icontains=search_term) |
                     Q(email__icontains=search_term)
                 )[:40]
 
             if search_option == 'starts_with':            
                 user_data = EmailUser.objects.annotate(
                     search_name=Concat('first_name', Value(' '), 'last_name')
-                ).annotate(
-                    legal_search_name=Concat('legal_first_name', Value(' '), 'legal_last_name')
                 ).filter(
                     Q(search_name__istartswith=search_term) |
-                    Q(legal_search_name__istartswith=search_term) |
                     Q(email__istartswith=search_term)
                 )[:40]
 
             if search_option == 'ends_with':            
                 user_data = EmailUser.objects.annotate(
                     search_name=Concat('first_name', Value(' '), 'last_name')
-                ).annotate(
-                    legal_search_name=Concat('legal_first_name', Value(' '), 'legal_last_name')
                 ).filter(
                     Q(search_name__iendswith=search_term) |
-                    Q(legal_search_name__iendswith=search_term) |
                     Q(email__iendswith=search_term)
                 )[:40]
 
@@ -1175,19 +1166,21 @@ class GetPersonOrg(views.APIView):
                 email_user_data['entity_type'] = 'user'
                 email_user_data['id'] = email_user.id
                 data_transform.append(email_user_data)
-            org_data = Organisation.objects.filter(
-                Q(organisation__name__icontains=search_term) |
-                Q(organisation__abn__icontains=search_term) |
-                Q(organisation__trading_name__icontains=search_term)
-            )[:10]
-            for org in org_data:
-                text = '{} (ABN: {})'.format(org.name, org.abn)
-                data = {}
-                data['text'] = text
-                data['entity_type'] = 'org'
-                data['id'] = org.id
-                data_transform.append(data)
-            ## order results
+
+            #TODO work out how to fix this
+            #org_data = Organisation.objects.filter(
+            #    Q(organisation__name__icontains=search_term) |
+            #    Q(organisation__abn__icontains=search_term) |
+            #    Q(organisation__trading_name__icontains=search_term)
+            #)[:10]
+            #for org in org_data:
+            #    text = '{} (ABN: {})'.format(org.name, org.abn)
+            #    data = {}
+            #    data['text'] = text
+            #    data['entity_type'] = 'org'
+            #    data['id'] = org.id
+            #    data_transform.append(data)
+            ### order results
             data_transform.sort(key=lambda item: item.get("id"))
             return Response({"results": data_transform})
         return Response()

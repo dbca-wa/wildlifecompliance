@@ -194,6 +194,7 @@ class SecureBaseView(View):
         return securebase_view.get_http_response()
 
 
+#TODO check if this is used/needed
 def getLedgerIdentificationFile(request, emailuser_id):
     allow_access = False
     # Add permission rules
@@ -213,9 +214,6 @@ def getLedgerIdentificationFile(request, emailuser_id):
         if id_path[-4:-3] == '.':
             extension = id_path[-3:]
 
-
-
-
         #if request.user.is_superuser:
         if allow_access == True:
             file_name_path =  id_path 
@@ -232,8 +230,8 @@ def getLedgerIdentificationFile(request, emailuser_id):
 
                     return HttpResponse(the_data, content_type=mimetypes.types_map['.'+str(extension)])
         else:
-                messages.error(request, 'Unable to find the document')
-                return redirect('home')
+            messages.error(request, 'Unable to find the document')
+            return redirect('home')
     except:
         messages.error(request, 'Unable to find the document')
         return redirect('home')
