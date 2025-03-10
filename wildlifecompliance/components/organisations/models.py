@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import JSONField
 from rest_framework import status
 
-from ledger_api_client.utils import get_organisation, get_search_organisation
+from ledger_api_client.utils import get_organisation, get_search_organisation, create_organisation
 
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from django.contrib.auth.models import Group
@@ -858,6 +858,11 @@ class OrganisationRequest(models.Model):
     def accept(self, request):
         with transaction.atomic():
             if is_wildlife_compliance_officer(request):
+
+                #create_organisation
+                organisation_response = create_organisation(self.name, self.abn)
+                #NOTE: the create_organisation func does not indicate success or failure, so must be confirmed via __accept
+
                 self.status = OrganisationRequest.ORG_REQUEST_STATUS_APPROVED
                 self.save()
                 self.log_user_action(
@@ -877,9 +882,8 @@ class OrganisationRequest(models.Model):
             response_status = organisation_response.get("status", None)
 
             if response_status == status.HTTP_404_NOT_FOUND:
-                # Note: Do we want to create a new organisation here?
                 raise NotImplementedError(
-                    "Organisation does not exist in the ledger. Please create it first."
+                    "Organisation does not exist in the ledger."
                 )
 
             if response_status != status.HTTP_200_OK:
