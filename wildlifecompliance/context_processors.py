@@ -3,6 +3,7 @@ from wildlifecompliance.helpers import (is_wildlife_compliance_officer,
 is_compliance_management_user,prefer_compliance_management, is_internal_url)
 from wildlifecompliance.components.users.models import (ComplianceManagementUserPreferences)
 from ledger_api_client import utils as ledger_api_utils
+import hashlib
 
 def authorised_index(request):
 
@@ -31,9 +32,9 @@ def wildlifecompliance_processor(request):
     web_url = request.META.get('HTTP_HOST', None)
     lt = ledger_api_utils.get_ledger_totals()
 
-    #checkouthash = None
-    #if 'payment_model' in request.session and 'payment_pk' in request.session:
-    #    checkouthash =  hashlib.sha256(str(str(request.session["payment_model"])+str(request.session["payment_pk"])).encode('utf-8')).hexdigest()
+    checkouthash = None
+    if 'payment_model' in request.session and 'payment_pk' in request.session:
+        checkouthash =  hashlib.sha256(str(str(request.session["payment_model"])+str(request.session["payment_pk"])).encode('utf-8')).hexdigest()
 
     return {
         'public_url': web_url,
@@ -41,5 +42,5 @@ def wildlifecompliance_processor(request):
         'LEDGER_UI_URL': f'{settings.LEDGER_UI_URL}',
         'LEDGER_SYSTEM_ID': f'{settings.LEDGER_SYSTEM_ID}',
         'ledger_totals': lt,
-        #'checkouthash' : checkouthash,
+        'checkouthash' : checkouthash,
     }

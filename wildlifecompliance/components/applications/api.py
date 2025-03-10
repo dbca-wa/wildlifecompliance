@@ -911,6 +911,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                     invoice_text=application_submission
                 )
 
+                request.session["payment_pk"] = instance.pk
+                request.session["payment_model"] = "application"
+
             return checkout_result
 
         except serializers.ValidationError:
@@ -1087,17 +1090,6 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                                 clear_inv.get_product_line_refund_for(p)
                             )
 
-#            if not product_lines and hasattr(instance.latest_invoice, 'voided') and instance.latest_invoice.voided:
-#                product_lines.append(
-#                    {
-#                        'ledger_description': f'{instance.lodgement_number} - Invoice Voided {instance.latest_invoice.reference}',
-#                        'quantity': 1,
-#                        'price_incl_tax': '0.00',
-#                        'price_excl_tax': '0.00',
-#                        'oracle_code': 'K417 EXEMPT'
-#                    }
-#                )
-
             checkout_result = checkout(
                 request, instance,
                 lines=product_lines,
@@ -1107,6 +1099,10 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                         reverse('external-licence-fee-success-invoice'))
                 },
             )
+
+            request.session["payment_pk"] = instance.pk
+            request.session["payment_model"] = "application"
+
             return checkout_result
         except serializers.ValidationError:
             print(traceback.print_exc())

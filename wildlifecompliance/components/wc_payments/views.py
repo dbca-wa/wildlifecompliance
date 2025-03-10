@@ -53,6 +53,9 @@ class InfringementPenaltyView(TemplateView):
                     invoice_text='Infringement Notice'
                 )
 
+                request.session["payment_pk"] = sanction_outcome.pk
+                request.session["payment_model"] = "sanction_outcome"
+
                 logger.info('{} built payment line item {} for Infringement and handing over to payment gateway'.format('User {} with id {}'.format(request.user.get_full_name(), request.user.id), sanction_outcome.id))
                 return checkout_response
 
