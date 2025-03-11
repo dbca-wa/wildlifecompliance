@@ -8,7 +8,7 @@ from django.utils.text import Truncator
 from django.http import HttpResponse
 
 import xlrd
-import xlwt
+#import xlwt
 import os
 
 import logging

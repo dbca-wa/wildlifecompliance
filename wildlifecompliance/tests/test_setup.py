@@ -1,4 +1,4 @@
-from mixer.backend.django import mixer
+#from mixer.backend.django import mixer
 from django.conf import settings
 from importlib import import_module
 from django.utils import timezone

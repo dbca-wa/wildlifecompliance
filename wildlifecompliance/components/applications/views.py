@@ -27,7 +27,7 @@ from wildlifecompliance.components.main.utils import (
 from reversion_compare.views import HistoryCompareDetailView
 import json
 from wildlifecompliance.exceptions import BindApplicationException
-import xlwt
+#import xlwt
 from wildlifecompliance.utils import serialize_export, unique_column_names
 from datetime import datetime
 from django.utils import timezone

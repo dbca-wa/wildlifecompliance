@@ -48,12 +48,12 @@ RUN apt-get install --no-install-recommends -y python3-gevent \
 RUN apt-get install --no-install-recommends -y npm bzip2
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt-get update
-RUN apt-get install --no-install-recommends -y python3.7 python3.7-dev python3.7-distutils
+RUN apt-get install --no-install-recommends -y python3.12 python3.12-dev
 RUN apt-get install --no-install-recommends -y graphviz libgraphviz-dev pkg-config
 
-RUN ln -s /usr/bin/python3.7 /usr/bin/python 
+RUN ln -s /usr/bin/python3.12 /usr/bin/python 
     # ln -s /usr/bin/pip3 /usr/bin/pip
-RUN python3.7 -m pip install --upgrade pip
+RUN python3.12 -m pip install --upgrade pip
 RUN apt-get install -yq vim
 
 # Install Python libs from requirements.txt.
@@ -62,7 +62,7 @@ WORKDIR /app
 COPY requirements.txt ./
 #COPY git_history_recent ./
 RUN touch /app/rand_hash
-RUN python3.7 -m pip install --no-cache-dir -r requirements.txt \
+RUN python3.12 -m pip install --no-cache-dir -r requirements.txt \
   # Update the Django <1.11 bug in django/contrib/gis/geos/libgeos.py
   # Reference: https://stackoverflow.com/questions/18643998/geodjango-geosexception-error
   # && sed -i -e "s/ver = geos_version().decode()/ver = geos_version().decode().split(' ')[0]/" /usr/local/lib/python2.7/dist-packages/django/contrib/gis/geos/libgeos.py \
