@@ -58,33 +58,33 @@ class LicenceFilterBackend(DatatablesFilterBackend):
                 # join queries for the search_text search
                 search_text_licence_ids = []
                 search_text_licence_ids = WildlifeLicence.objects.annotate(
-                    applicant_name=Case(
-                        When(
-                            current_application__proxy_applicant__isnull=False,
-                            then=Concat(
-                                'current_application__proxy_applicant__first_name',
-                                Value(' '),
-                                'current_application__proxy_applicant__last_name',
-                                Value(''),
-                            )
-                        ),
-                        default=Concat(
-                            'current_application__submitter__first_name',
-                            Value(' '),
-                            'current_application__submitter__last_name',
-                            Value(''),
-                        ),
-                        output_field=CharField(),
-                    )
-                ).filter(
-                Q(applicant_name__icontains=search_text) |
-                Q(current_application__submitter__email__icontains=search_text) |
-                Q(current_application__submitter__first_name__icontains=search_text) |
-                Q(current_application__submitter__first_name__icontains=search_text) |
-                Q(current_application__proxy_applicant__email__icontains=search_text) |
-                Q(current_application__proxy_applicant__first_name__icontains=search_text) |
-                Q(current_application__proxy_applicant__last_name__icontains=search_text) |
-                Q(current_application__org_applicant__organisation__name__icontains=search_text)
+                    #applicant_name=Case(
+                    #    When(
+                    #        current_application__proxy_applicant__isnull=False,
+                    #        then=Concat(
+                    #            'current_application__proxy_applicant__first_name',
+                    #            Value(' '),
+                    #            'current_application__proxy_applicant__last_name',
+                    #            Value(''),
+                    #        )
+                    #    ),
+                    #    default=Concat(
+                    #        'current_application__submitter__first_name',
+                    #        Value(' '),
+                    #        'current_application__submitter__last_name',
+                    #        Value(''),
+                    #    ),
+                    #    output_field=CharField(),
+                    #)
+                #).filter(
+                #Q(applicant_name__icontains=search_text) #|
+                #Q(current_application__submitter__email__icontains=search_text) |
+                #Q(current_application__submitter__first_name__icontains=search_text) |
+                #Q(current_application__submitter__first_name__icontains=search_text) |
+                #Q(current_application__proxy_applicant__email__icontains=search_text) |
+                #Q(current_application__proxy_applicant__first_name__icontains=search_text) |
+                #Q(current_application__proxy_applicant__last_name__icontains=search_text) |
+                #Q(current_application__org_applicant__organisation__name__icontains=search_text)
                 ).values('id')
 
                 # # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
