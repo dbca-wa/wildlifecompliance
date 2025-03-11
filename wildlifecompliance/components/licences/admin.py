@@ -2,9 +2,8 @@ from django.contrib import admin, messages
 from django.db import transaction
 from django.template.response import TemplateResponse
 from django.http import HttpResponseRedirect
-from django.urls import reverse
+from django.urls import reverse, re_path
 from django.utils.html import format_html
-from django.conf.urls import url
 
 from wildlifecompliance.components.licences import models
 from wildlifecompliance.components.licences import forms
@@ -83,7 +82,7 @@ class LicencePurposeAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
-            url(
+            re_path(
                 r'^(?P<licence_purpose_id>.+)/process_generate_schema/$',
                 self.admin_site.admin_view(self.process_generate_schema),
                 name='generate-schema',

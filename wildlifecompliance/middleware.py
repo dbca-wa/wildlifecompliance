@@ -2,7 +2,7 @@ import logging
 
 from django.urls import reverse
 from django.shortcuts import redirect
-from django.utils.http import urlquote_plus
+from urllib.parse import quote
 from django.conf import settings
 
 from wildlifecompliance.management.securebase_manager import (
@@ -102,7 +102,7 @@ class FirstTimeDefaultNag(object):
                     return redirect(
                         reverse('first_time') +
                         "?next=" +
-                        urlquote_plus(
+                        quote(
                             request.get_full_path()))
 
 

@@ -15,7 +15,7 @@ from jsontableschema.exceptions import InvalidDateType
 
 from openpyxl import Workbook
 from openpyxl.styles import Font
-from openpyxl.writer.write_only import WriteOnlyCell
+from openpyxl.cell.cell import WriteOnlyCell
 import six
 from six import python_2_unicode_compatible
 

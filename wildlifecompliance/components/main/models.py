@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from six import python_2_unicode_compatible
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 import os
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
 
 from wildlifecompliance.settings import SO_TYPE_CHOICES

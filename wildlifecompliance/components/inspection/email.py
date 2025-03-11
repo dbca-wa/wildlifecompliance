@@ -1,7 +1,7 @@
 import logging
 
 from django.core.mail import EmailMultiAlternatives, EmailMessage
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_bytes
 from django.urls import reverse
 from django.conf import settings
 from ledger_api_client.ledger_models import Invoice

@@ -6,7 +6,7 @@ import time
 from django.urls import reverse
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.utils.http import urlquote_plus
+from urllib.parse import quote
 
 from wildlifecompliance import settings
 from wildlifecompliance.exceptions import SecureBaseException
@@ -143,7 +143,7 @@ class SecureAuthorisationEnforcer(SecureBase):
                     return redirect(
                         reverse('first_time') +
                         "?next=" +
-                        urlquote_plus(
+                        quote(
                             self.request.get_full_path()))
 
 
