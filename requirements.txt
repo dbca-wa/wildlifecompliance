@@ -1,4 +1,5 @@
 Django~=5.0.13
+ipython~=9.0.2
 django-extensions~=3.2.3
 git+https://github.com/dbca-wa/dbca-utils@1.0.0
 git+https://github.com/dbca-wa/ledger_api_client.git
