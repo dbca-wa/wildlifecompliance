@@ -168,7 +168,7 @@ class SecurePipe(SecureBase):
         '''
         0. Check request is from an authenticated user.
         '''
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             self.allow_request = False
             message = '{0} - {1} Not Authenticated.'.format(
                 self,

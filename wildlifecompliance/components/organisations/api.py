@@ -738,6 +738,10 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['POST', ])
     def update_address(self, request, *args, **kwargs):
+        raise NotImplementedError(
+            "Updating addresses needs to be implemented in ledger api client"
+        )
+    
         try:
             org = self.get_object()
             instance = org.organisation
@@ -749,7 +753,6 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 state=serializer.validated_data['state'],
                 country=serializer.validated_data['country'],
                 postcode=serializer.validated_data['postcode'],
-                organisation=instance
             )
             instance.postal_address = address
             instance.save()

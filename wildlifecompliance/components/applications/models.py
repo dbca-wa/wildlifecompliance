@@ -423,7 +423,8 @@ class Application(RevisionedMixin):
     # number and lodgement sequence are used to generate Reference.
     def save(self, *args, **kwargs):
         logger.debug('Application.save()')
-        self.update_property_cache(False)
+        if self.pk:
+            self.update_property_cache(False)
         super(Application, self).save(*args, **kwargs)
         if self.lodgement_number == '':
             new_lodgement_id = 'A{0:06d}'.format(self.pk)
@@ -4348,7 +4349,8 @@ class ApplicationSelectedActivity(models.Model):
 
     def save(self, *args, **kwargs):
         logger.debug('ApplicationSelectedActivity.save()')
-        self.update_property_cache(False)
+        if self.pk:
+            self.update_property_cache(False)
         super(ApplicationSelectedActivity, self).save(*args, **kwargs)
 
     def save_without_cache(self, *args, **kwargs):
@@ -4941,8 +4943,7 @@ class ApplicationSelectedActivity(models.Model):
                 # exclude the refunds
                 detail = Invoice.objects.get(
                     reference=invoice.invoice_reference)
-                amount -= detail.refund_amount
-                # amount += detail.payment_amount
+                #amount -= detail.refund_amount TODO: investigate - ledger_api_client does not support this
 
         return amount
 
