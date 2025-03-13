@@ -161,11 +161,38 @@ MIDDLEWARE_CLASSES += [
     'wildlifecompliance.middleware.FirstTimeNagScreenMiddleware',
     'wildlifecompliance.middleware.CacheControlMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    #'django.contrib.sessions.middleware.SessionMiddleware',
+    #'django.contrib.auth.middleware.AuthenticationMiddleware',
+    #'django.contrib.messages.middleware.MessageMiddleware',
     'wildlifecompliance.middleware.PaymentSessionMiddleware',
 ]
+
+LEDGER_UI_ACCOUNTS_MANAGEMENT = [
+            # {'account_name': {'options' : {'view': True, 'edit': True}}},
+            # {'legal_name': {'options' : {'view': True, 'edit': True}}},
+            # {'verified_legal_name': {'options' : {'view': True, 'edit': True}}},
+
+            {'first_name': {'options' : {'view': True, 'edit': True}}},
+            {'last_name': {'options' : {'view': True, 'edit': True}}},
+            #{'legal_first_name': {'options' : {'view': True, 'edit': True}}},
+            #{'legal_last_name': {'options' : {'view': True, 'edit': True}}},
+            {'dob': {'options' : {'view': True, 'edit': True}}},
+ 
+            {'identification': {'options' : {'view': True, 'edit': True}}},
+
+            {'residential_address': {'options' : {'view': True, 'edit': True}}},
+            #{'postal_address': {'options' : {'view': True, 'edit': True}}},
+            #{'postal_same_as_residential': {'options' : {'view': True, 'edit': True}}},
+
+            #{'postal_address': {'options' : {'view': True, 'edit': True}}},
+            {'phone_number' : {'options' : {'view': True, 'edit': True}}},
+            {'mobile_number' : {'options' : {'view': True, 'edit': True}}},
+
+]
+
+LEDGER_UI_ACCOUNTS_MANAGEMENT_KEYS = []
+for am in LEDGER_UI_ACCOUNTS_MANAGEMENT:
+    LEDGER_UI_ACCOUNTS_MANAGEMENT_KEYS.append(list(am.keys())[0])
 
 LEDGER_SYSTEM_ID = env('PAYMENT_INTERFACE_SYSTEM_PROJECT_CODE', 'PAYMENT_INTERFACE_SYSTEM_PROJECT_CODE not configured')
 PAYMENT_SYSTEM_ID = LEDGER_SYSTEM_ID.replace('0', 'S')
