@@ -119,6 +119,7 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
         date_to = request.GET.get('date_to')
         search_text = request.GET.get('search[value]')
 
+        #TODO replace for loop with queryset filtering
         if search_text:
             search_text = search_text.lower()
             search_text_callemail_ids = []

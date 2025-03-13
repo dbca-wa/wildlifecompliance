@@ -56,6 +56,9 @@ from wildlifecompliance.components.main.models import TemporaryDocumentCollectio
 from wildlifecompliance.settings import SO_TYPE_CHOICES, SO_TYPE_REMEDIATION_NOTICE, SO_TYPE_INFRINGEMENT_NOTICE, \
     SO_TYPE_LETTER_OF_ADVICE, SO_TYPE_CAUTION_NOTICE
 
+from django.db.models.functions import Concat
+from django.db.models import Value
+
 logger = logging.getLogger('compliancemanagement')
 
 
@@ -72,20 +75,29 @@ class SanctionOutcomeFilterBackend(DatatablesFilterBackend):
         # Filter by the search_text
         search_text = request.GET.get('search[value]', '')
         if search_text:
+
+            email_user_ids = list(EmailUser.objects.annotate(
+                    full_name=Concat(
+                        'first_name',
+                        Value(' '),
+                        'last_name'
+                    )
+                ).filter(
+                    Q(email__icontains=search_text) |
+                    Q(first_name__icontains=search_text) |
+                    Q(last_name__icontains=search_text) |
+                    Q(full_name__icontains=search_text)
+                ).values_list('id', flat=True))
+
             q_objects &= Q(lodgement_number__icontains=search_text) | \
                          Q(identifier__icontains=search_text) | \
-                         Q(offender__person__first_name__icontains=search_text) | \
-                         Q(offender__person__last_name__icontains=search_text) | \
-                         Q(offender__person__email__icontains=search_text) | \
-                         Q(driver__first_name__icontains=search_text) | \
-                         Q(driver__last_name__icontains=search_text) | \
-                         Q(driver__email__icontains=search_text) | \
-                         Q(registration_holder__first_name__icontains=search_text) | \
-                         Q(registration_holder__last_name__icontains=search_text) | \
-                         Q(registration_holder__email__icontains=search_text) | \
-                         Q(offender__organisation__organisation__name__icontains=search_text) | \
-                         Q(offender__organisation__organisation__abn__icontains=search_text) | \
-                         Q(offender__organisation__organisation__trading_name__icontains=search_text)
+                         Q(offender__person_id__in=email_user_ids)  | \
+                         Q(driver_id__in=email_user_ids) | \
+                         Q(registration_holder_id__in=email_user_ids) 
+
+                         #Q(offender__organisation__organisation__name__icontains=search_text) | \
+                         #Q(offender__organisation__organisation__abn__icontains=search_text) | \
+                         #Q(offender__organisation__organisation__trading_name__icontains=search_text)
 
         type = request.GET.get('type', '').lower()
         if type and type != 'all':

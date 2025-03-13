@@ -80,6 +80,8 @@ class LicenceFilterBackend(DatatablesFilterBackend):
                     Q(current_application__submitter_id__in=email_user_ids) 
                 )
 
+                #TODO fix org search as well
+
                 # # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
                 # # (otherwise they will filter on top of each other)
                 queryset = queryset.filter(id__in=search_text_licence_ids).distinct() | super_queryset

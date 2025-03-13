@@ -255,6 +255,9 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
                     Q(proxy_applicant_id__in=email_user_ids) |
                     Q(submitter_id__in=email_user_ids) 
                 )
+
+                #TODO fix org search as well
+
                 # use pipe to join both custom and built-in DRF datatables
                 # querysets (returned by super call above)
                 # (otherwise they will filter on top of each other)

@@ -45,7 +45,8 @@ from wildlifecompliance.components.section_regulation.serializers import Section
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, AllegedCommittedOffence
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup, ComplianceManagementSystemGroupPermission
 from wildlifecompliance.helpers import is_internal, is_customer, is_compliance_internal_user, is_wildlife_compliance_officer
-
+from django.db.models.functions import Concat
+from django.db.models import Value
 
 class OffenceFilterBackend(DatatablesFilterBackend):
 
@@ -60,14 +61,27 @@ class OffenceFilterBackend(DatatablesFilterBackend):
         # Filter by the search_text
         search_text = request.GET.get('search[value]')
         if search_text:
+
+            email_user_ids = list(EmailUser.objects.annotate(
+                    full_name=Concat(
+                        'first_name',
+                        Value(' '),
+                        'last_name'
+                    )
+                ).filter(
+                    Q(email__icontains=search_text) |
+                    Q(first_name__icontains=search_text) |
+                    Q(last_name__icontains=search_text) |
+                    Q(full_name__icontains=search_text)
+                ).values_list('id', flat=True))
+
             q_objects &= Q(lodgement_number__icontains=search_text) | \
                          Q(identifier__icontains=search_text) | \
-                         Q(offender__person__first_name__icontains=search_text) | \
-                         Q(offender__person__last_name__icontains=search_text) | \
-                         Q(offender__person__email__icontains=search_text) | \
-                         Q(offender__organisation__organisation__name__icontains=search_text) | \
-                         Q(offender__organisation__organisation__abn__icontains=search_text) | \
-                         Q(offender__organisation__organisation__trading_name__icontains=search_text)
+                         Q(offender__person_id__in=email_user_ids) 
+                        #TODO fix org search as well
+                         #Q(offender__organisation__organisation__name__icontains=search_text) | \
+                         #Q(offender__organisation__organisation__abn__icontains=search_text) | \
+                         #Q(offender__organisation__organisation__trading_name__icontains=search_text)
 
         type = str(request.GET.get('type',)).lower()
         if type and type != 'all':
