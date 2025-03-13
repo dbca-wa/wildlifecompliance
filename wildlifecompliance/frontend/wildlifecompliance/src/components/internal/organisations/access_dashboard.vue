@@ -91,11 +91,11 @@ export default {
                 columns:[
                     {
                         data:"lodgement_number",
-                        searchable: false,
+                        searchable: true,
                     },
                     {
                         data:"name",
-                        searchable: false,
+                        searchable: true,
                     },
                     {
                         data:"requester",
@@ -103,7 +103,7 @@ export default {
                     },
                     {
                         data:"role",
-                        searchable: false,
+                        searchable: true,
                     },
                     {
                         data:"status.name",

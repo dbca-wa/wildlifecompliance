@@ -6,6 +6,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from datetime import datetime, timedelta
 import pytz
+
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
 from wildlifecompliance.components.licences.services import LicenceService
 from wildlifecompliance.components.licences.models import (
@@ -57,35 +59,26 @@ class LicenceFilterBackend(DatatablesFilterBackend):
                 search_text = search_text.lower().strip()
                 # join queries for the search_text search
                 search_text_licence_ids = []
-                search_text_licence_ids = WildlifeLicence.objects.annotate(
-                    #applicant_name=Case(
-                    #    When(
-                    #        current_application__proxy_applicant__isnull=False,
-                    #        then=Concat(
-                    #            'current_application__proxy_applicant__first_name',
-                    #            Value(' '),
-                    #            'current_application__proxy_applicant__last_name',
-                    #            Value(''),
-                    #        )
-                    #    ),
-                    #    default=Concat(
-                    #        'current_application__submitter__first_name',
-                    #        Value(' '),
-                    #        'current_application__submitter__last_name',
-                    #        Value(''),
-                    #    ),
-                    #    output_field=CharField(),
-                    #)
-                #).filter(
-                #Q(applicant_name__icontains=search_text) #|
-                #Q(current_application__submitter__email__icontains=search_text) |
-                #Q(current_application__submitter__first_name__icontains=search_text) |
-                #Q(current_application__submitter__first_name__icontains=search_text) |
-                #Q(current_application__proxy_applicant__email__icontains=search_text) |
-                #Q(current_application__proxy_applicant__first_name__icontains=search_text) |
-                #Q(current_application__proxy_applicant__last_name__icontains=search_text) |
-                #Q(current_application__org_applicant__organisation__name__icontains=search_text)
-                ).values('id')
+
+                email_user_ids = list(EmailUser.objects.annotate(
+                    full_name=Concat(
+                        'first_name',
+                        Value(' '),
+                        'last_name'
+                    )
+                ).filter(
+                    Q(email__icontains=search_text) |
+                    Q(first_name__icontains=search_text) |
+                    Q(last_name__icontains=search_text) |
+                    Q(full_name__icontains=search_text)
+                ).values_list('id', flat=True))
+
+                search_text_licence_ids = WildlifeLicence.objects.values(
+                    'id'
+                ).filter(
+                    Q(current_application__proxy_applicant_id__in=email_user_ids) |
+                    Q(current_application__submitter_id__in=email_user_ids) 
+                )
 
                 # # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
                 # # (otherwise they will filter on top of each other)

@@ -97,6 +97,8 @@ from wildlifecompliance.management.permissions_manager import PermissionUser
 logger = logging.getLogger(__name__)
 # logger = logging
 from wildlifecompliance.components.licences.utils import LicencePurposeUtil
+from django.db.models.functions import Concat
+from django.db.models import Value
 
 def application_refund_callback(invoice_ref, bpoint_tid):
     '''
@@ -229,25 +231,36 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
             # search_text filter, join all custom search columns
             # where ('searchable: false' in the datatable defintion)
 
-            #TODO fix activity search as well...
             if search_text:
                 search_text = search_text.lower()
                 # join queries for the search_text search
-                # search_text_app_ids = []
+                search_text_app_ids = []
 
-                #TODO fix
-                #search_text_app_ids = Application.objects.values(
-                #    'id'
-                #).filter(
-                #    Q(proxy_applicant__first_name__icontains=search_text) |
-                #    Q(proxy_applicant__last_name__icontains=search_text)
-                #)
+                email_user_ids = list(EmailUser.objects.annotate(
+                    full_name=Concat(
+                        'first_name',
+                        Value(' '),
+                        'last_name'
+                    )
+                ).filter(
+                    Q(email__icontains=search_text) |
+                    Q(first_name__icontains=search_text) |
+                    Q(last_name__icontains=search_text) |
+                    Q(full_name__icontains=search_text)
+                ).values_list('id', flat=True))
+
+                search_text_app_ids = Application.objects.values(
+                    'id'
+                ).filter(
+                    Q(proxy_applicant_id__in=email_user_ids) |
+                    Q(submitter_id__in=email_user_ids) 
+                )
                 # use pipe to join both custom and built-in DRF datatables
                 # querysets (returned by super call above)
                 # (otherwise they will filter on top of each other)
-                #queryset = queryset.filter(
-                #    id__in=search_text_app_ids
-                #).distinct() | super_queryset
+                queryset = queryset.filter(
+                    id__in=search_text_app_ids
+                ).distinct() | super_queryset
 
             # apply user selected filters
             activity_purpose = \

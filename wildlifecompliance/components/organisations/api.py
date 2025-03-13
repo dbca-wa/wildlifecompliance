@@ -95,6 +95,7 @@ class OrganisationFilterBackend(DatatablesFilterBackend):
 
         # Get built-in DRF datatables queryset first to join with search text, then apply additional filters
         super_queryset = super(OrganisationFilterBackend, self).filter_queryset(request, queryset, view).distinct()
+        print(super_queryset.count())
 
         total_count = queryset.count()
         search_text = request.GET.get('search[value]')
@@ -103,20 +104,6 @@ class OrganisationFilterBackend(DatatablesFilterBackend):
         role = request.GET.get('role')
         status = request.GET.get('status')
 
-        if queryset.model is Organisation:
-            # search_text filter, join all custom search columns
-            # where ('searchable: false' in the datatable definition)
-            if search_text:
-                search_text = search_text.lower()
-                # join queries for the search_text search
-                search_text_org_ids = []
-                for organisation in queryset:
-                    if search_text in organisation.address_string.lower():
-                        search_text_org_ids.append(organisation.id)
-                # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
-                # (otherwise they will filter on top of each other)
-                queryset = queryset.filter(id__in=search_text_org_ids).distinct() | super_queryset
-
         if queryset.model is OrganisationRequest:
             # search_text filter, join all custom search columns
             # where ('searchable: false' in the datatable definition)
@@ -124,27 +111,36 @@ class OrganisationFilterBackend(DatatablesFilterBackend):
                 search_text = search_text.lower()
                 # join queries for the search_text search
                 search_text_org_request_ids = []
+
+                email_user_ids = list(EmailUser.objects.annotate(
+                    full_name=Concat(
+                        'first_name',
+                        Value(' '),
+                        'last_name'
+                    )
+                ).filter(
+                    Q(email__icontains=search_text) |
+                    Q(first_name__icontains=search_text) |
+                    Q(last_name__icontains=search_text) |
+                    Q(full_name__icontains=search_text)
+                ).values_list('id', flat=True))
+
                 search_text_org_request_ids = OrganisationRequest.objects.filter(
-                Q(requester__first_name__icontains=search_text) |
-                Q(requester__last_name__icontains=search_text) |
-                Q(assigned_officer__first_name__icontains=search_text) |
-                Q(assigned_officer__last_name__icontains=search_text)
+                    Q(assigned_officer_id__in=email_user_ids) |
+                    Q(requester_id__in=email_user_ids) 
                 ).values('id')
+
+                print(search_text_org_request_ids.count())
+
                 # for organisation_request in queryset:
                 #     if search_text in organisation_request.address_string.lower():
                 #         search_text_org_request_ids.append(organisation_request.id)
                 # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
                 # (otherwise they will filter on top of each other)
                 queryset = queryset.filter(id__in=search_text_org_request_ids).distinct() | super_queryset
+                print(queryset.count())
 
-            # apply user selected filters
-            organisation_name = organisation_name.lower() if organisation_name else 'all'
-            if organisation_name != 'all':
-                queryset = queryset.filter(name__iexact=organisation_name)
-            applicant = applicant.lower() if applicant else 'all'
-            if applicant != 'all':
-                queryset = queryset.annotate(applicant_name=Concat('requester__first_name',
-                    Value(' '),'requester__last_name')).filter(applicant_name__iexact=applicant)
+
             role = role.lower() if role else 'all'
             if role != 'all':
                 queryset = queryset.filter(role__iexact=role)
