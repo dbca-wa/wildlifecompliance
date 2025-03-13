@@ -1091,8 +1091,8 @@ class EmailUserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EmailUserSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('first_name', 'last_name', 
-                     #'legal_first_name', 
-                     #'legal_last_name', 
+                     'legal_first_name', 
+                     'legal_last_name', 
                      'email', 'phone_number', 'mobile_number', 'organisation')
 
     def get_queryset(self):

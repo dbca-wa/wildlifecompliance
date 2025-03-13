@@ -712,8 +712,8 @@ def get_full_name(obj):
 
 def get_dob(obj):
 
-    #if hasattr(obj,"legal_dob") and obj.legal_dob:
-    #    return obj.legal_dob
+    if hasattr(obj,"legal_dob") and obj.legal_dob:
+        return obj.legal_dob
     if hasattr(obj,"dob") and obj.dob:
         return obj.dob
 
