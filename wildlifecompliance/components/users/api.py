@@ -1167,19 +1167,20 @@ class GetPersonOrg(views.APIView):
                 email_user_data['id'] = email_user.id
                 data_transform.append(email_user_data)
 
-            #TODO work out how to fix this
-            #org_data = Organisation.objects.filter(
-            #    Q(organisation__name__icontains=search_term) |
-            #    Q(organisation__abn__icontains=search_term) |
-            #    Q(organisation__trading_name__icontains=search_term)
-            #)[:10]
-            #for org in org_data:
-            #    text = '{} (ABN: {})'.format(org.name, org.abn)
-            #    data = {}
-            #    data['text'] = text
-            #    data['entity_type'] = 'org'
-            #    data['id'] = org.id
-            #    data_transform.append(data)
+            #Search based on Organisation Requests that been approved
+            org_data = OrganisationRequest.objects.filter(
+                 status=OrganisationRequest.ORG_REQUEST_STATUS_APPROVED
+            ).filter(
+                Q(name__icontains=search_term) |
+                Q(abn__icontains=search_term) 
+            )[:40]
+            for org in org_data:
+                text = '{} (ABN: {})'.format(org.name, org.abn)
+                data = {}
+                data['text'] = text
+                data['entity_type'] = 'org'
+                data['id'] = org.id
+                data_transform.append(data)
             ### order results
             data_transform.sort(key=lambda item: item.get("id"))
             return Response({"results": data_transform})
