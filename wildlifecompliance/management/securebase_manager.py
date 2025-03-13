@@ -6,7 +6,7 @@ import time
 from django.urls import reverse
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from urllib.parse import quote
+from urllib.parse import quote_plus
 
 from wildlifecompliance import settings
 from wildlifecompliance.exceptions import SecureBaseException
@@ -131,20 +131,18 @@ class SecureAuthorisationEnforcer(SecureBase):
         '''
         from wildlifecompliance.helpers import is_new_to_wildlifelicensing
 
-        if self.request.method == 'GET' and 'api' not in self.request.path \
-                and 'admin' not in self.request.path \
-                and self.request.user.is_authenticated:
+        if (self.request.method == 'GET' and 'api' not in self.request.path
+                and 'admin' not in self.request.path
+                and self.request.user.is_authenticated
+                and 'static' not in request.path
+                and "/ledger-ui/" not in request.get_full_path()):
 
+            path_first_time = '/ledger-ui/accounts-firsttime'
             if is_new_to_wildlifelicensing(self.request):
-                path_ft = reverse('first_time')
                 path_logout = reverse('logout')
                 self.request.session['new_to_wildlifecompliance'] = True
-                if self.request.path not in (path_ft, path_logout):
-                    return redirect(
-                        reverse('first_time') +
-                        "?next=" +
-                        quote(
-                            self.request.get_full_path()))
+                if self.request.path not in (path_first_time, path_logout):
+                    return redirect(path_first_time + "?next=" + quote_plus(request.get_full_path()))
 
 
 class SecurePipe(SecureBase):

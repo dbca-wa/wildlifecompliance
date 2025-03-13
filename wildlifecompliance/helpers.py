@@ -28,17 +28,20 @@ def is_new_to_wildlifelicensing(request=None):
         SecureBaseUtils
     )
 
-    has_user_details = True if request.user.first_name \
-        and request.user.last_name \
-        and request.user.dob \
-        and request.user.residential_address \
-        and (request.user.phone_number or request.user.mobile_number) \
-        and (prefer_compliance_management(request)) else False 
+    has_user_details = True if ((not request.user.first_name) or 
+                (not request.user.last_name) or 
+                (not request.user.dob ) or 
+                (not request.user.residential_address) or 
+                (not (
+                    request.user.phone_number or request.user.mobile_number
+                )
+                and (prefer_compliance_management(request)))) else False 
         #and (#request.user.identification2 or TODO
+        #TODO legal name and dob
         
 
     if not SecureBaseUtils.is_wildlifelicensing_request(request):
-         has_user_details = True
+        has_user_details = True
 
     if is_internal(request):
         has_user_details = True

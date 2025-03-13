@@ -2,7 +2,7 @@ import logging
 
 from django.urls import reverse
 from django.shortcuts import redirect
-from urllib.parse import quote
+from urllib.parse import quote_plus
 from django.conf import settings
 
 from wildlifecompliance.management.securebase_manager import (
@@ -41,14 +41,10 @@ class FirstTimeNagScreenMiddleware(object):
         if (request.method == 'GET' 
             and request.user.is_authenticated
             and 'api' not in request.path 
-            and 'admin' not in request.path):
-            # add CM Approved External users to CallEmail RO and volunteer groups
-            #if is_compliance_management_approved_external_user(request):
-            #    if not is_compliance_management_callemail_readonly_user(request):
-            #        ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_COMPLIANCE_MANAGEMENT_CALL_EMAIL_READ_ONLY).add_member(request.user)
-            #    if not is_compliance_management_volunteer(request):
-            #        ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_VOLUNTEER).add_member(request.user)
-            # Ensure CallEmail RO group users have prefer_compliance_management=True
+            and 'admin' not in request.path
+            and 'static' not in request.path
+            and "/ledger-ui/" not in request.get_full_path()):
+
             preference, created = ComplianceManagementUserPreferences.objects.get_or_create(email_user=request.user)
             if is_compliance_management_callemail_readonly_user(request) and not preference.prefer_compliance_management:
                 preference.prefer_compliance_management = True
@@ -58,16 +54,18 @@ class FirstTimeNagScreenMiddleware(object):
                 preference.prefer_compliance_management = False
                 preference.save()
 
-        if not is_compliance_management_user(request) and SecureBaseUtils.is_wildlifelicensing_request(request):
-        #if SecureBaseUtils.is_wildlifelicensing_request(request):
-            # Apply WildifeLicensing first-time checks.
-            first_time_nag = SecureAuthorisationEnforcer(request)
+        #print(not is_compliance_management_user(request) and SecureBaseUtils.is_wildlifelicensing_request(request))
+        #if not is_compliance_management_user(request) and SecureBaseUtils.is_wildlifelicensing_request(request):
+        #    first_time_nag = SecureAuthorisationEnforcer(request)
+        #else:
+        first_time_nag = FirstTimeDefaultNag()
 
+        response = first_time_nag.process_request(request)
+        print(response)
+        if not response:
+            return self.get_response(request)
         else:
-            first_time_nag = FirstTimeDefaultNag()
-
-        #response = first_time_nag.process_request(request)
-        return self.get_response(request)
+            return response
 
 
 class FirstTimeDefaultNag(object):
@@ -84,8 +82,12 @@ class FirstTimeDefaultNag(object):
             and request.user.is_authenticated
             and 'api' not in request.path 
             and 'admin' not in request.path 
-            and 'ledger-private' not in request.path):
+            and 'ledger-private' not in request.path
+            and 'static' not in request.path
+            and "/ledger-ui/" not in request.get_full_path()
+            and "/firsttime/" not in request.get_full_path()):
 
+            path_first_time = '/ledger-ui/accounts-firsttime'
             #(not request.user.dob and not request.user.legal_dob) or \
             print(request.user.first_name,request.user.last_name)
             if (not request.user.first_name) or \
@@ -95,15 +97,10 @@ class FirstTimeDefaultNag(object):
                     (not (
                         request.user.phone_number or request.user.mobile_number
                     )):
-                path_ft = reverse('first_time')
                 path_logout = reverse('logout')
                 request.session['new_to_wildlifecompliance'] = True
-                if request.path not in (path_ft, path_logout):
-                    return redirect(
-                        reverse('first_time') +
-                        "?next=" +
-                        quote(
-                            request.get_full_path()))
+                if request.path not in (path_first_time, path_logout):
+                    return redirect(path_first_time + "?next=" + quote_plus(request.get_full_path()))
 
 
 class CacheControlMiddleware:
