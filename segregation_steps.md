@@ -4,27 +4,33 @@
 
 Run pg_dump on the ledger database.
 
-`pg_dump -U $LEDGER_USER_NAME -W --exclude-table='django_cron*' -t 'wildlifecompliance_*' -t 'django_*' -t 'taggit_*' -t 'auth_group' -t 'auth_permission' $LEDGER_DATABASE_NAME -h 127.0.0.1 > $EXPORT_DIRECTORY/wildlifecompliance_ledger_tables.sql`
+`pg_dump -U ledger_user_name -W --exclude-table='django_cron*' -t 'wildlifecompliance_*' -t 'django_*' -t 'taggit_*' -t 'auth_group' -t 'auth_permission' ledger_database_name -h 127.0.0.1 > EXPORT_DIRECTORY/wildlifecompliance_ledger_tables.sql`
 
-`pg_dump --schema-only -U $LEDGER_DATABASE_NAME -W  -t 'reversion_*' -h 127.0.0.1 > $EXPORT_DIRECTORY/reversion_schema_wildlifecompliance_ledger_tables.sql`
+`pg_dump --schema-only -U ledger_database_name -W  -t 'reversion_*' -h 127.0.0.1 > EXPORT_DIRECTORY/reversion_schema_wildlifecompliance_ledger_tables.sql`
 
 # Step Two: create new wildlife compliance database
 
 As a postgres admin user (`su postgres` then `psql`) create the new wildlife compliance database.
 
 `CREATE DATABASE wildlifecompliance;`
-`CREATE USER wildlifecompliance WITH PASSWORD '<password>';`
+
+`CREATE USER wildlifecompliance WITH PASSWORD 'password';`
+
 `GRANT ALL ON DATABASE wildlifecompliance to wildlifecompliance;`
+
 `\c wildlifecompliance`
+
 `create extension postgis;`
+
 `GRANT ALL ON ALL TABLES IN SCHEMA public TO wildlifecompliance;`
+
 `GRANT ALL ON SCHEMA public TO wildlifecompliance;`
 
 # Step Three: import exported tables in to new wildlife compliance database
 
-`psql "host=127.0.0.1 port=5432 dbname=wildlifecompliance user=wildlifecompliance password=<password> sslmode=require" < $EXPORT_DIRECTORY/wildlifecompliance_ledger_tables.sql`
+`psql "host=127.0.0.1 port=5432 dbname=wildlifecompliance user=wildlifecompliance password=<password> sslmode=require" < EXPORT_DIRECTORY/wildlifecompliance_ledger_tables.sql`
 
-`psql "host=127.0.0.1 port=5432 dbname=wildlifecompliance user=wildlifecompliance password=<password> sslmode=require" < $EXPORT_DIRECTORY/reversion_schema_wildlifecompliance_ledger_tables.sql`
+`psql "host=127.0.0.1 port=5432 dbname=wildlifecompliance user=wildlifecompliance password=<password> sslmode=require" < EXPORT_DIRECTORY/reversion_schema_wildlifecompliance_ledger_tables.sql`
 
 # Step Four: Move django migration rows to temp table
 
@@ -38,11 +44,11 @@ While connected to the new wildlife compliance database, create a temporary copy
 
 Update the environment variables:
 
-- DATABASE_URL=postgis://wildlifecompliance:<password>@<host_address>:25432/wildlifecompliance
-- LEDGER_DATABASE_URL=postgis://<ledger_user_name>:<ledger_password>@<host_address>:25432/<ledger_database_name>
+- DATABASE_URL=postgis://wildlifecompliance:password@host_address:25432/wildlifecompliance
+- LEDGER_DATABASE_URL=postgis://ledger_user_name:ledger_password>host_address:25432/ledger_database_name
 - PAYMENT_INTERFACE_SYSTEM_PROJECT_CODE=0566
 - PAYMENT_INTERFACE_SYSTEM_ID=4
-- WILDLIFECOMPLIANCE_EXTERNAL_URL='<wildlifecompliance_external_url>'
+- WILDLIFECOMPLIANCE_EXTERNAL_URL='wildlifecompliance_external_url'
 
 # Step 6: Run ledger_api_client migrations
 
