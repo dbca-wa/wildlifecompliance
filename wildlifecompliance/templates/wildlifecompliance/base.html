@@ -150,7 +150,7 @@
                                                 {% endif %}
 
                                                 {% if is_payment_officer %}
-                                                    <li><a href="/internal/reports">Reports</a></li>
+                                                    <li><a  class="dropdown-item" href="{{ LEDGER_UI_URL }}/reports?system_id={{ LEDGER_SYSTEM_ID }} ">Reports</a></li>
                                                 {% endif %}
 
                                                 <li><a href="/ledger-ui/accounts">Manage Account</a></li>
