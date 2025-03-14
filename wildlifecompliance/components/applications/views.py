@@ -224,6 +224,7 @@ class LicenceFeeSuccessView(TemplateView):
     template_name = 'wildlifecompliance/licence_fee_success.html'
 
     def get(self, request, *args, **kwargs):
+        print("LicenceSuccessView")
         ACCEPTED = ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED
         session_activity = get_session_activity(request.session)
         try:
