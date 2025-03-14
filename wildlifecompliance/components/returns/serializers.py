@@ -1,5 +1,5 @@
 from django.urls import reverse
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.components.applications.models import ReturnRequest
 from wildlifecompliance.components.main.fields import CustomChoiceField
 from wildlifecompliance.components.returns.services import (
@@ -283,9 +283,7 @@ class ReturnSerializer(serializers.ModelSerializer):
         if _return.return_fee_paid:
             latest_invoice = _return.get_latest_invoice()
             if latest_invoice:
-                url = reverse(
-                    'payments:invoice-pdf',
-                    kwargs={'reference': latest_invoice.reference})
+                url = f'/ledger-toolkit-api/invoice-pdf/{latest_invoice.reference}/'
 
         return url
 
@@ -304,7 +302,7 @@ class ReturnSerializer(serializers.ModelSerializer):
                 invoice_str += '&invoice={}'.format(invoice.invoice_reference)
 
             url = '{}?invoice={}'.format(
-                reverse('payments:invoice-payment'),
+                reverse('invoice-payment'),
                 invoice_str)
 
         return url

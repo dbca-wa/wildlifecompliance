@@ -7,10 +7,10 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.core.exceptions import ValidationError
 from rest_framework import viewsets, serializers, views, status, mixins
-#from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from ledger.accounts.models import EmailUser, Address, Profile, EmailIdentity, EmailUserAction, PrivateDocument
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address, EmailIdentity, PrivateDocument
+from ledger_api_client.utils import get_or_create
 from django.contrib.auth.models import Permission, ContentType
 from datetime import datetime
 from django_countries import countries
@@ -34,12 +34,12 @@ from wildlifecompliance.helpers import (
 from wildlifecompliance.components.users.serializers import (
     UserSerializer,
     DTUserSerializer,
-    UserProfileSerializer,
+    #UserProfileSerializer,
     UserAddressSerializer,
     PersonalSerializer,
     ContactSerializer,
     EmailIdentitySerializer,
-    EmailUserActionSerializer,
+    #EmailUserActionSerializer,
     MyUserDetailsSerializer,
     #CompliancePermissionGroupSerializer,
     ComplianceUserDetailsSerializer,
@@ -62,8 +62,7 @@ from rest_framework_datatables.renderers import DatatablesRenderer
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework.decorators import (
-    detail_route,
-    list_route,
+    action,
     renderer_classes,
     parser_classes,
     api_view
@@ -164,48 +163,48 @@ class UserProfileCompleted(views.APIView):
         request.session['new_to_wildlifecompliance'] = False
         return HttpResponse('OK')
 
+# TODO remove/replace
+#class ProfileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+#    queryset = Profile.objects.none()
+#    serializer_class = UserProfileSerializer
+#
+#    def get_queryset(self):
+#        user = self.request.user
+#        if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
+#            return Profile.objects.all()
+#        elif user.is_authenticated:
+#            return Profile.objects.filter(user=user)
+#        return Profile.objects.none()
+#
+#    @action(detail=True, methods=['POST', ])
+#    def update_profile(self, request, *args, **kwargs):
+#        try:
+#            instance = self.get_object()
+#            serializer = UserProfileSerializer(instance, data=request.data)
+#            serializer.is_valid(raise_exception=True)
+#            instance = serializer.save()
+#            serializer = UserSerializer(instance)
+#            return Response(serializer.data)
+#        except serializers.ValidationError:
+#            print(traceback.print_exc())
+#            raise
+#        except ValidationError as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(repr(e.error_dict))
+#        except Exception as e:
+#            print(traceback.print_exc())
+#            raise serializers.ValidationError(str(e))
 
-class ProfileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
-    queryset = Profile.objects.none()
-    serializer_class = UserProfileSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
-            return Profile.objects.all()
-        elif user.is_authenticated():
-            return Profile.objects.filter(user=user)
-        return Profile.objects.none()
-
-    @detail_route(methods=['POST', ])
-    def update_profile(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            serializer = UserProfileSerializer(instance, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            instance = serializer.save()
-            serializer = UserSerializer(instance)
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
-
-
-class MyProfilesViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
-    queryset = Profile.objects.none()
-    serializer_class = UserProfileSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_authenticated():
-            return Profile.objects.filter(user=self.request.user)
-        return Profile.objects.none()
+# TODO remove/replace
+#class MyProfilesViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+#    queryset = Profile.objects.none()
+#    serializer_class = UserProfileSerializer
+#
+#    def get_queryset(self):
+#        user = self.request.user
+#        if user.is_authenticated:
+#            return Profile.objects.filter(user=self.request.user)
+#        return Profile.objects.none()
 
 
 class UserFilterBackend(DatatablesFilterBackend):
@@ -251,7 +250,7 @@ class UserPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             return EmailUser.objects.all()
         return EmailUser.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
         self.serializer_class = DTUserSerializer
         queryset = self.get_queryset()
@@ -277,7 +276,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         user = self.request.user
         if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
             queryset = EmailUser.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             queryset = EmailUser.objects.filter(id=user.id)
         else:
             queryset = EmailUser.objects.none()
@@ -295,7 +294,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             queryset = queryset.filter(dob=dob)
         return queryset
 
-    @detail_route(methods=['GET'])
+    @action(detail=True, methods=['GET'])
     @renderer_classes((JSONRenderer,))
     def get_intelligence_text(self, request, *args, **kwargs):
         try:
@@ -319,7 +318,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def save_intelligence_text(self, request, *args, **kwargs):
         try:
@@ -343,7 +342,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_intelligence_document(self, request, *args, **kwargs):
         try:
@@ -375,42 +374,43 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
+    #TODO replace/remove
+    #@action(detail=True, methods=['GET', ])
+    #def action_log(self, request, *args, **kwargs):
+    #    try:
+    #        instance = self.get_object()
+    #        qs = instance.action_logs.all()
+    #        serializer = EmailUserActionSerializer(qs, many=True)
+    #        return Response(serializer.data)
+    #    except serializers.ValidationError:
+    #        print(traceback.print_exc())
+    #        raise
+    #    except ValidationError as e:
+    #        print(traceback.print_exc())
+    #        raise serializers.ValidationError(repr(e.error_dict))
+    #    except Exception as e:
+    #        print(traceback.print_exc())
+    #        raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
-    def action_log(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            qs = instance.action_logs.all()
-            serializer = EmailUserActionSerializer(qs, many=True)
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+    #TODO replace/remove
+    #@action(detail=True, methods=['GET', ])
+    #def profiles(self, request, *args, **kwargs):
+    #    try:
+    #        instance = self.get_object()
+    #        serializer = UserProfileSerializer(
+    #            instance.profiles.all(), many=True)
+    #        return Response(serializer.data)
+    #    except serializers.ValidationError:
+    #        print(traceback.print_exc())
+    #        raise
+    #    except ValidationError as e:
+    #        print(traceback.print_exc())
+    #        raise serializers.ValidationError(repr(e.error_dict))
+    #    except Exception as e:
+    #        print(traceback.print_exc())
+    #        raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
-    def profiles(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            serializer = UserProfileSerializer(
-                instance.profiles.all(), many=True)
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
-
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def update_personal(self, request, *args, **kwargs):
         print("update personal")
         try:
@@ -438,7 +438,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def update_contact(self, request, *args, **kwargs):
         try:
             with transaction.atomic():
@@ -469,7 +469,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    # @detail_route(methods=['POST', ])
+    # @action(detail=True, methods=['POST', ])
     # def update_address(self, request, *args, **kwargs):
     #     try:
     #         instance = self.get_object()
@@ -509,7 +509,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     #         print(traceback.print_exc())
     #         raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def update_address(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -563,7 +563,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def upload_id(self, request, *args, **kwargs):
         from wildlifecompliance.management.securebase_manager import (
             SecureBaseUtils
@@ -634,7 +634,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def pending_org_requests(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -654,11 +654,11 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['POST', ])
+    @action(detail=False, methods=['POST', ])
     def create_new_person(self, request, *args, **kwargs):
         print("create_new_person")
 
-        if not is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
+        if not is_compliance_internal_user(self.request): # or is_wildlife_compliance_officer(self.request):
             return Response("user not authorised to create new person",
             status=status.HTTP_401_UNAUTHORIZED)
 
@@ -728,7 +728,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             #headers=self.get_success_headers(email_user_serializer.data)
         )
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def update_system_preference(self, request, *args, **kwargs):
         with transaction.atomic():
             try:
@@ -755,7 +755,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 print(traceback.print_exc())
                 raise serializers.ValidationError(str(e))
 
-class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.CreateModelMixin):
+class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = EmailUser.objects.none()
     serializer_class = UserSerializer
     #renderer_classes = [JSONRenderer, ]
@@ -771,7 +771,7 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
         user = self.request.user
         if is_compliance_internal_user(self.request):
             queryset = EmailUser.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             queryset = EmailUser.objects.filter(id=user.id)
         #else:
         #    queryset = EmailUser.objects.none()
@@ -789,11 +789,12 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
             queryset = queryset.filter(dob=dob)
         return queryset
 
+
     def create(self, request, *args, **kwargs):
         print("cm user create")
         print(request.data)
         
-        if not is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
+        if not is_compliance_internal_user(self.request): #or is_wildlife_compliance_officer(self.request):
             return Response("user not authorised to create new person",
             status=status.HTTP_401_UNAUTHORIZED)
         
@@ -808,7 +809,9 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
                     email_address = generate_dummy_email(first_name, last_name)
                     request_data.update({'email': email_address})
                 
-                email_user_instance = EmailUser.objects.create_user(email_address, '')
+                email_user_instance_id = get_or_create(email_address)['data']['emailuser_id']
+                email_user_instance = EmailUser.objects.get(id=email_user_instance_id)
+
                 res = self.update_person(request, instance=email_user_instance)
                 return res
                 #print("user_serializer_data")
@@ -830,7 +833,7 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
                 print(traceback.print_exc())
                 raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     #@renderer_classes((JSONRenderer,))
     def update_person(self, request, instance=None, *args, **kwargs):
         print("cm user update")
@@ -886,14 +889,11 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
                     saved_email_user = user_serializer.save()
                     email_user_refresh = EmailUser.objects.get(id=saved_email_user.id)
                     #return_serializer = UserSerializer(instance=instance)
-                    print("email_user_refresh.residential_address")
-                    print(email_user_refresh.residential_address)
                     return_serializer = ComplianceManagementUserSerializer(instance=email_user_refresh)
                     
                     return Response(
                         return_serializer.data,
                         status=status.HTTP_201_CREATED,
-                        headers=self.get_success_headers(user_serializer.data)
                     )
 
             except serializers.ValidationError:
@@ -919,7 +919,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
         user = self.request.user
         if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
             queryset = EmailIdentity.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             queryset = user.emailidentity_set.all()
         else:
             queryset = EmailIdentity.objects.none()
@@ -943,7 +943,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
 #            return CompliancePermissionGroup.objects.none()
 #        return CompliancePermissionGroup.objects.none()
 #
-#    @list_route(methods=['GET', ])
+#    @action(detail=False, methods=['GET', ])
 #    def get_officers(self, request, *args, **kwargs):
 #        try:
 #            officers = EmailUser.objects.filter(groups__in=CompliancePermissionGroup.objects.filter(permissions__in=Permission.objects.filter(codename='officer')))
@@ -959,7 +959,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
 #            print(traceback.print_exc())
 #            raise serializers.ValidationError(str(e))
 #
-#    @list_route(methods=['POST'])
+#    @action(detail=False, methods=['POST'])
 #    def get_users(self, request, *args, **kwargs):
 #        try:
 #            users = (EmailUser.objects.filter(id__in=request.data.get('user_list')))
@@ -975,7 +975,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
 #            print(traceback.print_exc())
 #            raise serializers.ValidationError(str(e))
 #
-#    @list_route(methods=['GET', ])
+#    @action(detail=False, methods=['GET', ])
 #    def get_detailed_list(self, request, *args, **kwargs):
 #        try:
 #            serializer = CompliancePermissionGroupDetailedSerializer(
@@ -993,7 +993,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
 #            print(traceback.print_exc())
 #            raise serializers.ValidationError(str(e))
 #
-#    @list_route(methods=['POST', ])
+#    @action(detail=False, methods=['POST', ])
 #    def get_compliance_group_by_region_district(self, request, *args, **kwargs):
 #        try:
 #            instance = self.get_object()
@@ -1042,7 +1042,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
 #            return RegionDistrict.objects.none()
 #        return RegionDistrict.objects.none()
 #    
-#    @list_route(methods=['GET', ])
+#    @action(detail=False, methods=['GET', ])
 #    def get_regions(self, request, *args, **kwargs):
 #        try:
 #            serializer = RegionDistrictSerializer(
@@ -1061,7 +1061,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
 #            print(traceback.print_exc())
 #            raise serializers.ValidationError(str(e))
 #
-#    @detail_route(methods=['GET', ])
+#    @action(detail=True, methods=['GET', ])
 #    def get_region_districts(self, request, *args, **kwargs):
 #        try:
 #            instance = self.get_object()
@@ -1078,7 +1078,7 @@ class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
 #            print(traceback.print_exc())
 #            raise serializers.ValidationError(str(e))
 #
-#    @detail_route(methods=['POST', ])
+#    @action(detail=True, methods=['POST', ])
 #    def get_compliance_group_by_region_district(self, request, *args, **kwargs):
 #        try:
 #            instance = self.get_object()
@@ -1130,33 +1130,24 @@ class GetPersonOrg(views.APIView):
             if search_option == 'contains':            
                 user_data = EmailUser.objects.annotate(
                     search_name=Concat('first_name', Value(' '), 'last_name')
-                ).annotate(
-                    legal_search_name=Concat('legal_first_name', Value(' '), 'legal_last_name')
                 ).filter(
                     Q(search_name__icontains=search_term) |
-                    Q(legal_search_name__icontains=search_term) |
                     Q(email__icontains=search_term)
                 )[:40]
 
             if search_option == 'starts_with':            
                 user_data = EmailUser.objects.annotate(
                     search_name=Concat('first_name', Value(' '), 'last_name')
-                ).annotate(
-                    legal_search_name=Concat('legal_first_name', Value(' '), 'legal_last_name')
                 ).filter(
                     Q(search_name__istartswith=search_term) |
-                    Q(legal_search_name__istartswith=search_term) |
                     Q(email__istartswith=search_term)
                 )[:40]
 
             if search_option == 'ends_with':            
                 user_data = EmailUser.objects.annotate(
                     search_name=Concat('first_name', Value(' '), 'last_name')
-                ).annotate(
-                    legal_search_name=Concat('legal_first_name', Value(' '), 'legal_last_name')
                 ).filter(
                     Q(search_name__iendswith=search_term) |
-                    Q(legal_search_name__iendswith=search_term) |
                     Q(email__iendswith=search_term)
                 )[:40]
 
@@ -1175,11 +1166,14 @@ class GetPersonOrg(views.APIView):
                 email_user_data['entity_type'] = 'user'
                 email_user_data['id'] = email_user.id
                 data_transform.append(email_user_data)
-            org_data = Organisation.objects.filter(
-                Q(organisation__name__icontains=search_term) |
-                Q(organisation__abn__icontains=search_term) |
-                Q(organisation__trading_name__icontains=search_term)
-            )[:10]
+
+            #Search based on Organisation Requests that been approved
+            org_data = OrganisationRequest.objects.filter(
+                 status=OrganisationRequest.ORG_REQUEST_STATUS_APPROVED
+            ).filter(
+                Q(name__icontains=search_term) |
+                Q(abn__icontains=search_term) 
+            )[:40]
             for org in org_data:
                 text = '{} (ABN: {})'.format(org.name, org.abn)
                 data = {}
@@ -1187,7 +1181,7 @@ class GetPersonOrg(views.APIView):
                 data['entity_type'] = 'org'
                 data['id'] = org.id
                 data_transform.append(data)
-            ## order results
+            ### order results
             data_transform.sort(key=lambda item: item.get("id"))
             return Response({"results": data_transform})
         return Response()

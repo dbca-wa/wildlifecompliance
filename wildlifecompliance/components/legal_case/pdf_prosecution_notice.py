@@ -5,7 +5,6 @@ from decimal import Decimal as D
 from io import BytesIO
 
 from django.core.files.storage import default_storage
-from oscar.templatetags.currency_filters import currency
 from reportlab.lib import enums
 from reportlab.lib.colors import Color
 from reportlab.lib.enums import TA_RIGHT, TA_CENTER
@@ -22,8 +21,8 @@ from reportlab.lib import colors
 from django.core.files import File
 from django.conf import settings
 
-from ledger.accounts.models import Document
-from ledger.checkout.utils import calculate_excl_gst
+from ledger_api_client.ledger_models import Document
+from ledger_api_client.utils import calculate_excl_gst
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage

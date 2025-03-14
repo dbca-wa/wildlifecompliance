@@ -33,6 +33,7 @@ from wildlifecompliance.components.applications.models import (
 from wildlifecompliance.components.main.utils import (
     get_full_name
 )
+from ledger_api_client.country_models import Country
 
 import logging
 logger = logging.getLogger(__name__)
@@ -297,22 +298,54 @@ def _create_licence(licence_buffer, licence, application):
         if application.applicant_type \
                 == application.APPLICANT_TYPE_ORGANISATION:
             address = application.org_applicant.address
-            pass
         elif application.applicant_type == application.APPLICANT_TYPE_PROXY:
             address = application.proxy_applicant.residential_address
-            pass
         else:
             # applic.applicant_type == application.APPLICANT_TYPE_SUBMITTER
             address = application.submitter.residential_address
 
-        address_paragraphs = [
-            Paragraph(address.line1, styles['Left']),
-            Paragraph(address.line2, styles['Left']),
-            Paragraph(address.line3, styles['Left']),
-            Paragraph('%s %s %s' % (
+        address_paragraphs = []
+        if type(address) is dict:
+            address_paragraphs = [
+                Paragraph(address['line1'], styles['Left']),
+            ]
+            
+            if "line2" in address and address["line2"]:
+                address_paragraphs.append(Paragraph(address["line2"], styles['Left']))
+            if "line3" in address and address["line3"]:
+                address_paragraphs.append(Paragraph(address["line3"], styles['Left']))
+            
+            country = Country.objects.filter(iso_3166_1_a2=address["country"])
+            country_name = address["country"]
+            if country.exists():
+                country_name = country.first().name
+            else:
+                country = Country.objects.filter(iso_3166_1_a3=address["country"])
+                if country.exists():
+                    country_name = country.first().name
+
+            address_paragraphs += [
+                Paragraph('%s %s %s' % (
+                address["locality"], address["state"],
+                address["postcode"]), styles['Left']),
+                Paragraph(country_name, styles['Left'])
+            ]
+        else:
+
+            address_paragraphs = [
+                Paragraph(address.line1, styles['Left']),
+            ]
+            
+            if hasattr(address, "line2") and address.line2:
+                address_paragraphs.append(Paragraph(address.line2, styles['Left']))
+            if hasattr(address, "line3") and address.line3:
+                address_paragraphs.append(Paragraph(address.line3, styles['Left']))
+            
+            address_paragraphs += [
+                Paragraph('%s %s %s' % (
                 address.locality, address.state,
                 address.postcode), styles['Left']),
-            Paragraph(address.country.name, styles['Left'])
+                Paragraph(address.country.name, styles['Left'])
             ]
 
         delegation.append(
@@ -343,7 +376,7 @@ def _create_licence(licence_buffer, licence, application):
                 'Date of Expiry', styles['BoldLeft'])]
 
         ltz = timezone.get_current_timezone()
-        issue_date = ltz.normalize(issued_purpose.issue_date.astimezone(ltz))
+        issue_date = issued_purpose.issue_date.astimezone(ltz)
         date_values = [
             Paragraph(issue_date.strftime('%d/%m/%Y'),
                       styles['Left']),

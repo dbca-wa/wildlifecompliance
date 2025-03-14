@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.components.call_email.models import (
         CallType,
         WildcareSpeciesType,

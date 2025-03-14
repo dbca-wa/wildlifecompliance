@@ -3,10 +3,11 @@ from concurrency.exceptions import RecordModifiedError
 from concurrency.fields import IntegerVersionField
 from django.db import models, transaction
 from django.db.utils import IntegrityError
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models import JSONField
 from django.utils import timezone
-from ledger.accounts.models import EmailUser, RevisionedMixin
-from ledger.payments.invoice.models import Invoice
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
+from wildlifecompliance.components.main.models import RevisionedMixin
+from ledger_api_client.ledger_models import Invoice
 from wildlifecompliance.components.applications.models import (
     ApplicationCondition,
     Application,
@@ -44,6 +45,7 @@ def update_returns_comms_log_filename(instance, filename):
     return 'wildlifecompliance/returns/{}/communications/{}/{}'.format(
         instance.log_entry.return_obj.id, instance.id, filename)
 
+#NOTE many Return models and functions appear to be generally unused.
 
 class ReturnType(models.Model):
     """
@@ -171,7 +173,7 @@ class ReturnTypeRegulatedSpecies(models.Model):
     '''
     return_type = models.ForeignKey(
         ReturnType,
-        related_name='regulated_species',
+        related_name='regulated_species', on_delete=models.CASCADE
     )
     species_name = models.CharField(max_length=100)
     species_price = models.DecimalField(
@@ -261,10 +263,10 @@ class Return(models.Model):
         default='')
     application = models.ForeignKey(
         Application,
-        related_name='returns_application')
+        related_name='returns_application', on_delete=models.CASCADE)
     licence = models.ForeignKey(
         'wildlifecompliance.WildlifeLicence',
-        related_name='returns_licence')
+        related_name='returns_licence', on_delete=models.CASCADE)
     due_date = models.DateField()
     processing_status = models.CharField(
         choices=PROCESSING_STATUS_CHOICES,
@@ -274,7 +276,7 @@ class Return(models.Model):
         EmailUser,
         related_name='returns_curator',
         null=True,
-        blank=True)
+        blank=True, on_delete=models.CASCADE)
     condition = models.ForeignKey(
         ApplicationCondition,
         blank=True,
@@ -286,17 +288,17 @@ class Return(models.Model):
         EmailUser,
         blank=True,
         null=True,
-        related_name='returns_submitter')
+        related_name='returns_submitter', on_delete=models.CASCADE)
     reminder_sent = models.BooleanField(default=False)
     post_reminder_sent = models.BooleanField(default=False)
-    return_type = models.ForeignKey(ReturnType, null=True)
+    return_type = models.ForeignKey(ReturnType, null=True, on_delete=models.CASCADE)
     nil_return = models.BooleanField(default=False)
     comments = models.TextField(blank=True, null=True)
     return_fee = models.DecimalField(
         max_digits=8,
         decimal_places=2,
         default='0')
-    property_cache = JSONField(null=True, blank=True, default={})
+    property_cache = JSONField(null=True, blank=True, default=dict)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -501,7 +503,9 @@ class Return(models.Model):
             'id', flat=True
         )
 
-        return EmailUser.objects.filter(groups__id__in=groups).distinct()
+        return EmailUser.objects.filter(
+            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
+        ).distinct()
 
     @transaction.atomic
     def set_submitted(self, request):
@@ -728,7 +732,7 @@ class ReturnActivity(models.Model):
 
     licence_return = models.ForeignKey(
         Return,
-        related_name='stock_activities'
+        related_name='stock_activities', on_delete=models.CASCADE
     )
     processing_status = models.CharField(
         choices=PROCESSING_STATUS_CHOICES,
@@ -748,7 +752,7 @@ class ReturnActivity(models.Model):
         WildlifeLicence,
         blank=True,
         null=True,
-        related_name='receiving_licences'
+        related_name='receiving_licences', on_delete=models.CASCADE
     )
     stock_id = models.IntegerField(default='0')
     stock_name = models.TextField(blank=True, null=True)
@@ -794,7 +798,7 @@ class ReturnActivity(models.Model):
 
 
 class ReturnTable(RevisionedMixin):
-    ret = models.ForeignKey(Return)
+    ret = models.ForeignKey(Return, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     version = IntegerVersionField()
 
@@ -851,7 +855,7 @@ class ReturnTable(RevisionedMixin):
 
 
 class ReturnRow(RevisionedMixin):
-    return_table = models.ForeignKey(ReturnTable)
+    return_table = models.ForeignKey(ReturnTable, on_delete=models.CASCADE)
 
     data = JSONField(blank=True, null=True)
 
@@ -890,11 +894,11 @@ class ReturnUserAction(UserAction):
             what=str(action)
         )
 
-    return_obj = models.ForeignKey(Return, related_name='action_logs')
+    return_obj = models.ForeignKey(Return, related_name='action_logs', on_delete=models.CASCADE)
 
 
 class ReturnLogEntry(CommunicationsLogEntry):
-    return_obj = models.ForeignKey(Return, related_name='comms_logs')
+    return_obj = models.ForeignKey(Return, related_name='comms_logs', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -910,7 +914,7 @@ class ReturnLogEntry(CommunicationsLogEntry):
 
 
 class ReturnLogDocument(Document):
-    log_entry = models.ForeignKey('ReturnLogEntry', related_name='documents')
+    log_entry = models.ForeignKey('ReturnLogEntry', related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(upload_to=update_returns_comms_log_filename, storage=private_storage)
 
     class Meta:
@@ -930,7 +934,7 @@ class ReturnInvoice(models.Model):
     PAYMENT_STATUS_PAID = 'paid'
     PAYMENT_STATUS_OVERPAID = 'over_paid'
 
-    invoice_return = models.ForeignKey(Return, related_name='invoices')
+    invoice_return = models.ForeignKey(Return, related_name='invoices', on_delete=models.CASCADE)
     invoice_reference = models.CharField(
         max_length=50, null=True, blank=True, default='')
 
@@ -960,7 +964,7 @@ reversion.register(
     Return,
     follow=[
         'application',
-        'submitter',
+        #'submitter', TODO disabled for segregation - check if needed/repairable  
         'assigned_to',
         'condition',
         'licence',

@@ -13,19 +13,21 @@ from django.db.models import Q
 from django.db.models.signals import pre_delete
 from django.db.models.query import QuerySet
 from django.dispatch import receiver
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models import JSONField
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible
-
+from six import python_2_unicode_compatible
 from smart_selects.db_fields import ChainedForeignKey
 from ckeditor.fields import RichTextField
 
-from ledger.accounts.models import EmailUser, RevisionedMixin
-from ledger.payments.invoice.models import Invoice
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
+from wildlifecompliance.components.main.models import RevisionedMixin
+from ledger_api_client.ledger_models import Invoice
+from ledger_api_client.utils import get_invoice_properties
+
 from wildlifecompliance.components.main.utils import (
     checkout, set_session_application,
     delete_session_application,
@@ -36,7 +38,7 @@ from wildlifecompliance.components.main.utils import (
 )
 
 from wildlifecompliance.components.inspection.models import Inspection
-
+from wildlifecompliance.components.licences.utils import LicencePurposeUtil
 from wildlifecompliance.components.organisations.models import Organisation
 from wildlifecompliance.components.organisations.emails import (
     send_org_id_update_request_notification
@@ -149,10 +151,11 @@ class ActivityPermissionGroup(Group):
         verbose_name_plural = 'Activity permission groups'
 
     def __str__(self):
-        return '{} ({} members)'.format(
-            self.name,
-            EmailUser.objects.filter(groups__name=self.name).count()
-        )
+        return self.name
+        #return '{} ({} members)'.format(
+        #    self.name,
+        #    EmailUser.objects.filter(groups__name=self.name).count()
+        #)
 
     @property
     def display_name(self):
@@ -160,8 +163,9 @@ class ActivityPermissionGroup(Group):
 
     @property
     def members(self):
+        groups = Group.objects.filter(id=self.id)
         return EmailUser.objects.filter(
-            groups__id=self.id
+            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
         ).distinct()
 
     @staticmethod
@@ -187,7 +191,7 @@ class ActivityPermissionGroup(Group):
 
 
 class ApplicationDocument(Document):
-    application = models.ForeignKey('Application', related_name='documents')
+    application = models.ForeignKey('Application', related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(upload_to=update_application_doc_filename, storage=private_storage)
     input_name = models.CharField(max_length=255, null=True, blank=True)
     # after initial submit prevent document from being deleted
@@ -356,17 +360,17 @@ class Application(RevisionedMixin):
         Organisation,
         blank=True,
         null=True,
-        related_name='org_applications')
+        related_name='org_applications', on_delete=models.CASCADE)
     proxy_applicant = models.ForeignKey(
         EmailUser,
         blank=True,
         null=True,
-        related_name='wildlifecompliance_proxy')
+        related_name='wildlifecompliance_proxy', on_delete=models.CASCADE)
     submitter = models.ForeignKey(
         EmailUser,
         blank=True,
         null=True,
-        related_name='wildlifecompliance_applications')
+        related_name='wildlifecompliance_applications', on_delete=models.CASCADE)
     id_check_status = models.CharField(
         'Identification Check Status',
         max_length=30,
@@ -390,12 +394,12 @@ class Application(RevisionedMixin):
     licence = models.ForeignKey(
         'wildlifecompliance.WildlifeLicence',
         null=True,
-        blank=True)
+        blank=True, on_delete=models.CASCADE)
     # generated licence for the application.
     licence_document = models.ForeignKey(
         LicenceDocument,
         blank=True,
-        null=True)
+        null=True, on_delete=models.CASCADE)
     previous_application = models.ForeignKey(
         'self', on_delete=models.PROTECT, blank=True, null=True, related_name='parents')
     application_fee = models.DecimalField(
@@ -405,7 +409,7 @@ class Application(RevisionedMixin):
         max_length=30,
         choices=SUBMIT_TYPE_CHOICES,
         default=SUBMIT_TYPE_ONLINE)
-    property_cache = JSONField(null=True, blank=True, default={})
+    property_cache = JSONField(null=True, blank=True, default=dict)
     # is_resubmitted is not used and can be removed.
     # is_resubmitted = models.BooleanField(default=False)
 
@@ -419,7 +423,8 @@ class Application(RevisionedMixin):
     # number and lodgement sequence are used to generate Reference.
     def save(self, *args, **kwargs):
         logger.debug('Application.save()')
-        self.update_property_cache(False)
+        if self.pk:
+            self.update_property_cache(False)
         super(Application, self).save(*args, **kwargs)
         if self.lodgement_number == '':
             new_lodgement_id = 'A{0:06d}'.format(self.pk)
@@ -487,17 +492,21 @@ class Application(RevisionedMixin):
     def applicant(self):
         logger.debug('Application.applicant()')
         if self.org_applicant:
-            return self.org_applicant.organisation.name
+            return self.org_applicant.name
         elif self.proxy_applicant:
-            return "{} {}".format(
+            applicant = "{} {}".format(
                 get_first_name(self.proxy_applicant),
                 get_last_name(self.proxy_applicant),
-            )
+            ).strip()
+
+            return applicant if applicant else None
         else:
-            return "{} {}".format(
+            applicant = "{} {}".format(
                 get_first_name(self.submitter),
                 get_last_name(self.submitter),
-            )
+            ).strip()
+
+            return applicant if applicant else None
 
     @property
     def applicant_details(self):
@@ -659,6 +668,7 @@ class Application(RevisionedMixin):
         '''
         Gets the payment status for this application.
         '''
+        from wildlifecompliance.components.wc_payments.utils import get_invoice_payment_status
         logger.debug('Application.payment_status()')
         if hasattr(self.latest_invoice, 'voided') and self.latest_invoice.voided:
             return ApplicationInvoice.PAYMENT_STATUS_NOT_REQUIRED
@@ -696,7 +706,7 @@ class Application(RevisionedMixin):
             except Invoice.DoesNotExist:
                 return ApplicationInvoice.PAYMENT_STATUS_UNPAID
 
-            return latest_invoice.payment_status
+            return get_invoice_payment_status(latest_invoice.id)
 
     @property
     def latest_invoice(self):
@@ -838,10 +848,10 @@ class Application(RevisionedMixin):
         """
         logger.debug('Application.licence_officers()')
         if not self.LICENCE_OFFICERS:
-            groups = self.get_permission_groups(
-                'licensing_officer').values_list('id', flat=True)
+            groups = list(self.get_permission_groups(
+                'licensing_officer').values_list('id', flat=True))
             self.LICENCE_OFFICERS = EmailUser.objects.filter(
-                groups__id__in=groups
+                id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
             ).distinct()
         
         return self.LICENCE_OFFICERS
@@ -849,24 +859,25 @@ class Application(RevisionedMixin):
     @property
     def licence_approvers(self):
         logger.debug('Application.licence_approvers() - start')
-        groups = self.get_permission_groups('issuing_officer')\
-            .values_list('id', flat=True)
+        groups = list(self.get_permission_groups('issuing_officer')\
+            .values_list('id', flat=True))
 
-        approvers = EmailUser.objects.filter(groups__id__in=groups).distinct()
+        approvers = EmailUser.objects.filter(
+            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
+        ).distinct()
         logger.debug('Application.licence_approvers() - end')
-
         return approvers
 
     @property
     def officers_and_assessors(self):
         logger.debug('Application.officers_and_assessors()')
-        groups = self.get_permission_groups(
+        groups = list(self.get_permission_groups(
             ['licensing_officer',
              'assessor',
              'issuing_officer']
-        ).values_list('id', flat=True)
+        ).values_list('id', flat=True))
         return EmailUser.objects.filter(
-            groups__id__in=groups
+            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
         ).distinct()
 
     @property
@@ -1144,7 +1155,7 @@ class Application(RevisionedMixin):
         logger.info("Application: %s Activity ID: %s changed activity approver \
             to: %s" % (self.id, activity_id, licence_approver))
 
-    def get_selected_activity(self, activity_id):
+    def get_selected_activity(self, activity_id, create=True):
         '''
         :param activity_id: LicenceActivity ID, used to filter ApplicationSelectedActivity (ASA)
         :return: first ApplicationSelectedActivity record filtered by application id and ASA id
@@ -1158,11 +1169,13 @@ class Application(RevisionedMixin):
             application_id=self.id,
             licence_activity_id=activity_id
         ).first()
-        if not selected_activity:
-            selected_activity = ApplicationSelectedActivity.objects.create(
-                application_id=self.id,
-                licence_activity_id=activity_id
-            )
+        #TODO a get function like this should not be creating records, seperate this functionality as needed
+        if create: #temp fix
+            if not selected_activity:
+                selected_activity = ApplicationSelectedActivity.objects.create(
+                    application_id=self.id,
+                    licence_activity_id=activity_id
+                )
         return selected_activity
 
     def get_licence_category(self):
@@ -1471,8 +1484,6 @@ class Application(RevisionedMixin):
         return True
 
     def submit(self, request):
-        from wildlifecompliance.components.licences.models import LicenceActivity
-
         with transaction.atomic():
             #import ipdb; ipdb.set_trace()
             requires_refund = self.requires_refund_at_submit()
@@ -1598,7 +1609,7 @@ class Application(RevisionedMixin):
                     licence_activities__purpose__licence_category__id=self.licence_type_data["id"]
                 )
                 group_users = EmailUser.objects.filter(
-                    groups__id__in=officer_groups.values_list('id', flat=True)
+                    id__in=list(UsersInGroup.objects.filter(group_id__in=officer_groups).values_list("emailuser_id",flat=True))
                 ).distinct()
 
                 if self.amendment_requests:
@@ -1616,20 +1627,6 @@ class Application(RevisionedMixin):
                     self.log_user_action(
                         ApplicationUserAction.ACTION_LODGE_APPLICATION.format(
                             self.id), request)
-                    # Create a log entry for the applicant (submitter,
-                    # organisation or proxy)
-                    if self.org_applicant:
-                        self.org_applicant.log_user_action(
-                            ApplicationUserAction.ACTION_LODGE_APPLICATION.format(
-                                self.id), request)
-                    elif self.proxy_applicant:
-                        self.proxy_applicant.log_user_action(
-                            ApplicationUserAction.ACTION_LODGE_APPLICATION.format(
-                                self.id), request)
-                    else:
-                        self.submitter.log_user_action(
-                            ApplicationUserAction.ACTION_LODGE_APPLICATION.format(
-                                self.id), request)
 
                     # notify linked officer groups of submission.
                     if requires_refund:
@@ -1661,20 +1658,6 @@ class Application(RevisionedMixin):
         self.log_user_action(
             ApplicationUserAction.ACTION_ACCEPT_ID.format(
                 self.id), request)
-        # Create a log entry for the applicant (submitter, organisation or
-        # proxy)
-        if self.org_applicant:
-            self.org_applicant.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_ID.format(
-                    self.id), request)
-        elif self.proxy_applicant:
-            self.proxy_applicant.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_ID.format(
-                    self.id), request)
-        else:
-            self.submitter.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_ID.format(
-                    self.id), request)
 
     def reset_id_check(self, request):
         self.id_check_status = Application.ID_CHECK_STATUS_NOT_CHECKED
@@ -1683,20 +1666,6 @@ class Application(RevisionedMixin):
         self.log_user_action(
             ApplicationUserAction.ACTION_RESET_ID.format(
                 self.id), request)
-        # Create a log entry for the applicant (submitter, organisation or
-        # proxy)
-        if self.org_applicant:
-            self.org_applicant.log_user_action(
-                ApplicationUserAction.ACTION_RESET_ID.format(
-                    self.id), request)
-        elif self.proxy_applicant:
-            self.proxy_applicant.log_user_action(
-                ApplicationUserAction.ACTION_RESET_ID.format(
-                    self.id), request)
-        else:
-            self.submitter.log_user_action(
-                ApplicationUserAction.ACTION_RESET_ID.format(
-                    self.id), request)
 
     def request_id_check(self, request):
         self.id_check_status = Application.ID_CHECK_STATUS_AWAITING_UPDATE
@@ -1705,18 +1674,7 @@ class Application(RevisionedMixin):
         self.log_user_action(
             ApplicationUserAction.ACTION_ID_REQUEST_UPDATE.format(
                 self.id), request)
-        # Create a log entry for the applicant (submitter or organisation only)
-        if self.org_applicant:
-            self.org_applicant.log_user_action(
-                ApplicationUserAction.ACTION_ID_REQUEST_UPDATE.format(
-                    self.id), request)
-        elif self.proxy_applicant:
-            # do nothing if proxy_applicant
-            pass
-        else:
-            self.submitter.log_user_action(
-                ApplicationUserAction.ACTION_ID_REQUEST_UPDATE.format(
-                    self.id), request)
+        
         # send email to submitter or org_applicant admins
         if self.org_applicant:
             send_org_id_update_request_notification(self, request)
@@ -1734,20 +1692,6 @@ class Application(RevisionedMixin):
         self.log_user_action(
             ApplicationUserAction.ACTION_ACCEPT_CHARACTER.format(
                 self.id), request)
-        # Create a log entry for the applicant (submitter, organisation or
-        # proxy)
-        if self.org_applicant:
-            self.org_applicant.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_CHARACTER.format(
-                    self.id), request)
-        elif self.proxy_applicant:
-            self.proxy_applicant.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_CHARACTER.format(
-                    self.id), request)
-        else:
-            self.submitter.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_CHARACTER.format(
-                    self.id), request)
 
     def reset_character_check(self, request):
         self.character_check_status = \
@@ -1758,20 +1702,6 @@ class Application(RevisionedMixin):
         self.log_user_action(
             ApplicationUserAction.ACTION_RESET_CHARACTER.format(
                 self.id), request)
-        # Create a log entry for the applicant (submitter, organisation or
-        # proxy)
-        if self.org_applicant:
-            self.org_applicant.log_user_action(
-                ApplicationUserAction.ACTION_RESET_CHARACTER.format(
-                    self.id), request)
-        elif self.proxy_applicant:
-            self.proxy_applicant.log_user_action(
-                ApplicationUserAction.ACTION_RESET_CHARACTER.format(
-                    self.id), request)
-        else:
-            self.submitter.log_user_action(
-                ApplicationUserAction.ACTION_RESET_CHARACTER.format(
-                    self.id), request)
 
     def accept_return_check(self, request):
         self.return_check_status = Application.RETURN_CHECK_STATUS_ACCEPTED
@@ -1780,20 +1710,6 @@ class Application(RevisionedMixin):
         self.log_user_action(
             ApplicationUserAction.ACTION_ACCEPT_RETURN.format(
                 self.id), request)
-        # Create a log entry for the applicant (submitter, organisation or
-        # proxy)
-        if self.org_applicant:
-            self.org_applicant.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_RETURN.format(
-                    self.id), request)
-        elif self.proxy_applicant:
-            self.proxy_applicant.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_RETURN.format(
-                    self.id), request)
-        else:
-            self.submitter.log_user_action(
-                ApplicationUserAction.ACTION_ACCEPT_RETURN.format(
-                    self.id), request)
 
     def reset_return_check(self, request):
         self.return_check_status = Application.RETURN_CHECK_STATUS_NOT_CHECKED
@@ -1802,20 +1718,6 @@ class Application(RevisionedMixin):
         self.log_user_action(
             ApplicationUserAction.ACTION_RESET_RETURN.format(
                 self.id), request)
-        # Create a log entry for the applicant (submitter, organisation or
-        # proxy)
-        if self.org_applicant:
-            self.org_applicant.log_user_action(
-                ApplicationUserAction.ACTION_RESET_RETURN.format(
-                    self.id), request)
-        elif self.proxy_applicant:
-            self.proxy_applicant.log_user_action(
-                ApplicationUserAction.ACTION_RESET_RETURN.format(
-                    self.id), request)
-        else:
-            self.submitter.log_user_action(
-                ApplicationUserAction.ACTION_RESET_RETURN.format(
-                    self.id), request)
 
     def assign_officer(self, request, officer):
         """
@@ -1897,9 +1799,10 @@ class Application(RevisionedMixin):
     def get_assessor_permission_group(
                     self, user, activity_id=None, first=True):
         app_label = get_app_label()
-        qs = user.groups.filter(
-            permissions__codename='assessor'
-        )
+        user_id = user.id
+        groups_with_permissions = Group.objects.filter(permissions__codename="assessor")
+        groups_with_user = UsersInGroup.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
+        qs = Group.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
         if activity_id is not None:
            qs = qs.filter(
                 activitypermissiongroup__licence_activities__id__in=activity_id if isinstance(
@@ -2002,22 +1905,6 @@ class Application(RevisionedMixin):
                         ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE
                         .format(assessor_group), request)
 
-                    # Log entry for organisation
-                    if self.org_applicant:
-                        self.org_applicant.log_user_action(
-                            ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE
-                            .format(assessor_group), request)
-
-                    elif self.proxy_applicant:
-                        self.proxy_applicant.log_user_action(
-                            ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE
-                            .format(assessor_group), request)
-
-                    else:
-                        self.submitter.log_user_action(
-                            ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE
-                            .format(assessor_group), request)
-
                     self.check_assessment_complete(
                         assessment.licence_activity_id)
             except BaseException:
@@ -2061,16 +1948,6 @@ class Application(RevisionedMixin):
                 # Log application action
                 self.log_user_action(
                     ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE.format(assessor_group), request)
-                # Log entry for organisation
-                if self.org_applicant:
-                    self.org_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE.format(assessor_group), request)
-                elif self.proxy_applicant:
-                    self.proxy_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE.format(assessor_group), request)
-                else:
-                    self.submitter.log_user_action(
-                        ApplicationUserAction.ACTION_ASSESSMENT_COMPLETE.format(assessor_group), request)
 
                 self.check_assessment_complete(activity_id)
             except BaseException:
@@ -2124,19 +2001,7 @@ class Application(RevisionedMixin):
                 self.log_user_action(
                     ApplicationUserAction.ACTION_PROPOSED_DECLINE.format(
                         self.id), request)
-                # Log entry for organisation
-                if self.org_applicant:
-                    self.org_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_PROPOSED_DECLINE.format(
-                            self.id), request)
-                elif self.proxy_applicant:
-                    self.proxy_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_PROPOSED_DECLINE.format(
-                            self.id), request)
-                else:
-                    self.submitter.log_user_action(
-                        ApplicationUserAction.ACTION_PROPOSED_DECLINE.format(
-                            self.id), request)
+
             except BaseException:
                 raise
 
@@ -3041,19 +2906,6 @@ class Application(RevisionedMixin):
                 self.log_user_action(
                     ApplicationUserAction.ACTION_PROPOSED_LICENCE.format(
                         self.id), request)
-                # Log entry for organisation
-                if self.org_applicant:
-                    self.org_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_PROPOSED_LICENCE.format(
-                            self.id), request)
-                elif self.proxy_applicant:
-                    self.proxy_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_PROPOSED_LICENCE.format(
-                            self.id), request)
-                else:
-                    self.submitter.log_user_action(
-                        ApplicationUserAction.ACTION_PROPOSED_LICENCE.format(
-                            self.id), request)
             except BaseException:
                 raise
 
@@ -3149,19 +3001,6 @@ class Application(RevisionedMixin):
                 self.log_user_action(
                     ApplicationUserAction.ACTION_REISSUE_LICENCE_.format(
                         selected_activity.licence_activity.name), request)
-                # Log entry for organisation
-                if self.org_applicant:
-                    self.org_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_REISSUE_LICENCE_.format(
-                            selected_activity.licence_activity.name), request)
-                elif self.proxy_applicant:
-                    self.proxy_applicant.log_user_action(
-                        ApplicationUserAction.ACTION_REISSUE_LICENCE_.format(
-                            selected_activity.licence_activity.name), request)
-                else:
-                    self.submitter.log_user_action(
-                        ApplicationUserAction.ACTION_REISSUE_LICENCE_.format(
-                            selected_activity.licence_activity.name), request)
 
                 selected_activity.save()
 
@@ -3599,25 +3438,6 @@ class Application(RevisionedMixin):
                             request
                         )
 
-                        # Log entry for organisation
-                        if self.org_applicant:
-                            self.org_applicant.log_user_action(
-                                P_LOG.format(purpose.purpose.name),
-                                request
-                            )
-
-                        elif self.proxy_applicant:
-                            self.proxy_applicant.log_user_action(
-                                P_LOG.format(purpose.purpose.name),
-                                request
-                            )
-
-                        else:
-                            self.submitter.log_user_action(
-                                P_LOG.format(purpose.purpose.name),
-                                request
-                            )
-
                     '''Currently if there is atleast one declined activity then activity status changes to 'decline'.
                     To fix it, if there is atleast one issued purpose on the activity then reverting back to original status so it will be accepted later'''
                     if issued_purpose_exists:
@@ -3694,24 +3514,6 @@ class Application(RevisionedMixin):
                         self.log_user_action(
                             ApplicationUserAction.ACTION_DECLINE_LICENCE_.format(
                                 p.purpose.name), request)
-
-                        # Log entry for org_applicant
-                        if self.org_applicant:
-                            self.org_applicant.log_user_action(
-                                ApplicationUserAction.ACTION_DECLINE_LICENCE_.format(
-                                    p.purpose.name), request)
-
-                        # Log entry for proxy_applicant
-                        elif self.proxy_applicant:
-                            self.proxy_applicant.log_user_action(
-                                ApplicationUserAction.ACTION_DECLINE_LICENCE_.format(
-                                    p.purpose.name), request)
-
-                        # Log entry for submitter
-                        else:
-                            self.submitter.log_user_action(
-                                ApplicationUserAction.ACTION_DECLINE_LICENCE_.format(
-                                    p.purpose.name), request)
 
                     selected_activity.save()
                     declined_activities.append(selected_activity)
@@ -4012,7 +3814,7 @@ class Application(RevisionedMixin):
         proxy_details = Application.get_request_user_proxy_details(request)
         proxy_id = proxy_details.get('proxy_id')
         organisation_id = proxy_details.get('organisation_id')
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             return Application.objects.filter(
                 Q(org_applicant_id=organisation_id) if organisation_id
                 else (
@@ -4040,7 +3842,7 @@ class ApplicationInvoice(models.Model):
         (OTHER_PAYMENT_METHOD_NONE, 'Invoice for No Payment'),
     )
 
-    application = models.ForeignKey(Application, related_name='invoices')
+    application = models.ForeignKey(Application, related_name='invoices', on_delete=models.CASCADE)
     invoice_reference = models.CharField(
         max_length=50, null=True, blank=True, default='')
     invoice_datetime = models.DateTimeField(auto_now=True)
@@ -4070,9 +3872,9 @@ class ApplicationInvoice(models.Model):
 
 class ApplicationInvoiceLine(models.Model):
     invoice = models.ForeignKey(
-        ApplicationInvoice, related_name='application_activity_lines')
+        ApplicationInvoice, related_name='application_activity_lines', on_delete=models.CASCADE)
     licence_activity = models.ForeignKey(
-        'wildlifecompliance.LicenceActivity', null=True)
+        'wildlifecompliance.LicenceActivity', null=True, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=8, decimal_places=2, default='0')
 
     class Meta:
@@ -4085,7 +3887,7 @@ class ApplicationInvoiceLine(models.Model):
 class ApplicationLogDocument(Document):
     log_entry = models.ForeignKey(
         'ApplicationLogEntry',
-        related_name='documents')
+        related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(upload_to=update_application_comms_log_filename, storage=private_storage)
 
     class Meta:
@@ -4093,7 +3895,7 @@ class ApplicationLogDocument(Document):
 
 
 class ApplicationLogEntry(CommunicationsLogEntry):
-    application = models.ForeignKey(Application, related_name='comms_logs')
+    application = models.ForeignKey(Application, related_name='comms_logs', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -4109,10 +3911,10 @@ class ApplicationLogEntry(CommunicationsLogEntry):
             self.subject, self.log_type, self.fromm)
 
 class ApplicationRequest(models.Model):
-    application = models.ForeignKey(Application)
+    application = models.ForeignKey(Application, on_delete=models.CASCADE)
     subject = models.CharField(max_length=200, blank=True)
     text = models.TextField(blank=True)
-    officer = models.ForeignKey(EmailUser, null=True)
+    officer = models.ForeignKey(EmailUser, null=True, on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -4161,7 +3963,7 @@ class AmendmentRequest(ApplicationRequest):
         choices=REASON_CHOICES,
         default=AMENDMENT_REQUEST_REASON_INSUFFICIENT_DETAIL)
     licence_activity = models.ForeignKey(
-        'wildlifecompliance.LicenceActivity', null=True)
+        'wildlifecompliance.LicenceActivity', null=True, on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -4202,17 +4004,17 @@ class Assessment(ApplicationRequest):
         default=STATUS_AWAITING_ASSESSMENT)
     date_last_reminded = models.DateField(null=True, blank=True)
     assessor_group = models.ForeignKey(
-        ActivityPermissionGroup, null=False, default=1)
+        ActivityPermissionGroup, null=False, default=1, on_delete=models.CASCADE)
     licence_activity = models.ForeignKey(
-        'wildlifecompliance.LicenceActivity', null=True)
+        'wildlifecompliance.LicenceActivity', null=True, on_delete=models.CASCADE)
     final_comment = models.TextField(blank=True)
     purpose = models.TextField(blank=True)
-    actioned_by = models.ForeignKey(EmailUser, null=True)
+    actioned_by = models.ForeignKey(EmailUser, null=True, on_delete=models.CASCADE)
     assigned_assessor = models.ForeignKey(
         EmailUser,
         blank=True,
         null=True,
-        related_name='wildlifecompliance_assessor')
+        related_name='wildlifecompliance_assessor', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -4311,7 +4113,8 @@ class Assessment(ApplicationRequest):
 
             except BaseException:
                 raise
-
+    
+    #TODO does not appear to be in use
     def add_inspection(self, request):
         """
         Attaches an Inspection to an Assessment.
@@ -4373,9 +4176,9 @@ class AssessmentInspection(models.Model):
     A model represention of an Inspection for an Assessment.
     """
     assessment = models.ForeignKey(
-        Assessment, related_name='inspections')
+        Assessment, related_name='inspections', on_delete=models.CASCADE)
     inspection = models.ForeignKey(
-        Inspection, related_name='wildlifecompliance_inspection')
+        Inspection, related_name='wildlifecompliance_inspection', on_delete=models.CASCADE)
     request_datetime = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -4488,13 +4291,13 @@ class ApplicationSelectedActivity(models.Model):
         max_length=40,
         choices=ACTIVITY_STATUS_CHOICES,
         default=ACTIVITY_STATUS_DEFAULT)
-    application = models.ForeignKey(Application, related_name='selected_activities')
-    updated_by = models.ForeignKey(EmailUser, null=True)
+    application = models.ForeignKey(Application, related_name='selected_activities', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(EmailUser, null=True, on_delete=models.CASCADE)
     reason = models.TextField(blank=True)
     cc_email = models.TextField(null=True)
     activity = JSONField(blank=True, null=True)
     licence_activity = models.ForeignKey(
-        'wildlifecompliance.LicenceActivity', null=True)
+        'wildlifecompliance.LicenceActivity', null=True, on_delete=models.CASCADE)
     additional_info = models.TextField(blank=True, null=True)
     conditions = models.TextField(blank=True, null=True)
     is_inspection_required = models.BooleanField(default=False)
@@ -4511,12 +4314,12 @@ class ApplicationSelectedActivity(models.Model):
         EmailUser,
         blank=True,
         null=True,
-        related_name='wildlifecompliance_officer_finalisation')
+        related_name='wildlifecompliance_officer_finalisation', on_delete=models.CASCADE)
     assigned_officer = models.ForeignKey(
         EmailUser,
         blank=True,
         null=True,
-        related_name='wildlifecompliance_officer')
+        related_name='wildlifecompliance_officer', on_delete=models.CASCADE)
     additional_licence_info = JSONField(default=list)
     # TODO:AYN issue dates and period dates are not required on Activity.
     # remove these status dates and logic.
@@ -4528,7 +4331,7 @@ class ApplicationSelectedActivity(models.Model):
     proposed_end_date = models.DateField(null=True, blank=True)
     #payment_status = models.CharField(max_length=24, default=ActivityInvoice.PAYMENT_STATUS_UNPAID)
     # payment_status = models.CharField(max_length=24, null=True, blank=True)
-    property_cache = JSONField(null=True, blank=True, default={})
+    property_cache = JSONField(null=True, blank=True, default=dict)
 
     def __str__(self):
         logger.debug('ApplicationSelectedActivity.__str__()')
@@ -4546,7 +4349,8 @@ class ApplicationSelectedActivity(models.Model):
 
     def save(self, *args, **kwargs):
         logger.debug('ApplicationSelectedActivity.save()')
-        self.update_property_cache(False)
+        if self.pk:
+            self.update_property_cache(False)
         super(ApplicationSelectedActivity, self).save(*args, **kwargs)
 
     def save_without_cache(self, *args, **kwargs):
@@ -5102,9 +4906,11 @@ class ApplicationSelectedActivity(models.Model):
         Authorised licence officers for this Selected Activity.
         """
         groups = ActivityPermissionGroup.get_groups_for_activities(
-            self.licence_activity, 'licensing_officer')
+            self.licence_activity, 'licensing_officer').values_list("id", flat=True)
 
-        return EmailUser.objects.filter(groups__id__in=groups).distinct()
+        return EmailUser.objects.filter(
+            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
+        ).distinct()
 
     @property
     def issuing_officers(self):
@@ -5112,9 +4918,11 @@ class ApplicationSelectedActivity(models.Model):
         Authorised issuing officers for this Selected Activity.
         """
         groups = ActivityPermissionGroup.get_groups_for_activities(
-            self.licence_activity, 'issuing_officer')
+            self.licence_activity, 'issuing_officer').values_list("id", flat=True)
 
-        return EmailUser.objects.filter(groups__id__in=groups).distinct()
+        return EmailUser.objects.filter(
+            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
+        ).distinct()
 
     @property
     def total_paid_amount(self):
@@ -5135,8 +4943,7 @@ class ApplicationSelectedActivity(models.Model):
                 # exclude the refunds
                 detail = Invoice.objects.get(
                     reference=invoice.invoice_reference)
-                amount -= detail.refund_amount
-                # amount += detail.payment_amount
+                #amount -= detail.refund_amount TODO: investigate - ledger_api_client does not support this
 
         return amount
 
@@ -5584,7 +5391,6 @@ class ApplicationSelectedActivity(models.Model):
         return is_reissued
 
     def process_licence_fee_payment(self, request, application):
-        from ledger.payments.models import BpointToken
         from wildlifecompliance.components.applications.payments import (
             ApplicationFeePolicy,
             LicenceFeeClearingInvoice,
@@ -5598,67 +5404,7 @@ class ApplicationSelectedActivity(models.Model):
         if not clear_inv.is_refundable and clear_inv.requires_refund:
             return True     # Officer needs to refund with dashboard link.
 
-        applicant = application.proxy_applicant if application.proxy_applicant else application.submitter
-        card_owner_id = applicant.id
-        card_token = BpointToken.objects.filter(user_id=card_owner_id).order_by('-id').first()
-        if not card_token:
-            logger.error("No card token found for user: %s" % card_owner_id)
-            return False
-        else:
-            logger.error("Cannot make payment with stored card: %s" % card_owner_id)
-            return False
-
-        product_lines = []
-        application_submission = u'Activity licence issued for {} application {}'.format(
-            u'{} {}'.format(applicant.first_name, applicant.last_name), application.lodgement_number)
-        set_session_application(request.session, application)
-
-        price_excl = calculate_excl_gst(self.licence_fee)
-        if ApplicationFeePolicy.GST_FREE:
-            price_excl = self.licence_fee
-
-        product_lines.append({
-            'ledger_description': '{}'.format(self.licence_activity.name),
-            'quantity': 1,
-            'price_incl_tax': str(self.licence_fee),
-            'price_excl_tax': str(price_excl),
-            'oracle_code': self.licence_activity.oracle_account_code
-        })
-        checkout(
-            request, application, lines=product_lines,
-            invoice_text=application_submission,
-            internal=True,
-            add_checkout_params={
-                'basket_owner': request.user.id,
-                'payment_method': 'card',
-                'checkout_token': card_token.id,
-            }
-        )
-        try:
-            '''
-            Requires check for KeyError when an Order has not been successfully created for an Activity Licence. When an Order
-            does not exist the session key 'checkout_invoice' will remain from the token's previous Application payment.
-            Another check is required to check valid invoice details.
-            '''
-            invoice_ref = request.session['checkout_invoice']
-            created_invoice = Invoice.objects.filter(reference=invoice_ref).first()
-            if (created_invoice.text != application_submission):  # text on invoice does not match this payment submission.
-                raise KeyError
-        except KeyError:
-            logger.error("No invoice reference generated for Activity ID: %s" % self.licence_activity_id)
-            return False
-        invoice = ActivityInvoice.objects.get_or_create(
-            activity=self,
-            invoice_reference=invoice_ref
-        )
-        line = ActivityInvoiceLine.object.get_or_create(
-            invoice=invoice[0],
-            licence_activity=self.licence_activity,
-            amount=self.licence_fee
-        )
-        delete_session_application(request.session)
-        flush_checkout_session(request.session)
-        return self.licence_fee_paid and send_activity_invoice_email_notification(application, self, invoice_ref, request)
+        return False
 
     def reactivate_renew(self, request):
         # TODO: this needs work, reactivate renew logic to be clarified and function adjusted
@@ -6219,9 +5965,9 @@ class ApplicationSelectedActivityPurpose(models.Model):
         choices=PURPOSE_STATUS_CHOICES,
         default=PURPOSE_STATUS_DEFAULT)
     selected_activity = models.ForeignKey(
-        ApplicationSelectedActivity, related_name='proposed_purposes')
+        ApplicationSelectedActivity, related_name='proposed_purposes', on_delete=models.CASCADE)
     purpose = models.ForeignKey(
-        LicencePurpose, related_name='selected_activity_proposed_purpose')
+        LicencePurpose, related_name='selected_activity_proposed_purpose', on_delete=models.CASCADE)
     licence_fee = models.DecimalField(
         max_digits=8, decimal_places=2, default='0')
     application_fee = models.DecimalField(
@@ -6251,8 +5997,8 @@ class ApplicationSelectedActivityPurpose(models.Model):
     additional_fee_text = models.TextField(blank=True, null=True)
     # Additional species header and text taken from licence purpose which can
     # be customised for this selected purpose.
-    purpose_species_json = JSONField(null=True, blank=True, default={})
-    property_cache = JSONField(null=True, blank=True, default={})
+    purpose_species_json = JSONField(null=True, blank=True, default=dict)
+    property_cache = JSONField(null=True, blank=True, default=dict)
 
     def __str__(self):
         logger.debug('ApplicationSelectedActivityPurpose.__str__()')
@@ -6381,7 +6127,8 @@ class ApplicationSelectedActivityPurpose(models.Model):
                 reference=self.selected_activity.activity_invoices.latest(
                     'id').invoice_reference,
             )
-            status = latest_invoice.payment_status
+            inv_props = get_invoice_properties(latest_invoice.id)
+            status = inv_props['data']['invoice']['payment_status']
         except Invoice.DoesNotExist:
             status =  ActivityInvoice.PAYMENT_STATUS_UNPAID
         except ActivityInvoice.DoesNotExist:
@@ -6869,7 +6616,7 @@ class IssuanceDocument(Document):
     can_delete = models.BooleanField(default=True)
     selected_activity = models.ForeignKey(
         'ApplicationSelectedActivity',
-        related_name='issuance_documents')
+        related_name='issuance_documents', on_delete=models.CASCADE)
     
     class Meta:
         app_label = 'wildlifecompliance'
@@ -6884,7 +6631,7 @@ class ActivityInvoice(models.Model):
 
     activity = models.ForeignKey(
         ApplicationSelectedActivity,
-        related_name='activity_invoices')
+        related_name='activity_invoices', on_delete=models.CASCADE)
     invoice_reference = models.CharField(
         max_length=50, null=True, blank=True, default='')
     invoice_datetime = models.DateTimeField(auto_now=True)
@@ -6929,11 +6676,11 @@ class ActivityInvoiceLine(models.Model):
         null=True,
         blank=True)
     invoice = models.ForeignKey(
-        ActivityInvoice, related_name='licence_activity_lines')
+        ActivityInvoice, related_name='licence_activity_lines', on_delete=models.CASCADE)
     licence_activity = models.ForeignKey(
-        'wildlifecompliance.LicenceActivity', null=True)
+        'wildlifecompliance.LicenceActivity', null=True, on_delete=models.CASCADE)
     licence_purpose = models.ForeignKey(
-        'wildlifecompliance.LicencePurpose', null=True, blank=True)
+        'wildlifecompliance.LicencePurpose', null=True, blank=True, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=8, decimal_places=2, default='0')
 
     class Meta:
@@ -6993,7 +6740,7 @@ class ApplicationFormDataRecord(models.Model):
     )
 
     application = models.ForeignKey(
-        Application, related_name='form_data_records')
+        Application, related_name='form_data_records', on_delete=models.CASCADE)
     field_name = models.CharField(max_length=512, null=True, blank=True)
     schema_name = models.CharField(max_length=256, null=True, blank=True)
     instance_name = models.CharField(max_length=256, null=True, blank=True)
@@ -7007,9 +6754,9 @@ class ApplicationFormDataRecord(models.Model):
     assessor_comment = models.TextField(blank=True)
     deficiency = models.TextField(blank=True)
     licence_activity = models.ForeignKey(
-        LicenceActivity, related_name='form_data_records')
+        LicenceActivity, related_name='form_data_records', on_delete=models.CASCADE)
     licence_purpose = models.ForeignKey(
-        LicencePurpose, related_name='form_data_records')
+        LicencePurpose, related_name='form_data_records', on_delete=models.CASCADE)
 
     def __str__(self):
         logger.debug('ApplicationFormDataRecord.__str__()')
@@ -7031,7 +6778,7 @@ class ApplicationStandardCondition(RevisionedMixin):
     code = models.CharField(max_length=10, unique=True)
     obsolete = models.BooleanField(default=False)
     return_type = models.ForeignKey(
-        'wildlifecompliance.ReturnType', null=True, blank=True)
+        'wildlifecompliance.ReturnType', null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.code
@@ -7051,15 +6798,15 @@ class DefaultCondition(OrderedModel):
     standard_condition = models.ForeignKey(
         ApplicationStandardCondition,
         related_name='default_condition',
-        null=True)
+        null=True, on_delete=models.CASCADE)
     licence_activity = models.ForeignKey(
         'wildlifecompliance.LicenceActivity',
         related_name='default_activity',
-        null=True)
+        null=True, on_delete=models.CASCADE)
     # licence_purpose = models.ForeignKey(
     #     'wildlifecompliance.LicencePurpose',
     #     related_name='default_purpose',
-    #     null=True)
+    #     null=True, on_delete=models.CASCADE)
     licence_purpose = ChainedForeignKey(
         'wildlifecompliance.LicencePurpose',
         chained_field='licence_activity',
@@ -7084,14 +6831,14 @@ class ApplicationCondition(OrderedModel):
         (APPLICATION_CONDITION_RECURRENCE_YEARLY, 'Yearly')
     )
     standard_condition = models.ForeignKey(
-        ApplicationStandardCondition, null=True, blank=True)
+        ApplicationStandardCondition, null=True, blank=True, on_delete=models.CASCADE)
     free_condition = models.TextField(null=True, blank=True)
     default_condition = models.ForeignKey(
-        DefaultCondition, null=True, blank=True)
+        DefaultCondition, null=True, blank=True, on_delete=models.CASCADE)
     is_default = models.BooleanField(default=False)
     standard = models.BooleanField(default=True)
     is_rendered = models.BooleanField(default=False)
-    application = models.ForeignKey(Application, related_name='conditions')
+    application = models.ForeignKey(Application, related_name='conditions', on_delete=models.CASCADE)
     due_date = models.DateField(null=True, blank=True)
     recurrence = models.BooleanField(default=False)
     recurrence_pattern = models.CharField(
@@ -7100,13 +6847,13 @@ class ApplicationCondition(OrderedModel):
         default=APPLICATION_CONDITION_RECURRENCE_WEEKLY)
     recurrence_schedule = models.IntegerField(null=True, blank=True)
     licence_activity = models.ForeignKey(
-        'wildlifecompliance.LicenceActivity', null=True)
+        'wildlifecompliance.LicenceActivity', null=True, on_delete=models.CASCADE)
     return_type = models.ForeignKey(
-        'wildlifecompliance.ReturnType', null=True, blank=True)
+        'wildlifecompliance.ReturnType', null=True, blank=True, on_delete=models.CASCADE)
     licence_purpose = models.ForeignKey(
-        'wildlifecompliance.LicencePurpose', null=True, blank=True)
+        'wildlifecompliance.LicencePurpose', null=True, blank=True, on_delete=models.CASCADE)
     source_group = models.ForeignKey(
-        ActivityPermissionGroup, blank=True, null=True)
+        ActivityPermissionGroup, blank=True, null=True, on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -7165,9 +6912,12 @@ class ApplicationCondition(OrderedModel):
 
     def get_assessor_permission_group(self, user, first=True):
         app_label = get_app_label()
-        qs = user.groups.filter(
-            permissions__codename='assessor'
-        )
+
+        user_id = user.id
+        groups_with_permissions = Group.objects.filter(permissions__codename="assessor")
+        groups_with_user = UsersInGroup.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
+        qs = Group.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+
         activity_id = self.licence_activity.id
         qs = qs.filter(
             activitypermissiongroup__licence_activities__id__in=activity_id\
@@ -7180,9 +6930,12 @@ class ApplicationCondition(OrderedModel):
 
     def get_officer_permission_group(self, user, first=True):
         app_label = get_app_label()
-        qs = user.groups.filter(
-            permissions__codename='licensing_officer'
-        )
+
+        user_id = user.id
+        groups_with_permissions = Group.objects.filter(permissions__codename="licensing_officer")
+        groups_with_user = UsersInGroup.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
+        qs = Group.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+
         activity_id = self.licence_activity.id
         qs = qs.filter(
             activitypermissiongroup__licence_activities__id__in=activity_id\
@@ -7255,7 +7008,7 @@ class ApplicationUserAction(UserAction):
             what=str(action)
         )
 
-    application = models.ForeignKey(Application, related_name='action_logs')
+    application = models.ForeignKey(Application, related_name='action_logs', on_delete=models.CASCADE)
 
 
 @receiver(pre_delete, sender=Application)
@@ -7271,17 +7024,20 @@ import reversion
 reversion.register(
     Application,
     follow=[
-        'selected_activities',
+    #    'selected_activities', TODO disabled for segregation - check if needed/repairable  
         'invoices',
+
         # 'form_data_records',
         # 'conditions',
+
         'previous_application',
         'licence_document',
         'licence',
-        'submitter',
+    #    'submitter', TODO disabled for segregation - check if needed/repairable  
         'org_applicant',
         'proxy_applicant',
         'licence_purposes',
+
         # 'action_logs',
         # 'comms_logs',
         ]

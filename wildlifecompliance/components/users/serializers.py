@@ -1,6 +1,6 @@
 import os
 from django.conf import settings
-from ledger.accounts.models import EmailUser, Address, Profile, EmailIdentity, EmailUserAction, Document, PrivateDocument
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address, EmailIdentity, Document, PrivateDocument
 from wildlifecompliance.components.organisations.models import (
     Organisation,
     OrganisationRequest,
@@ -82,8 +82,8 @@ class UserOrganisationContactSerializer(serializers.ModelSerializer):
 
 class UserOrganisationSerializer(serializers.ModelSerializer):
     # Serializer for an Organisation linked with a User
-    name = serializers.CharField(source='organisation.name')
-    abn = serializers.CharField(source='organisation.abn')
+    name = serializers.SerializerMethodField()
+    abn = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
     is_consultant = serializers.SerializerMethodField(read_only=True)
     is_admin = serializers.SerializerMethodField(read_only=True)
@@ -98,6 +98,12 @@ class UserOrganisationSerializer(serializers.ModelSerializer):
             'is_consultant',
             'is_admin'
         )
+
+    def get_name(self, obj):
+        return obj.name
+
+    def get_abn(self,obj):
+        return obj.abn
 
     def get_is_admin(self, obj):
         user = EmailUser.objects.get(id=self.context.get('user_id'))
@@ -144,60 +150,61 @@ class UserAddressSerializer(serializers.ModelSerializer):
         )
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
-    postal_address = UserAddressSerializer()
-
-    class Meta:
-        model = Profile
-        fields = (
-            'id',
-            'user',
-            'name',
-            'email',
-            'institution',
-            'postal_address'
-        )
-
-    def create(self, validated_data):
-        profile = Profile()
-        profile.user = validated_data['user']
-        profile.name = validated_data['name']
-        profile.email = validated_data['email']
-        profile.institution = validated_data.get('institution', '')
-        postal_address_data = validated_data.pop('postal_address')
-        if profile.email:
-            if EmailIdentity.objects.filter(
-                    email=profile.email).exclude(
-                    user=profile.user).exists():
-                # Email already used by other user in email identity.
-                raise ValidationError(
-                    "This email address is already associated with an existing account or profile.")
-        new_postal_address, address_created = Address.objects.get_or_create(
-            user=profile.user, **postal_address_data)
-        profile.postal_address = new_postal_address
-        setattr(profile, "auth_identity", True)
-        profile.save()
-        return profile
-
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.email = validated_data.get('email', instance.email)
-        instance.institution = validated_data.get(
-            'institution', instance.institution)
-        postal_address_data = validated_data.pop('postal_address')
-        if instance.email:
-            if EmailIdentity.objects.filter(
-                    email=instance.email).exclude(
-                    user=instance.user).exists():
-                # Email already used by other user in email identity.
-                raise ValidationError(
-                    "This email address is already associated with an existing account or profile.")
-        postal_address, address_created = Address.objects.get_or_create(
-            user=instance.user, **postal_address_data)
-        instance.postal_address = postal_address
-        setattr(instance, "auth_identity", True)
-        instance.save()
-        return instance
+#TODO remove/replace
+#class UserProfileSerializer(serializers.ModelSerializer):
+#    postal_address = UserAddressSerializer()
+#
+#    class Meta:
+#        model = Profile
+#        fields = (
+#            'id',
+#            'user',
+#            'name',
+#            'email',
+#            'institution',
+#            'postal_address'
+#        )
+#
+#    def create(self, validated_data):
+#        profile = Profile()
+#        profile.user = validated_data['user']
+#        profile.name = validated_data['name']
+#        profile.email = validated_data['email']
+#        profile.institution = validated_data.get('institution', '')
+#        postal_address_data = validated_data.pop('postal_address')
+#        if profile.email:
+#            if EmailIdentity.objects.filter(
+#                    email=profile.email).exclude(
+#                    user=profile.user).exists():
+#                # Email already used by other user in email identity.
+#                raise ValidationError(
+#                    "This email address is already associated with an existing account or profile.")
+#        new_postal_address, address_created = Address.objects.get_or_create(
+#            user=profile.user, **postal_address_data)
+#        profile.postal_address = new_postal_address
+#        setattr(profile, "auth_identity", True)
+#        profile.save()
+#        return profile
+#
+#    def update(self, instance, validated_data):
+#        instance.name = validated_data.get('name', instance.name)
+#        instance.email = validated_data.get('email', instance.email)
+#        instance.institution = validated_data.get(
+#            'institution', instance.institution)
+#        postal_address_data = validated_data.pop('postal_address')
+#        if instance.email:
+#            if EmailIdentity.objects.filter(
+#                    email=instance.email).exclude(
+#                    user=instance.user).exists():
+#                # Email already used by other user in email identity.
+#                raise ValidationError(
+#                    "This email address is already associated with an existing account or profile.")
+#        postal_address, address_created = Address.objects.get_or_create(
+#            user=instance.user, **postal_address_data)
+#        instance.postal_address = postal_address
+#        setattr(instance, "auth_identity", True)
+#        instance.save()
+#        return instance
 
 class ComplianceManagementSaveUserAddressSerializer(serializers.ModelSerializer):
     #user_id = serializers.IntegerField(
@@ -287,7 +294,7 @@ class UserSerializer(serializers.ModelSerializer):
     contact_details = serializers.SerializerMethodField()
     wildlifecompliance_organisations = serializers.SerializerMethodField()
     # identification = IdentificationSerializer()
-    identification2 = Identification2Serializer()
+    #identification2 = Identification2Serializer() TODO
     dob = serializers.SerializerMethodField()
     legal_dob = serializers.SerializerMethodField()
     acc_mgmt_url = serializers.SerializerMethodField(read_only=True)
@@ -304,7 +311,7 @@ class UserSerializer(serializers.ModelSerializer):
             'dob',
             'legal_dob',
             'email',
-            'identification2',
+            #'identification2', TODO
             'residential_address',
             'phone_number',
             'mobile_number',
@@ -474,7 +481,7 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
     contact_details = serializers.SerializerMethodField()
     wildlifecompliance_organisations = serializers.SerializerMethodField()
     #identification = IdentificationSerializer()
-    identification2 = Identification2Serializer()
+    #identification2 = Identification2Serializer()
     is_customer = serializers.SerializerMethodField()
     is_internal = serializers.SerializerMethodField()
     prefer_compliance_management = serializers.SerializerMethodField()
@@ -500,7 +507,7 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
             'legal_dob',
             'email',
             # 'identification',
-            'identification2',
+            #'identification2',
             'residential_address',
             'phone_number',
             'mobile_number',
@@ -553,7 +560,6 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
         formatted_date = obj.legal_dob.strftime(
             '%d/%m/%Y'
         ) if obj.legal_dob else None
-
         return formatted_date
 
     def get_personal_details(self, obj):
@@ -698,13 +704,13 @@ class ComplianceUserDetailsOptimisedSerializer(serializers.ModelSerializer):
     def get_last_name(self, obj):
         return get_last_name(obj)
 
-
-class EmailUserActionSerializer(serializers.ModelSerializer):
-    who = serializers.CharField(source='who.get_full_name')
-
-    class Meta:
-        model = EmailUserAction
-        fields = '__all__'
+#TODO replace/remove
+#class EmailUserActionSerializer(serializers.ModelSerializer):
+#    who = serializers.CharField(source='who.get_full_name')
+#
+#    class Meta:
+#        model = EmailUserAction
+#        fields = '__all__'
 
 
 class PersonalSerializer(serializers.ModelSerializer):

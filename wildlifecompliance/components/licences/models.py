@@ -6,7 +6,7 @@ import logging
 
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models import JSONField
 from django.db.models import Max, Q
 from django.db.models.query import QuerySet
 from django.forms.models import model_to_dict
@@ -17,7 +17,9 @@ from smart_selects.db_fields import ChainedForeignKey
 
 from ckeditor.fields import RichTextField
 
-from ledger.licence.models import LicenceType
+from wildlifecompliance.components.main.models import RevisionedMixin
+from dbca_utils.models import ActiveMixin
+from django.contrib.postgres.fields import ArrayField
 
 from wildlifecompliance.components.inspection.models import Inspection
 
@@ -39,7 +41,6 @@ logger = logging.getLogger(__name__)
 def update_licence_doc_filename(instance, filename):
     return 'wildlifecompliance/licences/{}/documents/{}'.format(
         instance.id, filename)
-
 
 class LicenceDocument(Document):
     _file = models.FileField(upload_to=update_licence_doc_filename, storage=private_storage)
@@ -67,12 +68,12 @@ class LicencePurpose(models.Model):
     licence_category = models.ForeignKey(
         'LicenceCategory',
         blank=True,
-        null=True
+        null=True, on_delete=models.CASCADE
     )
     licence_activity = models.ForeignKey(
         'LicenceActivity',
         blank=True,
-        null=True
+        null=True, on_delete=models.CASCADE
     )
     apply_multiple = models.BooleanField(
         default=False,
@@ -254,12 +255,12 @@ class LicencePurpose(models.Model):
 
 class PurposeSpecies(models.Model):
     licence_purpose = models.ForeignKey(
-        LicencePurpose, related_name='purpose_species')
+        LicencePurpose, related_name='purpose_species', on_delete=models.CASCADE)
     order = models.IntegerField(default=1)
     header = models.CharField(max_length=255)
     # details = models.TextField()
     details = RichTextField(config_name='pdf_config')
-    species = models.NullBooleanField()
+    species = models.BooleanField(null=True)
     is_additional_info = models.BooleanField(default=False)
 
     class Meta:
@@ -281,7 +282,7 @@ class LicenceActivity(models.Model):
     licence_category = models.ForeignKey(
         'LicenceCategory',
         blank=True,
-        null=True
+        null=True, on_delete=models.CASCADE
     )
     purpose = models.ManyToManyField(
         LicencePurpose,
@@ -305,18 +306,43 @@ class LicenceActivity(models.Model):
         return self.name
 
 
-# #LicenceType
-class LicenceCategory(LicenceType):
+# #LicenceType NOTE: values from ledger will need to be copied over to this segregated table
+class LicenceCategory(models.Model):
+    id = models.IntegerField(
+        unique=True,
+        primary_key=True
+    )
     activity = models.ManyToManyField(
         LicenceActivity,
         blank=True,
         through='DefaultActivity',
         related_name='wildlifecompliance_activities')
+    
+    name = models.CharField(max_length=256, blank=True, null=True)
+    short_name = models.CharField(max_length=30, blank=True, null=True,
+                                  help_text="The display name that will show in the dashboard")
+    version = models.SmallIntegerField(default=1, blank=False, null=False)
+    code = models.CharField(max_length=64, blank=True, null=True)
+    act = models.CharField(max_length=256, blank=True)
+    statement = models.TextField(blank=True)
+    authority = models.CharField(max_length=64, blank=True)
+    replaced_by = models.ForeignKey(
+        'self', on_delete=models.PROTECT, blank=True, null=True)
+    is_renewable = models.BooleanField(default=True)
+    keywords = ArrayField(models.CharField(max_length=50), blank=True, default=list)
+
+    def __str__(self):
+        return self.display_name
+
+    @property
+    def is_obsolete(self):
+        return self.replaced_by is not None
 
     class Meta:
         app_label = 'wildlifecompliance'
         verbose_name = 'Licence category'
         verbose_name_plural = 'Licence categories'
+        unique_together = ('short_name', 'version')
 
     @property
     # override LicenceType display_name to display name first instead of
@@ -324,9 +350,9 @@ class LicenceCategory(LicenceType):
     def display_name(self):
         result = self.name or self.short_name
         if self.replaced_by is None:
-            return result
+            return result if result != None else ""
         else:
-            return '{} (V{})'.format(result, self.version)
+            return '{} (V{})'.format(result if result != None else "", self.version)
 
     def get_activities(self):
         '''
@@ -365,8 +391,8 @@ class LicenceSpecies(models.Model):
 
 
 class DefaultActivity(models.Model):
-    activity = models.ForeignKey(LicenceActivity)
-    licence_category = models.ForeignKey(LicenceCategory)
+    activity = models.ForeignKey(LicenceActivity, on_delete=models.CASCADE)
+    licence_category = models.ForeignKey(LicenceCategory, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (('licence_category', 'activity'))
@@ -379,8 +405,8 @@ class DefaultActivity(models.Model):
 
 
 class DefaultPurpose(models.Model):
-    purpose = models.ForeignKey(LicencePurpose)
-    activity = models.ForeignKey(LicenceActivity)
+    purpose = models.ForeignKey(LicencePurpose, on_delete=models.CASCADE)
+    activity = models.ForeignKey(LicenceActivity, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (('activity', 'purpose'))
@@ -422,14 +448,14 @@ class WildlifeLicence(models.Model):
         LicenceDocument,
         blank=True,
         null=True,
-        related_name='licence_document')
-    replaced_by = models.ForeignKey('self', blank=True, null=True)
+        related_name='licence_document', on_delete=models.CASCADE)
+    replaced_by = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
     extracted_fields = JSONField(blank=True, null=True)
     licence_number = models.CharField(max_length=64, blank=True, null=True)
     licence_sequence = models.IntegerField(blank=True, default=1)
-    licence_category = models.ForeignKey(LicenceCategory)
-    current_application = models.ForeignKey('wildlifecompliance.Application')
-    property_cache = JSONField(null=True, blank=True, default={})
+    licence_category = models.ForeignKey(LicenceCategory, on_delete=models.CASCADE)
+    current_application = models.ForeignKey('wildlifecompliance.Application', on_delete=models.CASCADE)
+    property_cache = JSONField(null=True, blank=True, default=dict)
 
     class Meta:
         unique_together = (
@@ -681,7 +707,6 @@ class WildlifeLicence(models.Model):
             )
         ).filter(
             licence_category_id=self.licence_category.id
-
         ).latest('id') == self
 
         logger.debug('WildlifeLicence.is_latest_in_category() - end')
@@ -1586,9 +1611,9 @@ class LicenceInspection(models.Model):
     A model represention of an Inspection for Wildlife Licence.
     '''
     licence = models.ForeignKey(
-        WildlifeLicence, related_name='licence_inspections')
+        WildlifeLicence, related_name='licence_inspections', on_delete=models.CASCADE)
     inspection = models.ForeignKey(
-        Inspection, related_name='wildlifecompliance_licence_inspection')
+        Inspection, related_name='wildlifecompliance_licence_inspection', on_delete=models.CASCADE)
     request_datetime = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -1720,7 +1745,7 @@ class MasterlistQuestion(models.Model):
         default=ANSWER_TYPE_CHOICES[0][0],
     )
     help_text_url = models.CharField(max_length=200, null=True, blank=True)
-    property_cache = JSONField(null=True, blank=True, default={})
+    property_cache = JSONField(null=True, blank=True, default=dict)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -1987,7 +2012,7 @@ class SectionGroup(models.Model):
         related_name='section_groups',
         on_delete=models.PROTECT
     )
-    property_cache = JSONField(null=True, blank=True, default={})
+    property_cache = JSONField(null=True, blank=True, default=dict)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -2089,7 +2114,7 @@ class SectionQuestion(models.Model):
         default=False,
         help_text='If ticked, select the Save and Continue Editing button.')
     order = models.PositiveIntegerField(default=1)
-    property_cache = JSONField(null=True, blank=True, default={})
+    property_cache = JSONField(null=True, blank=True, default=dict)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -2209,13 +2234,14 @@ class SectionQuestion(models.Model):
             self.property_cache['options'] = data
 
 
+#TODO does not appear to work or be in use
 class SectionQuestionCondition(models.Model):
     '''
     Model representation of a Question Condition required for Question Option.
     '''
     section_question = models.ForeignKey(
         SectionQuestion,
-        related_name='special_conditions',
+        related_name='special_conditions', on_delete=models.CASCADE
     )
     label = models.CharField(max_length=100)
     value = models.CharField(max_length=100)
@@ -2230,9 +2256,9 @@ class SectionQuestionCondition(models.Model):
             self.id
         )
 
-
+#TODO does not appear to be in use
 class LicenceLogEntry(CommunicationsLogEntry):
-    licence = models.ForeignKey(WildlifeLicence, related_name='comms_logs')
+    licence = models.ForeignKey(WildlifeLicence, related_name='comms_logs', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -2262,7 +2288,7 @@ class LicenceUserAction(UserAction):
             what=str(action)
         )
 
-    licence = models.ForeignKey(WildlifeLicence, related_name='action_logs')
+    licence = models.ForeignKey(WildlifeLicence, related_name='action_logs', on_delete=models.CASCADE)
 
 
 # @receiver(pre_delete, sender=WildlifeLicence)

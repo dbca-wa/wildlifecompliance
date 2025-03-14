@@ -295,7 +295,7 @@ export default {
                        self.spinner_exit = false;
                        self.spinner_submit = false;
 
-                       window.location.href = "/ledger/checkout/checkout/payment-details/";
+                       window.location.href = res.body;
                        //let species_id = self.returns.sheet_species;
                        //self.setReturns(response.body);
                        //self.returns.sheet_species = species_id;

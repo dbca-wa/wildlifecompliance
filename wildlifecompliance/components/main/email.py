@@ -1,16 +1,15 @@
 import logging
 import traceback
 from django.core.mail import EmailMultiAlternatives, EmailMessage
-from django.utils.encoding import smart_text
-from django.core.urlresolvers import reverse
+from django.utils.encoding import smart_bytes
+from django.urls import reverse
 from django.conf import settings
-from ledger.payments.pdf import create_invoice_pdf_bytes
-from ledger.payments.models import Invoice
+from ledger_api_client.ledger_models import Invoice
 from wildlifecompliance.components.main.utils import get_choice_value
 from wildlifecompliance.components.emails.emails import TemplateEmailBase
 #from wildlifecompliance.components.users.models import CompliancePermissionGroup
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 import os
 
 logger = logging.getLogger(__name__)
@@ -34,13 +33,13 @@ def _extract_email_headers(email_message, sender=None):
         # instead
         text = email_message.body
         subject = email_message.subject
-        fromm = smart_text(sender) if sender else smart_text(
+        fromm = smart_bytes(sender) if sender else smart_bytes(
             email_message.from_email)
         # the to email is normally a list
         if isinstance(email_message.to, list):
             to = ','.join(email_message.to)
         else:
-            to = smart_text(email_message.to)
+            to = smart_bytes(email_message.to)
         # we log the cc and bcc in the same cc field of the log entry as a ','
         # comma separated string
         all_ccs = []
@@ -51,10 +50,10 @@ def _extract_email_headers(email_message, sender=None):
         all_ccs = ','.join(all_ccs)
 
     else:
-        text = smart_text(email_message)
+        text = smart_bytes(email_message)
         subject = ''
         to = ''
-        fromm = smart_text(sender) if sender else SYSTEM_NAME
+        fromm = smart_bytes(sender) if sender else SYSTEM_NAME
         all_ccs = ''
 
     email_data = {
@@ -89,7 +88,6 @@ def prepare_mail(request, instance, workflow_entry, send_mail, recipient_id=None
             for group in group_list:
                 email_group.append(group.strip())
         elif instance.allocated_group:
-            print("test4")
             print(instance.allocated_group.get_members())
             email_group.extend(instance.allocated_group.get_members())
         else:

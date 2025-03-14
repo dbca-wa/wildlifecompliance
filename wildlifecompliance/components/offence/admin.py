@@ -19,7 +19,7 @@ class PenaltyAmountInline(admin.TabularInline):
 
 @admin.register(models.Offence)
 class OffenceAdmin(admin.ModelAdmin):
-    filter_horizontal = ('alleged_offences',)
+    #filter_horizontal = ('alleged_offences',)
     raw_id_fields = ('location', 'call_email', 'legal_case', 'inspection', 'assigned_to')
 
 

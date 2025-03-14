@@ -1,6 +1,7 @@
 <template>
 <div class="container" id="internalOrgAccessDash">
     <div class="row">
+        <!-- Organisation and Applicant should not be dropdown filters (should be searchable if anything) TODO remove 
         <div class="col-md-3">
             <div class="form-group">
                 <label for="">Organisation</label>
@@ -18,7 +19,7 @@
                     <option v-for="a in applicantChoices" :value="a">{{a}}</option>
                 </select>
             </div>
-        </div>
+        </div>-->
         <div class="col-md-3">
             <div class="form-group">
                 <label for="">Role</label>
@@ -86,12 +87,15 @@ export default {
                         d.status = vm.filterStatus
                     },
                 },
+                //TODO rework
                 columns:[
                     {
                         data:"lodgement_number",
+                        searchable: true,
                     },
                     {
                         data:"name",
+                        searchable: true,
                     },
                     {
                         data:"requester",
@@ -99,7 +103,7 @@ export default {
                     },
                     {
                         data:"role",
-                        searchable: false,
+                        searchable: true,
                     },
                     {
                         data:"status.name",
@@ -107,6 +111,7 @@ export default {
                     },
                     {
                         data:"lodgement_date",
+                        searchable: false,
                         mRender:function(data,type,full){
                             return moment(data).format('DD/MM/YYYY')
                         }
@@ -117,6 +122,7 @@ export default {
                     },
                     {
                         data:"id",
+                        searchable: false,
                         mRender:function (data, type, full){
                             let links = '';
                             links += (full.can_be_processed && full.user_can_process_org_access_requests) ?

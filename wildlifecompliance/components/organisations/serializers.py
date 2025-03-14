@@ -1,5 +1,5 @@
 from django.conf import settings
-from ledger.accounts.models import EmailUser, OrganisationAddress
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address as OrganisationAddress
 from wildlifecompliance.components.organisations.models import (
     Organisation,
     OrganisationContact,
@@ -8,7 +8,7 @@ from wildlifecompliance.components.organisations.models import (
     OrganisationAction,
     OrganisationRequestLogEntry,
     OrganisationLogEntry,
-    ledger_organisation,
+    #ledger_organisation,
 )
 from wildlifecompliance.components.organisations.utils import (
     can_manage_org,
@@ -26,10 +26,10 @@ from wildlifecompliance.components.main.utils import (
     get_full_name
 )
 
-class LedgerOrganisationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ledger_organisation
-        fields = '__all__'
+#class LedgerOrganisationSerializer(serializers.ModelSerializer):
+#    class Meta:
+#        model = ledger_organisation
+#        fields = '__all__'
 
 
 class OrganisationCheckSerializer(serializers.Serializer):
@@ -119,31 +119,31 @@ class DTOrganisationSerializer(serializers.ModelSerializer):
     def get_address_string(self, obj):
         return obj.address_string
 
+#TODO replace for segregation
+#class ComplianceManagementCreateLedgerOrganisationSerializer(serializers.ModelSerializer):
+#    postal_address_id = serializers.IntegerField(
+#        required=False, write_only=True, allow_null=True)
+#    class Meta:
+#        model = ledger_organisation
+#        fields = (
+#            'id',
+#            'name',
+#            'abn',
+#            'postal_address_id',
+#            )
+#        read_only_fields = ('id', )
 
-class ComplianceManagementCreateLedgerOrganisationSerializer(serializers.ModelSerializer):
-    postal_address_id = serializers.IntegerField(
-        required=False, write_only=True, allow_null=True)
-    class Meta:
-        model = ledger_organisation
-        fields = (
-            'id',
-            'name',
-            'abn',
-            'postal_address_id',
-            )
-        read_only_fields = ('id', )
-
-
-class ComplianceManagementUpdateLedgerOrganisationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ledger_organisation
-        fields = (
-            'id',
-            'name',
-            'abn',
-            #'address',
-            )
-        read_only_fields = ('id', 'abn')
+#TODO replace for segregation
+#class ComplianceManagementUpdateLedgerOrganisationSerializer(serializers.ModelSerializer):
+#    class Meta:
+#        model = ledger_organisation
+#        fields = (
+#            'id',
+#            'name',
+#            'abn',
+#            #'address',
+#            )
+#        read_only_fields = ('id', 'abn')
 
 
 class ComplianceManagementSaveOrganisationSerializer(serializers.ModelSerializer):
@@ -169,7 +169,7 @@ class ComplianceManagementOrganisationSerializer(serializers.ModelSerializer):
     #organisation_id = serializers.IntegerField(
      #   required=False, write_only=True, allow_null=True)
     address = OrganisationAddressSerializer(read_only=True)
-    organisation = LedgerOrganisationSerializer()
+    #organisation = LedgerOrganisationSerializer()
 
     class Meta:
         model = Organisation
@@ -179,14 +179,15 @@ class ComplianceManagementOrganisationSerializer(serializers.ModelSerializer):
             'abn',
             'address',
             'email',
-            'organisation',
+            'organisation_id',
         )
 
 class OrganisationSerializer(serializers.ModelSerializer):
     address = OrganisationAddressSerializer(read_only=True)
     pins = serializers.SerializerMethodField(read_only=True)
     delegates = DelegateSerializer(many=True, read_only=True)
-    organisation = LedgerOrganisationSerializer()
+    organisation = serializers.SerializerMethodField(read_only=True)
+    # LedgerOrganisationSerializer()
 
     class Meta:
         model = Organisation
@@ -196,11 +197,15 @@ class OrganisationSerializer(serializers.ModelSerializer):
             'abn',
             'address',
             'email',
-            'organisation',
+            'organisation_id',
             'pins',
-            'delegates'
+            'delegates',
+            'organisation',
         )
 
+    def get_organisation(self,obj):
+        return obj.organisation
+    
     def get_pins(self, obj):
         try:
             user = self.context['request'].user
@@ -221,7 +226,7 @@ class OrganisationSerializer(serializers.ModelSerializer):
 class ExternalOrganisationSerializer(serializers.ModelSerializer):
     address = OrganisationAddressSerializer(read_only=True)
     delegates = DelegateSerializer(many=True, read_only=True)
-    organisation = LedgerOrganisationSerializer()
+    #organisation = LedgerOrganisationSerializer()
 
     class Meta:
         model = Organisation
@@ -231,7 +236,7 @@ class ExternalOrganisationSerializer(serializers.ModelSerializer):
             'abn',
             'address',
             'email',
-            'organisation',
+            'organisation_id',
             'delegates'
         )
 
@@ -299,9 +304,15 @@ class MyOrganisationsSerializer(serializers.ModelSerializer):
 
 
 class DetailsSerializer(serializers.ModelSerializer):
+
+    name = serializers.SerializerMethodField()
+
     class Meta:
-        model = ledger_organisation
-        fields = ('id', 'name')
+        model = Organisation
+        fields = ('organisation_id', 'name')
+
+    def get_name(self, obj):
+        return obj.name
 
 
 class OrganisationContactCheckSerializer(serializers.Serializer):

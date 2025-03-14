@@ -20,8 +20,7 @@ from django.utils import timezone
 from rest_framework import viewsets, serializers, status, generics, views, filters, mixins
 import rest_framework.exceptions as rest_exceptions
 from rest_framework.decorators import (
-    detail_route,
-    list_route,
+    action,
     renderer_classes,
     parser_classes,
     api_view
@@ -32,9 +31,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser, B
 from rest_framework.pagination import PageNumberPagination
 from collections import OrderedDict
 from django.core.cache import cache
-from ledger.accounts.models import EmailUser, Address
-from ledger.address.models import Country
-from ledger.checkout.utils import calculate_excl_gst
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address
+from ledger_api_client.country_models import Country
+from ledger_api_client.utils import calculate_excl_gst
 from datetime import datetime, timedelta, date
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -106,6 +105,7 @@ class InspectionFilterBackend(DatatablesFilterBackend):
         date_to = request.GET.get('date_to')
         search_text = request.GET.get('search[value]')
 
+        #TODO replace for loop with queryset filtering
         if search_text:
             search_text = search_text.lower()
             search_text_inspection_ids = []
@@ -156,9 +156,8 @@ class InspectionFilterBackend(DatatablesFilterBackend):
         # also needed to disable ordering for all fields for which data is not an
         # CallEmail model field, as property functions will not work with order_by
         
-        getter = request.query_params.get
-        fields = self.get_fields(getter)
-        ordering = self.get_ordering(getter, fields)
+        fields = self.get_fields(request)
+        ordering = self.get_ordering(request, view, fields)
         if len(ordering):
             for num, item in enumerate(ordering):
                 if item == 'planned_for':
@@ -206,7 +205,7 @@ class InspectionPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             return Inspection.objects.all()
         return Inspection.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def get_paginated_datatable(self, request, *args, **kwargs):
         queryset = self.get_queryset()
 
@@ -229,7 +228,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
             return Inspection.objects.all()
         return Inspection.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
         try:
             qs = self.get_queryset()
@@ -246,7 +245,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['GET', ])    
+    @action(detail=False, methods=['GET', ])    
     def status_choices(self, request, *args, **kwargs):
         res_obj = [] 
         for choice in Inspection.STATUS_CHOICES:
@@ -254,7 +253,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
     
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -271,7 +270,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -288,7 +287,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def add_comms_log(self, request, instance=None, workflow=False, *args, **kwargs):
         try:
@@ -328,7 +327,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     @renderer_classes((JSONRenderer,))
     def get_inspection_team(self, request, *args, **kwargs):
         try:
@@ -422,7 +421,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
         
         return True
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def modify_inspection_team(self, request, instance=None, workflow=False, user_id=None, new=False, *args, **kwargs):
         try:
@@ -511,7 +510,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
             raise serializers.ValidationError(str(e))
 
 
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     @renderer_classes((JSONRenderer,))
     def form_data(self, request, *args, **kwargs):
         try:
@@ -532,7 +531,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
         raise serializers.ValidationError(str(e))
 
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def can_user_create(self, request, *args, **kwargs):
 
        # Find groups which has permissions determined above
@@ -542,7 +541,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
                return Response(True)
        return Response(False)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def optimised(self, request, *args, **kwargs):
         queryset = self.get_queryset().exclude(location__isnull=True)
 
@@ -573,7 +572,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
         return Response(serializer.data)
 
 
-    #@detail_route(methods=['PUT', ])
+    #@action(detail=True, methods=['PUT', ])
     @renderer_classes((JSONRenderer,))
     #def inspection_save(self, request, workflow=False, *args, **kwargs):
     def update(self, request, workflow=False, *args, **kwargs):
@@ -653,7 +652,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def update_assigned_to_id(self, request, *args, **kwargs):
         try:
@@ -700,7 +699,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_renderer_document(self, request, *args, **kwargs):
         try:
@@ -724,7 +723,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_comms_log_document(self, request, *args, **kwargs):
         try:
@@ -752,7 +751,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_inspection_report_document(self, request, *args, **kwargs):
         print("process_inspection_report_document")
@@ -859,7 +858,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
             instance.call_email.save()
             # instance.call_email.close(request)
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def workflow_action(self, request, instance=None, create_inspection=None, *args, **kwargs):
         print("workflow action")
@@ -879,7 +878,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
                     instance = self.get_object()
 
                 comms_log_id = request.data.get('inspection_comms_log_id')
-                if comms_log_id and comms_log_id is not 'null':
+                if comms_log_id and comms_log_id != 'null':
                     workflow_entry = instance.comms_logs.get(
                             id=comms_log_id)
                 else:
@@ -981,7 +980,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
     
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def create_inspection_process_comms_log_document(self, request, *args, **kwargs):
         try:
@@ -1024,7 +1023,7 @@ class InspectionTypeViewSet(viewsets.ReadOnlyModelViewSet):
            return InspectionType.objects.all()
        return InspectionType.objects.none()
 
-   @detail_route(methods=['GET',])
+   @action(detail=True, methods=['GET',])
    @renderer_classes((JSONRenderer,))
    def get_schema(self, request, *args, **kwargs):
        instance = self.get_object()

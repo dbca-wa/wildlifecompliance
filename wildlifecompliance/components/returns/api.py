@@ -7,8 +7,7 @@ from django.db import transaction
 from django.core.exceptions import ValidationError
 from rest_framework import viewsets, serializers, status, views, mixins
 from rest_framework.decorators import (
-    detail_route,
-    list_route,
+    action,
     renderer_classes,
 )
 from rest_framework.response import Response
@@ -17,7 +16,7 @@ from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 from rest_framework_datatables.filters import DatatablesFilterBackend
 from rest_framework_datatables.renderers import DatatablesRenderer
 
-from ledger.checkout.utils import calculate_excl_gst
+from ledger_api_client.utils import calculate_excl_gst
 
 from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
 from wildlifecompliance.components.returns.utils import (
@@ -126,7 +125,7 @@ class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         if is_wildlife_compliance_officer(self.request):
             return Return.objects.all()
 
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_licences = [wildlifelicence.id for wildlifelicence in WildlifeLicence.objects.filter(
@@ -144,7 +143,7 @@ class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
         return Return.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def user_datatable_list(self, request, *args, **kwargs):
         self.serializer_class = ReturnSerializer
         queryset = self.get_queryset()
@@ -175,7 +174,7 @@ class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             result_page, context={'request': request}, many=True)
         return self.paginator.get_paginated_response(serializer.data)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def external_datatable_list(self, request, *args, **kwargs):
         self.serializer_class = ReturnSerializer
         queryset = self.get_queryset()
@@ -214,7 +213,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         user = self.request.user
         if is_wildlife_compliance_officer(self.request):
             return Return.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_licences = [wildlifelicence.id for wildlifelicence in WildlifeLicence.objects.filter(
@@ -261,7 +260,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def user_list(self, request, *args, **kwargs):
         qs = self.get_queryset().exclude(
             processing_status=Return.RETURN_PROCESSING_STATUS_FUTURE
@@ -270,7 +269,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         serializer = ReturnSerializer(qs, many=True)
         return Response(serializer.data)
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def accept(self, request, *args, **kwargs):
         try:
             if not is_wildlife_compliance_officer(self.request):
@@ -298,7 +297,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def upload_details(self, request, *args, **kwargs):
         try:
             logger.debug('ReturnViewSet.upload_details() - start')
@@ -331,7 +330,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def species_data_details(self, request, *args, **kwargs):
         species_id = request.GET.get('species_id', None)
         instance = self.get_object()
@@ -339,7 +338,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
         return Response(data.table)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def sheet_details(self, request, *args, **kwargs):
         logger.debug('ReturnViewSet.sheet_details() - start')
         return_id = self.request.query_params.get('return_id')
@@ -350,7 +349,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
         return Response(sheet.table)
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def sheet_check_transfer(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -373,7 +372,8 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    #TODO: determine when or if this is used, remove or repair as needed
+    @action(detail=True, methods=['POST', ])
     def sheet_pay_transfer(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -421,7 +421,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     @renderer_classes((JSONRenderer,))
     def submit_and_checkout(self, request, *args, **kwargs):
         try:
@@ -451,7 +451,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def save(self, request, *args, **kwargs):
         try:
             logger.debug('ReturnViewSet.save() - start')
@@ -474,7 +474,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def save_and_submit(self, request, *args, **kwargs):
         try:
             logger.debug('ReturnViewSet.save_and_submit() - start')
@@ -509,7 +509,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def submit(self, request, *args, **kwargs):
         try:
             logger.debug('ReturnViewSet.submit() - start')
@@ -539,7 +539,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def discard(self, request, *args, **kwargs):
         try:
             if not is_wildlife_compliance_officer(self.request):
@@ -557,7 +557,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def estimate_price(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -575,7 +575,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def assign_to_me(self, request, *args, **kwargs):
         try:
             if not is_wildlife_compliance_officer(self.request):
@@ -601,9 +601,9 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def assign_officer(self, request, *args, **kwargs):
-        from ledger.accounts.models import EmailUser
+        from ledger_api_client.ledger_models import EmailUserRO as EmailUser
         try:
             if not is_wildlife_compliance_officer(self.request):
                 return Response("user not authorised to assign return")
@@ -647,7 +647,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def unassign_officer(self, request, *args, **kwargs):
         try:
             if not is_wildlife_compliance_officer(self.request):
@@ -671,7 +671,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     @renderer_classes((JSONRenderer,))
     def officer_comments(self, request, *args, **kwargs):
         try:
@@ -686,7 +686,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
         raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -703,7 +703,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def add_comms_log(self, request, *args, **kwargs):
         try:
@@ -736,7 +736,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -777,7 +777,7 @@ class ReturnAmendmentRequestViewSet(viewsets.GenericViewSet, mixins.RetrieveMode
         user = self.request.user
         if is_wildlife_compliance_officer(self.request):
             return ReturnRequest.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_applications = [application.id for application in Application.objects.filter(

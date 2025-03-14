@@ -10,8 +10,7 @@ from wildlifecompliance.components.main.models import (
     ComplianceManagementSystemGroupPermission
 )
 
-#from ledger.accounts.models import EmailUser
-from wildlifecompliance.components.main.models import ComplianceManagementEmailUser as EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from django.db import models
 from rest_framework import serializers
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -317,8 +316,8 @@ def get_related_offenders(entity, **kwargs):
             if offender.person and not offender.removed:
                 user = EmailUser.objects.get(id=offender.person.id)
                 offender_list.append(user)
-            if offender.organisation and not offender.removed:
-                organisation = Organisation.objects.get(id=offender.organisation.id)
+            if offender.organisation_id and not offender.removed:
+                organisation = Organisation.objects.get(id=offender.organisation_id)
                 offender_list.append(organisation)
     return offender_list
 
@@ -385,10 +384,22 @@ def get_related_items(entity, pending_closure=False, **kwargs):
                         field_objects = f.related_model.objects.filter(offence_id=entity.id)
                     elif entity._meta.model_name == 'legalcase':
                         field_objects = f.related_model.objects.filter(legal_case_id=entity.id)
+
                     if field_objects:
                         for field_object in field_objects:
                             if pending_closure:
                                 children.append(field_object)
+                            elif isinstance(field_object, EmailUser):
+                                related_item = RelatedItem(
+                                        model_name = format_model_name(f.related_model.__name__),
+                                        identifier = field_object.email,
+                                        descriptor = field_object.first_name + " " + field_object.last_name,
+                                        action_url = format_url(
+                                                model_name=f.related_model.__name__,
+                                                obj_id=field_object.id
+                                                )
+                                        )
+                                return_list.append(related_item)
                             else:
                                 related_item = RelatedItem(
                                         model_name = format_model_name(f.related_model.__name__),
@@ -493,6 +504,7 @@ def get_related_items(entity, pending_closure=False, **kwargs):
                     #            return_list.append(related_item)
 
                 # foreign keys from entity to EmailUser
+                #TODO fix this to use EmailUserRO
                 elif f.is_relation and f.related_model._meta.model_name == 'emailuser':
                     field_value = f.value_from_object(entity)
                     print("EmailUser")
@@ -533,6 +545,17 @@ def get_related_items(entity, pending_closure=False, **kwargs):
                     if field_object:
                         if pending_closure:
                             parents.append(field_object)
+                        elif isinstance(field_object, EmailUser):
+                                related_item = RelatedItem(
+                                        model_name = format_model_name(f.related_model.__name__),
+                                        identifier = field_object.email,
+                                        descriptor = field_object.first_name + " " + field_object.last_name,
+                                        action_url = format_url(
+                                                model_name=f.related_model.__name__,
+                                                obj_id=field_object.id
+                                                )
+                                        )
+                                return_list.append(related_item)
                         else:
                             related_item = RelatedItem(
                                     model_name = format_model_name(field_object._meta.model_name),
@@ -619,6 +642,17 @@ def process_many_to_many(f, relatives, return_list, field_objects, pending_closu
         for field_object in field_objects:
             if pending_closure:
                 relatives.append(field_object)
+            elif isinstance(field_object, EmailUser):
+                related_item = RelatedItem(
+                        model_name = format_model_name(f.related_model.__name__),
+                        identifier = field_object.email,
+                        descriptor = field_object.first_name + " " + field_object.last_name,
+                        action_url = format_url(
+                                model_name=f.related_model.__name__,
+                                obj_id=field_object.id
+                                )
+                        )
+                return_list.append(related_item)
             else:
                 related_item = RelatedItem(
                         model_name = format_model_name(f.related_model.__name__),

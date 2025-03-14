@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='legalcase',
             name='associated_persons',
-            field=models.ManyToManyField(related_name='legal_case_associated_persons', to=settings.AUTH_USER_MODEL),
+            field=models.ManyToManyField(related_name='legal_case_associated_persons', through='legal_case.LegalCaseAssociatedPerson', to=settings.AUTH_USER_MODEL),
         ),
     ]

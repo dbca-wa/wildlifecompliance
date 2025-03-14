@@ -11,15 +11,15 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import HttpResponse
 from django.db.models import Q
-from ledger.settings_base import TIME_ZONE
+from ledger_api_client.settings_base import TIME_ZONE
 from rest_framework import viewsets, filters, serializers, status, mixins
-from rest_framework.decorators import detail_route, list_route, renderer_classes
+from rest_framework.decorators import action, renderer_classes
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework_datatables.filters import DatatablesFilterBackend
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.components.main.email import prepare_mail
 from wildlifecompliance.components.offence.email import send_mail
 from wildlifecompliance.components.organisations.models import Organisation
@@ -45,7 +45,8 @@ from wildlifecompliance.components.section_regulation.serializers import Section
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, AllegedCommittedOffence
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup, ComplianceManagementSystemGroupPermission
 from wildlifecompliance.helpers import is_internal, is_customer, is_compliance_internal_user, is_wildlife_compliance_officer
-
+from django.db.models.functions import Concat
+from django.db.models import Value
 
 class OffenceFilterBackend(DatatablesFilterBackend):
 
@@ -60,14 +61,34 @@ class OffenceFilterBackend(DatatablesFilterBackend):
         # Filter by the search_text
         search_text = request.GET.get('search[value]')
         if search_text:
+
+            email_user_ids = list(EmailUser.objects.annotate(
+                    full_name=Concat(
+                        'first_name',
+                        Value(' '),
+                        'last_name'
+                    ),
+                    legal_full_name=Concat(
+                        'legal_first_name',
+                        Value(' '),
+                        'legal_last_name'
+                    ),
+                ).filter(
+                    Q(email__icontains=search_text) |
+                    Q(first_name__icontains=search_text) |
+                    Q(last_name__icontains=search_text) |
+                    Q(full_name__icontains=search_text) |
+                    Q(legal_first_name__icontains=search_text) |
+                    Q(legal_last_name__icontains=search_text) |
+                    Q(legal_full_name__icontains=search_text) 
+                ).values_list('id', flat=True))
+
             q_objects &= Q(lodgement_number__icontains=search_text) | \
                          Q(identifier__icontains=search_text) | \
-                         Q(offender__person__first_name__icontains=search_text) | \
-                         Q(offender__person__last_name__icontains=search_text) | \
-                         Q(offender__person__email__icontains=search_text) | \
-                         Q(offender__organisation__organisation__name__icontains=search_text) | \
-                         Q(offender__organisation__organisation__abn__icontains=search_text) | \
-                         Q(offender__organisation__organisation__trading_name__icontains=search_text)
+                         Q(offender__person_id__in=email_user_ids) 
+                         #Q(offender__organisation__organisation__name__icontains=search_text) | \
+                         #Q(offender__organisation__organisation__abn__icontains=search_text) | \
+                         #Q(offender__organisation__organisation__trading_name__icontains=search_text)
 
         type = str(request.GET.get('type',)).lower()
         if type and type != 'all':
@@ -100,9 +121,8 @@ class OffenceFilterBackend(DatatablesFilterBackend):
         # perform filters
         queryset = queryset.filter(q_objects)
 
-        getter = request.query_params.get
-        fields = self.get_fields(getter)
-        ordering = self.get_ordering(getter, fields)
+        fields = self.get_fields(request)
+        ordering = self.get_ordering(request, view, fields)
         if len(ordering):
             for num, item in enumerate(ordering):
                 # offender is the foreign key of the sanction outcome
@@ -139,7 +159,7 @@ class OffencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             return Offence.objects.all()
         return Offence.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def get_paginated_datatable(self, request, *args, **kwargs):
         queryset = self.get_queryset()
 
@@ -164,7 +184,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             return Offence.objects.all()
         return Offence.objects.none()
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -185,7 +205,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def workflow_action(self, request, instance=None, *args, **kwargs):
         try:
@@ -200,7 +220,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                     instance = self.get_object()
 
                 comms_log_id = request.data.get('comms_log_id')
-                if comms_log_id and comms_log_id is not 'null':
+                if comms_log_id and comms_log_id != 'null':
                     workflow_entry = instance.comms_logs.get(id=comms_log_id)
                 else:
                     workflow_entry = self.add_comms_log(request, instance, workflow=True)
@@ -242,7 +262,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def can_user_create(self, request, *args, **kwargs):
     #TODO: Check logic with the business
 
@@ -253,7 +273,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                return Response(True)
        return Response(False)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def optimised(self, request, *args, **kwargs):
         queryset = self.get_queryset().exclude(location__isnull=True)
 
@@ -287,7 +307,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
         serializer = OffenceOptimisedSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def status_choices(self, request, *args, **kwargs):
         res_obj = []
         for choice in Offence.STATUS_CHOICES:
@@ -295,7 +315,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def types(self, request, *args, **kwargs):
         res_obj = []
         section_regulations = SectionRegulation.objects.all()
@@ -304,7 +324,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def statuses(self, request, *args, **kwargs):
         res_obj = []
         for choice in Offence.STATUS_CHOICES:
@@ -312,7 +332,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def filter_by_call_email(self, request, *args, **kwargs):
         call_email_id = self.request.query_params.get('call_email_id', None)
 
@@ -325,7 +345,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
         serializer = OffenceSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
     
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def filter_by_inspection(self, request, *args, **kwargs):
         inspection_id = self.request.query_params.get('inspection_id', None)
 
@@ -338,7 +358,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
         serializer = OffenceSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def filter_by_legal_case(self, request, *args, **kwargs):
         legal_case_id = self.request.query_params.get('legal_case_id', None)
 
@@ -407,7 +427,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             #instance.inspection.status = 'open_inspection'
             #instance.inspection.save()
 
-    # @detail_route(methods=['POST', ])
+    # @action(detail=True, methods=['POST', ])
     # @renderer_classes((JSONRenderer,))
     def update(self, request, *args, **kwargs):
         try:
@@ -545,7 +565,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    # @list_route(methods=['POST', ])
+    # @action(detail=False, methods=['POST', ])
     # def offence_save(self, request, *args, **kwargs):
     def create(self, request, *args, **kwargs):
         try:
@@ -658,7 +678,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def update_assigned_to_id(self, request, *args, **kwargs):
         try:
@@ -697,7 +717,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -714,7 +734,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def add_comms_log(self, request, instance=None, workflow=False, *args, **kwargs):
         try:
@@ -763,7 +783,7 @@ class SearchSectionRegulation(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             return SectionRegulation.objects.all()
         return SectionRegulation.objects.none()
 
@@ -778,6 +798,6 @@ class SearchOrganisation(viewsets.ReadOnlyModelViewSet):
         user = self.request.user
         if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
             return Organisation.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             return user.wildlifecompliance_organisations.all()
         return Organisation.objects.none()

@@ -20,7 +20,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <!--<div class="col-md-3">
                             <div class="form-group">
                                 <label for="">Licence Holder</label>
                                 <select class="form-control" v-model="filterLicenceHolder">
@@ -28,7 +28,7 @@
                                     <option v-for="holder in licence_holders" :value="holder.holder_name" v-bind:key="`licence_holder_${holder.holder_name}`">{{holder.holder_name}}</option>
                                 </select>
                             </div>
-                        </div>
+                        </div>-->
                         <!--<div class="col-md-3">
                             <div class="form-group">
                                 <label for="">Licence Status</label>
@@ -38,8 +38,8 @@
                                 </select>
                             </div>
                         </div>-->
-                    </div>
-                    <div class="row">
+                    <!--</div>
+                    <div class="row">-->
                         <div class="col-md-3">
                             <label for="">Issued From</label>
                             <div class="input-group date" ref="licenceDateFromPicker">

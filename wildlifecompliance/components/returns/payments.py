@@ -39,7 +39,7 @@ class ReturnFeePolicy(object):
         """
         Gets the checkout product lines for a return which includes the fees.
         """
-        from ledger.checkout.utils import calculate_excl_gst
+        from ledger_api_client.utils import calculate_excl_gst
 
         product_lines = []
         oracle_code = a_return.return_type.oracle_account_code

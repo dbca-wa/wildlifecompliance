@@ -1,5 +1,5 @@
 # from django.http import HttpResponseRedirect
-# from django.core.urlresolvers import reverse
+# from django.urls import reverse
 # from django.conf import settings
 # from django.core.exceptions import ValidationError
 # from django.db import transaction
@@ -11,17 +11,15 @@ from datetime import datetime, timedelta, date
 # from commercialoperator.components.organisations.models import Organisation
 # from commercialoperator.components.bookings.models import Booking, ParkBooking, BookingInvoice, ApplicationFee
 # from commercialoperator.components.bookings.email import send_monthly_invoice_tclass_email_notification
-# from ledger.checkout.utils import create_basket_session, create_checkout_session, calculate_excl_gst
+# from ledger_api_client.utils import create_basket_session, create_checkout_session, calculate_excl_gst
 from dateutil.relativedelta import relativedelta
 from django.db import transaction
 from django.db.models.signals import post_save
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponse
 from django.urls import reverse
 
-from ledger.checkout.utils import create_basket_session, create_checkout_session
-from ledger.payments.bpoint.models import BpointTransaction
-from ledger.payments.cash.models import CashTransaction
-from ledger.payments.models import Invoice
+from ledger_api_client.utils import create_basket_session, create_checkout_session, get_invoice_properties
+from ledger_api_client.ledger_models import Invoice
 # from ledger.payments.utils import oracle_parser
 # import json
 # import ast
@@ -30,7 +28,7 @@ from decimal import Decimal
 import logging
 
 #from oscar.apps.order.models import Order
-from ledger.order.models import Order
+from ledger_api_client.order import Order
 
 from wildlifecompliance import settings
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, SanctionOutcomeUserAction
@@ -38,6 +36,14 @@ from wildlifecompliance.components.wc_payments.models import InfringementPenalty
 
 logger = logging.getLogger('payment_checkout')
 
+def get_invoice_payment_status(invoice_id):
+    try:
+        inv_props = get_invoice_properties(invoice_id)
+        invoice_payment_status = inv_props['data']['invoice']['payment_status']
+        return invoice_payment_status
+    except Exception as e:
+        logger.error(f'Error raised when getting the payment status of the invoice (invoice_id: {invoice_id}). exception: [{e}]')
+        return '---'
 
 def get_session_infringement_invoice(session):
     """ Infringement Penalty session ID """
@@ -72,39 +78,27 @@ def checkout(request, proposal, lines, return_url_ns='public_booking_success', r
         'vouchers': vouchers,
         'system': settings.WC_PAYMENT_SYSTEM_ID,
         'custom_basket': True,
+        'booking_reference': proposal.lodgement_number,
+        'booking_reference_link': proposal.lodgement_number,
     }
 
-    basket, basket_hash = create_basket_session(request, basket_params)
-    #fallback_url = request.build_absolute_uri('/')
+    email_user_id = proposal.submitter_id if request.user.is_anonymous else request.user.id
+    basket_hash = create_basket_session(request, email_user_id, basket_params)
+
     checkout_params = {
         'system': settings.WC_PAYMENT_SYSTEM_ID,
-        'fallback_url': request.build_absolute_uri('/'),                                      # 'http://mooring-ria-jm.dbca.wa.gov.au/'
-        'return_url': request.build_absolute_uri(reverse(return_url_ns)),          # 'http://mooring-ria-jm.dbca.wa.gov.au/success/'
-        'return_preload_url': request.build_absolute_uri(reverse(return_url_ns)),  # 'http://mooring-ria-jm.dbca.wa.gov.au/success/'
+        'fallback_url': request.build_absolute_uri('/'),                          
+        'return_url': request.build_absolute_uri(reverse(return_url_ns)),         
+        'return_preload_url': settings.WILDLIFECOMPLIANCE_EXTERNAL_URL + reverse(return_preload_url_ns,kwargs={"lodgement_number": proposal.lodgement_number}), 
         'force_redirect': True,
         'proxy': True if internal else False,
-        'invoice_text': invoice_text,                                                         # 'Reservation for Jawaid Mushtaq from 2019-05-17 to 2019-05-19 at RIA 005'
+        'invoice_text': invoice_text,
+        'basket_owner': email_user_id,
+        'session_type': 'ledger_api',
     }
-    #    if not internal:
-    #        checkout_params['check_url'] = request.build_absolute_uri('/api/booking/{}/booking_checkout_status.json'.format(booking.id))
-    if internal or request.user.is_anonymous():
-        #checkout_params['basket_owner'] = booking.customer.id
-        checkout_params['basket_owner'] = proposal.submitter_id
-
-
     create_checkout_session(request, checkout_params)
 
-    #    if internal:
-    #        response = place_order_submission(request)
-    #    else:
-    response = HttpResponseRedirect(reverse('checkout:index'))
-    # inject the current basket into the redirect response cookies
-    # or else, anonymous users will be directionless
-    response.set_cookie(
-        settings.OSCAR_BASKET_COOKIE_OPEN, basket_hash,
-        max_age=settings.OSCAR_BASKET_COOKIE_LIFETIME,
-        secure=settings.OSCAR_BASKET_COOKIE_SECURE, httponly=True
-    )
+    response = HttpResponse(reverse('ledgergw-payment-details'))
 
     return response
 
@@ -144,7 +138,7 @@ def create_invoice(sanction_outcome, payment_method='bpay'):
     This will create and invoice and order from a basket bypassing the session
     and payment bpoint code constraints.
     """
-    from ledger.checkout.utils import createCustomBasket
+    from ledger_api_client.utils import createCustomBasket
     from ledger.payments.invoice.utils import CreateInvoiceBasket
 
     products = sanction_outcome.as_line_items

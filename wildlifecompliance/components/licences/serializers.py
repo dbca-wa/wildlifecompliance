@@ -18,7 +18,7 @@ from wildlifecompliance.components.applications.models import (
 from wildlifecompliance.components.applications.serializers import (
     WildlifeLicenceApplicationSerializer,
 )
-from ledger.payments.invoice.models import Invoice
+from ledger_api_client.ledger_models import Invoice
 from rest_framework import serializers
 
 
@@ -260,9 +260,7 @@ class DTExternalWildlifeLicenceSerializer(WildlifeLicenceSerializer):
             latest_invoice = Invoice.objects.get(
                 reference=activity_inv.invoice_reference)
 
-            url = reverse(
-                'payments:invoice-pdf',
-                kwargs={'reference': latest_invoice.reference})
+            url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
 
             return url
 

@@ -4,7 +4,7 @@ import traceback
 import pytz
 from rest_framework.fields import CharField
 
-from ledger.accounts.models import EmailUser, Address
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroupPermission
 from wildlifecompliance.components.legal_case.models import (
     LegalCase,

@@ -1,7 +1,7 @@
 import traceback
 from django.db import transaction
 from django.views.generic.base import TemplateView
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import render, redirect
 from wildlifecompliance.components.returns.utils import (
     get_session_return,
@@ -10,6 +10,7 @@ from wildlifecompliance.components.returns.utils import (
 from wildlifecompliance.components.returns.services import ReturnService
 
 
+#TODO check if this is used, remove/repair as needed (will need a way of tracking invoices with return)
 class ReturnSuccessView(TemplateView):
     template_name = 'wildlifecompliance/returns_success.html'
 
@@ -25,10 +26,7 @@ class ReturnSuccessView(TemplateView):
                 ReturnService.invoice_session_return_request(request)
 
             invoice_ref = request.GET.get('invoice')
-            invoice_url = request.build_absolute_uri(
-                reverse('payments:invoice-pdf',
-                        kwargs={'reference': invoice_ref})
-            )
+            invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
             context = {
                 'return': the_return,
                 'invoice_ref': invoice_ref,
@@ -57,10 +55,7 @@ class ReturnSheetSuccessView(TemplateView):
             ReturnService.invoice_session_return_request(request)
 
             invoice_ref = request.GET.get('invoice')
-            invoice_url = request.build_absolute_uri(
-                reverse('payments:invoice-pdf',
-                        kwargs={'reference': invoice_ref})
-            )
+            invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
             context = {
                 'return': the_return,
                 'invoice_ref': invoice_ref,

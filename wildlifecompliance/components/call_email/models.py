@@ -2,15 +2,17 @@ from __future__ import unicode_literals
 import logging
 from django.db import models
 from django.conf import settings
-from django.contrib.gis.db import models
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.contrib.gis.db.models import PointField
+from django.db.models import Manager as GeoManager
+from django.db.models import JSONField
 from django.db.models import Max
 from django.contrib.auth.models import Permission, ContentType
 from multiselectfield import MultiSelectField
-from django.utils.encoding import python_2_unicode_compatible
+from six import python_2_unicode_compatible
 from rest_framework import serializers
-from ledger.accounts.models import EmailUser, RevisionedMixin
-from ledger.licence.models import LicenceType
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from wildlifecompliance.components.main.models import RevisionedMixin
+
 from wildlifecompliance.components.main.models import (
         CommunicationsLogEntry,
         UserAction, 
@@ -184,14 +186,14 @@ class Location(models.Model):
         ('ACT', 'Australian Capital Territory')
     )
 
-    wkb_geometry = models.PointField(srid=4326, blank=True, null=True)
+    wkb_geometry = PointField(srid=4326, blank=True, null=True)
     street = models.CharField(max_length=100, blank=True, null=True)
     town_suburb = models.CharField(max_length=100, blank=True, null=True)
     state = models.CharField(
         max_length=50, choices=STATE_CHOICES, blank=True, null=True, default='WA')
     postcode = models.CharField(max_length=10, blank=True, null=True)
     country = models.CharField(max_length=100, blank=True, null=True, default='Australia')
-    objects = models.GeoManager()
+    objects = GeoManager()
     details = models.TextField(blank=True)
     ben_number = models.CharField(max_length=100, blank=True, null=True)
 
@@ -291,34 +293,34 @@ class CallEmail(RevisionedMixin):
     location = models.ForeignKey(
         Location,
         null=True,
-        related_name="call_location"
+        related_name="call_location", on_delete=models.CASCADE
     )
     classification = models.ForeignKey(
         Classification,
         null=True,
-        related_name="call_classification"
+        related_name="call_classification", on_delete=models.CASCADE
     )
     call_type = models.ForeignKey(
         CallType,
         null=True,
         blank=True,
-        related_name="call_type"
+        related_name="call_type", on_delete=models.CASCADE
     )
     wildcare_species_type = models.ForeignKey(
         WildcareSpeciesType,
         null=True,
         blank=True,
-        related_name="wildcare_species_type"
+        related_name="wildcare_species_type", on_delete=models.CASCADE
     )
     wildcare_species_sub_type = models.ForeignKey(
         WildcareSpeciesSubType,
         null=True,
         blank=True,
-        related_name="wildcare_species_sub_type"
+        related_name="wildcare_species_sub_type", on_delete=models.CASCADE
     )
     species_name = models.CharField(max_length=50, blank=True, null=True)
-    dead = models.NullBooleanField()
-    euthanise = models.NullBooleanField()
+    dead = models.BooleanField(null=True)
+    euthanise = models.BooleanField(null=True)
     number_of_animals = models.CharField(max_length=100, blank=True, null=True)
     brief_nature_of_call = models.TextField(blank=True)
     entangled = MultiSelectField(max_length=40, choices=ENTANGLED_CHOICES, blank=True, null=True)
@@ -333,12 +335,12 @@ class CallEmail(RevisionedMixin):
     assigned_to = models.ForeignKey(
         EmailUser, 
         related_name='callemail_assigned_to',
-        null=True
+        null=True, on_delete=models.CASCADE
     )
     volunteer = models.ForeignKey(
         EmailUser, 
         related_name='callemail_volunteer',
-        null=True
+        null=True, on_delete=models.CASCADE
     )
     anonymous_call = models.BooleanField(default=False)
     caller_wishes_to_remain_anonymous = models.BooleanField(default=False)
@@ -354,7 +356,7 @@ class CallEmail(RevisionedMixin):
     report_type = models.ForeignKey(
         ReportType,
         null=True,
-        related_name='call_schema',
+        related_name='call_schema', on_delete=models.CASCADE
     )
     referrer = models.ManyToManyField(
         Referrer,
@@ -363,7 +365,7 @@ class CallEmail(RevisionedMixin):
     )
     email_user = models.ForeignKey(
         EmailUser,
-        null=True,
+        null=True, on_delete=models.CASCADE
     )
     advice_given = models.BooleanField(default=False)
     advice_details = models.TextField(blank=True, null=True)
@@ -379,7 +381,7 @@ class CallEmail(RevisionedMixin):
     #)
     allocated_group = models.ForeignKey(
         ComplianceManagementSystemGroup,
-        null=True
+        null=True, on_delete=models.CASCADE
     )
 
     class Meta:
@@ -580,7 +582,7 @@ class ComplianceFormDataRecord(models.Model):
         (COMPONENT_TYPE_DATE, 'Date'),
     )
 
-    call_email = models.ForeignKey(CallEmail, related_name='form_data_records')
+    call_email = models.ForeignKey(CallEmail, related_name='form_data_records', on_delete=models.CASCADE)
     field_name = models.CharField(max_length=512, blank=True, null=True)
     schema_name = models.CharField(max_length=256, blank=True, null=True)
     instance_name = models.CharField(max_length=256, blank=True, null=True)
@@ -593,10 +595,13 @@ class ComplianceFormDataRecord(models.Model):
     deficiency = models.TextField(blank=True, null=True)
 
     def __str__(self):
+        value=""
+        if self.value:
+            value=self.value[:8] 
         return "CallEmail {id} record {field}: {value}".format(
             id=self.call_email_id,
             field=self.field_name,
-            value=self.value[:8]
+            value=value
         )
 
     class Meta:
@@ -650,9 +655,9 @@ class ComplianceFormDataRecord(models.Model):
                     form_data_record.deficiency = deficiency
             form_data_record.save()
 
-
+#TODO determine if in use, otherwise remove
 class CallEmailDocument(Document):
-    call_email = models.ForeignKey('CallEmail', related_name='documents')
+    call_email = models.ForeignKey('CallEmail', related_name='documents', on_delete=models.CASCADE)
     #_file = models.FileField(max_length=255, upload_to=update_call_email_doc_filename)
     _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
@@ -678,7 +683,7 @@ class CallEmailLogDocument(Document):
      #       verbose_name='name', help_text='')
     log_entry = models.ForeignKey(
         'CallEmailLogEntry',
-        related_name='documents')
+        related_name='documents', on_delete=models.CASCADE)
     #input_name = models.CharField(max_length=255, blank=True, null=True)
     #version_comment = models.CharField(max_length=255, blank=True, null=True)
     #_file = models.FileField(max_length=255, upload_to=update_call_email_comms_log_filename)
@@ -689,7 +694,7 @@ class CallEmailLogDocument(Document):
 
 
 class CallEmailLogEntry(CommunicationsLogEntry):
-    call_email = models.ForeignKey(CallEmail, related_name='comms_logs')
+    call_email = models.ForeignKey(CallEmail, related_name='comms_logs', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -713,7 +718,7 @@ class CallEmailUserAction(models.Model):
     ACTION_ADD_WEAK_LINK = "Create manual link between {}: {} and {}: {}"
     ACTION_REMOVE_WEAK_LINK = "Remove manual link between {}: {} and {}: {}"
 
-    who = models.ForeignKey(EmailUser, null=True, blank=True)
+    who = models.ForeignKey(EmailUser, null=True, blank=True, on_delete=models.CASCADE)
     when = models.DateTimeField(null=False, blank=False, auto_now_add=True)
     what = models.TextField(blank=False)
 
@@ -729,7 +734,7 @@ class CallEmailUserAction(models.Model):
             what=str(action)
         )
 
-    call_email = models.ForeignKey(CallEmail, related_name='action_logs')
+    call_email = models.ForeignKey(CallEmail, related_name='action_logs', on_delete=models.CASCADE)
 
 
 import reversion

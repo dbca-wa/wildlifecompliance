@@ -3,7 +3,7 @@ import datetime
 import logging
 
 from django.urls import reverse
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
 from wildlifecompliance import settings
 from wildlifecompliance.helpers import is_internal
 from wildlifecompliance.components.applications.models import (
@@ -80,7 +80,7 @@ class EmailUserSerializer(serializers.ModelSerializer):
 class LicenceCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = LicenceCategory
-        fields = ('id', 'name', 'short_name')
+        fields = ('id','name','short_name')
 
 
 class DTApplicationSelectSerializer(serializers.ModelSerializer):
@@ -739,7 +739,7 @@ class ExternalApplicationSelectedActivityMergedSerializer(serializers.Serializer
 class EmailUserAppViewSerializer(serializers.ModelSerializer):
     residential_address = UserAddressSerializer()
     # identification = IdentificationSerializer()
-    identification2 = Identification2Serializer()
+    #identification2 = Identification2Serializer() TODO fix
     dob = serializers.SerializerMethodField(read_only=True)
     first_name = serializers.SerializerMethodField()
     last_name = serializers.SerializerMethodField()
@@ -754,7 +754,7 @@ class EmailUserAppViewSerializer(serializers.ModelSerializer):
                   'title',
                   'organisation',
                   'residential_address',
-                  'identification2',
+                  #'identification2', TODO
                   'email',
                   'phone_number',
                   'mobile_number',)
@@ -1218,8 +1218,8 @@ class BaseApplicationSerializer(serializers.ModelSerializer):
             for invoice in invoices:
                 invoice_str += '&invoice={}'.format(invoice.invoice_reference)
 
-            url = '{0}payment?invoice={1}'.format(
-                settings.WC_PAYMENT_SYSTEM_URL_INV,
+            url = '{0}/ledger/payments/invoice/payment?invoice_no={1}'.format(
+                settings.LEDGER_UI_URL,
                 invoice_str,
             )
 
@@ -1233,8 +1233,8 @@ class BaseApplicationSerializer(serializers.ModelSerializer):
                 invoice_str += '&invoice={}'.format(
                     invoice.invoice_reference)
 
-            url = '{0}payment?invoice={1}'.format(
-                settings.WC_PAYMENT_SYSTEM_URL_INV,
+            url = '{0}/ledger/payments/invoice/payment?invoice_no={1}'.format(
+                settings.LEDGER_UI_URL,
                 invoice_str,
             )
         logger.debug('BaseApplicationSerializer.all_payments_url() - end')
@@ -1400,7 +1400,9 @@ class DTInternalApplicationSerializer(BaseApplicationSerializer):
 
     def get_user_in_officers(self, obj):
         groups = obj.get_permission_groups(['licensing_officer','issuing_officer']).values_list('id', flat=True)
-        can_process = EmailUser.objects.filter(groups__id__in=groups).distinct()
+        can_process = EmailUser.objects.filter(
+            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
+        ).distinct()
         if self.context['request'].user and self.context['request'].user in can_process:
             return True
 
@@ -2198,7 +2200,7 @@ class DTAssessmentSerializer(serializers.ModelSerializer):
 
     def get_can_be_processed(self, obj):
         groups = obj.application.get_permission_groups(['assessor']).values_list('id', flat=True)
-        can_process = EmailUser.objects.filter(groups__id__in=groups).distinct()
+        can_process = EmailUser.objects.filter(id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))).distinct()
         if self.context['request'].user and self.context['request'].user in can_process and obj.status == obj.STATUS_AWAITING_ASSESSMENT:
             return True
 

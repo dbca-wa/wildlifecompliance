@@ -49,24 +49,6 @@
     </div>
 </template>
 
-    <!--
-    application = models.ForeignKey(Application, related_name='app_activities')
-    activity_name = models.CharField(max_length=68)
-    name = models.CharField(max_length=68)
-    short_name = models.CharField(max_length=68)
-    data = JSONField(blank=True, null=True)
-    purpose = models.TextField(blank=True, null=True)
-    additional_info = models.TextField(blank=True, null=True)
-    advanced = models.NullBooleanField('Standard/Advanced', default=None)
-    conditions = models.TextField(blank=True, null=True)
-    issue_date = models.DateTimeField(blank=True, null=True)
-    start_date = models.DateField(blank=True, null=True)
-    expiry_date = models.DateField(blank=True, null=True)
-    to_be_issued = models.NullBooleanField(default=None)
-    processed = models.NullBooleanField(default=None)
-    -->
-
-
 <script>
     import TextField from '@/components/forms/text.vue'
     import TextArea from '@/components/forms/text-area.vue'

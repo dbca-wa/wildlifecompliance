@@ -15,9 +15,9 @@ from jsontableschema.exceptions import InvalidDateType
 
 from openpyxl import Workbook
 from openpyxl.styles import Font
-from openpyxl.writer.write_only import WriteOnlyCell
-from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
+from openpyxl.cell.cell import WriteOnlyCell
+import six
+from six import python_2_unicode_compatible
 
 from wildlifecompliance.utils.excel import is_blank_value
 

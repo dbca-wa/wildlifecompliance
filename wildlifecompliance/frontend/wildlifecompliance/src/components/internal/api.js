@@ -5,6 +5,6 @@ module.exports = {
     //countries: 'https://restcountries.eu/rest/v1/?fullText=true/',
     countries: '/api/countries',
     my_user_details: '/api/my_user_details/',
-    profiles: '/api/profiles/',
+    //profiles: '/api/profiles/',
     application_assessment:'/api/assessment/'
 }

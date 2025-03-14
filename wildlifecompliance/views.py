@@ -22,7 +22,7 @@ from wildlifecompliance.components.organisations.models import Organisation, Org
 from wildlifecompliance.components.main import utils
 from wildlifecompliance.exceptions import BindApplicationException
 from django.core.management import call_command
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 import os
 import mimetypes
 from django.contrib import messages
@@ -93,7 +93,7 @@ class WildlifeComplianceRoutingView(TemplateView):
     template_name = 'wildlifecompliance/index.html'
 
     def get(self, *args, **kwargs):
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             print('email: {}'.format(self.request.user.email))
             print("is_authenticated: True")
             print('is_superuser: {}'.format(self.request.user.is_superuser))
@@ -113,7 +113,7 @@ class WildlifeComplianceRoutingView(TemplateView):
         return super(WildlifeComplianceRoutingView, self).get(*args, **kwargs)
 
 
-@login_required(login_url='wc_home')
+@login_required(login_url='home')
 def first_time(request):
     context = {}
     if request.method == 'POST':
@@ -194,6 +194,7 @@ class SecureBaseView(View):
         return securebase_view.get_http_response()
 
 
+#TODO check if this is used/needed
 def getLedgerIdentificationFile(request, emailuser_id):
     allow_access = False
     # Add permission rules
@@ -213,9 +214,6 @@ def getLedgerIdentificationFile(request, emailuser_id):
         if id_path[-4:-3] == '.':
             extension = id_path[-3:]
 
-
-
-
         #if request.user.is_superuser:
         if allow_access == True:
             file_name_path =  id_path 
@@ -232,11 +230,11 @@ def getLedgerIdentificationFile(request, emailuser_id):
 
                     return HttpResponse(the_data, content_type=mimetypes.types_map['.'+str(extension)])
         else:
-                messages.error(request, 'Unable to find the document')
-                return redirect('wc_home')
+            messages.error(request, 'Unable to find the document')
+            return redirect('home')
     except:
         messages.error(request, 'Unable to find the document')
-        return redirect('wc_home')
+        return redirect('home')
 
 def getLedgerSeniorCardFile(request, emailuser_id):
     allow_access = False
@@ -275,10 +273,10 @@ def getLedgerSeniorCardFile(request, emailuser_id):
                     return HttpResponse(the_data, content_type=mimetypes.types_map['.'+str(extension)])
         else:
                 messages.error(request, 'Unable to find the document')
-                return redirect('wc_home')
+                return redirect('home')
     except:
         messages.error(request, 'Unable to find the document')
-        return redirect('wc_home')
+        return redirect('home')
 
 def is_authorised_to_access_application_document(request,document_id):
     if is_internal(request):
@@ -342,7 +340,7 @@ def is_authorised_to_access_document(request):
 
     if is_wildlife_compliance_officer(request) or is_compliance_internal_user(request):
         return True
-    elif request.user.is_authenticated():
+    elif request.user.is_authenticated:
         a_document_id = get_file_path_id("applications",request.path)
         if a_document_id:
             return is_authorised_to_access_application_document(request,a_document_id)

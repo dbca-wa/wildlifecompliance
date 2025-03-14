@@ -12,11 +12,11 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, FileResponse, HttpResponseNotFound
-from ledger.payments.invoice.models import Invoice
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import Invoice
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from django.conf import settings
 from rest_framework import viewsets, serializers, status, mixins
-from rest_framework.decorators import list_route, detail_route, renderer_classes
+from rest_framework.decorators import action, renderer_classes
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework_datatables.filters import DatatablesFilterBackend
@@ -56,6 +56,9 @@ from wildlifecompliance.components.main.models import TemporaryDocumentCollectio
 from wildlifecompliance.settings import SO_TYPE_CHOICES, SO_TYPE_REMEDIATION_NOTICE, SO_TYPE_INFRINGEMENT_NOTICE, \
     SO_TYPE_LETTER_OF_ADVICE, SO_TYPE_CAUTION_NOTICE
 
+from django.db.models.functions import Concat
+from django.db.models import Value
+
 logger = logging.getLogger('compliancemanagement')
 
 
@@ -72,20 +75,36 @@ class SanctionOutcomeFilterBackend(DatatablesFilterBackend):
         # Filter by the search_text
         search_text = request.GET.get('search[value]', '')
         if search_text:
+
+            email_user_ids = list(EmailUser.objects.annotate(
+                    full_name=Concat(
+                        'first_name',
+                        Value(' '),
+                        'last_name'
+                    ),
+                    legal_full_name=Concat(
+                        'legal_first_name',
+                        Value(' '),
+                        'legal_last_name'
+                    ),
+                ).filter(
+                    Q(email__icontains=search_text) |
+                    Q(first_name__icontains=search_text) |
+                    Q(last_name__icontains=search_text) |
+                    Q(full_name__icontains=search_text) |
+                    Q(legal_first_name__icontains=search_text) |
+                    Q(legal_last_name__icontains=search_text) |
+                    Q(legal_full_name__icontains=search_text) 
+                ).values_list('id', flat=True))
+
             q_objects &= Q(lodgement_number__icontains=search_text) | \
                          Q(identifier__icontains=search_text) | \
-                         Q(offender__person__first_name__icontains=search_text) | \
-                         Q(offender__person__last_name__icontains=search_text) | \
-                         Q(offender__person__email__icontains=search_text) | \
-                         Q(driver__first_name__icontains=search_text) | \
-                         Q(driver__last_name__icontains=search_text) | \
-                         Q(driver__email__icontains=search_text) | \
-                         Q(registration_holder__first_name__icontains=search_text) | \
-                         Q(registration_holder__last_name__icontains=search_text) | \
-                         Q(registration_holder__email__icontains=search_text) | \
-                         Q(offender__organisation__organisation__name__icontains=search_text) | \
-                         Q(offender__organisation__organisation__abn__icontains=search_text) | \
-                         Q(offender__organisation__organisation__trading_name__icontains=search_text)
+                         Q(offender__person_id__in=email_user_ids)  | \
+                         Q(driver_id__in=email_user_ids) | \
+                         Q(registration_holder_id__in=email_user_ids) 
+                         #Q(offender__organisation__organisation__name__icontains=search_text) | \
+                         #Q(offender__organisation__organisation__abn__icontains=search_text) | \
+                         #Q(offender__organisation__organisation__trading_name__icontains=search_text)
 
         type = request.GET.get('type', '').lower()
         if type and type != 'all':
@@ -121,9 +140,8 @@ class SanctionOutcomeFilterBackend(DatatablesFilterBackend):
         if queryset.exists:
             queryset = queryset.filter(q_objects)
 
-        getter = request.query_params.get
-        fields = self.get_fields(getter)
-        ordering = self.get_ordering(getter, fields)
+        fields = self.get_fields(request)
+        ordering = self.get_ordering(request, view, fields)
         if len(ordering):
             for num, item in enumerate(ordering):
                 # offender is the foreign key of the sanction outcome
@@ -160,11 +178,11 @@ class SanctionOutcomePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         user = self.request.user
         if is_compliance_internal_user(self.request):
             return SanctionOutcome.objects.all()
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             return SanctionOutcome.objects_for_external.filter(offender__person=user)
         return SanctionOutcome.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def get_paginated_datatable(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         queryset = self.filter_queryset(queryset)
@@ -175,7 +193,7 @@ class SanctionOutcomePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         ret = self.paginator.get_paginated_response(s_data)
         return ret
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def external_datatable_list(self, request, *args, **kwargs):
         """
         This function is called from the external dashboard page by external user
@@ -192,7 +210,7 @@ class SanctionOutcomePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         ret = self.paginator.get_paginated_response(serializer.data)
         return ret
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def person_org_datatable_list(self, request, *args, **kwargs):
         """
         This function is called from the external dashboard page by external user
@@ -224,7 +242,7 @@ class SanctionOutcomePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 #     queryset = AmendmentRequestReason.objects.all()
 #     serializer_class = AmendmentRequestReasonSerializer
 #
-#     @list_route(methods=['GET', ])
+#     @action(detail=False, methods=['GET', ])
 #     def reasons(self, request, *args, **kwargs):
 #         try:
 #             qs = self.get_queryset()
@@ -249,7 +267,7 @@ class RemediationActionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixi
     queryset = RemediationAction.objects.none()
     serializer_class = RemediationActionSerializer
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def request_amendment(self, request, *args, **kwargs):
         try:
@@ -300,7 +318,7 @@ class RemediationActionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixi
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET'])
+    @action(detail=True, methods=['GET'])
     @renderer_classes((JSONRenderer,))
     def accept(self, request, *args, **kwargs):
         try:
@@ -348,7 +366,7 @@ class RemediationActionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixi
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def submit(self, request, *args, **kwargs):
         try:
@@ -418,7 +436,7 @@ class RemediationActionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixi
     def get_queryset(self):
         if is_compliance_internal_user(self.request):
             return RemediationAction.objects.all()
-        elif self.user.is_authenticated():
+        elif self.user.is_authenticated:
             return RemediationAction.objects_for_external.filter(
                 (Q(sanction_outcome__offender__person=self.request.user) & Q(sanction_outcome__registration_holder__isnull=True) & Q(sanction_outcome__driver__isnull=True)) |
                 (Q(sanction_outcome__offender__isnull=True) & Q(sanction_outcome__registration_holder=self.request.user) & Q(sanction_outcome__driver__isnull=True)) |
@@ -473,7 +491,7 @@ class RemediationActionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixi
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_default_document(self, request, *args, **kwargs):
         """
@@ -520,7 +538,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
     queryset = SanctionOutcome.objects.none()
     serializer_class = SanctionOutcomeSerializer
 
-    @detail_route(methods=['GET',])
+    @action(detail=True, methods=['GET',])
     def doc(self, request, *args, **kwargs):
         try:
             file_name = request.GET['name']
@@ -553,7 +571,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
             response = HttpResponseNotFound()
         return response
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def reasons(self, request, *args, **kwargs):
         qs = AmendmentRequestReason.objects.all()
         serializer = AmendmentRequestReasonSerializer(qs, many=True, context={'request': request})
@@ -571,7 +589,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
             )
         return SanctionOutcome.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def types(self, request, *args, **kwargs):
         res_obj = []
         for choice in SO_TYPE_CHOICES:
@@ -579,7 +597,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def statuses(self, request, *args, **kwargs):
         res_obj = []
         for choice in SanctionOutcome.STATUS_CHOICES:
@@ -587,7 +605,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def payment_statuses(self, request, *args, **kwargs):
         res_obj = []
         for choice in SanctionOutcome.PAYMENT_STATUS_CHOICES:
@@ -595,7 +613,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def statuses_for_external(self, request, *args, **kwargs):
         res_obj = []
         for choice in SanctionOutcome.STATUS_CHOICES_FOR_EXTERNAL:
@@ -642,7 +660,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
 
     #    return group
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def update_assigned_to_id(self, request, *args, **kwargs):
         try:
@@ -685,7 +703,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -706,7 +724,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -986,7 +1004,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
 
                 # Create/Retrieve comms log entry
                 comms_log_id = request.data.get('comms_log_id')
-                if comms_log_id and comms_log_id is not 'null':
+                if comms_log_id and comms_log_id != 'null':
                     workflow_entry = instance.comms_logs.get(id=comms_log_id)
                 else:
                     workflow_entry = self.add_comms_log(request, instance, workflow=True)
@@ -1021,7 +1039,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_default_document(self, request, *args, **kwargs):
         """
@@ -1072,7 +1090,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
         try:
             qs = self.get_queryset()
@@ -1093,7 +1111,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_comms_log_document(self, request, *args, **kwargs):
         try:
@@ -1121,7 +1139,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def send_parking_infringement(self, request, instance=None, *args, **kwargs):
         try:
@@ -1138,7 +1156,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 # instance.endorse_parking_infringement()
 
                 comms_log_id = request.data.get('comms_log_id')
-                if comms_log_id and comms_log_id is not 'null':
+                if comms_log_id and comms_log_id != 'null':
                     workflow_entry = instance.comms_logs.get(id=comms_log_id)
                 # else:
                 #     workflow_entry = self.add_comms_log(request, instance, workflow=True)
@@ -1191,7 +1209,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def record_fer_case_number(self, request, instance=None, *args, **kwargs):
         try:
@@ -1234,7 +1252,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def extend_due_date(self, request, instance=None, *args, **kwargs):
         try:
@@ -1250,7 +1268,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                     instance = self.get_object()
 
                 comms_log_id = request.data.get('comms_log_id')
-                if comms_log_id and comms_log_id is not 'null':
+                if comms_log_id and comms_log_id != 'null':
                     workflow_entry = instance.comms_logs.get(id=comms_log_id)
                 else:
                     workflow_entry = self.add_comms_log(request, instance, workflow=True)
@@ -1271,8 +1289,8 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                     second_last = dates[1]
                     instance.log_user_action(SanctionOutcomeUserAction.ACTION_EXTEND_DUE_DATE.format(
                         instance.lodgement_number,
-                        second_last.due_date_applied.strftime('%d/%m/%Y'),
-                        last_date.due_date_applied.strftime('%d/%m/%Y')),
+                        second_last.due_date_applied.strftime('%d/%m/%Y') if second_last.due_date_applied else '',
+                        last_date.due_date_applied.strftime('%d/%m/%Y')) if last_date.due_date_applied else '',
                         request)
 
                 to_address = [instance.get_offender()[0].email,]
@@ -1310,7 +1328,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
             raise serializers.ValidationError(str(e))
 
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def workflow_action(self, request, instance=None, *args, **kwargs):
         try:
@@ -1325,7 +1343,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                     instance = self.get_object()
 
                 comms_log_id = request.data.get('comms_log_id')
-                if comms_log_id and comms_log_id is not 'null':
+                if comms_log_id and comms_log_id != 'null':
                     workflow_entry = instance.comms_logs.get(id=comms_log_id)
                 else:
                     workflow_entry = self.add_comms_log(request, instance, workflow=True)
@@ -1522,7 +1540,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def add_comms_log(self, request, instance=None, workflow=False, *args, **kwargs):
         print('SanctionOutcome.add_comms_log')

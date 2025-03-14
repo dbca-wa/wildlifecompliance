@@ -7,8 +7,8 @@ from django.db.models import Q, Max
 from django.utils import timezone
 import logging
 
-from ledger.payments.invoice.models import Invoice
-from ledger.settings_base import TIME_ZONE
+from ledger_api_client.ledger_models import Invoice
+from ledger_api_client.settings_base import TIME_ZONE
 
 from wildlifecompliance import settings
 from wildlifecompliance.components.inspection.email import send_notification_of_inspection_email

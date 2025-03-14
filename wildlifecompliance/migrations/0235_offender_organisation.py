@@ -9,14 +9,15 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0016_merge_20181116_1115'),
+        #('accounts', '0016_merge_20181116_1115'),
         ('wildlifecompliance', '0234_auto_20190624_1501'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='offender',
-            name='organisation',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='offender_organisation', to='accounts.Organisation'),
+            name='organisation_id',
+            #field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='offender_organisation', to='accounts.Organisation'),
+            field=models.IntegerField(unique=True, verbose_name='Ledger Organisation ID'),
         ),
     ]

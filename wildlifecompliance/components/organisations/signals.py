@@ -3,7 +3,7 @@ from django.db.models.signals import post_delete, pre_save, post_save
 from django.conf import settings
 
 from wildlifecompliance.components.organisations.models import Organisation, OrganisationContact
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.components.main.utils import (
     get_first_name,
     get_last_name,

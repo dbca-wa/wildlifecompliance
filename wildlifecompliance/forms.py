@@ -5,8 +5,11 @@ from crispy_forms.layout import Layout, Submit
 from django.contrib.auth import get_user_model
 from django.forms import Form, ModelForm, CharField, ValidationError, EmailField
 
-from ledger.accounts.models import Profile, Address, Organisation
+from ledger_api_client.ledger_models import Address
 
+from wildlifecompliance.components.organisations.models import (
+    Organisation
+)
 
 User = get_user_model()
 
@@ -88,32 +91,35 @@ class OrganisationAdminForm(ModelForm):
         return data
 
 
-class OrganisationForm(OrganisationAdminForm):
+#TODO does not appear to be in use
+#class OrganisationForm(OrganisationAdminForm):
+#
+#    class Meta:
+#        model = Organisation
+#        #TODO remove/replace
+#        #fields = ['name', 'abn', 'identification']
+#        fields = []
+#
+#    def __init__(self, *args, **kwargs):
+#        super(OrganisationForm, self).__init__(*args, **kwargs)
+#        self.fields['name'].label = 'Company name'
+#        self.fields['identification'].label = 'Certificate of incorporation'
+#        self.fields[
+#            'identification'].help_text = 'Electronic copy of current certificate (e.g. image/PDF)'
+#        self.helper = BaseFormHelper(self)
+#        self.helper.form_id = 'id_form_organisation'
+#        self.helper.attrs = {'novalidate': ''}
+#        self.helper.add_input(Submit('save', 'Save', css_class='btn-lg'))
+#        self.helper.add_input(Submit('cancel', 'Cancel'))
 
-    class Meta:
-        model = Organisation
-        fields = ['name', 'abn', 'identification']
-
-    def __init__(self, *args, **kwargs):
-        super(OrganisationForm, self).__init__(*args, **kwargs)
-        self.fields['name'].label = 'Company name'
-        self.fields['identification'].label = 'Certificate of incorporation'
-        self.fields[
-            'identification'].help_text = 'Electronic copy of current certificate (e.g. image/PDF)'
-        self.helper = BaseFormHelper(self)
-        self.helper.form_id = 'id_form_organisation'
-        self.helper.attrs = {'novalidate': ''}
-        self.helper.add_input(Submit('save', 'Save', css_class='btn-lg'))
-        self.helper.add_input(Submit('cancel', 'Cancel'))
-
-
-class DelegateAccessForm(Form):
-
-    def __init__(self, *args, **kwargs):
-        super(DelegateAccessForm, self).__init__(*args, **kwargs)
-        self.helper = BaseFormHelper(self)
-        self.helper.add_input(Submit('confirm', 'Confirm', css_class='btn-lg'))
-        self.helper.add_input(Submit('cancel', 'Cancel'))
+#TODO does not appear to be in use
+#class DelegateAccessForm(Form):
+#
+#    def __init__(self, *args, **kwargs):
+#        super(DelegateAccessForm, self).__init__(*args, **kwargs)
+#        self.helper = BaseFormHelper(self)
+#        self.helper.add_input(Submit('confirm', 'Confirm', css_class='btn-lg'))
+#        self.helper.add_input(Submit('cancel', 'Cancel'))
 
 
 class UnlinkDelegateForm(ModelForm):

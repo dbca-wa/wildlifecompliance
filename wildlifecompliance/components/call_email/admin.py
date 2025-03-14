@@ -1,5 +1,5 @@
 from django.contrib import admin
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.components.call_email import models, forms
 from reversion.admin import VersionAdmin
 

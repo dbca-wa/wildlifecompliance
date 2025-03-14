@@ -33,7 +33,7 @@ def is_last_admin(organisation, user):
 
 def can_admin_org(organisation, user):
     from wildlifecompliance.components.organisations.models import Organisation, UserDelegation, OrganisationContact
-    from ledger.accounts.models import EmailUser
+    from ledger_api_client.ledger_models import EmailUserRO as EmailUser
     try:
         org_contact = OrganisationContact.objects.get(
             organisation_id=organisation, email=user.email)

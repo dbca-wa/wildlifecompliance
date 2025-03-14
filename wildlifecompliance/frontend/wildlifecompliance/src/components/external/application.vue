@@ -403,8 +403,9 @@ export default {
                 vm.isProcessing = true;
                 if (this.adjusted_application_fee > 0 || this.application.licence_fee > 0) { //refund not required.
 
-                    vm.$http.post(helpers.add_endpoint_join(api_endpoints.applications,vm.application.id+'/application_fee_checkout/'), {}).then(res=>{
-                        window.location.href = "/ledger/checkout/checkout/payment-details/";
+                    vm.$http.post(helpers.add_endpoint_join(api_endpoints.applications,vm.application.id+'/application_fee_checkout/'), {})
+                    .then(res=>{
+                        window.location.href = res.body;
                     },err=>{
                         swal(
                             'Submit Error',

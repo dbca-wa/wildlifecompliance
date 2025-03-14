@@ -42,7 +42,15 @@ def retrieve_context(sanction_outcome):
     offender_given_name = get_first_name(offender)
     offender_dob = get_dob(offender).strftime('%d/%m/%Y')
     offender_postcode = offender.residential_address.postcode if offender.residential_address else ''
-    offender_residential_address = offender.residential_address if offender.residential_address else ''
+    
+    offender_residential_address = ', '.join(filter(None,[
+        offender.residential_address.line1,
+        offender.residential_address.line2,
+        offender.residential_address.line3,
+        offender.residential_address.state,
+        offender.residential_address.country.name if offender.residential_address.country else '',
+    ])) if offender.residential_address else ''
+    
     offender_email = offender.email if offender.email else ''
     rego = sanction_outcome.registration_number if sanction_outcome.registration_number else ''
     offence_date = sanction_outcome.offence.offence_occurrence_datetime.strftime('%d/%m/%Y') if sanction_outcome.offence.offence_occurrence_datetime else ''

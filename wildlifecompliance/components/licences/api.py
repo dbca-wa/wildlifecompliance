@@ -2,10 +2,12 @@ import traceback
 from django.db.models import Q
 from django.core.exceptions import ValidationError
 from rest_framework import viewsets, serializers, mixins
-from rest_framework.decorators import list_route, detail_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from datetime import datetime, timedelta
 import pytz
+
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
 from wildlifecompliance.components.licences.services import LicenceService
 from wildlifecompliance.components.licences.models import (
@@ -57,35 +59,34 @@ class LicenceFilterBackend(DatatablesFilterBackend):
                 search_text = search_text.lower().strip()
                 # join queries for the search_text search
                 search_text_licence_ids = []
-                search_text_licence_ids = WildlifeLicence.objects.annotate(
-                    applicant_name=Case(
-                        When(
-                            current_application__proxy_applicant__isnull=False,
-                            then=Concat(
-                                'current_application__proxy_applicant__first_name',
-                                Value(' '),
-                                'current_application__proxy_applicant__last_name',
-                                Value(''),
-                            )
-                        ),
-                        default=Concat(
-                            'current_application__submitter__first_name',
-                            Value(' '),
-                            'current_application__submitter__last_name',
-                            Value(''),
-                        ),
-                        output_field=CharField(),
-                    )
+
+                email_user_ids = list(EmailUser.objects.annotate(
+                    full_name=Concat(
+                        'first_name',
+                        Value(' '),
+                        'last_name'
+                    ),
+                    legal_full_name=Concat(
+                        'legal_first_name',
+                        Value(' '),
+                        'legal_last_name'
+                    ),
                 ).filter(
-                Q(applicant_name__icontains=search_text) |
-                Q(current_application__submitter__email__icontains=search_text) |
-                Q(current_application__submitter__first_name__icontains=search_text) |
-                Q(current_application__submitter__first_name__icontains=search_text) |
-                Q(current_application__proxy_applicant__email__icontains=search_text) |
-                Q(current_application__proxy_applicant__first_name__icontains=search_text) |
-                Q(current_application__proxy_applicant__last_name__icontains=search_text) |
-                Q(current_application__org_applicant__organisation__name__icontains=search_text)
-                ).values('id')
+                    Q(email__icontains=search_text) |
+                    Q(first_name__icontains=search_text) |
+                    Q(last_name__icontains=search_text) |
+                    Q(full_name__icontains=search_text) |
+                    Q(legal_first_name__icontains=search_text) |
+                    Q(legal_last_name__icontains=search_text) |
+                    Q(legal_full_name__icontains=search_text) 
+                ).values_list('id', flat=True))
+
+                search_text_licence_ids = WildlifeLicence.objects.values(
+                    'id'
+                ).filter(
+                    Q(current_application__proxy_applicant_id__in=email_user_ids) |
+                    Q(current_application__submitter_id__in=email_user_ids) 
+                )
 
                 # # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
                 # # (otherwise they will filter on top of each other)
@@ -186,9 +187,8 @@ class LicenceFilterBackend(DatatablesFilterBackend):
         # in the super call, but is then clobbered by the custom queryset joining above
         # also needed to disable ordering for all fields for which data is not an
         # WildlifeLicence model field, as property functions will not work with order_by
-        getter = request.query_params.get
-        fields = self.get_fields(getter)
-        ordering = self.get_ordering(getter, fields)
+        fields = self.get_fields(request)
+        ordering = self.get_ordering(request, view, fields)
         if len(ordering):
             queryset = queryset.order_by(*ordering)
 
@@ -223,7 +223,7 @@ class LicencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             return WildlifeLicence.objects.filter(
                 current_application__in=asa_accepted.values_list(
                     'application_id', flat=True))
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             return WildlifeLicence.objects.filter(
@@ -233,7 +233,7 @@ class LicencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             ).filter(current_application__in=asa_accepted.values_list('application_id', flat=True))
         return WildlifeLicence.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def internal_datatable_list(self, request, *args, **kwargs):
         self.serializer_class = DTInternalWildlifeLicenceSerializer
         queryset = self.get_queryset()
@@ -262,7 +262,7 @@ class LicencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = DTInternalWildlifeLicenceSerializer(result_page, context={'request': request}, many=True)
         return self.paginator.get_paginated_response(serializer.data)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def external_datatable_list(self, request, *args, **kwargs):
         self.serializer_class = DTExternalWildlifeLicenceSerializer
         # Filter for WildlifeLicence objects that have a current application linked with an
@@ -311,7 +311,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         if is_wildlife_compliance_officer(self.request):
             return WildlifeLicence.objects.filter(
                 current_application__in=asa_accepted.values_list('application_id', flat=True))
-        elif user.is_authenticated():
+        elif user.is_authenticated:
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             return WildlifeLicence.objects.filter(
@@ -363,7 +363,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             serializer = ExternalApplicationSelectedActivitySerializer(queryset)
         return Response(serializer.data)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def user_list(self, request, *args, **kwargs):
         user_orgs = [
             org.id for org in request.user.wildlifecompliance_organisations.all()]
@@ -382,7 +382,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         return Response(serializer.data)
 
     #TODO should external users be able to request an inspection on their own licence? Not a high risk, but odd
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def add_licence_inspection(self, request, pk=None, *args, **kwargs):
         try:
             if pk:
@@ -408,7 +408,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def reactivate_renew_purposes(self, request, pk=None, *args, **kwargs):
         try:
             purpose_ids_list = request.data.get('purpose_ids_list', None)
@@ -449,7 +449,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def surrender_licence(self, request, pk=None, *args, **kwargs):
         try:
             if pk:
@@ -473,7 +473,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def surrender_purposes(self, request, pk=None, *args, **kwargs):
         try:
             purpose_ids_list = request.data.get('purpose_ids_list', None)
@@ -503,7 +503,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def cancel_licence(self, request, pk=None, *args, **kwargs):
         try:
             if not request.user.has_perm('wildlifecompliance.issuing_officer'):
@@ -530,7 +530,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def cancel_purposes(self, request, pk=None, *args, **kwargs):
         try:
             purpose_ids_list = request.data.get('purpose_ids_list', None)
@@ -560,7 +560,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def suspend_licence(self, request, pk=None, *args, **kwargs):
         try:
             if not request.user.has_perm('wildlifecompliance.issuing_officer'):
@@ -587,7 +587,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def suspend_purposes(self, request, pk=None, *args, **kwargs):
         '''
         Request to suspend purposes.
@@ -621,7 +621,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def reinstate_licence(self, request, pk=None, *args, **kwargs):
         try:
             if not request.user.has_perm('wildlifecompliance.issuing_officer'):
@@ -648,7 +648,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def reinstate_purposes(self, request, pk=None, *args, **kwargs):
         MSG_NOAUTH = 'You are not authorised to reinstate licenced activities'
         # MSG_NOSAME = 'Purposes must all be of the same licence activity'
@@ -679,7 +679,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def reissue_purposes(self, request, pk=None, *args, **kwargs):
         try:
             purpose_ids_list = request.data.get('purpose_ids_list', None)
@@ -717,7 +717,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     def regenerate_licence_pdf(self, request, pk=None, *args, **kwargs):
         try:
             if not request.user.has_perm('wildlifecompliance.issuing_officer'):
@@ -741,7 +741,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def get_latest_purposes_for_licence_activity_and_action(
             self, request, *args, **kwargs
     ):
@@ -772,7 +772,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def licence_history(self, request, *args, **kwargs):
         try:
             qs = None
@@ -801,7 +801,7 @@ class LicenceCategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             return LicenceCategory.objects.all()
         return LicenceCategory.objects.none()
 
@@ -815,7 +815,7 @@ class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ReadOnlyModelViewSet)
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             return LicenceCategory.objects.all()
         return LicenceCategory.objects.none()
 

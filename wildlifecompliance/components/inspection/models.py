@@ -2,11 +2,11 @@ from __future__ import unicode_literals
 import logging
 from django.db import models
 from django.contrib.gis.db import models
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models import JSONField
 from django.db.models import Q
-from django.utils.encoding import python_2_unicode_compatible
-from ledger.accounts.models import EmailUser, RevisionedMixin
-from ledger.licence.models import LicenceType
+from six import python_2_unicode_compatible
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from wildlifecompliance.components.main.models import RevisionedMixin
 from wildlifecompliance.components.organisations.models import Organisation
 from wildlifecompliance.components.call_email.models import CallEmail, Location
 from wildlifecompliance.components.legal_case.models import LegalCase
@@ -49,7 +49,7 @@ class InspectionType(models.Model):
     approval_document = models.ForeignKey(
         'InspectionTypeApprovalDocument',
         related_name='inspection_type',
-        null=True)
+        null=True, on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -60,6 +60,23 @@ class InspectionType(models.Model):
     def __str__(self):
         return '{0}, v.{1}'.format(self.inspection_type, self.version)
 
+class InspectionTeam(models.Model):
+
+    emailuser = models.ForeignKey(
+        EmailUser, 
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+    inspection = models.ForeignKey(
+        'wildlifecompliance.Inspection', 
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        db_table = "wildlifecompliance_inspection_inspection_team"
+        unique_together=('inspection','emailuser')
 
 class Inspection(RevisionedMixin):
     PARTY_INDIVIDUAL = 'individual'
@@ -108,63 +125,63 @@ class Inspection(RevisionedMixin):
     call_email = models.ForeignKey(
         CallEmail, 
         related_name='inspection_call_email',
-        null=True
+        null=True, on_delete=models.CASCADE
         )
     legal_case = models.ForeignKey(
         LegalCase, 
         related_name='inspection_legal_case',
-        null=True
+        null=True, on_delete=models.CASCADE
         )
     location = models.ForeignKey(
         Location,
         null=True,
         blank=True,
-        related_name="inspection_location",
+        related_name="inspection_location", on_delete=models.CASCADE
     )
     individual_inspected = models.ForeignKey(
         EmailUser, 
         related_name='individual_inspected',
-        null=True
+        null=True, on_delete=models.CASCADE
         )
-    organisation_inspected = models.ForeignKey(
-        Organisation, 
-        related_name='organisation_inspected',
-        null=True
-        )
+    organisation_inspected_id = models.IntegerField(
+        unique=True, verbose_name="Ledger Organisation ID", null=True
+    )
     assigned_to = models.ForeignKey(
         EmailUser, 
         related_name='inspection_assigned_to',
-        null=True
+        null=True, on_delete=models.CASCADE
         )
     allocated_group = models.ForeignKey(
        ComplianceManagementSystemGroup,
        related_name='inspection_allocated_group', 
-       null=True
+       null=True, on_delete=models.CASCADE
        )
     inspection_team = models.ManyToManyField(
         EmailUser,
         # related_name='inspection_team',
+        through=InspectionTeam,
+        through_fields=('inspection', 'emailuser'),
         blank=True
         )
     inspection_team_lead = models.ForeignKey(
         EmailUser,
         related_name='inspection_team_lead',
-        null=True
+        null=True, on_delete=models.CASCADE
     )
     inspection_type = models.ForeignKey(
             InspectionType,
             related_name='inspection_inspection_type',
-            null=True
+            null=True, on_delete=models.CASCADE
             )
     region = models.ForeignKey(
        Region, 
        related_name='inspection_region', 
-       null=True
+       null=True, on_delete=models.CASCADE
     )
     district = models.ForeignKey(
        District, 
        related_name='inspection_district', 
-       null=True
+       null=True, on_delete=models.CASCADE
     )
 
     class Meta:
@@ -303,7 +320,7 @@ class Inspection(RevisionedMixin):
 class InspectionReportDocument(Document):
     log_entry = models.ForeignKey(
         'Inspection',
-        related_name='report')
+        related_name='report', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
@@ -320,7 +337,7 @@ class InspectionTypeApprovalDocument(Document):
 class InspectionCommsLogDocument(Document):
     log_entry = models.ForeignKey(
         'InspectionCommsLogEntry',
-        related_name='documents')
+        related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
@@ -328,7 +345,7 @@ class InspectionCommsLogDocument(Document):
 
 
 class InspectionCommsLogEntry(CommunicationsLogEntry):
-    inspection = models.ForeignKey(Inspection, related_name='comms_logs')
+    inspection = models.ForeignKey(Inspection, related_name='comms_logs', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -355,7 +372,7 @@ class InspectionUserAction(models.Model):
     ACTION_CHANGE_INDIVIDUAL_INSPECTED = "Change individual inspected from {} to {}"
     ACTION_CHANGE_ORGANISATION_INSPECTED = "Change organisation inspected from {} to {}"
 
-    who = models.ForeignKey(EmailUser, null=True, blank=True)
+    who = models.ForeignKey(EmailUser, null=True, blank=True, on_delete=models.CASCADE)
     when = models.DateTimeField(null=False, blank=False, auto_now_add=True)
     what = models.TextField(blank=False)
 
@@ -371,11 +388,11 @@ class InspectionUserAction(models.Model):
             what=str(action)
         )
 
-    inspection = models.ForeignKey(Inspection, related_name='action_logs')
+    inspection = models.ForeignKey(Inspection, related_name='action_logs', on_delete=models.CASCADE)
 
-
+#TODO check if used
 class InspectionDocument(Document):
-    inspection = models.ForeignKey('Inspection', related_name='documents')
+    inspection = models.ForeignKey('Inspection', related_name='documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
@@ -440,7 +457,7 @@ class InspectionFormDataRecord(models.Model):
         (COMPONENT_TYPE_DATE, 'Date'),
     )
 
-    inspection = models.ForeignKey(Inspection, related_name='form_data_records')
+    inspection = models.ForeignKey(Inspection, related_name='form_data_records', on_delete=models.CASCADE)
     field_name = models.CharField(max_length=512, blank=True, null=True)
     schema_name = models.CharField(max_length=256, blank=True, null=True)
     instance_name = models.CharField(max_length=256, blank=True, null=True)
@@ -514,7 +531,16 @@ class InspectionFormDataRecord(models.Model):
 import reversion
 reversion.register(InspectionType, follow=['inspectiontype_set', 'inspection_inspection_type'])
 #reversion.register(Inspection_inspection_team, follow=[])
-reversion.register(Inspection, follow=['report', 'comms_logs', 'action_logs', 'documents', 'form_data_records', 'wildlifecompliance_licence_inspection', 'wildlifecompliance_inspection', 'offence_inspection'])
+reversion.register(Inspection, follow=[
+    'report', 
+    'comms_logs', 
+    'action_logs', 
+    'documents', 
+    'form_data_records', 
+    'wildlifecompliance_licence_inspection', 
+    'wildlifecompliance_inspection', 
+    'offence_inspection'
+    ])
 reversion.register(InspectionReportDocument, follow=[])
 reversion.register(InspectionTypeApprovalDocument, follow=['inspection_type'])
 reversion.register(InspectionCommsLogDocument, follow=[])

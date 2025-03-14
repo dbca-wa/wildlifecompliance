@@ -1,7 +1,7 @@
 import logging
 from django.conf import settings
 from django.contrib import admin
-from django.conf.urls import url, include
+from django.urls import re_path, include
 from django.views.generic.base import TemplateView, RedirectView
 from django.conf.urls.static import static
 from rest_framework import routers
@@ -13,9 +13,9 @@ from wildlifecompliance.components.returns.views import (
 )
 from wildlifecompliance.components.applications.views import (
     ApplicationSuccessView,
+    ApplicationSuccessViewPreload,
     LicenceFeeSuccessView,
 )
-from wildlifecompliance.admin import wildlifecompliance_admin_site
 
 from wildlifecompliance.components.main.views import (
         SearchKeywordsView,
@@ -46,7 +46,7 @@ from wildlifecompliance.components.artifact import api as artifact_api
 from wildlifecompliance.management.default_data_manager import DefaultDataManager
 from wildlifecompliance.utils import are_migrations_running
 
-from ledger.urls import urlpatterns as ledger_patterns
+from ledger_api_client.urls import urlpatterns as ledger_patterns
 from django_media_serv.urls import urlpatterns as media_serv_patterns
 
 logger = logging.getLogger(__name__)
@@ -81,8 +81,8 @@ router.register(r'my_organisations', org_api.MyOrganisationsViewSet,'my_organisa
 router.register(r'users', users_api.UserViewSet,'users')
 router.register(r'compliance_management_users', users_api.ComplianceManagementUserViewSet,'compliance_management_users')
 router.register(r'users_paginated', users_api.UserPaginatedViewSet,'users_paginated')
-router.register(r'profiles', users_api.ProfileViewSet,'profiles')
-router.register(r'my_profiles', users_api.MyProfilesViewSet,'my_profiles')
+#router.register(r'profiles', users_api.ProfileViewSet,'profiles')
+#router.register(r'my_profiles', users_api.MyProfilesViewSet,'my_profiles')
 router.register(r'emailidentities', users_api.EmailIdentityViewSet,'emailidentities')
 router.register(r'call_email', call_email_api.CallEmailViewSet,'call_email')
 router.register(r'call_email_location', call_email_api.LocationViewSet,'call_email_location')
@@ -124,188 +124,192 @@ router.register(
     main_api.SchemaMasterlistViewSet
 )
 router.register(
-    r'schema_masterlist_paginated', main_api.SchemaMasterlistPaginatedViewSet)
+    r'schema_masterlist_paginated', main_api.SchemaMasterlistPaginatedViewSet, 'schema_masterlist_paginated')
 router.register(
-    r'schema_purpose', main_api.SchemaPurposeViewSet)
+    r'schema_purpose', main_api.SchemaPurposeViewSet, 'schema_purpose')
 router.register(
-    r'schema_purpose_paginated', main_api.SchemaPurposePaginatedViewSet)
+    r'schema_purpose_paginated', main_api.SchemaPurposePaginatedViewSet, 'schema_purpose_paginated')
 router.register(
-    r'schema_group', main_api.SchemaGroupViewSet)
+    r'schema_group', main_api.SchemaGroupViewSet, 'schema_group')
 router.register(
-    r'schema_group_paginated', main_api.SchemaGroupPaginatedViewSet)
+    r'schema_group_paginated', main_api.SchemaGroupPaginatedViewSet, 'schema_group_paginated')
 router.register(
-    r'schema_question', main_api.SchemaQuestionViewSet)
+    r'schema_question', main_api.SchemaQuestionViewSet, 'schema_question')
 router.register(
-    r'schema_question_paginated', main_api.SchemaQuestionPaginatedViewSet)
+    r'schema_question_paginated', main_api.SchemaQuestionPaginatedViewSet, 'schema_question_paginated')
 
-api_patterns = [url(r'^api/my_user_details/$',
+api_patterns = [re_path(r'^api/my_user_details/$',
                     users_api.GetMyUserDetails.as_view(),
                     name='get-my-user-details'),
-                url(r'^api/is_compliance_management_callemail_readonly_user$', 
+                re_path(r'^api/is_compliance_management_callemail_readonly_user$', 
                     users_api.IsComplianceManagementCallEmailReadonlyUser.as_view(), 
-                    name='is-compliance-manegement-callemail-readonly-user'),
-                url(r'^api/allocated_group_members$', 
+                    name='is-compliance-management-callemail-readonly-user'),
+                re_path(r'^api/allocated_group_members$', 
                     main_api.AllocatedGroupMembers.as_view(), 
                     name='allocated-group-members'),
-                url(r'^api/countries$', 
+                re_path(r'^api/countries$', 
                     users_api.GetCountries.as_view(), 
                     name='get-countries'),
-                url(r'^api/staff_member_lookup$', 
+                re_path(r'^api/staff_member_lookup$', 
                     users_api.StaffMemberLookup.as_view(), 
                     name='staff-member-lookup'),
-                #url(r'^api/department_users$',
+                #re_path(r'^api/department_users$',
                  #   users_api.DepartmentUserList.as_view(),
                   #  name='department-users-list'),
-                url(r'^api/my_compliance_user_details/$',
+                re_path(r'^api/my_compliance_user_details/$',
                     users_api.GetComplianceUserDetails.as_view(),
                     name='get-my-compliance-user-details'),
-                url(r'^api/is_new_user/$',
+                re_path(r'^api/is_new_user/$',
                     users_api.IsNewUser.as_view(),
                     name='is-new-user'),
-                url(r'^api/user_profile_completed/$',
+                re_path(r'^api/user_profile_completed/$',
                     users_api.UserProfileCompleted.as_view(),
                     name='get-user-profile-completed'),
-                url(r'^api/amendment_request_reason_choices',
+                re_path(r'^api/amendment_request_reason_choices',
                     application_api.AmendmentRequestReasonChoicesView.as_view(),
                     name='amendment_request_reason_choices'),
-                url(r'^api/return_amendment_request_reason_choices',
+                re_path(r'^api/return_amendment_request_reason_choices',
                     return_api.ReturnAmendmentRequestReasonChoicesView.as_view(),
                     name='return_amendment_request_reason_choices'),
-                url(r'^api/empty_list/$',
+                re_path(r'^api/empty_list/$',
                     application_api.GetEmptyList.as_view(),
                     name='get-empty-list'),
-                url(r'^api/organisation_access_group_members',
+                re_path(r'^api/organisation_access_group_members',
                     org_api.OrganisationAccessGroupMembers.as_view(),
                     name='organisation-access-group-members'),
-                url(r'^api/search_keywords',
+                re_path(r'^api/search_keywords',
                     SearchKeywordsView.as_view(),
                     name='search_keywords'),
-                url(r'^api/search_reference',
+                re_path(r'^api/search_reference',
                     SearchReferenceView.as_view(),
                     name='search_reference'),
-                url(r'^api/search_weak_links',
+                re_path(r'^api/search_weak_links',
                     SearchWeakLinksView.as_view(),
                     name='search_weak_links'),
-                url(r'^api/create_weak_link',
+                re_path(r'^api/create_weak_link',
                     CreateWeakLinkView.as_view(),
                     name='create_weak_link'),
-                url(r'^api/remove_weak_link',
+                re_path(r'^api/remove_weak_link',
                     RemoveWeakLinkView.as_view(),
                     name='remove_weak_link'),
-                url(r'^api/geocoding_address_search_token',
+                re_path(r'^api/geocoding_address_search_token',
                     GeocodingAddressSearchTokenView.as_view(),
                     name='geocoding_address_search_token'),
-                url(r'^api/system_preference',
+                re_path(r'^api/system_preference',
                     SystemPreferenceView.as_view(),
                     name='system_preference'),
-                url(r'^api/',
+                re_path(r'^api/',
                     include(router.urls))]
 
 # URL Patterns
 urlpatterns = [
-    url(r'contact-us/$',
+    re_path(r'contact-us/$',
         TemplateView.as_view(
             template_name="wildlifecompliance/contact_us.html"),
         name='wc_contact'),
-    url(
+    re_path(
         r'further-info/$',
         RedirectView.as_view(
             url='https://www.dpaw.wa.gov.au/plants-and-animals/licences-and-permits'),
         name='wc_further_info'),
-    url(r'^admin/', wildlifecompliance_admin_site.urls),
-    url(r'^ledger/admin/', admin.site.urls, name='ledger_admin'),
-    url(r'^chaining/', include('smart_selects.urls')),
-    url(r'', include(api_patterns)),
-    url(r'^$', views.WildlifeComplianceRoutingView.as_view(), name='wc_home'),
-    url(r'^internal/', views.InternalView.as_view(), name='internal'),
-    url(r'^external/', views.ExternalView.as_view(), name='external'),
-    url(r'^external/application/(?P<application_pk>\d+)/$', views.ExternalApplicationView.as_view(), name='external-application-detail'),
-    url(r'^external/return/(?P<return_pk>\d+)/$', views.ExternalReturnView.as_view(), name='external-return-detail'),
-    url(r'^firsttime/$', views.first_time, name='first_time'),
-    url(r'^account/$', views.ExternalView.as_view(), name='manage-account'),
-    url(r'^profiles/', views.ExternalView.as_view(), name='manage-profiles'),
-    # url(r'^external/organisations/manage/$', views.ExternalView.as_view(), name='manage-org'),
-    url(r'^application/$',
+    re_path(r'^admin/', admin.site.urls, name="admin"),
+    #re_path(r'^ledger/admin/', admin.site.urls, name='ledger_admin'),
+    re_path(r'^chaining/', include('smart_selects.urls')),
+    re_path(r'', include(api_patterns)),
+    re_path(r'^$', views.WildlifeComplianceRoutingView.as_view(), name='home'),
+    re_path(r'^internal/', views.InternalView.as_view(), name='internal'),
+    re_path(r'^external/', views.ExternalView.as_view(), name='external'),
+    re_path(r'^external/application/(?P<application_pk>\d+)/$', views.ExternalApplicationView.as_view(), name='external-application-detail'),
+    re_path(r'^external/return/(?P<return_pk>\d+)/$', views.ExternalReturnView.as_view(), name='external-return-detail'),
+    re_path(r'^firsttime/$', views.first_time, name='first_time'),
+    re_path(r'^account/$', views.ExternalView.as_view(), name='manage-account'),
+    re_path(r'^profiles/', views.ExternalView.as_view(), name='manage-profiles'),
+    # re_path(r'^external/organisations/manage/$', views.ExternalView.as_view(), name='manage-org'),
+    re_path(r'^application/$',
         application_views.ApplicationView.as_view(),
         name='application'),
-    # url(r'^organisations/(?P<pk>\d+)/confirm-delegate-access/(?P<uid>[0-9A-Za-z]+)-(?P<token>.+)/$',
+    # re_path(r'^organisations/(?P<pk>\d+)/confirm-delegate-access/(?P<uid>[0-9A-Za-z]+)-(?P<token>.+)/$',
     #     views.ConfirmDelegateAccess.as_view(), name='organisation_confirm_delegate_access'),
-    url('^healthcheck/', views.HealthCheckView.as_view(), name='health_check'),
+    re_path('^healthcheck/', views.HealthCheckView.as_view(), name='health_check'),
 
     # following url is defined so that to include url path when sending
     # call_email emails to users
-    url(r'^internal/call_email/(?P<call_email_id>\d+)/$', views.ApplicationView.as_view(),
+    re_path(r'^internal/call_email/(?P<call_email_id>\d+)/$', views.ApplicationView.as_view(),
         name='internal-call-email-detail'),
     # following url is defined so that to include url path when sending
     # artifact emails to users
-    url(r'^internal/object/(?P<artifact_id>\d+)/$', views.ApplicationView.as_view(),
+    re_path(r'^internal/object/(?P<artifact_id>\d+)/$', views.ApplicationView.as_view(),
         name='internal-artifact-detail'),
 
     # following url is defined so that to include url path when sending
     # inspection emails to users
-    url(r'^internal/inspection/(?P<inspection_id>\d+)/$', views.ApplicationView.as_view(),
+    re_path(r'^internal/inspection/(?P<inspection_id>\d+)/$', views.ApplicationView.as_view(),
         name='internal-inspection-detail'),
 
     # following url is defined so that to include url path when sending
     # sanction outcome emails to users
-    url(r'^internal/sanction_outcome/(?P<sanction_outcome_id>\d+)/$', views.ApplicationView.as_view(), name='internal-sanction-outcome-detail'),
+    re_path(r'^internal/sanction_outcome/(?P<sanction_outcome_id>\d+)/$', views.ApplicationView.as_view(), name='internal-sanction-outcome-detail'),
 
-    url(r'^internal/offence/(?P<offence_id>\d+)/$', views.ApplicationView.as_view(), name='internal-offence-detail'),
+    re_path(r'^internal/offence/(?P<offence_id>\d+)/$', views.ApplicationView.as_view(), name='internal-offence-detail'),
 
     # following url is defined so that to include url path when sending
     # inspection emails to users
-    url(r'^internal/legal_case/(?P<legal_case_id>\d+)/$', views.ApplicationView.as_view(),
+    re_path(r'^internal/legal_case/(?P<legal_case_id>\d+)/$', views.ApplicationView.as_view(),
         name='internal-legal-case-detail'),
-    url(r'^internal/application/(?P<application_pk>\d+)/$', views.ApplicationView.as_view(),
+    re_path(r'^internal/application/(?P<application_pk>\d+)/$', views.ApplicationView.as_view(),
         name='internal-application-detail'),
-    url(r'^internal/application/assessment/(?P<application_pk>\d+)/$', views.ApplicationView.as_view(),
+    re_path(r'^internal/application/assessment/(?P<application_pk>\d+)/$', views.ApplicationView.as_view(),
         name='internal-assessment-detail'),
-    url(r'^application_submit/submit_with_invoice/',
+    re_path(r'^application_submit/submit_with_invoice_preload/(?P<lodgement_number>.+)/',
+        ApplicationSuccessViewPreload.as_view(),
+        name='external-application-success-invoice-preload'),
+    re_path(r'^application_submit/submit_with_invoice/',
         ApplicationSuccessView.as_view(),
         name='external-application-success-invoice'),
-    url(r'^application/finish_licence_fee_payment/',
+    re_path(r'^application/finish_licence_fee_payment/',
         LicenceFeeSuccessView.as_view(),
         name='external-licence-fee-success-invoice'),
-    url(r'^returns_submit/submit_with_invoice/',
+    re_path(r'^returns_submit/submit_with_invoice/',
         ReturnSuccessView.as_view(),
         name='external-returns-success-invoice'),
-    url(r'^returns/finish_sheet_fee_payment/',
+    re_path(r'^returns/finish_sheet_fee_payment/',
         ReturnSheetSuccessView.as_view(),
         name='external-sheet-success-invoice'),
 
-    # url(r'^export/xls/$', application_views.export_applications, name='export_applications'),
-    url(r'^export/pdf/$', application_views.pdflatex, name='pdf_latex'),
-    url(r'^mgt-commands/$',
+    # re_path(r'^export/xls/$', application_views.export_applications, name='export_applications'),
+    re_path(r'^export/pdf/$', application_views.pdflatex, name='pdf_latex'),
+    re_path(r'^mgt-commands/$',
         views.ManagementCommandsView.as_view(),
         name='mgt-commands'),
 
     # payment related urls
-    url(r'^infringement_penalty/(?P<sanction_outcome_id>\d+)/$', payment_views.InfringementPenaltyView.as_view(), name='infringement_penalty'),
-    url(r'^success/fee/$', payment_views.InfringementPenaltySuccessView.as_view(), name='penalty_success'),
+    re_path(r'^infringement_penalty/(?P<sanction_outcome_id>\d+)/$', payment_views.InfringementPenaltyView.as_view(), name='infringement_penalty'),
+    re_path(r'^success/fee_preload/(?P<lodgement_number>.+)/$', payment_views.InfringementPenaltySuccessViewPreload.as_view(), name='penalty_success_preload'),
+    re_path(r'^success/fee/$', payment_views.InfringementPenaltySuccessView.as_view(), name='penalty_success'),
 
     # For 'Record Payment'
-    url(r'^payment_deferred/(?P<sanction_outcome_pk>\d+)/$', DeferredInvoicingView.as_view(), name='deferred_invoicing'),
-    url(r'^preview_deferred/(?P<sanction_outcome_pk>\d+)/$', DeferredInvoicingPreviewView.as_view(), name='preview_deferred_invoicing'),
+    re_path(r'^payment_deferred/(?P<sanction_outcome_pk>\d+)/$', DeferredInvoicingView.as_view(), name='deferred_invoicing'),
+    re_path(r'^preview_deferred/(?P<sanction_outcome_pk>\d+)/$', DeferredInvoicingPreviewView.as_view(), name='preview_deferred_invoicing'),
 
     # Reports
-    url(r'^api/oracle_job$',main_api.OracleJob.as_view(), name='get-oracle'),
-    #url(r'^api/oracle_job$',main_api.OracleJob.as_view(), name='get-oracle'),
-    #url(r'^api/reports/booking_settlements$', main_api.BookingSettlementReportView.as_view(),name='booking-settlements-report'),
+    re_path(r'^api/oracle_job$',main_api.OracleJob.as_view(), name='get-oracle'),
+    #re_path(r'^api/oracle_job$',main_api.OracleJob.as_view(), name='get-oracle'),
+    #re_path(r'^api/reports/booking_settlements$', main_api.BookingSettlementReportView.as_view(),name='booking-settlements-report'),
 
     # history comparison.
-    url(r'^history/application/(?P<pk>\d+)/$',
+    re_path(r'^history/application/(?P<pk>\d+)/$',
         application_views.ApplicationHistoryCompareView.as_view(),
         name='application-history'),
 
-    url(r'^preview/licence-pdf/(?P<application_pk>\d+)',application_views.PreviewLicencePDFView.as_view(), name='preview_licence_pdf'),
+    re_path(r'^preview/licence-pdf/(?P<application_pk>\d+)',application_views.PreviewLicencePDFView.as_view(), name='preview_licence_pdf'),
 
-    url(r'^securebase-view/',views.SecureBaseView.as_view(), name='securebase-view'),
-    url(r'^api/person_org_lookup$', users_api.GetPersonOrg.as_view(), name='get-person-org'),
-    url(r'^ledger-private/identification/(?P<emailuser_id>\d+)', views.getLedgerIdentificationFile, name='view_ledger_identification_file'),
-    url(r'^ledger-private/senior-card/(?P<emailuser_id>\d+)', views.getLedgerSeniorCardFile, name='view_ledger_senior_card_file'),
+    re_path(r'^securebase-view/',views.SecureBaseView.as_view(), name='securebase-view'),
+    re_path(r'^api/person_org_lookup$', users_api.GetPersonOrg.as_view(), name='get-person-org'),
+    re_path(r'^ledger-private/identification/(?P<emailuser_id>\d+)', views.getLedgerIdentificationFile, name='view_ledger_identification_file'),
+    re_path(r'^ledger-private/senior-card/(?P<emailuser_id>\d+)', views.getLedgerSeniorCardFile, name='view_ledger_senior_card_file'),
 
-    url(r'^private-media/', views.getPrivateFile, name='view_private_file'),
-    url(r'infringement/', views.InfringementView.as_view(), name='wc_infringement'),
+    re_path(r'^private-media/', views.getPrivateFile, name='view_private_file'),
+    re_path(r'infringement/', views.InfringementView.as_view(), name='wc_infringement'),
 
 ] + ledger_patterns #+ media_serv_patterns
 
@@ -320,5 +324,5 @@ if settings.DEBUG:
 if settings.SHOW_DEBUG_TOOLBAR:
     import debug_toolbar
     urlpatterns = [
-        url('__debug__/', include(debug_toolbar.urls)),
+        re_path('__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns

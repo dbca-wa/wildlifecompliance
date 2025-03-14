@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
-from django.utils.encoding import python_2_unicode_compatible
+from six import python_2_unicode_compatible
 from django.db import models
 from django.contrib.auth.models import Group
-from ledger.accounts.models import EmailUser
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.components.main.models import Document, Region, District
 
 from django.conf import settings
@@ -154,7 +154,7 @@ private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/"
 class ComplianceManagementUserPreferences(models.Model):
 
     prefer_compliance_management = models.BooleanField(default=False)
-    email_user = models.OneToOneField(EmailUser)
+    email_user = models.OneToOneField(EmailUser, on_delete=models.CASCADE)
     intelligence_information_text = models.TextField(blank=True)
 
     class Meta:
@@ -166,7 +166,7 @@ class ComplianceManagementUserPreferences(models.Model):
 
 
 class ComplianceUserIntelligenceDocument(Document):
-    email_user = models.ForeignKey(EmailUser, related_name='intelligence_documents')
+    email_user = models.ForeignKey(EmailUser, related_name='intelligence_documents', on_delete=models.CASCADE)
     _file = models.FileField(max_length=255,storage=private_storage)
 
     class Meta:

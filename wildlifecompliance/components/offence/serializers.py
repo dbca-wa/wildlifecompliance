@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 import pytz
 from django.db.models import Q
-from ledger.settings_base import TIME_ZONE
+from ledger_api_client.settings_base import TIME_ZONE
 from rest_framework import serializers
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroupPermission
 from wildlifecompliance.components.main.serializers import CommunicationLogEntrySerializer

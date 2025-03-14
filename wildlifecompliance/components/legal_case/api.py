@@ -20,8 +20,7 @@ from django.utils import timezone
 from rest_framework import viewsets, serializers, status, generics, views, filters, mixins
 import rest_framework.exceptions as rest_exceptions
 from rest_framework.decorators import (
-    detail_route,
-    list_route,
+    action,
     renderer_classes,
     parser_classes,
     api_view
@@ -32,9 +31,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser, B
 from rest_framework.pagination import PageNumberPagination
 from collections import OrderedDict
 from django.core.cache import cache
-from ledger.accounts.models import EmailUser, Address
-from ledger.address.models import Country
-from ledger.checkout.utils import calculate_excl_gst
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address
+from ledger_api_client.country_models import Country
+from ledger_api_client.utils import calculate_excl_gst
 from datetime import datetime, timedelta, date
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -189,9 +188,8 @@ class LegalCaseFilterBackend(DatatablesFilterBackend):
         # also needed to disable ordering for all fields for which data is not an
         # CallEmail model field, as property functions will not work with order_by
         
-        getter = request.query_params.get
-        fields = self.get_fields(getter)
-        ordering = self.get_ordering(getter, fields)
+        fields = self.get_fields(request)
+        ordering = self.get_ordering(request, view, fields)
         if len(ordering):
             for num, item in enumerate(ordering):
                 if item == 'status__name':
@@ -226,7 +224,7 @@ class LegalCasePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             return LegalCase.objects.all()
         return LegalCase.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def get_paginated_datatable(self, request, *args, **kwargs):
         queryset = self.get_queryset()
 
@@ -237,7 +235,7 @@ class LegalCasePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             result_page, many=True, context={'request': request})
         return self.paginator.get_paginated_response(serializer.data)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def get_person_org_paginated_datatable(self, request, *args, **kwargs):
         queryset = self.get_queryset()
 
@@ -289,7 +287,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         serialized_instance = self.variable_serializer(request, instance)
         return Response(serialized_instance.data)
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def court_outcome_type_list(self, request):
         try:
             qs = CourtOutcomeType.objects.all()
@@ -305,7 +303,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def court_list(self, request):
         try:
             qs = Court.objects.all()
@@ -321,7 +319,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
         try:
             qs = self.get_queryset()
@@ -338,7 +336,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['GET', ])    
+    @action(detail=False, methods=['GET', ])    
     def status_choices(self, request, *args, **kwargs):
         res_obj = [] 
         for choice in LegalCase.STATUS_CHOICES:
@@ -346,7 +344,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def no_running_sheet(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -372,7 +370,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -389,7 +387,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -406,7 +404,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def add_comms_log(self, request, instance=None, workflow=False, *args, **kwargs):
         try:
@@ -564,8 +562,8 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                         for key, entry in court_dates.items():
                             entry_copy = dict(entry)
                             comments = entry_copy.get('comments', '')
-                            ascii_comments = comments.encode('ascii', 'xmlcharrefreplace')
-                            entry_copy.update({'comments': ascii_comments})
+                            #ascii_comments = comments.encode('ascii', 'xmlcharrefreplace')
+                            entry_copy.update({'comments': comments})
                             entry_copy['court_id'] = entry_copy['court']['id'] if entry_copy['court'] else None
                             if entry_copy.get('id'):
                                 # Update existing court_date
@@ -711,7 +709,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def journal_entry_history(self, request, *args, **kwargs):
         try:
@@ -735,7 +733,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def running_sheet_history(self, request, *args, **kwargs):
         try:
@@ -759,7 +757,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def update_assigned_to_id(self, request, *args, **kwargs):
         try:
@@ -806,7 +804,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_brief_of_evidence_document(self, request, *args, **kwargs):
         try:
@@ -839,7 +837,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     #@renderer_classes((JSONRenderer,))
     #@renderer_classes([PDFRenderer])
     def generate_document(self, request, *args, **kwargs):
@@ -905,7 +903,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_court_hearing_notice_document(self, request, *args, **kwargs):
         try:
@@ -948,7 +946,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             raise serializers.ValidationError(str(e))
 
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_prosecution_notice_document(self, request, *args, **kwargs):
         try:
@@ -991,7 +989,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             raise serializers.ValidationError(str(e))
 
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_prosecution_brief_document(self, request, *args, **kwargs):
         try:
@@ -1025,7 +1023,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_default_document(self, request, *args, **kwargs):
         try:
@@ -1059,7 +1057,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_court_outcome_document(self, request, *args, **kwargs):
         try:
@@ -1094,7 +1092,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             raise serializers.ValidationError(str(e))
 
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_comms_log_document(self, request, *args, **kwargs):
         try:
@@ -1174,7 +1172,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             instance.call_email.status = 'open_case'
             instance.call_email.save()
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def workflow_action(self, request, instance=None, create_legal_case=None, *args, **kwargs):
         try:
@@ -1191,7 +1189,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                     instance = self.get_object()
 
                 comms_log_id = request.data.get('legal_case_comms_log_id')
-                if comms_log_id and comms_log_id is not 'null':
+                if comms_log_id and comms_log_id != 'null':
                     workflow_entry = instance.comms_logs.get(
                             id=comms_log_id)
                 else:
@@ -1332,7 +1330,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         # change status
         instance.set_status_generate_prosecution_brief(request)
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def create_legal_case_process_comms_log_document(self, request, *args, **kwargs):
         try:
@@ -1364,7 +1362,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def delete_reinstate_journal_entry(self, request, *args, **kwargs):
         try:
@@ -1406,7 +1404,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def create_journal_entry(self, request, *args, **kwargs):
         try:
@@ -1444,7 +1442,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def delete_reinstate_running_sheet_entry(self, request, *args, **kwargs):
         try:
@@ -1486,7 +1484,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def create_running_sheet_entry(self, request, *args, **kwargs):
         try:

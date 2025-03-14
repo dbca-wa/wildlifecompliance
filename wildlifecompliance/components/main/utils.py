@@ -1,20 +1,19 @@
 import ast
 
 import pytz
-import requests
 import json
 import logging
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
-from ledger.checkout.utils import (
+from django.urls import reverse
+from django.http import HttpResponseRedirect, HttpResponse
+from ledger_api_client.utils import (
     create_basket_session,
     create_checkout_session,
     place_order_submission
 )
 from django.db import transaction
-from ledger.payments.models import Invoice
+from ledger_api_client.ledger_models import Invoice
 from wildlifecompliance.exceptions import BindApplicationException
 from django.core.cache import cache
 from wildlifecompliance.components.main.models import RegionGIS, DistrictGIS
@@ -93,39 +92,39 @@ def checkout(
         vouchers=[],
         internal=False,
         add_checkout_params={}):
+    
     basket_params = {
         'products': lines,
         'vouchers': vouchers,
         'system': settings.WC_PAYMENT_SYSTEM_ID,
         'custom_basket': True,
+        'booking_reference': application.lodgement_number,
+        'booking_reference_link': application.lodgement_number,
+        'no_payment': False,
     }
-    basket, basket_hash = create_basket_session(request, basket_params)
-    request.basket = basket
+    print(basket_params)
+    basket_hash = create_basket_session(request, request.user.id, basket_params)
 
     checkout_params = {
         'system': settings.WC_PAYMENT_SYSTEM_ID,
         'fallback_url': request.build_absolute_uri('/'),
         'return_url': request.build_absolute_uri(reverse('external-application-success-invoice')),
-        'return_preload_url': request.build_absolute_uri('/'),
+        'return_preload_url': settings.WILDLIFECOMPLIANCE_EXTERNAL_URL + reverse('external-application-success-invoice-preload',kwargs={"lodgement_number": application.lodgement_number}),
         'force_redirect': True,
-        'proxy': True if internal else False,
-        'invoice_text': invoice_text}
+        #'proxy': True if internal else False,
+        'invoice_text': invoice_text,
+        'basket_owner': request.user.id,
+        'session_type': 'ledger_api',
+    }
+    
     checkout_params.update(add_checkout_params)
     print(' -------- main utils > checkout > checkout_params ---------- ')
     print(checkout_params)
     create_checkout_session(request, checkout_params)
 
-    if internal:
-        response = place_order_submission(request)
-    else:
-        response = HttpResponseRedirect(reverse('checkout:index'))
-        # inject the current basket into the redirect response cookies
-        # or else, anonymous users will be directionless
-        response.set_cookie(
-            settings.OSCAR_BASKET_COOKIE_OPEN, basket_hash,
-            max_age=settings.OSCAR_BASKET_COOKIE_LIFETIME,
-            secure=settings.OSCAR_BASKET_COOKIE_SECURE, httponly=True
-        )
+    response = HttpResponse(
+        reverse('ledgergw-payment-details')
+    )
 
     return response
 
@@ -219,7 +218,7 @@ def create_application_invoice(application, payment_method='cc'):
     from wildlifecompliance.components.applications.services import (
         ApplicationService,
     )
-    from ledger.checkout.utils import createCustomBasket
+    from ledger_api_client.utils import createCustomBasket
     from ledger.payments.invoice.utils import CreateInvoiceBasket
 
     products = ApplicationService.get_product_lines(application)
@@ -344,7 +343,7 @@ def delete_session_activity(session):
         pass
 
 
-def bind_application_to_invoice(request, application, invoice_ref):
+def bind_application_to_invoice(application, invoice_ref):
     from wildlifecompliance.components.applications.models import ApplicationInvoice, ApplicationInvoiceLine
     logger = logging.getLogger('application_checkout')
     try:
@@ -393,7 +392,7 @@ def bind_application_to_invoice(request, application, invoice_ref):
             )
         application.save()
 
-        request.session['wc_last_application'] = application.id
+        #request.session['wc_last_application'] = application.id
 
         # send out the invoice before the confirmation is sent
         # send_application_invoice(application)
@@ -715,7 +714,7 @@ def get_dob(obj):
 
     if hasattr(obj,"legal_dob") and obj.legal_dob:
         return obj.legal_dob
-    elif hasattr(obj,"dob") and obj.dob:
+    if hasattr(obj,"dob") and obj.dob:
         return obj.dob
 
     return ""

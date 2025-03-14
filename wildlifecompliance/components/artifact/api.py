@@ -19,8 +19,7 @@ from django.utils import timezone
 from rest_framework import viewsets, serializers, status, generics, views, filters, mixins
 import rest_framework.exceptions as rest_exceptions
 from rest_framework.decorators import (
-    detail_route,
-    list_route,
+    action,
     renderer_classes,
     parser_classes,
     api_view
@@ -31,9 +30,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser, B
 from rest_framework.pagination import PageNumberPagination
 from collections import OrderedDict
 from django.core.cache import cache
-from ledger.accounts.models import EmailUser, Address
-from ledger.address.models import Country
-from ledger.checkout.utils import calculate_excl_gst
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address
+from ledger_api_client.country_models import Country
+from ledger_api_client.utils import calculate_excl_gst
 from datetime import datetime, timedelta, date
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -133,7 +132,7 @@ class DocumentArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['GET', ])    
+    @action(detail=False, methods=['GET', ])    
     def document_type_choices(self, request, *args, **kwargs):
         res_obj = [] 
         for choice in DocumentArtifact.DOCUMENT_TYPE_CHOICES:
@@ -313,7 +312,7 @@ class DocumentArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    #@detail_route(methods=['POST'])
+    #@action(detail=True, methods=['POST'])
     #@renderer_classes((JSONRenderer,))
     #def process_default_document(self, request, *args, **kwargs):
     #    try:
@@ -406,7 +405,7 @@ class PhysicalArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_renderer_document(self, request, *args, **kwargs):
         print("process_renderer_document")
@@ -444,7 +443,7 @@ class PhysicalArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     @renderer_classes((JSONRenderer,))
     def form_data(self, instance, request_data, *args, **kwargs):
         print("form data")
@@ -620,9 +619,8 @@ class ArtifactFilterBackend(DatatablesFilterBackend):
         # perform filters
         queryset = queryset.filter(q_objects)
 
-        getter = request.query_params.get
-        fields = self.get_fields(getter)
-        ordering = self.get_ordering(getter, fields)
+        fields = self.get_fields(request)
+        ordering = self.get_ordering(request, view, fields)
         if len(ordering):
             for num, item in enumerate(ordering):
                 pass
@@ -664,7 +662,7 @@ class ArtifactPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             return qs
         return Artifact.objects.none()
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def get_paginated_datatable(self, request, *args, **kwargs):
 
         queryset = self.get_queryset()
@@ -687,7 +685,7 @@ class ArtifactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             return Artifact.objects.all()
         return Artifact.objects.none()
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def process_default_document(self, request, *args, **kwargs):
         try:
@@ -711,7 +709,7 @@ class ArtifactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -728,7 +726,7 @@ class ArtifactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['GET', ])
+    @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -745,7 +743,7 @@ class ArtifactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @detail_route(methods=['POST', ])
+    @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def add_comms_log(self, request, instance=None, workflow=False, *args, **kwargs):
         try:
@@ -785,7 +783,7 @@ class ArtifactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def types(self, request, *args, **kwargs):
         #### TODO: This is just for now
         #es_obj = [{'id': 'type_1', 'display': 'Type 1'}, {'id': 'type_2', 'display': 'Type 2'}]
@@ -802,7 +800,7 @@ class ArtifactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
         return HttpResponse(res_json, content_type='application/json')
 
-    @list_route(methods=['GET', ])
+    @action(detail=False, methods=['GET', ])
     def statuses(self, request, *args, **kwargs):
         #### TODO: This is just for now
         #es_obj = [{'id': 'status_1', 'display': 'Status 1'}, {'id': 'status_2', 'display': 'Status 2'}]
@@ -827,7 +825,7 @@ class ArtifactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 #           return LegalCasePriority.objects.all()
 #       return LegalCasePriority.objects.none()
 
-   #@detail_route(methods=['GET',])
+   #@action(detail=True, methods=['GET',])
    #@renderer_classes((JSONRenderer,))
    #def get_schema(self, request, *args, **kwargs):
    #    instance = self.get_object()
@@ -857,7 +855,7 @@ class ArtifactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 #           return DocumentArtifactType.objects.all()
 #       return DocumentArtifactType.objects.none()
 
-   #@detail_route(methods=['GET',])
+   #@action(detail=True, methods=['GET',])
    #@renderer_classes((JSONRenderer,))
    #def get_schema(self, request, *args, **kwargs):
    #    instance = self.get_object()
@@ -887,7 +885,7 @@ class PhysicalArtifactTypeViewSet(viewsets.ReadOnlyModelViewSet):
            return PhysicalArtifactType.objects.all()
        return PhysicalArtifactType.objects.none()
 
-   @detail_route(methods=['GET',])
+   @action(detail=True, methods=['GET',])
    @renderer_classes((JSONRenderer,))
    def get_schema(self, request, *args, **kwargs):
        instance = self.get_object()

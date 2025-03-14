@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('accounts', '0023_communicationslogentry_log_type'),
+        #('accounts', '0023_communicationslogentry_log_type'),
         ('wildlifecompliance', '0322_auto_20191025_1122'),
     ]
 
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('emailuser_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
                 ('legal_case', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='legal_case_person', to='wildlifecompliance.LegalCase')),
             ],
-            bases=('accounts.emailuser',),
+            #bases=('accounts.emailuser',),
         ),
         migrations.CreateModel(
             name='LegalCaseRunningSheetEntry',

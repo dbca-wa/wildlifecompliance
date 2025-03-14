@@ -3,15 +3,13 @@ from __future__ import unicode_literals
 from datetime import datetime, timedelta
 from django.db import models, transaction
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible
+from six import python_2_unicode_compatible
 # from django.utils import timezone
-from ledger.accounts.models import EmailUser, RevisionedMixin
-from ledger.payments.models import Invoice
-#from commercialoperator.components.proposals.models import Proposal
-#from commercialoperator.components.main.models import Park
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Invoice
+from wildlifecompliance.components.main.models import RevisionedMixin
 # from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome
 from decimal import Decimal as D
-from ledger.checkout.utils import calculate_excl_gst
+from ledger_api_client.utils import calculate_excl_gst
 
 import logging
 logger = logging.getLogger(__name__)
@@ -120,14 +118,15 @@ class InfringementPenalty(Payment):
 
     def __str__(self):
         # return 'Sanction Outcome {} : Invoice {}'.format(self.sanction_outcome, self.infringement_penalty_invoices.last())
-        return 'Sanction Outcome {} : Invoice {}'.format(self.sanction_outcome, self.invoice)
+        #return 'Sanction Outcome {} : Invoice {}'.format(self.sanction_outcome, self.invoice)
+        return 'Sanction Outcome {}'.format(self.sanction_outcome)
 
     class Meta:
         app_label = 'wildlifecompliance'
 
 
 class InfringementPenaltyInvoice(RevisionedMixin):
-    infringement_penalty = models.ForeignKey(InfringementPenalty, related_name='infringement_penalty_invoices')
+    infringement_penalty = models.ForeignKey(InfringementPenalty, related_name='infringement_penalty_invoices', on_delete=models.CASCADE)
     invoice_reference = models.CharField(max_length=50, null=True, blank=True, default='')
 
     def __str__(self):

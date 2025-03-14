@@ -3,10 +3,10 @@ import logging
 import calendar
 import time
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.utils.http import urlquote_plus
+from urllib.parse import quote_plus
 
 from wildlifecompliance import settings
 from wildlifecompliance.exceptions import SecureBaseException
@@ -131,20 +131,18 @@ class SecureAuthorisationEnforcer(SecureBase):
         '''
         from wildlifecompliance.helpers import is_new_to_wildlifelicensing
 
-        if self.request.method == 'GET' and 'api' not in self.request.path \
-                and 'admin' not in self.request.path \
-                and self.request.user.is_authenticated():
+        if (self.request.method == 'GET' and 'api' not in self.request.path
+                and 'admin' not in self.request.path
+                and self.request.user.is_authenticated
+                and 'static' not in request.path
+                and "/ledger-ui/" not in request.get_full_path()):
 
+            path_first_time = '/ledger-ui/accounts-firsttime'
             if is_new_to_wildlifelicensing(self.request):
-                path_ft = reverse('first_time')
-                path_logout = reverse('accounts:logout')
+                path_logout = reverse('logout')
                 self.request.session['new_to_wildlifecompliance'] = True
-                if self.request.path not in (path_ft, path_logout):
-                    return redirect(
-                        reverse('first_time') +
-                        "?next=" +
-                        urlquote_plus(
-                            self.request.get_full_path()))
+                if self.request.path not in (path_first_time, path_logout):
+                    return redirect(path_first_time + "?next=" + quote_plus(request.get_full_path()))
 
 
 class SecurePipe(SecureBase):
@@ -168,7 +166,7 @@ class SecurePipe(SecureBase):
         '''
         0. Check request is from an authenticated user.
         '''
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             self.allow_request = False
             message = '{0} - {1} Not Authenticated.'.format(
                 self,
@@ -252,7 +250,7 @@ class SecurePipe(SecureBase):
         :return: HttpResponse for a client request.
         '''
         import mimetypes
-        from ledger.accounts.models import EmailUser
+        from ledger_api_client.ledger_models import EmailUserRO as EmailUser
         from wildlifecompliance.components.licences.models import (
             WildlifeLicence,
         )

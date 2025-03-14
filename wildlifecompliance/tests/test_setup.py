@@ -1,4 +1,4 @@
-from mixer.backend.django import mixer
+#from mixer.backend.django import mixer
 from django.conf import settings
 from importlib import import_module
 from django.utils import timezone
@@ -6,7 +6,7 @@ from datetime import timedelta
 
 from wildlifecompliance.management.default_data_manager import DefaultDataManager
 #from .models import *
-from ledger.accounts.models import EmailUser, EmailUserManager
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, EmailUserManager
 import random
 import string
 import json, io, os, sys
@@ -18,7 +18,7 @@ from rest_framework.test import (
         RequestsClient,
         )
 from rest_framework import status
-from ledger.accounts.models import EmailUser, Address
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address
 from ledger.address.models import UserAddress
 from requests.auth import HTTPBasicAuth
 from wildlifecompliance.components.call_email.models import (

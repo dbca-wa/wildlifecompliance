@@ -21,6 +21,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='inspection',
             name='organisation_inspected',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='organisation_inspected', to='accounts.Organisation'),
+            #field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='organisation_inspected', to='accounts.Organisation'),
+            field=models.IntegerField(unique=True, verbose_name='Ledger Organisation ID'),
         ),
     ]
