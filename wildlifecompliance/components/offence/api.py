@@ -78,7 +78,6 @@ class OffenceFilterBackend(DatatablesFilterBackend):
             q_objects &= Q(lodgement_number__icontains=search_text) | \
                          Q(identifier__icontains=search_text) | \
                          Q(offender__person_id__in=email_user_ids) 
-                        #TODO fix org search as well
                          #Q(offender__organisation__organisation__name__icontains=search_text) | \
                          #Q(offender__organisation__organisation__abn__icontains=search_text) | \
                          #Q(offender__organisation__organisation__trading_name__icontains=search_text)

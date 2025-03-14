@@ -94,7 +94,6 @@ class SanctionOutcomeFilterBackend(DatatablesFilterBackend):
                          Q(offender__person_id__in=email_user_ids)  | \
                          Q(driver_id__in=email_user_ids) | \
                          Q(registration_holder_id__in=email_user_ids) 
-
                          #Q(offender__organisation__organisation__name__icontains=search_text) | \
                          #Q(offender__organisation__organisation__abn__icontains=search_text) | \
                          #Q(offender__organisation__organisation__trading_name__icontains=search_text)
