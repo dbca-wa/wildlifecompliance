@@ -89,14 +89,15 @@ class FirstTimeDefaultNag(object):
 
             path_first_time = '/ledger-ui/accounts-firsttime'
 
-            print(request.user.first_name,request.user.last_name)
             if (not request.user.first_name) or \
-                    (not request.user.last_name) or \
-                    (not request.user.dob and not request.user.legal_dob) or \
-                    (not request.user.residential_address) or \
-                    (not (
-                        request.user.phone_number or request.user.mobile_number
-                    )):
+                (not request.user.last_name) or \
+                (not request.user.legal_first_name) or \
+                (not request.user.legal_last_name) or \
+                (not request.user.dob and not request.user.legal_dob) or \
+                (not request.user.residential_address) or \
+                (not (
+                    request.user.phone_number or request.user.mobile_number
+                )):
                 path_logout = reverse('logout')
                 request.session['new_to_wildlifecompliance'] = True
                 if request.path not in (path_first_time, path_logout):
