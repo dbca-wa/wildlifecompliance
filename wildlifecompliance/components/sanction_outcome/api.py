@@ -81,12 +81,20 @@ class SanctionOutcomeFilterBackend(DatatablesFilterBackend):
                         'first_name',
                         Value(' '),
                         'last_name'
-                    )
+                    ),
+                    legal_full_name=Concat(
+                        'legal_first_name',
+                        Value(' '),
+                        'legal_last_name'
+                    ),
                 ).filter(
                     Q(email__icontains=search_text) |
                     Q(first_name__icontains=search_text) |
                     Q(last_name__icontains=search_text) |
-                    Q(full_name__icontains=search_text)
+                    Q(full_name__icontains=search_text) |
+                    Q(legal_first_name__icontains=search_text) |
+                    Q(legal_last_name__icontains=search_text) |
+                    Q(legal_full_name__icontains=search_text) 
                 ).values_list('id', flat=True))
 
             q_objects &= Q(lodgement_number__icontains=search_text) | \
