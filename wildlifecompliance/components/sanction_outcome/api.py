@@ -1004,7 +1004,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
 
                 # Create/Retrieve comms log entry
                 comms_log_id = request.data.get('comms_log_id')
-                if comms_log_id and comms_log_id is not 'null':
+                if comms_log_id and comms_log_id != 'null':
                     workflow_entry = instance.comms_logs.get(id=comms_log_id)
                 else:
                     workflow_entry = self.add_comms_log(request, instance, workflow=True)
@@ -1156,7 +1156,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 # instance.endorse_parking_infringement()
 
                 comms_log_id = request.data.get('comms_log_id')
-                if comms_log_id and comms_log_id is not 'null':
+                if comms_log_id and comms_log_id != 'null':
                     workflow_entry = instance.comms_logs.get(id=comms_log_id)
                 # else:
                 #     workflow_entry = self.add_comms_log(request, instance, workflow=True)
@@ -1268,7 +1268,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                     instance = self.get_object()
 
                 comms_log_id = request.data.get('comms_log_id')
-                if comms_log_id and comms_log_id is not 'null':
+                if comms_log_id and comms_log_id != 'null':
                     workflow_entry = instance.comms_logs.get(id=comms_log_id)
                 else:
                     workflow_entry = self.add_comms_log(request, instance, workflow=True)
@@ -1343,7 +1343,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                     instance = self.get_object()
 
                 comms_log_id = request.data.get('comms_log_id')
-                if comms_log_id and comms_log_id is not 'null':
+                if comms_log_id and comms_log_id != 'null':
                     workflow_entry = instance.comms_logs.get(id=comms_log_id)
                 else:
                     workflow_entry = self.add_comms_log(request, instance, workflow=True)

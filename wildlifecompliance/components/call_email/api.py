@@ -746,7 +746,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 #import ipdb; ipdb.set_trace()
                 instance = self.get_object()
                 comms_log_id = request.data.get('call_email_comms_log_id')
-                if comms_log_id and comms_log_id is not 'null':
+                if comms_log_id and comms_log_id != 'null':
                     workflow_entry = instance.comms_logs.get(
                             id=comms_log_id)
                 else:
