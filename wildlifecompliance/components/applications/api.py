@@ -357,11 +357,6 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
                 date_to = datetime.strptime(date_to, '%Y-%m-%d') + timedelta(days=1)
                 queryset = queryset.filter(lodgement_date__lte=date_to)
 
-            #TODO fix (?)
-            #submitter = submitter.lower() if submitter else 'all'
-            #if submitter != 'all':
-            #    queryset = queryset.filter(submitter__email__iexact=submitter)
-
         if queryset.model is Assessment:
             # search_text filter, join all custom search columns
             # where ('searchable: false' in the datatable definition)
@@ -531,10 +526,8 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 proxy_applicant=user) | Q(submitter=user))
         return Application.objects.none()
 
-    #TODO:  this method and others like it should be reviewed - the error handling should be more graceful
     def get_serializer_class(self):
         try:
-            application = self.get_object()
             return ApplicationSerializer
         except serializers.ValidationError:
             print(traceback.print_exc())
@@ -551,7 +544,6 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        #serializer = BaseApplicationSerializer(queryset, many=True, context={'request': request})
         serializer = self.get_serializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 

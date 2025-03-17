@@ -685,7 +685,7 @@ def _log_org_email(email_message, organisation, customer, sender=None):
     else:
         text = smart_bytes(email_message)
         subject = ''
-        to = request.requester.email
+        to = customer.email if customer else None
         fromm = smart_bytes(sender) if sender else SYSTEM_NAME
         all_ccs = ''
 

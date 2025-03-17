@@ -5738,6 +5738,7 @@ class ApplicationSelectedActivity(models.Model):
 
         return is_updated
 
+    #TODO does not appear to be in use
     def store_proposed_attachments(self, proposed_attachments):
         """
         Stores proposed attachments from Temporary Document Collection to the

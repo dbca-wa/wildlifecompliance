@@ -30,6 +30,8 @@ def is_new_to_wildlifelicensing(request=None):
 
     has_user_details = True if ((not request.user.first_name) or 
                 (not request.user.last_name) or 
+                (not request.user.legal_first_name) or
+                (not request.user.legal_last_name) or
                 (not request.user.dob ) or 
                 (not request.user.residential_address) or 
                 (not (
@@ -37,8 +39,6 @@ def is_new_to_wildlifelicensing(request=None):
                 )
                 and (prefer_compliance_management(request)))) else False 
         #and (#request.user.identification2 or TODO
-        #TODO legal name and dob
-        
 
     if not SecureBaseUtils.is_wildlifelicensing_request(request):
         has_user_details = True
@@ -94,10 +94,6 @@ def is_wildlifecompliance_admin(request):
                request.user.is_superuser or
                is_cm_compliance_admin(request) or
                is_cm_licensing_admin(request)
-               #TODO fix
-               #request.user.complianceadmingroup_set.exists() or
-               #request.user.licensingadmingroup_set.exists()
-               #request.user.groups.filter(name__in=['Wildlife Compliance Admin - Licensing', 'Wildlife Compliance Admin - Compliance']).exists()
            )
 
 
@@ -231,7 +227,7 @@ def is_compliance_management_user(request):
             is_compliance_management_callemail_readonly_user(request) or
             is_compliance_management_approved_external_user(request) or
             is_compliance_management_volunteer(request) or
-            is_compliance_internal_user(request) #TODO make sure this is ok
+            is_compliance_internal_user(request) 
             ):
         compliance_user = True
     return compliance_user
