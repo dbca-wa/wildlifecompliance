@@ -102,7 +102,8 @@ from rest_framework_datatables.filters import DatatablesFilterBackend
 from rest_framework_datatables.renderers import DatatablesRenderer
 
 from wildlifecompliance.components.call_email.email import send_mail
-#from wildlifecompliance.components.inspection.serializers import InspectionTypeSerializer
+from django.db.models.functions import Concat
+from django.db.models import Value
 
 
 class CallEmailFilterBackend(DatatablesFilterBackend):
@@ -110,7 +111,7 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
     def filter_queryset(self, request, queryset, view):
         #import ipdb; ipdb.set_trace()
         # Get built-in DRF datatables queryset first to join with search text, then apply additional filters
-        # super_queryset = super(CallEmailFilterBackend, self).filter_queryset(request, queryset, view).distinct()
+        #super_queryset = super(CallEmailFilterBackend, self).filter_queryset(request, queryset, view).distinct()
 
         total_count = queryset.count()
         status_filter = request.GET.get('status_description')
@@ -122,30 +123,39 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
         #TODO replace for loop with queryset filtering
         if search_text:
             search_text = search_text.lower()
-            search_text_callemail_ids = []
-            for call_email in queryset:
-                #lodged_on_str = time.strftime('%d/%m/%Y', call_email.lodged_on)
-                lodged_on_str = call_email.lodged_on.strftime('%d/%m/%Y')
-                if (search_text in (call_email.number.lower() if call_email.number else '')
-                    or search_text in (call_email.status.lower() if call_email.status else '')
-                    or search_text in (call_email.classification.name.lower() if call_email.classification else '')
-                    or search_text in (lodged_on_str.lower() if lodged_on_str else '')
-                    or search_text in (call_email.caller.lower() if call_email.caller else '')
-                    or search_text in (
-                        get_full_name(call_email.assigned_to).lower()
-                        if call_email.assigned_to else ''
-                        )
-                    or search_text in (call_email.wildcare_species_sub_type.species_sub_name 
-                        if call_email.wildcare_species_sub_type else ''
-                        )
-                    ):
-                    search_text_callemail_ids.append(call_email.id)
 
-            # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
-            # (otherwise they will filter on top of each other)
-            #_queryset = queryset.filter(id__in=search_text_callemail_ids).distinct() | super_queryset
-            # BB 20190704 - is super_queryset necessary?
-            queryset = queryset.filter(id__in=search_text_callemail_ids)
+            email_user_ids = list(EmailUser.objects.annotate(
+                    full_name=Concat(
+                        'first_name',
+                        Value(' '),
+                        'last_name'
+                    ),
+                    legal_full_name=Concat(
+                        'legal_first_name',
+                        Value(' '),
+                        'legal_last_name'
+                    ),
+                ).filter(
+                    Q(email__icontains=search_text) |
+                    Q(first_name__icontains=search_text) |
+                    Q(last_name__icontains=search_text) |
+                    Q(full_name__icontains=search_text) |
+                    Q(legal_first_name__icontains=search_text) |
+                    Q(legal_last_name__icontains=search_text) |
+                    Q(legal_full_name__icontains=search_text) 
+                ).values_list('id', flat=True))
+
+            search_text_callemail_ids = list(CallEmail.objects.filter(
+                Q(number__icontains=search_text) |
+                Q(status__icontains=search_text) |
+                Q(classification__name__icontains=search_text) |
+                Q(caller__icontains=search_text) |
+                Q(wildcare_species_sub_type__species_sub_name__icontains=search_text) |
+                Q(assigned_to_id__in=email_user_ids)
+            ).values_list('id', flat=True))
+
+
+            queryset = queryset.filter(id__in=search_text_callemail_ids).distinct() #| super_queryset
 
         status_filter = status_filter.lower() if status_filter else 'all'
         if status_filter != 'all':
