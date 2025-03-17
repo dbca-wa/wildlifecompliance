@@ -154,7 +154,6 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
                 Q(assigned_to_id__in=email_user_ids)
             ).values_list('id', flat=True))
 
-
             queryset = queryset.filter(id__in=search_text_callemail_ids).distinct() #| super_queryset
 
         status_filter = status_filter.lower() if status_filter else 'all'

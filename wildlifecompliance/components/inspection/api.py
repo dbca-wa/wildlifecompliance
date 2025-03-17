@@ -89,6 +89,9 @@ from wildlifecompliance.components.main.utils import (
 from wildlifecompliance.components.inspection.email import (
     send_mail)
 
+from django.db.models.functions import Concat
+from django.db.models import Value
+
 logger = logging.getLogger(__name__)
 
 class InspectionFilterBackend(DatatablesFilterBackend):
@@ -108,27 +111,39 @@ class InspectionFilterBackend(DatatablesFilterBackend):
         #TODO replace for loop with queryset filtering
         if search_text:
             search_text = search_text.lower()
-            search_text_inspection_ids = []
-            for inspection in queryset:
-                #lodged_on_str = time.strftime('%d/%m/%Y', call_email.lodged_on)
-                planned_for_str = inspection.planned_for_date.strftime('%d/%m/%Y') if inspection.planned_for_date else ''
-                if (search_text in (inspection.number.lower() if inspection.number else '')
-                    or search_text in (inspection.status.lower() if inspection.status else '')
-                    or search_text in (inspection.inspection_type.inspection_type.lower() if inspection.inspection_type else '')
-                    or search_text in (planned_for_str.lower() if planned_for_str else '')
-                    or search_text in (inspection.title.lower() if inspection.title else '')
-                    or search_text in (
-                        get_full_name(inspection.assigned_to).lower()
-                        if inspection.assigned_to else ''
-                        )
-                    ):
-                    search_text_inspection_ids.append(inspection.id)
 
-            # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
-            # (otherwise they will filter on top of each other)
-            #_queryset = queryset.filter(id__in=search_text_callemail_ids).distinct() | super_queryset
-            # BB 20190704 - is super_queryset necessary?
-            queryset = queryset.filter(id__in=search_text_inspection_ids)
+            email_user_ids = list(EmailUser.objects.annotate(
+                    full_name=Concat(
+                        'first_name',
+                        Value(' '),
+                        'last_name'
+                    ),
+                    legal_full_name=Concat(
+                        'legal_first_name',
+                        Value(' '),
+                        'legal_last_name'
+                    ),
+                ).filter(
+                    Q(email__icontains=search_text) |
+                    Q(first_name__icontains=search_text) |
+                    Q(last_name__icontains=search_text) |
+                    Q(full_name__icontains=search_text) |
+                    Q(legal_first_name__icontains=search_text) |
+                    Q(legal_last_name__icontains=search_text) |
+                    Q(legal_full_name__icontains=search_text) 
+                ).values_list('id', flat=True))
+            
+
+            search_text_inspection_ids = list(Inspection.objects.filter(
+                Q(number__icontains=search_text) |
+                Q(status__icontains=search_text) |
+                Q(inspection_type__inspection_type__icontains=search_text) |
+                Q(title__icontains=search_text) |
+                Q(assigned_to_id__in=email_user_ids) |
+                Q(inspection_team_lead__in=email_user_ids)
+            ).values_list('id', flat=True))
+
+            queryset = queryset.filter(id__in=search_text_inspection_ids).distinct() #| super_queryset
 
         status_filter = status_filter.lower() if status_filter else 'all'
         if status_filter != 'all':
