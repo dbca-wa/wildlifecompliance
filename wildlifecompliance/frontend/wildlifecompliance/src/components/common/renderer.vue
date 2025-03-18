@@ -48,7 +48,6 @@
 
 
 <script>
-import Vue from 'vue';
 import { mapActions, mapGetters } from 'vuex';
 import AmendmentRequestDetails from '@/components/forms/amendment_request_details.vue';
 import '@/scss/forms/form.scss';

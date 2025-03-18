@@ -31,7 +31,6 @@
 <script>
 
 import moment from 'moment';
-import datetimepicker from 'datetimepicker';
 import CommentBlock from './comment_block.vue';
 import HelpText from './help_text.vue';
 import HelpTextUrl from './help_text_url.vue';

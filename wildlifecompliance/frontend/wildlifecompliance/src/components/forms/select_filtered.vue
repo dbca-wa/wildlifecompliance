@@ -51,7 +51,6 @@ search and calls the server api with a filtered_list_url.
 </template>
 
 <script>
-import Vue from 'vue';
 import { mapActions, mapGetters } from 'vuex';
 import HelpText from './help_text.vue';
 import HelpTextUrl from './help_text_url.vue';

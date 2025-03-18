@@ -270,7 +270,6 @@
 </template>
 <script>
 import Application from '../../form.vue';
-import Vue from 'vue';
 import modal from '@vue-utils/bootstrap-modal.vue'
 import { mapActions, mapGetters } from 'vuex'
 import ApplicationAssessments from './application_assessments.vue';

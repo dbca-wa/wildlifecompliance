@@ -109,7 +109,6 @@
 </template>
 <script>
 import Application from '../../form.vue';
-import Vue from 'vue';
 import modal from '@vue-utils/bootstrap-modal.vue'
 import datatable from '@vue-utils/datatable.vue';
 import { mapActions, mapGetters } from 'vuex'

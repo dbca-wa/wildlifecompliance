@@ -78,7 +78,6 @@
 import datatable from '@/utils/vue/datatable.vue'
 require("select2/dist/css/select2.min.css");
 require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
-import Vue from 'vue';
 import { mapActions, mapGetters } from 'vuex'
 import {
     api_endpoints,

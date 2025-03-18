@@ -658,7 +658,6 @@
 </template>
 <script>
 import Application from '../../form.vue';
-import Vue from 'vue';
 import { mapActions, mapGetters } from 'vuex'
 import ProposedDecline from './application_proposed_decline.vue';
 import AmendmentRequest from './amendment_request.vue';
