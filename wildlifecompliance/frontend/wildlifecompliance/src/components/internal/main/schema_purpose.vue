@@ -321,7 +321,7 @@ export default {
 
                 }).then(async (result) => {
 
-                    if (result.value) {
+                    if (result) {
 
                         await self.$http.delete(helpers.add_endpoint_json(api_endpoints.schema_purpose,(self.sectionPurpose.id+'/delete_purpose')))
     

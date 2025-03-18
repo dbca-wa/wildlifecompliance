@@ -339,7 +339,7 @@ export default {
             confirmButtonText: 'Submit'
 
         }).then( async (result) => {
-            if (result.value) {
+            if (result) {
                 let is_submitting = true
                 let is_saved = await this.save_form(is_submitting);
                 if (is_saved) {
@@ -394,7 +394,7 @@ export default {
             confirmButtonText: 'Submit'
 
         }).then(async (result) => {
-            if (result.value) {
+            if (result) {
               let is_submitting = true;
               let is_saved = await vm.save_form(is_submitting);
 
@@ -452,7 +452,7 @@ export default {
             showCancelButton: true,
             confirmButtonText: 'Submit'
         }).then(async (result) => {
-            if (result.value) {
+            if (result) {
               let is_submitting = true;
               let is_saved = await this.save_form(is_submitting)
               

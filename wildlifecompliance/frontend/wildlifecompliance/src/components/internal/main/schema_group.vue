@@ -395,7 +395,7 @@ export default {
 
                 }).then(async (result) => {
 
-                    if (result.value) {
+                    if (result) {
 
                         await self.$http.delete(helpers.add_endpoint_json(api_endpoints.schema_group,(self.sectionGroup.id+'/delete_group')))
     

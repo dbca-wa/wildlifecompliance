@@ -409,7 +409,7 @@ export default {
             showCancelButton: true,
             confirmButtonText: 'Accept'
         }).then((result) => {
-            if (result.value) {
+            if (result) {
                 vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/accept')))
                 .then((response) => {
                     swal({
@@ -443,7 +443,7 @@ export default {
             showCancelButton: true,
             confirmButtonText: 'Send Request'
         }).then((result) => {
-            if (result.value) {
+            if (result) {
                 vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result.value)))
                 .then((response) => {
                     swal({
@@ -475,7 +475,7 @@ export default {
             showCancelButton: true,
             confirmButtonText: 'Accept'
         }).then((result) => {
-            if (result.value) {
+            if (result) {
                 vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/decline')))
                 .then((response) => {
                     swal({

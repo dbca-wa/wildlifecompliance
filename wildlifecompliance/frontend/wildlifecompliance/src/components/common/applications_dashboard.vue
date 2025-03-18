@@ -563,7 +563,7 @@ export default {
                 confirmButtonText: 'Discard Application',
                 confirmButtonColor:'#d9534f'
             }).then((result) => {
-                if (result.value) {
+                if (result) {
                     vm.$http.delete(api_endpoints.discard_application(application_id))
                     .then((response) => {
                         swal(

@@ -844,7 +844,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/make_admin_user'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
@@ -890,7 +890,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/make_user'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
@@ -946,7 +946,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/suspend_user'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
@@ -1001,7 +1001,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/reinstate_user'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
@@ -1047,7 +1047,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/relink_user'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
@@ -1093,7 +1093,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/make_consultant'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
@@ -1202,7 +1202,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then((result) => {
-                if (result.value) {
+                if (result) {
                     vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'),{'user':person.id},{
                         emulateJSON:true
                     }).then((response) => {

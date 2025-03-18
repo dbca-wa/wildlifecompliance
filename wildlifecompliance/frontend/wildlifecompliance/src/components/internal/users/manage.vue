@@ -525,7 +525,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then((result) => {
-                if (result.value) {
+                if (result) {
                     vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'),JSON.stringify(vm.user),{
                         emulateJSON:true
                     }).then((response) => {

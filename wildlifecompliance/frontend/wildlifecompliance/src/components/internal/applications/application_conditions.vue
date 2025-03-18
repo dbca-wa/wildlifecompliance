@@ -290,7 +290,7 @@ export default {
                 confirmButtonText: 'Remove Condition',
                 confirmButtonColor:'#d9534f'
             }).then((result) => {
-                if (result.value) {
+                if (result) {
                     vm.$http.delete(helpers.add_endpoint_json(api_endpoints.application_conditions,_id+'/delete'))
                     .then((response) => {
                         vm.$refs.conditions_datatable.vmDataTable.ajax.reload();
