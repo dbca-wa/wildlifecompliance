@@ -121,25 +121,25 @@ class OrganisationAdminForm(ModelForm):
 #        self.helper.add_input(Submit('confirm', 'Confirm', css_class='btn-lg'))
 #        self.helper.add_input(Submit('cancel', 'Cancel'))
 
-
-class UnlinkDelegateForm(ModelForm):
-
-    class Meta:
-        model = Organisation
-        exclude = [
-            'name',
-            'abn',
-            'identification',
-            'postal_address',
-            'billing_address',
-            'delegates']
-
-    def __init__(self, *args, **kwargs):
-        super(UnlinkDelegateForm, self).__init__(*args, **kwargs)
-        self.helper = BaseFormHelper(self)
-        self.helper.add_input(
-            Submit(
-                'unlink',
-                'Unlink user',
-                css_class='btn-lg btn-danger'))
-        self.helper.add_input(Submit('cancel', 'Cancel'))
+#TODO does not appear to be in use
+#class UnlinkDelegateForm(ModelForm):
+#
+#    class Meta:
+#        model = Organisation
+#        exclude = [
+#            'name',
+#            'abn',
+#            'identification',
+#            'postal_address',
+#            'billing_address',
+#            'delegates']
+#
+#    def __init__(self, *args, **kwargs):
+#        super(UnlinkDelegateForm, self).__init__(*args, **kwargs)
+#        self.helper = BaseFormHelper(self)
+#        self.helper.add_input(
+#            Submit(
+#                'unlink',
+#                'Unlink user',
+#                css_class='btn-lg btn-danger'))
+#        self.helper.add_input(Submit('cancel', 'Cancel'))

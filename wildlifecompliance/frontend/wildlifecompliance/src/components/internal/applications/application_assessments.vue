@@ -109,13 +109,12 @@
 </template>
 <script>
 import Application from '../../form.vue';
-import Vue from 'vue';
 import modal from '@vue-utils/bootstrap-modal.vue'
 import datatable from '@vue-utils/datatable.vue';
 import { mapActions, mapGetters } from 'vuex'
 import Conditions from './application_conditions.vue';
 import SendToAssessor from './application_send_assessor.vue';
-import ResponsiveDatatablesHelper from "@/utils/responsive_datatable_helper.js";
+
 import {
     api_endpoints,
     helpers

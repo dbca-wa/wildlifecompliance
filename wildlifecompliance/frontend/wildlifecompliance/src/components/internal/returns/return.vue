@@ -94,7 +94,6 @@ import ReturnQuestion from '../../external/returns/enter_return_question.vue'
 import ReturnSheet from '../../external/returns/enter_return_sheet.vue'
 import ReturnData from '../../external/returns/enter_return.vue'
 import CommsLogs from '@common-components/comms_logs.vue'
-import ResponsiveDatatablesHelper from "@/utils/responsive_datatable_helper.js"
 import {
   api_endpoints,
   helpers
@@ -112,8 +111,6 @@ export default {
     return {
         pdBody: 'pdBody' + vm._uid,
         panelClickersInitialised: false,
-        // TODO: check if still required.
-        assignTo: false,
         loading: [],
         spinner: false,
         spinner_exit: false,

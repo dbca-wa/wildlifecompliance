@@ -305,8 +305,8 @@ urlpatterns = [
 
     re_path(r'^securebase-view/',views.SecureBaseView.as_view(), name='securebase-view'),
     re_path(r'^api/person_org_lookup$', users_api.GetPersonOrg.as_view(), name='get-person-org'),
-    re_path(r'^ledger-private/identification/(?P<emailuser_id>\d+)', views.getLedgerIdentificationFile, name='view_ledger_identification_file'),
-    re_path(r'^ledger-private/senior-card/(?P<emailuser_id>\d+)', views.getLedgerSeniorCardFile, name='view_ledger_senior_card_file'),
+    #re_path(r'^ledger-private/identification/(?P<emailuser_id>\d+)', views.getLedgerIdentificationFile, name='view_ledger_identification_file'),
+    #re_path(r'^ledger-private/senior-card/(?P<emailuser_id>\d+)', views.getLedgerSeniorCardFile, name='view_ledger_senior_card_file'),
 
     re_path(r'^private-media/', views.getPrivateFile, name='view_private_file'),
     re_path(r'infringement/', views.InfringementView.as_view(), name='wc_infringement'),

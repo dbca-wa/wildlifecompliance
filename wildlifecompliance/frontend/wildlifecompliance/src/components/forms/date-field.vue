@@ -31,7 +31,6 @@
 <script>
 
 import moment from 'moment';
-import datetimepicker from 'datetimepicker';
 import CommentBlock from './comment_block.vue';
 import HelpText from './help_text.vue';
 import HelpTextUrl from './help_text_url.vue';
@@ -49,10 +48,6 @@ export default {
             'canViewDeficiencies',
             'canEditDeficiencies',
         ]),
-        isChecked: function() {
-            //TODO return value from database
-            return false;
-        },
         options: function() {
         return JSON.stringify(this.conditions);
         },

@@ -15,6 +15,7 @@ ENV SITE_PREFIX='wls-uat'
 ENV SITE_DOMAIN='dbca.wa.gov.au'
 ENV OSCAR_SHOP_NAME='Department of Biodiversity, Conservation and Attractions'
 ENV BPAY_ALLOWED=False
+ENV NODE_MAJOR=20
 
 # For app.js, manifest.js, vendor.js versioning (default value set to 0.0.0)
 ARG build_tag=0.0.0
@@ -36,7 +37,7 @@ RUN apt-get upgrade -y
 # RUN pip install --upgrade pip
 # RUN apt-get install -yq vim
 
-RUN apt-get install --no-install-recommends -y wget git libmagic-dev gcc \
+RUN apt-get install --no-install-recommends -y curl wget git libmagic-dev gcc \
     binutils libproj-dev gdal-bin python3-setuptools python3-pip tzdata cron \
     rsyslog gunicorn libreoffice
 RUN apt-get install --no-install-recommends -y libpq-dev patch
@@ -50,6 +51,13 @@ RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt-get update
 RUN apt-get install --no-install-recommends -y python3.12 python3.12-dev
 RUN apt-get install --no-install-recommends -y graphviz libgraphviz-dev pkg-config
+
+RUN mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" \
+    | tee /etc/apt/sources.list.d/nodesource.list && \
+    apt-get update && \
+    apt-get install -y nodejs
 
 RUN ln -s /usr/bin/python3.12 /usr/bin/python 
     # ln -s /usr/bin/pip3 /usr/bin/pip

@@ -154,10 +154,6 @@ export default {
             var vm = this;
             return vm.errors;
         },
-        title: function(){
-        // TODO: application processing status doesnt have with approver anymore, need to review
-            return this.processing_status.id == 'with_approver' ? 'Issue Comms' : 'Propose to issue licence';
-        }
     },
     methods:{
         ok:function () {

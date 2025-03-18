@@ -65,7 +65,6 @@
      </div>
 </template>
 <script>
-import datetimepicker from 'datetimepicker';
 import HelpText from './help_text.vue'
 import HelpTextUrl from './help_text_url.vue'
 import CommentBlock from './comment_block.vue';

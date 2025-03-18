@@ -175,10 +175,6 @@ class AllegedOffenceSerializer(serializers.ModelSerializer):
             )
         ]
 
-    def validate(self, data):
-        # TODO: Add object level validation here if needed
-        return data
-
 
 class AllegedCommittedOffenceCreateSerializer(serializers.ModelSerializer):
     alleged_offence_id = serializers.IntegerField(write_only=True,)
@@ -211,11 +207,6 @@ class AllegedCommittedOffenceCreateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError('Sanction outcome has been issued for the alleged offence: {} - {}'.format(
                     alleged_offence.section_regulation.act,
                     alleged_offence.section_regulation.name))
-
-        # if acos.count():
-        #     # TODO:
-        #     ao = acos.first().alleged_offence
-        #     raise serializers.ValidationError('Alleged offence: %s is duplicated' % ao)
 
         return data
 
@@ -515,9 +506,9 @@ class SanctionOutcomeDatatableSerializer(serializers.ModelSerializer):
         view_payment_url = '<a href="/ledger/payments/invoice/payment?invoice=' + inv_ref + '">View Payment</a>' if inv_ref else ''
         cc_payment_url = '<a href="#" data-pay-infringement-penalty="' + str(obj.id) + '">Pay</a>'
         
-        #TODO fix
-        record_payment_url = ''#'<a href="' + reverse('invoice-payment') + '?invoice={}'.format(inv_ref) + '">Record Payment</a>' if inv_ref \
-            #else '<a href="' + reverse('preview_deferred_invoicing', kwargs={'sanction_outcome_pk': obj.id}) + '">Record Payment</a>'
+        #TODO fix or remove
+        record_payment_url = '' #'<a href="/ledger/payments/invoice/payment?invoice=' + inv_ref + '">Record Payment</a>' if inv_ref \
+        #    else '<a href="' + reverse('preview_deferred_invoicing', kwargs={'sanction_outcome_pk': obj.id}) + '">Record Payment</a>'
 
         if user == obj.get_offender()[0]:
             # If offender

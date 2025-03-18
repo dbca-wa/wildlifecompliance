@@ -627,39 +627,6 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
         """
         return super(SanctionOutcomeViewSet, self).retrieve(request, *args, **kwargs)
 
-    #TODO: This function needs to be reviewed and uncommented - it may also be redundant
-    #alternatively, use the SanctionOutcome get_compliance_permission_group method if the outcome is to be the same
-
-    # def get_allocated_group(self, workflow_type, region_id, district_id):
-    #    """
-    #    Determine which ComplianceManagementSystemGroup this sanction outcome should belong to
-    #    :param region_id and district_id sanction outcome is in
-    #    :param workflow_type: string like 'send_to_manager', 'return_to_officer', ...
-    #    :return: ComplianceManagementSystemGroup quersyet
-
-    #    """
-    #    codename = 'Officer'
-    #    if workflow_type == SanctionOutcome.WORKFLOW_SEND_TO_MANAGER:
-    #        codename = 'Manager'
-    #    elif workflow_type == SanctionOutcome.WORKFLOW_DECLINE:
-    #        codename = '---'
-    #    elif workflow_type == SanctionOutcome.WORKFLOW_ENDORSE:
-    #        codename = 'Infringement Notice Coordinator'
-    #    elif workflow_type == SanctionOutcome.WORKFLOW_RETURN_TO_OFFICER:
-    #        codename = 'Officer'
-    #    elif workflow_type == SanctionOutcome.WORKFLOW_WITHDRAW:
-    #        codename = '---'
-    #    elif workflow_type == SanctionOutcome.WORKFLOW_CLOSE:
-    #        codename = '---'
-    #    else:
-    #        # Should not reach here
-    #        # instance.save()
-    #        pass
-
-    #    group = ComplianceManagementSystemGroup.objects.get(workflow_type=codename, region_id=region_id, district_id=district_id)
-
-    #    return group
-
     @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def update_assigned_to_id(self, request, *args, **kwargs):

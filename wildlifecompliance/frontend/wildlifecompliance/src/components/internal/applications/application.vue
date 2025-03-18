@@ -283,7 +283,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-12">
+                    <!--<div class="col-md-12">
                         <div class="row">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
@@ -325,7 +325,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                     <div class="col-md-12">
                         <div class="row">
                             <div class="panel panel-default">
@@ -658,7 +658,6 @@
 </template>
 <script>
 import Application from '../../form.vue';
-import Vue from 'vue';
 import { mapActions, mapGetters } from 'vuex'
 import ProposedDecline from './application_proposed_decline.vue';
 import AmendmentRequest from './amendment_request.vue';
@@ -669,7 +668,6 @@ import IssueLicence from './application_issuance.vue';
 import CommsLogs from '@common-components/comms_logs.vue';
 import AmendmentRequestDetails from '@/components/forms/amendment_request_details.vue';
 import SecureBaseLink from '@common-components/securebase_link.vue';
-import ResponsiveDatatablesHelper from "@/utils/responsive_datatable_helper.js";
 import {
     api_endpoints,
     helpers
@@ -1268,7 +1266,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result.value) {
+                if (result) {
                     await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_id_check')))
                     .then((response) => {
                         vm.setIdCheckStatus(response.body.id_check_status);
@@ -1288,7 +1286,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result.value) {
+                if (result) {
                     await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_id_check')))
                     .then((response) => {
                         vm.setIdCheckStatus(response.body.id_check_status);
@@ -1308,7 +1306,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result.value) {
+                if (result) {
                     await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/request_id_check')))
                     .then((response) => {
                         vm.setIdCheckStatus(response.body.id_check_status);
@@ -1328,7 +1326,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result.value) {
+                if (result) {
                     await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_character_check')))
                     .then((response) => {
                         vm.setCharacterCheckStatus(response.body.character_check_status);
@@ -1348,7 +1346,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result.value) {
+                if (result) {
                     await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_character_check')))
                     .then((response) => {
                         vm.setCharacterCheckStatus(response.body.character_check_status);
@@ -1368,7 +1366,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result.value) {
+                if (result) {
                     await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_return_check')))
                     .then((response) => {
                         vm.setReturnCheckStatus(response.body.return_check_status);
@@ -1388,7 +1386,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result.value) {
+                if (result) {
                     await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_return_check')))
                     .then((response) => {
                         vm.setReturnCheckStatus(response.body.return_check_status);

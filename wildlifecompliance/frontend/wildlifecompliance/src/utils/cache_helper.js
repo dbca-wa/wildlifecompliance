@@ -5,7 +5,7 @@ import Vue from 'vue';
  * Functions below are named after 'Cache' but no cache functionality is used.
  * On the firefox, cache fanctionality doesn't work very well, therefore it has been removed
  */
-module.exports = {
+export default {
     getSetCache: async (store_name, key, url, expiry) => {
         const returnedFromUrl = await Vue.http.get(url);
         return returnedFromUrl.body

@@ -128,7 +128,6 @@
 import Vue from 'vue'
 import datatable from '@vue-utils/datatable.vue'
 import CommsLogs from '@common-components/comms_logs.vue'
-import ResponsiveDatatablesHelper from "@/utils/responsive_datatable_helper.js"
 import {
   api_endpoints,
   helpers
@@ -259,11 +258,6 @@ export default {
 
                         return result;
                     },
-                    'createdCell': function (cell) {
-                        //TODO why this is not working?
-                        // the call to popover is done in the 'draw' event
-                        $(cell).popover();
-                    }
                 },
                 {
                     title: 'Documents',
@@ -415,7 +409,7 @@ export default {
             showCancelButton: true,
             confirmButtonText: 'Accept'
         }).then((result) => {
-            if (result.value) {
+            if (result) {
                 vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/accept')))
                 .then((response) => {
                     swal({
@@ -449,7 +443,7 @@ export default {
             showCancelButton: true,
             confirmButtonText: 'Send Request'
         }).then((result) => {
-            if (result.value) {
+            if (result) {
                 vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result.value)))
                 .then((response) => {
                     swal({
@@ -481,7 +475,7 @@ export default {
             showCancelButton: true,
             confirmButtonText: 'Accept'
         }).then((result) => {
-            if (result.value) {
+            if (result) {
                 vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/decline')))
                 .then((response) => {
                     swal({

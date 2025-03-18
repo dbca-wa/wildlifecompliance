@@ -304,7 +304,8 @@ export default {
                 if (this.personOrgEntity && this.personOrgEntity.entity_type === 'user') {
                     window.location.replace("/internal/users/" + this.personOrgEntity.id);
                 } else if (this.personOrgEntity && this.personOrgEntity.entity_type === 'org') {
-                    window.location.replace("/internal/organisations/" + this.personOrgEntity.id);
+                    //TODO remove /access/ when we are able to acquire the actual org id (not the request id)
+                    window.location.replace("/internal/organisations/access/" + this.personOrgEntity.id);
                 }
             });
 

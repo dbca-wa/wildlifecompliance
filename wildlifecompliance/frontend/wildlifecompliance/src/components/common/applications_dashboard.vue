@@ -78,7 +78,6 @@
 import datatable from '@/utils/vue/datatable.vue'
 require("select2/dist/css/select2.min.css");
 require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
-import Vue from 'vue';
 import { mapActions, mapGetters } from 'vuex'
 import {
     api_endpoints,
@@ -139,7 +138,7 @@ export default {
             {
                 data: "submitter",
                 visible: false,
-                searchable: false, //TODO backend searching
+                searchable: false,
                 orderable: false,
                 className: "normal-white-space",
                 name: "submitter__first_name, submitter__last_name, submitter__email",
@@ -249,7 +248,7 @@ export default {
             {
                 data: "submitter",
                 visible: false,
-                searchable: false, //TODO backend searching
+                searchable: false,
                 orderable: false,
                 name: "submitter__first_name, submitter__last_name, submitter__email",
                 mRender:function (data,type,full) {
@@ -564,7 +563,7 @@ export default {
                 confirmButtonText: 'Discard Application',
                 confirmButtonColor:'#d9534f'
             }).then((result) => {
-                if (result.value) {
+                if (result) {
                     vm.$http.delete(api_endpoints.discard_application(application_id))
                     .then((response) => {
                         swal(
@@ -703,7 +702,7 @@ export default {
                             <tr>
                                 <td>${activity['activity_name_str']}</td>
                                 
-                                <td>${activity['activity_purpose_names_status']['name_string'].
+                                <td>${vm.is_external ? '' : activity['activity_purpose_names_status']['name_string'].
                                     replace(/(?:\r\n|\r|\n|,)/g, '<br>')}</td>
                                 ${vm.is_external ? '' : activity['officer_name'] == null ?  `<td>&nbsp;</td>`: `<td>${activity['officer_name']}</td>`}    
     

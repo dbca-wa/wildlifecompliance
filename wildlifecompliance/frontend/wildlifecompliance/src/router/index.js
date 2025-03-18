@@ -22,33 +22,6 @@ const router = new Router({
           name: 'account',
           component: MyUserDetails
         },
-        //TODO replace/remove
-        /*{
-          path: '/profiles',
-          component: {
-              render(c)
-              {
-                  return c('router-view')
-              }
-          },
-          children: [
-              {
-                  path: '/',
-                  component: ProfileDashTable,
-                  name:"profiles-dash"
-              },
-              {
-                  path: 'create',
-                  component: CreateProfile,
-                  name:"profile-create"
-              },
-              {
-                  path: ':profile_id',
-                  component: EditProfile,
-                  name:"profile-detail"
-              },
-          ]
-        },*/
         external_routes,
         internal_routes
     ]

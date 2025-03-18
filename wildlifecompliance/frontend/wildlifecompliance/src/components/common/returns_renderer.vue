@@ -25,7 +25,6 @@
 
 
 <script>
-import Vue from 'vue';
 import MenuAccess from '../internal/returns/access.vue';
 import { mapActions, mapGetters } from 'vuex';
 import CommsLogs from '@common-components/comms_logs.vue'

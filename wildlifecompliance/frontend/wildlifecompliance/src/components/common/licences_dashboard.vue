@@ -366,7 +366,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         vm.setApplyLicenceSelect({licence_select: 'new_activity'});
                         var licence_no = $(this).attr('licence-id');
                         var licence_category_id = $(this).attr('licence-category-id');
@@ -388,7 +388,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         vm.setApplyLicenceSelect({licence_select: 'amend_activity'});
                         var licence_no = $(this).attr('licence-id');
                         var licence_category_id = $(this).attr('licence-category-id');
@@ -410,7 +410,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         vm.setApplyLicenceSelect({licence_select: 'amend_activity'});
                         var licence_no = $(this).attr('licence-id');
                         var licence_category_id = $(this).attr('licence-category-id');
@@ -435,7 +435,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         vm.setApplyLicenceSelect({licence_select: 'renew_activity'});
                         var licence_no = $(this).attr('licence-id');
                         var licence_category_id = $(this).attr('licence-category-id');
@@ -457,7 +457,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         vm.setApplyLicenceSelect({licence_select: 'renew_activity'});
                         var licence_no = $(this).attr('licence-id');
                         var licence_category_id = $(this).attr('licence-category-id');
@@ -482,7 +482,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         var licence_activity_id = $(this).attr('reactivate-renew-purposes');
                         var licence_id = $(this).attr('lic-id');
                         vm.licence_action = 'reactivate-renew';
@@ -516,7 +516,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         var licence_id = $(this).attr('surrender-licence');
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/surrender_licence')).then((response)=>{
                                 swal(
@@ -546,7 +546,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         var licence_activity_id = $(this).attr('surrender-purposes');
                         var licence_id = $(this).attr('lic-id');
                         vm.licence_action = 'surrender';
@@ -600,7 +600,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         var licence_id = $(this).attr('cancel-licence');
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/cancel_licence')).then((response)=>{
                                 swal(
@@ -630,7 +630,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         var licence_activity_id = $(this).attr('cancel-purposes');
                         var licence_id = $(this).attr('lic-id');
                         vm.licence_action = 'cancel';
@@ -683,7 +683,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         var licence_id = $(this).attr('suspend-licence');
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/suspend_licence')).then((response)=>{
                                 swal(
@@ -713,7 +713,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         var licence_activity_id = $(this).attr('suspend-purposes');
                         var licence_id = $(this).attr('lic-id');
                         vm.licence_action = 'suspend';
@@ -767,7 +767,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         vm.setApplyLicenceSelect({licence_select: 'reissue_activity'});
                         var licence_category_id = $(this).attr('licence-category-id');
                         var licence_activity_id = null;
@@ -787,7 +787,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         var licence_activity_id = $(this).attr('reissue-activity');
                         var licence_id = $(this).attr('lic-id');
                         vm.licence_action = 'reissue';
@@ -842,7 +842,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         var licence_id = $(this).attr('reinstate-licence');
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/reinstate_licence')).then((response)=>{
                                 swal(
@@ -872,7 +872,7 @@ export default {
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result.value) {
+                    if (result) {
                         var licence_activity_id = $(this).attr('reinstate-purposes');
                         var licence_id = $(this).attr('lic-id');
                         vm.licence_action = 'reinstate';

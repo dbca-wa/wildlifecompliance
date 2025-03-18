@@ -221,16 +221,8 @@
 	-->
 
         {% if not dev %}
-            <script type="text/javascript" src="https://static.dbca.wa.gov.au/static/libs/jquery/3.3.1/jquery.min.js"></script>
-	        <script type="text/javascript" src="{% static 'wildlifecompliance_vue/js/manifest.js' %}?v={{RAND_HASH}}"></script>
-	        <script type="text/javascript" src="{% static 'wildlifecompliance_vue/js/vendor.js' %}?v={{RAND_HASH}}"></script>
-    
-            {% if app_build_url %}
-	        <script type="text/javascript" src="{{ app_build_url }}?v={{RAND_HASH}}"></script>
-            {% else %}
-                <!--script type="text/javascript" charset="utf-8" src="{% static 'wildlifecompliance_vue/js/app.js' %}"></script-->
-	        <script type="text/javascript" src="{% static 'wildlifecompliance_vue/js/app.js' %}?v={{RAND_HASH}}"></script>
-            {% endif %}
+            <script type="text/javascript" src="{% static 'wildlifecompliance_vue/js/chunk-vendors.js' %}?v={{RAND_HASH}}"></script>
+            <script type="text/javascript" src="{% static 'wildlifecompliance_vue/js/app.js' %}?v={{RAND_HASH}}"></script>
         {% else %}
             <!--script type="text/javascript" charset="utf-8" src="{{ dev_url }}"></script-->
             <script type="text/javascript" src="{{ dev_url }}"></script>

@@ -282,7 +282,7 @@ export default {
         //            showCancelButton: true,
         //            confirmButtonText: 'Accept'
         //        }).then((result) => {
-        //            if (result.value) {
+        //            if (result) {
         //                vm.deleteContact(id);
         //            }
         //        },(error) => {

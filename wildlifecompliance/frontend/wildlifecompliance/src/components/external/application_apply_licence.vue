@@ -242,10 +242,12 @@ export default {
             showCancelButton: true,
             confirmButtonText: 'Accept'
         }).then((result) => {
-            if (result.value) {
+            console.log(result)
+            if (result) {
                vm.createApplication();
             }
         },(error) => {
+            console.log(error)
             vm.spinner = false;
         });
         vm.spinner = false;

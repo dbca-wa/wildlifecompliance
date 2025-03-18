@@ -323,7 +323,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import "awesomplete/awesomplete.css";
 import RelatedItems from "@common-components/related_items.vue";
 import moment from 'moment';
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import hash from 'object-hash';
 
 export default {
@@ -1176,7 +1176,7 @@ export default {
                         organisation: null,
                         number_linked_sanction_outcomes_total: 0,
                         number_linked_sanction_outcomes_active: 0,
-                        uuid: uuid()
+                        uuid: uuidv4()
                     };
                     if (this.current_offender.data_type == 'individual'){
                         // Add person as offender object
