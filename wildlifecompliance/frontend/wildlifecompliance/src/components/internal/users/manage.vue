@@ -1,20 +1,11 @@
 <template>
     <div class="container" id="internalUserInfo">
-    <!-- <div class="row"> -->
-    <!-- <div class="col-md-10 col-md-offset-1"> -->
         <div class="row">
             <div class="col-md-9">
                 <h3>{{ user.first_name }} {{ user.last_name  }} - {{ user.dob }} ({{ user.email }})</h3>
             </div>
         </div>
-
-            <!-- TODO replace/remove
-            <div class="col-md-3">
-                <CommsLogs :comms_url="comms_url" :logs_url="logs_url" comms_add_url="test"/>
-            </div>
-            -->
             <div class="col-md-9">
-                <!--ul class="nav nav-tabs"-->
                 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link active" id="pills-details-tab" data-toggle="pill" href="#pills-details" role="tab" aria-controls="pills-details" aria-selected="true">
@@ -34,8 +25,6 @@
                 </ul>
                 <div class="tab-content" id="pills-tabContent">
                   <div class="tab-pane fade" id="pills-details" role="tabpanel" aria-labelledby="pills-details-tab">
-                <!--div class="tab-content">
-                    <div :id="dTab" class="tab-pane fade in active"-->
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="panel panel-default">

@@ -112,8 +112,6 @@ export default {
     return {
         pdBody: 'pdBody' + vm._uid,
         panelClickersInitialised: false,
-        // TODO: check if still required.
-        assignTo: false,
         loading: [],
         spinner: false,
         spinner_exit: false,

@@ -464,9 +464,15 @@ class OrganisationActionSerializer(serializers.ModelSerializer):
 
 
 class OrganisationRequestCommsSerializer(serializers.ModelSerializer):
+    documents = serializers.SerializerMethodField()
+
     class Meta:
         model = OrganisationRequestLogEntry
         fields = '__all__'
+    
+    #NOTE: adding this was simpler than modifying the template, and it may be required later
+    def get_documents(self, obj):
+        return []
 
 
 class OrganisationCommsSerializer(serializers.ModelSerializer):

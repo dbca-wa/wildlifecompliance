@@ -49,10 +49,6 @@ export default {
             'canViewDeficiencies',
             'canEditDeficiencies',
         ]),
-        isChecked: function() {
-            //TODO return value from database
-            return false;
-        },
         options: function() {
         return JSON.stringify(this.conditions);
         },

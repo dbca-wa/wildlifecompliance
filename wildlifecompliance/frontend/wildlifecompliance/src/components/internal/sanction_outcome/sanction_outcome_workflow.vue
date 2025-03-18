@@ -128,27 +128,6 @@ export default {
                 return null;
             }
       },
-    //   groupPermission: function() {
-    //       if (!this.workflow_type) {
-    //           return "";  // TODO: make sure if this is correct
-    //       } else if (this.workflow_type === 'send_to_manager') {
-    //           return "manager";
-    //       } else if (this.workflow_type === 'return_to_officer') {
-    //           return "officer";
-    //       } else if (this.workflow_type === 'endorse') {
-    //           return "infringement_notice_coordinator";
-    //       } else if (this.workflow_type === 'decline') {
-    //           if (this.sanction_outcome.issued_on_paper) {
-    //              return "officer";
-    //           } else {
-    //              return "manager";
-    //           }
-    //       } else if (this.workflow_type === 'withdraw') {
-    //           return "infringement_notice_coordinator";
-    //       } else if (this.workflow_type === 'close') {
-    //           return "";  // TODO: make sure if this is correct
-    //       }
-    //   },
     },
     mounted: function () {
         this.$nextTick(() => {

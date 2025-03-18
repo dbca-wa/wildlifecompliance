@@ -1,25 +1,6 @@
 <template>
 <div class="container" id="internalOrgAccessDash">
     <div class="row">
-        <!-- Organisation and Applicant should not be dropdown filters (should be searchable if anything) TODO remove 
-        <div class="col-md-3">
-            <div class="form-group">
-                <label for="">Organisation</label>
-                <select class="form-control" v-model="filterOrganisation">
-                    <option value="All">All</option>
-                    <option v-for="o in organisationChoices" :value="o">{{o}}</option>
-                </select>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="form-group">
-                <label for="">Applicant</label>
-                <select class="form-control" v-model="filterApplicant">
-                    <option value="All">All</option>
-                    <option v-for="a in applicantChoices" :value="a">{{a}}</option>
-                </select>
-            </div>
-        </div>-->
         <div class="col-md-3">
             <div class="form-group">
                 <label for="">Role</label>
@@ -87,7 +68,6 @@ export default {
                         d.status = vm.filterStatus
                     },
                 },
-                //TODO rework
                 columns:[
                     {
                         data:"lodgement_number",
