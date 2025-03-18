@@ -114,7 +114,7 @@ import datatable from '@vue-utils/datatable.vue';
 import { mapActions, mapGetters } from 'vuex'
 import Conditions from './application_conditions.vue';
 import SendToAssessor from './application_send_assessor.vue';
-import ResponsiveDatatablesHelper from "@/utils/responsive_datatable_helper.js";
+
 import {
     api_endpoints,
     helpers

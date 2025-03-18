@@ -275,7 +275,6 @@ import { mapActions, mapGetters } from 'vuex'
 import ApplicationAssessments from './application_assessments.vue';
 import datatable from '@vue-utils/datatable.vue';
 import CommsLogs from '@common-components/comms_logs.vue';
-import ResponsiveDatatablesHelper from "@/utils/responsive_datatable_helper.js";
 import InspectionRequest from '../inspection/create_inspection_modal'
 import {
     api_endpoints,

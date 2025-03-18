@@ -4,9 +4,7 @@ import Vue from 'vue';
 import resource from 'vue-resource';
 import App from './App';
 import router from './router';
-import bs from 'bootstrap';
 import helpers from '@/utils/helpers';
-import hooks from './packages';
 import api_endpoints from './api';
 import store from './store';
 import RendererBlock from '@/components/common/renderer_block.vue';
@@ -14,6 +12,28 @@ import ComplianceRendererBlock from '@/components/common/compliance_renderer_blo
 import VueScrollTo from 'vue-scrollto';
 import Affix from 'vue-affix';
 import Vuelidate from 'vuelidate'
+
+import { extendMoment } from 'moment-range';
+ 
+ import jsZip from 'jszip';
+ window.JSZip = jsZip;
+ 
+ import  'datatables.net';
+ import 'datatables.net-bs';
+ import 'datatables.net-responsive-bs';
+ import 'datatables.net-buttons/js/dataTables.buttons.js';
+ import 'datatables.net-buttons/js/buttons.html5.js';
+ 
+ require("datatables.net-bs/css/dataTables.bootstrap.css");
+ require("datatables.net-responsive-bs/css/responsive.bootstrap.css");
+ 
+ import 'select2';
+ import "sweetalert2/dist/sweetalert2.css";
+ import 'jquery-validation';
+ 
+ import 'select2-bootstrap-theme/dist/select2-bootstrap.min.css';
+ 
+ extendMoment(moment);
 
 require( '../node_modules/bootstrap/dist/css/bootstrap.css' );
 //require('../node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css')

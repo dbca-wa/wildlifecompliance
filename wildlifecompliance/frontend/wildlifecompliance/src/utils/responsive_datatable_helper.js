@@ -655,4 +655,4 @@ ResponsiveDatatablesHelper.prototype.difference = function (a, b) {
     return arr;
 };
 
-module.exports = ResponsiveDatatablesHelper;
+export default ResponsiveDatatablesHelper;

@@ -14,7 +14,7 @@
 </template>
 <script>
 import ResponsiveDatatablesHelper from "../responsive_datatable_helper.js"
-module.exports = {
+export default {
    name : 'DataTable',
    props:{
       dtHeaders:{

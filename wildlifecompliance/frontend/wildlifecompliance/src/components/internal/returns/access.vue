@@ -82,7 +82,6 @@ import { mapActions, mapGetters } from 'vuex';
 import datatable from '@vue-utils/datatable.vue'
 import CommsLogs from '@common-components/comms_logs.vue'
 import AmendmentRequest from './amendment_request.vue';
-import ResponsiveDatatablesHelper from "@/utils/responsive_datatable_helper.js"
 import '@/scss/forms/form.scss';
 import {
     api_endpoints,

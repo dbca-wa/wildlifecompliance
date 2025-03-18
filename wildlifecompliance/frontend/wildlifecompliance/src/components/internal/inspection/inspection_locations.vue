@@ -163,7 +163,7 @@ L.Icon.Default.mergeOptions({
 });
 /********************************************/
 
-module.exports = {
+export default {
     data: function(){
         let vm = this;
         vm.layers = [];

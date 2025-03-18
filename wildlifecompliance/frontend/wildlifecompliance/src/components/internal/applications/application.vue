@@ -668,7 +668,6 @@ import IssueLicence from './application_issuance.vue';
 import CommsLogs from '@common-components/comms_logs.vue';
 import AmendmentRequestDetails from '@/components/forms/amendment_request_details.vue';
 import SecureBaseLink from '@common-components/securebase_link.vue';
-import ResponsiveDatatablesHelper from "@/utils/responsive_datatable_helper.js";
 import {
     api_endpoints,
     helpers

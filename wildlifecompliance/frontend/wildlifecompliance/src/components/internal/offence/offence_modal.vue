@@ -244,7 +244,7 @@ import utils from "../utils";
 import $ from "jquery";
 import "bootstrap/dist/css/bootstrap.css";
 import "awesomplete/awesomplete.css";
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import "jquery-ui/ui/widgets/draggable.js";
 import FileField from '@/components/common/compliance_file.vue';
 
@@ -708,7 +708,7 @@ export default {
                     section_regulation: {},
                     number_linked_sanction_outcomes_total: 0,
                     number_linked_sanction_outcomes_active: 0,
-                    uuid: uuid()
+                    uuid: uuidv4()
                 };
                 Object.assign(alleged_offence_obj.section_regulation, this.current_alleged_offence);
                 this.offence.alleged_offences.push(alleged_offence_obj);
@@ -726,7 +726,7 @@ export default {
         }
     },
     addAllegedOffenceToTable: function(allegedOffence){
-        allegedOffence.uuid = uuid();
+        allegedOffence.uuid = uuidv4();
         this.$refs.alleged_offence_table.vmDataTable.row.add({ "allegedOffence": allegedOffence, "offence": this.offence }).draw();
     },
     ok: async function() {
