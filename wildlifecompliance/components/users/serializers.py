@@ -150,62 +150,6 @@ class UserAddressSerializer(serializers.ModelSerializer):
         )
 
 
-#TODO remove/replace
-#class UserProfileSerializer(serializers.ModelSerializer):
-#    postal_address = UserAddressSerializer()
-#
-#    class Meta:
-#        model = Profile
-#        fields = (
-#            'id',
-#            'user',
-#            'name',
-#            'email',
-#            'institution',
-#            'postal_address'
-#        )
-#
-#    def create(self, validated_data):
-#        profile = Profile()
-#        profile.user = validated_data['user']
-#        profile.name = validated_data['name']
-#        profile.email = validated_data['email']
-#        profile.institution = validated_data.get('institution', '')
-#        postal_address_data = validated_data.pop('postal_address')
-#        if profile.email:
-#            if EmailIdentity.objects.filter(
-#                    email=profile.email).exclude(
-#                    user=profile.user).exists():
-#                # Email already used by other user in email identity.
-#                raise ValidationError(
-#                    "This email address is already associated with an existing account or profile.")
-#        new_postal_address, address_created = Address.objects.get_or_create(
-#            user=profile.user, **postal_address_data)
-#        profile.postal_address = new_postal_address
-#        setattr(profile, "auth_identity", True)
-#        profile.save()
-#        return profile
-#
-#    def update(self, instance, validated_data):
-#        instance.name = validated_data.get('name', instance.name)
-#        instance.email = validated_data.get('email', instance.email)
-#        instance.institution = validated_data.get(
-#            'institution', instance.institution)
-#        postal_address_data = validated_data.pop('postal_address')
-#        if instance.email:
-#            if EmailIdentity.objects.filter(
-#                    email=instance.email).exclude(
-#                    user=instance.user).exists():
-#                # Email already used by other user in email identity.
-#                raise ValidationError(
-#                    "This email address is already associated with an existing account or profile.")
-#        postal_address, address_created = Address.objects.get_or_create(
-#            user=instance.user, **postal_address_data)
-#        instance.postal_address = postal_address
-#        setattr(instance, "auth_identity", True)
-#        instance.save()
-#        return instance
-
 class ComplianceManagementSaveUserAddressSerializer(serializers.ModelSerializer):
     #user_id = serializers.IntegerField(
     #    required=False, write_only=True, allow_null=True)
@@ -703,15 +647,7 @@ class ComplianceUserDetailsOptimisedSerializer(serializers.ModelSerializer):
     
     def get_last_name(self, obj):
         return get_last_name(obj)
-
-#TODO replace/remove
-#class EmailUserActionSerializer(serializers.ModelSerializer):
-#    who = serializers.CharField(source='who.get_full_name')
-#
-#    class Meta:
-#        model = EmailUserAction
-#        fields = '__all__'
-
+    
 
 class PersonalSerializer(serializers.ModelSerializer):
     dob = serializers.DateField(

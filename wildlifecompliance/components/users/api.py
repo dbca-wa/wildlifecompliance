@@ -162,50 +162,7 @@ class UserProfileCompleted(views.APIView):
         request.session['is_new'] = False
         request.session['new_to_wildlifecompliance'] = False
         return HttpResponse('OK')
-
-# TODO remove/replace
-#class ProfileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
-#    queryset = Profile.objects.none()
-#    serializer_class = UserProfileSerializer
-#
-#    def get_queryset(self):
-#        user = self.request.user
-#        if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
-#            return Profile.objects.all()
-#        elif user.is_authenticated:
-#            return Profile.objects.filter(user=user)
-#        return Profile.objects.none()
-#
-#    @action(detail=True, methods=['POST', ])
-#    def update_profile(self, request, *args, **kwargs):
-#        try:
-#            instance = self.get_object()
-#            serializer = UserProfileSerializer(instance, data=request.data)
-#            serializer.is_valid(raise_exception=True)
-#            instance = serializer.save()
-#            serializer = UserSerializer(instance)
-#            return Response(serializer.data)
-#        except serializers.ValidationError:
-#            print(traceback.print_exc())
-#            raise
-#        except ValidationError as e:
-#            print(traceback.print_exc())
-#            raise serializers.ValidationError(repr(e.error_dict))
-#        except Exception as e:
-#            print(traceback.print_exc())
-#            raise serializers.ValidationError(str(e))
-
-# TODO remove/replace
-#class MyProfilesViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
-#    queryset = Profile.objects.none()
-#    serializer_class = UserProfileSerializer
-#
-#    def get_queryset(self):
-#        user = self.request.user
-#        if user.is_authenticated:
-#            return Profile.objects.filter(user=self.request.user)
-#        return Profile.objects.none()
-
+    
 
 class UserFilterBackend(DatatablesFilterBackend):
 
@@ -374,41 +331,6 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    #TODO replace/remove
-    #@action(detail=True, methods=['GET', ])
-    #def action_log(self, request, *args, **kwargs):
-    #    try:
-    #        instance = self.get_object()
-    #        qs = instance.action_logs.all()
-    #        serializer = EmailUserActionSerializer(qs, many=True)
-    #        return Response(serializer.data)
-    #    except serializers.ValidationError:
-    #        print(traceback.print_exc())
-    #        raise
-    #    except ValidationError as e:
-    #        print(traceback.print_exc())
-    #        raise serializers.ValidationError(repr(e.error_dict))
-    #    except Exception as e:
-    #        print(traceback.print_exc())
-    #        raise serializers.ValidationError(str(e))
-
-    #TODO replace/remove
-    #@action(detail=True, methods=['GET', ])
-    #def profiles(self, request, *args, **kwargs):
-    #    try:
-    #        instance = self.get_object()
-    #        serializer = UserProfileSerializer(
-    #            instance.profiles.all(), many=True)
-    #        return Response(serializer.data)
-    #    except serializers.ValidationError:
-    #        print(traceback.print_exc())
-    #        raise
-    #    except ValidationError as e:
-    #        print(traceback.print_exc())
-    #        raise serializers.ValidationError(repr(e.error_dict))
-    #    except Exception as e:
-    #        print(traceback.print_exc())
-    #        raise serializers.ValidationError(str(e))
 
     @action(detail=True, methods=['POST', ])
     def update_personal(self, request, *args, **kwargs):
