@@ -38,7 +38,7 @@ export default {
             required: true
         },
         assigned_to_id:{
-            type: String,
+            type: Number,
             required: false
         },
         allowed_group_ids:{
@@ -53,7 +53,7 @@ export default {
     data: function() {
         let vm = this;
         return {
-            allowed_groups: this.getAllocatedGroup(this.allowed_group_ids),
+            allowed_groups: [],//this.getAllocatedGroup(this.allowed_group_ids),
         }         
     },
     components:{
