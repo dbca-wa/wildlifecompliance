@@ -33,8 +33,8 @@ def _extract_email_headers(email_message, sender=None):
         # instead
         text = email_message.body
         subject = email_message.subject
-        fromm = smart_bytes(sender) if sender else smart_bytes(
-            email_message.from_email)
+        fromm = smart_bytes(sender).decode("utf-8") if sender else smart_bytes(
+            email_message.from_email).decode("utf-8")
         # the to email is normally a list
         if isinstance(email_message.to, list):
             to = ','.join(email_message.to)
