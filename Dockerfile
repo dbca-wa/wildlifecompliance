@@ -1,5 +1,5 @@
 # Prepare the base environment.
-FROM ubuntu:20.04 as builder_base_wls
+FROM ubuntu:24.04 as builder_base_wls
 MAINTAINER asi@dbca.wa.gov.au
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBUG=True
@@ -51,7 +51,7 @@ RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt-get update
 RUN apt-get install --no-install-recommends -y python3.12 python3.12-dev
 RUN apt-get install --no-install-recommends -y graphviz libgraphviz-dev pkg-config
-
+RUN apt-get install -yq vim
 RUN mkdir -p /etc/apt/keyrings && \
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" \
@@ -59,70 +59,61 @@ RUN mkdir -p /etc/apt/keyrings && \
     apt-get update && \
     apt-get install -y nodejs
 
-RUN ln -s /usr/bin/python3.12 /usr/bin/python 
-    # ln -s /usr/bin/pip3 /usr/bin/pip
-RUN python3.12 -m pip install --upgrade pip
-RUN apt-get install -yq vim
+RUN groupadd -g 5000 oim 
+RUN useradd -g 5000 -u 5000 oim -s /bin/bash -d /app
+RUN mkdir /app 
+RUN chown -R oim.oim /app 
+
+COPY timezone /etc/timezone
+ENV TZ=Australia/Perth
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Default Scripts
+RUN wget https://raw.githubusercontent.com/dbca-wa/wagov_utils/main/wagov_utils/bin/default_script_installer.sh -O /tmp/default_script_installer.sh
+RUN chmod 755 /tmp/default_script_installer.sh
+RUN /tmp/default_script_installer.sh
+
+COPY startup.sh  /
+RUN chmod 755 /startup.sh && \
+    chmod +s /startup.sh && \
+    groupadd -g 5000 oim && \
+    useradd -g 5000 -u 5000 oim -s /bin/bash -d /app && \        
+    mkdir /app && \
+    chown -R oim.oim /app && \
+    mkdir /container-config/ && \
+    chown -R oim.oim /container-config/ && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+   
 
 # Install Python libs from requirements.txt.
 FROM builder_base_wls as python_libs_wls
 WORKDIR /app
-COPY requirements.txt ./
+USER oim
+RUN virtualenv /app/venv
+ENV PATH=/app/venv/bin:$PATH
+RUN git config --global --add safe.directory /app
+COPY --chown=oim:oim requirements.txt ./
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt 
 #COPY git_history_recent ./
 RUN touch /app/rand_hash
-RUN python3.12 -m pip install --no-cache-dir -r requirements.txt \
-  # Update the Django <1.11 bug in django/contrib/gis/geos/libgeos.py
-  # Reference: https://stackoverflow.com/questions/18643998/geodjango-geosexception-error
-  # && sed -i -e "s/ver = geos_version().decode()/ver = geos_version().decode().split(' ')[0]/" /usr/local/lib/python2.7/dist-packages/django/contrib/gis/geos/libgeos.py \
-  && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/*
 
-COPY libgeos.py.patch /app/
-RUN patch /usr/local/lib/python3.7/dist-packages/django/contrib/gis/geos/libgeos.py /app/libgeos.py.patch
-RUN rm /app/libgeos.py.patch
 
 # Install the project (ensure that frontend projects have been built prior to this step).
 FROM python_libs_wls
-COPY gunicorn.ini manage_wc.py ./
+COPY  --chown=oim:oim gunicorn.ini manage_ml.py ./
 #COPY timezone /etc/timezone
-RUN echo "Australia/Perth" > /etc/timezone
-ENV TZ=Australia/Perth
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN touch /app/.env
-COPY .git ./.git
-#COPY ledger ./ledger
-COPY wildlifecompliance ./wildlifecompliance
+COPY --chown=oim:oim.git ./.git
+COPY --chown=oim:oim wildlifecompliance ./wildlifecompliance
 RUN cd /app/wildlifecompliance/frontend/wildlifecompliance; npm install
 RUN cd /app/wildlifecompliance/frontend/wildlifecompliance; npm run build
 RUN python manage_wc.py collectstatic --noinput
 
-# upgrade postgresql to v11
-#RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main 11" > /etc/apt/sources.list.d/pgsql.list
-#RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main 11" > /etc/apt/sources.list.d/pgsql.list
-#RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-#RUN apt update && apt install -y lsb-release postgresql-11 postgresql-client
-
 RUN mkdir /app/tmp/
 RUN chmod 777 /app/tmp/
-
-COPY cron /etc/cron.d/dockercron
-COPY startup.sh /
-# Cron start
-RUN service rsyslog start
-RUN chmod 0644 /etc/cron.d/dockercron
-RUN crontab /etc/cron.d/dockercron
-RUN touch /var/log/cron.log
-RUN service cron start
-RUN chmod 755 /startup.sh
-# cron end
-
-# IPYTHONDIR - Will allow shell_plus (in Docker) to remember history between sessions
-RUN export IPYTHONDIR=/app/logs/.ipython/
-
-# Health checks for kubernetes 
-RUN wget https://raw.githubusercontent.com/dbca-wa/wagov_utils/main/wagov_utils/bin/health_check.sh -O /bin/health_check.sh
-RUN chmod 755 /bin/health_check.sh
 
 EXPOSE 8080
 HEALTHCHECK --interval=1m --timeout=5s --start-period=10s --retries=3 CMD ["wget", "-q", "-O", "-", "http://localhost:8080/"]
 CMD ["/startup.sh"]
-#CMD ["gunicorn", "wildlifecompliance.wsgi", "--bind", ":8080", "--config", "gunicorn.ini"]
+
