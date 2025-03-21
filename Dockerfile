@@ -104,7 +104,7 @@ FROM python_libs_wls
 COPY  --chown=oim:oim gunicorn.ini manage_ml.py ./
 #COPY timezone /etc/timezone
 RUN touch /app/.env
-COPY --chown=oim:oim.git ./.git
+#COPY --chown=oim:oim.git ./.git
 COPY --chown=oim:oim wildlifecompliance ./wildlifecompliance
 RUN cd /app/wildlifecompliance/frontend/wildlifecompliance; npm install
 RUN cd /app/wildlifecompliance/frontend/wildlifecompliance; npm run build
