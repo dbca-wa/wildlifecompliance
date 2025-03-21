@@ -75,15 +75,8 @@ RUN /tmp/default_script_installer.sh
 
 COPY startup.sh  /
 RUN chmod 755 /startup.sh && \
-    chmod +s /startup.sh && \
     groupadd -g 5000 oim && \
-    useradd -g 5000 -u 5000 oim -s /bin/bash -d /app && \        
-    mkdir /app && \
-    chown -R oim.oim /app && \
-    mkdir /container-config/ && \
-    chown -R oim.oim /container-config/ && \
-    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-   
+    useradd -g 5000 -u 5000 oim -s /bin/bash -d /app        
 
 # Install Python libs from requirements.txt.
 FROM builder_base_wls as python_libs_wls
