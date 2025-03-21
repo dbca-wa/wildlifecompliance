@@ -59,11 +59,6 @@ RUN mkdir -p /etc/apt/keyrings && \
     apt-get update && \
     apt-get install -y nodejs
 
-RUN groupadd -g 5000 oim 
-RUN useradd -g 5000 -u 5000 oim -s /bin/bash -d /app
-RUN mkdir /app 
-RUN chown -R oim.oim /app 
-
 COPY timezone /etc/timezone
 ENV TZ=Australia/Perth
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
