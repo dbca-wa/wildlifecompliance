@@ -101,7 +101,7 @@ RUN touch /app/rand_hash
 
 # Install the project (ensure that frontend projects have been built prior to this step).
 FROM python_libs_wls
-COPY  --chown=oim:oim gunicorn.ini manage_ml.py ./
+COPY  --chown=oim:oim gunicorn.ini manage_wc.py ./
 #COPY timezone /etc/timezone
 RUN touch /app/.env
 #COPY --chown=oim:oim.git ./.git
