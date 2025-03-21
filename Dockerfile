@@ -74,9 +74,11 @@ RUN chmod 755 /tmp/default_script_installer.sh
 RUN /tmp/default_script_installer.sh
 
 COPY startup.sh  /
-RUN chmod 755 /startup.sh && \
-    groupadd -g 5000 oim && \
-    useradd -g 5000 -u 5000 oim -s /bin/bash -d /app        
+RUN chmod 755 /startup.sh 
+RUN groupadd -g 5000 oim
+RUN useradd -g 5000 -u 5000 oim -s /bin/bash -d /app
+RUN mkdir /app 
+RUN chown -R oim.oim /app 
 
 # Install Python libs from requirements.txt.
 FROM builder_base_wls as python_libs_wls
