@@ -98,7 +98,7 @@ RUN touch /app/.env
 COPY --chown=oim:oim wildlifecompliance ./wildlifecompliance
 RUN cd /app/wildlifecompliance/frontend/wildlifecompliance; npm install
 RUN cd /app/wildlifecompliance/frontend/wildlifecompliance; npm run build
-# RUN python manage_wc.py collectstatic --noinput
+RUN python manage_wc.py collectstatic --noinput
 
 RUN mkdir /app/tmp/
 RUN chmod 777 /app/tmp/
@@ -106,4 +106,3 @@ RUN chmod 777 /app/tmp/
 EXPOSE 8080
 HEALTHCHECK --interval=1m --timeout=5s --start-period=10s --retries=3 CMD ["wget", "-q", "-O", "-", "http://localhost:8080/"]
 CMD ["/startup.sh"]
-

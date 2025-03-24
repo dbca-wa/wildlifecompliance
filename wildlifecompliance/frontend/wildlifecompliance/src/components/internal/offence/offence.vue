@@ -1212,7 +1212,7 @@ export default {
                         section_regulation: this.current_alleged_offence,
                         number_linked_sanction_outcomes_total: 0,
                         number_linked_sanction_outcomes_active: 0,
-                        uuid: uuid()
+                        uuid: uuidv4()
                     };
                     this.offence.alleged_offences.push(alleged_offence_obj);
                 }
@@ -1230,7 +1230,7 @@ export default {
             }
         },
         addAllegedOffenceToTable: function(allegedOffence){
-            allegedOffence.uuid = uuid();
+            allegedOffence.uuid = uuidv4();
             this.$refs.alleged_offence_table.vmDataTable.row.add({ allegedOffence: allegedOffence, offence: this.offence }).draw();
         },
         constructOffendersTable: function(){
@@ -1242,7 +1242,7 @@ export default {
             }
         },
         addOffenderToTable: function(offender) {
-            offender.uuid = uuid();
+            offender.uuid = uuidv4();
             this.$refs.offender_table.vmDataTable.row.add({ offender: offender, offence: this.offence }).draw();
         },
         markMatchedText(original_text, input) {
