@@ -206,7 +206,9 @@ export default {
         let vm = this;
         return {
             oBody: 'oBody'+vm._uid,
-            wildlifecompliance_organisations:[],
+            current_user: {
+                wildlifecompliance_organisations:[],
+            },
             newOrg: {
                 'name': '',
                 'abn': '',
@@ -269,7 +271,10 @@ export default {
     },
     computed: {
         hasOrgs: function() {
-            return this.current_user.wildlifecompliance_organisations && this.current_user.wildlifecompliance_organisations.length > 0 ? true: false;
+            if (this.current_user) {
+                return this.current_user.wildlifecompliance_organisations && this.current_user.wildlifecompliance_organisations.length > 0 ? true: false;
+            }
+            return false;
         },
         uploadedFileName: function() {
             return this.uploadedFile != null ? this.uploadedFile.name: '';
@@ -382,7 +387,6 @@ export default {
                     vm.resetNewOrg();
                     Vue.http.get(api_endpoints.my_user_details).then((response) => {
                         vm.current_user = response.body
-                        if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
                         if ( vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0 ) { vm.managesOrg = 'Yes' }
                     },(error) => {
                     })
@@ -592,7 +596,6 @@ export default {
                     }).then((response) => {
                         Vue.http.get(api_endpoints.my_user_details).then((response) => {
                             vm.current_user = response.body
-                            if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
                             if ( vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0 ) { vm.managesOrg = 'Yes' }
                         },(error) => {
                         })
@@ -625,9 +628,7 @@ export default {
             else{
                 next(vm => {
                     vm.current_user = response.body
-                    if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
                     if (vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0) { vm.managesOrg = 'Yes' }
-                    if (vm.current_user.identification2){ vm.uploadedID = vm.current_user.identification2; }
                 });
             }
         },(error) => {
