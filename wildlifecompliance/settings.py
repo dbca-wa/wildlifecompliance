@@ -167,6 +167,7 @@ MIDDLEWARE_CLASSES += [
     'wildlifecompliance.middleware.PaymentSessionMiddleware',
 ]
 
+LEDGER_UI_CARDS_MANAGEMENT = True
 LEDGER_UI_ACCOUNTS_MANAGEMENT = [
             # {'account_name': {'options' : {'view': True, 'edit': True}}},
             # {'legal_name': {'options' : {'view': True, 'edit': True}}},

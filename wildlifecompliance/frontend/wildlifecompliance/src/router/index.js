@@ -24,8 +24,8 @@ const router = new Router({
           component: MyUserDetails
         },
         {
-          path: '/manageorganisations',
-          name: 'manage-organisations',
+          path: '/ledger-ui/accounts',
+          name: 'organisation',
           component: ManageOrganisations
         },
         external_routes,
@@ -39,6 +39,7 @@ router.beforeEach(async (to, from, next) => {
     if (!([
         "first-time",
         "account",
+        "organisation",
         "internal-call-email-dash",
         "view-call-email"].includes(to.name)) && isComplianceManagementCallemailReadonlyUser) {
         // Call Email Read Only users can only access these four routes
