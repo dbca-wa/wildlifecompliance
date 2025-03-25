@@ -10,7 +10,8 @@ export const inspectionStore = {
     namespaced: true,
     state: {
         inspection: {
-            
+            user_is_assignee: false,
+            user_in_group: false,
         },
         
     },

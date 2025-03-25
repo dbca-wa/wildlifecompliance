@@ -8,8 +8,8 @@
             </div>
             <div class="row">
                 <div class="col-sm-9">
-                <select :disabled="!user_in_group" class="form-control" v-model="assigned_to_id" @change="updateAssignedToId()">
-                <option  v-for="option in allowed_groups" :value="option.id" v-bind:key="option.id" :selected="option.id==assigned_to_id">
+                <select :disabled="!user_in_group" class="form-control" v-model="assign_to_id" @change="updateAssignedToId()">
+                <option  v-for="option in allowed_groups" :value="option.id" :key="option.id" :selected="option.id==assign_to_id">
                     {{ option.full_name }}
                 </option>
                 </select>
@@ -54,6 +54,7 @@ export default {
         let vm = this;
         return {
             allowed_groups: [],//this.getAllocatedGroup(this.allowed_group_ids),
+            assign_to_id: null,
         }         
     },
     components:{
@@ -69,7 +70,7 @@ export default {
             } else if (user === 'blank') {
                 payload = {'blank': true};
             } else {
-                payload = { 'assigned_to_id': this.assigned_to_id };
+                payload = { 'assigned_to_id': this.assign_to_id };
             }
             let res = await Vue.http.post(
                 url,
@@ -96,8 +97,14 @@ export default {
         allowed_group_ids(after,before) {
             if (before === undefined && after !== undefined) {
                 this.getAllocatedGroup(this.allowed_group_ids);
+                this.assign_to_id = this.assigned_to_id; 
             }
         }
+    },
+    mounted: function() {
+        let vm = this;
+        this.getAllocatedGroup(this.allowed_group_ids);
+        this.assign_to_id = vm.assigned_to_id; 
     },
 }
 </script>

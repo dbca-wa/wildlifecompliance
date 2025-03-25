@@ -10,6 +10,8 @@ export const legalCaseStore = {
     namespaced: true,
     state: {
         legal_case: {
+            user_is_assignee: false,
+            user_in_group: false,
             running_sheet_entries: [],
             //runningSheetArtifactList: [],
             //runningSheetPersonList: [],
