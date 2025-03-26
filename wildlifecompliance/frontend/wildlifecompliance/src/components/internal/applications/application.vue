@@ -1950,10 +1950,10 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Return',
                 }).then(async (result) => {
-                    if(!result.value) {
+                    if(!result) {
                         return;
                     }
-                    const text = result.value;
+                    const text = result;
                     const data = {
                         "activity_id" : this.selectedActivity.licence_activity,
                         "text": text
