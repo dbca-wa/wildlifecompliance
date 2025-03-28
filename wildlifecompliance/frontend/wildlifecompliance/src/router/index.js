@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import MyUserDetails from '@/components/user/manage_my_user_details.vue'
+import ManageOrganisations from '@/components/user/manage_organisations.vue'
 import ProfileDashTable from '@/components/user/profile_dashboard.vue'
 import CreateProfile from '@/components/user/profile_create.vue'
 import EditProfile from '@/components/user/profile_manage.vue'
@@ -22,6 +23,11 @@ const router = new Router({
           name: 'account',
           component: MyUserDetails
         },
+        {
+          path: '/ledger-ui/accounts',
+          name: 'organisation',
+          component: ManageOrganisations
+        },
         external_routes,
         internal_routes
     ]
@@ -33,6 +39,7 @@ router.beforeEach(async (to, from, next) => {
     if (!([
         "first-time",
         "account",
+        "organisation",
         "internal-call-email-dash",
         "view-call-email"].includes(to.name)) && isComplianceManagementCallemailReadonlyUser) {
         // Call Email Read Only users can only access these four routes

@@ -444,7 +444,7 @@ export default {
             confirmButtonText: 'Send Request'
         }).then((result) => {
             if (result) {
-                vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result.value)))
+                vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result)))
                 .then((response) => {
                     swal({
                         title: "Amendment Request",

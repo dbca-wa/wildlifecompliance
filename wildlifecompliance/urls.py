@@ -223,6 +223,7 @@ urlpatterns = [
     re_path(r'^external/return/(?P<return_pk>\d+)/$', views.ExternalReturnView.as_view(), name='external-return-detail'),
     re_path(r'^firsttime/$', views.first_time, name='first_time'),
     re_path(r'^account/$', views.ExternalView.as_view(), name='manage-account'),
+    re_path(r'^organisation/$', views.ExternalView.as_view(), name='organisation'),
     re_path(r'^profiles/', views.ExternalView.as_view(), name='manage-profiles'),
     # re_path(r'^external/organisations/manage/$', views.ExternalView.as_view(), name='manage-org'),
     re_path(r'^application/$',

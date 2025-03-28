@@ -9,7 +9,8 @@ export const sanctionOutcomeStore = {
     namespaced: true,
     state: {
         sanction_outcome: {
-            
+            user_is_assignee: false,
+            user_in_group: false,
         },
     },
     getters: {

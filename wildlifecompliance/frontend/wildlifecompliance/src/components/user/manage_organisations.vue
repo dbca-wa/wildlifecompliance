@@ -1,231 +1,5 @@
 <template>
     <div class="container" id="userInfo">
-        <div v-if="showCompletion" class="row">
-            <div class="col-sm-12">
-                <div class="well well-sm">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <p>
-                                We have detected that this may be the first time you have logged into the system.Please take a moment to provide us with your details
-                                (personal details, address details, contact details, and whether you are managing licences for an organisation).
-                                Once completed, click Continue to start using the system.
-                            </p>
-                            <button v-if="completedProfile" @click.prevent="userProfileCompleted()" class="btn btn-primary pull-right">Continue</button>
-                            <button v-else disabled class="btn btn-primary pull-right">Complete profile to continue</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="panel panel-default">
-                  <div class="panel-heading">
-                    <h3 class="panel-title">Personal Details <small>Provide your personal details</small>
-                        <a class="panelClicker" :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                  </div>
-                  <div class="panel-body collapse in" :id="pBody">
-                      <form class="form-horizontal" name="personal_form" method="post">
-                          <div class="form-group">
-                            <label for="" class="col-sm-3 control-label"></label>
-                            <div class="col-sm-6">
-                            <b>To update your account name please <a :href="current_user.sso_setting_url+'/sso/setting?back='+current_url">click here</a>:</b>
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="" class="col-sm-3 control-label"></label>
-                            <div class="col-sm-6">
-                            <i>Changes will not update until your next login.</i>
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="" class="col-sm-3 control-label">Account Given name(s)</label>
-                            <div class="col-sm-6">
-                                <input disabled type="text" class="form-control" name="first_name" placeholder="" v-model="current_user.first_name">
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="" class="col-sm-3 control-label" >Account Surname</label>
-                            <div class="col-sm-6">
-                                <input disabled type="text" class="form-control" name="last_name" placeholder="" v-model="current_user.last_name">
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="" class="col-sm-3 control-label" >Date of Birth</label>
-                            <div class="col-sm-6">
-                                <!-- <input type="date" class="form-control" name="dob" placeholder="" max="2100-12-31" v-model="current_user.dob"> -->
-                                <div class="input-group date" ref="dob" style="width: 100%;">
-                                    <input v-if="!canUpdateDOB" disabled type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="current_user.legal_dob">
-                                    <input v-else type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="current_user.dob">
-                                    <span class="input-group-addon">
-                                        <span class="glyphicon glyphicon-calendar"></span>
-                                    </span>
-                                </div>
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="" class="col-sm-3 control-label">Verified Given name(s)</label>
-                            <div class="col-sm-6">
-                                <input disabled type="text" class="form-control" name="legal_first_name" placeholder="" v-model="current_user.legal_first_name">
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="" class="col-sm-3 control-label" >Verified Surname</label>
-                            <div class="col-sm-6">
-                                <input disabled type="text" class="form-control" name="legal_last_name" placeholder="" v-model="current_user.legal_last_name">
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <div v-if="canUpdateDOB" class="col-sm-12">
-                                <button v-if="!updatingPersonal" class="pull-right btn btn-primary" @click.prevent="updatePersonal()">Update</button>
-                                <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
-                            </div>
-                          </div>
-                       </form>
-                  </div>
-                </div>
-            </div>
-        </div>
-        <div class="row" v-if="!approvedExternalUser">
-            <div class="col-sm-12">
-                <div class="panel panel-default">
-                  <div class="panel-heading">
-                    <i v-if="showCompletion && uploadedID" class="fa fa-check fa-2x pull-left" style="color:green"></i>
-                    <i v-else-if="!uploadedID && !current_user.has_complete_first_time" class="fa fa-times fa-2x pull-left" style="color:red"></i>
-                    <h3 class="panel-title">Identification <small>Upload your photo ID</small>
-                        <a class="panelClicker" :href="'#'+idBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="idBody">
-                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                        </a>
-                    </h3>
-                  </div>
-                  <div class="panel-body collapse" :id="idBody">
-                      <form class="form-horizontal" name="id_form" method="post">
-                          <div class="form-group">
-                            <span class="col-sm-12" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attach a scan of the complete photo page of your passport or the complete photo side of your driver’s licence showing full name, date of birth and photo.</span>
-                          </div>
-                          <div class="form-group">
-                            <label class="col-sm-3 control-label">Identification</label>
-                            <div class="col-sm-9">
-                                <span class="col-sm-3 btn btn-link btn-file pull-left" v-if="uploadedID"><SecureBaseLink link_name="Uploaded Photo ID" :link_data="{'user_id': current_user.id}" /></span>
-                                <span class="col-sm-3 btn btn-link btn-file pull-left" v-else-if="!uploadedID">Attach Photo ID<input type="file" ref="uploadedID" @change="readFileID()"/></span>
-                                <span class="col-sm-3 btn btn-link btn-file pull-left" v-else >&nbsp;Uploading...</span>
-                                <span v-if="uploadedID" class="btn btn-link btn-file pull-left">
-                                    <a @click="removeID()" class="fa fa-trash-o" title="Remove file" style="cursor: pointer; color:red;" />
-                                </span>
-                            </div>                            
-                          </div>
-                          <div class="form-group">
-                            <div class="col-sm-12"></div>
-                          </div>
-                          <div class="form-group">
-                            <div class="col-sm-12"></div>
-                          </div>
-                       </form>
-                  </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="panel panel-default">
-                  <div class="panel-heading">
-                    <i v-if="showCompletion && current_user.address_details" class="fa fa-check fa-2x pull-left" style="color:green"></i>
-                    <i v-else-if="showCompletion && !current_user.address_details" class="fa fa-times fa-2x pull-left" style="color:red"></i>
-                    <h3 class="panel-title">Address Details <small>Provide your address details</small>
-                        <a class="panelClicker" :href="'#'+adBody" data-toggle="collapse" expanded="false"  data-parent="#userInfo" :aria-controls="adBody">
-                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                        </a>
-                    </h3>
-                  </div>
-                  <div v-if="loading.length == 0" class="panel-body collapse" :id="adBody">
-                      <form class="form-horizontal" action="index.html" method="post">
-                          <div class="form-group">
-                            <label for="" class="col-sm-3 control-label">Street</label>
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control" name="street" placeholder="" v-model="current_user.residential_address.line1">
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="" class="col-sm-3 control-label" >Town/Suburb</label>
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control" name="surburb" placeholder="" v-model="current_user.residential_address.locality">
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="" class="col-sm-3 control-label">State</label>
-                            <div class="col-sm-3">
-                                <input type="text" class="form-control" name="country" placeholder="" v-model="current_user.residential_address.state">
-                            </div>
-                            <label for="" class="col-sm-1 control-label">Postcode</label>
-                            <div class="col-sm-2">
-                                <input type="text" class="form-control" name="postcode" placeholder="" v-model="current_user.residential_address.postcode">
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="" class="col-sm-3 control-label" >Country</label>
-                            <div class="col-sm-4">
-                                <select class="form-control" name="country" v-model="current_user.residential_address.country">
-                                    <option v-for="c in countries" :value="c.code" v-bind:key="c.code">{{ c.name }}</option>
-                                </select>
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <div class="col-sm-12">
-                                <button v-if="!updatingAddress" class="pull-right btn btn-primary" @click.prevent="updateAddress()">Update</button>
-                                <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
-                            </div>
-                          </div>
-                       </form>
-                  </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="panel panel-default">
-                  <div class="panel-heading">
-                    <i v-if="showCompletion && current_user.contact_details" class="fa fa-check fa-2x pull-left" style="color:green"></i>
-                    <i v-else-if="showCompletion && !current_user.contact_details" class="fa fa-times fa-2x pull-left" style="color:red"></i>
-                    <h3 class="panel-title">Contact Details <small>Provide your contact details</small>
-                        <a class="panelClicker" :href="'#'+cBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="cBody">
-                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                        </a>
-                    </h3>
-                  </div>
-                  <div class="panel-body collapse" :id="cBody">
-                      <form class="form-horizontal" action="index.html" method="post">
-                          <div class="form-group">
-                            <label for="" class="col-sm-3 control-label">Phone</label>
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control" name="phone" placeholder="" v-model="current_user.phone_number">
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="" class="col-sm-3 control-label" >Mobile</label>
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control" name="mobile" placeholder="" v-model="current_user.mobile_number">
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="" class="col-sm-3 control-label" >Email</label>
-                            <div class="col-sm-6">
-                                <input disabled type="email" class="form-control" name="email" placeholder="" v-model="current_user.email">
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <div class="col-sm-12">
-                                <button v-if="!updatingContact" class="pull-right btn btn-primary" @click.prevent="updateContact()">Update</button>
-                                <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
-                            </div>
-                          </div>
-                       </form>
-                  </div>
-                </div>
-            </div>
-        </div>
         <div class="row">
             <div class="col-sm-12">
                 <div class="panel panel-default">
@@ -236,7 +10,7 @@
                         </a>
                     </h3>
                   </div>
-                  <div class="panel-body collapse" :id="oBody">
+                  <div class="panel-body collapse in" :id="oBody">
                       <form class="form-horizontal" name="orgForm" method="post">
                           <div class="form-group">
                             <label for="" class="col-sm-5 control-label">Do you manage licences on behalf of an organisation?</label>
@@ -431,39 +205,25 @@ export default {
     data () {
         let vm = this;
         return {
-            adBody: 'adBody'+vm._uid,
-            pBody: 'pBody'+vm._uid,
-            idBody: 'idBody'+vm._uid,
-            cBody: 'cBody'+vm._uid,
             oBody: 'oBody'+vm._uid,
             current_user: {
-                first_name: '',
-                last_name: '',
-                dob: '',
-                legal_first_name: '',
-                legal_last_name: '',
-                legal_dob: '',
                 wildlifecompliance_organisations:[],
-                residential_address : {}
             },
-            
             newOrg: {
                 'name': '',
                 'abn': '',
                 'detailsChecked': false,
                 'exists': false
             },
-            countries: [],
             loading: [],
             registeringOrg: false,
             validatingPins: false,
-            uploadingID: false,
-            checkingDetails: false,
             addingCompany: false,
             managesOrg: 'No',
             managesOrgConsultant: 'No',
             uploadedFile: null,
             uploadedID: null,
+
             updatingPersonal: false,
             updatingAddress: false,
             updatingContact: false,
@@ -510,37 +270,14 @@ export default {
   
     },
     computed: {
-        current_url: function() {
-            return window.location.href;
-        },
-        canUpdateDOB: function() {
-            return (this.current_user.legal_dob === null || this.current_user.legal_dob === "")
-        },
         hasOrgs: function() {
-            return this.current_user.wildlifecompliance_organisations && this.current_user.wildlifecompliance_organisations.length > 0 ? true: false;
+            if (this.current_user) {
+                return this.current_user.wildlifecompliance_organisations && this.current_user.wildlifecompliance_organisations.length > 0 ? true: false;
+            }
+            return false;
         },
         uploadedFileName: function() {
             return this.uploadedFile != null ? this.uploadedFile.name: '';
-        },
-        showCompletion: function() {
-            // if (!this.showCompleteMsg) {
-            //     this.showCompleteMsg = this.$route.name == 'first-time' ? true : this.current_user.identification == null ? true : false
-            // }
-            return this.$route.name == 'first-time'
-        },
-        approvedExternalUser: function() {
-            if (this.current_user.is_compliance_management_approved_external_user) {
-                return true;
-            }
-        },
-        completedProfile: function(){
-            if (this.current_user.is_compliance_management_approved_external_user) {
-                return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details;
-            } else {
-                //return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details && this.current_user.identification2 && this.current_user.identification2 != null;
-                return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details;
-
-            }
         },
     },
     methods: {
@@ -585,171 +322,6 @@ export default {
                 'detailsChecked': false,
                 'exists': false
             };
-        },
-        deleteUserLogout: function() {
-            let vm = this;
-            vm.$http.delete(helpers.add_endpoint_json(api_endpoints.users,vm.current_user.id)).then((response) => {
-                window.location.href='/ledger/logout';
-            },(error) => {
-            })
-        },
-        updatePersonal: function() {
-            let vm = this;
-            vm.updatingPersonal = true;
-            console.log(vm.current_user.residential_address);
-            if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
-            let params = '?';
-            params += '&first_name=' + vm.current_user.first_name;
-            params += '&last_name=' + vm.current_user.last_name;
-            params += '&dob=' + vm.current_user.dob;
-            if (vm.current_user.first_name == '' || vm.current_user.last_name == '' || (vm.current_user.dob == null || vm.current_user.dob == '')){
-                let error_msg = 'Please ensure all fields are filled in.';
-                swal({
-                    title: 'Update Personal Details',
-                    html: 'There was an error updating your personal details.<br/>' + error_msg,
-                    type: 'error'
-                }).then(() => {
-                    vm.updatingPersonal = false;
-                    vm.current_user.personal_details = false;
-                });
-                return;
-            }
-            if (vm.new_user == 'True') {
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.current_user.id+'/update_personal')),JSON.stringify(vm.current_user),{
-                    emulateJSON:true
-                }).then((response) => {
-                    swal({
-                        title: 'Update Personal Details',
-                        html: 'Your personal details has been successfully updated.',
-                        type: 'success',
-                    }).then(() => {
-                        vm.updatingPersonal = false;
-                        vm.current_user.personal_details = true;
-                        if (vm.completedProfile) {
-                            vm.$http.get(api_endpoints.user_profile_completed).then((response) => {
-                            },(error) => {
-                            })
-                        }
-                    });
-                }, (error) => {
-                    vm.updatingPersonal = false;
-                    vm.current_user.personal_details = false;
-                    let error_msg = '<br/>';
-                    for (var key in error.body) {
-                        if (key === 'dob') {
-                            error_msg += 'dob: Please enter a valid date.<br/>';
-                        } else {
-                            error_msg += key + ': ' + error.body[key] + '<br/>';
-                        }
-                    }
-                    swal({
-                        title: 'Update Personal Details',
-                        html: 'There was an error updating your personal details.<br/>' + error_msg,
-                        type: 'error'
-                    })
-                });
-            } else {
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.current_user.id+'/update_personal')),JSON.stringify(vm.current_user),{
-                    emulateJSON:true
-                }).then((response) => {
-                    swal({
-                        title: 'Update Personal Details',
-                        html: 'Your personal details has been successfully updated.',
-                        type: 'success',
-                    }).then(() => {
-                        vm.updatingPersonal = false;
-                        vm.current_user.personal_details = true;
-                        vm.current_user.personal_details = true;
-                        if (vm.completedProfile) {
-                            vm.$http.get(api_endpoints.user_profile_completed).then((response) => {
-                            },(error) => {
-                            })
-                        }
-                    });
-                }, (error) => {
-                    vm.updatingPersonal = false;
-                    vm.current_user.personal_details = false;
-                    let error_msg = '<br/>';
-                    for (var key in error.body) {
-                        if (key === 'dob') {
-                            error_msg += 'dob: Please enter a valid date.<br/>';
-                        } else {
-                            error_msg += key + ': ' + error.body[key] + '<br/>';
-                        }
-                    }
-                    swal({
-                        title: 'Update Personal Details',
-                        html: 'There was an error updating your personal details.<br/>' + error_msg,
-                        type: 'error'
-                    })
-                });
-            }
-        },
-        updateContact: function() {
-            let vm = this;
-            vm.updatingContact = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.current_user.id+'/update_contact')),JSON.stringify(vm.current_user),{
-                emulateJSON:true
-            }).then((response) => {
-                vm.updatingContact = false;
-                vm.current_user = response.body;
-                if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
-                swal({
-                    title: 'Update Contact Details',
-                    html: 'Your contact details has been successfully updated.',
-                    type: 'success',
-                })
-                if (vm.completedProfile) {
-                    vm.$http.get(api_endpoints.user_profile_completed).then((response) => {
-                    },(error) => {
-                    })
-                }
-            }, (error) => {
-                vm.updatingContact = false;
-                vm.current_user.contact_details = false;
-                let error_msg = '<br/>';
-                for (var key in error.body) {
-                    error_msg += key + ': ' + error.body[key] + '<br/>';
-                }
-                swal({
-                    title: 'Update Contact Details',
-                    html: 'There was an error updating your contact details.<br/>' + error_msg,
-                    type: 'error'
-                })
-            });
-        },
-        updateAddress: function() {
-            let vm = this;
-            vm.updatingAddress = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.current_user.id+'/update_address')),JSON.stringify(vm.current_user.residential_address),{
-                emulateJSON:true
-            }).then((response) => {
-                vm.updatingAddress = false;
-                vm.current_user = response.body;
-                if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
-                swal({
-                    title: 'Update Address Details',
-                    html: 'Your address details has been successfully updated.',
-                    type: 'success',
-                })
-            }, (error) => {
-                vm.updatingAddress = false;
-                vm.current_user.address_details = false;
-                let error_msg = '<br/>';
-                for (var key in error.body) {
-                    error_msg += key + ': ' + error.body[key] + '<br/>';
-                }
-                swal({
-                    title: 'Update Address Details',
-                    html: 'There was an error updating your address details.<br/>' + error_msg,
-                    type: 'error'
-                })
-                if (vm.completedProfile) {
-                    vm.$http.get(api_endpoints.user_profile_completed).then((response) => {
-                    },(error) => {
-                    })
-                }
-            });
         },
         checkOrganisation: function() {
             console.log('Entered CheckOrg')
@@ -815,7 +387,6 @@ export default {
                     vm.resetNewOrg();
                     Vue.http.get(api_endpoints.my_user_details).then((response) => {
                         vm.current_user = response.body
-                        if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
                         if ( vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0 ) { vm.managesOrg = 'Yes' }
                     },(error) => {
                     })
@@ -830,45 +401,6 @@ export default {
             }, (error) => {
                 vm.validatingPins = false;
             });
-        },
-        removeID: async function() {
-            this.uploadedID = null;
-        },
-        uploadID: async function() {
-            let vm = this;
-            vm.uploadingID = true;
-            let data = new FormData();
-            data.append('identification2', vm.uploadedID);
-            if (vm.uploadedID == null){
-                vm.uploadingID = false;
-                swal({
-                        title: 'Upload ID',
-                        html: 'Please select a file to upload.',
-                        type: 'error'
-                });
-            } else {
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.current_user.id+'/upload_id')),data,{
-                    emulateJSON:true
-                }).then((response) => {
-                    vm.uploadingID = false;
-                    vm.uploadedID = null;
-                    vm.uploadedID = response.body.identification2;
-                    vm.current_user.identification2 = response.body.identification2;
-                }, (error) => {
-                    console.log(error);
-                    vm.uploadingID = false;
-                    vm.uploadedID = null;
-                    let error_msg = '<br/>';
-                    for (var key in error.body) {
-                        error_msg += key + ': ' + error.body[key] + '<br/>';
-                    }
-                    swal({
-                        title: 'Upload ID',
-                        html: 'There was an error uploading your ID.<br/>' + error_msg,
-                        type: 'error'
-                    });
-                });
-            }
         },
         orgRequest: function() {
             let vm = this;
@@ -1028,16 +560,6 @@ export default {
                 $(chev).toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
             })
         },
-        fetchCountries:function (){
-            let vm =this;
-            vm.loading.push('fetching countries');
-            vm.$http.get(api_endpoints.countries).then((response)=>{
-                vm.countries = response.body;
-                vm.loading.splice('fetching countries',1);
-            },(response)=>{
-                vm.loading.splice('fetching countries',1);
-            });
-        },
         fetchOrgRequestPending:function (){
             let vm =this;
             vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_pending_requests')).then((response)=>{
@@ -1074,7 +596,6 @@ export default {
                     }).then((response) => {
                         Vue.http.get(api_endpoints.my_user_details).then((response) => {
                             vm.current_user = response.body
-                            if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
                             if ( vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0 ) { vm.managesOrg = 'Yes' }
                         },(error) => {
                         })
@@ -1098,26 +619,6 @@ export default {
             },(error) => {
             }); 
         },
-        userProfileCompleted: function(){
-            let vm = this;
-            vm.$http.get(api_endpoints.user_profile_completed).then((response) => {
-                window.location.href='/';
-            },(error) => {
-            })
-        },
-        eventListeners:function () {
-            const self = this
-            let _dob = 'dob';
-            $(`[name='${_dob}']`).datetimepicker(self.datepickerOptions);
-            $(`[name='${_dob}']`).on('dp.change', function(e){
-                if ($(`[name='${_dob}']`).data('DateTimePicker').date()) {
-                    self.current_user.dob =  e.date.format('DD/MM/YYYY');
-                }
-                else if ($(`[name='${_dob}']`).data('date') === "") {
-                    self.current_user.dob = "";
-                }
-            });
-        },
     },
     beforeRouteEnter: function(to,from,next){
         Vue.http.get(api_endpoints.my_user_details).then((response) => {
@@ -1127,16 +628,13 @@ export default {
             else{
                 next(vm => {
                     vm.current_user = response.body
-                    if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
                     if (vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0) { vm.managesOrg = 'Yes' }
-                    if (vm.current_user.identification2){ vm.uploadedID = vm.current_user.identification2; }
                 });
             }
         },(error) => {
         })
     },
     mounted: function(){
-        this.fetchCountries();
         this.fetchOrgRequestPending();
         this.fetchOrgRequestAmendmentRequested();
         this.personal_form = document.forms.personal_form;
@@ -1149,9 +647,6 @@ export default {
         Vue.http.get(api_endpoints.is_new_user).then((response) => {
             this.new_user = response.body;
         })
-        this.$nextTick(()=>{
-            this.eventListeners();
-        });
     }
 }
 </script>

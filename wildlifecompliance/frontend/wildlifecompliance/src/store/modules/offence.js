@@ -11,7 +11,10 @@ export const offenceStore = {
     state: {
         // offence doesn't have any contents in it.
         // you can call setOffenceEmpty to store default contents
-        offence: {}
+        offence: {
+            user_is_assignee: false,
+            user_in_group: false,
+        }
     },
     getters: {
         offence: state => state.offence,
