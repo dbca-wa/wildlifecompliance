@@ -4,7 +4,7 @@
 
 Run pg_dump on the ledger database.
 
-`pg_dump -U ledger_user_name -W --exclude-table='django_cron*' -t 'wildlifecompliance_*' -t 'django_*' -t 'taggit_*' -t 'auth_group' -t 'auth_permission' ledger_database_name -h 127.0.0.1 > EXPORT_DIRECTORY/wildlifecompliance_ledger_tables.sql`
+`pg_dump -U ledger_user_name -W --exclude-table='django_cron*' -t 'wildlifecompliance_*' -t 'django_*' -t 'taggit_*' -t 'auth_group' -t 'auth_permission' -t 'auth_group_permissions' ledger_database_name -h 127.0.0.1 > EXPORT_DIRECTORY/wildlifecompliance_ledger_tables.sql`
 
 `pg_dump --schema-only -U ledger_database_name -W  -t 'reversion_*' -h 127.0.0.1 > EXPORT_DIRECTORY/reversion_schema_wildlifecompliance_ledger_tables.sql`
 
@@ -51,12 +51,6 @@ Update the environment variables:
 - WILDLIFECOMPLIANCE_EXTERNAL_URL='wildlifecompliance_external_url'
 
 # Step 6: Run ledger_api_client migrations
-
-Ensure environment is running python3.12 and python3.12-dev installed.
-
-Install pip modules:
-
-`pip install -r requirements.txt`
 
 Run ledger_api_client migrations:
 
