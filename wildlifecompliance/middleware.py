@@ -34,17 +34,21 @@ class FirstTimeNagScreenMiddleware(object):
     def __init__(self, get_response):
         self.get_response = get_response
 
-    def __call__(self, request):
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        return None
 
+    def __call__(self, request):
+        
         if 'static' in request.path:
-            return self.get_response
+            return self.get_response(request)
+        
         if (request.method == 'GET' 
             and request.user.is_authenticated
             and 'api' not in request.path 
             and 'admin' not in request.path
             and 'static' not in request.path
             and "/ledger-ui/" not in request.get_full_path()):
-
+        
             preference, created = ComplianceManagementUserPreferences.objects.get_or_create(email_user=request.user)
             if is_compliance_management_callemail_readonly_user(request) and not preference.prefer_compliance_management:
                 preference.prefer_compliance_management = True
@@ -61,7 +65,6 @@ class FirstTimeNagScreenMiddleware(object):
         first_time_nag = FirstTimeDefaultNag()
 
         response = first_time_nag.process_request(request)
-        print(response)
         if not response:
             return self.get_response(request)
         else:
@@ -76,7 +79,7 @@ class FirstTimeDefaultNag(object):
     def process_request(self, request):
 
         if 'static' in request.path:
-            return
+            return None
 
         if (request.method == 'GET' 
             and request.user.is_authenticated
@@ -102,6 +105,8 @@ class FirstTimeDefaultNag(object):
                 request.session['new_to_wildlifecompliance'] = True
                 if request.path not in (path_first_time, path_logout):
                     return redirect(path_first_time + "?next=" + quote_plus(request.get_full_path()))
+                
+        return None
 
 
 class CacheControlMiddleware:
