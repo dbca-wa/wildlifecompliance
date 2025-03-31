@@ -76,8 +76,8 @@
                                                                     </div>
                                                                     <div class="col-sm-9">
 
-                                                                        <ckeditor ref="ap_text_detail" v-model="free_text.details" :config="editorConfig"></ckeditor>
-
+                                                                        <!--<ckeditor ref="ap_text_detail" v-model="free_text.details" :config="editorConfig"></ckeditor>-->
+                                                                        <summernote :formatted_text="free_text.details" :purpose_index="pt_idx" :activity_index="index" @update-formatted-text="updateFormattedText"></summernote>
                                                                     </div>
                                                                 </div>
 
@@ -185,6 +185,7 @@ import alert from '@vue-utils/alert.vue'
 import {helpers,api_endpoints} from "@/utils/hooks.js"
 import { mapGetters } from 'vuex'
 import filefield from '@/components/common/compliance_file.vue'
+import summernote from '@/components/summernote'
 
 export default {
     name:'Proposed-Licence',
@@ -192,6 +193,7 @@ export default {
         modal,
         alert,
         filefield,
+        summernote,
     },
     props:{
         can_view_richtext_src: Boolean,
@@ -312,6 +314,16 @@ export default {
 
             this.checkedActivities = [];
             this.pickedPurposes = [];
+        },
+        updateFormattedText: function(object) {
+
+            //TODO remove debug
+            console.log("test")
+            console.log(this.applicationSelectedActivitiesForPurposes)
+            console.log(this.applicationSelectedActivitiesForPurposes[object.activity_id][object.purpose_index])
+            this.applicationSelectedActivitiesForPurposes[object.activity_id][object.purpose_index] = object.formatted_text;
+            console.log(this.applicationSelectedActivitiesForPurposes[object.activity_id][object.purpose_index])
+
         },
         fetchContact: function(id){
             let vm = this;

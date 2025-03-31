@@ -32,6 +32,8 @@ import { extendMoment } from 'moment-range';
  import 'jquery-validation';
  
  import 'select2-bootstrap-theme/dist/select2-bootstrap.min.css';
+ import 'summernote/dist/summernote';
+ import 'summernote/dist/summernote.min.css';
  
  extendMoment(moment);
 
@@ -49,6 +51,7 @@ Vue.component('renderer-block', RendererBlock);
 Vue.component('compliance-renderer-block', ComplianceRendererBlock);
 
 // ckeditor4 is installed in 'wildlifecompliance/templates/wildlifecompliance/base.html'
+//TODO remove entirely
 import CKEditor from 'ckeditor4-vue';
 Vue.use( CKEditor );
 

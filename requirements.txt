@@ -43,7 +43,7 @@ BeautifulSoup4~=4.13.3
 django-treebeard~=4.7.1
 docxtpl~=0.19.1
 django-multiselectfield~=0.1.12
-whitenoise~=6.9.0
+whitenoise==6.8.0
 git+https://github.com/dbca-wa/django-media-serv.git#egg=django_media_serv
 python-decouple~=3.8
 git+https://github.com/dbca-wa/appmonitor_client.git#egg=appmonitor_client
