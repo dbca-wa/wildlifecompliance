@@ -92,10 +92,10 @@
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-sm-9">
-                                                                                    <!--<ckeditor ref="ap_text_detail" v-model="free_text.details" :config="editorConfig"></ckeditor>-->                                                                                
-                                                                                    <summernote :formatted_text="free_text.details" :purpose_index="pt_idx" :activity_index="index" @update-formatted-text="updateFormattedText"></summernote>
+                                                                                    <!--<ckeditor ref="ap_text_detail" v-model="free_text.details" :config="editorConfig"></ckeditor>-->  
+                                                                                    <!--TODO get this working (this does not appear to be consistent with proposed_issuance.vue)-->                                                                              
+                                                                                    <summernote :formatted_text="free_text.details" :purpose_index="p_idx" :activity_index="index" :species_index="pt_idx" @update-formatted-text="updateFormattedText"></summernote>
                                                                                 </div>
-
                                                                             </div>
 
                                                                         </div>
@@ -257,7 +257,7 @@ import {
 from '@/utils/hooks'
 import { mapGetters, mapActions } from 'vuex'
 import filefield from '@/components/common/compliance_file.vue'
-import summernote from '@/components/summernote'
+import summernote from '@/components/purpose_details_summernote'
 
 export default {
     name: 'InternalApplicationIssuance',
@@ -480,9 +480,11 @@ export default {
             //TODO remove debug
             console.log("test")
             console.log(this.applicationSelectedActivitiesForPurposes)
-            console.log(this.applicationSelectedActivitiesForPurposes[object.activity_id][object.purpose_index])
-            this.applicationSelectedActivitiesForPurposes[object.activity_id][object.purpose_index] = object.formatted_text;
-            console.log(this.applicationSelectedActivitiesForPurposes[object.activity_id][object.purpose_index])
+            console.log(object)
+            console.log(this.applicationSelectedActivitiesForPurposes[object.activity_index])
+            console.log(this.applicationSelectedActivitiesForPurposes[object.activity_index].proposed_purposes[object.purpose_index].purpose_species_json[object.species_index])
+            this.applicationSelectedActivitiesForPurposes[object.activity_index].proposed_purposes[object.purpose_index].purpose_species_json[object.species_index];
+            console.log(this.applicationSelectedActivitiesForPurposes[object.activity_index].proposed_purposes[object.purpose_index].purpose_species_json[object.species_index])
 
         },
         preview: async function () {

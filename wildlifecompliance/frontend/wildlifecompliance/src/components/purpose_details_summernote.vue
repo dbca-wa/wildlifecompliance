@@ -21,6 +21,10 @@ export default {
         activity_index: {
             type: Number,
             required: true,
+        },
+        species_index: {
+            type: Number,
+            required: true,
         }
     },
     data: function () {
@@ -54,8 +58,8 @@ export default {
                     this.pushed--;
                 } else {
                     this.changed++;
-                    this.formatted_text = contents;
-                    this.$emit('update-formatted-text', {"formatted_text":this.formatted_text, "purpose_index":this.purpose_index, "activity_index":this.activity_index})
+                    //this.formatted_text = contents;
+                    this.$emit('update-formatted-text', {"formatted_text":this.formatted_text, "purpose_index":this.purpose_index, "activity_index":this.activity_index, "species_index":this.species_index})
                 }
         }
     },
