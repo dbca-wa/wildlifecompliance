@@ -41,6 +41,8 @@ from wildlifecompliance.components.applications.models import (
 
 from wildlifecompliance.exceptions import ApplicationServiceException
 logger = logging.getLogger(__name__)
+
+from ledger_api_client.ledger_models import UsersInGroup
 # logger = logging
 
 
@@ -511,7 +513,7 @@ class SubmitRequestCommand(ApplicationCommand):
             licence_activities__purpose__licence_category__id=type_id
         )
         group_users = EmailUser.objects.filter(
-            groups__id__in=officer_groups.values_list('id', flat=True)
+            id__in=list(UsersInGroup.objects.filter(group_id__in=officer_groups).values_list("emailuser_id",flat=True))
         ).distinct()
 
         requires_refund = self.application.requires_refund_at_submit()

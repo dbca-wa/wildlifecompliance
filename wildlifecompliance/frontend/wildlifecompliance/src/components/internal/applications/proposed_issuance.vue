@@ -316,16 +316,7 @@ export default {
             this.pickedPurposes = [];
         },
         updateFormattedText: function(object) {
-
-            //TODO remove debug
-            console.log("test")
-            console.log(this.applicationSelectedActivitiesForPurposes)
-            console.log(object)
-            console.log(this.applicationSelectedActivitiesForPurposes[object.activity_index])
-            console.log(this.applicationSelectedActivitiesForPurposes[object.activity_index].proposed_purposes[object.purpose_index].purpose_species_json[object.species_index])
-            this.applicationSelectedActivitiesForPurposes[object.activity_index].proposed_purposes[object.purpose_index].purpose_species_json[object.species_index];
-            console.log(this.applicationSelectedActivitiesForPurposes[object.activity_index].proposed_purposes[object.purpose_index].purpose_species_json[object.species_index])
-
+            this.applicationSelectedActivitiesForPurposes[object.activity_index].proposed_purposes[object.purpose_index].purpose_species_json[object.species_index].details = object.formatted_text;
         },
         fetchContact: function(id){
             let vm = this;

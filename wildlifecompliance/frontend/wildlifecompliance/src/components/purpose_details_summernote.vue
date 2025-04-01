@@ -20,7 +20,7 @@ export default {
         },
         activity_index: {
             type: Number,
-            required: true,
+            required: true, //technically not also required, but we substitute it anyway
         },
         species_index: {
             type: Number,
@@ -59,7 +59,7 @@ export default {
                 } else {
                     this.changed++;
                     //this.formatted_text = contents;
-                    this.$emit('update-formatted-text', {"formatted_text":this.formatted_text, "purpose_index":this.purpose_index, "activity_index":this.activity_index, "species_index":this.species_index})
+                    this.$emit('update-formatted-text', {"formatted_text":contents, "purpose_index":this.purpose_index, "activity_index":this.activity_index, "species_index":this.species_index})
                 }
         }
     },
@@ -69,10 +69,10 @@ export default {
         config.minHeight = null;
         config.maxHeight = null;
         config.toolbar =  [
-                ['style', ['bold', 'italic', 'underline', 'clear']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['height', ['height']]
+                ['view', ['codeview']],
+                ['style', ['bold', 'italic', 'style']],
+                ['para', ['ul', 'ol']],
+                ['table', ['table']],
             ]; 
         // init the editor
         this.$summernoterElement.summernote(config);

@@ -92,9 +92,7 @@
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-sm-9">
-                                                                                    <!--<ckeditor ref="ap_text_detail" v-model="free_text.details" :config="editorConfig"></ckeditor>-->  
-                                                                                    <!--TODO get this working (this does not appear to be consistent with proposed_issuance.vue)-->                                                                              
-                                                                                    <summernote :formatted_text="free_text.details" :purpose_index="p_idx" :activity_index="index" :species_index="pt_idx" @update-formatted-text="updateFormattedText"></summernote>
+                                                                                    <summernote :formatted_text="free_text.details" :purpose_index="index" :activity_index="0" :species_index="pt_idx" @update-formatted-text="updateFormattedText"></summernote>
                                                                                 </div>
                                                                             </div>
 
@@ -476,16 +474,7 @@ export default {
             this.$emit('action-tab', {tab: 'IssueApplicant'})
         },
         updateFormattedText: function(object) {
-
-            //TODO remove debug
-            console.log("test")
-            console.log(this.applicationSelectedActivitiesForPurposes)
-            console.log(object)
-            console.log(this.applicationSelectedActivitiesForPurposes[object.activity_index])
-            console.log(this.applicationSelectedActivitiesForPurposes[object.activity_index].proposed_purposes[object.purpose_index].purpose_species_json[object.species_index])
-            this.applicationSelectedActivitiesForPurposes[object.activity_index].proposed_purposes[object.purpose_index].purpose_species_json[object.species_index];
-            console.log(this.applicationSelectedActivitiesForPurposes[object.activity_index].proposed_purposes[object.purpose_index].purpose_species_json[object.species_index])
-
+            this.applicationSelectedActivitiesForPurposes[object.purpose_index].purpose_species_json[object.species_index].details = object.formatted_text;
         },
         preview: async function () {
             let vm = this;

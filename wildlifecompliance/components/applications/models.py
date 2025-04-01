@@ -1772,7 +1772,7 @@ class Application(RevisionedMixin):
                 licence_activities__id=activity_id
             )
             group_users = EmailUser.objects.filter(
-                groups__id__in=officer_groups.values_list('id', flat=True)
+                id__in=list(UsersInGroup.objects.filter(group_id__in=officer_groups).values_list("emailuser_id",flat=True))
             ).distinct()
             email_list = [user.email for user in group_users]
 
@@ -2314,7 +2314,7 @@ class Application(RevisionedMixin):
             licence_activities__purpose__licence_category__id=self.licence_type_data["id"]
         )
         group_users = EmailUser.objects.filter(
-            groups__id__in=officer_groups.values_list('id', flat=True)
+            id__in=list(UsersInGroup.objects.filter(group_id__in=officer_groups).values_list("emailuser_id",flat=True))
         ).distinct()
 
         if self.processing_status == UNDER_REVIEW:
