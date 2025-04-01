@@ -318,16 +318,6 @@ export default {
             },
             pickedPurposes: [],
             spinner:false,
-
-            editorConfig: {
-                // The configuration of the editor.
-                toolbar: toolbar_options,
-                format_tags: 'p;h1;h2;h3;h4;h5;h6;div',
-
-                // remove bottom bar
-                removePlugins: 'elementspath',
-                resize_enabled: false, 
-            },
         }
     },
     watch:{
@@ -888,8 +878,5 @@ export default {
     }
     br {
         padding-bottom: 5px;
-    }
-    .cke_notifications_area {
-        display: none !important;
     }
 </style>

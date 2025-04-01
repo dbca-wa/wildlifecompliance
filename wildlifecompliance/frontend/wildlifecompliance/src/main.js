@@ -50,11 +50,6 @@ Vue.use(Vuelidate)
 Vue.component('renderer-block', RendererBlock);
 Vue.component('compliance-renderer-block', ComplianceRendererBlock);
 
-// ckeditor4 is installed in 'wildlifecompliance/templates/wildlifecompliance/base.html'
-//TODO remove entirely
-import CKEditor from 'ckeditor4-vue';
-Vue.use( CKEditor );
-
 // Add CSRF Token to every request
 Vue.http.interceptors.push( function ( request, next ) {
   // modify headers

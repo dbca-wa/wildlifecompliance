@@ -11,12 +11,14 @@
 
             <CommentBlock :label="label" :name="name" :field_data="field_data" />
 
-	    <ckeditor v-model="field_data.value" :config="editorConfig" :read-only="readonly" :name="name" :required="isRequired" ></ckeditor>
+	    <!--<ckeditor v-model="field_data.value" :config="editorConfig" :read-only="readonly" :name="name" :required="isRequired" ></ckeditor>-->
+        <textarea v-model="field_data.value" :config="editorConfig" :read-only="readonly" :name="name" :required="isRequired" ></textarea>
         </div>
     </div>
 </template>
 
 <script>
+//TODO does not appear to be in use, remove
 import CommentBlock from './comment_block.vue';
 import HelpText from './help_text.vue';
 import HelpTextUrl from './help_text_url.vue';
@@ -57,8 +59,4 @@ export default {
 }
 </script>
 
-<style lang="css">
-  .cke_notifications_area {
-    display: none !important;
-  }
-</style>
+

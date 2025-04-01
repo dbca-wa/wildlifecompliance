@@ -75,13 +75,9 @@
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-sm-9">
-
-                                                                        <!--<ckeditor ref="ap_text_detail" v-model="free_text.details" :config="editorConfig"></ckeditor>-->
                                                                         <summernote :formatted_text="free_text.details" :purpose_index="p_idx" :activity_index="index" :species_index="pt_idx" @update-formatted-text="updateFormattedText"></summernote>
                                                                     </div>
                                                                 </div>
-
-
                                                             </div>
                                                         </div>
                                                     </div>
@@ -247,15 +243,6 @@ export default {
             pickedPurposes: [],
             checkedActivities: [],
             additionalFees: [],
-            editorConfig: {
-                // The configuration of the editor.
-                toolbar: toolbar_options,
-                format_tags: 'p;h1;h2;h3;h4;h5;h6;div',
-
-                // remove bottom bar
-                removePlugins: 'elementspath',
-                resize_enabled: false, 
-            },
         }
     },
     computed: {
@@ -501,8 +488,5 @@ export default {
 <style lang="css">
     br {
         padding-bottom: 5px;
-    }
-    .cke_notifications_area {
-        display: none !important;
     }
 </style>

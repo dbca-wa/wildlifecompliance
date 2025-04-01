@@ -339,7 +339,6 @@ import File from '@/components/forms/file.vue'
 import SelectBlock from '@/components/forms/select.vue'
 import DateField from '@/components/forms/date-field.vue'
 import TextField from '@/components/forms/text.vue'
-import RichTextField from '@/components/forms/richtext.vue'
 import TextAreaBlock from '@/components/forms/text-area.vue'
 import LabelBlock from '@/components/forms/label.vue'
 import AssessorText from '@/components/forms/readonly_text.vue'
@@ -358,7 +357,6 @@ const RendererBlock = {
   components: {
       FormSection,
       TextField,
-      RichTextField,
       Group,
       Group2,
       SelectBlock,
