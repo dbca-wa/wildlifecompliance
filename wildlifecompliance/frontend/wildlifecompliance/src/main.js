@@ -15,31 +15,29 @@ import Vuelidate from 'vuelidate'
 
 import { extendMoment } from 'moment-range';
  
- import jsZip from 'jszip';
- window.JSZip = jsZip;
- 
- import  'datatables.net';
- import 'datatables.net-bs';
- import 'datatables.net-responsive-bs';
- import 'datatables.net-buttons/js/dataTables.buttons.js';
- import 'datatables.net-buttons/js/buttons.html5.js';
- 
- require("datatables.net-bs/css/dataTables.bootstrap.css");
- require("datatables.net-responsive-bs/css/responsive.bootstrap.css");
- 
- import 'select2';
- import "sweetalert2/dist/sweetalert2.css";
- import 'jquery-validation';
- 
- import 'select2-bootstrap-theme/dist/select2-bootstrap.min.css';
- import 'summernote/dist/summernote';
- import 'summernote/dist/summernote.min.css';
- 
- extendMoment(moment);
+import jsZip from 'jszip';
+window.JSZip = jsZip;
+
+import 'select2';
+import "sweetalert2/dist/sweetalert2.css";
+import 'jquery-validation';
+
+import 'datatables.net-buttons-bs';
+import 'datatables.net-responsive-bs';
+
+import 'select2-bootstrap-theme/dist/select2-bootstrap.min.css';
+import 'summernote/dist/summernote';
+import 'summernote/dist/summernote.min.css';
+
+extendMoment(moment);
 
 require( '../node_modules/bootstrap/dist/css/bootstrap.css' );
 //require('../node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css')
 require( '../node_modules/font-awesome/css/font-awesome.min.css' );
+
+import '@/../node_modules/datatables.net-bs/css/dataTables.bootstrap.min.css';
+import '@/../node_modules/datatables.net-responsive-bs/css/responsive.bootstrap.min.css';
+import '@/../node_modules/datatables.net-buttons-bs/css/buttons.bootstrap.min.css';
 
 //Vue.config.devtools = true;
 Vue.config.productionTip = false

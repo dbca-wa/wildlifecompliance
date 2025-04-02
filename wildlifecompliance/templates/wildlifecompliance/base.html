@@ -30,6 +30,7 @@
                 <link type="text/css" href="{% static 'wildlifecompliance/css/base.css' %}" rel="stylesheet">
             {% if not dev %}
 	    <link rel="stylesheet" href="{% static 'wildlifecompliance_vue/css/app.css' %}?v={{RAND_HASH}}">
+        <link rel="stylesheet" href="{% static 'wildlifecompliance_vue/css/chunk-vendors.css' %}?v={{RAND_HASH}}">
             {% endif %}
             {% block extra_css %}
             {% endblock %}

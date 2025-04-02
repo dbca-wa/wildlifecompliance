@@ -35,6 +35,10 @@ module.exports = defineConfig({
             'easing',
             path.resolve(__dirname, 'jquery.easing/jquery.easing.js')
         );
+        config.resolve.alias.set(
+            '@static-root',
+            path.resolve(__dirname, '../../../staticfiles_wc/')
+        );
     },
     configureWebpack: {
         devtool: 'source-map',
