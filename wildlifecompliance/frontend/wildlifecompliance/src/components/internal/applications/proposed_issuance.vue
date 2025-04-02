@@ -75,13 +75,9 @@
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-sm-9">
-
-                                                                        <ckeditor ref="ap_text_detail" v-model="free_text.details" :config="editorConfig"></ckeditor>
-
+                                                                        <summernote :formatted_text="free_text.details" :purpose_index="p_idx" :activity_index="index" :species_index="pt_idx" @update-formatted-text="updateFormattedText"></summernote>
                                                                     </div>
                                                                 </div>
-
-
                                                             </div>
                                                         </div>
                                                     </div>
@@ -185,6 +181,7 @@ import alert from '@vue-utils/alert.vue'
 import {helpers,api_endpoints} from "@/utils/hooks.js"
 import { mapGetters } from 'vuex'
 import filefield from '@/components/common/compliance_file.vue'
+import summernote from '@/components/purpose_details_summernote'
 
 export default {
     name:'Proposed-Licence',
@@ -192,6 +189,7 @@ export default {
         modal,
         alert,
         filefield,
+        summernote,
     },
     props:{
         can_view_richtext_src: Boolean,
@@ -245,15 +243,6 @@ export default {
             pickedPurposes: [],
             checkedActivities: [],
             additionalFees: [],
-            editorConfig: {
-                // The configuration of the editor.
-                toolbar: toolbar_options,
-                format_tags: 'p;h1;h2;h3;h4;h5;h6;div',
-
-                // remove bottom bar
-                removePlugins: 'elementspath',
-                resize_enabled: false, 
-            },
         }
     },
     computed: {
@@ -312,6 +301,9 @@ export default {
 
             this.checkedActivities = [];
             this.pickedPurposes = [];
+        },
+        updateFormattedText: function(object) {
+            this.applicationSelectedActivitiesForPurposes[object.activity_index].proposed_purposes[object.purpose_index].purpose_species_json[object.species_index].details = object.formatted_text;
         },
         fetchContact: function(id){
             let vm = this;
@@ -496,8 +488,5 @@ export default {
 <style lang="css">
     br {
         padding-bottom: 5px;
-    }
-    .cke_notifications_area {
-        display: none !important;
     }
 </style>

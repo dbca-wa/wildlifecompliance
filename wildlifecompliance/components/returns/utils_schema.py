@@ -4,14 +4,15 @@ from future.utils import raise_with_traceback
 import json
 import re
 import logging
+import datetime
 
 from dateutil.parser import parse as date_parse
 
 # TODO: fix the deprecation of SchemaModel. Use
 # jsontableschema.model.Schema, but there is a problem (see below)
-from jsontableschema.model import SchemaModel
-from jsontableschema import types
-from jsontableschema.exceptions import InvalidDateType
+from tableschema import Schema as SchemaModel
+from tableschema.exceptions import ValidationError
+from tableschema import types
 
 from openpyxl import Workbook
 from openpyxl.styles import Font
@@ -45,42 +46,45 @@ def parse_datetime_day_first(value):
     return date_parse(value, dayfirst=dayfirst)
 
 
-class DayFirstDateType(types.DateType):
+class DayFirstDateType():
     """
     Extend the jsontableschema DateType which use the mm/dd/yyyy date model for the 'any' format
     to use dd/mm/yyyy.
     """
 
     def cast_any(self, value, fmt=None):
-        if isinstance(value, self.python_type):
+        if isinstance(value, datetime.datetime):
             return value
         try:
             return parse_datetime_day_first(value).date()
         except (TypeError, ValueError) as e:
-            raise_with_traceback(InvalidDateType(e))
+            raise_with_traceback(ValidationError(e))
 
 
-class DayFirstDateTimeType(types.DateTimeType):
+class DayFirstDateTimeType():
     """
     Extend the jsontableschema DateType which use the mm/dd/yyyy date model for the 'any' format
     to use dd/mm/yyyy
     """
 
     def cast_any(self, value, fmt=None):
-        if isinstance(value, self.python_type):
+        if isinstance(value, datetime.datetime):
             return value
         try:
             return parse_datetime_day_first(value)
         except (TypeError, ValueError) as e:
-            raise_with_traceback(InvalidDateType(e))
+            raise_with_traceback(ValidationError(e))
 
 
-class NotBlankStringType(types.StringType):
+class NotBlankStringType():
     """
     The default StringType accepts empty string when required = True
     """
     null_values = ['null', 'none', 'nil', 'nan', '-', '']
 
+
+class NumberType():
+    pass
 
 @python_2_unicode_compatible
 class WLSchema:
@@ -136,19 +140,20 @@ class SchemaField:
     # For most of the type we use the jsontableschema ones
     # TODO: SchemaModel is deprecated in favor of of
     # jsontableschema.schema.Schema but there's no _type_map!
-    BASE_TYPE_MAP = SchemaModel._type_map()
+    BASE_TYPE_MAP = {} #Schema._type_map()
     # except for anything date.
     BASE_TYPE_MAP['date'] = DayFirstDateType
     BASE_TYPE_MAP['datetime'] = DayFirstDateTimeType
     # and string
     BASE_TYPE_MAP['string'] = NotBlankStringType
+    BASE_TYPE_MAP['number'] = NumberType
 
     WL_TYPE_MAP = {
     }
 
     def __init__(self, data):
-        self.data = data
-        self.name = self.data.get('name')
+        self.data = data.__dict__['_Field__descriptor']
+        self.name = self.data['name']
         # We want to throw an exception if there is no name
         if not self.name:
             raise FieldSchemaError(
@@ -160,7 +165,7 @@ class SchemaField:
         type_class = self.WL_TYPE_MAP.get(
             self.wl.type) or self.BASE_TYPE_MAP.get(
             self.data.get('type'))
-        self.type = type_class(self.data)
+        self.type = type_class()
         self.constraints = SchemaConstraints(self.data.get('constraints', {}))
 
     # implement some dict like methods
@@ -226,7 +231,7 @@ class SchemaField:
         error = None
         # override the integer validation. The default message is a bit cryptic if there's an error casting a string
         # like '1.2' into an int.
-        if isinstance(self.type, types.IntegerType):
+        if isinstance(self.type, types.integer):
             if not is_blank_value(value):
                 not_integer = False
                 try:

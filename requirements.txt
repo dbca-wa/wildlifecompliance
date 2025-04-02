@@ -6,7 +6,6 @@ git+https://github.com/dbca-wa/ledger_api_client.git
 git+https://github.com/dbca-wa/django5-utils-six.git#egg=django5_six
 git+https://github.com/dbca-wa/webtemplate2.git#egg=webtemplate_dbca
 psycopg2~=2.9.10
-social-auth-app-django==2.1.0
 git+https://github.com/scottp-dpaw/social-core.git@email_fix#egg=social-auth-core
 coverage~=7.6.12
 coveralls~=4.0.1
@@ -18,7 +17,7 @@ django-reversion-compare==0.18.1
 git+https://github.com/xzzy/django-preserialize.git#egg=django-preserialize
 django-countries~=7.6.1
 openpyxl~=3.1.5
-jsontableschema==0.10.1
+tableschema~=1.21.0
 python-dateutil~=2.9.0
 djangorestframework~=3.15.2
 djangorestframework-gis~=1.1
@@ -43,7 +42,7 @@ BeautifulSoup4~=4.13.3
 django-treebeard~=4.7.1
 docxtpl~=0.19.1
 django-multiselectfield~=0.1.12
-whitenoise~=6.9.0
+whitenoise==6.8.0
 git+https://github.com/dbca-wa/django-media-serv.git#egg=django_media_serv
 python-decouple~=3.8
 git+https://github.com/dbca-wa/appmonitor_client.git#egg=appmonitor_client
@@ -60,3 +59,4 @@ django-cron~=0.6.0
 django-phonenumber-field~=8.0.0
 pytz~=2025.1
 phonenumbers~=9.0.1
+click~=8.1.8

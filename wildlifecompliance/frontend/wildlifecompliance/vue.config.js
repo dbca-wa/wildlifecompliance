@@ -3,7 +3,7 @@ const { defineConfig } = require('@vue/cli-service');
 const path = require('path');
 const webpack = require('webpack');
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
-const port = process.env.PORT ? parseInt(process.env.PORT) : 9122;
+const port = process.env.PORT ? parseInt(process.env.PORT) : 9052;
 
 module.exports = defineConfig({
     runtimeCompiler: true,
@@ -34,6 +34,10 @@ module.exports = defineConfig({
         config.resolve.alias.set(
             'easing',
             path.resolve(__dirname, 'jquery.easing/jquery.easing.js')
+        );
+        config.resolve.alias.set(
+            '@static-root',
+            path.resolve(__dirname, '../../../staticfiles_wc/')
         );
     },
     configureWebpack: {

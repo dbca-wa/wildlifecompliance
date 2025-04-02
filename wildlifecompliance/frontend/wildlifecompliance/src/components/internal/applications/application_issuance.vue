@@ -83,7 +83,6 @@
                                                                         <div v-for="(free_text, pt_idx) in p.purpose_species_json" v-bind:key="`pt_${pt_idx}`">
                                                                             <br/>
 
-
                                                                             <div class="col-sm-12">
                                                                                 <div class="col-sm-3">
                                                                                     <label class="control-label pull-left" for="Name">Details</label>
@@ -93,10 +92,8 @@
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-sm-9">
-
-                                                                                    <ckeditor ref="ap_text_detail" v-model="free_text.details" :config="editorConfig"></ckeditor>
+                                                                                    <summernote :formatted_text="free_text.details" :purpose_index="index" :activity_index="0" :species_index="pt_idx" @update-formatted-text="updateFormattedText"></summernote>
                                                                                 </div>
-
                                                                             </div>
 
                                                                         </div>
@@ -249,6 +246,7 @@
 
             
 </template>
+
 <script>
 import {
     api_endpoints,
@@ -257,11 +255,13 @@ import {
 from '@/utils/hooks'
 import { mapGetters, mapActions } from 'vuex'
 import filefield from '@/components/common/compliance_file.vue'
+import summernote from '@/components/purpose_details_summernote'
 
 export default {
     name: 'InternalApplicationIssuance',
     components:{
         filefield,
+        summernote,
     },    
     props: {
         application: Object,
@@ -318,16 +318,6 @@ export default {
             },
             pickedPurposes: [],
             spinner:false,
-
-            editorConfig: {
-                // The configuration of the editor.
-                toolbar: toolbar_options,
-                format_tags: 'p;h1;h2;h3;h4;h5;h6;div',
-
-                // remove bottom bar
-                removePlugins: 'elementspath',
-                resize_enabled: false, 
-            },
         }
     },
     watch:{
@@ -473,7 +463,10 @@ export default {
         selectApplicantTab: function() {
             this.$emit('action-tab', {tab: 'IssueApplicant'})
         },
-       preview: async function () {
+        updateFormattedText: function(object) {
+            this.applicationSelectedActivitiesForPurposes[object.purpose_index].purpose_species_json[object.species_index].details = object.formatted_text;
+        },
+        preview: async function () {
             let vm = this;
 
             this.setApplicationWorkflowState({bool: true});
@@ -885,8 +878,5 @@ export default {
     }
     br {
         padding-bottom: 5px;
-    }
-    .cke_notifications_area {
-        display: none !important;
     }
 </style>
