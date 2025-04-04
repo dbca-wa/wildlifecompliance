@@ -1,4 +1,4 @@
-Django~=5.0.13
+Django~=5.2.0
 ipython~=9.0.2
 django-extensions~=3.2.3
 git+https://github.com/dbca-wa/dbca-utils@1.0.0
@@ -55,7 +55,7 @@ urllib3~=2.3.0
 requests~=2.32.3
 numpy~=2.2.3
 django-widget-tweaks~=1.5.0
-django-cron~=0.6.0
+git+https://github.com/jorenham/django-cron.git@cec74656a6cada4c40fec43f46594bf332268ab1
 django-phonenumber-field~=8.0.0
 pytz~=2025.1
 phonenumbers~=9.0.1
