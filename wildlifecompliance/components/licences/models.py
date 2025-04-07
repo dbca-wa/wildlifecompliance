@@ -17,7 +17,7 @@ from smart_selects.db_fields import ChainedForeignKey
 
 from ckeditor.fields import RichTextField
 
-from wildlifecompliance.components.main.models import RevisionedMixin
+from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 from dbca_utils.models import ActiveMixin
 from django.contrib.postgres.fields import ArrayField
 
@@ -49,7 +49,7 @@ class LicenceDocument(Document):
         app_label = 'wildlifecompliance'
 
 
-class LicencePurpose(models.Model):
+class LicencePurpose(SanitiseMixin):
     name = models.CharField(max_length=100)
     short_name = models.CharField(max_length=30, default='')
     code = models.CharField(max_length=4, default='')
@@ -253,7 +253,7 @@ class LicencePurpose(models.Model):
         return json.dumps(_list)
 
 
-class PurposeSpecies(models.Model):
+class PurposeSpecies(SanitiseMixin):
     licence_purpose = models.ForeignKey(
         LicencePurpose, related_name='purpose_species', on_delete=models.CASCADE)
     order = models.IntegerField(default=1)

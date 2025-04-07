@@ -24,7 +24,7 @@ from smart_selects.db_fields import ChainedForeignKey
 from ckeditor.fields import RichTextField
 
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
-from wildlifecompliance.components.main.models import RevisionedMixin
+from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 from ledger_api_client.ledger_models import Invoice
 from ledger_api_client.utils import get_invoice_properties
 
@@ -1601,7 +1601,7 @@ class Application(RevisionedMixin):
                                 p.purpose_species_json = \
                                     prev.purpose_species_json
 
-                                p.save()
+                                p.save(exclude_sanitise="purpose_species_json")
 
                 self.save()
                 officer_groups = ActivityPermissionGroup.objects.filter(
@@ -2862,7 +2862,7 @@ class Application(RevisionedMixin):
                                 p_proposed['purpose_species_json']
 
                         proposed.processing_status = status
-                        proposed.save()
+                        proposed.save(exclude_sanitise="purpose_species_json")
 
                     activity.save()
 
@@ -3430,7 +3430,7 @@ class Application(RevisionedMixin):
                                 purpose.purpose.name,
                             ), request)
 
-                        purpose.save()
+                        purpose.save(exclude_sanitise="purpose_species_json")
                         # TODO: check to ensure that purpose does not
                         # exist in decline aswell for double logging.
                         self.log_user_action(
@@ -5900,7 +5900,7 @@ class ApplicationSelectedActivity(models.Model):
 
         return previous
 
-class ApplicationSelectedActivityPurpose(models.Model):
+class ApplicationSelectedActivityPurpose(SanitiseMixin):
     '''
     A purpose selected for issue on an Application Selected Activity.
     '''

@@ -79,6 +79,15 @@ class LicencePurposeAdmin(admin.ModelAdmin):
     readonly_fields = ('licence_purpose_actions',)
     raw_id_fields = ('licence_category', 'licence_activity', 'replaced_by')
 
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+        for obj in formset.deleted_objects:
+            obj.delete()
+        for instance in instances:
+            instance.user = request.user
+            instance.save(exclude_sanitise=["details"])
+        formset.save_m2m()
+
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [

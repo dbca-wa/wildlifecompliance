@@ -1,4 +1,5 @@
 import ast
+import re
 
 import pytz
 import json
@@ -718,3 +719,45 @@ def get_dob(obj):
         return obj.dob
 
     return ""
+
+def remove_html_tags(text):
+
+    if text is None:
+        return None
+
+    HTML_TAGS_WRAPPED = re.compile(r'<[^>]+>.+</[^>]+>')
+    HTML_TAGS_NO_WRAPPED = re.compile(r'<[^>]+>')
+
+    text = HTML_TAGS_WRAPPED.sub('', text)
+    text = HTML_TAGS_NO_WRAPPED.sub('', text)
+    return text
+
+def remove_script_tags(text):
+
+    if text is None:
+        return None
+
+    SCRIPT_TAGS_WRAPPED = re.compile(r'(?i)<script+>.+</script+>')
+    SCRIPT_TAGS_NO_WRAPPED = re.compile(r'(?i)<script+>')
+
+    text = SCRIPT_TAGS_WRAPPED.sub('', text)
+    text = SCRIPT_TAGS_NO_WRAPPED.sub('', text)
+    return text
+
+def sanitise_fields(instance, exclude=[], error_on_change=[]):
+    for i in instance.__dict__:
+        #remove html tags for all string fields not in the exclude list
+        if isinstance(instance.__dict__[i], str) and not i in exclude:
+            check = instance.__dict__[i]
+            setattr(instance, i, remove_html_tags(instance.__dict__[i]))
+            if i in error_on_change and check != instance.__dict__[i]:
+                #only fields that cannot be allowed to change through sanitisation just before saving will throw an error
+                raise ValidationError("html tags included in field")
+        elif isinstance(instance.__dict__[i], str) and i in exclude:
+            #even though excluded, we still check to remove script tags
+            setattr(instance, i, remove_script_tags(instance.__dict__[i]))
+            if i in error_on_change and check != instance.__dict__[i]:
+                #only fields that cannot be allowed to change through sanitisation just before saving will throw an error
+                raise ValidationError("script tags included in field")
+
+    return instance
