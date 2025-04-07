@@ -1,7 +1,7 @@
 Django~=5.2.0
 ipython~=9.0.2
 django-extensions~=3.2.3
-git+https://github.com/dbca-wa/dbca-utils@1.0.0
+git+https://github.com/dbca-wa/dbca-utils@2.1.0
 git+https://github.com/dbca-wa/ledger_api_client.git
 git+https://github.com/dbca-wa/django5-utils-six.git#egg=django5_six
 git+https://github.com/dbca-wa/webtemplate2.git#egg=webtemplate_dbca
@@ -55,7 +55,7 @@ urllib3~=2.3.0
 requests~=2.32.3
 numpy~=2.2.3
 django-widget-tweaks~=1.5.0
-git+https://github.com/jorenham/django-cron.git@cec74656a6cada4c40fec43f46594bf332268ab1
+git+https://github.com/dbca-wa/django-cron.git#egg=django-cron
 django-phonenumber-field~=8.0.0
 pytz~=2025.1
 phonenumbers~=9.0.1
