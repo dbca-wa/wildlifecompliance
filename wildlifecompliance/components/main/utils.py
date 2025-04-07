@@ -753,24 +753,18 @@ def is_json(value):
     return True
 
 def sanitise_fields(instance, exclude=[], error_on_change=[]):
-    print(instance) #TODO MAKE THIS WORK FOR JSON FIELDS AND LISTS
     if hasattr(instance,"__dict__"):
         for i in instance.__dict__:
             #remove html tags for all string fields not in the exclude list
-            print(i)
-            print(type(instance.__dict__[i]))
             if not i in exclude and (isinstance(instance.__dict__[i], dict)):
-                print("jsonfield")
                 sanitise_fields(instance.__dict__[i])
             
             elif isinstance(instance.__dict__[i], list):
-                print("list")
-                print(instance.__dict__[i])
-                print(len(instance.__dict__[i])-1)
                 for j in range(0, len(instance.__dict__[i])):
-                    print(instance.__dict__[i][j])
-                    instance.__dict__[i][j] = remove_html_tags(instance.__dict__[i][j])
-                    instance.__dict__[i][j]
+                    if isinstance(instance.__dict__[i][j],str):
+                        instance.__dict__[i][j] = remove_html_tags(instance.__dict__[i][j])
+                    else:
+                        sanitise_fields(instance.__dict__[i][j])
             
             elif isinstance(instance.__dict__[i], str) and not i in exclude:
                 check = instance.__dict__[i]
@@ -788,13 +782,14 @@ def sanitise_fields(instance, exclude=[], error_on_change=[]):
         for i in instance:
             #remove html tags for all string fields not in the exclude list
             if not i in exclude and (isinstance(instance[i], dict)):
-                print("jsonfield in depth")
                 sanitise_fields(json.loads(instance[i]))
 
             elif isinstance(instance[i], list):
-                print("list in depth")
-                for j in range(0, i<len(instance[i])):
-                    instance[i][j] = remove_html_tags(instance[i][j])
+                for j in range(0, len(instance[i])):
+                    if isinstance(instance[i][j],str):
+                        instance[i][j] = remove_html_tags(instance[i][j])
+                    else:
+                        sanitise_fields(instance[i][j])
 
             else:
                 if isinstance(instance[i], str) and not i in exclude:

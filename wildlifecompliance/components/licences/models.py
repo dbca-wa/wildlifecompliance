@@ -277,7 +277,7 @@ class PurposeSpecies(SanitiseMixin):
         return json.dumps(dict_obj)
 
 
-class LicenceActivity(models.Model):
+class LicenceActivity(SanitiseMixin):
     name = models.CharField(max_length=100)
     licence_category = models.ForeignKey(
         'LicenceCategory',
@@ -307,7 +307,7 @@ class LicenceActivity(models.Model):
 
 
 # #LicenceType NOTE: values from ledger will need to be copied over to this segregated table
-class LicenceCategory(models.Model):
+class LicenceCategory(SanitiseMixin):
     id = models.IntegerField(
         unique=True,
         primary_key=True
@@ -366,7 +366,7 @@ class LicenceCategory(models.Model):
         return _activities
 
 
-class LicenceSpecies(models.Model):
+class LicenceSpecies(SanitiseMixin):
     """
     Model representation of a verified specie information that can be applied
     to a licence.
@@ -418,7 +418,7 @@ class DefaultPurpose(models.Model):
         return '{} - {}'.format(self.activity, self.purpose)
 
 
-class WildlifeLicence(models.Model):
+class WildlifeLicence(SanitiseMixin):
     '''
     A model representation of a Wildlife Licence.
     '''
@@ -1640,7 +1640,7 @@ class LicenceInspection(models.Model):
         return is_active
 
 
-class QuestionOption(models.Model):
+class QuestionOption(SanitiseMixin):
     '''
     Model representation of Option available for a Licence Purpose Question.
     '''
@@ -1676,7 +1676,7 @@ class QuestionOption(models.Model):
 #         )
 
 
-class MasterlistQuestion(models.Model):
+class MasterlistQuestion(SanitiseMixin):
     '''
     Model representation of Schema Question/Type available for construction.
     '''
@@ -1980,7 +1980,7 @@ class MasterlistQuestion(models.Model):
             self.property_cache['expanders'] = data
 
 
-class LicencePurposeSection(models.Model):
+class LicencePurposeSection(SanitiseMixin):
     '''
     A model represention of Licence Purpose Section for a licence application.
     '''
@@ -1999,7 +1999,7 @@ class LicencePurposeSection(models.Model):
         return '{} - {}'.format(self.section_label, self.licence_purpose)
 
 
-class SectionGroup(models.Model):
+class SectionGroup(SanitiseMixin):
     '''
     Model representation of Section Group.
     '''
@@ -2059,7 +2059,7 @@ class SectionGroup(models.Model):
             self.property_cache['repeatable'] = data
 
 
-class SectionQuestion(models.Model):
+class SectionQuestion(SanitiseMixin):
     '''
     Model representation of Section available with questions.
     '''
@@ -2235,7 +2235,7 @@ class SectionQuestion(models.Model):
 
 
 #TODO does not appear to work or be in use
-class SectionQuestionCondition(models.Model):
+class SectionQuestionCondition(SanitiseMixin):
     '''
     Model representation of a Question Condition required for Question Option.
     '''
@@ -2296,7 +2296,7 @@ class LicenceUserAction(UserAction):
 #     for document in instance.documents.all():
 #         document.delete()
 
-class WildlifeLicenceReceptionEmail(models.Model):
+class WildlifeLicenceReceptionEmail(SanitiseMixin):
     '''
     An model representation of an Wildlife Licensing Reception email address
     used for general purposes.

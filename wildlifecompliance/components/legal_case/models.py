@@ -7,7 +7,7 @@ from django.contrib.postgres.fields.jsonb import JSONField
 from django.db.models import Q, Max
 from six import python_2_unicode_compatible
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
-from wildlifecompliance.components.main.models import RevisionedMixin
+from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 from wildlifecompliance.components.organisations.models import Organisation
 from wildlifecompliance.components.call_email.models import CallEmail, Location
 #from wildlifecompliance.components.artifact.utils import build_legal_case_hierarchy
@@ -32,7 +32,7 @@ private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/"
 logger = logging.getLogger(__name__)
 
 
-class LegalCasePriority(models.Model):
+class LegalCasePriority(SanitiseMixin):
     case_priority = models.CharField(max_length=50)
     #schema = JSONField(null=True)
     #version = models.SmallIntegerField(default=1, blank=False, null=False)
@@ -52,7 +52,7 @@ class LegalCasePriority(models.Model):
         return self.case_priority
 
 
-class CourtProceedings(models.Model):
+class CourtProceedings(SanitiseMixin):
     legal_case = models.OneToOneField(
         'LegalCase',
         null=True,
@@ -359,7 +359,7 @@ class LegalCase(RevisionedMixin):
         self.save()
 
 
-class BriefOfEvidence(models.Model):
+class BriefOfEvidence(SanitiseMixin):
     legal_case = models.OneToOneField(
             LegalCase,
             null=True,
@@ -401,7 +401,7 @@ class BriefOfEvidence(models.Model):
         app_label = 'wildlifecompliance'
 
 
-class ProsecutionBrief(models.Model):
+class ProsecutionBrief(SanitiseMixin):
     legal_case = models.OneToOneField(
             LegalCase,
             null=True,
@@ -587,7 +587,7 @@ class LegalCaseCommsLogDocument(Document):
 
 
 # class LegalCaseUserAction(UserAction):
-class LegalCaseUserAction(models.Model):
+class LegalCaseUserAction(SanitiseMixin):
     ACTION_CREATE_LEGAL_CASE = "Create Case {}"
     ACTION_SAVE_LEGAL_CASE = "Save Case {}"
     ACTION_STATUS_BRIEF_OF_EVIDENCE = "Generate 'Brief of Evidence' for Case {}"
@@ -713,7 +713,7 @@ class CourtOutcomeDocument(Document):
         verbose_name_plural = 'CM_CourtOutcomeDocuments'
 
 
-class Court(models.Model):
+class Court(SanitiseMixin):
     identifier = models.CharField(max_length=255, blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
@@ -727,7 +727,7 @@ class Court(models.Model):
         return self.identifier + ' ({})'.format(self.location)
 
 
-class CourtOutcomeType(models.Model):
+class CourtOutcomeType(SanitiseMixin):
     identifier = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
@@ -740,7 +740,7 @@ class CourtOutcomeType(models.Model):
         return self.identifier
 
 
-class CourtDate(models.Model):
+class CourtDate(SanitiseMixin):
     court_proceedings = models.ForeignKey(CourtProceedings, related_name='court_dates', on_delete=models.CASCADE)
     court_datetime = models.DateTimeField(blank=True, null=True,)
     comments = models.TextField(blank=True)

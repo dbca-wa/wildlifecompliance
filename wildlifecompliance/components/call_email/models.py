@@ -11,7 +11,7 @@ from multiselectfield import MultiSelectField
 from six import python_2_unicode_compatible
 from rest_framework import serializers
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
-from wildlifecompliance.components.main.models import RevisionedMixin
+from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 
 from wildlifecompliance.components.main.models import (
         CommunicationsLogEntry,
@@ -82,7 +82,7 @@ class Classification(models.Model):
     def __str__(self):
         return self.get_name_display()
 
-class CallType(models.Model):
+class CallType(SanitiseMixin):
     name = models.CharField(
         max_length=50,
         unique=True,
@@ -98,7 +98,7 @@ class CallType(models.Model):
     def __str__(self):
         return self.name
         
-class WildcareSpeciesType(models.Model):
+class WildcareSpeciesType(SanitiseMixin):
     call_type=models.ForeignKey(CallType, on_delete=models.CASCADE , related_name='wildcare_species_types', blank=True, null=True)
     species_name = models.CharField(
         max_length=100,
@@ -117,7 +117,7 @@ class WildcareSpeciesType(models.Model):
     def __str__(self):
         return self.species_name
         
-class WildcareSpeciesSubType(models.Model):
+class WildcareSpeciesSubType(SanitiseMixin):
     wildcare_species_type=models.ForeignKey(WildcareSpeciesType, on_delete=models.CASCADE , related_name='wildcare_species_sub_types', limit_choices_to={'show_species_name_textbox':False},)
     species_sub_name = models.CharField(
         max_length=100,
@@ -136,7 +136,7 @@ class WildcareSpeciesSubType(models.Model):
         return self.species_sub_name
 
 
-class Referrer(models.Model):
+class Referrer(SanitiseMixin):
     name = models.CharField(max_length=50, blank=True)
 
     class Meta:
@@ -148,7 +148,7 @@ class Referrer(models.Model):
         return self.name
 
 
-class ReportType(models.Model):
+class ReportType(SanitiseMixin):
 
     report_type = models.CharField(max_length=50)
     schema = JSONField(null=True)
@@ -174,7 +174,7 @@ class ReportType(models.Model):
             return self.referrer.name
 
 
-class Location(models.Model):
+class Location(SanitiseMixin):
 
     STATE_CHOICES = (
         ('WA', 'Western Australia'),
@@ -214,7 +214,7 @@ class Location(models.Model):
             return self.details
 
 
-class MapLayer(models.Model):
+class MapLayer(SanitiseMixin):
     display_name = models.CharField(max_length=100, blank=True, null=True)
     layer_name = models.CharField(max_length=200, blank=True, null=True)  # layer name defined in geoserver (kmi.dpaw.wa.gov.au)
     availability = models.BooleanField(default=True)  # False to hide from the frontend options
@@ -538,7 +538,7 @@ class CallEmail(RevisionedMixin):
         self.save()
 
 @python_2_unicode_compatible
-class ComplianceFormDataRecord(models.Model):
+class ComplianceFormDataRecord(SanitiseMixin):
 
     INSTANCE_ID_SEPARATOR = "__instance-"
 

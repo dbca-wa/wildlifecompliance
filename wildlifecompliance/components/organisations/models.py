@@ -33,6 +33,7 @@ from wildlifecompliance.components.organisations.emails import (
     send_organisation_id_upload_email_notification,
     send_organisation_contact_consultant_email_notification,
 )
+from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 from wildlifecompliance.components.main.models import Document
 from wildlifecompliance.components.main.utils import (
     get_first_name,
@@ -56,7 +57,7 @@ def is_wildlife_compliance_officer(request):
     return wildlife_compliance_user
 
 @python_2_unicode_compatible
-class Organisation(models.Model):
+class Organisation(SanitiseMixin):
     intelligence_information_text = models.TextField(blank=True)
     organisation_id = models.IntegerField(
         unique=True, verbose_name="Ledger Organisation ID"
@@ -628,7 +629,7 @@ class OrganisationIntelligenceDocument(Document):
 
 
 @python_2_unicode_compatible
-class OrganisationContact(models.Model):
+class OrganisationContact(SanitiseMixin):
     ORG_CONTACT_STATUS_DRAFT = 'draft'
     ORG_CONTACT_STATUS_PENDING = 'pending'
     ORG_CONTACT_STATUS_ACTIVE = 'active'
@@ -797,7 +798,7 @@ class OrganisationLogEntry(CommunicationsLogEntry):
         app_label = 'wildlifecompliance'
 
 
-class OrganisationRequest(models.Model):
+class OrganisationRequest(SanitiseMixin):
     ORG_REQUEST_STATUS_WITH_ASSESSOR = 'with_assessor'
     ORG_REQUEST_STATUS_AMENDMENT_REQUESTED = 'amendment_requested'
     ORG_REQUEST_STATUS_APPROVED = 'approved'
@@ -1117,7 +1118,7 @@ class OrganisationRequestUserAction(UserAction):
         ordering = ['-when']
 
 
-class OrganisationRequestDeclinedDetails(models.Model):
+class OrganisationRequestDeclinedDetails(SanitiseMixin):
     request = models.ForeignKey(OrganisationRequest, on_delete=models.CASCADE)
     officer = models.ForeignKey(EmailUser, null=False, on_delete=models.CASCADE)
     reason = models.TextField(blank=True)

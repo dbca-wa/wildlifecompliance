@@ -9,7 +9,7 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.signals import post_save
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
-from wildlifecompliance.components.main.models import RevisionedMixin
+from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 from rest_framework import serializers
 from wildlifecompliance import settings
 from wildlifecompliance.components.main.models import Document, CommunicationsLogEntry, Region, District
@@ -58,7 +58,7 @@ class SanctionOutcomeExternalManager(models.Manager):
             Q(status__in=SanctionOutcome.STATUSES_FOR_EXTERNAL))
 
 
-class SanctionOutcome(models.Model):
+class SanctionOutcome(SanitiseMixin):
     # Workflow
     WORKFLOW_SEND_TO_MANAGER = 'send_to_manager'
     WORKFLOW_ENDORSE = 'endorse'
@@ -1008,7 +1008,7 @@ class SanctionOutcomeUserAction(models.Model):
         )
 
 #TODO determine if this is used
-class DotRequestFile(models.Model):
+class DotRequestFile(SanitiseMixin):
     contents = models.TextField(blank=True)
     filename = models.CharField(max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -1021,7 +1021,7 @@ class DotRequestFile(models.Model):
         verbose_name_plural = 'CM_DotReguestFiles'
 
 #TODO investigate if working (may not be set when it should be)
-class UnpaidInfringementFile(models.Model):
+class UnpaidInfringementFile(SanitiseMixin):
     contents = models.TextField(blank=True)
     filename = models.CharField(max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -1056,7 +1056,7 @@ class ActionTakenDocument(Document):
         verbose_name_plural = 'CM_RemediationActionDocuments'
 
 
-class AmendmentRequestReason(models.Model):
+class AmendmentRequestReason(SanitiseMixin):
     reason = models.CharField(max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -1070,7 +1070,7 @@ class AmendmentRequestReason(models.Model):
         return self.reason
 
 
-class AmendmentRequestForRemediationAction(models.Model):
+class AmendmentRequestForRemediationAction(SanitiseMixin):
     remediation_action = models.ForeignKey(RemediationAction, related_name='amendment_requests', on_delete=models.CASCADE)
     # The value of this field is copied from the selection of AmendmentRequestReason
     reason = models.CharField(max_length=100, blank=True)
@@ -1087,7 +1087,7 @@ class AmendmentRequestForRemediationAction(models.Model):
         verbose_name_plural = 'CM_AmendmentRequests'
 
 
-class RemediationActionNotification(models.Model):
+class RemediationActionNotification(SanitiseMixin):
     TYPE_CLOSE_TO_DUE = 'close_to_due'
     TYPE_OVERDUE = 'overdue'
 

@@ -3,7 +3,7 @@ from django.db.models import Q
 from rest_framework.exceptions import ValidationError
 
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
-from wildlifecompliance.components.main.models import RevisionedMixin
+from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 
 
 class SanctionOutcomeDueDateConfiguration(RevisionedMixin):
@@ -25,7 +25,7 @@ class SanctionOutcomeDueDateConfiguration(RevisionedMixin):
         return '1st due date window: {} days, 2nd due date window: {} days, enforcement date: {})'.format(self.due_date_window_1st, self.due_date_window_2nd, self.date_of_enforcement)
 
 
-class SanctionOutcomeDueDate(models.Model):
+class SanctionOutcomeDueDate(SanitiseMixin):
     due_date_1st = models.DateField(null=True, blank=True)
     due_date_2nd = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
