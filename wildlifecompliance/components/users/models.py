@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import Group
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.components.main.models import Document, Region, District
+from wildlifecompliance.components.main.models import SanitiseMixin
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -151,7 +152,7 @@ private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/"
 #        ).distinct()
 
 
-class ComplianceManagementUserPreferences(models.Model):
+class ComplianceManagementUserPreferences(SanitiseMixin):
 
     prefer_compliance_management = models.BooleanField(default=False)
     email_user = models.OneToOneField(EmailUser, on_delete=models.CASCADE)

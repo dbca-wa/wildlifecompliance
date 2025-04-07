@@ -7,7 +7,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.db.models import Q
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
-from wildlifecompliance.components.main.models import RevisionedMixin
+from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 from wildlifecompliance.components.call_email.models import Location, CallEmail
 from wildlifecompliance.components.legal_case.models import LegalCase
 from wildlifecompliance.components.inspection.models import Inspection
@@ -258,7 +258,7 @@ class ActiveOffenderManager(models.Manager):
         return super(ActiveOffenderManager, self).get_queryset().filter(removed=False)
 
 
-class Offender(models.Model):
+class Offender(SanitiseMixin):
     reason_for_removal = models.TextField(blank=True)
     removed = models.BooleanField(default=False)
     removed_by = models.ForeignKey(
@@ -294,7 +294,7 @@ class Offender(models.Model):
             return '---'
 
 
-class OffenceUserAction(models.Model):
+class OffenceUserAction(SanitiseMixin):
     ACTION_CLOSE = "Close offence: {}"
     ACTION_PENDING_CLOSURE = "Mark offence {} as pending closure"
     ACTION_CREATE = "Create Offence: {}"

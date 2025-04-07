@@ -6,7 +6,7 @@ from django.db.models import JSONField
 from django.db.models import Q
 from six import python_2_unicode_compatible
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
-from wildlifecompliance.components.main.models import RevisionedMixin
+from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 from wildlifecompliance.components.organisations.models import Organisation
 from wildlifecompliance.components.call_email.models import CallEmail, Location
 from wildlifecompliance.components.legal_case.models import LegalCase
@@ -38,7 +38,7 @@ def update_inspection_report_filename(instance, filename):
      pass
 
 
-class InspectionType(models.Model):
+class InspectionType(SanitiseMixin):
     inspection_type = models.CharField(max_length=50)
     schema = JSONField(null=True)
     version = models.SmallIntegerField(default=1, blank=False, null=False)
@@ -351,7 +351,7 @@ class InspectionCommsLogEntry(CommunicationsLogEntry):
         app_label = 'wildlifecompliance'
 
 
-class InspectionUserAction(models.Model):
+class InspectionUserAction(SanitiseMixin):
     ACTION_CREATE_INSPECTION = "Create Inspection {}"
     ACTION_SAVE_INSPECTION_ = "Save Inspection {}"
     ACTION_OFFENCE = "Create Offence {}"
@@ -413,7 +413,7 @@ class InspectionDocument(Document):
 
 
 @python_2_unicode_compatible
-class InspectionFormDataRecord(models.Model):
+class InspectionFormDataRecord(SanitiseMixin):
 
     INSTANCE_ID_SEPARATOR = "__instance-"
 

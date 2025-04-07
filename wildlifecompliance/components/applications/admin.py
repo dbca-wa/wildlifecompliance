@@ -73,6 +73,9 @@ class ApplicationStandardConditionAdmin(admin.ModelAdmin):
     list_display = ['id', 'code', 'short_description', 'obsolete']
     raw_id_fields = ('return_type',)
 
+    def save_model(self, request, obj, form, change):
+        obj.save(exclude_sanitise=["text"])
+
 
 @admin.register(models.ApplicationSelectedActivityPurpose)
 class ApplicationSelectedActivityPurposeAdmin(admin.ModelAdmin):

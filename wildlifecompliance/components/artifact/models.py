@@ -6,7 +6,7 @@ from django.db.models import JSONField
 from django.db.models import Max
 from six import python_2_unicode_compatible
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
-from wildlifecompliance.components.main.models import RevisionedMixin
+from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 from wildlifecompliance.components.organisations.models import Organisation
 from wildlifecompliance.components.call_email.models import CallEmail, Location
 from wildlifecompliance.components.main.models import (
@@ -114,7 +114,7 @@ class Artifact(RevisionedMixin):
 
 
 # TODO - no longer required
-class DocumentArtifactType(models.Model):
+class DocumentArtifactType(SanitiseMixin):
     artifact_type = models.CharField(max_length=50)
     #schema = JSONField(null=True)
     version = models.SmallIntegerField(default=1, blank=False, null=False)
@@ -133,7 +133,7 @@ class DocumentArtifactType(models.Model):
         return self.artifact_type
 
 
-class PhysicalArtifactType(models.Model):
+class PhysicalArtifactType(SanitiseMixin):
     FOUND_OBJECT = 'found_object'
     SEIZED_OBJECT = 'seized_object'
     SURRENDERED_OBJECT = 'surrendered_object'
@@ -169,7 +169,7 @@ class PhysicalArtifactType(models.Model):
         return display_name
 
 
-class PhysicalArtifactDisposalMethod(models.Model):
+class PhysicalArtifactDisposalMethod(SanitiseMixin):
     disposal_method = models.CharField(max_length=50)
     description = models.CharField(max_length=255, blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
@@ -535,7 +535,7 @@ class PhysicalArtifactLegalCases(models.Model):
         unique_together = ('physical_artifact', 'legal_case')
 
 
-class BriefOfEvidencePhysicalArtifacts(models.Model):
+class BriefOfEvidencePhysicalArtifacts(SanitiseMixin):
     legal_case = models.ForeignKey(
             LegalCase, on_delete=models.CASCADE
             )
@@ -598,7 +598,7 @@ class ProsecutionBriefPhysicalArtifacts(models.Model):
         hyperlink = '/internal/object/' + str(self.physical_artifact.id)
         return hyperlink
 
-#TODO determine if in use
+#TODO determine if in use (if it is, apply sanitise plugin, otherwise remove)
 @python_2_unicode_compatible
 class PhysicalArtifactFormDataRecord(models.Model):
 

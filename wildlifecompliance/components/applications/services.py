@@ -433,7 +433,7 @@ class SubmitRequestCommand(ApplicationCommand):
                 p.purpose_species_json = \
                     prev.purpose_species_json
 
-                p.save()
+                p.save(exclude_sanitise="purpose_species_json")
 
     def prepare_reissue(self, selected_activity):
         '''

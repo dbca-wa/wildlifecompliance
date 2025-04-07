@@ -6,7 +6,7 @@ from django.db.utils import IntegrityError
 from django.db.models import JSONField
 from django.utils import timezone
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
-from wildlifecompliance.components.main.models import RevisionedMixin
+from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 from ledger_api_client.ledger_models import Invoice
 from wildlifecompliance.components.applications.models import (
     ApplicationCondition,
@@ -47,7 +47,7 @@ def update_returns_comms_log_filename(instance, filename):
 
 #NOTE many Return models and functions appear to be generally unused.
 
-class ReturnType(models.Model):
+class ReturnType(SanitiseMixin):
     """
     A definition to identify the format used to facilitate Return.
     """
@@ -166,7 +166,7 @@ class ReturnType(models.Model):
         return resource.get('schema', {}) if resource else None
 
 
-class ReturnTypeRegulatedSpecies(models.Model):
+class ReturnTypeRegulatedSpecies(SanitiseMixin):
     '''
     Model object representation of Regulated Species applicable for a Return
     Type.
@@ -194,7 +194,7 @@ class ReturnTypeRegulatedSpecies(models.Model):
         )
 
 
-class Return(models.Model):
+class Return(SanitiseMixin):
     """
     A number of requirements relating to a Licence condition recorded during
     the Licence period.
@@ -666,7 +666,7 @@ class Return(models.Model):
         return ReturnUserAction.log_action(self, action, request.user)
 
 
-class ReturnActivity(models.Model):
+class ReturnActivity(SanitiseMixin):
     '''
     A model representation of a licensed stock movement activity that has
     occured on a licence return.
