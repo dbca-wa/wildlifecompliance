@@ -170,7 +170,7 @@ class UserAction(models.Model):
         app_label = 'wildlifecompliance'
 
 
-class CommunicationsLogEntry(models.Model):
+class CommunicationsLogEntry(SanitiseMixin):
     COMMUNICATIONS_LOG_TYPE_EMAIL = 'email'
     COMMUNICATIONS_LOG_TYPE_PHONE = 'phone'
     COMMUNICATIONS_LOG_TYPE_MAIL = 'mail'
@@ -206,7 +206,7 @@ class CommunicationsLogEntry(models.Model):
 
 
 @python_2_unicode_compatible
-class Document(models.Model):
+class Document(SanitiseMixin):
     name = models.CharField(max_length=100, blank=True,
                             verbose_name='name', help_text='')
     description = models.TextField(blank=True,

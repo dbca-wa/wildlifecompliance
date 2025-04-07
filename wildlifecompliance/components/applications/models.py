@@ -3910,7 +3910,7 @@ class ApplicationLogEntry(CommunicationsLogEntry):
         return 'Comms Log: {} Type: {} From: {}'.format(
             self.subject, self.log_type, self.fromm)
 
-class ApplicationRequest(models.Model):
+class ApplicationRequest(SanitiseMixin):
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     subject = models.CharField(max_length=200, blank=True)
     text = models.TextField(blank=True)
@@ -4205,7 +4205,7 @@ class AssessmentInspection(models.Model):
         return is_active
 
 
-class ApplicationSelectedActivity(models.Model):
+class ApplicationSelectedActivity(SanitiseMixin):
 
     PROPOSED_ACTION_DEFAULT = 'default'
     PROPOSED_ACTION_DECLINE = 'propose_decline'
@@ -6693,7 +6693,7 @@ class ActivityInvoiceLine(models.Model):
 
 
 @python_2_unicode_compatible
-class ApplicationFormDataRecord(models.Model):
+class ApplicationFormDataRecord(SanitiseMixin):
 
     INSTANCE_ID_SEPARATOR = "__instance-"
 

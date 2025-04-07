@@ -18,6 +18,7 @@ from ledger_api_client.ledger_models import Invoice
 from wildlifecompliance.exceptions import BindApplicationException
 from django.core.cache import cache
 from wildlifecompliance.components.main.models import RegionGIS, DistrictGIS
+from django.db.models import JSONField
 
 logger = logging.getLogger(__name__)
 
@@ -744,9 +745,19 @@ def remove_script_tags(text):
     text = SCRIPT_TAGS_NO_WRAPPED.sub('', text)
     return text
 
+def is_json(value):
+    try:
+        json.loads(value)
+    except:
+        return False
+    return True
+
 def sanitise_fields(instance, exclude=[], error_on_change=[]):
     for i in instance.__dict__:
         #remove html tags for all string fields not in the exclude list
+        if not i in exclude and (isinstance(instance.__dict__[i], JSONField) or is_json(instance.__dict__[i])):
+            sanitise_fields(instance.__dict__[i])
+        
         if isinstance(instance.__dict__[i], str) and not i in exclude:
             check = instance.__dict__[i]
             setattr(instance, i, remove_html_tags(instance.__dict__[i]))
@@ -759,5 +770,5 @@ def sanitise_fields(instance, exclude=[], error_on_change=[]):
             if i in error_on_change and check != instance.__dict__[i]:
                 #only fields that cannot be allowed to change through sanitisation just before saving will throw an error
                 raise ValidationError("script tags included in field")
-
+    print(instance)
     return instance
