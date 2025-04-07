@@ -70,7 +70,7 @@ class RevisionedMixin(SanitiseMixin):
         abstract = True
 
 @python_2_unicode_compatible
-class SystemMaintenance(models.Model):
+class SystemMaintenance(SanitiseMixin):
     name = models.CharField(max_length=100)
     description = models.TextField()
     start_date = models.DateTimeField()

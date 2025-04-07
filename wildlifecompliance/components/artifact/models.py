@@ -6,7 +6,7 @@ from django.db.models import JSONField
 from django.db.models import Max
 from six import python_2_unicode_compatible
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
-from wildlifecompliance.components.main.models import RevisionedMixin
+from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 from wildlifecompliance.components.organisations.models import Organisation
 from wildlifecompliance.components.call_email.models import CallEmail, Location
 from wildlifecompliance.components.main.models import (
@@ -114,7 +114,7 @@ class Artifact(RevisionedMixin):
 
 
 # TODO - no longer required
-class DocumentArtifactType(models.Model):
+class DocumentArtifactType(SanitiseMixin):
     artifact_type = models.CharField(max_length=50)
     #schema = JSONField(null=True)
     version = models.SmallIntegerField(default=1, blank=False, null=False)
@@ -133,7 +133,7 @@ class DocumentArtifactType(models.Model):
         return self.artifact_type
 
 
-class PhysicalArtifactType(models.Model):
+class PhysicalArtifactType(SanitiseMixin):
     FOUND_OBJECT = 'found_object'
     SEIZED_OBJECT = 'seized_object'
     SURRENDERED_OBJECT = 'surrendered_object'

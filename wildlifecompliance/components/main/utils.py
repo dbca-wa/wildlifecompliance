@@ -753,22 +753,60 @@ def is_json(value):
     return True
 
 def sanitise_fields(instance, exclude=[], error_on_change=[]):
-    for i in instance.__dict__:
-        #remove html tags for all string fields not in the exclude list
-        if not i in exclude and (isinstance(instance.__dict__[i], JSONField) or is_json(instance.__dict__[i])):
-            sanitise_fields(instance.__dict__[i])
-        
-        if isinstance(instance.__dict__[i], str) and not i in exclude:
-            check = instance.__dict__[i]
-            setattr(instance, i, remove_html_tags(instance.__dict__[i]))
-            if i in error_on_change and check != instance.__dict__[i]:
-                #only fields that cannot be allowed to change through sanitisation just before saving will throw an error
-                raise ValidationError("html tags included in field")
-        elif isinstance(instance.__dict__[i], str) and i in exclude:
-            #even though excluded, we still check to remove script tags
-            setattr(instance, i, remove_script_tags(instance.__dict__[i]))
-            if i in error_on_change and check != instance.__dict__[i]:
-                #only fields that cannot be allowed to change through sanitisation just before saving will throw an error
-                raise ValidationError("script tags included in field")
-    print(instance)
+    print(instance) #TODO MAKE THIS WORK FOR JSON FIELDS AND LISTS
+    if hasattr(instance,"__dict__"):
+        for i in instance.__dict__:
+            #remove html tags for all string fields not in the exclude list
+            print(i)
+            print(type(instance.__dict__[i]))
+            if not i in exclude and (isinstance(instance.__dict__[i], dict)):
+                print("jsonfield")
+                sanitise_fields(instance.__dict__[i])
+            
+            elif isinstance(instance.__dict__[i], list):
+                print("list")
+                print(instance.__dict__[i])
+                print(len(instance.__dict__[i])-1)
+                for j in range(0, len(instance.__dict__[i])):
+                    print(instance.__dict__[i][j])
+                    instance.__dict__[i][j] = remove_html_tags(instance.__dict__[i][j])
+                    instance.__dict__[i][j]
+            
+            elif isinstance(instance.__dict__[i], str) and not i in exclude:
+                check = instance.__dict__[i]
+                setattr(instance, i, remove_html_tags(instance.__dict__[i]))
+                if i in error_on_change and check != instance.__dict__[i]:
+                    #only fields that cannot be allowed to change through sanitisation just before saving will throw an error
+                    raise ValidationError("html tags included in field")
+            elif isinstance(instance.__dict__[i], str) and i in exclude:
+                #even though excluded, we still check to remove script tags
+                setattr(instance, i, remove_script_tags(instance.__dict__[i]))
+                if i in error_on_change and check != instance.__dict__[i]:
+                    #only fields that cannot be allowed to change through sanitisation just before saving will throw an error
+                    raise ValidationError("script tags included in field")
+    else:
+        for i in instance:
+            #remove html tags for all string fields not in the exclude list
+            if not i in exclude and (isinstance(instance[i], dict)):
+                print("jsonfield in depth")
+                sanitise_fields(json.loads(instance[i]))
+
+            elif isinstance(instance[i], list):
+                print("list in depth")
+                for j in range(0, i<len(instance[i])):
+                    instance[i][j] = remove_html_tags(instance[i][j])
+
+            else:
+                if isinstance(instance[i], str) and not i in exclude:
+                    check = instance[i]
+                    instance[i] = remove_html_tags(instance[i])
+                    if i in error_on_change and check != instance[i]:
+                        #only fields that cannot be allowed to change through sanitisation just before saving will throw an error
+                        raise ValidationError("html tags included in field")
+                elif isinstance(instance[i], str) and i in exclude:
+                    #even though excluded, we still check to remove script tags
+                    instance[i] = remove_script_tags(instance[i])
+                    if i in error_on_change and check != instance[i]:
+                        #only fields that cannot be allowed to change through sanitisation just before saving will throw an error
+                        raise ValidationError("script tags included in field")
     return instance
