@@ -782,7 +782,7 @@ def sanitise_fields(instance, exclude=[], error_on_change=[]):
         for i in instance:
             #remove html tags for all string fields not in the exclude list
             if not i in exclude and (isinstance(instance[i], dict)):
-                sanitise_fields(json.loads(instance[i]))
+                sanitise_fields(instance[i])
 
             elif isinstance(instance[i], list):
                 for j in range(0, len(instance[i])):
