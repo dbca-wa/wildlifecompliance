@@ -222,9 +222,12 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @renderer_classes((JSONRenderer,))
     def get_intelligence_text(self, request, *args, **kwargs):
         try:
-            instance = self.get_object()
-            intelligence_text = instance.intelligence_information_text
-            return Response({"intelligence_text": intelligence_text})
+            if is_wildlife_compliance_officer(self.request):
+                instance = self.get_object()
+                intelligence_text = instance.intelligence_information_text
+                return Response({"intelligence_text": intelligence_text})
+            else:
+                raise serializers.ValidationError("user not authorised")
 
         except serializers.ValidationError:
             print(traceback.print_exc())
@@ -243,11 +246,14 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @renderer_classes((JSONRenderer,))
     def save_intelligence_text(self, request, *args, **kwargs):
         try:
-            instance = self.get_object()
-            intelligence_text = request.data.get('intelligence_text')
-            instance.intelligence_information_text = intelligence_text
-            instance.save()
-            return Response()
+            if is_wildlife_compliance_officer(self.request):
+                instance = self.get_object()
+                intelligence_text = request.data.get('intelligence_text')
+                instance.intelligence_information_text = intelligence_text
+                instance.save()
+                return Response()
+            else:
+                raise serializers.ValidationError("user not authorised")
 
         except serializers.ValidationError:
             print(traceback.print_exc())
@@ -266,20 +272,23 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @renderer_classes((JSONRenderer,))
     def process_intelligence_document(self, request, *args, **kwargs):
         try:
-            instance = self.get_object()
-            # process docs
-            returned_data = process_generic_document(request, instance, 'intelligence_document')
-            # delete Sanction Outcome if user cancels modal
-            action = request.data.get('action')
-            if action == 'cancel' and returned_data:
-                instance.status = 'discarded'
-                instance.save()
+            if is_wildlife_compliance_officer(self.request):
+                instance = self.get_object()
+                # process docs
+                returned_data = process_generic_document(request, instance, 'intelligence_document')
+                # delete Sanction Outcome if user cancels modal
+                action = request.data.get('action')
+                if action == 'cancel' and returned_data:
+                    instance.status = 'discarded'
+                    instance.save()
 
-            # return response
-            if returned_data:
-                return Response(returned_data)
+                # return response
+                if returned_data:
+                    return Response(returned_data)
+                else:
+                    return Response()
             else:
-                return Response()
+                raise serializers.ValidationError("user not authorised")
 
         except serializers.ValidationError:
             print(traceback.print_exc())
@@ -298,9 +307,12 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def contacts(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            serializer = OrganisationContactSerializer(
+            if is_wildlife_compliance_officer(self.request) or instance.can_user_edit(request.user.email):
+                serializer = OrganisationContactSerializer(
                 instance.contacts.all(), many=True)
-            return Response(serializer.data)
+                return Response(serializer.data)
+            else:
+                raise serializers.ValidationError("user not authorised")
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
@@ -314,9 +326,13 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['GET', ])
     def contacts_linked(self, request, *args, **kwargs):
         try:
-            qs = self.get_queryset()
-            serializer = OrganisationContactSerializer(qs, many=True)
-            return Response(serializer.data)
+            instance = self.get_object()
+            if is_wildlife_compliance_officer(self.request) or instance.can_user_edit(request.user.email):
+                qs = self.get_queryset()
+                serializer = OrganisationContactSerializer(qs, many=True)
+                return Response(serializer.data)
+            else:
+                raise serializers.ValidationError("user not authorised")
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
@@ -331,9 +347,12 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def contacts_exclude(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            qs = instance.contacts.exclude(user_status=OrganisationContact.ORG_CONTACT_STATUS_DRAFT)
-            serializer = OrganisationContactSerializer(qs, many=True)
-            return Response(serializer.data)
+            if is_wildlife_compliance_officer(self.request) or instance.can_user_edit(request.user.email):
+                qs = instance.contacts.exclude(user_status=OrganisationContact.ORG_CONTACT_STATUS_DRAFT)
+                serializer = OrganisationContactSerializer(qs, many=True)
+                return Response(serializer.data)
+            else:
+                raise serializers.ValidationError("user not authorised")
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
@@ -347,10 +366,13 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['POST', ])
     def add_nonuser_contact(self, request, *args, **kwargs):
         try:
+            instance = self.get_object()
+            if not instance.can_user_edit(request.user.email):
+                raise serializers.ValidationError("user not authorised")
+
             serializer = OrganisationContactCheckSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
 
-            instance = self.get_object()
             admin_flag = False
             role = OrganisationContact.ORG_CONTACT_ROLE_USER
             status = OrganisationContact.ORG_CONTACT_STATUS_DRAFT
@@ -427,6 +449,8 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def accept_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+            if not instance.can_user_edit(request.user.email):
+                raise serializers.ValidationError("user not authorised")
             serializer = OrgUserAcceptSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             user_obj = EmailUser.objects.get(
@@ -449,6 +473,8 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def accept_declined_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+            if not instance.can_user_edit(request.user.email):
+                raise serializers.ValidationError("user not authorised")
             serializer = OrgUserAcceptSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             user_obj = EmailUser.objects.get(
@@ -471,6 +497,8 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def decline_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+            if not instance.can_user_edit(request.user.email):
+                raise serializers.ValidationError("user not authorised")
             serializer = OrgUserAcceptSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             user_obj = EmailUser.objects.get(
@@ -493,6 +521,8 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def unlink_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+            if not instance.can_user_edit(request.user.email):
+                raise serializers.ValidationError("user not authorised")
             request.data.update([('org_id', instance.id)])
             serializer = OrgUserCheckSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -516,6 +546,8 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def make_admin_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+            if not instance.can_user_edit(request.user.email):
+                raise serializers.ValidationError("user not authorised")
             serializer = OrgUserAcceptSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             user_obj = EmailUser.objects.get(
@@ -538,6 +570,8 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def make_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+            if not instance.can_user_edit(request.user.email):
+                raise serializers.ValidationError("user not authorised")
             request.data.update([('org_id', instance.id)])
             serializer = OrgUserCheckSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -561,6 +595,8 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def make_consultant(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+            if not instance.can_user_edit(request.user.email):
+                raise serializers.ValidationError("user not authorised")
             request.data.update([('org_id', instance.id)])
             serializer = OrgUserCheckSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -584,6 +620,8 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def suspend_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+            if not instance.can_user_edit(request.user.email):
+                raise serializers.ValidationError("user not authorised")
             request.data.update([('org_id', instance.id)])
             serializer = OrgUserCheckSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -607,6 +645,8 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def reinstate_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+            if not instance.can_user_edit(request.user.email):
+                raise serializers.ValidationError("user not authorised")
             serializer = OrgUserAcceptSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             user_obj = EmailUser.objects.get(
@@ -629,6 +669,8 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def relink_user(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+            if not instance.can_user_edit(request.user.email):
+                raise serializers.ValidationError("user not authorised")
             serializer = OrgUserAcceptSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             user_obj = EmailUser.objects.get(
@@ -651,9 +693,12 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def action_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            qs = instance.action_logs.all()
-            serializer = OrganisationActionSerializer(qs, many=True)
-            return Response(serializer.data)
+            if is_wildlife_compliance_officer(request) or instance.can_user_edit(request.user.email):
+                qs = instance.action_logs.all()
+                serializer = OrganisationActionSerializer(qs, many=True)
+                return Response(serializer.data)
+            else:
+                raise serializers.ValidationError("user not authorised")
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
@@ -669,7 +714,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         try:
             instance = self.get_object()
             qs = instance.org_applications.all()
-            serializer = BaseApplicationSerializer(qs, many=True)
+            serializer = BaseApplicationSerializer(qs, many=True, context={'request': request})
             return Response(serializer.data)
         except serializers.ValidationError:
             print(traceback.print_exc())
@@ -685,9 +730,12 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def comms_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            qs = instance.comms_logs.all()
-            serializer = OrganisationCommsSerializer(qs, many=True)
-            return Response(serializer.data)
+            if is_wildlife_compliance_officer(request) or instance.can_user_edit(request.user.email):
+                qs = instance.comms_logs.all()
+                serializer = OrganisationCommsSerializer(qs, many=True)
+                return Response(serializer.data)
+            else:
+                raise serializers.ValidationError("user not authorised")
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
@@ -719,96 +767,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
-
-    @action(detail=True, methods=['POST', ])
-    def update_details(self, request, *args, **kwargs):
-        try:
-            org = self.get_object()
-            instance = org.organisation
-            serializer = DetailsSerializer(instance, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            instance = serializer.save()
-            serializer = self.get_serializer(org)
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
-
-    @action(detail=True, methods=['POST', ])
-    def update_address(self, request, *args, **kwargs):
-        raise NotImplementedError(
-            "Updating addresses needs to be implemented in ledger api client"
-        )
-    
-        try:
-            org = self.get_object()
-            instance = org.organisation
-            serializer = OrganisationAddressSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            address, created = OrganisationAddress.objects.get_or_create(
-                line1=serializer.validated_data['line1'],
-                locality=serializer.validated_data['locality'],
-                state=serializer.validated_data['state'],
-                country=serializer.validated_data['country'],
-                postcode=serializer.validated_data['postcode'],
-            )
-            instance.postal_address = address
-            instance.save()
-            send_organisation_address_updated_email_notification(
-                request.user, instance, org, request)
-            serializer = self.get_serializer(org)
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
-
-    @action(detail=True, methods=['POST', ])
-    def upload_id(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            instance.organisation.upload_identification(request)
-            with transaction.atomic():
-                instance.save()
-                instance.log_user_action(
-                    OrganisationAction.ACTION_ID_UPDATE.format(
-                        '{} ({})'.format(
-                            instance.name, instance.abn)), request)
-            # For any of the submitter's applications that have requested ID update,
-            # email the assigned officer
-            applications = instance.org_applications.filter(
-                org_applicant=instance,
-                id_check_status=Application.ID_CHECK_STATUS_AWAITING_UPDATE,
-                proxy_applicant=None
-            ).exclude(customer_status__in=(
-                Application.CUSTOMER_STATUS_ACCEPTED,
-                Application.CUSTOMER_STATUS_DECLINED)
-            ).order_by('id')
-            Organisation.send_organisation_id_upload_email_notification(
-                instance, applications, request)
-            serializer = OrganisationSerializer(instance, partial=True)
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
-
+        
 
 class OrganisationRequestsPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (OrganisationFilterBackend,)
@@ -920,7 +879,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     @action(detail=True, methods=['GET', ])
     def assign_to_me(self, request, *args, **kwargs):
         try:
-            if not is_wildlife_compliance_officer(self.request):
+            if not is_wildlife_compliance_officer(request):
                 return Response("user not authorised to assign organisation request")
             instance = self.get_object()
             user = request.user
@@ -944,7 +903,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     @action(detail=True, methods=['POST', ])
     def assign_officer(self, request, *args, **kwargs):
         try:
-            if not is_wildlife_compliance_officer(self.request):
+            if not is_wildlife_compliance_officer(request):
                 return Response("user not authorised to assign organisation request")
 
             instance = self.get_object()
@@ -978,7 +937,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     @action(detail=True, methods=['GET', ])
     def unassign_officer(self, request, *args, **kwargs):
         try:
-            if not is_wildlife_compliance_officer(self.request):
+            if not is_wildlife_compliance_officer(request):
                 return Response("user not authorised to unassign organisation request")
 
             instance = self.get_object()
@@ -999,7 +958,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     @action(detail=True, methods=['GET', ])
     def accept(self, request, *args, **kwargs):
         try:
-            if not is_wildlife_compliance_officer(self.request):
+            if not is_wildlife_compliance_officer(request):
                 return Response("user not authorised to accept organisation request")
             
             instance = self.get_object()
@@ -1020,7 +979,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     @action(detail=True, methods=['GET', ])
     def amendment_request(self, request, *args, **kwargs):
         try:
-            if not is_wildlife_compliance_officer(self.request):
+            if not is_wildlife_compliance_officer(request):
                 return Response("user not authorised to create amendemnt request for organisation request")
             
             instance = self.get_object()
@@ -1060,7 +1019,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
     @action(detail=True, methods=['GET', ])
     def decline(self, request, *args, **kwargs):
         try:
-            if not is_wildlife_compliance_officer(self.request):
+            if not is_wildlife_compliance_officer(request):
                 return Response("user not authorised to decline organisation request")
             
             instance = self.get_object()
@@ -1232,7 +1191,7 @@ class OrganisationComplianceManagementViewSet(viewsets.GenericViewSet, mixins.Re
         print(request.data)
 
         #auth, in case it is used
-        if not is_wildlife_compliance_officer(self.request):
+        if not is_wildlife_compliance_officer(request):
             return Response("user not authorised to create",
             status=status.HTTP_401_UNAUTHORIZED)
 
@@ -1369,7 +1328,7 @@ class GetOrganisationId(views.APIView):
 
         org_id = request.GET.get('org_id', '')
         user = self.request.user
-        if is_wildlife_compliance_officer(self.request):
+        if is_wildlife_compliance_officer(request):
             organisation_qs = Organisation.objects.filter(organisation_id=org_id)
         elif user.is_authenticated:
             organisation_qs = user.wildlifecompliance_organisations.filter(organisation_id=org_id)

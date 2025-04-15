@@ -191,6 +191,14 @@ LEDGER_UI_ACCOUNTS_MANAGEMENT = [
 
 ]
 
+ORGANISATION_PERMISSION_MODULE = 'wildlifecompliance.permission'
+
+LEDGER_UI_ORGANISATION_MANAGEMENT = [
+        {'organisation_name': {'options' : {'view': True, 'edit': True}}},
+        {'organisation_abn': {'options' : {'view': True, 'edit': True}}},
+        {'postal_address': {'options' : {'view': True, 'edit': True}}}
+]
+
 LEDGER_UI_ACCOUNTS_MANAGEMENT_KEYS = []
 for am in LEDGER_UI_ACCOUNTS_MANAGEMENT:
     LEDGER_UI_ACCOUNTS_MANAGEMENT_KEYS.append(list(am.keys())[0])
