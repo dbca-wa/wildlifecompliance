@@ -5,6 +5,9 @@ module.exports = {
     allocated_group_members: '/api/allocated_group_members',
     staff_member_lookup: '/api/staff_member_lookup',
     organisations: '/api/organisations/',
+    get_organisation_id: function (org_id) {
+      return `/api/get_organisation_id/?org_id=${org_id}`
+    },
     organisations_paginated: '/api/organisations_paginated/',
     organisation_requests: '/api/organisation_requests/',
     organisation_requests_paginated: '/api/organisation_requests_paginated/',

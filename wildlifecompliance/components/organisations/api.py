@@ -1360,3 +1360,21 @@ class OrganisationComplianceManagementViewSet(viewsets.GenericViewSet, mixins.Re
     #        saved_address = address_serializer.save()
     #        print("address saved")
     #    return saved_address
+
+
+class GetOrganisationId(views.APIView):
+    renderer_classes = [JSONRenderer,]
+
+    def get(self, request, format=None):
+
+        org_id = request.GET.get('org_id', '')
+        user = self.request.user
+        if is_wildlife_compliance_officer(self.request):
+            organisation_qs = Organisation.objects.filter(organisation_id=org_id)
+        elif user.is_authenticated:
+            organisation_qs = user.wildlifecompliance_organisations.filter(organisation_id=org_id)
+
+        if organisation_qs.exists():
+            return Response({"id":organisation_qs.last().id})
+        else:
+            serializers.ValidationError("not authorised to access organisation")

@@ -1,5 +1,128 @@
+<!--TODO remove, no longer needed-->
 <template>
-    <div class="container" v-if="org && loaded" id="userInfo">
+    <div class="container" v-if="org" id="userInfo">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h3 class="panel-title">Organisation Details<small> View and update the organisation's details</small>
+                        <a class="panelClicker" :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
+                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
+                        </a>
+                    </h3>
+                  </div>
+                  <div class="panel-body collapse in" :id="pBody">
+                      <form class="form-horizontal" name="personal_form" method="post">
+                          <div class="form-group">
+                            <label for="" class="col-sm-3 control-label">Name</label>
+                            <div class="col-sm-6">
+                                <input type="text" :disabled ='!myorgperms.is_admin' class="form-control" name="first_name" placeholder=""  v-model="org.name">
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="" class="col-sm-3 control-label" >ABN</label>
+                            <div class="col-sm-6">
+                                <input type="text" disabled class="form-control" name="last_name" placeholder="" v-model="org.abn">
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <div class="col-sm-12">
+                                <button v-if="!updatingDetails" class="pull-right btn btn-primary" @click.prevent="updateDetails()">Update</button>
+                                <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
+                            </div>
+                          </div>
+                       </form>
+                  </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <!-- <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h3 class="panel-title">Identification<small> Upload organisation ID</small>
+                        <a class="panelClicker" :href="'#'+idBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="idBody">
+                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
+                        </a>
+                    </h3>
+                  </div>
+                  <div class="panel-body collapse" :id="idBody">
+                      <form class="form-horizontal" name="id_form" method="post">
+                          <div class="form-group">
+                            <label for="" class="col-sm-3 control-label">Identification</label>
+                            <div class="col-sm-6">
+                                <img v-if="org.organisation.identification" width="100%" name="identification" v-bind:src="org.organisation.identification" />
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <div class="col-sm-12">
+                                output order in reverse due to pull-right at runtime 
+                                <button v-if="!uploadingID" class="pull-right btn btn-primary" @click.prevent="uploadID()">Upload</button>
+                                <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Uploading</button>
+                                <span class="pull-right" style="margin-left:10px;margin-top:10px;margin-right:10px">{{uploadedIDFileName}}</span>
+                                <span class="btn btn-primary btn-file pull-right">
+                                    Select ID to Upload<input type="file" ref="uploadedID" @change="readFileID()"/>
+                                </span> -->
+                            <!-- </div>
+                          </div>
+                       </form>
+                  </div> -->
+                <!-- </div> -->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h3 class="panel-title">Address Details<small> View and update the organisation's address details</small>
+                        <a class="panelClicker" :href="'#'+adBody" data-toggle="collapse" expanded="false"  data-parent="#userInfo" :aria-controls="adBody">
+                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
+                        </a>
+                    </h3>
+                  </div>
+                  <div v-if="loading.length == 0" class="panel-body collapse" :id="adBody">
+                      <form class="form-horizontal" action="index.html" method="post">
+                          <div class="form-group">
+                            <label for="" class="col-sm-3 control-label">Street</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" name="street" placeholder=""  v-model="org.address.line1">
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="" class="col-sm-3 control-label" >Town/Suburb</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" name="surburb" placeholder=""  v-model="org.address.locality">
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="" class="col-sm-3 control-label">State</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" name="country" placeholder=""  v-model="org.address.state">
+                            </div>
+                            <label for="" class="col-sm-1 control-label">Postcode</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" name="postcode" placeholder=""  v-model="org.address.postcode">
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="" class="col-sm-3 control-label" >Country</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" name="country"  v-model="org.address.country">
+                                    <option v-for="c in countries" :value="c.code">{{ c.name }}</option>
+                                </select>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <div class="col-sm-12">
+                                <button v-if="!updatingAddress"  class="pull-right btn btn-primary" @click.prevent="updateAddress()">Update</button>
+                                <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
+                            </div>
+                          </div>
+                       </form>
+                  </div>
+                </div>
+            </div>
+        </div>
         <div class="row" >
             <div class="col-sm-12">
                 <div class="panel panel-default" >
@@ -15,14 +138,13 @@
                             <div class="col-sm-12">
                                 <button @click.prevent="addContact()" style="margin-bottom:10px;" class="btn btn-primary pull-right">Add Contact</button>
                             </div>
-                            </br></br>
                             <datatable ref="contacts_datatable" id="organisation_contacts_datatable" :dtOptions="contacts_options" :dtHeaders="contacts_headers"/>
                         </form>
                   </div>
                 </div>
             </div>
         </div>
-        <div v-if="myorgperms.is_admin && org && loaded" class="row">
+        <div v-if="myorgperms.is_admin" class="row">
             <div class="col-sm-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -66,7 +188,7 @@
                                 </div>
                             </div>
                         </form>
-                        <div class="col-sm-12 row">
+                        <div>
                             <div class="col-sm-12 row">
                                 <div class="row">
                                     <div class="col-sm-12 top-buffer-s">
@@ -75,18 +197,20 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-12 row">
-                            <datatable ref="contacts_datatable_user" id="organisation_contacts_datatable_ref" :dtOptions="contacts_options_ref" :dtHeaders="contacts_headers_ref"/>
+                        <div>
+                            <datatable ref="contacts_datatable_user" id="organisation_contacts_datatable_ref" :dtOptions="contacts_options_ref" :dtHeaders="contacts_headers_ref" v-model="filterOrgContactStatus"/>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <AddContact v-if="loaded" ref="add_contact" :org_id="org_id" />
+        <AddContact ref="add_contact" :org_id="org.id" />
     </div>
 </template>
 
 <script>
+//import $ from 'jquery'
+import Vue from 'vue'
 import { api_endpoints, helpers } from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
 import utils from '../utils'
@@ -97,12 +221,14 @@ export default {
     data () {
         let vm = this;
         return {
+            adBody: 'adBody'+vm._uid,
+            pBody: 'pBody'+vm._uid,
             cBody: 'cBody'+vm._uid,
             oBody: 'oBody'+vm._uid,
-            org_id: null,
+            idBody: 'idBody'+vm._uid,
+            
             org: null,
             myorgperms: null,
-            loaded: false,
             contact_user: {
                 first_name: null,
                 last_name: null,
@@ -111,7 +237,159 @@ export default {
                 phone_number: null,
                 user_role: {}
             },
+             
+            loading: [],
+            countries: [],
+            updatingDetails: false,
+            updatingAddress: false,
+            updatingContact: false,
+            updatingAcceptUser: false,
+            uploadingID: false,
+            uploadedID: null,
+            logsTable: null,
             DATE_TIME_FORMAT: 'DD/MM/YYYY HH:mm:ss',
+            logsDtOptions:{
+                language: {
+                    processing: "<i class='fa fa-4x fa-spinner fa-spin'></i>"
+                },
+                responsive: true,
+                deferRender: true, 
+                autowidth: true,
+                order: [[2, 'desc']],
+                dom:
+                    "<'row'<'col-sm-5'l><'col-sm-6'f>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                processing:true,
+                ajax: {
+                    "url": helpers.add_endpoint_json(api_endpoints.organisations,vm.$route.params.org_id+'/action_log'),
+                    "dataSrc": '',
+                },
+                columns:[
+                    {
+                        data:"who",
+                    },
+                    {
+                        data:"what",
+                    },
+                    {
+                        data:"when",
+                        mRender:function(data,type,full){
+                            return moment(data).format(vm.DATE_TIME_FORMAT)
+                        }
+                    },
+                ]
+            },
+            commsDtOptions:{
+                language: {
+                    processing: "<i class='fa fa-4x fa-spinner fa-spin'></i>"
+                },
+                responsive: true,
+                deferRender: true, 
+                autowidth: true,
+                order: [[0, 'desc']],
+                processing:true,
+                ajax: {
+                    "url": helpers.add_endpoint_json(api_endpoints.organisations,vm.$route.params.org_id+'/comms_log'),
+                    "dataSrc": '',
+                },
+                columns:[
+                    {
+                        title: 'Date',
+                        data: 'created',
+                        render: function (date) {
+                            return moment(date).format(vm.DATE_TIME_FORMAT);
+                        }
+                    },
+                    {
+                        title: 'Type',
+                        data: 'type'
+                    },
+                    {
+                        title: 'Reference',
+                        data: 'reference'
+                    },
+                    {
+                        title: 'To',
+                        data: 'to',
+                        render: vm.commaToNewline
+                    },
+                    {
+                        title: 'CC',
+                        data: 'cc',
+                        render: vm.commaToNewline
+                    },
+                    {
+                        title: 'From',
+                        data: 'fromm',
+                        render: vm.commaToNewline
+                    },
+                    {
+                        title: 'Subject/Desc.',
+                        data: 'subject'
+                    },
+                    {
+                        title: 'Text',
+                        data: 'text',
+                        'render': function (value) {
+                            var ellipsis = '...',
+                                truncated = _.truncate(value, {
+                                    length: 100,
+                                    omission: ellipsis,
+                                    separator: ' '
+                                }),
+                                result = '<span>' + truncated + '</span>',
+                                popTemplate = _.template('<a href="#" ' +
+                                    'role="button" ' +
+                                    'data-toggle="popover" ' +
+                                    'data-trigger="click" ' +
+                                    'data-placement="top auto"' +
+                                    'data-html="true" ' +
+                                    'data-content="<%= text %>" ' +
+                                    '>more</a>');
+                            if (_.endsWith(truncated, ellipsis)) {
+                                result += popTemplate({
+                                    text: value
+                                });
+                            }
+
+                            return result;
+                        },
+                    },
+                    {
+                        title: 'Documents',
+                        data: 'documents',
+                        'render': function (values) {
+                            var result = '';
+                            _.forEach(values, function (value) {
+                                // We expect an array [docName, url]
+                                // if it's a string it is the url
+                                var docName = '',
+                                    url = '';
+                                if (_.isArray(value) && value.length > 1){
+                                    docName = value[0];
+                                    url = value[1];
+                                }
+                                if (typeof s === 'string'){
+                                    url = value;
+                                    // display the first  chars of the filename
+                                    docName = _.last(value.split('/'));
+                                    docName = _.truncate(docName, {
+                                        length: 18,
+                                        omission: '...',
+                                        separator: ' '
+                                    });
+                                }
+                                result += '<a href="' + url + '" target="_blank"><p>' + docName+ '</p></a><br>';
+                            });
+                            return result;
+                        }
+                    }
+                ]
+            },
+            commsTable : null,
+
+
             contacts_headers:["Name","Phone","Mobile","Fax","Email","Action"],
             contacts_options:{
                  language: {
@@ -119,7 +397,7 @@ export default {
                 },
                 responsive: true,
                 ajax: {
-                    "url": '',
+                    "url": helpers.add_endpoint_json(api_endpoints.organisations,vm.$route.params.org_id+'/contacts'),
                     "dataSrc": ''
                 },
                 columns: [
@@ -157,7 +435,7 @@ export default {
                 },
                 responsive: true,
                 ajax: {
-                    "url": '',
+                    "url": helpers.add_endpoint_json(api_endpoints.organisations,vm.$route.params.org_id+'/contacts_exclude'),
                     "dataSrc": ''
                 },
                 columns: [
@@ -212,55 +490,118 @@ export default {
                             return links;
                         }
                     }
-                ],
-                processing: true,
+                  ],
+                  processing: true,
                                   
             }
+         
+
+         
         }
     },
     components: {
         datatable,
         AddContact
     },
+    
+    computed: {
+        uploadedIDFileName: function() {
+            return this.uploadedID != null ? this.uploadedID.name: '';
+        },
+    },
     beforeRouteEnter: function(to, from, next){
-        let id = [utils.fetchOrganisationId(to.params.org_id)];
-        Promise.all(id).then(res => {
-            let initialisers = [
-                utils.fetchOrganisation(res[0].id),
-                utils.fetchOrganisationPermissions(res[0].id)
-            ]
-            Promise.all(initialisers).then(data => {
-                next(vm => {
-                    vm.org_id = res[0].id;
-                    vm.org = data[0];
-                    vm.myorgperms = data[1];
-                    vm.org.address = vm.org.address != null ? vm.org.address : {};
-                    vm.org.pins = vm.org.pins != null ? vm.org.pins : {};
-                });
+        let initialisers = [
+            utils.fetchCountries(),
+            utils.fetchOrganisation(to.params.org_id),
+            utils.fetchOrganisationPermissions(to.params.org_id)
+        ]
+        Promise.all(initialisers).then(data => {
+            next(vm => {
+                vm.countries = data[0];
+                vm.org = data[1];
+                vm.myorgperms = data[2];
+                vm.org.address = vm.org.address != null ? vm.org.address : {};
+                vm.org.pins = vm.org.pins != null ? vm.org.pins : {};
             });
         });
+
+
+
     },
     beforeRouteUpdate: function(to, from, next){
-        let id = [utils.fetchOrganisationId(to.params.org_id)];
-        Promise.all(id).then(res => {
-            let initialisers = [
-                utils.fetchOrganisation(res[0].id),
-                utils.fetchOrganisationPermissions(res[0].id)
-            ]
-            Promise.all(initialisers).then(data => {
-                next(vm => {
-                    vm.org_id = res[0].id;
-                    vm.org = data[0];
-                    vm.myorgperms = data[1];
-                    vm.org.address = vm.org.address != null ? vm.org.address : {};
-                    vm.org.pins = vm.org.pins != null ? vm.org.pins : {};
-                });
+        let initialisers = [
+            utils.fetchOrganisation(to.params.org_id),
+            utils.fetchOrganisationPermissions(to.params.org_id)
+        ]
+        Promise.all(initialisers).then(data => {
+            next(vm => {
+                vm.org = data[0];
+                vm.myorgperms = data[1];
+                vm.org.address = vm.org.address != null ? vm.org.address : {};
+                vm.org.pins = vm.org.pins != null ? vm.org.pins : {};
             });
         });
     },
     methods: {
         addContact: function(){
             this.$refs.add_contact.isModalOpen = true;
+        },
+        readFileID: function() {
+            let vm = this;
+            let _file = null;
+            var input = $(vm.$refs.uploadedID)[0];
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.readAsDataURL(input.files[0]);
+                reader.onload = function(e) {
+                    _file = e.target.result;
+                };
+                _file = input.files[0];
+            }
+            vm.uploadedID = _file;
+        },
+        uploadID: function() {
+            let vm = this;
+            vm.uploadingID = true;
+            let data = new FormData();
+            data.append('identification', vm.uploadedID);
+            if (vm.uploadedID == null){
+                vm.uploadingID = false;
+                swal({
+                        title: 'Upload ID',
+                        html: 'Please select a file to upload.',
+                        type: 'error'
+                });
+            } else {
+                vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,(vm.org.id+'/upload_id')),data,{
+                    emulateJSON:true
+                }).then((response) => {
+                    vm.uploadingID = false;
+                    vm.uploadedID = null;
+                    swal({
+                        title: 'Upload ID',
+                        html: 'The organisation ID has been successfully uploaded.',
+                        type: 'success',
+                    }).then(() => {
+                        window.location.reload(true);
+                    });
+                }, (error) => {
+                    vm.uploadingID = false;
+                    let error_msg = '<br/>';
+                    for (var key in error.body) {
+                        error_msg += key + ': ' + error.body[key] + '<br/>';
+                    }
+                    swal({
+                        title: 'Upload ID',
+                        html: 'There was an error uploading the organisation ID.<br/>' + error_msg,
+                        type: 'error'
+                    });
+                });
+            }
+        },
+        filterOrgContactStatus: function(){
+            
+            t
         },
         eventListeners: function(){
             let vm = this;
@@ -784,6 +1125,25 @@ export default {
 
 
         },
+        updateDetails: function() {
+            let vm = this;
+            vm.updatingDetails = true;
+            vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,(vm.org.id+'/update_details')),JSON.stringify(vm.org),{
+                emulateJSON:true
+            }).then((response) => {
+                vm.updatingDetails = false;
+                vm.org = response.body;
+                if (vm.org.address == null){ vm.org.address = {}; }
+                swal(
+                    'Saved',
+                    'Organisation details have been saved.',
+                    'success'
+                )
+            }, (error) => {
+                vm.updatingDetails = false;
+            });
+
+        },
         addedContact: function() {
             let vm = this;
             swal(
@@ -811,6 +1171,24 @@ export default {
                     'The contact could not be deleted because of the following error: ' + error,
                     'error'
                 )
+            });
+        },
+        updateAddress: function() {
+            let vm = this;
+            vm.updatingAddress = true;
+            vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,(vm.org.id+'/update_address')),JSON.stringify(vm.org.address),{
+                emulateJSON:true
+            }).then((response) => {
+                vm.updatingAddress = false;
+                vm.org = response.body;
+                swal(
+                    'Saved',
+                    'Address details have been saved.',
+                    'success'
+                )
+                if (vm.org.address == null){ vm.org.address = {}; }
+            }, (error) => {
+                vm.updatingAddress = false;
             });
         },
         unlinkUser: function(d){
@@ -858,7 +1236,6 @@ export default {
     },
     mounted: function(){
         this.personal_form = document.forms.personal_form;
-        //this.loaded = true;
     },
     updated: function(){
         let vm = this;
@@ -872,17 +1249,7 @@ export default {
             this.eventListeners();
         });
     },
-    watch: {
-        org_id: function() {
-            let vm = this;
-            if (vm.org_id != null) {
-                console.log(vm.contacts_options_ref.ajax)
-                vm.contacts_options.ajax.url = helpers.add_endpoint_json(api_endpoints.organisations,vm.org_id+'/contacts');
-                vm.contacts_options_ref.ajax.url= helpers.add_endpoint_json(api_endpoints.organisations,vm.org_id+'/contacts_exclude');
-                vm.loaded = true;
-            }
-        }
-    }
+    
 }
 </script>
 
