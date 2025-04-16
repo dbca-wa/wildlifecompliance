@@ -744,16 +744,15 @@ def remove_script_tags(text):
     text = SCRIPT_TAGS_WRAPPED.sub('', text)
     text = SCRIPT_TAGS_NO_WRAPPED.sub('', text)
 
-    ATTR_BLACKLIST = ["abort","afterprint","animationend","animationiteration","animationstart","beforeprint",
-    "beforeunload","blur","canplay","canplaythrough","change","click","contextmenu","copy","cut",
-    "dblclick","drag","dragend","dragenter","dragleave","dragover","dragstart","drop","durationchange",
-    "ended","error","focus","focusin","focusout","fullscreenchange","fullscreenerror","hashchange",
-    "input","invalid","keydown","keypress","keyup","load","loadeddata","loadedmetadata","loadstart",
-    "message","mousedown","mouseenter","mouseleave","mousemove","mouseover","mouseout","mouseup",
-    "mousewheel","offline","online","open","pagehide","pageshow","paste","pause","play","playing",
-    "popstate","progress","ratechange","resize","reset","scroll","search","seeked","seeking","select",
-    "show","stalled","storage","submit","suspend","timeupdate","toggle","touchcancel","touchend",
-    "touchmove","touchstart","transitionend","unload","volumechange","waiting","wheel"]
+    ATTR_BLACKLIST = ['onresize','onvolumechange','onsuspend','onpopstate','onbeforeunload','oncontextmenu',
+        'ondragstart','oncuechange','onselect','onafterprint','onmouseover','ondragleave','onstorage',
+        'onbeforeprint','onhashchange','onabort','ondragover','onwaiting','onclick','onmousemove','onkeyup',
+        'onmousedown','ononline','onsearch','onprogress','onfocus','onmouseup','onplaying','onstalled','oninvalid',
+        'ontimeupdate','onkeypress','onseeked','onreset','onwheel','onemptied','oninput','onpagehide','onpause',
+        'onloadeddata','onseeking','onunload','onpageshow','onerror','ondrop','oncanplay','oncopy','onended','oncut',
+        'onsubmit','ondrag','onblur','ondragend','onplay','onratechange','onloadedmetadata','oncanplaythrough',
+        'ondurationchange','onchange','ondblclick','onmousewheel','onpaste','onload','onscroll','onkeydown',
+        'ontoggle','onmouseout','onoffline','onloadstart','ondragenter']
     ATTR_BLACKLIST_STR=('|').join(ATTR_BLACKLIST)
 
     HTML_TAGS_WITH_ATTR_WRAPPED = re.compile(r'(?i)<[^>]+('+ATTR_BLACKLIST_STR+')[\s]*=[^>]+>.+</[^>]+>')
