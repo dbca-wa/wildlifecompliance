@@ -1601,7 +1601,7 @@ class Application(RevisionedMixin):
                                 p.purpose_species_json = \
                                     prev.purpose_species_json
 
-                                p.save(exclude_sanitise="purpose_species_json")
+                                p.save(exclude_sanitise=["purpose_species_json","purpose_species_json.details"])
 
                 self.save()
                 officer_groups = ActivityPermissionGroup.objects.filter(
@@ -2862,7 +2862,7 @@ class Application(RevisionedMixin):
                                 p_proposed['purpose_species_json']
 
                         proposed.processing_status = status
-                        proposed.save(exclude_sanitise="purpose_species_json")
+                        proposed.save(exclude_sanitise=["purpose_species_json","purpose_species_json.details"])
 
                     activity.save()
 
@@ -3430,7 +3430,7 @@ class Application(RevisionedMixin):
                                 purpose.purpose.name,
                             ), request)
 
-                        purpose.save(exclude_sanitise="purpose_species_json")
+                        purpose.save(exclude_sanitise=["purpose_species_json","purpose_species_json.details"])
                         # TODO: check to ensure that purpose does not
                         # exist in decline aswell for double logging.
                         self.log_user_action(
@@ -5733,7 +5733,7 @@ class ApplicationSelectedActivity(SanitiseMixin):
 
         for purpose in selected:
             purpose.processing_status = status
-            purpose.save()
+            purpose.save(exclude_sanitise=["purpose_species_json","purpose_species_json.details"])
             is_updated = True
 
         return is_updated
