@@ -89,3 +89,6 @@ class ApplicationSelectedActivityPurposeAdmin(admin.ModelAdmin):
     list_display = ['id', 'purpose', 'purpose_status']
     raw_id_fields = ('selected_activity', 'purpose')
     search_fields = ['id', 'purpose__name', 'purpose_status']
+
+    def save_model(self, request, obj, form, change):
+        obj.save(exclude_sanitise=["purpose_species_json","purpose_species_json.details"])

@@ -738,17 +738,29 @@ def remove_script_tags(text):
     if text is None:
         return None
 
-    SCRIPT_TAGS_WRAPPED = re.compile(r'(?i)<script+>.+</script+>')
-    SCRIPT_TAGS_NO_WRAPPED = re.compile(r'(?i)<script+>')
+    SCRIPT_TAGS_WRAPPED = re.compile(r'(?i)<script[^>]+>.+</script[^>]+>')
+    SCRIPT_TAGS_NO_WRAPPED = re.compile(r'(?i)<script[^>]+>')
 
     text = SCRIPT_TAGS_WRAPPED.sub('', text)
     text = SCRIPT_TAGS_NO_WRAPPED.sub('', text)
 
-    #HTML_TAGS_WITH_ATTR_WRAPPED = re.compile(r'<[^>]+>.+</[^>]+>')
-    #HTML_TAGS_WITH_ATTR_NO_WRAPPED = re.compile(r'<[^>]+>')
+    ATTR_BLACKLIST = ["abort","afterprint","animationend","animationiteration","animationstart","beforeprint",
+    "beforeunload","blur","canplay","canplaythrough","change","click","contextmenu","copy","cut",
+    "dblclick","drag","dragend","dragenter","dragleave","dragover","dragstart","drop","durationchange",
+    "ended","error","focus","focusin","focusout","fullscreenchange","fullscreenerror","hashchange",
+    "input","invalid","keydown","keypress","keyup","load","loadeddata","loadedmetadata","loadstart",
+    "message","mousedown","mouseenter","mouseleave","mousemove","mouseover","mouseout","mouseup",
+    "mousewheel","offline","online","open","pagehide","pageshow","paste","pause","play","playing",
+    "popstate","progress","ratechange","resize","reset","scroll","search","seeked","seeking","select",
+    "show","stalled","storage","submit","suspend","timeupdate","toggle","touchcancel","touchend",
+    "touchmove","touchstart","transitionend","unload","volumechange","waiting","wheel"]
+    ATTR_BLACKLIST_STR=('|').join(ATTR_BLACKLIST)
 
-    #text = HTML_TAGS_WITH_ATTR_WRAPPED.sub('', text)
-    #text = HTML_TAGS_WITH_ATTR_NO_WRAPPED.sub('', text)
+    HTML_TAGS_WITH_ATTR_WRAPPED = re.compile(r'(?i)<[^>]+('+ATTR_BLACKLIST_STR+')[\s]*=[^>]+>.+</[^>]+>')
+    HTML_TAGS_WITH_ATTR_NO_WRAPPED = re.compile(r'(?i)<[^>]+('+ATTR_BLACKLIST_STR+')[\s]*=[^>]+>')
+
+    text = HTML_TAGS_WITH_ATTR_WRAPPED.sub('', text)
+    text = HTML_TAGS_WITH_ATTR_NO_WRAPPED.sub('', text)
 
     return text
 
