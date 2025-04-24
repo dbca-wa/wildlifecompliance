@@ -192,7 +192,7 @@ class ActivityPermissionGroup(Group):
 
 class ApplicationDocument(Document):
     application = models.ForeignKey('Application', related_name='documents', on_delete=models.CASCADE)
-    _file = models.FileField(upload_to=update_application_doc_filename, storage=private_storage)
+    _file = models.FileField(max_length=255, upload_to=update_application_doc_filename, storage=private_storage)
     input_name = models.CharField(max_length=255, null=True, blank=True)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
@@ -3888,7 +3888,7 @@ class ApplicationLogDocument(Document):
     log_entry = models.ForeignKey(
         'ApplicationLogEntry',
         related_name='documents', on_delete=models.CASCADE)
-    _file = models.FileField(upload_to=update_application_comms_log_filename, storage=private_storage)
+    _file = models.FileField(max_length=255, upload_to=update_application_comms_log_filename, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'

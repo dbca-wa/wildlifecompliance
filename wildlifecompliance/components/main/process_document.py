@@ -2,6 +2,7 @@ from django.core.files.base import ContentFile
 import traceback
 from wildlifecompliance.components.main.models import TemporaryDocument
 from wildlifecompliance.components.applications import models
+import os
 
 def process_generic_document(request, instance, document_type=None, *args, **kwargs):
     try:

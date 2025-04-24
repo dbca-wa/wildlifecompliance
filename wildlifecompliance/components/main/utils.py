@@ -1,5 +1,6 @@
 import ast
 import re
+import os
 
 import pytz
 import json
@@ -19,6 +20,7 @@ from wildlifecompliance.exceptions import BindApplicationException
 from django.core.cache import cache
 from wildlifecompliance.components.main.models import RegionGIS, DistrictGIS
 from django.db.models import JSONField
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
@@ -891,3 +893,29 @@ def sanitise_fields(instance, exclude=[], error_on_change=[]):
         for i in remove_keys:
             del instance[i]
     return instance
+
+def file_extension_valid(file, whitelist, model):
+    _, extension = os.path.splitext(file)
+    extension = extension.replace(".", "").lower()
+
+    check = whitelist.filter(name=extension).filter(
+        Q(model="all") | Q(model__iexact=model)
+    )
+    valid = check.exists()
+
+    return valid
+
+def check_file(file, model_name):
+    from wildlifecompliance.components.main.models import FileExtensionWhitelist
+
+    # check if extension in whitelist
+    cache_key = settings.CACHE_KEY_FILE_EXTENSION_WHITELIST
+    whitelist = cache.get(cache_key)
+    if whitelist is None:
+        whitelist = FileExtensionWhitelist.objects.all()
+        cache.set(cache_key, whitelist, settings.CACHE_TIMEOUT_2_HOURS)
+
+    valid = file_extension_valid(str(file), whitelist, model_name)
+
+    if not valid:
+        raise ValidationError("File type/extension not supported")

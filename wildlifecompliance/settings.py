@@ -245,6 +245,11 @@ del BOOTSTRAP3['css_url']
 #    'required_css_class': 'required-form-field',
 #    'set_placeholder': False,
 #}
+
+CACHE_TIMEOUT_2_HOURS = 60 * 60 * 2
+CACHE_KEY_FILE_EXTENSION_WHITELIST = "file-extension-whitelist"
+FILE_SIZE_LIMIT_BYTES = env('FILE_SIZE_LIMIT_BYTES' ,128000000)
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
