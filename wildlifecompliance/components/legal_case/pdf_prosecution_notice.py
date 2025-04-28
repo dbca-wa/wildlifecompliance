@@ -447,7 +447,7 @@ def _create_pdf(invoice_buffer, legal_case, brief_of_evidence_record_of_intervie
     doc.build(elements)
     return invoice_buffer
 
-
+#TODO may not be in use
 def create_prosecution_notice_pdf_bytes(filename, legal_case):
     with BytesIO() as invoice_buffer:
         _create_pdf(invoice_buffer, legal_case)
@@ -457,9 +457,9 @@ def create_prosecution_notice_pdf_bytes(filename, legal_case):
 
         # START: Save the pdf file to the database
         document = legal_case.documents.create(name=filename)
-        path = private_storage.save('wildlifecompliance/{}/{}/documents/{}'.format(legal_case._meta.model_name, legal_case.id, filename), invoice_buffer)
-        document._file = path
-        document.save()
+        #path = private_storage.save('wildlifecompliance/{}/{}/documents/{}'.format(legal_case._meta.model_name, legal_case.id, filename), invoice_buffer)
+        document._file.save(filename, invoice_buffer, save=False)
+        document.save(path_to_file='wildlifecompliance/{}/{}/documents/'.format(legal_case._meta.model_name, legal_case.id),storage=private_storage)
         # END: Save
 
         invoice_buffer.close()

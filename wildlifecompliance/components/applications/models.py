@@ -5738,39 +5738,6 @@ class ApplicationSelectedActivity(SanitiseMixin):
 
         return is_updated
 
-    #TODO does not appear to be in use
-    def store_proposed_attachments(self, proposed_attachments):
-        """
-        Stores proposed attachments from Temporary Document Collection to the
-        Application Selected Activity.
-        """
-        with transaction.atomic():
-            INPUT_NAME = 'proposed_attachment'
-            try:
-                for attachment in proposed_attachments.documents.all():
-                    document = self.proposed_attachments.get_or_create(
-                        application_id=self.application_id,
-                        selected_activity_id=self.licence_activity_id,
-                        input_name=INPUT_NAME)[0]
-
-                    document.name = str(attachment.name)
-
-                    #TODO look in to this - does not appear to work and may need review
-                    if document._file and os.path.isfile(document._file.path):
-                        os.remove(document._file.path)
-                    document.application_id = self.application_id
-                    document.selected_activity_id = self.licence_activity_id
-
-                    path = private_storage.save(
-                      'wildlifecompliance/applications/{}/documents/{}'.format(
-                          self.application_id), ContentFile(
-                          attachment._file.read()))
-
-                    document._file = path
-                    document.save()
-
-            except BaseException:
-                raise
 
     def has_licence_amendment(self, purpose_list=[]):
         '''

@@ -578,12 +578,8 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
                 document = instance.documents.get_or_create(
                     input_name=section, name=filename)[0]
-                path = private_storage.save(
-                    'applications/{}/documents/{}'.format(
-                        application_id, filename), ContentFile(
-                        _file.read()))
 
-                document._file = path
+                document._file = _file
                 document.save()
                 # to allow revision to be added to reversion history
                 instance.save(
@@ -606,7 +602,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                raise serializers.ValidationError(repr(e[0]))
+                raise serializers.ValidationError(e)
                 # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
         except Exception as e:
             print(traceback.print_exc())
@@ -673,7 +669,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             raise
         except ValidationError as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+            raise serializers.ValidationError(e)
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
