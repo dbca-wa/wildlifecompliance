@@ -760,8 +760,8 @@ def create_licence_doc(licence, application):
     _create_licence(licence_buffer, licence, application)
     filename = 'licence-{}.pdf'.format(licence.licence_number)
     document = LicenceDocument.objects.create(name=filename)
-    document._file.save(filename, File(licence_buffer), save=True)
-
+    document._file.save(filename, File(licence_buffer), save=False)
+    document.save()
     licence_buffer.close()
 
     return document

@@ -9,6 +9,7 @@ from wildlifecompliance.components.main.email import prepare_attachments, _extra
 from wildlifecompliance.components.sanction_outcome.pdf import create_infringement_notice_pdf, \
     create_letter_of_advice_pdf, \
     create_caution_notice_pdf, create_remediation_notice_pdf
+from wildlifecompliance.components.main.process_document import save_comms_log_document_obj
 
 logger = logging.getLogger(__name__)
 
@@ -308,8 +309,7 @@ def send_remediation_notice(to_address, sanction_outcome, workflow_entry, reques
 
     # Attach the pdf file created above to the communication log entry
     doc = workflow_entry.documents.create(name=document.name)
-    doc._file = document._file
-    doc.save()
+    save_comms_log_document_obj(doc, workflow_entry, document)
 
     msg = email.send(to_address,
                      context=context,
@@ -342,8 +342,7 @@ def send_caution_notice(to_address, sanction_outcome, workflow_entry, request, c
 
     # Attach the pdf file created above to the communication log entry
     doc = workflow_entry.documents.create(name=document.name)
-    doc._file = document._file
-    doc.save()
+    save_comms_log_document_obj(doc, workflow_entry, document)
 
     msg = email.send(to_address,
                      context=context,
@@ -376,8 +375,7 @@ def send_letter_of_advice(to_address, sanction_outcome, workflow_entry, request,
 
     # Attach the pdf file created above to the communication log entry
     doc = workflow_entry.documents.create(name=document.name)
-    doc._file = document._file
-    doc.save()
+    save_comms_log_document_obj(doc, workflow_entry, document)
 
     msg = email.send(to_address,
                      context=context,

@@ -401,75 +401,45 @@ def save_document(request, instance, comms_instance, document_type, input_name=N
 
 # For transferring files from temp doc objs to comms_log objs
 def save_comms_log_document_obj(instance, comms_instance, temp_document):
+    print("save_comms_log_document_obj")
+    from wildlifecompliance.components.applications.models import private_storage
     document = comms_instance.documents.get_or_create(
         name=temp_document.name)[0]
-    path = private_storage = models.private_storage
-    path = private_storage.save(
-        'wildlifecompliance/{}/{}/communications/{}/documents/{}'.format(
-            instance._meta.model_name, 
-            instance.id, 
-            comms_instance.id, 
-            temp_document.name
-            ), 
-            temp_document._file
-        )
-
-    document._file = path
-    document.save()
+    document.save(path_to_file='wildlifecompliance/{}/{}/communications/{}/documents/'.format(
+            instance._meta.model_name, instance.id, comms_instance.id, ), 
+            storage=private_storage, file_content=temp_document._file)
 
 
 # For transferring files from temp doc objs to default doc objs
 def save_default_document_obj(instance, temp_document):
+    from wildlifecompliance.components.applications.models import private_storage
     document = instance.documents.get_or_create(
         name=temp_document.name)[0]
-    path = private_storage = models.private_storage
-    path = private_storage.save(
-        'wildlifecompliance/{}/{}/documents/{}'.format(
-            instance._meta.model_name, 
-            instance.id, 
-            temp_document.name
-            ), 
-            temp_document._file
-        )
-
-    document._file = path
-    document.save()
+    document.save(path_to_file='wildlifecompliance/{}/{}/documents/'.format(
+            instance._meta.model_name, instance.id), 
+            storage=private_storage, file_content=temp_document._file)
 
 
 # For transferring files from temp doc objs to issuance doc objs
 def save_issuance_document_obj(instance, temp_document):
+    from wildlifecompliance.components.applications.models import private_storage
     document = instance.issuance_documents.get_or_create(
         name=temp_document.name)[0]
-    path = private_storage = models.private_storage
-    path = private_storage.save(
-        'wildlifecompliance/applications/{}/{}/{}/{}'.format(
+    document.save(path_to_file='wildlifecompliance/applications/{}/{}/{}/'.format(
             instance.application_id,
             instance._meta.model_name,
-            instance.id,
-            temp_document.name
-            ),
-        temp_document._file
-        )
-
-    document._file = path
-    document.save()
+            instance.id,), 
+            storage=private_storage, file_content=temp_document._file)
 
 # For transferring files from temp doc objs to physical artifact renderer objs
 def save_renderer_document_obj(instance, temp_document, input_name):
+    from wildlifecompliance.components.applications.models import private_storage
     document = instance.renderer_documents.get_or_create(
             input_name=input_name,
             name=temp_document.name)[0]
-    path = private_storage = models.private_storage
-    path = private_storage.save(
-        'wildlifecompliance/{}/{}/renderer_documents/{}/{}'.format(
+    document.save(path_to_file='wildlifecompliance/{}/{}/renderer_documents/{}/'.format(
             instance._meta.model_name,
             instance.id,
-            input_name,
-            temp_document.name
-            ),
-            temp_document._file
-        )
-
-    document._file = path
-    document.save()
+            input_name,), 
+            storage=private_storage, file_content=temp_document._file)
 

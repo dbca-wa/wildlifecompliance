@@ -759,7 +759,14 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                 serializer.is_valid(raise_exception=True)
                 # overwrite comms with updated instance
                 comms = serializer.save()
-
+                # Save the files
+                for f in request.FILES:
+                    document = comms.documents.create()
+                    document.name = str(request.FILES[f])
+                    document._file = request.FILES[f]
+                    document.save(path_to_file='wildlifecompliance/{}/{}/communications/{}/documents/'.format(
+                    instance._meta.model_name, instance.id, comms.id,))
+                # End Save Documents
                 if workflow:
                     return comms
                 else:
@@ -769,7 +776,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
             raise
         except ValidationError as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+            raise serializers.ValidationError(e)
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
