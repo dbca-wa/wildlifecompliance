@@ -401,7 +401,6 @@ def save_document(request, instance, comms_instance, document_type, input_name=N
 
 # For transferring files from temp doc objs to comms_log objs
 def save_comms_log_document_obj(instance, comms_instance, temp_document):
-    print("save_comms_log_document_obj")
     from wildlifecompliance.components.applications.models import private_storage
     document = comms_instance.documents.get_or_create(
         name=temp_document.name)[0]
