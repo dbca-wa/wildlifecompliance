@@ -16,9 +16,8 @@ def create_infringement_notice_pdf(filename, sanction_outcome):
 
     # START: Save the pdf file to the database
     document = sanction_outcome.documents.create(name=filename)
-    path = private_storage.save('wildlifecompliance/{}/{}/documents/{}'.format(sanction_outcome._meta.model_name, sanction_outcome.id, filename), content)
-    document._file = path
-    document.save()
+    document._file.save(filename, content, save=False)
+    document.save(path_to_file='wildlifecompliance/{}/{}/documents/'.format(sanction_outcome._meta.model_name, sanction_outcome.id))
     # END: Save
 
     return document
@@ -30,9 +29,8 @@ def create_caution_notice_pdf(filename, sanction_outcome):
 
     # START: Save the pdf file to the database
     document = sanction_outcome.documents.create(name=filename)
-    path = private_storage.save('wildlifecompliance/{}/{}/documents/{}'.format(sanction_outcome._meta.model_name, sanction_outcome.id, filename), content)
-    document._file = path
-    document.save()
+    document._file.save(filename, content, save=False)
+    document.save(path_to_file='wildlifecompliance/{}/{}/documents/'.format(sanction_outcome._meta.model_name, sanction_outcome.id))
     # END: Save
 
     return document
@@ -44,9 +42,8 @@ def create_letter_of_advice_pdf(filename, sanction_outcome):
 
     # START: Save the pdf file to the database
     document = sanction_outcome.documents.create(name=filename)
-    path = private_storage.save('wildlifecompliance/{}/{}/documents/{}'.format(sanction_outcome._meta.model_name, sanction_outcome.id, filename), content)
-    document._file = path
-    document.save()
+    document._file.save(filename, content, save=False)
+    document.save(path_to_file='wildlifecompliance/{}/{}/documents/'.format(sanction_outcome._meta.model_name, sanction_outcome.id))
     # END: Save
 
     return document
@@ -58,11 +55,8 @@ def create_remediation_notice_pdf(filename, sanction_outcome):
 
     # START: Save the pdf file to the database
     document = sanction_outcome.documents.create(name=filename)
-    path = private_storage.save(
-        'wildlifecompliance/{}/{}/documents/{}'.format(sanction_outcome._meta.model_name, sanction_outcome.id, filename),
-        content)
-    document._file = path
-    document.save()
+    document._file.save(filename, content, save=False)
+    document.save(path_to_file='wildlifecompliance/{}/{}/documents/'.format(sanction_outcome._meta.model_name, sanction_outcome.id))
     # END: Save
 
     return document

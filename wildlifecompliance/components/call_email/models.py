@@ -46,9 +46,8 @@ def update_compliance_comms_log_filename(instance, filename):
     pass
 
 def update_call_email_comms_log_filename(instance, filename):
-    #return 'wildlifecompliance/compliance/{}/communications/{}/{}'.format(
-     #   instance.log_entry.call_email.id, instance.id, filename)
-    pass
+    return 'wildlifecompliance/compliance/{}/communications/{}/{}'.format(
+        instance.log_entry.call_email.id, instance.id, filename)
 
 def update_compliance_workflow_log_filename(instance, filename):
     #return 'wildlifecompliance/compliance/{}/workflow/{}/{}'.format(
@@ -686,8 +685,7 @@ class CallEmailLogDocument(Document):
         related_name='documents', on_delete=models.CASCADE)
     #input_name = models.CharField(max_length=255, blank=True, null=True)
     #version_comment = models.CharField(max_length=255, blank=True, null=True)
-    #_file = models.FileField(max_length=255, upload_to=update_call_email_comms_log_filename)
-    _file = models.FileField(max_length=255, storage=private_storage)
+    _file = models.FileField(max_length=255, storage=private_storage, upload_to=update_call_email_comms_log_filename)
 
     class Meta:
         app_label = 'wildlifecompliance'

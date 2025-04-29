@@ -915,7 +915,7 @@ class ReturnLogEntry(CommunicationsLogEntry):
 
 class ReturnLogDocument(Document):
     log_entry = models.ForeignKey('ReturnLogEntry', related_name='documents', on_delete=models.CASCADE)
-    _file = models.FileField(upload_to=update_returns_comms_log_filename, storage=private_storage)
+    _file = models.FileField(max_length=255, upload_to=update_returns_comms_log_filename, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'

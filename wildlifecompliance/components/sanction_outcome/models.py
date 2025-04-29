@@ -949,10 +949,10 @@ class SanctionOutcomeCommsLogDocument(Document):
 class SanctionOutcomeCommsLogEntry(CommunicationsLogEntry):
     sanction_outcome = models.ForeignKey(SanctionOutcome, related_name='comms_logs', on_delete=models.CASCADE)
 
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+    def save(self, *args, **kwargs):
         print('=================')
         print('In SanctionOutcomeCommsLogEntry.save()')
-        super(SanctionOutcomeCommsLogEntry, self).save(force_insert, force_update, using, update_fields)
+        super(SanctionOutcomeCommsLogEntry, self).save(*args, **kwargs)
 
     class Meta:
         app_label = 'wildlifecompliance'

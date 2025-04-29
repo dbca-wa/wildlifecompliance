@@ -474,17 +474,6 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                     document.save()
                 # End Save Documents
 
-                # Save the files
-                #comms.process_comms_log_document(request)
-                # for f in request.FILES:
-                #     document = comms.documents.create()
-                #     print("filename")
-                #     print(str(request.FILES[f]))
-                #     document.name = str(request.FILES[f])
-                #     document._file = request.FILES[f]
-                #     document.save()
-                # End Save Documents
-
                 if workflow:
                     return comms
                 else:
@@ -494,7 +483,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             raise
         except ValidationError as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+            raise serializers.ValidationError(e)
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))

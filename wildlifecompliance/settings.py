@@ -191,6 +191,14 @@ LEDGER_UI_ACCOUNTS_MANAGEMENT = [
 
 ]
 
+ORGANISATION_PERMISSION_MODULE = 'wildlifecompliance.permission'
+
+LEDGER_UI_ORGANISATION_MANAGEMENT = [
+        {'organisation_name': {'options' : {'view': True, 'edit': True}}},
+        {'organisation_abn': {'options' : {'view': True, 'edit': True}}},
+        {'postal_address': {'options' : {'view': True, 'edit': True}}}
+]
+
 LEDGER_UI_ACCOUNTS_MANAGEMENT_KEYS = []
 for am in LEDGER_UI_ACCOUNTS_MANAGEMENT:
     LEDGER_UI_ACCOUNTS_MANAGEMENT_KEYS.append(list(am.keys())[0])
@@ -237,6 +245,11 @@ del BOOTSTRAP3['css_url']
 #    'required_css_class': 'required-form-field',
 #    'set_placeholder': False,
 #}
+
+CACHE_TIMEOUT_2_HOURS = 60 * 60 * 2
+CACHE_KEY_FILE_EXTENSION_WHITELIST = "file-extension-whitelist"
+FILE_SIZE_LIMIT_BYTES = env('FILE_SIZE_LIMIT_BYTES' ,128000000)
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',

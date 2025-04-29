@@ -67,6 +67,7 @@ class SchemaParser(object):
             except BaseException:
                 raise
 
+    #TODO check if any of this is used (os not imported, may be failing silently)
     def save_application_officer_data(self, instance, request, viewset):
         with transaction.atomic():
             try:

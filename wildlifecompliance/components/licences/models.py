@@ -43,7 +43,7 @@ def update_licence_doc_filename(instance, filename):
         instance.id, filename)
 
 class LicenceDocument(Document):
-    _file = models.FileField(upload_to=update_licence_doc_filename, storage=private_storage)
+    _file = models.FileField(max_length=255, upload_to=update_licence_doc_filename, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'

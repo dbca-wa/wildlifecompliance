@@ -8,6 +8,7 @@ from datetime import datetime
 
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
@@ -24,7 +25,8 @@ from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 
 from wildlifecompliance.components.main.process_document import (
         process_generic_document,
-        save_default_document_obj
+        save_default_document_obj,
+        save_comms_log_document_obj,
         )
 from wildlifecompliance.components.call_email.models import CallEmail, CallEmailUserAction
 from wildlifecompliance.components.inspection.models import Inspection, InspectionUserAction
@@ -398,8 +400,7 @@ class RemediationActionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixi
                 # Attach files submitted to the communication log entry, so that they are displayed in the comms log table
                 for document in ra.documents.all():
                     doc = comms_log_entry.documents.create(name=document.name)
-                    doc._file = document._file
-                    doc.save()
+                    save_comms_log_document_obj(doc, comms_log_entry, document)
 
                 # Log the above email as a communication log entry
                 if email_data:
@@ -1527,6 +1528,14 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 serializer.is_valid(raise_exception=True)
                 # overwrite comms with updated instance
                 comms = serializer.save()
+                # Save the files
+                for f in request.FILES:
+                    document = comms.documents.create()
+                    document.name = str(request.FILES[f])
+                    document._file = request.FILES[f]
+                    document.save(path_to_file='wildlifecompliance/{}/{}/communications/{}/documents/'.format(
+                    instance._meta.model_name, instance.id, comms.id,))
+                # End Save Documents
 
                 if workflow:
                     return comms
@@ -1537,11 +1546,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
             raise
         except ValidationError as e:
             print(traceback.print_exc())
-            if hasattr(e, 'error_dict'):
-                raise serializers.ValidationError(repr(e.error_dict))
-            else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
-                raise serializers.ValidationError(repr(e[0]))
+            raise serializers.ValidationError(e)
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))

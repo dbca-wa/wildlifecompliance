@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import api from './api'
-import {helpers} from '@/utils/hooks' 
+import {api_endpoints, helpers} from '@/utils/hooks' 
 
 export default {
     fetchCurrentUser: function (){
@@ -66,6 +66,16 @@ export default {
     fetchLicenceAvailablePurposes: function(params){
         return new Promise ((resolve,reject) => {
             Vue.http.get(api.licence_available_purposes, {"params": params}).then((response) => {
+                resolve(response.body);
+            },
+            (error) => {
+                reject(error);
+            });
+        });
+    },
+    fetchOrganisationId: function(org_id) {
+        return new Promise ((resolve,reject) => {
+            Vue.http.get(api_endpoints.get_organisation_id(org_id)).then((response) => {
                 resolve(response.body);
             },
             (error) => {

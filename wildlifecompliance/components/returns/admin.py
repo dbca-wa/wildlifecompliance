@@ -28,6 +28,8 @@ class ReturnTypeAdmin(admin.ModelAdmin):
 class ReturnAdmin(admin.ModelAdmin):
     actions = ['verify_due_returns']
     raw_id_fields = ('application', 'licence', 'assigned_to', 'condition', 'submitter', 'return_type')
+    list_display = ('id', 'return_type', 'application', 'licence')
+    search_fields = ('id', 'return_type__name', 'application__lodgement_number', 'licence__licence_number')
 
     def verify_due_returns(self, request, queryset):
         '''
@@ -41,11 +43,15 @@ class ReturnAdmin(admin.ModelAdmin):
 @admin.register(models.ReturnTable)
 class ReturnTable(admin.ModelAdmin):
     raw_id_fields = ('ret',)
+    list_display = ('id', 'ret', 'name')
+    search_fields = ('id', 'ret__lodgement_number', 'name')
 
 
 @admin.register(models.ReturnRow)
 class ReturnRow(admin.ModelAdmin):
     raw_id_fields = ('return_table',)
+    list_display = ('id', 'return_table', 'return_table__ret')
+    search_fields = ('id', 'return_table__id', 'return_table__ret__lodgement_number')
 
 
 @admin.register(models.ReturnUserAction)

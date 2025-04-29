@@ -192,7 +192,7 @@ class ActivityPermissionGroup(Group):
 
 class ApplicationDocument(Document):
     application = models.ForeignKey('Application', related_name='documents', on_delete=models.CASCADE)
-    _file = models.FileField(upload_to=update_application_doc_filename, storage=private_storage)
+    _file = models.FileField(max_length=255, upload_to=update_application_doc_filename, storage=private_storage)
     input_name = models.CharField(max_length=255, null=True, blank=True)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
@@ -1601,7 +1601,7 @@ class Application(RevisionedMixin):
                                 p.purpose_species_json = \
                                     prev.purpose_species_json
 
-                                p.save(exclude_sanitise="purpose_species_json")
+                                p.save(exclude_sanitise=["purpose_species_json","purpose_species_json.details"])
 
                 self.save()
                 officer_groups = ActivityPermissionGroup.objects.filter(
@@ -2862,7 +2862,7 @@ class Application(RevisionedMixin):
                                 p_proposed['purpose_species_json']
 
                         proposed.processing_status = status
-                        proposed.save(exclude_sanitise="purpose_species_json")
+                        proposed.save(exclude_sanitise=["purpose_species_json","purpose_species_json.details"])
 
                     activity.save()
 
@@ -3430,7 +3430,7 @@ class Application(RevisionedMixin):
                                 purpose.purpose.name,
                             ), request)
 
-                        purpose.save(exclude_sanitise="purpose_species_json")
+                        purpose.save(exclude_sanitise=["purpose_species_json","purpose_species_json.details"])
                         # TODO: check to ensure that purpose does not
                         # exist in decline aswell for double logging.
                         self.log_user_action(
@@ -3888,7 +3888,7 @@ class ApplicationLogDocument(Document):
     log_entry = models.ForeignKey(
         'ApplicationLogEntry',
         related_name='documents', on_delete=models.CASCADE)
-    _file = models.FileField(upload_to=update_application_comms_log_filename, storage=private_storage)
+    _file = models.FileField(max_length=255, upload_to=update_application_comms_log_filename, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -5733,44 +5733,11 @@ class ApplicationSelectedActivity(SanitiseMixin):
 
         for purpose in selected:
             purpose.processing_status = status
-            purpose.save()
+            purpose.save(exclude_sanitise=["purpose_species_json","purpose_species_json.details"])
             is_updated = True
 
         return is_updated
 
-    #TODO does not appear to be in use
-    def store_proposed_attachments(self, proposed_attachments):
-        """
-        Stores proposed attachments from Temporary Document Collection to the
-        Application Selected Activity.
-        """
-        with transaction.atomic():
-            INPUT_NAME = 'proposed_attachment'
-            try:
-                for attachment in proposed_attachments.documents.all():
-                    document = self.proposed_attachments.get_or_create(
-                        application_id=self.application_id,
-                        selected_activity_id=self.licence_activity_id,
-                        input_name=INPUT_NAME)[0]
-
-                    document.name = str(attachment.name)
-
-                    #TODO look in to this - does not appear to work and may need review
-                    if document._file and os.path.isfile(document._file.path):
-                        os.remove(document._file.path)
-                    document.application_id = self.application_id
-                    document.selected_activity_id = self.licence_activity_id
-
-                    path = private_storage.save(
-                      'wildlifecompliance/applications/{}/documents/{}'.format(
-                          self.application_id), ContentFile(
-                          attachment._file.read()))
-
-                    document._file = path
-                    document.save()
-
-            except BaseException:
-                raise
 
     def has_licence_amendment(self, purpose_list=[]):
         '''

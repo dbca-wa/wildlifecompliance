@@ -5,10 +5,11 @@ from django.contrib import admin
 from django import forms as django_forms
 from django.conf import settings
 from wildlifecompliance.components.main import models, forms
-from wildlifecompliance.components.main.models import SanctionOutcomeWordTemplate
+from wildlifecompliance.components.main.models import SanctionOutcomeWordTemplate, FileExtensionWhitelist, Document 
 from wildlifecompliance.components.main.utils import to_local_tz
 #from reversion.admin import VersionAdmin
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from django.apps import apps
 
 logger = logging.getLogger(__name__)
 
@@ -173,3 +174,34 @@ class SanctionOutcomeWordTemplateAdmin(admin.ModelAdmin):
     def Time(self, obj):
         local_date = to_local_tz(obj.uploaded_date)
         return local_date.strftime('%H:%M')
+
+class ModelForm(django_forms.ModelForm):
+    choices = (
+        (
+            "all",
+            "all",
+        ),
+    ) + tuple(
+        map(
+            lambda m: (m, m),
+            filter(
+                lambda m: Document
+                in apps.get_app_config("wildlifecompliance").models[m].__bases__,
+                apps.get_app_config("wildlifecompliance").models,
+            ),
+        )
+    )
+
+    model = django_forms.ChoiceField(choices=choices)
+
+@admin.register(FileExtensionWhitelist)
+class FileExtensionWhitelistAdmin(admin.ModelAdmin):
+    fields = (
+        "name",
+        "model",
+    )
+    list_display = (
+        "name",
+        "model",
+    )
+    form = ModelForm

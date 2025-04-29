@@ -731,7 +731,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             raise
         except ValidationError as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+            raise serializers.ValidationError(e)
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
