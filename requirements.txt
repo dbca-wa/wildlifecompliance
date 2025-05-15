@@ -6,7 +6,6 @@ git+https://github.com/dbca-wa/ledger_api_client.git
 git+https://github.com/dbca-wa/django5-utils-six.git#egg=django5_six
 git+https://github.com/dbca-wa/webtemplate2.git#egg=webtemplate_dbca
 psycopg2~=2.9.10
-git+https://github.com/scottp-dpaw/social-core.git@email_fix#egg=social-auth-core
 coverage~=7.6.12
 coveralls~=4.0.1
 reportlab~=4.3.1
@@ -61,3 +60,4 @@ pytz~=2025.1
 phonenumbers~=9.0.1
 click~=8.1.8
 future~=1.0.0
+setuptools~=80.4.0
