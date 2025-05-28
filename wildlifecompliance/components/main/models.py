@@ -251,6 +251,7 @@ class SanitiseFileMixin(SanitiseMixin, DirtyFieldsMixin):
     def auto_generate_file_name(self, extension):
         return "{}_{}_{}.{}".format(self._meta.model_name,uuid.uuid4(),int(datetime.now().timestamp()*100000), extension)
 
+    #TODO override for _file name where field name is different (org requests and return type)
     def save(self, **kwargs):
         from wildlifecompliance.components.main.utils import check_file
 
