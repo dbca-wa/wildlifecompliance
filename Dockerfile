@@ -99,7 +99,7 @@ COPY --chown=oim:oim wildlifecompliance ./wildlifecompliance
 RUN cd /app/wildlifecompliance/frontend/wildlifecompliance; npm install
 RUN cd /app/wildlifecompliance/frontend/wildlifecompliance; npm run build
 RUN python manage_wc.py collectstatic --noinput
-
+RUN mkdir /app/wildlifecompliance/cache
 RUN mkdir /app/tmp/
 RUN chmod 777 /app/tmp/
 
