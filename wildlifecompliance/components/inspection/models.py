@@ -326,9 +326,11 @@ class InspectionReportDocument(Document):
     class Meta:
         app_label = 'wildlifecompliance'
 
+def update_inspection_type_approval_doc_filename(instance, filename):
+    return 'wildlifecompliance/inspectiontypeapprovaldocuments/{}'.format(filename)
 
 class InspectionTypeApprovalDocument(Document):
-    _file = models.FileField(max_length=255, storage=private_storage)
+    _file = models.FileField(max_length=255, storage=private_storage,upload_to=update_inspection_type_approval_doc_filename)
 
     class Meta:
         app_label = 'wildlifecompliance'

@@ -33,7 +33,7 @@ from wildlifecompliance.components.organisations.emails import (
     send_organisation_id_upload_email_notification,
     send_organisation_contact_consultant_email_notification,
 )
-from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
+from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin, SanitiseFileMixin
 from wildlifecompliance.components.main.models import Document
 from wildlifecompliance.components.main.utils import (
     get_first_name,
@@ -798,7 +798,7 @@ class OrganisationLogEntry(CommunicationsLogEntry):
         app_label = 'wildlifecompliance'
 
 
-class OrganisationRequest(SanitiseMixin):
+class OrganisationRequest(SanitiseFileMixin):
     ORG_REQUEST_STATUS_WITH_ASSESSOR = 'with_assessor'
     ORG_REQUEST_STATUS_AMENDMENT_REQUESTED = 'amendment_requested'
     ORG_REQUEST_STATUS_APPROVED = 'approved'
