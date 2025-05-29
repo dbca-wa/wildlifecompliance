@@ -251,27 +251,38 @@ class SanitiseFileMixin(SanitiseMixin, DirtyFieldsMixin):
     def auto_generate_file_name(self, extension):
         return "{}_{}_{}.{}".format(self._meta.model_name,uuid.uuid4(),int(datetime.now().timestamp()*100000), extension)
 
-    #TODO override for _file name where field name is different (org requests and return type)
     def save(self, **kwargs):
         from wildlifecompliance.components.main.utils import check_file
 
-        path_to_file = kwargs.pop("path_to_file",None)
-        file_content = kwargs.pop("file_content",None)
-        storage = kwargs.pop("storage",None)
+        path_to_file = kwargs.pop("path_to_file", None)
+        file_content = kwargs.pop("file_content", None)
+        storage = kwargs.pop("storage", None)
+        file_field = kwargs.pop("file_field", "_file")
+
+        if not hasattr(self, file_field):
+            #if no file field is provided, get the first filefield on the model (this mixin is designed to handle one filefield per model, but can multiple can be handled with separate saves)
+            for field in self._meta.get_fields():
+                if isinstance(field, models.FileField):
+                    file_field = field.attname
+                    break
 
         if not path_to_file:
             try:
                 #we specify an empty string here so we can substitute our own (NOTE: may be worth changing how this works to just return the path)
-                path_to_file = self._meta.get_field('_file').upload_to(self,'')
+                path_to_file = self._meta.get_field(file_field).upload_to(self,'')
             except Exception as e:
                 print(e)
                 path_to_file = None
 
         if not storage:
-            storage = self._meta.get_field('_file').storage
+            storage = self._meta.get_field(file_field).storage
 
         if not file_content:
-            file_content = self._file
+            try:
+                file_content = getattr(self, file_field)
+            except Exception as e:
+                print(e)
+                file_content = None
 
         if path_to_file and file_content and storage:
             #check file extension
