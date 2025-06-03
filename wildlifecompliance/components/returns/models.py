@@ -952,6 +952,12 @@ class ReturnInvoice(models.Model):
             pass
         return False
 
+class ReturnReportHash(models.Model):
+
+    report_hash = models.CharField(max_length=64, unique=True)
+
+    class Meta:
+        app_label = 'wildlifecompliance'
 
 '''
 NOTE: REGISTER MODELS FOR REVERSION HERE.
