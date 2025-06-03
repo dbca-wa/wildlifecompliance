@@ -1,17 +1,18 @@
 from django.core.management.base import BaseCommand
-from wildlifecompliance.components.returns.models import ReturnRow, ReturnActivity
+from wildlifecompliance.components.returns.models import ReturnRow, ReturnActivity, ReturnReportHash
 import logging
 from datetime import datetime
 import uuid
 import xlsxwriter
 from django.conf import settings
-from wildlifecompliance.components.emails.emails import TemplateEmailBase
+from wildlifecompliance.components.returns.email import ReturnInvoiceNotificationEmail
 from wildlifecompliance.settings import NOTIFICATION_EMAIL
+import hashlib
 
 logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
-    help = 'Print a report of all return tables with totals not conistent with existing rows'
+    help = 'Create a report of all return tables with totals not conistent with existing rows (and other related issues)'
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -307,9 +308,9 @@ class Command(BaseCommand):
                 
                 correct_by_doa = False
                 if latest_total != correct_total:
-                    print("Initial (stock) total {}, total in {}, total out {}".format(initial_total,in_total,out_total))
-                    print("Correct Total:",correct_total)
-                    print("Reported Total (when ordered by activity date):",latest_total)
+                    #print("Initial (stock) total {}, total in {}, total out {}".format(initial_total,in_total,out_total))
+                    #print("Correct Total:",correct_total)
+                    #print("Reported Total (when ordered by activity date):",latest_total)
                     if out_of_order:
                         incorrect_totals_out_of_order.append([return_table.id, return_table.name, return_table.ret_id])
                         msg = "Return Table {} has an incorrect total with activities prior to stock (still counted) when ordered by activity date".format(return_table.id)
@@ -330,14 +331,13 @@ class Command(BaseCommand):
                         print(msg)
                         logger.info(msg)
                     else:
-                        print("Initial (stock) total {}, total in {}, total out {}".format(initial_total,in_total,out_total))
-                        print("Correct Total:",correct_total)
-                        print("Reported Total (when ordered by record added date):",latest_added_total)
+                        #print("Initial (stock) total {}, total in {}, total out {}".format(initial_total,in_total,out_total))
+                        #print("Correct Total:",correct_total)
+                        #print("Reported Total (when ordered by record added date):",latest_added_total)
                         incorrect_totals_regardless_ordering.append([return_table.id, return_table.name, return_table.ret_id])
                         msg = "Return Table {} has an incorrect total".format(return_table.id)
                         print(msg)
                         logger.info(msg)
-                        print(return_table_rows)
         
         #report
         print("\n\nREPORT")
@@ -346,14 +346,14 @@ class Command(BaseCommand):
         excel_file = str(settings.BASE_DIR)+'/tmp/{}_{}_{}.xlsx'.format("returns_report",uuid.uuid4(),int(datetime.now().timestamp()*100000))
         workbook = xlsxwriter.Workbook(excel_file) 
         worksheet_titles = [
-            "Incorrect added order".format(len(incorrect_totals_regardless_ordering)),
-            "Incorrect activity date order".format(len(incorrect_totals)),
-            "Bad date format".format(len(bad_date_format)),
-            "Incorrect many stock rows".format(len(incorrect_totals_with_multiple_stocks)),
-            "Incorrect pre-stock activity".format(len(incorrect_totals_out_of_order)),
-            "No stock row".format(len(no_stock_rows)),
-            "Many stock rows same date".format(len(multiple_stock_rows_with_same_dates)),
-            "Many stock rows".format(len(multiple_stock_rows)),
+            "Incorrect added order",
+            "Incorrect activity date order",
+            "Bad date format",
+            "Incorrect many stock rows",
+            "Incorrect pre-stock activity",
+            "No stock row",
+            "Many stock rows same date",
+            "Many stock rows",
         ]
         worksheet_info = [
             "The totals for these return tables are incorrect even when disregarding multiple stock rows and incorrect activity date orders. These rows are ordered by whenever they had been added.",
@@ -365,6 +365,7 @@ class Command(BaseCommand):
             "If a return table has multiple stock rows and those rows have the same activity date, there is no way to reliably determine what order the activities should be counted if relying on the date of activity.",
             "A return table should only have one initial stock row. Multiple stock rows may cause issues with counts.",
         ]
+
         worksheet_data = [
             incorrect_totals_regardless_ordering,
             incorrect_totals,
@@ -375,25 +376,41 @@ class Command(BaseCommand):
             multiple_stock_rows_with_same_dates,
             multiple_stock_rows,
         ]
-        
-        for i in range(len(worksheet_titles)):
-            worksheet = workbook.add_worksheet(worksheet_titles[i])
-            self.create_report_sheet(worksheet, worksheet_titles[i], worksheet_info[i], worksheet_data[i])
 
-        workbook.close() 
+        report_already_sent = False
 
-        #email report
-        attachments = []
-        attachments.append(excel_file)
-        #email to user
-        email = TemplateEmailBase(
-            subject='Attached: Return Totals Report', 
-            html_template='wildlifecompliance/components/returns/templates/wildlifecompliance/emails/send_return_count_report.html',
-            txt_template='wildlifecompliance/components/returns/templates/wildlifecompliance/emails/send_return_count_report.txt',
-        )
-        to_address = NOTIFICATION_EMAIL
-        # Send email
-        email.send(to_address, attachments=attachments)
+        hash = hashlib.sha256(str(worksheet_data).encode('utf-8')).hexdigest()
+        last_report_hash = ReturnReportHash.objects.last()
+
+        if last_report_hash:
+            if last_report_hash.report_hash == hash:
+                report_already_sent = True
+            else:
+                last_report_hash.report_hash = hash
+                last_report_hash.save()
+        else:
+            ReturnReportHash.objects.create(report_hash=hash) 
+
+        if report_already_sent:
+            print("\n\n\nREPORT ALREADY SENT\n\n\n")
+        else:
+            for i in range(len(worksheet_titles)):
+                worksheet = workbook.add_worksheet(worksheet_titles[i])
+                self.create_report_sheet(worksheet, worksheet_titles[i], worksheet_info[i], worksheet_data[i])
+
+            workbook.close() 
+
+            with open(excel_file, 'rb') as f:
+                file_buffer = f.read()    
+            attachment =  ('Returns Report.xlsx', file_buffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            #email report
+            attachments = []
+            attachments.append(attachment)
+            #email to user
+            email = ReturnInvoiceNotificationEmail()
+            to_address = NOTIFICATION_EMAIL
+            # Send email
+            email.send(to_address.split(','), attachments=attachments)
 
         msg = "\n\n{} return tables have multiple stock rows".format(len(multiple_stock_rows))
         print(msg)
