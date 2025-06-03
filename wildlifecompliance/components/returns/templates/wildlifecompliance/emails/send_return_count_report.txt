@@ -1,0 +1,5 @@
+{%  extends 'wildlifecompliance/emails/base_email.txt' %}
+
+{%  block content %}
+        Attached is a report detailing incorrect report table counts and related issues.
+{%  endblock %}

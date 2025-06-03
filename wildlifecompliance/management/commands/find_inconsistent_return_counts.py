@@ -2,8 +2,13 @@ from django.core.management.base import BaseCommand
 from wildlifecompliance.components.returns.models import ReturnRow, ReturnActivity
 import logging
 from datetime import datetime
-logger = logging.getLogger(__name__)
+import uuid
+import xlsxwriter
+from django.conf import settings
+from wildlifecompliance.components.emails.emails import TemplateEmailBase
+from wildlifecompliance.settings import NOTIFICATION_EMAIL
 
+logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     help = 'Print a report of all return tables with totals not conistent with existing rows'
@@ -13,6 +18,30 @@ class Command(BaseCommand):
             '--id',
             dest='id'
         )
+
+    def create_report_sheet(self, worksheet, sheet_name, sheet_info, sheet_rows):
+
+        col = 0
+        row = 0
+        row_header = ["Return Table Id", "Return Table Species", "Return Id"]
+
+        worksheet.write(row, col, sheet_name)
+        row += 1
+        worksheet.write(row, col, sheet_info)
+        row += 1
+
+        for header_col in row_header:
+            worksheet.write(row, col, header_col)
+            col += 1
+        row += 1
+        col = 0
+
+        for sheet_row in sheet_rows:
+            for sheet_col in sheet_row:
+                worksheet.write(row, col, sheet_col)
+                col += 1
+            row += 1
+            col = 0
 
 
     def handle(self, *args, **options):
@@ -26,8 +55,6 @@ class Command(BaseCommand):
         incorrect_totals_out_of_order = []
         incorrect_totals_regardless_ordering = []
         incorrect_totals_without_ordering_correct_with_ordering = []
-
-        report_format = "Report Table {}({}) from Return {}"
 
         if 'id' in options and options['id']:
             return_row_tables = ReturnRow.objects.filter(return_table_id=options['id']).distinct("return_table")
@@ -48,7 +75,7 @@ class Command(BaseCommand):
             stock_rows = return_rows.filter(data__activity=ReturnActivity.TYPE_IN_STOCK)
 
             if stock_rows.count() > 1:
-                multiple_stock_rows.append(report_format.format(return_table.id, return_table.name, return_table.ret_id))
+                multiple_stock_rows.append([return_table.id, return_table.name, return_table.ret_id])
                 msg = "Return Table {} has multiple stock rows".format(return_table.id)
                 print(msg)
                 logger.info(msg)
@@ -64,7 +91,7 @@ class Command(BaseCommand):
                         break
 
                 if bad_date:
-                    bad_date_format.append(report_format.format(return_table.id, return_table.name, return_table.ret_id))
+                    bad_date_format.append([return_table.id, return_table.name, return_table.ret_id])
                     msg = "Return Table {} has at least one row with an incorrect date value/format".format(return_table.id)
                     print(msg)
                     logger.info(msg)
@@ -74,7 +101,7 @@ class Command(BaseCommand):
 
                 same_dates = False
                 if len(stock_row_dates) < len(list(set(stock_row_dates))):
-                    multiple_stock_rows_with_same_dates.append(report_format.format(return_table.id, return_table.name, return_table.ret_id))
+                    multiple_stock_rows_with_same_dates.append([return_table.id, return_table.name, return_table.ret_id])
                     msg = "Return Table {} has multiple stock rows with the same activity dates".format(return_table.id)
                     print(msg)
                     logger.info(msg)
@@ -112,7 +139,7 @@ class Command(BaseCommand):
                         bad_date = True
                         break
                     if doa < stock_row_dates[0]:
-                        out_of_order_before_stock_rows.append(report_format.format(return_table.id, return_table.name, return_table.ret_id))
+                        out_of_order_before_stock_rows.append([return_table.id, return_table.name, return_table.ret_id])
                         msg = "Return Table {} has activities reported before stock activities".format(return_table.id)
                         print(msg)
                         logger.info(msg)
@@ -124,7 +151,7 @@ class Command(BaseCommand):
                         stock_groups[group_index].append(row)
 
                 if bad_date:
-                    bad_date_format.append(report_format.format(return_table.id, return_table.name, return_table.ret_id))
+                    bad_date_format.append([return_table.id, return_table.name, return_table.ret_id])
                     msg = "Return Table {} has at least one row with an incorrect date value/format".format(return_table.id)
                     print(msg)
                     logger.info(msg)
@@ -132,6 +159,7 @@ class Command(BaseCommand):
 
                 #for each stock group, check if the counts are consistent
                 bad_date = False
+                recorded = False
                 for stock_group in stock_groups:
                     stock_row = stock_group[0]
                     initial_total = stock_row["total"]
@@ -169,21 +197,22 @@ class Command(BaseCommand):
                         latest_total = initial_total
                     correct_total = initial_total + in_total - out_total
 
-                    if latest_total != correct_total:
-                        incorrect_totals_with_multiple_stocks.append(report_format.format(return_table.id, return_table.name, return_table.ret_id))
+                    if latest_total != correct_total and not recorded:
+                        incorrect_totals_with_multiple_stocks.append([return_table.id, return_table.name, return_table.ret_id])
                         msg = "Return Table {} has an incorrect total and multiple stock rows".format(return_table.id)
                         print(msg)
                         logger.info(msg)
+                        recorded = True
 
                 if bad_date:
-                    bad_date_format.append(report_format.format(return_table.id, return_table.name, return_table.ret_id))
+                    bad_date_format.append([return_table.id, return_table.name, return_table.ret_id])
                     msg = "Return Table {} has at least one row with an incorrect date value/format".format(return_table.id)
                     print(msg)
                     logger.info(msg)
                     continue
                 
             elif stock_rows.count() == 0:
-                no_stock_rows.append(report_format.format(return_table.id, return_table.name, return_table.ret_id))
+                no_stock_rows.append([return_table.id, return_table.name, return_table.ret_id])
                 msg = "Return Table {} has no stock".format(return_table.id)
                 print(msg)
                 logger.info(msg)
@@ -205,7 +234,7 @@ class Command(BaseCommand):
                     continue
 
                 if bad_date:
-                    bad_date_format.append(report_format.format(return_table.id, return_table.name, return_table.ret_id))
+                    bad_date_format.append([return_table.id, return_table.name, return_table.ret_id])
                     msg = "Return Table {} has at least one row with an incorrect date value/format".format(return_table.id)
                     print(msg)
                     logger.info(msg)
@@ -224,8 +253,8 @@ class Command(BaseCommand):
                         bad_date = True
                         break
 
-                    if doa < stock_row_date:
-                        out_of_order_before_stock_rows.append(report_format.format(return_table.id, return_table.name, return_table.ret_id))
+                    if doa < stock_row_date and not(stock_rows.count() > 1):
+                        out_of_order_before_stock_rows.append([return_table.id, return_table.name, return_table.ret_id])
                         msg = "Return Table {} has activities reported before stock activities".format(return_table.id)
                         print(msg)
                         logger.info(msg)
@@ -249,7 +278,7 @@ class Command(BaseCommand):
                     if not latest_added:
                         latest_added = return_table_rows[i]
                 
-                    elif int(latest_added["id"]) < int(return_table_rows[i]["id"]):
+                    elif int(latest_added["data"]["date"]) < int(return_table_rows[i]["data"]["date"]):
                         latest_added = return_table_rows[i]
                     
                     if return_table_rows[i]["data"]["activity"].startswith("in_"):
@@ -258,7 +287,7 @@ class Command(BaseCommand):
                         out_total += int(return_table_rows[i]["data"]["qty"])                        
 
                 if bad_date:
-                    bad_date_format.append(report_format.format(return_table.id, return_table.name, return_table.ret_id))
+                    bad_date_format.append([return_table.id, return_table.name, return_table.ret_id])
                     msg = "Return Table {} has at least one row with an incorrect date value/format".format(return_table.id)
                     print(msg)
                     logger.info(msg)
@@ -280,15 +309,14 @@ class Command(BaseCommand):
                 if latest_total != correct_total:
                     print("Initial (stock) total {}, total in {}, total out {}".format(initial_total,in_total,out_total))
                     print("Correct Total:",correct_total)
-                    print(latest_total)
                     print("Reported Total (when ordered by activity date):",latest_total)
                     if out_of_order:
-                        incorrect_totals_out_of_order.append(report_format.format(return_table.id, return_table.name, return_table.ret_id))
+                        incorrect_totals_out_of_order.append([return_table.id, return_table.name, return_table.ret_id])
                         msg = "Return Table {} has an incorrect total with activities prior to stock (still counted) when ordered by activity date".format(return_table.id)
                         print(msg)
                         logger.info(msg)   
                     else:
-                        incorrect_totals.append(report_format.format(return_table.id, return_table.name, return_table.ret_id))
+                        incorrect_totals.append([return_table.id, return_table.name, return_table.ret_id])
                         msg = "Return Table {} has an incorrect total when ordered by activity date".format(return_table.id)
                         print(msg)
                         logger.info(msg)
@@ -297,22 +325,75 @@ class Command(BaseCommand):
 
                 if latest_added_total != correct_total:
                     if correct_by_doa:
-                        incorrect_totals_without_ordering_correct_with_ordering.append(report_format.format(return_table.id, return_table.name, return_table.ret_id))
+                        incorrect_totals_without_ordering_correct_with_ordering.append([return_table.id, return_table.name, return_table.ret_id])
                         msg = "Return Table {} has an incorrect total when ordered by when added, but correct when ordered by doa".format(return_table.id)
                         print(msg)
                         logger.info(msg)
                     else:
                         print("Initial (stock) total {}, total in {}, total out {}".format(initial_total,in_total,out_total))
                         print("Correct Total:",correct_total)
-                        print("Reported Total (when ordered by record id):",latest_added_total)
-                        incorrect_totals_regardless_ordering.append(report_format.format(return_table.id, return_table.name, return_table.ret_id))
+                        print("Reported Total (when ordered by record added date):",latest_added_total)
+                        incorrect_totals_regardless_ordering.append([return_table.id, return_table.name, return_table.ret_id])
                         msg = "Return Table {} has an incorrect total".format(return_table.id)
                         print(msg)
                         logger.info(msg)
+                        print(return_table_rows)
         
-        #end report
+        #report
         print("\n\nREPORT")
         print("--------------------------------------------------------------------------------")
+
+        excel_file = str(settings.BASE_DIR)+'/tmp/{}_{}_{}.xlsx'.format("returns_report",uuid.uuid4(),int(datetime.now().timestamp()*100000))
+        workbook = xlsxwriter.Workbook(excel_file) 
+        worksheet_titles = [
+            "Incorrect added order".format(len(incorrect_totals_regardless_ordering)),
+            "Incorrect activity date order".format(len(incorrect_totals)),
+            "Bad date format".format(len(bad_date_format)),
+            "Incorrect many stock rows".format(len(incorrect_totals_with_multiple_stocks)),
+            "Incorrect pre-stock activity".format(len(incorrect_totals_out_of_order)),
+            "No stock row".format(len(no_stock_rows)),
+            "Many stock rows same date".format(len(multiple_stock_rows_with_same_dates)),
+            "Many stock rows".format(len(multiple_stock_rows)),
+        ]
+        worksheet_info = [
+            "The totals for these return tables are incorrect even when disregarding multiple stock rows and incorrect activity date orders. These rows are ordered by whenever they had been added.",
+            "The total may still be correct when the activity date is disregarded or corrected. But this error at least means that the activity dates provided do not match what should be expected.",
+            "A bad date renders the return table unorderable. No further information will be available until this is remedied.",
+            "The total may still be correct when the activity date is disregarded or corrected, as well as if the extra stock rows were to be corrected or counted as any other row.",
+            "The total may still be correct when the activity date is disregarded or corrected. This report counts activities with dates recorded prior to stock (where all activities should be after stock).",
+            "All return tables should have at least one stock row. No further information regarding this return row will be available until this is remedied.",
+            "If a return table has multiple stock rows and those rows have the same activity date, there is no way to reliably determine what order the activities should be counted if relying on the date of activity.",
+            "A return table should only have one initial stock row. Multiple stock rows may cause issues with counts.",
+        ]
+        worksheet_data = [
+            incorrect_totals_regardless_ordering,
+            incorrect_totals,
+            bad_date_format,
+            incorrect_totals_with_multiple_stocks,
+            incorrect_totals_out_of_order,
+            no_stock_rows,
+            multiple_stock_rows_with_same_dates,
+            multiple_stock_rows,
+        ]
+        
+        for i in range(len(worksheet_titles)):
+            worksheet = workbook.add_worksheet(worksheet_titles[i])
+            self.create_report_sheet(worksheet, worksheet_titles[i], worksheet_info[i], worksheet_data[i])
+
+        workbook.close() 
+
+        #email report
+        attachments = []
+        attachments.append(excel_file)
+        #email to user
+        email = TemplateEmailBase(
+            subject='Attached: Return Totals Report', 
+            html_template='wildlifecompliance/components/returns/templates/wildlifecompliance/emails/send_return_count_report.html',
+            txt_template='wildlifecompliance/components/returns/templates/wildlifecompliance/emails/send_return_count_report.txt',
+        )
+        to_address = NOTIFICATION_EMAIL
+        # Send email
+        email.send(to_address, attachments=attachments)
 
         msg = "\n\n{} return tables have multiple stock rows".format(len(multiple_stock_rows))
         print(msg)
@@ -349,27 +430,7 @@ class Command(BaseCommand):
         logger.info(msg)
         print(out_of_order_before_stock_rows)
         logger.info(out_of_order_before_stock_rows)
-        exp = "\nReturn table has recorded activities with date prior to stock date. These activities cannot be counted when determining the correct total as ordered by activity date (only recorded date/record id)."
-        print(exp)
-        logger.info(exp)
-        print("--------------------------------------------------------------------------------")
-
-        msg = "\n\n{} return tables have rows with incorrect date of activity values/formats".format(len(bad_date_format))
-        print(msg)
-        logger.info(msg)
-        print(bad_date_format)
-        logger.info(bad_date_format)
-        exp = "\nA bad date renders the return table unusable. No further information will be available until this is remedied."
-        print(exp)
-        logger.info(exp)
-        print("--------------------------------------------------------------------------------")
-
-        msg = "\n\n{} return tables have incorrect totals when ordered by activity date".format(len(incorrect_totals))
-        print(msg)
-        logger.info(msg)
-        print(incorrect_totals)
-        logger.info(incorrect_totals)
-        exp = "\nThe total may still be correct when the activity date is disregarded or corrected. But this error at least means that the activity dates provided do not match what should be expected."
+        exp = "\nReturn table has recorded activities with date prior to stock date. These activities cannot be counted when determining the correct total as ordered by activity date (only recorded date)."
         print(exp)
         logger.info(exp)
         print("--------------------------------------------------------------------------------")
@@ -394,7 +455,7 @@ class Command(BaseCommand):
         logger.info(exp)
         print("--------------------------------------------------------------------------------")
 
-        msg = "\n\n{} return tables have incorrect totals when ordered by id, but correct when ordered by activity date".format(len(incorrect_totals_without_ordering_correct_with_ordering))
+        msg = "\n\n{} return tables have incorrect totals when ordered by date added, but correct when ordered by activity date".format(len(incorrect_totals_without_ordering_correct_with_ordering))
         print(msg)
         logger.info(msg)
         print(incorrect_totals_without_ordering_correct_with_ordering)
@@ -404,7 +465,27 @@ class Command(BaseCommand):
         logger.info(exp)
         print("--------------------------------------------------------------------------------")
 
-        msg = "\n\n{} return tables have incorrect totals".format(len(incorrect_totals_regardless_ordering))
+        msg = "\n\n{} return tables have rows with incorrect date of activity values/formats".format(len(bad_date_format))
+        print(msg)
+        logger.info(msg)
+        print(bad_date_format)
+        logger.info(bad_date_format)
+        exp = "\nA bad date renders the return table unorderable. No further information will be available until this is remedied."
+        print(exp)
+        logger.info(exp)
+        print("--------------------------------------------------------------------------------")
+
+        msg = "\n\n{} return tables have incorrect totals when ordered by activity date".format(len(incorrect_totals))
+        print(msg)
+        logger.info(msg)
+        print(incorrect_totals)
+        logger.info(incorrect_totals)
+        exp = "\nThe total may still be correct when the activity date is disregarded or corrected. But this error at least means that the activity dates provided do not match what should be expected."
+        print(exp)
+        logger.info(exp)
+        print("--------------------------------------------------------------------------------")
+
+        msg = "\n\n{} return tables have incorrect totals when ordered as added".format(len(incorrect_totals_regardless_ordering))
         print(msg)
         logger.info(msg)
         print(incorrect_totals_regardless_ordering)
@@ -412,3 +493,4 @@ class Command(BaseCommand):
         exp = "\nThe totals for these return tables are incorrect even when disregarding multiple stock rows and incorrect activity date orders. These rows are ordered by whenever they had been added."
         print(exp)
         logger.info(exp)
+
