@@ -6,7 +6,7 @@ import uuid
 import xlsxwriter
 from django.conf import settings
 from wildlifecompliance.components.returns.email import ReturnInvoiceNotificationEmail
-from wildlifecompliance.settings import NOTIFICATION_EMAIL
+from wildlifecompliance.settings import REPORTING_EMAIL
 import hashlib
 
 logger = logging.getLogger(__name__)
@@ -408,7 +408,7 @@ class Command(BaseCommand):
             attachments.append(attachment)
             #email to user
             email = ReturnInvoiceNotificationEmail()
-            to_address = NOTIFICATION_EMAIL
+            to_address = REPORTING_EMAIL
             # Send email
             email.send(to_address.split(','), attachments=attachments)
 
