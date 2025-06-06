@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from wildlifecompliance.components.returns.models import ReturnRow, ReturnActivity, ReturnReportHash
+from wildlifecompliance.components.returns.models import ReturnRow, ReturnActivity, ReturnReportHash, Return
 import logging
 from datetime import datetime
 import uuid
@@ -18,6 +18,11 @@ class Command(BaseCommand):
         parser.add_argument(
             '--id',
             dest='id'
+        )
+        parser.add_argument(
+            '--include-expired', 
+            action='store_true', 
+            default=False
         )
 
     def create_report_sheet(self, worksheet, sheet_name, sheet_info, sheet_rows):
@@ -58,12 +63,16 @@ class Command(BaseCommand):
         incorrect_totals_without_ordering_correct_with_ordering = []
 
         if 'id' in options and options['id']:
-            return_row_tables = ReturnRow.objects.filter(return_table_id=options['id']).distinct("return_table")
-            all_return_rows = ReturnRow.objects.filter(return_table_id=options['id'])
+            return_row_tables = ReturnRow.objects.filter(return_table__ret__application__property_cache__licence_purpose_names='Possessing (pet keeper)').filter(return_table_id=options['id']).distinct("return_table")
+            all_return_rows = ReturnRow.objects.filter(return_table__ret__application__property_cache__licence_purpose_names='Possessing (pet keeper)').filter(return_table_id=options['id'])
         else:
             #get return tables via return rows (not directly)
-            return_row_tables = ReturnRow.objects.distinct("return_table")
-            all_return_rows = ReturnRow.objects
+            return_row_tables = ReturnRow.objects.filter(return_table__ret__application__property_cache__licence_purpose_names='Possessing (pet keeper)').distinct("return_table")
+            all_return_rows = ReturnRow.objects.filter(return_table__ret__application__property_cache__licence_purpose_names='Possessing (pet keeper)')
+        
+        if not options['include_expired']:
+            return_row_tables = return_row_tables.exclude(return_table__ret__processing_status=Return.RETURN_PROCESSING_STATUS_EXPIRED)
+            all_return_rows = all_return_rows.exclude(return_table__ret__processing_status=Return.RETURN_PROCESSING_STATUS_EXPIRED)
 
         #iterate through each table
         count = 0
