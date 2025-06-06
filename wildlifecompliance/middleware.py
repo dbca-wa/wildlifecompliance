@@ -94,8 +94,6 @@ class FirstTimeDefaultNag(object):
 
             if (not request.user.first_name) or \
                 (not request.user.last_name) or \
-                (not request.user.legal_first_name) or \
-                (not request.user.legal_last_name) or \
                 (not request.user.dob and not request.user.legal_dob) or \
                 (not request.user.residential_address) or \
                 (not (
