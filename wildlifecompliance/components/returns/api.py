@@ -458,6 +458,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             instance = self.get_object()
 
             with transaction.atomic():
+                print("saving return")
                 ReturnService.store_request_details_for(instance, request)
                 instance.save()
                 serializer = self.get_serializer(instance)

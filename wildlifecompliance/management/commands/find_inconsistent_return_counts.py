@@ -63,16 +63,34 @@ class Command(BaseCommand):
         incorrect_totals_without_ordering_correct_with_ordering = []
 
         if 'id' in options and options['id']:
-            return_row_tables = ReturnRow.objects.filter(return_table__ret__application__property_cache__licence_purpose_names='Possessing (pet keeper)').filter(return_table_id=options['id']).distinct("return_table")
-            all_return_rows = ReturnRow.objects.filter(return_table__ret__application__property_cache__licence_purpose_names='Possessing (pet keeper)').filter(return_table_id=options['id'])
+            return_row_tables = ReturnRow.objects.filter(
+                return_table__ret__application__property_cache__licence_purpose_names='Possessing (pet keeper)'
+            ).filter(
+                return_table__ret__licence__property_cache__status="current"
+            ).filter(return_table_id=options['id']).distinct("return_table")
+            
+            all_return_rows = ReturnRow.objects.filter(
+                return_table__ret__application__property_cache__licence_purpose_names='Possessing (pet keeper)'
+            ).filter(
+                return_table__ret__licence__property_cache__status="current"
+            ).filter(return_table_id=options['id'])
         else:
             #get return tables via return rows (not directly)
-            return_row_tables = ReturnRow.objects.filter(return_table__ret__application__property_cache__licence_purpose_names='Possessing (pet keeper)').distinct("return_table")
-            all_return_rows = ReturnRow.objects.filter(return_table__ret__application__property_cache__licence_purpose_names='Possessing (pet keeper)')
+            return_row_tables = ReturnRow.objects.filter(
+                return_table__ret__application__property_cache__licence_purpose_names='Possessing (pet keeper)'
+            ).filter(
+                return_table__ret__licence__property_cache__status="current"
+            ).distinct("return_table")
+
+            all_return_rows = ReturnRow.objects.filter(
+                return_table__ret__application__property_cache__licence_purpose_names='Possessing (pet keeper)'
+            ).filter(
+                return_table__ret__licence__property_cache__status="current"
+            )
         
         if not options['include_expired']:
-            return_row_tables = return_row_tables.exclude(return_table__ret__processing_status=Return.RETURN_PROCESSING_STATUS_EXPIRED)
-            all_return_rows = all_return_rows.exclude(return_table__ret__processing_status=Return.RETURN_PROCESSING_STATUS_EXPIRED)
+            return_row_tables = return_row_tables.exclude(return_table__ret__processing_status=Return.RETURN_PROCESSING_STATUS_EXPIRED).exclude(return_table__ret__processing_status=Return.RETURN_PROCESSING_STATUS_DISCARDED)
+            all_return_rows = all_return_rows.exclude(return_table__ret__processing_status=Return.RETURN_PROCESSING_STATUS_EXPIRED).exclude(return_table__ret__processing_status=Return.RETURN_PROCESSING_STATUS_DISCARDED)
 
         #iterate through each table
         count = 0

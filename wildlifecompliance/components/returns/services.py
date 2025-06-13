@@ -8,6 +8,7 @@ from datetime import date, timedelta
 from concurrency.exceptions import RecordModifiedError
 
 from django.core.exceptions import ValidationError, FieldError
+from rest_framework import serializers
 from django.db import transaction
 from django.db.utils import IntegrityError
 from django.utils import timezone
@@ -2175,10 +2176,16 @@ class ReturnSheet(object):
             if not _data:
                 continue
 
-            try:
                 # _data = request.data.get(species).encode('utf-8')
+            try:
                 _data = ast.literal_eval(_data)  # ast should convert to tuple.
-                table_rows = self._get_table_rows(_data)
+            except Exception as e:
+                print(e)
+
+            table_rows = self._get_table_rows(_data)
+            
+            try:
+                print(species, table_rows)
                 self._return.save_return_table(species, table_rows, request)
 
             except AttributeError as e:
@@ -2342,6 +2349,7 @@ class ReturnSheet(object):
         return self._table
 
     def _get_table_rows(self, _data):
+        print("_get_table_rows")
         """
         Gets the formatted row of data from Species data.
         :param _data:
@@ -2351,18 +2359,6 @@ class ReturnSheet(object):
         # by_column is of format {'col_header':[row1_val, row2_val,...],...}
         key_values = []
         num_rows = 0
-        # if isinstance(_data, tuple):
-        #     for key in _data[0].keys():
-        #         for cnt in range(_data.__len__()):
-        #             key_values.append(_data[cnt][key])
-        #         by_column[key] = key_values
-        #         key_values = []
-        #     num_rows = len(list(by_column.values())[0])\
-        #         if len(by_column.values()) > 0 else 0
-        # else:
-        #     for key in _data[0].keys():
-        #         by_column[key] = _data[0][key]
-        #     num_rows = num_rows + 1
 
         for key in _data[0].keys():
             for cnt in range(_data.__len__()):
@@ -2375,11 +2371,6 @@ class ReturnSheet(object):
         rows = []
         for row_num in range(num_rows):
             row_data = {}
-            # if num_rows > 1:
-            #     for key, value in by_column.items():
-            #         row_data[key] = value[row_num]
-            # else:
-            #     row_data = by_column
             for key, value in by_column.items():
                 row_data[key] = value[row_num]
 
@@ -2392,6 +2383,35 @@ class ReturnSheet(object):
             if not is_empty:
                 row_data['rowId'] = str(row_num)
                 rows.append(row_data)
+
+        rows = list(sorted(rows, key=lambda row: row['date']))
+        #TODO log validation fail to action log
+        #validation for totals
+        for i in range(len(rows)):
+            if i == 0:
+                continue
+            current_row = rows[i]
+            previous_row = rows[i-1]
+            previous_total = previous_row["total"]
+            new_total = current_row["total"]
+
+            if current_row["activity"].startswith("in_"):
+                try:
+                    add = int(current_row["qty"])
+                except:
+                    raise serializers.ValidationError('Invalid activity amount given.')                
+                if (previous_total + add) != new_total:
+                    raise serializers.ValidationError('Invalid total in table rows. If this issue persists please contact us.')
+            elif current_row["activity"].startswith("out_"):
+                try:
+                    subtract = int(current_row["qty"])
+                except:
+                    raise serializers.ValidationError('Invalid activity amount given.')
+                
+                if (previous_total - subtract) != new_total:
+                    raise serializers.ValidationError('Invalid total in table rows. If this issue persists please contact us.')
+            elif current_row["activity"] == "stock":
+                raise serializers.ValidationError('Row other than first describes "stock" activity. Only the first row should be "stock" activity.')
 
         return rows
 
