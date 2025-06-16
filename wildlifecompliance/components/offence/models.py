@@ -16,6 +16,7 @@ from wildlifecompliance.components.main.related_item import can_close_record
 from wildlifecompliance.components.section_regulation.models import SectionRegulation
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.organisations.models import Organisation
+from django_countries.fields import CountryField
 
 from wildlifecompliance.components.main.utils import (
     get_first_name,
@@ -266,11 +267,20 @@ class Offender(SanitiseMixin):
         null=True,
         related_name='offender_removed_by', on_delete=models.CASCADE
     )
-    person = models.ForeignKey(
-        EmailUser,
-        null=True,
-        related_name='offender_person', on_delete=models.CASCADE
-    )
+
+    email = models.EmailField(unique=True, blank=False, null=True)
+    first_name = models.CharField(max_length=128, blank=False, verbose_name='Given name(s)', null=True)
+    last_name = models.CharField(max_length=128, blank=False, null=True)
+    dob = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=False, verbose_name="date of birth", help_text='')
+    phone_number = models.CharField(max_length=50, null=True, blank=True, verbose_name="phone number", help_text='')
+    mobile_number = models.CharField(max_length=50, null=True, blank=True, verbose_name="mobile number", help_text='')
+
+    address_street = models.CharField('Street', max_length=255, null=True, blank=True)
+    address_locality = models.CharField('Suburb / Town', max_length=255, null=True, blank=True)
+    address_state = models.CharField(max_length=255, default='WA', null=True, blank=True)
+    address_country = CountryField(default='AU', null=True, blank=True)
+    address_postcode = models.CharField(max_length=10, null=True, blank=True)
+
     organisation_id = models.IntegerField(
         unique=True, verbose_name="Ledger Organisation ID", null=True
     )

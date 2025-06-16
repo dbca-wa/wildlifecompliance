@@ -34,6 +34,8 @@
               :personToUpdate="entity.id"
               @person-saved="savePerson"
               v-bind:key="updateCreatePersonBindId"
+              :emailRequired="emailRequired"
+              :allowSaveUser="allowSaveUser"
               ref="update_create_person"/>
             </div>
             <div class="col-sm-12" v-if="displayUpdateCreateOrganisation && !personOnly">
@@ -199,6 +201,16 @@ export default {
             type: Boolean,
             required: false,
             default: false,
+        },
+        emailRequired: {
+            type: Boolean,
+            required: false,
+            default: true,
+        },
+        allowSaveUser: {
+            type: Boolean,
+            required: false,
+            default: true,
         },
         parentEntity: {
             type: Object,

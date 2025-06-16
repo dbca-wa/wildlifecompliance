@@ -179,8 +179,9 @@
                                     :excludeStaff="true" 
                                     :personOnly="true" 
                                     classNames="form-control" 
-                                    @entity-selected="personSelected" 
                                     showCreateUpdate
+                                    :allowSaveUser="false"
+                                    :emailRequired="false"
                                     ref="search_offender"
                                     domIdHelper="offender"
                                     :key="updateSearchPersonOrganisationBindId"/>
@@ -247,6 +248,7 @@ import "awesomplete/awesomplete.css";
 import { v4 as uuidv4 } from 'uuid';
 import "jquery-ui/ui/widgets/draggable.js";
 import FileField from '@/components/common/compliance_file.vue';
+import { data } from "jquery";
 
 export default {
   name: "Offence",
@@ -262,6 +264,7 @@ export default {
 
     return {
       uuid: 0,
+      offender_count: 0,
       displayCreateNewPerson: false,
       updatingContact: false,
       newPersonBeingCreated: false,
@@ -551,37 +554,20 @@ export default {
         // );
         // Object.assign(this.regionDistricts, returned_region_districts);
     },
-    newPersonCreated: function(obj) {
-      if(obj.person){
-        this.setCurrentOffender('individual', obj.person.id);
-
-        // Set fullname and DOB into the input box
-        let full_name = [obj.person.first_name, obj.person.last_name].filter(Boolean).join(" ");
-        let dob = obj.person.dob ? "DOB:" + obj.person.dob : "DOB: ---";
-        let value = [full_name, dob].filter(Boolean).join(", ");
-        this.$refs.person_search.setInput(value);
-      } else if (obj.err) {
-        //console.log(err);
-      } else {
-        // Should not reach here
-      }
-    },
-    personSelected: function(para) {
-        let vm = this;
-        vm.setCurrentOffender(para.data_type, para.id);
-    },
     removeOffenderClicked: function(e) {
       let vm = this;
 
       let offenderId = parseInt(e.target.getAttribute("data-offender-id"));
+      let remove_idx;
       vm.$refs.offender_table.vmDataTable.rows(function(idx, data, node) {
         if (data.id === offenderId) {
-          vm.$refs.offender_table.vmDataTable
-            .row(idx)
-            .remove()
-            .draw();
+          remove_idx = (idx); 
         }
       });
+      vm.$refs.offender_table.vmDataTable
+            .row(remove_idx)
+            .remove()
+            .draw();
     },
     removeClicked: function(e) {
             let alleged_offence_uuid = e.target.getAttribute("data-alleged-offence-uuid");
@@ -634,58 +620,41 @@ export default {
     addOffenderClicked: async function() {
       let vm = this;
 
+      let current_offender = this.$refs.search_offender.$refs.update_create_person.email_user;
       if (
-        vm.current_offender &&
-        vm.current_offender.id &&
-        vm.current_offender.data_type
+        current_offender.first_name &&
+        current_offender.last_name &&
+        current_offender.dob
       ) {
-        // save person before adding to offender list
-        await this.$refs.search_offender.parentSave()
-        let already_exists = false;
-
-        let ids = vm.$refs.offender_table.vmDataTable.columns(0).data()[0];
-        let data_types = vm.$refs.offender_table.vmDataTable
-          .columns(1)
-          .data()[0];
-
-        for (let i = 0; i < ids.length; i++) {
-          if (
-            ids[i] == vm.current_offender.id &&
-            data_types[i] == vm.current_offender.data_type
-          ) {
-            already_exists = true;
-            break;
-          }
+        //NOTE: we assume individual if data type not specified
+        if ((!('data_type' in current_offender) || current_offender.data_type !== undefined) || current_offender.data_type == "individual") {
+          vm.offender_count++;
+          vm.$refs.offender_table.vmDataTable.row
+            .add({
+              data_type: "individual",
+              id: vm.offender_count,
+              first_name: current_offender.first_name,
+              last_name: current_offender.last_name,
+              email: current_offender.email,
+              p_number: current_offender.p_number,
+              m_number: current_offender.m_number,
+              dob: current_offender.dob
+            })
+            .draw();
+        } else if (current_offender.data_type == "organisation") {
+          vm.offender_count++;
+          vm.$refs.offender_table.vmDataTable.row
+            .add({
+              data_type: "organisation",
+              id: vm.offender_count,
+              name: current_offender.name,
+              abn: current_offender.abn
+            })
+            .draw();
         }
-
-        if (!already_exists) {
-          if (vm.current_offender.data_type == "individual") {
-            vm.$refs.offender_table.vmDataTable.row
-              .add({
-                data_type: vm.current_offender.data_type,
-                id: vm.current_offender.id,
-                first_name: vm.current_offender.first_name,
-                last_name: vm.current_offender.last_name,
-                email: vm.current_offender.email,
-                p_number: vm.current_offender.p_number,
-                m_number: vm.current_offender.m_numberum,
-                dob: vm.current_offender.dob
-              })
-              .draw();
-          } else if (vm.current_offender.data_type == "organisation") {
-            vm.$refs.offender_table.vmDataTable.row
-              .add({
-                data_type: vm.current_offender.data_type,
-                id: vm.current_offender.id,
-                name: vm.current_offender.name,
-                abn: vm.current_offender.abn
-              })
-              .draw();
-          }
-        }
+        this.$refs.search_offender.clearInput();
+        this.$refs.search_offender.$refs.update_create_person.setDefaultPerson();
       }
-
-      vm.setCurrentOffenderEmpty();
     },
     addAllegedOffenceClicked: function() {
         if (this.current_alleged_offence && this.current_alleged_offence.id) {
@@ -841,6 +810,9 @@ export default {
 
         // Collect offenders data from the datatable, and set them to the vuex
         let offenders = vm.$refs.offender_table.vmDataTable.rows().data().toArray();
+
+        //TODO fix to include all offender details
+        console.log(offenders)
         vm.setOffenders(offenders);
 
         let res = await vm.createOffence();;
@@ -1046,24 +1018,6 @@ export default {
         );
       });
     },
-    setCurrentOffender: function(data_type, id) {
-      let vm = this;
-      if (!id) {
-          this.current_offender = null;
-      } else if (data_type == "individual") {
-        let initialisers = [utils.fetchUser(id)];
-        Promise.all(initialisers).then(data => {
-          vm.current_offender = data[0];
-          vm.current_offender.data_type = "individual";
-        });
-      } else if (data_type == "organisation") {
-        let initialisers = [vm.searchOrganisation(id)];
-        Promise.all(initialisers).then(data => {
-          vm.current_offender = data[0];
-          vm.current_offender.data_type = "organisation";
-        });
-      }
-    },
     setCurrentOffenceSelected: function(offence) {
       let vm = this;
 
@@ -1075,14 +1029,6 @@ export default {
       } else {
         vm.setCurrentAllegedOffenceEmpty();
       }
-    },
-    setCurrentOffenderEmpty: function() {
-      let vm = this;
-
-      vm.current_offender = null;
-
-      $("#offender_input").val("");
-        vm.$refs.search_offender.clearInput();
     },
     setCurrentAllegedOffenceEmpty: function() {
       let vm = this;

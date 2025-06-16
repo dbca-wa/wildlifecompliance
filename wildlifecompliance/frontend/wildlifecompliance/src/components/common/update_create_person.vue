@@ -136,7 +136,7 @@
                 </div>
             </div>
 
-            <input 
+            <input v-if="allowSaveUser"
             :disabled="!saveButtonEnabled"
             type="button" 
             class="pull-right btn btn-primary" 
@@ -240,6 +240,14 @@ export default {
             required: false,
         },
         isEditable: {
+            type: Boolean,
+            default: false,
+        },
+        emailRequired: {
+            type: Boolean,
+            default: false,
+        },
+        allowSaveUser: {
             type: Boolean,
             default: false,
         },
@@ -435,7 +443,7 @@ export default {
                         fetchUrl = helpers.add_endpoint_join(api_endpoints.compliance_management_users, payload.id + '/update_person/');
                     }
                 } else {
-                    if (!payload.first_name || !payload.last_name || !payload.dob || !payload.email) {
+                    if (!payload.first_name || !payload.last_name || !payload.dob || (this.emailRequired && !payload.email)) {
                         await swal("Error", "Fill out all Personal Details and email fields", "error");
                         return;
                     } else {
