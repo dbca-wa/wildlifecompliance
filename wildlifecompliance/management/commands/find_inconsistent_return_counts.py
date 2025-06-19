@@ -110,7 +110,8 @@ class Command(BaseCommand):
                 
                 #get all rows with doa after respective stock
                 stock_return_row_json = list(stock_rows.values_list('data',flat=True))
-                stock_row_dates = list(stock_rows.values_list("data__doa", flat=True))
+                #stock_row_dates = list(stock_rows.values_list("data__doa", flat=True))
+                stock_row_dates = list(map(lambda i: i['doa'],stock_return_row_json))
                 for i in range(len(stock_row_dates)):
                     try:
                         stock_row_dates[i] = datetime.strptime(stock_row_dates[i], '%d/%m/%Y').date()
