@@ -292,6 +292,14 @@ class Offender(SanitiseMixin):
     active_offenders = ActiveOffenderManager()
     objects = models.Manager()
 
+    @property
+    def get_related_items_identifier(self):
+        return self.first_name + " " + self.last_name
+    
+    @property
+    def get_related_items_descriptor(self):
+        return self.first_name + " " + self.last_name
+
     class Meta:
         app_label = 'wildlifecompliance'
         verbose_name = 'CM_Offender'
