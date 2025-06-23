@@ -629,6 +629,7 @@ export default {
         //NOTE: we assume individual if data type not specified
         if ((!('data_type' in current_offender) || current_offender.data_type !== undefined) || current_offender.data_type == "individual") {
           vm.offender_count++;
+          console.log(current_offender)
           vm.$refs.offender_table.vmDataTable.row
             .add({
               data_type: "individual",
@@ -636,9 +637,10 @@ export default {
               first_name: current_offender.first_name,
               last_name: current_offender.last_name,
               email: current_offender.email,
-              p_number: current_offender.p_number,
-              m_number: current_offender.m_number,
-              dob: current_offender.dob
+              p_number: current_offender.phone_number,
+              m_number: current_offender.mobile_number,
+              dob: current_offender.dob,
+              residential_address: current_offender.residential_address
             })
             .draw();
         } else if (current_offender.data_type == "organisation") {
@@ -652,8 +654,9 @@ export default {
             })
             .draw();
         }
-        this.$refs.search_offender.clearInput();
-        this.$refs.search_offender.$refs.update_create_person.setDefaultPerson();
+        this.$nextTick(() => {
+            this.$refs.search_offender.$refs.update_create_person.setDefaultPerson();
+        });
       }
     },
     addAllegedOffenceClicked: function() {

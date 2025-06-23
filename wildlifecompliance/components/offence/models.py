@@ -268,7 +268,7 @@ class Offender(SanitiseMixin):
         related_name='offender_removed_by', on_delete=models.CASCADE
     )
 
-    email = models.EmailField(unique=True, blank=False, null=True)
+    email = models.EmailField(unique=True, blank=True, null=True)
     first_name = models.CharField(max_length=128, blank=False, verbose_name='Given name(s)', null=True)
     last_name = models.CharField(max_length=128, blank=False, null=True)
     dob = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=False, verbose_name="date of birth", help_text='')

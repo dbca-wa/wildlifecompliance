@@ -305,21 +305,12 @@ def format_url(model_name, obj_id):
 
 def get_related_offenders(entity, **kwargs):
     from wildlifecompliance.components.offence.models import Offender
-    offender_list = []
     offenders = []
     if entity._meta.model_name == 'sanctionoutcome':
         offenders.append(entity.offender)
     if entity._meta.model_name == 'offence':
         offenders = Offender.objects.filter(offence_id=entity.id)
-    for offender in offenders:
-        if offender:
-            if offender.person and not offender.removed:
-                user = EmailUser.objects.get(id=offender.person.id)
-                offender_list.append(user)
-            if offender.organisation_id and not offender.removed:
-                organisation = Organisation.objects.get(id=offender.organisation_id)
-                offender_list.append(organisation)
-    return offender_list
+    return offenders
 
 def checkWeakLinkAuth(request,content_type_str,object_id):
     from wildlifecompliance.components.inspection.models import Inspection

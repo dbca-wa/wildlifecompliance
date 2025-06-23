@@ -113,7 +113,7 @@
                         <label for="" class="col-sm-3 control-label">Phone</label>
                         <div class="col-sm-6">
                             <div v-if="email_user">
-                                <input :readonly="!isEditable" type="text" class="form-control" name="phone" placeholder="" v-model="email_user.phone_number" v-bind:key="email_user.id">
+                                <input :readonly="!isEditable" type="text" class="form-control" name="phone_number" placeholder="" v-model="email_user.phone_number" v-bind:key="email_user.id">
                             </div>
                         </div>
                         </div>
@@ -121,7 +121,7 @@
                         <label for="" class="col-sm-3 control-label" >Mobile</label>
                         <div class="col-sm-6">
                             <div v-if="email_user">
-                                <input :readonly="!isEditable" type="text" class="form-control" name="mobile" placeholder="" v-model="email_user.mobile_number" v-bind:key="email_user.id">
+                                <input :readonly="!isEditable" type="text" class="form-control" name="mobile_number" placeholder="" v-model="email_user.mobile_number" v-bind:key="email_user.id">
                             </div>
                         </div>
                         </div>

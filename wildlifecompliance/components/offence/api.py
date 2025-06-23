@@ -647,15 +647,36 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                 # 4. Create relations between this offence and offender(s)
                 for dict in request_data['offenders']:
                     if dict['data_type'] == 'individual':
-                        offender = EmailUser.objects.get(id=dict['id'])
-                        serializer_offender = SaveOffenderSerializer(data={'offence_id': saved_offence_instance.id, 'person_id': offender.id})
+                        #offender = EmailUser.objects.get(id=dict['id'])
+                        address = dict['residential_address']
+                        try:
+                            dob = datetime.strptime(dict['dob'], '%d/%m/%Y').date()
+                        except:
+                            dob = ''
+                        serializer_offender = SaveOffenderSerializer(
+                            data={
+                                'offence_id': saved_offence_instance.id, 
+                                'email': dict['email'],
+                                'first_name': dict['first_name'],
+                                'last_name': dict['last_name'],
+                                'dob': dob,
+                                'phone_number': dict['p_number'],
+                                'mobile_number': dict['m_number'],
+                                'address_street': address['line1'],
+                                'address_locality': address['locality'],
+                                'address_state': address['state'],
+                                'address_country': address['country'],
+                                'address_postcode': address['postcode'],
+                            }
+                        )
                         serializer_offender.is_valid(raise_exception=True)
                         serializer_offender.save()
-                    elif dict['data_type'] == 'organisation':
-                        offender = Organisation.objects.get(id=dict['id'])
-                        serializer_offender = SaveOffenderSerializer(data={'offence_id': saved_offence_instance.id, 'organisation_id': offender.id})
-                        serializer_offender.is_valid(raise_exception=True)
-                        serializer_offender.save()
+                    #TODO do we still need organisation offenders?
+                    #elif dict['data_type'] == 'organisation':
+                    #    offender = Organisation.objects.get(id=dict['id'])
+                    #    serializer_offender = SaveOffenderSerializer(data={'offence_id': saved_offence_instance.id, 'organisation_id': offender.id})
+                    #    serializer_offender.is_valid(raise_exception=True)
+                    #    serializer_offender.save()
 
                 # 4. Return Json
                 headers = self.get_success_headers(serializer.data)

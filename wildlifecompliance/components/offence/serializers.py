@@ -449,33 +449,24 @@ class SaveOffenceSerializer(serializers.ModelSerializer):
 
 class SaveOffenderSerializer(serializers.ModelSerializer):
     offence_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
-    person_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
-    organisation_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
 
     class Meta:
         model = Offender
         fields = (
-            'id',
             'offence_id',
-            'person_id',
-            'organisation_id',
+            'email',
+            'first_name',
+            'last_name',
+            'dob',
+            'phone_number',
+            'mobile_number',
+            'address_street',
+            'address_locality',
+            'address_state',
+            'address_country',
+            'address_postcode',
         )
         read_only_fields = ()
-
-    def validate(self, data):
-        field_errors = {}
-        non_field_errors = []
-
-        # if (data['person_id'] and data['organisation_id']) or (not data['person_id'] and not data['organisation_id']):
-        if ('person_id' in data and 'organisation_id' in data) or ('person_id' not in data and 'organisation_id' not in data):
-            non_field_errors.append('An offender must be either a person or an organisation.')
-
-        if field_errors:
-            raise serializers.ValidationError(field_errors)
-        if non_field_errors:
-            raise serializers.ValidationError(non_field_errors)
-
-        return data
 
 
 class OffenceUserActionSerializer(serializers.ModelSerializer):
