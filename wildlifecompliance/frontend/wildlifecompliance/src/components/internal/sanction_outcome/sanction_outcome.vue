@@ -179,12 +179,12 @@
                                                 <select :disabled="readonlyForm" class="form-control" v-model="sanction_outcome.offender">
                                                     <option value=""></option>
                                                     <option v-for="offender in sanction_outcome.offence.offenders" v-bind:value="offender" v-bind:key="offender.id">
-                                                        <span v-if="offender.person">
-                                                            {{ offender.person.first_name + ' ' + offender.person.last_name + ', DOB:' + offender.person.dob }}
+                                                        <span v-if="offender">
+                                                            {{ offender.first_name + ' ' + offender.last_name + ', DOB:' + offender.dob }}
                                                         </span>
-                                                        <span v-else-if="offender.organisation">
+                                                        <!--<span v-else-if="offender.organisation">
                                                             {{ offender.organisation.name + ', ABN: ' + offender.organisation.abn }}
-                                                        </span>
+                                                        </span>-->
                                                     </option>
                                                 </select>
                                             </div>
@@ -865,11 +865,12 @@ export default {
             let ret = '';
             if (this.sanction_outcome){
                 if (this.sanction_outcome.offender){
-                    if (this.sanction_outcome.offender.person){
-                        ret = [this.sanction_outcome.offender.person.first_name, this.sanction_outcome.offender.person.last_name].filter(Boolean).join(" ");
-                    } else if (this.sanction_outcome.offender.organisation){
-                        ret = [this.sanction_outcome.offender.organisation.name, this.sanction_outcome.offender.organisation.abn].filter(Boolean).join(" ");
+                    if (this.sanction_outcome.offender){
+                        ret = [this.sanction_outcome.offender.first_name, this.sanction_outcome.offender.last_name].filter(Boolean).join(" ");
                     }
+                    /*} else if (this.sanction_outcome.offender.organisation){
+                        ret = [this.sanction_outcome.offender.organisation.name, this.sanction_outcome.offender.organisation.abn].filter(Boolean).join(" ");
+                    }*/
                 }
             }
             return ret;

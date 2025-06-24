@@ -268,7 +268,7 @@ class Offender(SanitiseMixin):
         related_name='offender_removed_by', on_delete=models.CASCADE
     )
 
-    email = models.EmailField(unique=True, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
     first_name = models.CharField(max_length=128, blank=False, verbose_name='Given name(s)', null=True)
     last_name = models.CharField(max_length=128, blank=False, null=True)
     dob = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=False, verbose_name="date of birth", help_text='')
@@ -300,17 +300,22 @@ class Offender(SanitiseMixin):
     def get_related_items_descriptor(self):
         return self.first_name + " " + self.last_name
 
+    @property
+    def full_name(self):
+        return "{} {}".format(self.first_name, self.last_name)
+
+    @property
+    def address(self):
+        return "{} {} {} {} {}".format(self.address_street, self.address_locality, self.address_state, self.address_postcode, self.address_country)
+
     class Meta:
         app_label = 'wildlifecompliance'
         verbose_name = 'CM_Offender'
         verbose_name_plural = 'CM_Offenders'
 
     def __str__(self):
-        if self.person:
-            return 'First name: {}, Last name: {}'.format(get_first_name(self.person), get_last_name(self.person))
-        else:
-            return '---'
-
+        return 'First name: {}, Last name: {}'.format(self.first_name, self.last_name)
+        
 
 class OffenceUserAction(SanitiseMixin):
     ACTION_CLOSE = "Close offence: {}"

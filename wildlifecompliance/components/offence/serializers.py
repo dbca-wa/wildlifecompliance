@@ -33,8 +33,8 @@ class OrganisationSerializer(serializers.ModelSerializer):
 
 
 class OffenderSerializer(serializers.ModelSerializer):
-    person = EmailUserSerializer(read_only=True,)
-    organisation = OrganisationSerializer(read_only=True,)
+    #person = EmailUserSerializer(read_only=True,)
+    #organisation = OrganisationSerializer(read_only=True,)
     number_linked_sanction_outcomes_total = serializers.SerializerMethodField(read_only=True)
     number_linked_sanction_outcomes_active = serializers.SerializerMethodField(read_only=True)
     can_user_action = serializers.SerializerMethodField(read_only=True)
@@ -43,13 +43,24 @@ class OffenderSerializer(serializers.ModelSerializer):
         model = Offender
         fields = (
             'id',
-            'person',
-            'organisation',
+            #'person',
+            #'organisation',
             'removed',
             'reason_for_removal',
             'number_linked_sanction_outcomes_total',
             'number_linked_sanction_outcomes_active',
             'can_user_action',
+            'email',
+            'first_name',
+            'last_name',
+            'dob',
+            'phone_number',
+            'mobile_number',
+            'address_street',
+            'address_locality',
+            'address_state',
+            'address_country',
+            'address_postcode',
         )
 
     def get_number_linked_sanction_outcomes_total(self, obj):
@@ -224,7 +235,7 @@ class OffenceSerializer(serializers.ModelSerializer):
             connected_offenders = []
             for aco in qs:
                 if aco.sanction_outcome and aco.sanction_outcome.offender:
-                    serializer = EmailUserSerializer(aco.sanction_outcome.offender.person)
+                    serializer = OffenderSerializer(aco.sanction_outcome.offender)
                     connected_offenders.append(serializer.data)
             ret_obj['connected_offenders'] = connected_offenders
 

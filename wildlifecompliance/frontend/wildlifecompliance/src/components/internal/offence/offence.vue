@@ -199,10 +199,11 @@
                                                 classNames="form-control"
                                                 @entity-selected="personSelected"
                                                 showCreateUpdate
+                                                :allowSaveUser="false"
+                                                :emailRequired="false"
                                                 ref="search_offender"
                                                 domIdHelper="offender"
                                                 v-bind:key="updateSearchPersonOrganisationBindId"/>
-                                                <!--PersonSearch ref="person_search" elementId="idSetInParent" classNames="col-sm-5 form-control" @person-selected="personSelected" :search_type="offender_search_type" /-->
                                             </div>
                                             <div>
                                                 <input type="button" class="btn btn-primary" value="Add to Offender List" @click.prevent="addOffenderClicked()" />
@@ -448,12 +449,13 @@ export default {
                         data: 'offender',
                         render: function(data, type, row) {
                             let data_type = '';
-                            if (row.offender.person){
-                                data_type = 'individual';
-                            }
+                            //if (row.offender.person){
+                            data_type = 'individual';
+                            /*}
+                            TODO check if organisation offender needed
                             else {
                                 data_type = 'organisation';
-                            }
+                            }*/
                             if(row.offender.removed){
                                 data_type = '<strike>' + data_type + '</strike>';
                             }
@@ -463,18 +465,19 @@ export default {
                     {
                         data: 'offender',
                         render: function(data, type, row) {
-                            if (row.offender.person) {
-                                let full_name = [row.offender.person.first_name, row.offender.person.last_name].filter(Boolean).join(" ");
-                                let email = row.offender.person.email ? "E:" + row.offender.person.email : "";
-                                let p_number = row.offender.person.phone_number ? "P:" + row.offender.person.phone_number : "";
-                                let m_number = row.offender.person.mobile_number ? "M:" + row.offender.person.mobile_number : "";
-                                let dob = row.offender.person.dob ? "DOB:" + row.offender.person.dob : "DOB: ---";
+                            //if (row.offender.person) {
+                                let full_name = [row.offender.first_name, row.offender.last_name].filter(Boolean).join(" ");
+                                let email = row.offender.email ? "E:" + row.offender.email : "";
+                                let p_number = row.offender.phone_number ? "P:" + row.offender.phone_number : "";
+                                let m_number = row.offender.mobile_number ? "M:" + row.offender.mobile_number : "";
+                                let dob = row.offender.dob ? "DOB:" + row.offender.dob : "DOB: ---";
                                 let myLabel = ["<strong>" + full_name + "</strong>", email, p_number, m_number, dob].filter(Boolean).join("<br />");
                                 if (row.offender.removed){
                                     myLabel = '<strike>' + myLabel + '</strike>';
                                 }
                                 return myLabel;
-                            } else if (row.offender.organisation) {
+                            //TODO determine if organisation offender needed
+                            /*} else if (row.offender.organisation) {
                                 let name = row.offender.organisation.name ? row.offender.organisation.name : "";
                                 let abn = row.offender.organisation.abn ? "ABN:" + row.offender.organisation.abn : "";
                                 let myLabel = ["<strong>" + name + "</strong>", abn].filter(Boolean).join("<br />");
@@ -482,7 +485,7 @@ export default {
                                     myLabel = '<strike>' + myLabel + '</strike>';
                                 }
                                 return myLabel;
-                            }
+                            }*/
                         }
                     },
                     {
@@ -1017,21 +1020,6 @@ export default {
                 this.$refs.mapLocationComponent.invalidateSize();
             }
         },
-        //newPersonCreated: function(obj) {
-        //  if(obj.person){
-        //    this.setCurrentOffender('individual', obj.person.id);
-
-        //    // Set fullname and DOB into the input box
-        //    let full_name = [obj.person.first_name, obj.person.last_name].filter(Boolean).join(" ");
-        //    let dob = obj.person.dob ? "DOB:" + obj.person.dob : "DOB: ---";
-        //    let value = [full_name, dob].filter(Boolean).join(", ");
-        //    this.$refs.search_offender.setInput(value);
-        //  } else if (obj.err) {
-        //    console.log(err);
-        //  } else {
-        //    // Should not reach here
-        //  }
-        //},
         personSelected: function(para) {
             let vm = this;
             vm.setCurrentOffender(para.data_type, para.id);
@@ -1143,50 +1131,36 @@ export default {
             this.constructAllegedOffencesTable();
         },
         addOffenderClicked: async function() {
-            if (this.current_offender && this.current_offender.id && this.current_offender.data_type) {
-                // save person before adding to offender list
-                await this.$refs.search_offender.parentSave()
+            let vm = this;
 
-                // Check if the item is already in the list
-                let already_exists = false;
-                for (let i=0; i<this.offence.offenders.length; i++){
-                    let offender = this.offence.offenders[i];
-                    if (this.current_offender.data_type == 'individual'){
-                        if (offender.person){
-                            if (!offender.removed && offender.person.id == this.current_offender.id){
-                                already_exists = true;
-                            }
-                        }
-                    } else if (this.current_offender.data_type == 'organisation'){
-                        if (offender.organisation){
-                            if (!offender.removed && offender.organisation.id == this.current_offender.id){
-                                already_exists = true;
-                            }
-                        }
-                    }
-                }
-
-                if (!already_exists) {
-                    let offender_obj = {
-                        id: '',
-                        can_user_action: true,
-                        removed: false,
-                        reason_for_removal: '',
-                        person: null,
-                        organisation: null,
-                        number_linked_sanction_outcomes_total: 0,
-                        number_linked_sanction_outcomes_active: 0,
-                        uuid: uuidv4()
-                    };
-                    if (this.current_offender.data_type == 'individual'){
-                        // Add person as offender object
-                        offender_obj['person'] = this.current_offender;
-                    } else if (this.current_offender.data_type == 'organisation'){
-                        // Add organisation as offender object
-                        offender_obj['organisation'] = this.current_offender;
-                    }
-                    this.offence.offenders.push(offender_obj);
-                }
+            let current_offender = this.$refs.search_offender.$refs.update_create_person.email_user;
+            if (
+                current_offender.first_name &&
+                current_offender.last_name &&
+                current_offender.dob
+            ) {
+                let address = current_offender.residential_address;
+                let offender_obj = {
+                    id: '',
+                    can_user_action: true,
+                    removed: false,
+                    reason_for_removal: '',
+                    number_linked_sanction_outcomes_total: 0,
+                    number_linked_sanction_outcomes_active: 0,
+                    uuid: uuidv4(),
+                    email: current_offender.email,
+                    first_name: current_offender.first_name,
+                    last_name: current_offender.last_name,
+                    dob: current_offender.dob,
+                    phone_number: current_offender.phone_number,
+                    mobile_number: current_offender.mobile_number,
+                    address_street: address.line1,
+                    address_locality: address.locality,
+                    address_state: address.state,
+                    address_country: address.country,
+                    address_postcode: address.postcode,
+                };
+                this.offence.offenders.push(offender_obj);
             }
             this.constructOffendersTable();
             this.setCurrentOffenderEmpty();

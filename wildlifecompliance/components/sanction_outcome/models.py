@@ -321,7 +321,7 @@ class SanctionOutcome(SanitiseMixin):
         elif self.registration_holder:
             return self.registration_holder, 'registration_holder'
         elif self.offender:
-            return self.offender.person, 'offender'
+            return self.offender, 'offender'
         else:
             print('SanctionOutcome: ' + self.lodgement_number + ' has no offenders.')
             return None, ''

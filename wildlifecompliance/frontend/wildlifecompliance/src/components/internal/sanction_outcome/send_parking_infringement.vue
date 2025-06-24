@@ -102,7 +102,7 @@ export default {
                 } else if (this.sanction_outcome.registration_holder){
                     details = 'Registration holder: ' + this.sanction_outcome.registration_holder.email;
                 } else if (this.sanction_outcome.offender){
-                    details = this.sanction_outcome.offender.person.email;
+                    details = this.sanction_outcome.offender.email;
                 }
             }
             return details;

@@ -512,14 +512,37 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
 
                 # 4. Create relations between this offence and offender(s)
                 for item in request_data['offenders']:
-                    if item['person']:
-                        offender, created = Offender.objects.get_or_create(person_id=item['person']['id'], offence_id=request_data['id'])
-                    elif item['organisation']:
-                        offender, created = Offender.objects.get_or_create(organisation_id=item['organisation']['id'], offence_id=request_data['id'])
 
-                    if not created:
+                    if not item['id']:
+                        try:
+                            dob = datetime.strptime(item['dob'], '%d/%m/%Y').date()
+                        except:
+                            dob = ''
+                        #if item['person']:
+                        offender = Offender.objects.create(
+                            offence_id=request_data['id'],
+                            email=item['email'],
+                            first_name=item['first_name'],
+                            last_name=item['last_name'],
+                            dob=dob,
+                            phone_number=item['phone_number'],
+                            mobile_number=item['mobile_number'],
+                            address_street=item['address_street'],
+                            address_locality=item['address_locality'],
+                            address_state=item['address_state'],
+                            address_country=item['address_country'],
+                            address_postcode=item['address_postcode'],
+                        )
+                        #TODO check if organisation offender needed
+                        #elif item['organisation']:
+                        #    offender, created = Offender.objects.get_or_create(organisation_id=item['organisation']['id'], offence_id=request_data['id'])
+                    else:
+                        try:
+                            offender = Offender.objects.get(id=item['id'])
+                        except:
+                            continue
+
                         serializer = None
-
                         # Update attributes of existing offender
                         if not offender.removed and item['removed']:
                             # This offender is going to be removed
@@ -536,10 +559,6 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                                 'removed_by_id': None,
                                 'reason_for_removal': ''
                             })
-
-                        else:
-                            # other case where nothing changed on this offender
-                            pass
 
                         if serializer:
                             serializer.is_valid(raise_exception=True)
