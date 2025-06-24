@@ -72,7 +72,7 @@ def _create_pdf(invoice_buffer, legal_case, brief_of_evidence_record_of_intervie
                               alignment=TA_CENTER))
     elements = []
     for boe in brief_of_evidence_record_of_interviews:
-        offender = boe.offender
+        offender = boe.offender.person
         offence = boe.offence
         if not offender or not offence:
             continue

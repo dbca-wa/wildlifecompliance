@@ -196,12 +196,12 @@ class AllegedCommittedOffenceCreateSerializer(serializers.ModelSerializer):
         for aco in acos:
             if aco.sanction_outcome.offender:
                 # Sanction outcome has an offender
-                if aco.sanction_outcome.offender.id == offender_id:
+                if aco.sanction_outcome.offender.person.id == offender_id:
                     # Sanction outcome has been already created for this offender
                     raise serializers.ValidationError('Sanction outcome has been issued for the alleged offence: {} - {} to the offender: {}'.format(
                         alleged_offence.section_regulation.act,
                         alleged_offence.section_regulation.name,
-                        aco.sanction_outcome.offender))
+                        aco.sanction_outcome.offender.person))
             else:
                 # Sanction outome has been already created without any offenders
                 raise serializers.ValidationError('Sanction outcome has been issued for the alleged offence: {} - {}'.format(

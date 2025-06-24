@@ -51,7 +51,7 @@ def retrieve_context(sanction_outcome):
         offender.residential_address.country.name if offender.residential_address.country else '',
     ])) if offender.residential_address else ''
     
-    offender_email = offender.email if offender.email else ''
+    offender_email = offender.person.email if offender.person else ''
     rego = sanction_outcome.registration_number if sanction_outcome.registration_number else ''
     offence_date = sanction_outcome.offence.offence_occurrence_datetime.strftime('%d/%m/%Y') if sanction_outcome.offence.offence_occurrence_datetime else ''
     offence_time = sanction_outcome.offence.offence_occurrence_datetime.strftime('%I:%M %p') if sanction_outcome.offence.offence_occurrence_datetime else ''

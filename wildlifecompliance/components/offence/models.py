@@ -259,14 +259,7 @@ class ActiveOffenderManager(models.Manager):
         return super(ActiveOffenderManager, self).get_queryset().filter(removed=False)
 
 
-class Offender(SanitiseMixin):
-    reason_for_removal = models.TextField(blank=True)
-    removed = models.BooleanField(default=False)
-    removed_by = models.ForeignKey(
-        EmailUser,
-        null=True,
-        related_name='offender_removed_by', on_delete=models.CASCADE
-    )
+class OffenderPerson(SanitiseMixin):
 
     email = models.EmailField(blank=True, null=True)
     first_name = models.CharField(max_length=128, blank=False, verbose_name='Given name(s)', null=True)
@@ -281,6 +274,35 @@ class Offender(SanitiseMixin):
     address_country = CountryField(default='AU', null=True, blank=True)
     address_postcode = models.CharField(max_length=10, null=True, blank=True)
 
+    @property
+    def full_name(self):
+        return "{} {}".format(self.first_name, self.last_name)
+
+    @property
+    def address(self):
+        return "{} {} {} {} {}".format(self.address_street, self.address_locality, self.address_state, self.address_postcode, self.address_country)
+    
+    class Meta:
+        app_label = 'wildlifecompliance'
+        verbose_name = 'CM_Offender_Person'
+        verbose_name_plural = 'CM_Offender_Persons'
+
+
+class Offender(SanitiseMixin):
+    reason_for_removal = models.TextField(blank=True)
+    removed = models.BooleanField(default=False)
+    removed_by = models.ForeignKey(
+        EmailUser,
+        null=True,
+        related_name='offender_removed_by', on_delete=models.CASCADE
+    )
+
+    person = models.ForeignKey(
+        OffenderPerson,
+        null=True,
+        related_name='offender_person', on_delete=models.CASCADE
+    )
+
     organisation_id = models.IntegerField(
         unique=True, verbose_name="Ledger Organisation ID", null=True
     )
@@ -291,22 +313,6 @@ class Offender(SanitiseMixin):
     )
     active_offenders = ActiveOffenderManager()
     objects = models.Manager()
-
-    @property
-    def get_related_items_identifier(self):
-        return self.first_name + " " + self.last_name
-    
-    @property
-    def get_related_items_descriptor(self):
-        return self.first_name + " " + self.last_name
-
-    @property
-    def full_name(self):
-        return "{} {}".format(self.first_name, self.last_name)
-
-    @property
-    def address(self):
-        return "{} {} {} {} {}".format(self.address_street, self.address_locality, self.address_state, self.address_postcode, self.address_country)
 
     class Meta:
         app_label = 'wildlifecompliance'

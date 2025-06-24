@@ -91,8 +91,8 @@
                                             <option v-for="offender in sanction_outcome.current_offence.offenders"
                                                 :value="offender"
                                                 :key="offender.id">
-                                                <span v-if="offender">
-                                                    {{ offender.first_name + ' ' + offender.last_name + ', DOB:' + offender.dob }}
+                                                <span v-if="offender.person">
+                                                    {{ offender.person.first_name + ' ' + offender.person.last_name + ', DOB:' + offender.person.dob }}
                                                 </span>
                                                 <!--<span v-else-if="offender.organisation">
                                                     {{ offender.organisation.name + ', ABN: ' + offender.organisation.abn }}
@@ -953,8 +953,8 @@ export default {
         constructAllegedOffencesTable: function(){
             console.log('*** constructAllegedOffencesTable ***');
             let current_offender_id = 0
-            if (this.sanction_outcome.current_offender){
-                current_offender_id = this.sanction_outcome.current_offender.id;
+            if (this.sanction_outcome.current_offender.person){
+                current_offender_id = this.sanction_outcome.current_offender.person.id;
             }
 
             // Construct the datatable of the alleged offences

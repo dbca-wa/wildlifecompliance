@@ -465,17 +465,18 @@ export default {
                     {
                         data: 'offender',
                         render: function(data, type, row) {
-                            //if (row.offender.person) {
-                                let full_name = [row.offender.first_name, row.offender.last_name].filter(Boolean).join(" ");
-                                let email = row.offender.email ? "E:" + row.offender.email : "";
-                                let p_number = row.offender.phone_number ? "P:" + row.offender.phone_number : "";
-                                let m_number = row.offender.mobile_number ? "M:" + row.offender.mobile_number : "";
-                                let dob = row.offender.dob ? "DOB:" + row.offender.dob : "DOB: ---";
+                            if (row.offender.person) {
+                                let full_name = [row.offender.person.first_name, row.offender.person.last_name].filter(Boolean).join(" ");
+                                let email = row.offender.person.email ? "E:" + row.offender.person.email : "";
+                                let p_number = row.offender.person.phone_number ? "P:" + row.offender.person.phone_number : "";
+                                let m_number = row.offender.person.mobile_number ? "M:" + row.offender.person.mobile_number : "";
+                                let dob = row.offender.person.dob ? "DOB:" + row.offender.person.dob : "DOB: ---";
                                 let myLabel = ["<strong>" + full_name + "</strong>", email, p_number, m_number, dob].filter(Boolean).join("<br />");
                                 if (row.offender.removed){
                                     myLabel = '<strike>' + myLabel + '</strike>';
                                 }
                                 return myLabel;
+                            }
                             //TODO determine if organisation offender needed
                             /*} else if (row.offender.organisation) {
                                 let name = row.offender.organisation.name ? row.offender.organisation.name : "";

@@ -13,7 +13,7 @@ from wildlifecompliance.components.call_email.serializers import LocationSeriali
 from wildlifecompliance.components.main.fields import CustomChoiceField
 from wildlifecompliance.components.main.related_item import get_related_items
 from wildlifecompliance.components.offence.models import Offence, Offender, AllegedOffence, \
-    OffenceUserAction, OffenceCommsLogEntry
+    OffenceUserAction, OffenceCommsLogEntry, OffenderPerson
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, AllegedCommittedOffence
 from wildlifecompliance.components.section_regulation.serializers import SectionRegulationSerializer
 #from wildlifecompliance.components.users.serializers import CompliancePermissionGroupMembersSerializer
@@ -31,9 +31,28 @@ class OrganisationSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ()
 
+class OffenderPersonSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OffenderPerson
+        fields = (
+            'id',
+            'can_user_action',
+            'email',
+            'first_name',
+            'last_name',
+            'dob',
+            'phone_number',
+            'mobile_number',
+            'address_street',
+            'address_locality',
+            'address_state',
+            'address_country',
+            'address_postcode',
+        )
 
 class OffenderSerializer(serializers.ModelSerializer):
-    #person = EmailUserSerializer(read_only=True,)
+    person = OffenderPersonSerializer(read_only=True,)
     #organisation = OrganisationSerializer(read_only=True,)
     number_linked_sanction_outcomes_total = serializers.SerializerMethodField(read_only=True)
     number_linked_sanction_outcomes_active = serializers.SerializerMethodField(read_only=True)
@@ -49,18 +68,6 @@ class OffenderSerializer(serializers.ModelSerializer):
             'reason_for_removal',
             'number_linked_sanction_outcomes_total',
             'number_linked_sanction_outcomes_active',
-            'can_user_action',
-            'email',
-            'first_name',
-            'last_name',
-            'dob',
-            'phone_number',
-            'mobile_number',
-            'address_street',
-            'address_locality',
-            'address_state',
-            'address_country',
-            'address_postcode',
         )
 
     def get_number_linked_sanction_outcomes_total(self, obj):

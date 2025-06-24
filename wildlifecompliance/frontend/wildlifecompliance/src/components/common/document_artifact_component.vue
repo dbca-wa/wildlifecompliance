@@ -493,7 +493,7 @@ export default {
                 for (let offence of this.legal_case.offence_list) {
                     if (this.document_artifact.offence_id === offence.id) {
                         for (let offender of offence.offenders) {
-                            let offenderObj = Object.assign({}, offender)
+                            let offenderObj = Object.assign({}, offender.person)
                             offenderObj.offender_id = offender.id
                             offenderList.push(offenderObj)
                         }
@@ -607,8 +607,8 @@ export default {
         },
         existingOffenderDisplay: function() {
             let display = '';
-            if (this.offenceExists && this.document_artifact.offender) {
-                display = this.document_artifact.offender.full_name + ": " + this.document_artifact.offender.email;
+            if (this.offenceExists && this.document_artifact.offender && this.document_artifact.offender.person) {
+                display = this.document_artifact.offender.person.full_name + ": " + this.document_artifact.offender.person.email;
             }
             return display;
         },
