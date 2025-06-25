@@ -303,7 +303,7 @@ export default {
       dtOptionsOffender: {
         columns: [
           {
-            data: "id",
+            data: "person_id",
             visible: false
           },
           {
@@ -346,11 +346,11 @@ export default {
             }
           },
           {
-            data: "id",
+            data: "person_id",
             render: function(data, type, row) {
               return (
-                '<a href="#" class="remove_button" data-offender-id="' +
-                row.id +
+                '<a href="#" class="remove_button" data-offender-num="' +
+                row.num +
                 '">Remove</a>'
               );
             }
@@ -557,10 +557,10 @@ export default {
     removeOffenderClicked: function(e) {
       let vm = this;
 
-      let offenderId = parseInt(e.target.getAttribute("data-offender-id"));
+      let offenderNum = parseInt(e.target.getAttribute("data-offender-num"));
       let remove_idx;
       vm.$refs.offender_table.vmDataTable.rows(function(idx, data, node) {
-        if (data.id === offenderId) {
+        if (data.num === offenderNum) {
           remove_idx = (idx); 
         }
       });
@@ -628,12 +628,15 @@ export default {
       ) {
         //NOTE: we assume individual if data type not specified
         if ((!('data_type' in current_offender) || current_offender.data_type !== undefined) || current_offender.data_type == "individual") {
-          vm.offender_count++;
-          console.log(current_offender)
+          vm.offender_count++;          
+          let person_id = 'new'
+          //TODO if from an existing offender person, set id to the id of that offender
+
           vm.$refs.offender_table.vmDataTable.row
             .add({
+              person_id: person_id,
               data_type: "individual",
-              id: vm.offender_count,
+              num: vm.offender_count,
               first_name: current_offender.first_name,
               last_name: current_offender.last_name,
               email: current_offender.email,

@@ -282,6 +282,14 @@ class OffenderPerson(SanitiseMixin):
     def address(self):
         return "{} {} {} {} {}".format(self.address_street, self.address_locality, self.address_state, self.address_postcode, self.address_country)
     
+    @property
+    def get_related_items_identifier(self):
+        return self.id
+    
+    @property
+    def get_related_items_descriptor(self):
+        return "{} {}".format(self.first_name, self.last_name)
+    
     class Meta:
         app_label = 'wildlifecompliance'
         verbose_name = 'CM_Offender_Person'
@@ -320,7 +328,10 @@ class Offender(SanitiseMixin):
         verbose_name_plural = 'CM_Offenders'
 
     def __str__(self):
-        return 'First name: {}, Last name: {}'.format(self.first_name, self.last_name)
+        subject = ''
+        if self.person:
+            subject = 'First name: {}, Last name: {}'.format(self.person.first_name, self.person.last_name)
+        return subject
         
 
 class OffenceUserAction(SanitiseMixin):

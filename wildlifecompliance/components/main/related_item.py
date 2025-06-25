@@ -309,7 +309,9 @@ def get_related_offenders(entity, **kwargs):
     if entity._meta.model_name == 'sanctionoutcome':
         offenders.append(entity.offender)
     if entity._meta.model_name == 'offence':
-        offenders = Offender.objects.filter(offence_id=entity.id)
+        offenders_qs = Offender.objects.filter(offence_id=entity.id).exclude(removed=True).exclude(person=None) #TODO check if org needed
+        for offender in offenders_qs:
+            offenders.append(offender.person)
     return offenders
 
 def checkWeakLinkAuth(request,content_type_str,object_id):

@@ -36,8 +36,7 @@ class OffenderPersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = OffenderPerson
         fields = (
-            'id',
-            'can_user_action',
+            'id',   
             'email',
             'first_name',
             'last_name',
@@ -62,7 +61,8 @@ class OffenderSerializer(serializers.ModelSerializer):
         model = Offender
         fields = (
             'id',
-            #'person',
+            'can_user_action',
+            'person',
             #'organisation',
             'removed',
             'reason_for_removal',
@@ -467,22 +467,13 @@ class SaveOffenceSerializer(serializers.ModelSerializer):
 
 class SaveOffenderSerializer(serializers.ModelSerializer):
     offence_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
+    person_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
 
     class Meta:
         model = Offender
         fields = (
             'offence_id',
-            'email',
-            'first_name',
-            'last_name',
-            'dob',
-            'phone_number',
-            'mobile_number',
-            'address_street',
-            'address_locality',
-            'address_state',
-            'address_country',
-            'address_postcode',
+            'person_id',
         )
         read_only_fields = ()
 

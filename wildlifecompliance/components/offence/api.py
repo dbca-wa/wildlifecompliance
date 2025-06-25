@@ -29,7 +29,7 @@ from wildlifecompliance.components.legal_case.models import LegalCase
 from wildlifecompliance.components.main.api import save_location
 
 from wildlifecompliance.components.offence.models import Offence, Offender, AllegedOffence, \
-    OffenceUserAction, OffenceCommsLogEntry
+    OffenceUserAction, OffenceCommsLogEntry, OffenderPerson
 from wildlifecompliance.components.section_regulation.models import SectionRegulation
 from wildlifecompliance.components.offence.serializers import (
     OffenceSerializer,
@@ -518,21 +518,34 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                             dob = datetime.strptime(item['dob'], '%d/%m/%Y').date()
                         except:
                             dob = ''
-                        #if item['person']:
-                        offender = Offender.objects.create(
-                            offence_id=request_data['id'],
-                            email=item['email'],
-                            first_name=item['first_name'],
-                            last_name=item['last_name'],
-                            dob=dob,
-                            phone_number=item['phone_number'],
-                            mobile_number=item['mobile_number'],
-                            address_street=item['address_street'],
-                            address_locality=item['address_locality'],
-                            address_state=item['address_state'],
-                            address_country=item['address_country'],
-                            address_postcode=item['address_postcode'],
-                        )
+                        if 'person_id' in item:
+                        
+                            if item['person_id'] == "new":
+                                offender_person = OffenderPerson.objects.create(
+                                    email=item['email'],
+                                    first_name=item['first_name'],
+                                    last_name=item['last_name'],
+                                    dob=dob,
+                                    phone_number=item['phone_number'],
+                                    mobile_number=item['mobile_number'],
+                                    address_street=item['address_street'],
+                                    address_locality=item['address_locality'],
+                                    address_state=item['address_state'],
+                                    address_country=item['address_country'],
+                                    address_postcode=item['address_postcode'],
+                                )
+
+                            else:
+                                try:
+                                    offender_person = OffenderPerson.objects.get(id=int(item['person_id']))
+                                except:
+                                    raise serializer.ValidationError("Invalid Offender Id provided")
+
+                            offender = Offender.objects.create(
+                                offence_id=request_data['id'],
+                                person=offender_person,
+                            )
+                    
                         #TODO check if organisation offender needed
                         #elif item['organisation']:
                         #    offender, created = Offender.objects.get_or_create(organisation_id=item['organisation']['id'], offence_id=request_data['id'])
@@ -665,27 +678,37 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
 
                 # 4. Create relations between this offence and offender(s)
                 for dict in request_data['offenders']:
-                    if dict['data_type'] == 'individual':
-                        #offender = EmailUser.objects.get(id=dict['id'])
-                        address = dict['residential_address']
-                        try:
-                            dob = datetime.strptime(dict['dob'], '%d/%m/%Y').date()
-                        except:
-                            dob = ''
+                    if dict['data_type'] == 'individual' and "person_id" in dict:
+    
+                        if dict["person_id"] == "new":
+
+                            address = dict['residential_address']
+                            try:
+                                dob = datetime.strptime(dict['dob'], '%d/%m/%Y').date()
+                            except:
+                                dob = ''
+                            offender_person = OffenderPerson.objects.create(
+                                    email=dict['email'],
+                                    first_name=dict['first_name'],
+                                    last_name=dict['last_name'],
+                                    dob=dob,
+                                    phone_number=dict['p_number'],
+                                    mobile_number=dict['m_number'],
+                                    address_street=address['line1'],
+                                    address_locality=address['locality'],
+                                    address_state=address['state'],
+                                    address_country=address['country'],
+                                    address_postcode=address['postcode'],
+                                )
+                        else:
+                            try:
+                                offender_person = OffenderPerson.objects.get(id=dict["person_id"])
+                            except:
+                                raise serializers.ValidationError("Invalid Offender Id provided")
                         serializer_offender = SaveOffenderSerializer(
                             data={
                                 'offence_id': saved_offence_instance.id, 
-                                'email': dict['email'],
-                                'first_name': dict['first_name'],
-                                'last_name': dict['last_name'],
-                                'dob': dob,
-                                'phone_number': dict['p_number'],
-                                'mobile_number': dict['m_number'],
-                                'address_street': address['line1'],
-                                'address_locality': address['locality'],
-                                'address_state': address['state'],
-                                'address_country': address['country'],
-                                'address_postcode': address['postcode'],
+                                'person_id': offender_person.id
                             }
                         )
                         serializer_offender.is_valid(raise_exception=True)

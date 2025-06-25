@@ -465,17 +465,17 @@ export default {
                     {
                         data: 'offender',
                         render: function(data, type, row) {
+                            let myLabel = ''
                             if (row.offender.person) {
                                 let full_name = [row.offender.person.first_name, row.offender.person.last_name].filter(Boolean).join(" ");
                                 let email = row.offender.person.email ? "E:" + row.offender.person.email : "";
                                 let p_number = row.offender.person.phone_number ? "P:" + row.offender.person.phone_number : "";
                                 let m_number = row.offender.person.mobile_number ? "M:" + row.offender.person.mobile_number : "";
                                 let dob = row.offender.person.dob ? "DOB:" + row.offender.person.dob : "DOB: ---";
-                                let myLabel = ["<strong>" + full_name + "</strong>", email, p_number, m_number, dob].filter(Boolean).join("<br />");
+                                myLabel = ["<strong>" + full_name + "</strong>", email, p_number, m_number, dob].filter(Boolean).join("<br />");
                                 if (row.offender.removed){
                                     myLabel = '<strike>' + myLabel + '</strike>';
                                 }
-                                return myLabel;
                             }
                             //TODO determine if organisation offender needed
                             /*} else if (row.offender.organisation) {
@@ -487,6 +487,7 @@ export default {
                                 }
                                 return myLabel;
                             }*/
+                            return myLabel;
                         }
                     },
                     {
@@ -1141,8 +1142,30 @@ export default {
                 current_offender.dob
             ) {
                 let address = current_offender.residential_address;
+
+                let person_id = 'new';
+
+                //TODO if from an existing offender person, set id to the id of that offender
+                console.log(current_offender)
+                //TODO consider removing redundancy
+                let person_obj = {
+                    email: current_offender.email,
+                    first_name: current_offender.first_name,
+                    last_name: current_offender.last_name,
+                    dob: current_offender.dob,
+                    phone_number: current_offender.phone_number,
+                    mobile_number: current_offender.mobile_number,
+                    address_street: address.line1,
+                    address_locality: address.locality,
+                    address_state: address.state,
+                    address_country: address.country,
+                    address_postcode: address.postcode,
+                }
+
                 let offender_obj = {
                     id: '',
+                    person_id: person_id,
+                    person: person_obj,
                     can_user_action: true,
                     removed: false,
                     reason_for_removal: '',
