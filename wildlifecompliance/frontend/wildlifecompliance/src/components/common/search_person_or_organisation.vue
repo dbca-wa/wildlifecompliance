@@ -467,7 +467,7 @@ export default {
                     vm.awesomplete_obj.list = suggest_list_offender;
                     vm.awesomplete_obj.evaluate();
                     // show 'Create' buttons
-                    if (searchTerm.length >=2 && suggest_list_offender.length > 0) {
+                    if (searchTerm.length >=2) {
                         if (vm.showCreateUpdate && vm.searchType === 'individual') {
                             vm.showCreateNewPerson = true;
                         } else if (vm.showCreateUpdate && vm.searchType === 'organisation') {
