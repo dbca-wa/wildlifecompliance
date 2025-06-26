@@ -193,21 +193,28 @@
                                         <label class="col-sm-2">Offender</label>
                                         <div v-show="!readonlyForm">
                                             <div>
-                                                <SearchPersonOrganisation
+                                                <!--<SearchPersonOrganisation
                                                 :excludeStaff="true"
                                                 :personOnly="true"
                                                 classNames="form-control"
-                                                @entity-selected="personSelected"
+                                                
                                                 showCreateUpdate
                                                 :allowSaveUser="false"
                                                 :emailRequired="false"
-                                                ref="search_offender"
+                                                
                                                 domIdHelper="offender"
-                                                v-bind:key="updateSearchPersonOrganisationBindId"/>
+                                                v-bind:key="updateSearchPersonOrganisationBindId"/>-->
+
+                                                <SearchOffender
+                                                ref="search_offender"
+                                                @entity-selected="personSelected"
+                                                domIdHelper="offender"
+                                                v-bind:key="updateSearchOffenderBindId"
+                                                />
                                             </div>
-                                            <div>
+                                            <!--<div>
                                                 <input type="button" class="btn btn-primary" value="Add to Offender List" @click.prevent="addOffenderClicked()" />
-                                            </div>
+                                            </div>-->
                                             <!--div class="col-sm-2">
                                                 <input type="button" class="btn btn-primary" value="Create New Person" @click.prevent="createNewPersonClicked()" />
                                             </div-->
@@ -317,6 +324,7 @@ import CommsLogs from "@common-components/comms_logs.vue";
 import FileField from '@/components/common/compliance_file.vue';
 import OffenceWorkflow from './offence_workflow';
 import SearchPersonOrganisation from "@common-components/search_person_or_organisation.vue";
+import SearchOffender from './search_offenders.vue'
 //import CreateNewPerson from "@common-components/create_new_person.vue";
 import MapLocation from "../../common/map_location";
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal';
@@ -614,6 +622,7 @@ export default {
         CommsLogs,
         datatable,
         SearchPersonOrganisation,
+        SearchOffender,
         MapLocation,
         //CreateNewPerson,
         RelatedItems,
@@ -637,7 +646,11 @@ export default {
             }
             return visibility;
         },
-        updateSearchPersonOrganisationBindId: function() {
+        /*updateSearchPersonOrganisationBindId: function() {
+            this.uuid += 1
+            return 'offender' + this.uuid
+        },*/
+        updateSearchOffenderBindId: function() {
             this.uuid += 1
             return 'offender' + this.uuid
         },

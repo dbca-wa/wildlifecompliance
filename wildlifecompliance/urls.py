@@ -108,6 +108,7 @@ router.register(r'sanction_outcome', sanction_outcome_api.SanctionOutcomeViewSet
 router.register(r'sanction_outcome_paginated', sanction_outcome_api.SanctionOutcomePaginatedViewSet,'sanction_outcome_paginated')
 router.register(r'remediation_action', sanction_outcome_api.RemediationActionViewSet,'remediation_action')
 router.register(r'offence', offence_api.OffenceViewSet,'offence')
+router.register(r'search_offender', offence_api.OffenderViewSet,'search_offender')
 router.register(r'offence_paginated', offence_api.OffencePaginatedViewSet,'offence_paginated')
 router.register(r'temporary_document', main_api.TemporaryDocumentCollectionViewSet,'temporary_document')
 router.register(r'legal_case', legal_case_api.LegalCaseViewSet,'legal_case')

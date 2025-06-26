@@ -35,6 +35,7 @@ from wildlifecompliance.components.offence.serializers import (
     OffenceSerializer,
     SaveOffenceSerializer,
     SaveOffenderSerializer,
+    OffenderPersonSerializer,
     OrganisationSerializer,
     OffenceDatatableSerializer,
     UpdateAssignedToIdSerializer, UpdateOffenderAttributeSerializer, OffenceOptimisedSerializer,
@@ -44,7 +45,7 @@ from wildlifecompliance.components.offence.serializers import (
 from wildlifecompliance.components.section_regulation.serializers import SectionRegulationSerializer
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, AllegedCommittedOffence
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup, ComplianceManagementSystemGroupPermission
-from wildlifecompliance.helpers import is_internal, is_customer, is_compliance_internal_user, is_wildlife_compliance_officer
+from wildlifecompliance.helpers import is_internal, is_customer, is_compliance_internal_user, is_wildlife_compliance_officer, is_compliance_management_user
 from django.db.models.functions import Concat
 from django.db.models import Value
 
@@ -170,6 +171,17 @@ class OffencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         ret = self.paginator.get_paginated_response(serializer.data)
         return ret
 
+class OffenderViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = EmailUser.objects.none()
+    serializer_class = OffenderPersonSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('first_name', 'last_name', 
+                     'email', 'phone_number', 'mobile_number')
+
+    def get_queryset(self):
+        if is_compliance_management_user(self.request):
+            return OffenderPerson.objects.all()
+        return OffenderPerson.objects.none()
 
 class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
     queryset = Offence.objects.all()
