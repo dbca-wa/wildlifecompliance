@@ -180,7 +180,7 @@
                                                     <option value=""></option>
                                                     <option v-for="offender in sanction_outcome.offence.offenders" v-bind:value="offender" v-bind:key="offender.id">
                                                         <span v-if="offender">
-                                                            {{ offender.first_name + ' ' + offender.last_name + ', DOB:' + offender.dob }}
+                                                            {{ offender.person.first_name + ' ' + offender.person.last_name + ', DOB:' + offender.person.dob }}
                                                         </span>
                                                         <!--<span v-else-if="offender.organisation">
                                                             {{ offender.organisation.name + ', ABN: ' + offender.organisation.abn }}

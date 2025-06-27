@@ -271,6 +271,8 @@ def format_model_name(model_name):
                 'legalcase': 'Case',
                 'documentartifact': 'Document Artifact',
                 'physicalartifact': 'Physical Artifact',
+                'offender': 'Offender',
+                'offenderperson': 'Offender'
                 }
         return switcher.get(lower_model_name, '')
 

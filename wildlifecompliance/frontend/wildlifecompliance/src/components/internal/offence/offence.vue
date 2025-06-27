@@ -290,6 +290,10 @@
         <div v-if="sanctionOutcomeInitialised">
             <SanctionOutcome ref="sanction_outcome" :parent_update_function="constructOffenceDedicatedPage" @sanction_outcome_created="constructOffenceDedicatedPage" />
         </div>
+
+        <div v-if="offenderModalOpened">
+            <OffenderModal ref="offender_modal" :offender="selectedOffender" v-bind:key="offenderBindId"/>
+        </div>
     </div>
 </template>
 
@@ -315,6 +319,7 @@ import RelatedItems from "@common-components/related_items.vue";
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
 import hash from 'object-hash';
+import OffenderModal from "./offender_person_modal.vue";
 
 export default {
     name: 'ViewOffence',
@@ -339,6 +344,9 @@ export default {
             workflow_type :'',
             workflowBindId :'',
             offender_search_type: "individual",
+            offenderBindId: '',
+            selectedOffender: null,
+            offenderModalOpened: false,
             offenceTab: 'offenceTab' + vm._uid,
             detailsTab: 'detailsTab' + vm._uid,
             documentTab: 'documentTab' + vm._uid,
@@ -489,10 +497,14 @@ export default {
                                 if (row.offender.removed){
                                     ret_str = ret_str + '<a href="#" class="restore_button" data-offender-uuid="' + row.offender.uuid + '">Restore</a>';
                                 } else {
+                                    //TODO add view/edit button
+                                    ret_str = ret_str + '<a href="#" class="edit_button" data-offender-uuid="' + row.offender.uuid + '">Edit</a></br>';
                                     if (!row.offender.number_linked_sanction_outcomes_active){
                                         ret_str = ret_str + '<a href="#" class="remove_button" data-offender-uuid="' + row.offender.uuid + '">Remove</a>';
                                     }
-                                }
+                                }         
+                            } else {
+                                ret_str = ret_str + '<a href="#" class="view_button" data-offender-uuid="' + row.offender.uuid + '">View</a>';
                             }
                             return ret_str;
                         }
@@ -609,6 +621,7 @@ export default {
         SanctionOutcome,
         FileField,
         Assignment,
+        OffenderModal
     },
     computed: {
         ...mapGetters('offenceStore', {
