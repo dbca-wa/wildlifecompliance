@@ -171,12 +171,21 @@ class OffencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         ret = self.paginator.get_paginated_response(serializer.data)
         return ret
 
-class OffenderViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = EmailUser.objects.none()
+class SearchOffenderViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = OffenderPerson.objects.none()
     serializer_class = OffenderPersonSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('first_name', 'last_name', 
                      'email', 'phone_number', 'mobile_number')
+
+    def get_queryset(self):
+        if is_compliance_management_user(self.request):
+            return OffenderPerson.objects.all()
+        return OffenderPerson.objects.none()
+    
+class OffenderViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    queryset = OffenderPerson.objects.none()
+    serializer_class = OffenderPersonSerializer
 
     def get_queryset(self):
         if is_compliance_management_user(self.request):

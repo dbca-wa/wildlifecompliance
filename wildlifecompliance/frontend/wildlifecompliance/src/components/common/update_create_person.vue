@@ -12,11 +12,14 @@
                         <p>test alert</p>
                     </div>
                     <form class="form-horizontal" name="personal_form" method="post">
+                        <div v-if="allowCreateEdit && personalDetailsReadOnly" class="alert alert-info">
+                            Please ensure details provided here are up to date and match corresponding user account details.
+                        </div>
                         <div class="form-group" v-bind:class="{ 'has-error': errorGivenName }">
                             <label for="" class="col-sm-3 control-label">Given Name(s)</label>
                             <div class="col-sm-6">
                                 <div v-if="email_user">
-                                    <input :readonly="personalDetailsReadOnly" type="text" class="form-control" name="first_name" placeholder="" v-model="email_user.first_name" v-bind:key="email_user.id">
+                                    <input :readonly="personalDetailsReadOnly && !allowCreateEdit" type="text" class="form-control" name="first_name" placeholder="" v-model="email_user.first_name" v-bind:key="email_user.id">
                                 </div>
                             </div>
                         </div>
@@ -24,7 +27,7 @@
                             <label for="" class="col-sm-3 control-label">Last Name</label>
                             <div class="col-sm-6">
                                 <div v-if="email_user">
-                                    <input :readonly="personalDetailsReadOnly" type="text" class="form-control" name="last_name" placeholder="" v-model="email_user.last_name" v-bind:key="email_user.id">
+                                    <input :readonly="personalDetailsReadOnly && !allowCreateEdit" type="text" class="form-control" name="last_name" placeholder="" v-model="email_user.last_name" v-bind:key="email_user.id">
                                 </div>
                             </div>
                         </div>
@@ -33,7 +36,7 @@
                             <div class="col-sm-6">
                                 <div class="input-group date" ref="dobDatePicker">
                                     <input 
-                                    :disabled="personalDetailsReadOnly" 
+                                    :disabled="personalDetailsReadOnly && !allowCreateEdit" 
                                     type="text" 
                                     class="form-control" 
                                     placeholder="DD/MM/YYYY" 
@@ -200,6 +203,11 @@ export default {
         }
     },
     props: {
+        allowCreateEdit: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
         displayComponent: {
             type: Boolean,
             required: true,

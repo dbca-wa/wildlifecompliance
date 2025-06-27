@@ -1,7 +1,8 @@
 <template lang="html">
     <div class="">
         <div class="col-sm-12 form-group"><div class="row">
-                <label class="col-sm-4">Search Offender</label>
+                <div v-if="showSearchOffender" class="alert alert-info">Search existing offender records or create new offender record.</div>
+                <label v-if="showSearchOffender" class="col-sm-4">Search offender</label>
         </div></div>
         <div class="form-group"><div class="row">
             <div class="col-sm-12">
@@ -13,7 +14,20 @@
                 </div>
 
                 <div v-if="displayCreateOffender">
-                    <input type="button" class="btn btn-primary" value="Add to Offender List" @click.prevent="addOffenderClicked()" />
+                    <input type="button" class="btn btn-primary" value="Back" @click.prevent="CancelNewOffender()" />
+                    <SearchPersonOrganisation
+                    :excludeStaff="true"
+                    :personOnly="true"
+                    classNames="form-control"
+                    @entity-selected="entitySelected"
+                    showCreateUpdate
+                    :allowCreateEdit="true"
+                    :allowSaveUser="false"
+                    :emailRequired="false"
+                    :info="'Search for offenders among user accounts or create a new offender.'"
+                    ref="search_users"
+                    domIdHelper="offender"
+                    v-bind:key="updateSearchPersonOrganisationBindId"/>
                 </div>
             </div>
         </div></div>
@@ -26,6 +40,7 @@ import $ from "jquery";
 import "bootstrap/dist/css/bootstrap.css";
 import "awesomplete/awesomplete.css";
 import hash from 'object-hash';
+import SearchPersonOrganisation from "@common-components/search_person_or_organisation.vue";
 
 export default {
     name: "search-offender",
@@ -37,6 +52,7 @@ export default {
                 id: null,
                 data_type: null,
                 full_name: null,
+                source: null,
             },
             searchType: '',
             errorText: '',
@@ -47,7 +63,7 @@ export default {
         }
     },
     components: {
-        
+        SearchPersonOrganisation,
     },
     watch: {
         entity: {
@@ -56,7 +72,8 @@ export default {
                     this.$emit('entity-selected', {
                         id: this.entity.id,
                         data_type: this.entity.data_type,
-                        full_name: this.entity.full_name
+                        full_name: this.entity.full_name,
+                        source: this.entity.source,
                     });
                 }
             },
@@ -64,6 +81,10 @@ export default {
         },
     },
     computed: {
+        updateSearchPersonOrganisationBindId: function() {
+            this.uuid += 1
+            return 'offender' + this.uuid
+        },
         elemId: function() {
             this.uuid += 1
             let domId = this.uuid + 'search';
@@ -93,8 +114,26 @@ export default {
         },
     },
     methods: {
-        addOffenderClicked: function() {
-            //TODO emit
+        entitySelected: function(para) {
+            this.entity = {
+                id: para.id,
+                data_type: para.data_type,
+                full_name: para.full_name,
+                source: 'email_users',
+            }
+        },
+        CancelNewOffender: function() {
+            this.displayCreateOffender = false;
+            this.showCreateNewOffender = true;
+            this.showSearchOffender = true;
+            this.creatingPerson = false;
+            this.uuid += 1;
+            this.$nextTick(()=>{
+                this.initAwesomplete();
+            });
+            this.object_hash = hash(this.entity);
+            let element_search = $('#' + this.elemId);
+            element_search.val('');
         },
         clearPerson: function() {
             this.$emit('clear-person');
@@ -102,6 +141,7 @@ export default {
                 'id': 0, 
                 'data_type': 'individual',
                 'full_name': '',
+                'source': '',
             };
             let element_search = $('#' + this.elemId);
             console.log(element_search);
@@ -110,10 +150,7 @@ export default {
         },
         createNewOffender: function() {
             this.creatingPerson = true;
-            this.entity = {
-                id: null,
-                data_type: null
-            },
+            this.clearPerson();
             this.$nextTick(() => {
                 this.displayCreateOffender = true;
                 this.showCreateNewOffender = false;
@@ -122,16 +159,27 @@ export default {
             });
         },
         clearInput: function(){
-            document.getElementById(this.elemId).value = "";
+            if (this.showSearchOffender) {
+                document.getElementById(this.elemId).value = "";
+            }
+            if (this.displayCreateOffender) {
+                this.$refs.search_users.clearInput();
+            }
         },
         setInput: function(str){
-            document.getElementById(this.elemId).value = str;
+            if (this.showSearchOffender) {
+                document.getElementById(this.elemId).value = str;
+            }
         },
         markMatchedText(original_text, input) {
-            let ret_text = original_text.replace(new RegExp(input, "gi"), function( a, b) {
-                return "<mark>" + a + "</mark>";
-            });
-            return ret_text;
+            try {
+                let ret_text = original_text.replace(new RegExp(input, "gi"), function( a, b) {
+                    return "<mark>" + a + "</mark>";
+                });
+                return ret_text;
+            } catch {
+                return ""
+            }
         },
         initAwesomplete: function() {
             let vm = this;
@@ -218,7 +266,8 @@ export default {
                     vm.entity = {
                         'id': data_item_id_int, 
                         'data_type': data_type,
-                        'full_name': data_full_name
+                        'full_name': data_full_name,
+                        'source': 'offenders',
                     };
                 });
             });

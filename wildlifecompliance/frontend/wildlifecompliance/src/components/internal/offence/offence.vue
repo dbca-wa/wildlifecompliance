@@ -193,28 +193,17 @@
                                         <label class="col-sm-2">Offender</label>
                                         <div v-show="!readonlyForm">
                                             <div>
-                                                <!--<SearchPersonOrganisation
-                                                :excludeStaff="true"
-                                                :personOnly="true"
-                                                classNames="form-control"
-                                                
-                                                showCreateUpdate
-                                                :allowSaveUser="false"
-                                                :emailRequired="false"
-                                                
-                                                domIdHelper="offender"
-                                                v-bind:key="updateSearchPersonOrganisationBindId"/>-->
-
                                                 <SearchOffender
                                                 ref="search_offender"
                                                 @entity-selected="personSelected"
-                                                domIdHelper="offender"
+                                                @clear-person="clearPerson"
+                                                domIdHelper="search-offender"
                                                 v-bind:key="updateSearchOffenderBindId"
                                                 />
                                             </div>
-                                            <!--<div>
+                                            <div>
                                                 <input type="button" class="btn btn-primary" value="Add to Offender List" @click.prevent="addOffenderClicked()" />
-                                            </div>-->
+                                            </div>
                                             <!--div class="col-sm-2">
                                                 <input type="button" class="btn btn-primary" value="Create New Person" @click.prevent="createNewPersonClicked()" />
                                             </div-->
@@ -323,7 +312,6 @@ import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import CommsLogs from "@common-components/comms_logs.vue";
 import FileField from '@/components/common/compliance_file.vue';
 import OffenceWorkflow from './offence_workflow';
-import SearchPersonOrganisation from "@common-components/search_person_or_organisation.vue";
 import SearchOffender from './search_offenders.vue'
 //import CreateNewPerson from "@common-components/create_new_person.vue";
 import MapLocation from "../../common/map_location";
@@ -373,6 +361,7 @@ export default {
             time_from: null,
             date_to: null,
             time_to: null,
+            offenderIdList: [],
             hashAttributeWhiteDict: {
                 'alleged_offences': [
                     'id',
@@ -621,7 +610,6 @@ export default {
         OffenceWorkflow,
         CommsLogs,
         datatable,
-        SearchPersonOrganisation,
         SearchOffender,
         MapLocation,
         //CreateNewPerson,
@@ -646,10 +634,6 @@ export default {
             }
             return visibility;
         },
-        /*updateSearchPersonOrganisationBindId: function() {
-            this.uuid += 1
-            return 'offender' + this.uuid
-        },*/
         updateSearchOffenderBindId: function() {
             this.uuid += 1
             return 'offender' + this.uuid
@@ -1037,7 +1021,11 @@ export default {
         },
         personSelected: function(para) {
             let vm = this;
-            vm.setCurrentOffender(para.data_type, para.id);
+            vm.setCurrentOffender(para.data_type, para.id, para.source);
+        },
+        clearPerson: function(para) {
+            let vm = this;
+            vm.setCurrentOffender('', 0, '');
         },
         createNewPersonClicked: function() {
           let vm = this;
@@ -1147,9 +1135,19 @@ export default {
         },
         addOffenderClicked: async function() {
             let vm = this;
-
-            let current_offender = this.$refs.search_offender.$refs.update_create_person.email_user;
+            let current_offender;
             if (
+                (vm.current_offender == null || vm.current_offender.source == 'email_users') 
+                && this.$refs.search_offender.displayCreateOffender
+                && this.$refs.search_offender.$refs.search_users.displayUpdateCreatePerson
+            ) {
+                current_offender = this.$refs.search_offender.$refs.search_users.$refs.update_create_person.email_user;
+            } else {
+                current_offender = vm.current_offender;
+            }
+
+            if (
+                current_offender &&
                 current_offender.first_name &&
                 current_offender.last_name &&
                 current_offender.dob
@@ -1157,50 +1155,60 @@ export default {
                 let address = current_offender.residential_address;
 
                 let person_id = 'new';
-
-                //TODO if from an existing offender person, set id to the id of that offender
-                console.log(current_offender)
-                //TODO consider removing redundancy
-                let person_obj = {
-                    email: current_offender.email,
-                    first_name: current_offender.first_name,
-                    last_name: current_offender.last_name,
-                    dob: current_offender.dob,
-                    phone_number: current_offender.phone_number,
-                    mobile_number: current_offender.mobile_number,
-                    address_street: address.line1,
-                    address_locality: address.locality,
-                    address_state: address.state,
-                    address_country: address.country,
-                    address_postcode: address.postcode,
+                let id_in_table = false
+                //if from an existing offender person, set id to the id of that offender
+                if (vm.current_offender != null && vm.current_offender.source == 'offenders') {
+                    person_id = current_offender.id;
+                    if (vm.offenderIdList.includes(person_id)) {
+                        id_in_table = true;
+                    }
                 }
 
-                let offender_obj = {
-                    id: '',
-                    person_id: person_id,
-                    person: person_obj,
-                    can_user_action: true,
-                    removed: false,
-                    reason_for_removal: '',
-                    number_linked_sanction_outcomes_total: 0,
-                    number_linked_sanction_outcomes_active: 0,
-                    uuid: uuidv4(),
-                    email: current_offender.email,
-                    first_name: current_offender.first_name,
-                    last_name: current_offender.last_name,
-                    dob: current_offender.dob,
-                    phone_number: current_offender.phone_number,
-                    mobile_number: current_offender.mobile_number,
-                    address_street: address.line1,
-                    address_locality: address.locality,
-                    address_state: address.state,
-                    address_country: address.country,
-                    address_postcode: address.postcode,
-                };
-                this.offence.offenders.push(offender_obj);
+                if (!id_in_table) {
+                    console.log(current_offender)
+                    //TODO consider removing redundancy
+                    let person_obj = {
+                        email: current_offender.email,
+                        first_name: current_offender.first_name,
+                        last_name: current_offender.last_name,
+                        dob: current_offender.dob,
+                        phone_number: current_offender.phone_number,
+                        mobile_number: current_offender.mobile_number,
+                        address_street: address.line1,
+                        address_locality: address.locality,
+                        address_state: address.state,
+                        address_country: address.country,
+                        address_postcode: address.postcode,
+                    }
+
+                    let offender_obj = {
+                        id: '',
+                        person_id: person_id,
+                        person: person_obj,
+                        can_user_action: true,
+                        removed: false,
+                        reason_for_removal: '',
+                        number_linked_sanction_outcomes_total: 0,
+                        number_linked_sanction_outcomes_active: 0,
+                        uuid: uuidv4(),
+                        email: current_offender.email,
+                        first_name: current_offender.first_name,
+                        last_name: current_offender.last_name,
+                        dob: current_offender.dob,
+                        phone_number: current_offender.phone_number,
+                        mobile_number: current_offender.mobile_number,
+                        address_street: address.line1,
+                        address_locality: address.locality,
+                        address_state: address.state,
+                        address_country: address.country,
+                        address_postcode: address.postcode,
+                    };
+                    this.offence.offenders.push(offender_obj);
+                }
             }
             this.constructOffendersTable();
             this.setCurrentOffenderEmpty();
+            this.uuid++;
         },
         addAllegedOffenceClicked: function() {
             if (this.current_alleged_offence && this.current_alleged_offence.id) {
@@ -1246,9 +1254,11 @@ export default {
         },
         constructOffendersTable: function(){
             this.$refs.offender_table.vmDataTable.clear().draw();
+            this.offenderIdList = [];
             if (this.offence.offenders){
                 for(let i=0; i<this.offence.offenders.length; i++){
                     this.addOffenderToTable(this.offence.offenders[i]);
+                    this.offenderIdList.push(this.offence.offenders[i].person.id);
                 }
             }
         },
@@ -1385,22 +1395,30 @@ export default {
             );
           });
         },
-        setCurrentOffender: function(data_type, id) {
+        setCurrentOffender: function(data_type, id, source) {
+          console.log("setCurrentOffender", data_type, id, source)
           let vm = this;
+          console.log(!id, id)
           if (!id) {
-              this.current_offender = null;
-          } else if (data_type == "individual") {
-            let initialisers = [utils.fetchUser(id)];
+              vm.current_offender = null;
+          } else if (source == "offenders") {
+            let initialisers = [utils.fetchOffender(id)];
             Promise.all(initialisers).then(data => {
               vm.current_offender = data[0];
+              vm.current_offender.residential_address = {
+                    line1: data[0].address_street,
+                    locality: data[0].address_locality,
+                    state: data[0].address_state,
+                    country: data[0].address_country,
+                    postcode: data[0].address_postcode,
+              }
               vm.current_offender.data_type = "individual";
+              vm.current_offender.source = source;
             });
-          } else if (data_type == "organisation") {
-            let initialisers = [vm.searchOrganisation(id)];
-            Promise.all(initialisers).then(data => {
-              vm.current_offender = data[0];
-              vm.current_offender.data_type = "organisation";
-            });
+          } else if (source == "email_users") {
+              vm.current_offender = {};
+              vm.current_offender.data_type = "individual";
+              vm.current_offender.source = source;
           }
         },
         setCurrentOffenceSelected: function(offence) {

@@ -83,6 +83,16 @@ export default {
             });
         });
     },
+    fetchOffender: function(id){
+        return new Promise ((resolve,reject) => {
+            Vue.http.get(helpers.add_endpoint_json(api.offenders,id)).then((response) => {
+                resolve(response.body);
+            },
+            (error) => {
+                reject(error);
+            });
+        });
+    },
     fetchCurrentUser: function (){
         return new Promise ((resolve,reject) => {
             Vue.http.get(api.my_user_details).then((response) => {
