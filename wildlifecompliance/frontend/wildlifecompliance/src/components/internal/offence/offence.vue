@@ -204,17 +204,10 @@
                                             <div>
                                                 <input type="button" class="btn btn-primary" value="Add to Offender List" @click.prevent="addOffenderClicked()" />
                                             </div>
-                                            <!--div class="col-sm-2">
-                                                <input type="button" class="btn btn-primary" value="Create New Person" @click.prevent="createNewPersonClicked()" />
-                                            </div-->
                                         </div>
                                     </div></div>
 
                                     <div class="form-group"><div class="row">
-                                        <!--div class="col-sm-12">
-                                          <CreateNewPerson :displayComponent="displayCreateNewPerson" @new-person-created="newPersonCreated"/>
-                                        </div-->
-
                                         <div class="col-sm-12">
                                             <datatable ref="offender_table" id="offender-table" :dtOptions="dtOptionsOffender" :dtHeaders="dtHeadersOffender" />
                                         </div>
@@ -612,7 +605,6 @@ export default {
         datatable,
         SearchOffender,
         MapLocation,
-        //CreateNewPerson,
         RelatedItems,
         SanctionOutcome,
         FileField,
@@ -730,17 +722,14 @@ export default {
             this.temporary_document_collection_id = val;
         },
         constructOffenceDedicatedPage: async function(){
-            console.log('constructOffenceDedicatedPage');
             await this.loadOffenceVuex({offence_id: this.$route.params.offence_id});
             if (this.offence.occurrence_datetime_from){
                 this.date_from = moment(this.offence.occurrence_datetime_from).format("DD/MM/YYYY");
                 this.time_from = moment(this.offence.occurrence_datetime_from).format("LT");
-                console.log('date_from and time_from has been set');
             }
             if (this.offence.occurrence_datetime_to){
                 this.date_to = moment(this.offence.occurrence_datetime_to).format("DD/MM/YYYY");
                 this.time_to = moment(this.offence.occurrence_datetime_to).format("LT");
-                console.log('date_to and time_to has been set');
             }
             this.constructAllegedOffencesTable();
             this.constructOffendersTable();
@@ -750,9 +739,6 @@ export default {
             this.objectHash = this.calculateHash();
         },
         calculateHash: function() {
-            console.log('calculateHash()');
-            console.log(this.offence);
-
             let copiedObject = {}
             Object.getOwnPropertyNames(this.offence).forEach(
                 (val, idx, array) => {
@@ -779,7 +765,6 @@ export default {
                     }
                 });
             let hashedValue = hash(copiedObject);
-            console.log(hashedValue);
             return hashedValue;
         },
         formChanged: function(){
@@ -793,8 +778,6 @@ export default {
         },
         save: async function(){
             try {
-                console.log('aho');
-                console.log($(this.$refs.occurrenceDateFromPicker).data('DateTimePicker').date());
                 await this.saveOffence({'fr_date': this.date_from, 'fr_time': this.time_from, 'to_date': this.date_to, 'to_time': this.time_to});
                 await swal("Saved", "The record has been saved", "success");
 
@@ -802,7 +785,6 @@ export default {
                 this.constructAllegedOffencesTable();
                 this.updateObjectHash();
             } catch (err) {
-                console.log('aho')
                 this.processError(err);
             }
         },
@@ -1165,7 +1147,6 @@ export default {
                 }
 
                 if (!id_in_table) {
-                    console.log(current_offender)
                     //TODO consider removing redundancy
                     let person_obj = {
                         email: current_offender.email,
@@ -1396,9 +1377,7 @@ export default {
           });
         },
         setCurrentOffender: function(data_type, id, source) {
-          console.log("setCurrentOffender", data_type, id, source)
           let vm = this;
-          console.log(!id, id)
           if (!id) {
               vm.current_offender = null;
           } else if (source == "offenders") {
@@ -1443,7 +1422,6 @@ export default {
             $("#alleged-offence").val("");
         },
         addEventListeners: function() {
-            console.log('addEventListeners');
             let vm = this;
             let el_fr_date = $(vm.$refs.occurrenceDateFromPicker);
             let el_fr_time = $(vm.$refs.occurrenceTimeFromPicker);
@@ -1480,9 +1458,6 @@ export default {
             });
 
             // "To" Date field
-            console.log('to date');
-            console.log(vm.offence.occurrence_datetime_from);
-
             el_to_date.datetimepicker({
                 format: "DD/MM/YYYY",
                 maxDate: moment().millisecond(0).second(0).minute(0).hour(0),
@@ -1536,7 +1511,6 @@ export default {
         });
     },
     mounted: async function() {
-        console.log('mounted');
         let vm = this;
 
         vm.$nextTick(() => {

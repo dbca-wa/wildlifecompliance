@@ -175,16 +175,13 @@
                                     <strong><label>Offender</label></strong>
                                 </div>
                                 <div>
-                                    <SearchPersonOrganisation 
-                                    :excludeStaff="true" 
-                                    :personOnly="true" 
-                                    classNames="form-control" 
-                                    showCreateUpdate
-                                    :allowSaveUser="false"
-                                    :emailRequired="false"
-                                    ref="search_offender"
-                                    domIdHelper="offender"
-                                    :key="updateSearchPersonOrganisationBindId"/>
+                                    <SearchOffender
+                                      ref="search_offender"
+                                      @entity-selected="personSelected"
+                                      @clear-person="clearPerson"
+                                      domIdHelper="search-offender"
+                                      v-bind:key="updateSearchOffenderBindId"
+                                      />
                                 </div>
                             </div></div>
 
@@ -249,6 +246,7 @@ import { v4 as uuidv4 } from 'uuid';
 import "jquery-ui/ui/widgets/draggable.js";
 import FileField from '@/components/common/compliance_file.vue';
 import { data } from "jquery";
+import SearchOffender from './search_offenders.vue'
 
 export default {
   name: "Offence",
@@ -428,7 +426,7 @@ export default {
       MapLocationOffence,
       SearchPersonOrganisation,
       FileField,
-    //CreateNewPerson
+      SearchOffender,
   },
     props:{
       region_id: {
@@ -490,7 +488,7 @@ export default {
         return "Occurrence time";
       }
     },
-    updateSearchPersonOrganisationBindId: function() {
+    updateSearchOffenderBindId: function() {
         this.uuid += 1
         return 'offender' + this.uuid
     },
@@ -553,6 +551,43 @@ export default {
         //     api_endpoints.region_district
         // );
         // Object.assign(this.regionDistricts, returned_region_districts);
+    },
+    personSelected: function(para) {
+        let vm = this;
+        vm.setCurrentOffender(para.data_type, para.id, para.source);
+    },
+    clearPerson: function(para) {
+        let vm = this;
+        vm.setCurrentOffender('', 0, '');
+    },
+    setCurrentOffender: function(data_type, id, source) {
+      let vm = this;
+      if (!id) {
+          vm.current_offender = null;
+      } else if (source == "offenders") {
+        let initialisers = [utils.fetchOffender(id)];
+        Promise.all(initialisers).then(data => {
+          vm.current_offender = data[0];
+          vm.current_offender.residential_address = {
+                line1: data[0].address_street,
+                locality: data[0].address_locality,
+                state: data[0].address_state,
+                country: data[0].address_country,
+                postcode: data[0].address_postcode,
+          }
+          vm.current_offender.data_type = "individual";
+          vm.current_offender.source = source;
+        });
+      } else if (source == "email_users") {
+          vm.current_offender = {};
+          vm.current_offender.data_type = "individual";
+          vm.current_offender.source = source;
+      }
+    },
+    setCurrentOffenderEmpty: function() {
+        this.current_offender = {};
+        $("#offender_input").val("");
+        this.$refs.search_offender.clearInput();
     },
     removeOffenderClicked: function(e) {
       let vm = this;
@@ -620,8 +655,19 @@ export default {
     addOffenderClicked: async function() {
       let vm = this;
 
-      let current_offender = this.$refs.search_offender.$refs.update_create_person.email_user;
+      let current_offender;
       if (
+          (vm.current_offender == null || vm.current_offender.source == 'email_users') 
+          && this.$refs.search_offender.displayCreateOffender
+          && this.$refs.search_offender.$refs.search_users.displayUpdateCreatePerson
+      ) {
+          current_offender = this.$refs.search_offender.$refs.search_users.$refs.update_create_person.email_user;
+      } else {
+          current_offender = vm.current_offender;
+      }
+
+      if (
+        current_offender &&
         current_offender.first_name &&
         current_offender.last_name &&
         current_offender.dob
@@ -630,8 +676,10 @@ export default {
         if ((!('data_type' in current_offender) || current_offender.data_type !== undefined) || current_offender.data_type == "individual") {
           vm.offender_count++;          
           let person_id = 'new'
-          //TODO if from an existing offender person, set id to the id of that offender
-
+          //if from an existing offender person, set id to the id of that offender
+          if (vm.current_offender != null && vm.current_offender.source == 'offenders') {
+              person_id = current_offender.id;
+          }
           vm.$refs.offender_table.vmDataTable.row
             .add({
               person_id: person_id,
@@ -646,7 +694,9 @@ export default {
               residential_address: current_offender.residential_address
             })
             .draw();
-        } else if (current_offender.data_type == "organisation") {
+        }
+        //TODO do we need org offenders?
+        /*else if (current_offender.data_type == "organisation") {
           vm.offender_count++;
           vm.$refs.offender_table.vmDataTable.row
             .add({
@@ -656,10 +706,9 @@ export default {
               abn: current_offender.abn
             })
             .draw();
-        }
-        this.$nextTick(() => {
-            this.$refs.search_offender.$refs.update_create_person.setDefaultPerson();
-        });
+        }*/
+        this.setCurrentOffenderEmpty();
+        this.uuid++;
       }
     },
     addAllegedOffenceClicked: function() {

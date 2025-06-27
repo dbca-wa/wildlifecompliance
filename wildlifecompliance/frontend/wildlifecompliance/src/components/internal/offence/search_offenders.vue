@@ -144,7 +144,6 @@ export default {
                 'source': '',
             };
             let element_search = $('#' + this.elemId);
-            console.log(element_search);
             element_search.val('');
             this.displayCreateOffender = false;
         },
@@ -242,10 +241,7 @@ export default {
             })
             .on("awesomplete-select", function(ev) {
                 let origin = $(ev.originalEvent.origin);
-                console.log('In awesomplete-select')
-                console.log(origin)
                 let originTagName = origin[0].tagName;
-                console.log('originTagName: ' + originTagName);
                 switch(originTagName){
                     case "STRONG":
                         origin = origin.parent();
