@@ -292,7 +292,12 @@
         </div>
 
         <div v-if="offenderModalOpened">
-            <OffenderModal ref="offender_modal" :offender="selectedOffender" v-bind:key="offenderBindId"/>
+            <OffenderModal 
+            key="offender_modal_key"
+            ref="offender_modal" 
+            :offender_id="selectedOffender" 
+            :readonly="readonlyForm"
+            />
         </div>
     </div>
 </template>
@@ -345,8 +350,10 @@ export default {
             workflowBindId :'',
             offender_search_type: "individual",
             offenderBindId: '',
+            offenderPersonBindId: '',
             selectedOffender: null,
             offenderModalOpened: false,
+            offender_modal_key: 0,
             offenceTab: 'offenceTab' + vm._uid,
             detailsTab: 'detailsTab' + vm._uid,
             documentTab: 'documentTab' + vm._uid,
@@ -497,14 +504,17 @@ export default {
                                 if (row.offender.removed){
                                     ret_str = ret_str + '<a href="#" class="restore_button" data-offender-uuid="' + row.offender.uuid + '">Restore</a>';
                                 } else {
-                                    //TODO add view/edit button
-                                    ret_str = ret_str + '<a href="#" class="edit_button" data-offender-uuid="' + row.offender.uuid + '">Edit</a></br>';
+                                    if (row.offender.id != null && row.offender.id != 'new') {
+                                        ret_str = ret_str + '<a href="#" class="edit_button" data-offender-id="' + row.offender.person.id + '">Edit</a></br>';
+                                    }
                                     if (!row.offender.number_linked_sanction_outcomes_active){
                                         ret_str = ret_str + '<a href="#" class="remove_button" data-offender-uuid="' + row.offender.uuid + '">Remove</a>';
                                     }
                                 }         
                             } else {
-                                ret_str = ret_str + '<a href="#" class="view_button" data-offender-uuid="' + row.offender.uuid + '">View</a>';
+                                if (row.offender.id != null && row.offender.id != 'new') {
+                                    ret_str = ret_str + '<a href="#" class="view_button" data-offender-id="' + row.offender.person.id + '">View</a>';
+                                }
                             }
                             return ret_str;
                         }
@@ -1247,6 +1257,7 @@ export default {
             this.$refs.alleged_offence_table.vmDataTable.row.add({ allegedOffence: allegedOffence, offence: this.offence }).draw();
         },
         constructOffendersTable: function(){
+            console.log("constructOffendersTable")
             this.$refs.offender_table.vmDataTable.clear().draw();
             this.offenderIdList = [];
             if (this.offence.offenders){
@@ -1434,6 +1445,14 @@ export default {
             this.current_alleged_offence = {};
             $("#alleged-offence").val("");
         },
+        openOffenderPersonModal: function(e) {
+            this.selectedOffender = e.target.getAttribute("data-offender-id");
+            this.offenderModalOpened = true;
+            this.$nextTick(() => {
+                this.offender_modal_key++;
+                this.$refs.offender_modal.isModalOpen = true;
+            });
+        },
         addEventListeners: function() {
             let vm = this;
             let el_fr_date = $(vm.$refs.occurrenceDateFromPicker);
@@ -1506,6 +1525,8 @@ export default {
 
             $("#offender-table").on("click", ".remove_button", vm.removeOffenderClicked);
             $("#offender-table").on("click", ".restore_button", vm.restoreOffenderClicked);
+            $("#offender-table").on("click", ".edit_button", vm.openOffenderPersonModal);
+            $("#offender-table").on("click", ".view_button", vm.openOffenderPersonModal);
             $("#offender-table").on("blur", ".reason_element", vm.reasonOffenderLostFocus);
 
             window.addEventListener('beforeunload', this.leaving);

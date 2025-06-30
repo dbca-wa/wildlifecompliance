@@ -6,18 +6,134 @@
                     <div class="col-sm-12 form-group">
                       <div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left" for="offence-identifier">Test</label>
+                            <label class="control-label pull-left" for="first_name">First Name</label>
                         </div>
                         <div class="col-sm-6">
-                            <div v-if="offender">
-                                <input type="text" class="form-control" name="identifier" placeholder="" v-model="offender.test" v-bind:key="offender.id">
+                            <div v-if="offender_person">
+                                <input type="text" class="form-control" name="first_name" placeholder="" v-model="offender_person.first_name" v-bind:key="offender_id">
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                      <div class="row">
+                        <div class="col-sm-3">
+                            <label class="control-label pull-left" for="last_name">Last Name</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <div v-if="offender_person">
+                                <input type="text" class="form-control" name="last_name" placeholder="" v-model="offender_person.last_name" v-bind:key="offender_id">
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                      <div class="row">
+                        <div class="col-sm-3">
+                            <label class="control-label pull-left" for="dob">Date of Birth</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <div v-if="offender_person">
+                                <div class="input-group date" ref="dobDatePicker">
+                                    <input 
+                                    name="dob"
+                                    type="text" 
+                                    class="form-control" 
+                                    placeholder="DD/MM/YYYY" 
+                                    v-model="offender_person.dob" 
+                                    />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                      <div class="row">
+                        <div class="col-sm-3">
+                            <label class="control-label pull-left" for="phone_number">Phone Number</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <div v-if="offender_person">
+                                <input type="text" class="form-control" name="phone_number" placeholder="" v-model="offender_person.phone_number" v-bind:key="offender_id">
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                      <div class="row">
+                        <div class="col-sm-3">
+                            <label class="control-label pull-left" for="mobile_number">Mobile Number</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <div v-if="offender_person">
+                                <input type="text" class="form-control" name="mobile_number" placeholder="" v-model="offender_person.mobile_number" v-bind:key="offender_id">
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                      <div class="row">
+                        <div class="col-sm-3">
+                            <label class="control-label pull-left" for="address_street">Street</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <div v-if="offender_person">
+                                <input type="text" class="form-control" name="address_street" placeholder="" v-model="offender_person.address_street" v-bind:key="offender_id">
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                      <div class="row">
+                        <div class="col-sm-3">
+                            <label class="control-label pull-left" for="address_locality">Locality</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <div v-if="offender_person">
+                                <input type="text" class="form-control" name="address_locality" placeholder="" v-model="offender_person.address_locality" v-bind:key="offender_id">
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                      <div class="row">
+                        <div class="col-sm-3">
+                            <label class="control-label pull-left" for="address_state">State</label>
+                        </div>
+                        <div class="col-sm-3">
+                            <div v-if="offender_person">
+                                <input type="text" class="form-control" name="address_state" placeholder="" v-model="offender_person.address_state" v-bind:key="offender_id">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <label class="control-label pull-left" for="address_postcode">Postcode</label>
+                        </div>
+                        <div class="col-sm-3">
+                            <div v-if="offender_person">
+                                <input type="text" class="form-control" name="address_postcode" placeholder="" v-model="offender_person.address_postcode" v-bind:key="offender_id">
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                      <div class="row">
+                        <div class="col-sm-3">
+                            <label class="control-label pull-left" for="offence-identifier">Country</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <div v-if="offender_person">
+                                <select class="form-control" name="country" placeholder="" v-model="offender_person.address_country">
+                                    <option v-for="c in countries" :value="c.code">{{ c.name }}</option>
+                                </select>                            
                             </div>
                         </div>
                       </div>
                     </div>
                 </div>
             </div>
-
                    
             <div slot="footer">
                 <div v-if="errorResponse" class="form-group">
@@ -38,21 +154,46 @@
 </template>
 
 <script>
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers } from "@/utils/hooks";
+import utils from '@/components/internal/utils'
+import modal from "@vue-utils/bootstrap-modal.vue";
 import "bootstrap/dist/css/bootstrap.css";
+import Vue from "vue";
+import 'eonasdan-bootstrap-datetimepicker';
 
 export default {
   name: "Offender",
   data: function() {
-    let vm = this;
     return {
       uuid: 0,
+      errorResponse: null,
+      processingDetails: false,
+      isModalOpen: false,
+      countries: [],
+      offender_person: {
+        first_name: "",
+        last_name: "",
+        dob: "",
+        phone_number: "",
+        mobile_number: "",
+        address_street: "",
+        address_locality: "",
+        address_state: "",
+        address_country: "",
+        address_postcode: "",
+      }
     }
   },
   props:{
-    offender: {
+    offender_id: {
       requird: true,
+    },
+    readonly: {
+      default: true,
     }
+  },
+  components: {
+    modal,
   },
   computed: {
     modalTitle: function() {
@@ -62,7 +203,24 @@ export default {
   methods: {
     sendData: async function() {
         let vm = this;
-        let res //= await TODO
+        let data = new FormData(); 
+        data = {};
+        data.first_name = vm.offender_person.first_name;
+        data.last_name = vm.offender_person.last_name;
+        data.dob = vm.offender_person.dob;
+        data.phone_number = vm.offender_person.phone_number;
+        data.mobile_number = vm.offender_person.mobile_number;
+        data.address_street = vm.offender_person.address_street;
+        data.address_locality = vm.offender_person.address_locality;
+        data.address_state = vm.offender_person.address_state;
+        data.address_country = vm.offender_person.address_country;
+        data.address_postcode = vm.offender_person.address_postcode;
+        let res = Vue.http.post(
+            helpers.add_endpoint_join(
+                api_endpoints.offenders,
+                this.offender_id + "/update_offender_person/"),
+                data
+            );
         return res
     },
     ok: async function() {
@@ -71,12 +229,15 @@ export default {
             let response = await this.sendData();
 
             if (response.ok) {
-                // Refresh offence table TODO
+                // Refresh offence table
+                this.$nextTick(()=>{
+                    this.$parent.$router.go()
+                });
             }
         } catch(err) {
             this.processError(err);
         } finally {
-            this.processingDetails = false;
+            this.close();
         }
     },
     processError: async function(err) {
@@ -117,6 +278,48 @@ export default {
         this.processingDetails = false;
         this.isModalOpen = false;
     },
+    addEventListeners: function() {
+          let el_dob_date = $(this.$refs.dobDatePicker);
+
+          el_dob_date.datetimepicker({
+            format: "DD/MM/YYYY",
+            maxDate: "now",
+            showClear: true
+          });
+          el_dob_date.on("dp.change", (e) => {
+            if (el_dob_date.data("DateTimePicker").date()) {
+              this.offender_person.dob = e.date.format("DD/MM/YYYY");
+            } else if (el_dob_date.data("date") === "") {
+              this.offender_person.dob = "";
+            }
+          });
+    },
+    loadCountries: function(){
+        let vm = this;
+        let initialisers = [
+            utils.fetchCountries()
+        ]
+        Promise.all(initialisers).then(data => {
+            vm.countries = data[0];
+        });
+    },
+  },
+  watch: {
+    isModalOpen: function() {
+        if (this.isModalOpen) {
+            let initialisers = [utils.fetchOffender(this.offender_id)];
+            Promise.all(initialisers).then(data => {
+              this.offender_person = data[0];
+            })
+        }
+    }
+  },
+  mounted() {
+      let vm = this;
+      vm.$nextTick(()=>{
+          vm.loadCountries();
+          vm.addEventListeners();
+      })
   }  
 };
 </script>

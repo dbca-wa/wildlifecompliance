@@ -191,6 +191,19 @@ class OffenderViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         if is_compliance_management_user(self.request):
             return OffenderPerson.objects.all()
         return OffenderPerson.objects.none()
+    
+    @action(detail=True, methods=['POST', ])
+    def update_offender_person(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            request_data = request.data
+            serializer = OffenderPersonSerializer(instance, data=request_data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
 
 class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
     queryset = Offence.objects.all()

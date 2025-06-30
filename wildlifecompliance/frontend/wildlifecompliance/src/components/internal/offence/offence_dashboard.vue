@@ -56,7 +56,7 @@
         </FormSection>
 
         <div v-if="offenceInitialised">
-            <OffenceModal ref="add_offence"  v-bind:key="offenceBindId"/>
+            <OffenceModal ref="add_offence" v-bind:key="offenceBindId"/>
         </div>
     </div>
 </template>
