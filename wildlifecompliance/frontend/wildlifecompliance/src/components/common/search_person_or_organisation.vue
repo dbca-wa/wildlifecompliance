@@ -1,6 +1,11 @@
 <template lang="html">
     <div class="">
-        <div class="col-sm-12 form-group"><div class="row">
+        <div class="col-sm-12 form-group">
+            <div class="row">
+            </br>
+            <div v-if="info" class="alert alert-info">{{ info }}</div>
+            </div>
+            <div class="row">
                 <label v-if="componentTitle" class="col-sm-4">{{ componentTitle }}</label>
                 <label v-else-if="displayTitle" class="col-sm-4">{{ labelTitle }}</label>
                 <div v-if="!personOnly">
@@ -9,13 +14,14 @@
                     <input :disabled="!isEditable" class="col-sm-1" id="organisation" type="radio" v-model="searchType" v-bind:value="`organisation`">
                     <label class="col-sm-1" for="organisation">Organisation</label>
                 </div>
-        </div></div>
+            </div>
+        </div>
         <div class="form-group"><div class="row">
             <div class="col-sm-12">
                 <div class="col-sm-9">
                     <input :id="elemId" :class="classNames" :readonly="!isEditable" ref="search_person_org"/>
                 </div>
-                <div v-if="showCreateNewPerson" class="col-sm-2">
+                <div v-if="showCreateNewPerson || allowCreateEdit" class="col-sm-2">
                     <input :disabled="!isEditable" type="button" class="btn btn-primary" value="Create New Person" @click.prevent="createNewPerson()" />
                 </div>
                 <div v-if="showClearPerson" class="col-sm-2">
@@ -31,9 +37,12 @@
               <updateCreatePerson 
               displayComponent 
               :isEditable="isEditable"
+              :allowCreateEdit="true"
               :personToUpdate="entity.id"
               @person-saved="savePerson"
               v-bind:key="updateCreatePersonBindId"
+              :emailRequired="emailRequired"
+              :allowSaveUser="allowSaveUser"
               ref="update_create_person"/>
             </div>
             <div class="col-sm-12" v-if="displayUpdateCreateOrganisation && !personOnly">
@@ -200,8 +209,27 @@ export default {
             required: false,
             default: false,
         },
+        allowCreateEdit: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+        emailRequired: {
+            type: Boolean,
+            required: false,
+            default: true,
+        },
+        allowSaveUser: {
+            type: Boolean,
+            required: false,
+            default: true,
+        },
         parentEntity: {
             type: Object,
+            required: false,
+        },
+        info: {
+            type: String,
             required: false,
         },
         domIdHelper: {
@@ -282,10 +310,14 @@ export default {
             document.getElementById(this.elemId).value = person_org_str;
         },
         markMatchedText(original_text, input) {
-            let ret_text = original_text.replace(new RegExp(input, "gi"), function( a, b) {
-                return "<mark>" + a + "</mark>";
-            });
-            return ret_text;
+            try {
+                let ret_text = original_text.replace(new RegExp(input, "gi"), function( a, b) {
+                    return "<mark>" + a + "</mark>";
+                });
+                return ret_text;
+            } catch {
+                return ""
+            }
         },
         createUpdateOrganisationClicked: function() {
           this.displayUpdateCreateOrganisation = !this.displayUpdateCreateOrganisation;
@@ -455,7 +487,7 @@ export default {
                     vm.awesomplete_obj.list = suggest_list_offender;
                     vm.awesomplete_obj.evaluate();
                     // show 'Create' buttons
-                    if (searchTerm.length >=2 && suggest_list_offender.length > 0) {
+                    if (searchTerm.length >=2 || this.allowCreateEdit) {
                         if (vm.showCreateUpdate && vm.searchType === 'individual') {
                             vm.showCreateNewPerson = true;
                         } else if (vm.showCreateUpdate && vm.searchType === 'organisation') {

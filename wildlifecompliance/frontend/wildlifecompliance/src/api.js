@@ -46,6 +46,7 @@ module.exports = {
     system_name: 'Wildlife Licensing System',
     call_email: "/api/call_email/",
     offence: "/api/offence/",
+    offenders: "/api/offenders/",
     sanction_outcome: "/api/sanction_outcome/",
     sanction_outcome_paginated: "/api/sanction_outcome_paginated/",
     remediation_action: "/api/remediation_action/",

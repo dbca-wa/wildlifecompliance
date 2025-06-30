@@ -316,7 +316,7 @@ def is_authorised_to_modify(request, instance):
                                           .format(instance.status))
 
     # Submitter must be the offence holder.
-    offender = instance.sanction_outcome.offender.person.email # organisation to be handled later
+    offender = instance.sanction_outcome.offender.person.email #TODO organisation to be handled later
     submitter = request.user.email
     authorised &= offender == submitter
 

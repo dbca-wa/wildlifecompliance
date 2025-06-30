@@ -12,11 +12,14 @@
                         <p>test alert</p>
                     </div>
                     <form class="form-horizontal" name="personal_form" method="post">
+                        <div v-if="allowCreateEdit && personalDetailsReadOnly" class="alert alert-info">
+                            Please ensure details provided here are up to date and match corresponding user account details.
+                        </div>
                         <div class="form-group" v-bind:class="{ 'has-error': errorGivenName }">
                             <label for="" class="col-sm-3 control-label">Given Name(s)</label>
                             <div class="col-sm-6">
                                 <div v-if="email_user">
-                                    <input :readonly="personalDetailsReadOnly" type="text" class="form-control" name="first_name" placeholder="" v-model="email_user.first_name" v-bind:key="email_user.id">
+                                    <input :readonly="personalDetailsReadOnly && !allowCreateEdit" type="text" class="form-control" name="first_name" placeholder="" v-model="email_user.first_name" v-bind:key="email_user.id">
                                 </div>
                             </div>
                         </div>
@@ -24,7 +27,7 @@
                             <label for="" class="col-sm-3 control-label">Last Name</label>
                             <div class="col-sm-6">
                                 <div v-if="email_user">
-                                    <input :readonly="personalDetailsReadOnly" type="text" class="form-control" name="last_name" placeholder="" v-model="email_user.last_name" v-bind:key="email_user.id">
+                                    <input :readonly="personalDetailsReadOnly && !allowCreateEdit" type="text" class="form-control" name="last_name" placeholder="" v-model="email_user.last_name" v-bind:key="email_user.id">
                                 </div>
                             </div>
                         </div>
@@ -33,7 +36,7 @@
                             <div class="col-sm-6">
                                 <div class="input-group date" ref="dobDatePicker">
                                     <input 
-                                    :disabled="personalDetailsReadOnly" 
+                                    :disabled="personalDetailsReadOnly && !allowCreateEdit" 
                                     type="text" 
                                     class="form-control" 
                                     placeholder="DD/MM/YYYY" 
@@ -113,7 +116,7 @@
                         <label for="" class="col-sm-3 control-label">Phone</label>
                         <div class="col-sm-6">
                             <div v-if="email_user">
-                                <input :readonly="!isEditable" type="text" class="form-control" name="phone" placeholder="" v-model="email_user.phone_number" v-bind:key="email_user.id">
+                                <input :readonly="!isEditable" type="text" class="form-control" name="phone_number" placeholder="" v-model="email_user.phone_number" v-bind:key="email_user.id">
                             </div>
                         </div>
                         </div>
@@ -121,7 +124,7 @@
                         <label for="" class="col-sm-3 control-label" >Mobile</label>
                         <div class="col-sm-6">
                             <div v-if="email_user">
-                                <input :readonly="!isEditable" type="text" class="form-control" name="mobile" placeholder="" v-model="email_user.mobile_number" v-bind:key="email_user.id">
+                                <input :readonly="!isEditable" type="text" class="form-control" name="mobile_number" placeholder="" v-model="email_user.mobile_number" v-bind:key="email_user.id">
                             </div>
                         </div>
                         </div>
@@ -136,7 +139,7 @@
                 </div>
             </div>
 
-            <input 
+            <input v-if="allowSaveUser"
             :disabled="!saveButtonEnabled"
             type="button" 
             class="pull-right btn btn-primary" 
@@ -200,6 +203,11 @@ export default {
         }
     },
     props: {
+        allowCreateEdit: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
         displayComponent: {
             type: Boolean,
             required: true,
@@ -240,6 +248,14 @@ export default {
             required: false,
         },
         isEditable: {
+            type: Boolean,
+            default: false,
+        },
+        emailRequired: {
+            type: Boolean,
+            default: false,
+        },
+        allowSaveUser: {
             type: Boolean,
             default: false,
         },
@@ -435,7 +451,7 @@ export default {
                         fetchUrl = helpers.add_endpoint_join(api_endpoints.compliance_management_users, payload.id + '/update_person/');
                     }
                 } else {
-                    if (!payload.first_name || !payload.last_name || !payload.dob || !payload.email) {
+                    if (!payload.first_name || !payload.last_name || !payload.dob || (this.emailRequired && !payload.email)) {
                         await swal("Error", "Fill out all Personal Details and email fields", "error");
                         return;
                     } else {

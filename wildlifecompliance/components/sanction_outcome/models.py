@@ -619,11 +619,11 @@ class SanctionOutcome(SanitiseMixin):
         offender, title = self.get_offender()
         recipient = ''
         if title == 'driver':
-            recipient = ' to the {} (driver)'.format(offender.email)
+            recipient = ' to the {} (driver)'.format(offender.person.email)
         elif title == 'registration_holder':
-            recipient = ' to the {} (registration holder)'.format(offender.email)
+            recipient = ' to the {} (registration holder)'.format(offender.person.email)
         elif recipient == 'offender':
-            recipient = ' to the {}'.format(offender.email)
+            recipient = ' to the {}'.format(offender.person.email)
         reason_for_extension = 'Issue infringement notice on ' + self.date_of_issue.strftime("%d/%m/%Y") + recipient
 
         due_date_config = SanctionOutcomeDueDateConfiguration.get_config_by_date(self.date_of_issue)

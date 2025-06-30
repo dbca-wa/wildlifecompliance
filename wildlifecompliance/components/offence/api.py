@@ -29,12 +29,13 @@ from wildlifecompliance.components.legal_case.models import LegalCase
 from wildlifecompliance.components.main.api import save_location
 
 from wildlifecompliance.components.offence.models import Offence, Offender, AllegedOffence, \
-    OffenceUserAction, OffenceCommsLogEntry
+    OffenceUserAction, OffenceCommsLogEntry, OffenderPerson
 from wildlifecompliance.components.section_regulation.models import SectionRegulation
 from wildlifecompliance.components.offence.serializers import (
     OffenceSerializer,
     SaveOffenceSerializer,
     SaveOffenderSerializer,
+    OffenderPersonSerializer,
     OrganisationSerializer,
     OffenceDatatableSerializer,
     UpdateAssignedToIdSerializer, UpdateOffenderAttributeSerializer, OffenceOptimisedSerializer,
@@ -44,7 +45,7 @@ from wildlifecompliance.components.offence.serializers import (
 from wildlifecompliance.components.section_regulation.serializers import SectionRegulationSerializer
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, AllegedCommittedOffence
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup, ComplianceManagementSystemGroupPermission
-from wildlifecompliance.helpers import is_internal, is_customer, is_compliance_internal_user, is_wildlife_compliance_officer
+from wildlifecompliance.helpers import is_internal, is_customer, is_compliance_internal_user, is_wildlife_compliance_officer, is_compliance_management_user
 from django.db.models.functions import Concat
 from django.db.models import Value
 
@@ -84,8 +85,8 @@ class OffenceFilterBackend(DatatablesFilterBackend):
                 ).values_list('id', flat=True))
 
             q_objects &= Q(lodgement_number__icontains=search_text) | \
-                         Q(identifier__icontains=search_text) | \
-                         Q(offender__person_id__in=email_user_ids) 
+                         Q(identifier__icontains=search_text) #| \
+                         #Q(offender__person_id__in=email_user_ids) TODO check if this is still viable, replace otherwise
                          #Q(offender__organisation__organisation__name__icontains=search_text) | \
                          #Q(offender__organisation__organisation__abn__icontains=search_text) | \
                          #Q(offender__organisation__organisation__trading_name__icontains=search_text)
@@ -170,6 +171,39 @@ class OffencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         ret = self.paginator.get_paginated_response(serializer.data)
         return ret
 
+class SearchOffenderViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = OffenderPerson.objects.none()
+    serializer_class = OffenderPersonSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('first_name', 'last_name', 
+                     'email', 'phone_number', 'mobile_number')
+
+    def get_queryset(self):
+        if is_compliance_management_user(self.request):
+            return OffenderPerson.objects.all()
+        return OffenderPerson.objects.none()
+    
+class OffenderViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    queryset = OffenderPerson.objects.none()
+    serializer_class = OffenderPersonSerializer
+
+    def get_queryset(self):
+        if is_compliance_management_user(self.request):
+            return OffenderPerson.objects.all()
+        return OffenderPerson.objects.none()
+    
+    @action(detail=True, methods=['POST', ])
+    def update_offender_person(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            request_data = request.data
+            serializer = OffenderPersonSerializer(instance, data=request_data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
 
 class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
     queryset = Offence.objects.all()
@@ -512,14 +546,50 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
 
                 # 4. Create relations between this offence and offender(s)
                 for item in request_data['offenders']:
-                    if item['person']:
-                        offender, created = Offender.objects.get_or_create(person_id=item['person']['id'], offence_id=request_data['id'])
-                    elif item['organisation']:
-                        offender, created = Offender.objects.get_or_create(organisation_id=item['organisation']['id'], offence_id=request_data['id'])
 
-                    if not created:
+                    if not item['id']:
+                        try:
+                            dob = datetime.strptime(item['dob'], '%d/%m/%Y').date()
+                        except:
+                            dob = ''
+                        if 'person_id' in item:
+                        
+                            if item['person_id'] == "new":
+                                offender_person = OffenderPerson.objects.create(
+                                    email=item['email'],
+                                    first_name=item['first_name'],
+                                    last_name=item['last_name'],
+                                    dob=dob,
+                                    phone_number=item['phone_number'],
+                                    mobile_number=item['mobile_number'],
+                                    address_street=item['address_street'],
+                                    address_locality=item['address_locality'],
+                                    address_state=item['address_state'],
+                                    address_country=item['address_country'],
+                                    address_postcode=item['address_postcode'],
+                                )
+
+                            else:
+                                try:
+                                    offender_person = OffenderPerson.objects.get(id=int(item['person_id']))
+                                except:
+                                    raise serializer.ValidationError("Invalid Offender Id provided")
+
+                            offender = Offender.objects.create(
+                                offence_id=request_data['id'],
+                                person=offender_person,
+                            )
+                    
+                        #TODO check if organisation offender needed
+                        #elif item['organisation']:
+                        #    offender, created = Offender.objects.get_or_create(organisation_id=item['organisation']['id'], offence_id=request_data['id'])
+                    else:
+                        try:
+                            offender = Offender.objects.get(id=item['id'])
+                        except:
+                            continue
+
                         serializer = None
-
                         # Update attributes of existing offender
                         if not offender.removed and item['removed']:
                             # This offender is going to be removed
@@ -536,10 +606,6 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                                 'removed_by_id': None,
                                 'reason_for_removal': ''
                             })
-
-                        else:
-                            # other case where nothing changed on this offender
-                            pass
 
                         if serializer:
                             serializer.is_valid(raise_exception=True)
@@ -646,16 +712,47 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
 
                 # 4. Create relations between this offence and offender(s)
                 for dict in request_data['offenders']:
-                    if dict['data_type'] == 'individual':
-                        offender = EmailUser.objects.get(id=dict['id'])
-                        serializer_offender = SaveOffenderSerializer(data={'offence_id': saved_offence_instance.id, 'person_id': offender.id})
+                    if dict['data_type'] == 'individual' and "person_id" in dict:
+    
+                        if dict["person_id"] == "new":
+
+                            address = dict['residential_address']
+                            try:
+                                dob = datetime.strptime(dict['dob'], '%d/%m/%Y').date()
+                            except:
+                                dob = ''
+                            offender_person = OffenderPerson.objects.create(
+                                    email=dict['email'],
+                                    first_name=dict['first_name'],
+                                    last_name=dict['last_name'],
+                                    dob=dob,
+                                    phone_number=dict['p_number'],
+                                    mobile_number=dict['m_number'],
+                                    address_street=address['line1'],
+                                    address_locality=address['locality'],
+                                    address_state=address['state'],
+                                    address_country=address['country'],
+                                    address_postcode=address['postcode'],
+                                )
+                        else:
+                            try:
+                                offender_person = OffenderPerson.objects.get(id=dict["person_id"])
+                            except:
+                                raise serializers.ValidationError("Invalid Offender Id provided")
+                        serializer_offender = SaveOffenderSerializer(
+                            data={
+                                'offence_id': saved_offence_instance.id, 
+                                'person_id': offender_person.id
+                            }
+                        )
                         serializer_offender.is_valid(raise_exception=True)
                         serializer_offender.save()
-                    elif dict['data_type'] == 'organisation':
-                        offender = Organisation.objects.get(id=dict['id'])
-                        serializer_offender = SaveOffenderSerializer(data={'offence_id': saved_offence_instance.id, 'organisation_id': offender.id})
-                        serializer_offender.is_valid(raise_exception=True)
-                        serializer_offender.save()
+                    #TODO do we still need organisation offenders?
+                    #elif dict['data_type'] == 'organisation':
+                    #    offender = Organisation.objects.get(id=dict['id'])
+                    #    serializer_offender = SaveOffenderSerializer(data={'offence_id': saved_offence_instance.id, 'organisation_id': offender.id})
+                    #    serializer_offender.is_valid(raise_exception=True)
+                    #    serializer_offender.save()
 
                 # 4. Return Json
                 headers = self.get_success_headers(serializer.data)

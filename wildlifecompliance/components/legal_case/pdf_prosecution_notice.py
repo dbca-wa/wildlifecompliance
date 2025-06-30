@@ -78,9 +78,9 @@ def _create_pdf(invoice_buffer, legal_case, brief_of_evidence_record_of_intervie
             continue
 
         # Generate texts
-        accused_text = offender.get_full_name()
+        accused_text = offender.full_name
         accused_dob_text = offender.dob.strftime('%d/%m/%Y') if offender.dob else ''
-        accused_address_text = offender.residential_address
+        accused_address_text = offender.address
         offence_period = offence.occurrence_datetime_from.strftime("%d/%m/%Y")
         if offence.occurrence_from_to:
             offence_period += ' to ' + offence.occurrence_datetime_to.strftime("%d/%m/%Y")

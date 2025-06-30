@@ -74,7 +74,7 @@ def _create_pdf(invoice_buffer, legal_case, offenders):
         court_place_txt = ''
 
         if offender.person:
-            offender_full_name = offender.person.get_full_name()
+            offender_full_name = offender.person.full_name
         if court_date_obj and court_date_obj.court_datetime:
             local_datetime = court_date_obj.court_datetime.astimezone(pytz.timezone(TIME_ZONE))
             court_date_txt = local_datetime.strftime('%d/%m/%Y')

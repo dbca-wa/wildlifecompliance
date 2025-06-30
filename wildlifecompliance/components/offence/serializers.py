@@ -13,7 +13,7 @@ from wildlifecompliance.components.call_email.serializers import LocationSeriali
 from wildlifecompliance.components.main.fields import CustomChoiceField
 from wildlifecompliance.components.main.related_item import get_related_items
 from wildlifecompliance.components.offence.models import Offence, Offender, AllegedOffence, \
-    OffenceUserAction, OffenceCommsLogEntry
+    OffenceUserAction, OffenceCommsLogEntry, OffenderPerson
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, AllegedCommittedOffence
 from wildlifecompliance.components.section_regulation.serializers import SectionRegulationSerializer
 #from wildlifecompliance.components.users.serializers import CompliancePermissionGroupMembersSerializer
@@ -31,10 +31,28 @@ class OrganisationSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ()
 
+class OffenderPersonSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OffenderPerson
+        fields = (
+            'id',   
+            'email',
+            'first_name',
+            'last_name',
+            'dob',
+            'phone_number',
+            'mobile_number',
+            'address_street',
+            'address_locality',
+            'address_state',
+            'address_country',
+            'address_postcode',
+        )
 
 class OffenderSerializer(serializers.ModelSerializer):
-    person = EmailUserSerializer(read_only=True,)
-    organisation = OrganisationSerializer(read_only=True,)
+    person = OffenderPersonSerializer(read_only=True,)
+    #organisation = OrganisationSerializer(read_only=True,)
     number_linked_sanction_outcomes_total = serializers.SerializerMethodField(read_only=True)
     number_linked_sanction_outcomes_active = serializers.SerializerMethodField(read_only=True)
     can_user_action = serializers.SerializerMethodField(read_only=True)
@@ -43,13 +61,13 @@ class OffenderSerializer(serializers.ModelSerializer):
         model = Offender
         fields = (
             'id',
+            'can_user_action',
             'person',
-            'organisation',
+            #'organisation',
             'removed',
             'reason_for_removal',
             'number_linked_sanction_outcomes_total',
             'number_linked_sanction_outcomes_active',
-            'can_user_action',
         )
 
     def get_number_linked_sanction_outcomes_total(self, obj):
@@ -224,7 +242,7 @@ class OffenceSerializer(serializers.ModelSerializer):
             connected_offenders = []
             for aco in qs:
                 if aco.sanction_outcome and aco.sanction_outcome.offender:
-                    serializer = EmailUserSerializer(aco.sanction_outcome.offender.person)
+                    serializer = OffenderSerializer(aco.sanction_outcome.offender)
                     connected_offenders.append(serializer.data)
             ret_obj['connected_offenders'] = connected_offenders
 
@@ -450,32 +468,14 @@ class SaveOffenceSerializer(serializers.ModelSerializer):
 class SaveOffenderSerializer(serializers.ModelSerializer):
     offence_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
     person_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
-    organisation_id = serializers.IntegerField(required=False, write_only=True, allow_null=True)
 
     class Meta:
         model = Offender
         fields = (
-            'id',
             'offence_id',
             'person_id',
-            'organisation_id',
         )
         read_only_fields = ()
-
-    def validate(self, data):
-        field_errors = {}
-        non_field_errors = []
-
-        # if (data['person_id'] and data['organisation_id']) or (not data['person_id'] and not data['organisation_id']):
-        if ('person_id' in data and 'organisation_id' in data) or ('person_id' not in data and 'organisation_id' not in data):
-            non_field_errors.append('An offender must be either a person or an organisation.')
-
-        if field_errors:
-            raise serializers.ValidationError(field_errors)
-        if non_field_errors:
-            raise serializers.ValidationError(non_field_errors)
-
-        return data
 
 
 class OffenceUserActionSerializer(serializers.ModelSerializer):

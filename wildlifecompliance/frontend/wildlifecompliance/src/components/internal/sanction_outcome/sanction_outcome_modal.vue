@@ -94,9 +94,9 @@
                                                 <span v-if="offender.person">
                                                     {{ offender.person.first_name + ' ' + offender.person.last_name + ', DOB:' + offender.person.dob }}
                                                 </span>
-                                                <span v-else-if="offender.organisation">
+                                                <!--<span v-else-if="offender.organisation">
                                                     {{ offender.organisation.name + ', ABN: ' + offender.organisation.abn }}
-                                                </span>
+                                                </span>-->
                                             </option>
                                         </select>
                                     </div>

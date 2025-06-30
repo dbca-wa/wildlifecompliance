@@ -16,6 +16,7 @@ from wildlifecompliance.components.main.related_item import can_close_record
 from wildlifecompliance.components.section_regulation.models import SectionRegulation
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.organisations.models import Organisation
+from django_countries.fields import CountryField
 
 from wildlifecompliance.components.main.utils import (
     get_first_name,
@@ -258,6 +259,43 @@ class ActiveOffenderManager(models.Manager):
         return super(ActiveOffenderManager, self).get_queryset().filter(removed=False)
 
 
+class OffenderPerson(SanitiseMixin):
+
+    email = models.EmailField(blank=True, null=True)
+    first_name = models.CharField(max_length=128, blank=False, verbose_name='Given name(s)', null=True)
+    last_name = models.CharField(max_length=128, blank=False, null=True)
+    dob = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=False, verbose_name="date of birth", help_text='')
+    phone_number = models.CharField(max_length=50, null=True, blank=True, verbose_name="phone number", help_text='')
+    mobile_number = models.CharField(max_length=50, null=True, blank=True, verbose_name="mobile number", help_text='')
+
+    address_street = models.CharField('Street', max_length=255, null=True, blank=True)
+    address_locality = models.CharField('Suburb / Town', max_length=255, null=True, blank=True)
+    address_state = models.CharField(max_length=255, default='WA', null=True, blank=True)
+    address_country = CountryField(default='AU', null=True, blank=True)
+    address_postcode = models.CharField(max_length=10, null=True, blank=True)
+
+    @property
+    def full_name(self):
+        return "{} {}".format(self.first_name, self.last_name)
+
+    @property
+    def address(self):
+        return "{} {} {} {} {}".format(self.address_street, self.address_locality, self.address_state, self.address_postcode, self.address_country)
+    
+    @property
+    def get_related_items_identifier(self):
+        return self.id
+    
+    @property
+    def get_related_items_descriptor(self):
+        return "{} {}".format(self.first_name, self.last_name)
+    
+    class Meta:
+        app_label = 'wildlifecompliance'
+        verbose_name = 'CM_Offender_Person'
+        verbose_name_plural = 'CM_Offender_Persons'
+
+
 class Offender(SanitiseMixin):
     reason_for_removal = models.TextField(blank=True)
     removed = models.BooleanField(default=False)
@@ -266,11 +304,13 @@ class Offender(SanitiseMixin):
         null=True,
         related_name='offender_removed_by', on_delete=models.CASCADE
     )
+
     person = models.ForeignKey(
-        EmailUser,
+        OffenderPerson,
         null=True,
         related_name='offender_person', on_delete=models.CASCADE
     )
+
     organisation_id = models.IntegerField(
         unique=True, verbose_name="Ledger Organisation ID", null=True
     )
@@ -282,17 +322,27 @@ class Offender(SanitiseMixin):
     active_offenders = ActiveOffenderManager()
     objects = models.Manager()
 
+    @property
+    def get_related_items_identifier(self):
+        if self.person:
+            return self.person.id
+    
+    @property
+    def get_related_items_descriptor(self):
+        if self.person:
+            return "{} {}".format(self.person.first_name, self.person.last_name)
+
     class Meta:
         app_label = 'wildlifecompliance'
         verbose_name = 'CM_Offender'
         verbose_name_plural = 'CM_Offenders'
 
     def __str__(self):
+        subject = ''
         if self.person:
-            return 'First name: {}, Last name: {}'.format(get_first_name(self.person), get_last_name(self.person))
-        else:
-            return '---'
-
+            subject = 'First name: {}, Last name: {}'.format(self.person.first_name, self.person.last_name)
+        return subject
+        
 
 class OffenceUserAction(SanitiseMixin):
     ACTION_CLOSE = "Close offence: {}"

@@ -923,11 +923,8 @@ class BriefOfEvidenceRecordOfInterview(models.Model):
     @property
     def hyperlink(self):
         hyperlink = ''
-        if not self.offender and not self.record_of_interview and not self.associated_doc_artifact:
+        if not self.record_of_interview and not self.associated_doc_artifact:
             hyperlink = '/internal/offence/' + str(self.offence.id)
-        elif not self.record_of_interview and not self.associated_doc_artifact:
-            if self.offender.person:
-                hyperlink = '/internal/users/' + str(self.offender.person.id)
         elif not self.associated_doc_artifact:
             hyperlink = '/internal/object/' + str(self.record_of_interview.id)
         else:
@@ -1105,9 +1102,6 @@ class ProsecutionBriefRecordOfInterview(models.Model):
         hyperlink = ''
         if not self.offender and not self.record_of_interview and not self.associated_doc_artifact:
             hyperlink = '/internal/offence/' + str(self.offence.id)
-        elif not self.record_of_interview and not self.associated_doc_artifact:
-            if self.offender.person:
-                hyperlink = '/internal/users/' + str(self.offender.person.id)
         elif not self.associated_doc_artifact:
             hyperlink = '/internal/object/' + str(self.record_of_interview.id)
         else:

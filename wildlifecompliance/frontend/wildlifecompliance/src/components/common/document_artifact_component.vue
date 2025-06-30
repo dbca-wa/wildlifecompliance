@@ -692,29 +692,6 @@ export default {
         ...mapActions('legalCaseStore', {
             loadLegalCase: 'loadLegalCase',
         }),
-        /*
-        setOffenderList: function() {
-            this.setOffenderId(null);
-            this.$nextTick(() => {
-                let oList = [{ 
-                    "id": null,
-                    "full_name": null,
-                    "email": null,
-                }];
-                //let offenderList = [];
-                if (this.legalCaseExists && this.document_artifact.offence_id) {
-                    for (let offence of this.legal_case.offence_list) {
-                        if (this.document_artifact.offence_id === offence.id) {
-                            for (let offender of offence.offenders) {
-                                oList.push(offender.person)
-                            }
-                        }
-                    }
-                }
-                Object.assign(this.offenderList, oList);
-            });
-        },
-        */
         setStatementVisibility: function() {
             if (
                 // legal case exists and Document Type is not a statementArtifactType

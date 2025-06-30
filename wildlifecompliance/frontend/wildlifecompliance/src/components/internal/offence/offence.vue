@@ -193,31 +193,21 @@
                                         <label class="col-sm-2">Offender</label>
                                         <div v-show="!readonlyForm">
                                             <div>
-                                                <SearchPersonOrganisation
-                                                :excludeStaff="true"
-                                                :personOnly="true"
-                                                classNames="form-control"
-                                                @entity-selected="personSelected"
-                                                showCreateUpdate
+                                                <SearchOffender
                                                 ref="search_offender"
-                                                domIdHelper="offender"
-                                                v-bind:key="updateSearchPersonOrganisationBindId"/>
-                                                <!--PersonSearch ref="person_search" elementId="idSetInParent" classNames="col-sm-5 form-control" @person-selected="personSelected" :search_type="offender_search_type" /-->
+                                                @entity-selected="personSelected"
+                                                @clear-person="clearPerson"
+                                                domIdHelper="search-offender"
+                                                v-bind:key="updateSearchOffenderBindId"
+                                                />
                                             </div>
                                             <div>
                                                 <input type="button" class="btn btn-primary" value="Add to Offender List" @click.prevent="addOffenderClicked()" />
                                             </div>
-                                            <!--div class="col-sm-2">
-                                                <input type="button" class="btn btn-primary" value="Create New Person" @click.prevent="createNewPersonClicked()" />
-                                            </div-->
                                         </div>
                                     </div></div>
 
                                     <div class="form-group"><div class="row">
-                                        <!--div class="col-sm-12">
-                                          <CreateNewPerson :displayComponent="displayCreateNewPerson" @new-person-created="newPersonCreated"/>
-                                        </div-->
-
                                         <div class="col-sm-12">
                                             <datatable ref="offender_table" id="offender-table" :dtOptions="dtOptionsOffender" :dtHeaders="dtHeadersOffender" />
                                         </div>
@@ -300,6 +290,15 @@
         <div v-if="sanctionOutcomeInitialised">
             <SanctionOutcome ref="sanction_outcome" :parent_update_function="constructOffenceDedicatedPage" @sanction_outcome_created="constructOffenceDedicatedPage" />
         </div>
+
+        <div v-if="offenderModalOpened">
+            <OffenderModal 
+            key="offender_modal_key"
+            ref="offender_modal" 
+            :offender_id="selectedOffender" 
+            :readonly="readonlyForm"
+            />
+        </div>
     </div>
 </template>
 
@@ -315,7 +314,7 @@ import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import CommsLogs from "@common-components/comms_logs.vue";
 import FileField from '@/components/common/compliance_file.vue';
 import OffenceWorkflow from './offence_workflow';
-import SearchPersonOrganisation from "@common-components/search_person_or_organisation.vue";
+import SearchOffender from './search_offenders.vue'
 //import CreateNewPerson from "@common-components/create_new_person.vue";
 import MapLocation from "../../common/map_location";
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal';
@@ -325,6 +324,7 @@ import RelatedItems from "@common-components/related_items.vue";
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
 import hash from 'object-hash';
+import OffenderModal from "./offender_person_modal.vue";
 
 export default {
     name: 'ViewOffence',
@@ -349,6 +349,11 @@ export default {
             workflow_type :'',
             workflowBindId :'',
             offender_search_type: "individual",
+            offenderBindId: '',
+            offenderPersonBindId: '',
+            selectedOffender: null,
+            offenderModalOpened: false,
+            offender_modal_key: 0,
             offenceTab: 'offenceTab' + vm._uid,
             detailsTab: 'detailsTab' + vm._uid,
             documentTab: 'documentTab' + vm._uid,
@@ -364,6 +369,7 @@ export default {
             time_from: null,
             date_to: null,
             time_to: null,
+            offenderIdList: [],
             hashAttributeWhiteDict: {
                 'alleged_offences': [
                     'id',
@@ -448,12 +454,13 @@ export default {
                         data: 'offender',
                         render: function(data, type, row) {
                             let data_type = '';
-                            if (row.offender.person){
-                                data_type = 'individual';
-                            }
+                            //if (row.offender.person){
+                            data_type = 'individual';
+                            /*}
+                            TODO check if organisation offender needed
                             else {
                                 data_type = 'organisation';
-                            }
+                            }*/
                             if(row.offender.removed){
                                 data_type = '<strike>' + data_type + '</strike>';
                             }
@@ -463,18 +470,20 @@ export default {
                     {
                         data: 'offender',
                         render: function(data, type, row) {
+                            let myLabel = ''
                             if (row.offender.person) {
                                 let full_name = [row.offender.person.first_name, row.offender.person.last_name].filter(Boolean).join(" ");
                                 let email = row.offender.person.email ? "E:" + row.offender.person.email : "";
                                 let p_number = row.offender.person.phone_number ? "P:" + row.offender.person.phone_number : "";
                                 let m_number = row.offender.person.mobile_number ? "M:" + row.offender.person.mobile_number : "";
                                 let dob = row.offender.person.dob ? "DOB:" + row.offender.person.dob : "DOB: ---";
-                                let myLabel = ["<strong>" + full_name + "</strong>", email, p_number, m_number, dob].filter(Boolean).join("<br />");
+                                myLabel = ["<strong>" + full_name + "</strong>", email, p_number, m_number, dob].filter(Boolean).join("<br />");
                                 if (row.offender.removed){
                                     myLabel = '<strike>' + myLabel + '</strike>';
                                 }
-                                return myLabel;
-                            } else if (row.offender.organisation) {
+                            }
+                            //TODO determine if organisation offender needed
+                            /*} else if (row.offender.organisation) {
                                 let name = row.offender.organisation.name ? row.offender.organisation.name : "";
                                 let abn = row.offender.organisation.abn ? "ABN:" + row.offender.organisation.abn : "";
                                 let myLabel = ["<strong>" + name + "</strong>", abn].filter(Boolean).join("<br />");
@@ -482,7 +491,8 @@ export default {
                                     myLabel = '<strike>' + myLabel + '</strike>';
                                 }
                                 return myLabel;
-                            }
+                            }*/
+                            return myLabel;
                         }
                     },
                     {
@@ -494,9 +504,16 @@ export default {
                                 if (row.offender.removed){
                                     ret_str = ret_str + '<a href="#" class="restore_button" data-offender-uuid="' + row.offender.uuid + '">Restore</a>';
                                 } else {
+                                    if (row.offender.id != null && row.offender.id != 'new') {
+                                        ret_str = ret_str + '<a href="#" class="edit_button" data-offender-id="' + row.offender.person.id + '">Edit</a></br>';
+                                    }
                                     if (!row.offender.number_linked_sanction_outcomes_active){
                                         ret_str = ret_str + '<a href="#" class="remove_button" data-offender-uuid="' + row.offender.uuid + '">Remove</a>';
                                     }
+                                }         
+                            } else {
+                                if (row.offender.id != null && row.offender.id != 'new') {
+                                    ret_str = ret_str + '<a href="#" class="view_button" data-offender-id="' + row.offender.person.id + '">View</a>';
                                 }
                             }
                             return ret_str;
@@ -608,13 +625,13 @@ export default {
         OffenceWorkflow,
         CommsLogs,
         datatable,
-        SearchPersonOrganisation,
+        SearchOffender,
         MapLocation,
-        //CreateNewPerson,
         RelatedItems,
         SanctionOutcome,
         FileField,
         Assignment,
+        OffenderModal
     },
     computed: {
         ...mapGetters('offenceStore', {
@@ -632,7 +649,7 @@ export default {
             }
             return visibility;
         },
-        updateSearchPersonOrganisationBindId: function() {
+        updateSearchOffenderBindId: function() {
             this.uuid += 1
             return 'offender' + this.uuid
         },
@@ -728,17 +745,14 @@ export default {
             this.temporary_document_collection_id = val;
         },
         constructOffenceDedicatedPage: async function(){
-            console.log('constructOffenceDedicatedPage');
             await this.loadOffenceVuex({offence_id: this.$route.params.offence_id});
             if (this.offence.occurrence_datetime_from){
                 this.date_from = moment(this.offence.occurrence_datetime_from).format("DD/MM/YYYY");
                 this.time_from = moment(this.offence.occurrence_datetime_from).format("LT");
-                console.log('date_from and time_from has been set');
             }
             if (this.offence.occurrence_datetime_to){
                 this.date_to = moment(this.offence.occurrence_datetime_to).format("DD/MM/YYYY");
                 this.time_to = moment(this.offence.occurrence_datetime_to).format("LT");
-                console.log('date_to and time_to has been set');
             }
             this.constructAllegedOffencesTable();
             this.constructOffendersTable();
@@ -748,9 +762,6 @@ export default {
             this.objectHash = this.calculateHash();
         },
         calculateHash: function() {
-            console.log('calculateHash()');
-            console.log(this.offence);
-
             let copiedObject = {}
             Object.getOwnPropertyNames(this.offence).forEach(
                 (val, idx, array) => {
@@ -777,7 +788,6 @@ export default {
                     }
                 });
             let hashedValue = hash(copiedObject);
-            console.log(hashedValue);
             return hashedValue;
         },
         formChanged: function(){
@@ -791,8 +801,6 @@ export default {
         },
         save: async function(){
             try {
-                console.log('aho');
-                console.log($(this.$refs.occurrenceDateFromPicker).data('DateTimePicker').date());
                 await this.saveOffence({'fr_date': this.date_from, 'fr_time': this.time_from, 'to_date': this.date_to, 'to_time': this.time_to});
                 await swal("Saved", "The record has been saved", "success");
 
@@ -800,7 +808,6 @@ export default {
                 this.constructAllegedOffencesTable();
                 this.updateObjectHash();
             } catch (err) {
-                console.log('aho')
                 this.processError(err);
             }
         },
@@ -1017,24 +1024,13 @@ export default {
                 this.$refs.mapLocationComponent.invalidateSize();
             }
         },
-        //newPersonCreated: function(obj) {
-        //  if(obj.person){
-        //    this.setCurrentOffender('individual', obj.person.id);
-
-        //    // Set fullname and DOB into the input box
-        //    let full_name = [obj.person.first_name, obj.person.last_name].filter(Boolean).join(" ");
-        //    let dob = obj.person.dob ? "DOB:" + obj.person.dob : "DOB: ---";
-        //    let value = [full_name, dob].filter(Boolean).join(", ");
-        //    this.$refs.search_offender.setInput(value);
-        //  } else if (obj.err) {
-        //    console.log(err);
-        //  } else {
-        //    // Should not reach here
-        //  }
-        //},
         personSelected: function(para) {
             let vm = this;
-            vm.setCurrentOffender(para.data_type, para.id);
+            vm.setCurrentOffender(para.data_type, para.id, para.source);
+        },
+        clearPerson: function(para) {
+            let vm = this;
+            vm.setCurrentOffender('', 0, '');
         },
         createNewPersonClicked: function() {
           let vm = this;
@@ -1143,53 +1139,80 @@ export default {
             this.constructAllegedOffencesTable();
         },
         addOffenderClicked: async function() {
-            if (this.current_offender && this.current_offender.id && this.current_offender.data_type) {
-                // save person before adding to offender list
-                await this.$refs.search_offender.parentSave()
+            let vm = this;
+            let current_offender;
+            if (
+                (vm.current_offender == null || vm.current_offender.source == 'email_users') 
+                && this.$refs.search_offender.displayCreateOffender
+                && this.$refs.search_offender.$refs.search_users.displayUpdateCreatePerson
+            ) {
+                current_offender = this.$refs.search_offender.$refs.search_users.$refs.update_create_person.email_user;
+            } else {
+                current_offender = vm.current_offender;
+            }
 
-                // Check if the item is already in the list
-                let already_exists = false;
-                for (let i=0; i<this.offence.offenders.length; i++){
-                    let offender = this.offence.offenders[i];
-                    if (this.current_offender.data_type == 'individual'){
-                        if (offender.person){
-                            if (!offender.removed && offender.person.id == this.current_offender.id){
-                                already_exists = true;
-                            }
-                        }
-                    } else if (this.current_offender.data_type == 'organisation'){
-                        if (offender.organisation){
-                            if (!offender.removed && offender.organisation.id == this.current_offender.id){
-                                already_exists = true;
-                            }
-                        }
+            if (
+                current_offender &&
+                current_offender.first_name &&
+                current_offender.last_name &&
+                current_offender.dob
+            ) {
+                let address = current_offender.residential_address;
+
+                let person_id = 'new';
+                let id_in_table = false
+                //if from an existing offender person, set id to the id of that offender
+                if (vm.current_offender != null && vm.current_offender.source == 'offenders') {
+                    person_id = current_offender.id;
+                    if (vm.offenderIdList.includes(person_id)) {
+                        id_in_table = true;
                     }
                 }
 
-                if (!already_exists) {
+                if (!id_in_table) {
+                    //TODO consider removing redundancy
+                    let person_obj = {
+                        email: current_offender.email,
+                        first_name: current_offender.first_name,
+                        last_name: current_offender.last_name,
+                        dob: current_offender.dob,
+                        phone_number: current_offender.phone_number,
+                        mobile_number: current_offender.mobile_number,
+                        address_street: address.line1,
+                        address_locality: address.locality,
+                        address_state: address.state,
+                        address_country: address.country,
+                        address_postcode: address.postcode,
+                    }
+
                     let offender_obj = {
                         id: '',
+                        person_id: person_id,
+                        person: person_obj,
                         can_user_action: true,
                         removed: false,
                         reason_for_removal: '',
-                        person: null,
-                        organisation: null,
                         number_linked_sanction_outcomes_total: 0,
                         number_linked_sanction_outcomes_active: 0,
-                        uuid: uuidv4()
+                        uuid: uuidv4(),
+                        email: current_offender.email,
+                        first_name: current_offender.first_name,
+                        last_name: current_offender.last_name,
+                        dob: current_offender.dob,
+                        phone_number: current_offender.phone_number,
+                        mobile_number: current_offender.mobile_number,
+                        address_street: address.line1,
+                        address_locality: address.locality,
+                        address_state: address.state,
+                        address_country: address.country,
+                        address_postcode: address.postcode,
                     };
-                    if (this.current_offender.data_type == 'individual'){
-                        // Add person as offender object
-                        offender_obj['person'] = this.current_offender;
-                    } else if (this.current_offender.data_type == 'organisation'){
-                        // Add organisation as offender object
-                        offender_obj['organisation'] = this.current_offender;
-                    }
                     this.offence.offenders.push(offender_obj);
                 }
             }
             this.constructOffendersTable();
             this.setCurrentOffenderEmpty();
+            this.uuid++;
         },
         addAllegedOffenceClicked: function() {
             if (this.current_alleged_offence && this.current_alleged_offence.id) {
@@ -1234,10 +1257,13 @@ export default {
             this.$refs.alleged_offence_table.vmDataTable.row.add({ allegedOffence: allegedOffence, offence: this.offence }).draw();
         },
         constructOffendersTable: function(){
+            console.log("constructOffendersTable")
             this.$refs.offender_table.vmDataTable.clear().draw();
+            this.offenderIdList = [];
             if (this.offence.offenders){
                 for(let i=0; i<this.offence.offenders.length; i++){
                     this.addOffenderToTable(this.offence.offenders[i]);
+                    this.offenderIdList.push(this.offence.offenders[i].person.id);
                 }
             }
         },
@@ -1374,22 +1400,28 @@ export default {
             );
           });
         },
-        setCurrentOffender: function(data_type, id) {
+        setCurrentOffender: function(data_type, id, source) {
           let vm = this;
           if (!id) {
-              this.current_offender = null;
-          } else if (data_type == "individual") {
-            let initialisers = [utils.fetchUser(id)];
+              vm.current_offender = null;
+          } else if (source == "offenders") {
+            let initialisers = [utils.fetchOffender(id)];
             Promise.all(initialisers).then(data => {
               vm.current_offender = data[0];
+              vm.current_offender.residential_address = {
+                    line1: data[0].address_street,
+                    locality: data[0].address_locality,
+                    state: data[0].address_state,
+                    country: data[0].address_country,
+                    postcode: data[0].address_postcode,
+              }
               vm.current_offender.data_type = "individual";
+              vm.current_offender.source = source;
             });
-          } else if (data_type == "organisation") {
-            let initialisers = [vm.searchOrganisation(id)];
-            Promise.all(initialisers).then(data => {
-              vm.current_offender = data[0];
-              vm.current_offender.data_type = "organisation";
-            });
+          } else if (source == "email_users") {
+              vm.current_offender = {};
+              vm.current_offender.data_type = "individual";
+              vm.current_offender.source = source;
           }
         },
         setCurrentOffenceSelected: function(offence) {
@@ -1413,8 +1445,15 @@ export default {
             this.current_alleged_offence = {};
             $("#alleged-offence").val("");
         },
+        openOffenderPersonModal: function(e) {
+            this.selectedOffender = e.target.getAttribute("data-offender-id");
+            this.offenderModalOpened = true;
+            this.$nextTick(() => {
+                this.offender_modal_key++;
+                this.$refs.offender_modal.isModalOpen = true;
+            });
+        },
         addEventListeners: function() {
-            console.log('addEventListeners');
             let vm = this;
             let el_fr_date = $(vm.$refs.occurrenceDateFromPicker);
             let el_fr_time = $(vm.$refs.occurrenceTimeFromPicker);
@@ -1451,9 +1490,6 @@ export default {
             });
 
             // "To" Date field
-            console.log('to date');
-            console.log(vm.offence.occurrence_datetime_from);
-
             el_to_date.datetimepicker({
                 format: "DD/MM/YYYY",
                 maxDate: moment().millisecond(0).second(0).minute(0).hour(0),
@@ -1489,6 +1525,8 @@ export default {
 
             $("#offender-table").on("click", ".remove_button", vm.removeOffenderClicked);
             $("#offender-table").on("click", ".restore_button", vm.restoreOffenderClicked);
+            $("#offender-table").on("click", ".edit_button", vm.openOffenderPersonModal);
+            $("#offender-table").on("click", ".view_button", vm.openOffenderPersonModal);
             $("#offender-table").on("blur", ".reason_element", vm.reasonOffenderLostFocus);
 
             window.addEventListener('beforeunload', this.leaving);
@@ -1507,7 +1545,6 @@ export default {
         });
     },
     mounted: async function() {
-        console.log('mounted');
         let vm = this;
 
         vm.$nextTick(() => {
