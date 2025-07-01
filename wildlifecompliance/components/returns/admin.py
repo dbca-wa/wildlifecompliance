@@ -40,11 +40,16 @@ class ReturnAdmin(admin.ModelAdmin):
         self.message_user(request, 'Selected returns have been verified.')
 
 
+class ReturnRowsInline(admin.TabularInline):
+    model = models.ReturnRow
+    extra = 0
+
 @admin.register(models.ReturnTable)
 class ReturnTable(admin.ModelAdmin):
     raw_id_fields = ('ret',)
     list_display = ('id', 'ret', 'name')
     search_fields = ('id', 'ret__lodgement_number', 'name')
+    inlines = [ReturnRowsInline,]
 
 
 @admin.register(models.ReturnRow)
