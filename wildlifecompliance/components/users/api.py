@@ -9,72 +9,54 @@ from django.core.exceptions import ValidationError
 from rest_framework import viewsets, serializers, views, status, mixins
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address, EmailIdentity, PrivateDocument
+from ledger_api_client.ledger_models import (
+    EmailUserRO as EmailUser, Address, EmailIdentity, PrivateDocument
+)
 from ledger_api_client.utils import get_or_create
-from django.contrib.auth.models import Permission, ContentType
 from datetime import datetime
 from django_countries import countries
 from wildlifecompliance.components.applications.models import Application
 from wildlifecompliance.components.applications.email import send_id_updated_notification
-from wildlifecompliance.components.call_email.serializers import SaveEmailUserSerializer, SaveUserAddressSerializer
-from wildlifecompliance.components.organisations.models import (
-    OrganisationRequest, Organisation
+from wildlifecompliance.components.call_email.serializers import (
+    SaveEmailUserSerializer, SaveUserAddressSerializer
 )
-from wildlifecompliance.components.main.models import Region, District
-from wildlifecompliance.components.users.models import (
-        #CompliancePermissionGroup, 
-        ComplianceManagementUserPreferences,
-        )
+from wildlifecompliance.components.organisations.models import OrganisationRequest
+from wildlifecompliance.components.users.models import ComplianceManagementUserPreferences
 from wildlifecompliance.helpers import (
-        is_customer, is_internal, is_compliance_management_callemail_readonly_user,
+        is_internal, is_compliance_management_callemail_readonly_user,
         is_compliance_management_volunteer, is_compliance_management_readonly_user, 
-        is_compliance_management_callemail_readonly_user, prefer_compliance_management,
+        is_compliance_management_callemail_readonly_user,
         is_wildlife_compliance_officer, is_compliance_internal_user,
         )
 from wildlifecompliance.components.users.serializers import (
     UserSerializer,
     DTUserSerializer,
-    #UserProfileSerializer,
     UserAddressSerializer,
     PersonalSerializer,
     ContactSerializer,
     EmailIdentitySerializer,
-    #EmailUserActionSerializer,
     MyUserDetailsSerializer,
-    #CompliancePermissionGroupSerializer,
     ComplianceUserDetailsSerializer,
-    #CompliancePermissionGroupDetailedSerializer,
-    ComplianceUserDetailsOptimisedSerializer,
-    #CompliancePermissionGroupMembersSerializer,
     UpdateComplianceManagementUserPreferencesSerializer,
     ComplianceManagementSaveUserSerializer,
     ComplianceManagementUserSerializer,
     ComplianceManagementSaveUserAddressSerializer,
     FirstTimeUserSerializer,
 )
-from wildlifecompliance.components.organisations.serializers import (
-    OrganisationRequestDTSerializer,
-)
-
+from wildlifecompliance.components.organisations.serializers import OrganisationRequestDTSerializer
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 from rest_framework_datatables.filters import DatatablesFilterBackend
-from rest_framework_datatables.renderers import DatatablesRenderer
-from django.urls import reverse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect
 from rest_framework.decorators import (
     action,
     renderer_classes,
-    parser_classes,
-    api_view
 )
 from wildlifecompliance.components.main.utils import (
     get_first_name,
     get_last_name,
     get_dob,
 )
-from django.core.cache import cache
 from wildlifecompliance.components.main.process_document import process_generic_document
-#from wildlifecompliance.components.main.utils import retrieve_department_users
 
 
 def generate_dummy_email(first_name, last_name):
@@ -103,18 +85,6 @@ class GetCountries(views.APIView):
         return Response(country_list)
 
 
-#class DepartmentUserList(views.APIView):
-#    renderer_classes = [JSONRenderer,]
-#    def get(self, request, format=None):
-#        data = cache.get('department_users')
-#        if not data:
-#            retrieve_department_users()
-#            data = cache.get('department_users')
-#        return Response(data)
-#
-#        #serializer  = UserSerializer(request.user)
-
-
 class GetMyUserDetails(views.APIView):
     renderer_classes = [JSONRenderer, ]
 
@@ -129,9 +99,6 @@ class GetComplianceUserDetails(views.APIView):
     def get(self, request, format=None):
         serializer = ComplianceUserDetailsSerializer(request.user, context={'request': request})
         returned_data = serializer.data
-        if returned_data.get('id'):
-            user_id = returned_data.get('id')
-            user = EmailUser.objects.get(id=user_id)
         returned_data.update({'is_internal': is_internal(request)})
         returned_data.update({'is_volunteer': is_compliance_management_volunteer(request)})
         returned_data.update({'is_readonly_user': is_compliance_management_readonly_user(request)})
@@ -148,6 +115,7 @@ class GetUser(views.APIView):
 
 
 class IsNewUser(views.APIView):
+    
     def get(self, request, format=None):
         is_new = 'False'
         try:
@@ -158,6 +126,7 @@ class IsNewUser(views.APIView):
 
 
 class UserProfileCompleted(views.APIView):
+
     def get(self, request, format=None):
         request.session['is_new'] = False
         request.session['new_to_wildlifecompliance'] = False
@@ -187,17 +156,9 @@ class UserFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-#class UserRenderer(DatatablesRenderer):
-#    def render(self, data, accepted_media_type=None, renderer_context=None):
-#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-#        return super(UserRenderer, self).render(data, accepted_media_type, renderer_context)
-
-
 class UserPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (UserFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    #renderer_classes = (UserRenderer,)
     queryset = EmailUser.objects.none()
     serializer_class = DTUserSerializer
     page_size = 10
@@ -269,7 +230,6 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
