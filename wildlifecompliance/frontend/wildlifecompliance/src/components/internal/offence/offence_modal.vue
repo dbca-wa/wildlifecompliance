@@ -161,42 +161,40 @@
                     </div>
 
                     <div :id="pTab" class="tab-pane fade in">
-                        <div class="row"><div class="col-sm-12">
-
-                            <!--div class="col-sm-12 form-group"><div class="row">
-                                <input class="col-sm-1" id="offender_individual" type="radio" v-model="offender_search_type" value="individual">
-                                <label class="col-sm-1 radio-button-label" for="offender_individual">Individual</label>
-                                <input class="col-sm-1" id="offender_organisation" type="radio" v-model="offender_search_type" value="organisation">
-                                <label class="col-sm-1 radio-button-label" for="offender_organisation">Organisation</label>
-                            </div></div-->
-
-                            <div class="form-group"><div class="row">
+                        <div class="row">
+                          <div class="col-sm-12">
+                            <div class="form-group">
+                              <div class="row">
                                 <div class="col-sm-12">
                                     <strong><label>Offender</label></strong>
+                                  <div style="padding: 10px 5px; border: 1px solid lightgray;">
+                                      <SearchOffender
+                                        ref="search_offender"
+                                        @entity-selected="personSelected"
+                                        @clear-person="clearPerson"
+                                        domIdHelper="search-offender"
+                                        v-bind:key="updateSearchOffenderBindId"
+                                        />
+                                  </div>
                                 </div>
-                                <div>
-                                    <SearchOffender
-                                      ref="search_offender"
-                                      @entity-selected="personSelected"
-                                      @clear-person="clearPerson"
-                                      domIdHelper="search-offender"
-                                      v-bind:key="updateSearchOffenderBindId"
-                                      />
-                                </div>
-                            </div></div>
+                            </div>
+                          </div>
 
-                            <div class="form-group"><div class="row">
+                          <div class="form-group">
+                            <div class="row">
                                 <div class="col-sm-12">
                                     <input type="button" class="btn btn-primary" value="Add to Offender List" @click.prevent="addOffenderClicked()" />
                                 </div>
-                            </div></div>
+                            </div>
+                          </div>
                             <div class="form-group"><div class="row">
-
                                 <div class="col-sm-12">
                                     <datatable ref="offender_table" id="offender-table" :dtOptions="dtOptionsOffender" :dtHeaders="dtHeadersOffender" />
                                 </div>
-                            </div></div>
-                        </div></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     <div :id="lTab" class="tab-pane fade in">

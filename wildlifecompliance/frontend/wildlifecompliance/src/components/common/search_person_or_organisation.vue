@@ -3,7 +3,7 @@
         <div class="col-sm-12 form-group">
             <div class="row">
             </br>
-            <div v-if="info" class="alert alert-info">{{ info }}</div>
+            <div v-if="info" class="alert alert-warning">{{ info }}</div>
             </div>
             <div class="row">
                 <label v-if="componentTitle" class="col-sm-4">{{ componentTitle }}</label>
