@@ -5,7 +5,6 @@ import logging
 from datetime import datetime, timedelta
 from django.db.models import Q
 from django.db import transaction
-from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
 from rest_framework import viewsets, serializers, status, views, mixins
 from rest_framework.decorators import (
@@ -13,7 +12,7 @@ from rest_framework.decorators import (
 )
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from ledger_api_client.utils import calculate_excl_gst
 from django.urls import reverse
 from django.shortcuts import redirect, render
@@ -44,7 +43,6 @@ from wildlifecompliance.components.applications.models import (
     ApplicationFormDataRecord,
     ApplicationInvoice,
     ApplicationSelectedActivityPurpose,
-    private_storage,
 )
 from wildlifecompliance.components.applications.services import (
     ApplicationService,
@@ -59,7 +57,6 @@ from wildlifecompliance.components.applications.serializers import (
     ApplicationSerializer,
     InternalApplicationSerializer,
     SaveApplicationSerializer,
-    BaseApplicationSerializer,
     CreateExternalApplicationSerializer,
     DTInternalApplicationSerializer,
     DTExternalApplicationSerializer,
@@ -83,23 +80,19 @@ from wildlifecompliance.components.applications.serializers import (
     IssueLicenceSerializer,
     DTApplicationSelectSerializer,
 )
-
-from wildlifecompliance.components.main.process_document import (
-        process_generic_document,
-        )
+from wildlifecompliance.components.main.process_document import process_generic_document
 
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 from rest_framework_datatables.filters import DatatablesFilterBackend
-from rest_framework_datatables.renderers import DatatablesRenderer
 
 from wildlifecompliance.management.permissions_manager import PermissionUser
 
 logger = logging.getLogger(__name__)
-# logger = logging
 from wildlifecompliance.components.licences.utils import LicencePurposeUtil
 from django.db.models.functions import Concat
 from django.db.models import Value
 
+#TODO remove(?)
 def application_refund_callback(invoice_ref, bpoint_tid):
     '''
     Callback routine for Ledger when refund transaction.
@@ -144,7 +137,7 @@ def application_refund_callback(invoice_ref, bpoint_tid):
             'app_refund_callback(): Inv {0} - {1}'.format(invoice_ref, e)
         )
 
-
+#TODO remove(?)
 def application_invoice_callback(invoice_ref):
     '''
     Callback routine for Ledger when record transaction.
@@ -196,13 +189,6 @@ def application_invoice_callback(invoice_ref):
         logger.error(
             'app_invoice_callback(): Inv {0} - {1}'.format(invoice_ref, e)
         )
-
-
-class GetEmptyList(views.APIView):
-    renderer_classes = [JSONRenderer, ]
-
-    def get(self, request, format=None):
-        return Response([])
 
 
 class ApplicationFilterBackend(DatatablesFilterBackend):
@@ -272,8 +258,7 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
                 ).distinct() | super_queryset
 
             # apply user selected filters
-            activity_purpose = \
-                activity_purpose.lower() if activity_purpose else 'all'
+            activity_purpose = activity_purpose.lower() if activity_purpose else 'all'
             if activity_purpose != 'all':
                 activity_purpose_app_ids = \
                 ApplicationSelectedActivityPurpose.objects.filter(
@@ -283,7 +268,6 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
 
             category_name = category_name.lower() if category_name else 'all'
             if category_name != 'all':
-                # category_name_app_ids = []
                 category_name_app_ids = Application.objects.values(
                     'id'
                 ).filter(
@@ -294,8 +278,7 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
             processing_status = processing_status.lower() if processing_status else 'all'
             if processing_status != 'all':
 
-                if processing_status \
-                == Application.CUSTOMER_STATUS_UNDER_REVIEW:
+                if processing_status == Application.CUSTOMER_STATUS_UNDER_REVIEW:
                     exclude = [
                         ApplicationSelectedActivity.PROCESSING_STATUS_DRAFT,
                         ApplicationSelectedActivity.PROCESSING_STATUS_AWAITING_LICENCE_FEE_PAYMENT,
@@ -310,8 +293,7 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
                         selected_activities__processing_status__in=exclude,
                     )
 
-                elif processing_status \
-                == Application.CUSTOMER_STATUS_AWAITING_PAYMENT:
+                elif processing_status == Application.CUSTOMER_STATUS_AWAITING_PAYMENT:
                     include = [
                         ApplicationSelectedActivity.PROCESSING_STATUS_AWAITING_LICENCE_FEE_PAYMENT,
                     ]
@@ -321,8 +303,7 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
                         selected_activities__processing_status__in=include,
                     )
 
-                elif processing_status \
-                == Application.CUSTOMER_STATUS_PARTIALLY_APPROVED:
+                elif processing_status == Application.CUSTOMER_STATUS_PARTIALLY_APPROVED:
                     include = [
                         Application.CUSTOMER_STATUS_PARTIALLY_APPROVED,
                     ]
@@ -360,6 +341,8 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
         if queryset.model is Assessment:
             # search_text filter, join all custom search columns
             # where ('searchable: false' in the datatable definition)
+
+            #TODO FIX remove for loop
             if search_text:
                 search_text = search_text.lower()
                 # join queries for the search_text search
@@ -416,17 +399,9 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-#class ApplicationRenderer(DatatablesRenderer):
-#    def render(self, data, accepted_media_type=None, renderer_context=None):
-#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-#        return super(ApplicationRenderer, self).render(data, accepted_media_type, renderer_context)
-
-
 class ApplicationPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (ApplicationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    #renderer_classes = (ApplicationRenderer,)
     queryset = Application.objects.none()
     serializer_class = DTExternalApplicationSerializer
     page_size = 10
@@ -585,15 +560,14 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 instance.save(
                     version_comment='File Added: {}'.format(filename))
 
-            return Response(
-                [
-                    dict(
-                        input_name=d.input_name,
-                        name=d.name,
-                        file=d._file.url,
-                        id=d.id,
-                        can_delete=d.can_delete) for d in instance.documents.filter(
-                        input_name=section) if d._file])
+            return Response([dict(
+                input_name=d.input_name,
+                name=d.name,
+                file=d._file.url,
+                id=d.id,
+                can_delete=d.can_delete) for d in instance.documents.filter(
+                input_name=section) if d._file
+                ])
 
         except serializers.ValidationError:
             print(traceback.print_exc())
@@ -603,7 +577,6 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
                 raise serializers.ValidationError(e)
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
@@ -1010,11 +983,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             set_session_activity(request.session, activities[0])
 
             # Adjustments occuring only to the application fee.
-            # if instance.has_adjusted_fees or instance.has_additional_fees \
-            if instance.has_additional_fees \
-                or instance.has_payable_fees_at_finalisation:
-
-                # activities = instance.amended_activities
+            if instance.has_additional_fees or instance.has_payable_fees_at_finalisation:
                 # only fees awaiting payment
                 activities_pay = [
                     a for a in activities if a.processing_status == PAY_STATUS
@@ -1022,7 +991,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 # only fees with adjustments or additional fee.
                 activities_adj = [
                    a for a in activities_pay
-                #    if a.has_adjusted_application_fee
+
                 if a.has_payable_fees_at_issue
                    or a.has_adjusted_licence_fee
                    or a.has_additional_fee
@@ -1030,7 +999,6 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 # only fees which are greater than zero.
 
                 for activity in activities_adj:
-
                     # Check if refund is required and can be included.
                     clear_inv = LicenceFeeClearingInvoice(instance)
 
@@ -1531,7 +1499,6 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -2124,9 +2091,6 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                     ).first()
                     data['previous_application'] = previous_application
 
-
-                    # cleaned_purpose_ids = set(active_current_purposes) & set(licence_purposes)
-
                     # Set to the latest licence purpose version in queryset.
                     amendable_purposes_qs = licence_purposes_queryset
                     cleaned_purposes = [
@@ -2155,7 +2119,6 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                     Application.APPLICATION_TYPE_RENEWAL,
                 ]:
                     target_application = serializer.instance
-                    copied_purpose_ids = []
                     activity = licence_activities.filter(
                         id=int(selected_activity)).first() 
 
@@ -2201,8 +2164,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                     serializer.instance)
 
                 # Use fee policy to set initial base fee for the application.
-                policy = \
-                ApplicationFeePolicy.get_fee_policy_for(serializer.instance)
+                policy = ApplicationFeePolicy.get_fee_policy_for(serializer.instance)
                 policy.set_base_application_fee_for(serializer.instance)
 
                 response = Response(serializer.data)
@@ -2238,8 +2200,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             processing_status=ApplicationSelectedActivity.PROCESSING_STATUS_DISCARDED
         )
 
-        return Response({'processing_status': ApplicationSelectedActivity.PROCESSING_STATUS_DISCARDED
-                         }, status=http_status)
+        return Response({'processing_status': ApplicationSelectedActivity.PROCESSING_STATUS_DISCARDED}, status=http_status)
 
     @action(detail=True, methods=['DELETE', ]) #TODO: more appropriate as a POST?
     def discard_activity(self, request, *args, **kwargs):
@@ -2262,7 +2223,6 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['GET', ])
     def assessment_details(self, request, *args, **kwargs):
-        # queryset = self.get_queryset()
         instance = self.get_object()
         queryset = Assessment.objects.filter(application=instance.id)
         licence_activity = self.request.query_params.get(
@@ -2480,8 +2440,6 @@ class ApplicationStandardConditionViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         if is_wildlife_compliance_officer(self.request):
             return ApplicationStandardCondition.objects.all()
-        #elif is_customer(self.request):
-        #    return ApplicationStandardCondition.objects.none()
         return ApplicationStandardCondition.objects.none()
 
     def list(self, request, *args, **kwargs):
@@ -2496,7 +2454,6 @@ class ApplicationStandardConditionViewSet(viewsets.ReadOnlyModelViewSet):
 class AssessmentPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (ApplicationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    #renderer_classes = (ApplicationRenderer,)
     queryset = Assessment.objects.none()
     serializer_class = DTAssessmentSerializer
     page_size = 10
@@ -2504,8 +2461,6 @@ class AssessmentPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         if is_wildlife_compliance_officer(self.request):
             return Assessment.objects.all()
-        #elif is_customer(self.request):
-        #    return Assessment.objects.none()
         return Assessment.objects.none()
 
     @action(detail=False, methods=['GET', ])
@@ -2539,8 +2494,6 @@ class AssessmentViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def get_queryset(self): 
         if is_wildlife_compliance_officer(self.request):
             return Assessment.objects.all()
-        #elif is_customer(self.request):
-        #    return Assessment.objects.none()
         return Assessment.objects.none()
 
     @action(detail=False, methods=['GET', ])
@@ -2677,7 +2630,6 @@ class AssessmentViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 class AssessorGroupViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     queryset = ActivityPermissionGroup.objects.none()
     serializer_class = ActivityPermissionGroupSerializer
-    #renderer_classes = [JSONRenderer, ]
 
     def get_queryset(self, application=None):
         if is_wildlife_compliance_officer(self.request):
@@ -2686,8 +2638,6 @@ class AssessorGroupViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             return ActivityPermissionGroup.objects.filter(
                 permissions__codename='assessor'
             )
-        #elif is_customer(self.request):
-        #    return ActivityPermissionGroup.objects.none()
         return ActivityPermissionGroup.objects.none()
 
     @action(detail=False, methods=['POST', ])
@@ -2753,12 +2703,10 @@ class AmendmentRequestViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin
                 instance.generate_amendment(request)
 
                 # Set all proposed purposes back to selected.
-                STATUS = \
-                  ApplicationSelectedActivityPurpose.PROCESSING_STATUS_SELECTED
-                p_ids = [ p.purpose.id \
-                    for p in selected_activity.proposed_purposes.all() ]
-                selected_activity.set_proposed_purposes_process_status_for(
-                    p_ids, STATUS)
+                STATUS = ApplicationSelectedActivityPurpose.PROCESSING_STATUS_SELECTED
+                #TODO not as impactful but for loop should still be replace here
+                p_ids = [ p.purpose.id for p in selected_activity.proposed_purposes.all() ]
+                selected_activity.set_proposed_purposes_process_status_for(p_ids, STATUS)
 
             # send email
             send_application_amendment_notification(
@@ -2788,6 +2736,7 @@ class AmendmentRequestReasonChoicesView(views.APIView):
     def get(self, request, format=None):
         choices_list = []
         choices = AmendmentRequest.REASON_CHOICES
+        #TODO replace for loop
         if choices:
             for c in choices:
                 choices_list.append({'key': c[0], 'value': c[1]})
