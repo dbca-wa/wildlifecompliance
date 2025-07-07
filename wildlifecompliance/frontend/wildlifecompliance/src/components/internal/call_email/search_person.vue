@@ -371,54 +371,6 @@ export default {
                 })
             });
         },
-        updatePersonal: function() {
-            console.log('updatePersonal');
-            let vm = this;
-            vm.updatingPersonal = true;
-            if (vm.call_email.email_user.residential_address == null){ vm.call_email.email_user.residential_address = {}; }
-            let params = '?';
-            params += '&first_name=' + vm.call_email.email_user.first_name;
-            params += '&last_name=' + vm.call_email.email_user.last_name;
-            params += '&dob=' + vm.call_email.email_user.dob;
-            // if (vm.call_email.email_user.first_name == '' || vm.call_email.email_user.last_name == '' || (vm.call_email.email_user.dob == null || vm.call_email.email_user.dob == '')){
-            if (vm.call_email.email_user.first_name == '' || vm.call_email.email_user.last_name == ''){
-                let error_msg = 'Please ensure all fields are filled in.';
-                swal({
-                    title: 'Update Personal Details',
-                    html: 'There was an error updating the user personal details.<br/>' + error_msg,
-                    type: 'error'
-                }).then(() => {
-                    vm.updatingPersonal = false;
-                });
-                return;
-            }
-			vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.call_email.email_user.id+'/update_personal')),JSON.stringify(vm.call_email.email_user),{
-				emulateJSON:true
-			}).then((response) => {
-				swal({
-					title: 'Update Personal Details',
-					html: 'User personal details has been successfully updated.',
-					type: 'success',
-				}).then(() => {
-					vm.updatingPersonal = false;
-				});
-			}, (error) => {
-				vm.updatingPersonal = false;
-				let error_msg = '<br/>';
-				for (var key in error.body) {
-					if (key === 'dob') {
-						error_msg += 'dob: Please enter a valid date.<br/>';
-					} else {
-						error_msg += key + ': ' + error.body[key] + '<br/>';
-					}
-				}
-				swal({
-					title: 'Update Personal Details',
-					html: 'There was an error updating the user personal details.<br/>' + error_msg,
-					type: 'error'
-				})
-			});
-        },
         loadCountries: function(){
             let vm = this;
             let initialisers = [

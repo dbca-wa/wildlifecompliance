@@ -83,12 +83,6 @@
                                             <b>To update this account please <a class="btn btn-primary" target="_blank" :href="user.acc_mgmt_url">click here</a></b>
                                             </div>
                                           </div>
-                                          <!--<div class="form-group">
-                                            <div class="col-sm-12">
-                                                <button v-if="!updatingPersonal" class="pull-right btn btn-primary" @click.prevent="updatePersonal()">Update</button>
-                                                <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
-                                            </div>
-                                          </div>-->
                                        </form>
                                   </div>
                                 </div>
@@ -414,52 +408,6 @@ export default {
                 vm.$refs.licences_table.$refs.licence_datatable.vmDataTable.columns.adjust().responsive.recalc();
                 vm.$refs.returns_table.$refs.return_datatable.vmDataTable.columns.adjust().responsive.recalc();
             });
-        },
-        updatePersonal: function() {
-            let vm = this;
-            vm.updatingPersonal = true;
-            if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
-            let params = '?';
-            params += '&first_name=' + vm.user.first_name;
-            params += '&last_name=' + vm.user.last_name;
-            params += '&dob=' + vm.user.dob;
-            if (vm.user.first_name == '' || vm.user.last_name == '' || (vm.user.dob == null || vm.user.dob == '')){
-                let error_msg = 'Please ensure all fields are filled in.';
-                swal({
-                    title: 'Update Personal Details',
-                    html: 'There was an error updating the user personal details.<br/>' + error_msg,
-                    type: 'error'
-                }).then(() => {
-                    vm.updatingPersonal = false;
-                });
-                return;
-            }
-			vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/update_personal')),JSON.stringify(vm.user),{
-				emulateJSON:true
-			}).then((response) => {
-				swal({
-					title: 'Update Personal Details',
-					html: 'User personal details has been successfully updated.',
-					type: 'success',
-				}).then(() => {
-					vm.updatingPersonal = false;
-				});
-			}, (error) => {
-				vm.updatingPersonal = false;
-				details_msg = '<br/>';
-				for (var key in error.body) {
-					if (key === 'dob') {
-						error_msg += 'dob: Please enter a valid date.<br/>';
-					} else {
-						error_msg += key + ': ' + error.body[key] + '<br/>';
-					}
-				}
-				swal({
-					title: 'Update Personal Details',
-					html: 'There was an error updating the user personal details.<br/>' + error_msg,
-					type: 'error'
-				})
-			});
         },
         updateContact: function() {
             let vm = this;

@@ -291,35 +291,6 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-
-    @action(detail=True, methods=['POST', ])
-    def update_personal(self, request, *args, **kwargs):
-        print("update personal")
-        try:
-            instance = self.get_object()
-            serializer = PersonalSerializer(instance, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            with transaction.atomic():
-                instance = serializer.save()
-                instance.log_user_action(
-                    EmailUserAction.ACTION_PERSONAL_DETAILS_UPDATE.format(
-                        '{} {} ({})'.format(
-                            get_first_name(instance),
-                            get_last_name(instance),
-                            instance.email)),
-                    request)
-            serializer = UserSerializer(instance)
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
-
     @action(detail=True, methods=['POST', ])
     def update_contact(self, request, *args, **kwargs):
         try:
