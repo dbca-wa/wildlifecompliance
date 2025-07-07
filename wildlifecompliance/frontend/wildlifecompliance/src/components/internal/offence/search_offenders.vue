@@ -24,7 +24,7 @@
                     :allowCreateEdit="true"
                     :allowSaveUser="false"
                     :emailRequired="false"
-                    :info="'Search for offenders among user accounts or create a new offender.'"
+                    :info="'Search for offenders among ledger user accounts or create a new offender.'"
                     ref="search_users"
                     domIdHelper="offender"
                     v-bind:key="updateSearchPersonOrganisationBindId"/>
