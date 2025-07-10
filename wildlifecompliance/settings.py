@@ -167,6 +167,12 @@ MIDDLEWARE_CLASSES += [
     'wildlifecompliance.middleware.PaymentSessionMiddleware',
 ]
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+SESSION_FILE_PATH = decouple.config('SESSION_FILE_PATH', default='/app/session_store/')
+
+SESSION_COOKIE_SECURE = env('SESSION_COOKIE_SECURE', True)
+CSRF_COOKIE_SECURE = env('CSRF_COOKIE_SECURE', True)
+
 LEDGER_UI_CARDS_MANAGEMENT = True
 LEDGER_UI_ACCOUNTS_MANAGEMENT = [
             # {'account_name': {'options' : {'view': True, 'edit': True}}},
