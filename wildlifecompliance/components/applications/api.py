@@ -220,7 +220,6 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
             if search_text:
                 search_text = search_text.lower()
                 # join queries for the search_text search
-                search_text_app_ids = []
 
                 email_user_ids = list(EmailUser.objects.annotate(
                     full_name=Concat(
@@ -342,25 +341,36 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
             # search_text filter, join all custom search columns
             # where ('searchable: false' in the datatable definition)
 
-            #TODO FIX remove for loop
             if search_text:
                 search_text = search_text.lower()
-                # join queries for the search_text search
-                search_text_ass_ids = []
-                for assessment in queryset:
-                    if (search_text in assessment.application.licence_category.lower()
-                        or search_text in assessment.licence_activity.short_name.lower()
-                        or search_text in assessment.application.applicant.lower()
-                        or search_text in assessment.get_status_display().lower()
-                    ):
-                        search_text_ass_ids.append(assessment.id)
-                    # if applicant is not an organisation, also search against the user's email address
-                    if (assessment.application.applicant_type == Application.APPLICANT_TYPE_PROXY and
-                        search_text in assessment.application.proxy_applicant.email.lower()):
-                            search_text_ass_ids.append(assessment.id)
-                    if (assessment.application.applicant_type == Application.APPLICANT_TYPE_SUBMITTER and
-                        search_text in assessment.application.submitter.email.lower()):
-                            search_text_ass_ids.append(assessment.id)
+            
+                email_user_ids = list(EmailUser.objects.annotate(
+                    full_name=Concat(
+                        'first_name',
+                        Value(' '),
+                        'last_name'
+                    ),
+                    legal_full_name=Concat(
+                        'legal_first_name',
+                        Value(' '),
+                        'legal_last_name'
+                    ),
+                ).filter(
+                    Q(email__icontains=search_text) |
+                    Q(first_name__icontains=search_text) |
+                    Q(last_name__icontains=search_text) |
+                    Q(full_name__icontains=search_text) |
+                    Q(legal_first_name__icontains=search_text) |
+                    Q(legal_last_name__icontains=search_text) |
+                    Q(legal_full_name__icontains=search_text) 
+                ).values_list('id', flat=True))
+
+                search_text_ass_ids = Assessment.objects.values('id').filter(
+                    Q(application__applicant__icontains=search_text) |
+                    Q(licence_activity__short_name__icontains=search_text) |
+                    Q(application__proxy_applicant_id__in=email_user_ids) |
+                    Q(submitter_id__in=email_user_ids) 
+                )
                 # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
                 # (otherwise they will filter on top of each other)
                 queryset = queryset.filter(id__in=search_text_ass_ids).distinct() | super_queryset
@@ -2202,7 +2212,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
         return Response({'processing_status': ApplicationSelectedActivity.PROCESSING_STATUS_DISCARDED}, status=http_status)
 
-    @action(detail=True, methods=['DELETE', ]) #TODO: more appropriate as a POST?
+    @action(detail=True, methods=['DELETE', ])
     def discard_activity(self, request, *args, **kwargs):
         http_status = status.HTTP_200_OK
         activity_id = request.GET.get('activity_id')
@@ -2704,8 +2714,7 @@ class AmendmentRequestViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin
 
                 # Set all proposed purposes back to selected.
                 STATUS = ApplicationSelectedActivityPurpose.PROCESSING_STATUS_SELECTED
-                #TODO not as impactful but for loop should still be replace here
-                p_ids = [ p.purpose.id for p in selected_activity.proposed_purposes.all() ]
+                p_ids = list(selected_activity.proposed_purposes.values_list('purpose_id', flat=True))
                 selected_activity.set_proposed_purposes_process_status_for(p_ids, STATUS)
 
             # send email
@@ -2736,7 +2745,6 @@ class AmendmentRequestReasonChoicesView(views.APIView):
     def get(self, request, format=None):
         choices_list = []
         choices = AmendmentRequest.REASON_CHOICES
-        #TODO replace for loop
         if choices:
             for c in choices:
                 choices_list.append({'key': c[0], 'value': c[1]})
