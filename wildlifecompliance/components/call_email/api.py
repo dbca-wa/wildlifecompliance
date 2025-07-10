@@ -2,7 +2,7 @@ import json
 import operator
 import traceback
 from functools import reduce
-from django.db.models import Q, Max
+from django.db.models import Q, Func, FloatField, Value, F
 from django.db import transaction
 from django.http import HttpResponse
 from django.core.exceptions import ValidationError
@@ -51,7 +51,6 @@ from wildlifecompliance.components.call_email.serializers import (
     ReportTypeSchemaSerializer,
     ReferrerSerializer,
     LocationSerializerOptimized,
-    CallEmailOptimisedSerializer,
     EmailUserSerializer,
     SaveEmailUserSerializer,
     MapLayerSerializer,
@@ -65,7 +64,6 @@ from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 from rest_framework_datatables.filters import DatatablesFilterBackend
 from wildlifecompliance.components.call_email.email import send_mail
 from django.db.models.functions import Concat
-from django.db.models import Value
 
 
 class CallEmailFilterBackend(DatatablesFilterBackend):
@@ -210,8 +208,30 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
 
         queryset = queryset.filter(reduce(operator.and_, q_list)) if len(q_list) else queryset
 
-        serializer = CallEmailOptimisedSerializer(queryset, many=True)
-        return Response(serializer.data)
+        data = queryset.annotate(
+            lat=Func("location__wkb_geometry", function="ST_Y", output_field=FloatField()),
+            lon=Func("location__wkb_geometry", function="ST_X", output_field=FloatField()),
+        ).annotate(
+            street=F("location__street"),
+            town_suburb=F("location__town_suburb"),
+            state=F("location__state"),
+            postcode=F("location__postcode"),
+            details=F("location__details"),
+        ).values(
+            'id',
+            'number',
+            'lat',
+            'lon',
+            'classification',
+            'classification__name',
+            'status', 
+            'report_type',
+            'street',
+            'town_suburb',
+            'postcode',
+            'details',
+        )
+        return Response(data)
     
     @action(detail=False, methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
