@@ -437,9 +437,9 @@ export default {
 
             if (offences && offences.length > 0){
                 for (var i = 0; i < offences.length; i++){
-                    if(offences[i].location){
+                    if(offences[i].lon && offences[i].lat){
                         let offence = offences[i];
-                        let coords = offence.location.geometry.coordinates;
+                        let coords = (offences[i].lat, offences[i].lon);
 
                         /* Select a marker file, according to the classification */
                         let filename = 'marker-gray-locked.svg';
@@ -465,7 +465,7 @@ export default {
                             iconAnchor: [16, 32],
                             popupAnchor: [0, -20]
                         });
-                        let myMarker = L.marker([coords[1], coords[0]], {icon: myIcon});
+                        let myMarker = L.marker([offences[i].lat, offences[i].lon], {icon: myIcon});
                         let myPopup = L.popup();
                         myMarker.bindPopup(myPopup);
                         self.mcg.addLayer(myMarker);
@@ -489,7 +489,7 @@ export default {
             for (let i=0; i<offence.offenders.length; i++) {
                 let offender = offence.offenders[i].person;
                 if (offender){
-                    offenders_str += `<div>${offender.full_name}</div>`
+                    offenders_str += `<div>${offender.first_name} ${offender.last_name}</div>`
                 }
             }
             let status_str = offence.status?offence.status.name:''
@@ -525,7 +525,7 @@ export default {
                 + str_postcode
                 + '</div>'
 
-            } else {
+            } else if (offence.location.properties.details) {
                 content += '<div class="popup-title">Details</div>'
                 + '<div class="popup-address">'
                 + offence.location.properties.details.substring(0, 10)

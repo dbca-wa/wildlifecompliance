@@ -2,7 +2,7 @@ import json
 import operator
 import traceback
 from functools import reduce
-from django.db.models import Q, Func, FloatField, Value, F
+from django.db.models import Q, Func, FloatField, Value
 from django.db import transaction
 from django.http import HttpResponse
 from django.core.exceptions import ValidationError
@@ -211,25 +211,10 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         data = queryset.annotate(
             lat=Func("location__wkb_geometry", function="ST_Y", output_field=FloatField()),
             lon=Func("location__wkb_geometry", function="ST_X", output_field=FloatField()),
-        ).annotate(
-            street=F("location__street"),
-            town_suburb=F("location__town_suburb"),
-            state=F("location__state"),
-            postcode=F("location__postcode"),
-            details=F("location__details"),
         ).values(
             'id',
-            'number',
             'lat',
             'lon',
-            'classification',
-            'classification__name',
-            'status', 
-            'report_type',
-            'street',
-            'town_suburb',
-            'postcode',
-            'details',
         )
         return Response(data)
     

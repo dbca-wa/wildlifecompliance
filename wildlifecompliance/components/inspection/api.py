@@ -1,5 +1,6 @@
 import json
 from functools import reduce
+from django.db.models import Q, Func, FloatField, Value
 import operator
 import traceback
 import logging
@@ -507,8 +508,15 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
 
         queryset = queryset.filter(reduce(operator.and_, q_list)) if len(q_list) else queryset
 
-        serializer = InspectionOptimisedSerializer(queryset, many=True)
-        return Response(serializer.data)
+        data = queryset.annotate(
+            lat=Func("location__wkb_geometry", function="ST_Y", output_field=FloatField()),
+            lon=Func("location__wkb_geometry", function="ST_X", output_field=FloatField()),
+        ).values(
+            'id',
+            'lat',
+            'lon',
+        )
+        return Response(data)
 
 
     #@action(detail=True, methods=['PUT', ])

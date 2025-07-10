@@ -2,7 +2,7 @@ import json
 import operator
 import traceback
 from datetime import datetime
-
+from functools import reduce
 import pytz
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -10,7 +10,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import HttpResponse
-from django.db.models import Q
+from django.db.models import Q, Func, FloatField, Value
 from ledger_api_client.settings_base import TIME_ZONE
 from rest_framework import viewsets, filters, serializers, status, mixins
 from rest_framework.decorators import action, renderer_classes
@@ -337,9 +337,15 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
 
         queryset = queryset.filter(reduce(operator.and_, q_list)) if len(q_list) else queryset
 
-
-        serializer = OffenceOptimisedSerializer(queryset, many=True)
-        return Response(serializer.data)
+        data = queryset.annotate(
+            lat=Func("location__wkb_geometry", function="ST_Y", output_field=FloatField()),
+            lon=Func("location__wkb_geometry", function="ST_X", output_field=FloatField()),
+        ).values(
+            'id',
+            'lat',
+            'lon',
+        )
+        return Response(data)
 
     @action(detail=False, methods=['GET', ])
     def status_choices(self, request, *args, **kwargs):
