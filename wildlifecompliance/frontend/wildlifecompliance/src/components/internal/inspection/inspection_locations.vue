@@ -494,17 +494,7 @@ export default {
             if (inspection.report_type){
                 report_type_str = inspection.report_type.report_type;
             }
-            //TODO fix to work for inspection
             let content = '<div class="popup-title-main">' + inspection.number + '</div>';
-            content    += '<div class="popup-title">Classification</div>'
-                        + '<div class="popup-coords">'
-                        + classification_str
-                        + '</div>'
-
-            content    += '<div class="popup-title">Report Type</div>'
-                        + '<div class="popup-address">'
-                        + report_type_str
-                        + '</div>'
 
             if (inspection.location.properties.street){
                 content += '<div class="popup-title">Address</div>'

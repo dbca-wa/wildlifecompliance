@@ -168,7 +168,12 @@ MIDDLEWARE_CLASSES += [
 ]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.file'
-SESSION_FILE_PATH = decouple.config('SESSION_FILE_PATH', default='/app/session_store/')
+if env('EMAIL_INSTANCE') is not None and env('EMAIL_INSTANCE','') != 'PROD':
+    SESSION_FILE_PATH = env('SESSION_FILE_PATH', BASE_DIR+'/session_store/')
+    if not os.path.isdir(SESSION_FILE_PATH):
+        os.mkdir(SESSION_FILE_PATH)       
+else:
+    SESSION_FILE_PATH = env('SESSION_FILE_PATH', '/app/session_store/')
 
 SESSION_COOKIE_SECURE = env('SESSION_COOKIE_SECURE', True)
 CSRF_COOKIE_SECURE = env('CSRF_COOKIE_SECURE', True)
