@@ -185,7 +185,7 @@ export default {
              * The value of this is used queryset.filter() in the backend.
              */
             filterInspectionType: 'all',
-            filterStatus: 'all',
+            filterStatus: 'open',
             filterDateFrom: '',
             filterDateTo: '',
 

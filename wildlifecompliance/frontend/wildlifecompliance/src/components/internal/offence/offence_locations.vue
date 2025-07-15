@@ -184,7 +184,7 @@ export default {
              * value of the "value" attribute of the option is stored.
              * The value of this is used queryset.filter() in the backend.
              */
-            filterStatus: 'all',
+            filterStatus: 'open',
             filterDateFrom: '',
             filterDateTo: '',
             filterSanctionOutcomeType: 'all',
