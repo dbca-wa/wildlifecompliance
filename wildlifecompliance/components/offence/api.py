@@ -49,6 +49,9 @@ from wildlifecompliance.helpers import is_internal, is_customer, is_compliance_i
 from django.db.models.functions import Concat
 from django.db.models import Value
 
+#specify mandatory fields (to avoid migration issues with changing nullability)
+OFFENDER_PERSON_MANDATORY_FIELDS = ('first_name', 'last_name', 'dob', 'address_street', 'address_locality', 'address_state', 'address_country', 'address_postcode')
+
 class OffenceFilterBackend(DatatablesFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
@@ -727,6 +730,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                                 dob = datetime.strptime(dict['dob'], '%d/%m/%Y').date()
                             except:
                                 dob = ''
+
                             offender_person = OffenderPerson.objects.create(
                                     email=dict['email'],
                                     first_name=dict['first_name'],
