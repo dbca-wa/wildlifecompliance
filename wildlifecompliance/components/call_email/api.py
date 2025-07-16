@@ -884,7 +884,7 @@ class ReportTypeViewSet(viewsets.ReadOnlyModelViewSet):
     def get_distinct_queryset(self, request, *args, **kwargs):
         return_list = []
         if is_internal(self.request) or is_compliance_management_user(self.request):
-            return_list = list(ReportType.objects.distinct('report_type').order_by('-version').values('id', 'report_type', 'version'))
+            return_list = list(ReportType.objects.order_by('report_type','-version').distinct('report_type').values('id', 'report_type', 'version'))
         return Response(return_list)
 
     @action(detail=True, methods=['GET',])
