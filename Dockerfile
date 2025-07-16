@@ -99,11 +99,10 @@ COPY --chown=oim:oim wildlifecompliance ./wildlifecompliance
 RUN cd /app/wildlifecompliance/frontend/wildlifecompliance; npm install
 RUN cd /app/wildlifecompliance/frontend/wildlifecompliance; npm run build
 RUN python manage_wc.py collectstatic --noinput
-RUN mkdir /app/wildlifecompliance/cache
-RUN mkdir /app/tmp/
-RUN chmod 777 /app/tmp/
-RUN mkdir /app/session_store/
-RUN chmod 777 /app/session_store/
+RUN mkdir -p /app/wildlifecompliance/cache
+RUN mkdir -p /app/tmp/
+RUN mkdir -p /app/session_store/
+
 
 EXPOSE 8080
 HEALTHCHECK --interval=1m --timeout=5s --start-period=10s --retries=3 CMD ["wget", "-q", "-O", "-", "http://localhost:8080/"]
