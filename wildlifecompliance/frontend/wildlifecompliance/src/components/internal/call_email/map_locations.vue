@@ -183,7 +183,7 @@ export default {
              * value of the "value" attribute of the option is stored.
              * The value of this is used queryset.filter() in the backend.
              */
-            filterStatus: 'all',
+            filterStatus: 'open',
             filterClassification: 'all',
             filterLodgedFrom: '',
             filterLodgedTo: '',
@@ -439,9 +439,8 @@ export default {
 
             if (call_emails && call_emails.length > 0){
                 for (var i = 0; i < call_emails.length; i++){
-                    if(call_emails[i].location){
+                    if(call_emails[i].lon && call_emails[i].lat){
                         let call_email = call_emails[i];
-                        let coords = call_email.location.geometry.coordinates;
 
                         /* Select a marker file, according to the classification */
                         let filename = 'marker-gray-locked.svg';
@@ -465,11 +464,11 @@ export default {
                             iconAnchor: [16, 32],
                             popupAnchor: [0, -20]
                         });
-                        let myMarker = L.marker([coords[1], coords[0]], {icon: myIcon});
+                        let myMarker = L.marker([call_emails[i].lat, call_emails[i].lon], {icon: myIcon});
                         let myPopup = L.popup();
                         myMarker.bindPopup(myPopup);
                         self.mcg.addLayer(myMarker);
-
+                        let coords = (call_emails[i].lat, call_emails[i].lon);
                         /* dynamically construct content of the popup */
                         myMarker.on('click', (ev)=>{
                             let popup = ev.target.getPopup();
@@ -483,15 +482,14 @@ export default {
             }
         },
         construct_content: function (call_email, coords){
-            let classification_str = call_email.classification?call_email.classification.name:''
-            let status_str = call_email.status?call_email.status.name:''
-            let identifier_str = call_email.identifier?call_email.identifier:''
-
+            let classification_str = call_email.classification?call_email.classification.name.charAt(0).toUpperCase() + call_email.classification.name.slice(1):"";
+            let status_str = call_email.status?call_email.status.name:"";
+            console.log(classification_str)
             let content = '<div class="popup-title-main">' + call_email.number + '</div>';
 
             content += '<div class="popup-title">Identifier</div>'
                     + '<div class="popup-address">'
-                    + call_email.identifier
+                    + call_email.number
                     + '</div>'
 
             content += '<div class="popup-title">Classification</div>'
@@ -504,11 +502,11 @@ export default {
                     + status_str
                     + '</div>'
 
-            if (call_email.location.properties.street){
-                let str_street = call_email.location.properties.street?call_email.location.properties.street:''
-                let str_town_suburb = call_email.location.properties.town_suburt?call_email.location.properties.town_suburt:''
-                let str_state = call_email.location.properties.state?call_email.location.properties.state:''
-                let str_postcode = call_email.location.properties.postcode?call_email.location.properties.postcode:''
+            if (call_email.street){
+                let str_street = call_email.street;
+                let str_town_suburb = call_email.town_suburb;
+                let str_state = call_email.state;
+                let str_postcode = call_email.postcode;
                 content += '<div class="popup-title">Address</div>'
                 + '<div class="popup-address">'
                 + str_street + '<br />'
@@ -517,10 +515,10 @@ export default {
                 + str_postcode
                 + '</div>'
 
-            } else {
+            } else if (call_email.details) {
                 content += '<div class="popup-title">Details</div>'
                 + '<div class="popup-address">'
-                + call_email.location.properties.details.substring(0, 10)
+                + call_email.details.substring(0, 10)
                 + '</div>'
             }
 

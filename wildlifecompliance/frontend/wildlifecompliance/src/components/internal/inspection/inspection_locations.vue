@@ -185,7 +185,7 @@ export default {
              * The value of this is used queryset.filter() in the backend.
              */
             filterInspectionType: 'all',
-            filterStatus: 'all',
+            filterStatus: 'open',
             filterDateFrom: '',
             filterDateTo: '',
 
@@ -437,9 +437,9 @@ export default {
 
             if (inspections && inspections.length > 0){
                 for (var i = 0; i < inspections.length; i++){
-                    if(inspections[i].location){
+                    if(inspections[i].lon && inspections[i].lat){
                         let inspection = inspections[i];
-                        let coords = inspection.location.geometry.coordinates;
+                        let coords = (inspections[i].lat, inspections[i].lon);
 
                         /* Select a marker file, according to the classification */
                         let filename = 'marker-gray-locked.svg';
@@ -467,7 +467,7 @@ export default {
                             iconAnchor: [16, 32],
                             popupAnchor: [0, -20]
                         });
-                        let myMarker = L.marker([coords[1], coords[0]], {icon: myIcon});
+                        let myMarker = L.marker([inspections[i].lat, inspections[i].lon], {icon: myIcon});
                         let myPopup = L.popup();
                         myMarker.bindPopup(myPopup);
                         self.mcg.addLayer(myMarker);
@@ -494,17 +494,7 @@ export default {
             if (inspection.report_type){
                 report_type_str = inspection.report_type.report_type;
             }
-
             let content = '<div class="popup-title-main">' + inspection.number + '</div>';
-            content    += '<div class="popup-title">Classification</div>'
-                        + '<div class="popup-coords">'
-                        + classification_str
-                        + '</div>'
-
-            content    += '<div class="popup-title">Report Type</div>'
-                        + '<div class="popup-address">'
-                        + report_type_str
-                        + '</div>'
 
             if (inspection.location.properties.street){
                 content += '<div class="popup-title">Address</div>'

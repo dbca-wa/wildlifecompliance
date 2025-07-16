@@ -220,15 +220,13 @@ class SanctionOutcomePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         entity_id = request.GET.get('entity_id')
         entity_type = request.GET.get('entity_type')
         person = None
-        org = None
+        person_email = None
         if entity_type == 'person':
             person = EmailUser.objects.get(id=entity_id)
-        ## Expand to include Orgs
-        elif entity_type == 'org':
-            pass
-        #import ipdb; ipdb.set_trace()
+            person_email = person.email
+
         queryset = SanctionOutcome.objects.filter(
-            (Q(offender__person=person) & Q(offender__removed=False) & Q(registration_holder__isnull=True) & Q(driver__isnull=True)) |
+            (Q(offender__person__email=person_email) & Q(offender__removed=False) & Q(registration_holder__isnull=True) & Q(driver__isnull=True)) |
             (Q(offender__isnull=True) & Q(registration_holder=person) & Q(driver__isnull=True)) |
             (Q(offender__isnull=True) & Q(driver=person))
         )

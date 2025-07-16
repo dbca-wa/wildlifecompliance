@@ -1,42 +1,25 @@
 import json
-import re
+from functools import reduce
+from django.db.models import Q, Func, FloatField, Value
 import operator
 import traceback
-import os
-import base64
-import geojson
 import logging
-from django.db.models import Q, Min, Max
+from django.db.models import Q
 from django.db import transaction
 from django.http import HttpResponse
-from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
-from django.conf import settings
 from wildlifecompliance import settings
-from django.contrib import messages
-from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
-from django.utils import timezone
-from rest_framework import viewsets, serializers, status, generics, views, filters, mixins
-import rest_framework.exceptions as rest_exceptions
+from rest_framework import viewsets, serializers, status, mixins
 from rest_framework.decorators import (
     action,
     renderer_classes,
-    parser_classes,
-    api_view
 )
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser, BasePermission
-from rest_framework.pagination import PageNumberPagination
-from collections import OrderedDict
-from django.core.cache import cache
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address
-from ledger_api_client.country_models import Country
-from ledger_api_client.utils import calculate_excl_gst
-from datetime import datetime, timedelta, date
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
+from datetime import datetime, timedelta
 from django.urls import reverse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect
 from wildlifecompliance.components.main.api import save_location
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup,TemporaryDocumentCollection, ComplianceManagementSystemGroupPermission
 from wildlifecompliance.components.main.process_document import (
@@ -44,18 +27,13 @@ from wildlifecompliance.components.main.process_document import (
         save_comms_log_document_obj
         )
 from wildlifecompliance.components.main.email import prepare_mail
-from wildlifecompliance.components.users.serializers import (
-    UserAddressSerializer,
-    ComplianceUserDetailsSerializer,
-)
-from wildlifecompliance.helpers import is_customer, is_internal, is_compliance_internal_user
+from wildlifecompliance.helpers import is_compliance_internal_user
 from wildlifecompliance.components.inspection.models import (
     Inspection,
     InspectionUserAction,
     InspectionType,
     InspectionCommsLogEntry,
     InspectionFormDataRecord,
-    InspectionCommsLogDocument,
     )
 from wildlifecompliance.components.call_email.models import (
         CallEmailUserAction,
@@ -68,27 +46,15 @@ from wildlifecompliance.components.inspection.serializers import (
     InspectionDatatableSerializer,
     UpdateAssignedToIdSerializer,
     InspectionTypeSerializer,
-    # InspectionTeamSerializer,
     EmailUserSerializer,
     InspectionTypeSchemaSerializer,
     InspectionOptimisedSerializer)
 from wildlifecompliance.components.organisations.models import (
     Organisation,    
 )
-from django.contrib.auth.models import Permission, ContentType
-# from utils import SchemaParser
-
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 from rest_framework_datatables.filters import DatatablesFilterBackend
-from rest_framework_datatables.renderers import DatatablesRenderer
-
-from wildlifecompliance.components.main.utils import (
-    get_full_name
-)
-
-from wildlifecompliance.components.inspection.email import (
-    send_mail)
-
+from wildlifecompliance.components.inspection.email import send_mail
 from django.db.models.functions import Concat
 from django.db.models import Value
 
@@ -97,9 +63,6 @@ logger = logging.getLogger(__name__)
 class InspectionFilterBackend(DatatablesFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
-        #import ipdb; ipdb.set_trace()
-        # Get built-in DRF datatables queryset first to join with search text, then apply additional filters
-        # super_queryset = super(CallEmailFilterBackend, self).filter_queryset(request, queryset, view).distinct()
 
         total_count = queryset.count()
         status_filter = request.GET.get('status_description')
@@ -112,25 +75,25 @@ class InspectionFilterBackend(DatatablesFilterBackend):
             search_text = search_text.lower()
 
             email_user_ids = list(EmailUser.objects.annotate(
-                    full_name=Concat(
-                        'first_name',
-                        Value(' '),
-                        'last_name'
-                    ),
-                    legal_full_name=Concat(
-                        'legal_first_name',
-                        Value(' '),
-                        'legal_last_name'
-                    ),
-                ).filter(
-                    Q(email__icontains=search_text) |
-                    Q(first_name__icontains=search_text) |
-                    Q(last_name__icontains=search_text) |
-                    Q(full_name__icontains=search_text) |
-                    Q(legal_first_name__icontains=search_text) |
-                    Q(legal_last_name__icontains=search_text) |
-                    Q(legal_full_name__icontains=search_text) 
-                ).values_list('id', flat=True))
+                full_name=Concat(
+                    'first_name',
+                    Value(' '),
+                    'last_name'
+                ),
+                legal_full_name=Concat(
+                    'legal_first_name',
+                    Value(' '),
+                    'legal_last_name'
+                ),
+            ).filter(
+                Q(email__icontains=search_text) |
+                Q(first_name__icontains=search_text) |
+                Q(last_name__icontains=search_text) |
+                Q(full_name__icontains=search_text) |
+                Q(legal_first_name__icontains=search_text) |
+                Q(legal_last_name__icontains=search_text) |
+                Q(legal_full_name__icontains=search_text) 
+            ).values_list('id', flat=True))
             
 
             search_text_inspection_ids = list(Inspection.objects.filter(
@@ -142,53 +105,33 @@ class InspectionFilterBackend(DatatablesFilterBackend):
                 Q(inspection_team_lead__in=email_user_ids)
             ).values_list('id', flat=True))
 
-            queryset = queryset.filter(id__in=search_text_inspection_ids).distinct() #| super_queryset
+            queryset = queryset.filter(id__in=search_text_inspection_ids).distinct()
 
         status_filter = status_filter.lower() if status_filter else 'all'
         if status_filter != 'all':
-            status_filter_inspection_ids = []
-            for inspection in queryset:
-                if status_filter == inspection.get_status_display().lower():
-                    status_filter_inspection_ids.append(inspection.id)
-            queryset = queryset.filter(id__in=status_filter_inspection_ids)
+            queryset = queryset.filter(status=status_filter)
+
         inspection_filter = inspection_filter.lower() if inspection_filter else 'all'
         if inspection_filter != 'all':
-            inspection_filter_inspection_ids = []
-            for inspection in queryset:
-                if inspection_filter in inspection.inspection_type.inspection_type.lower() if inspection.inspection_type else '':
-                    inspection_filter_inspection_ids.append(inspection.id)
-            queryset = queryset.filter(id__in=inspection_filter_inspection_ids)
+            queryset = queryset.filter(inspection_type__inspection_type__iexact=inspection_filter)
 
         if date_from:
             queryset = queryset.filter(planned_for_date__gte=date_from)
         if date_to:
             date_to = datetime.strptime(date_to, '%Y-%m-%d') + timedelta(days=1)
             queryset = queryset.filter(planned_for_date__lte=date_to)
-
-        # override queryset ordering, required because the ordering is usually handled
-        # in the super call, but is then clobbered by the custom queryset joining above
-        # also needed to disable ordering for all fields for which data is not an
-        # CallEmail model field, as property functions will not work with order_by
         
         fields = self.get_fields(request)
         ordering = self.get_ordering(request, view, fields)
         if len(ordering):
             for num, item in enumerate(ordering):
                 if item == 'planned_for':
-                    # ordering.pop(num)
-                    # ordering.insert(num, 'planned_for_date')
                     ordering[num] = 'planned_for_date'
                 elif item == '-planned_for':
-                    # ordering.pop(num)
-                    # ordering.insert(num, '-planned_for_date')
                     ordering[num] = '-planned_for_date'
                 elif item == 'status__name':
-                    # ordering.pop(num)
-                    # ordering.insert(num, 'status')
                     ordering[num] = 'status'
                 elif item == '-status__name':
-                    # ordering.pop(num)
-                    # ordering.insert(num, '-status')
                     ordering[num] = '-status'
 
             queryset = queryset.order_by(*ordering)
@@ -197,24 +140,14 @@ class InspectionFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-#class InspectionRenderer(DatatablesRenderer):
-#    def render(self, data, accepted_media_type=None, renderer_context=None):
-#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-#        return super(InspectionRenderer, self).render(data, accepted_media_type, renderer_context)
-
-
 class InspectionPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (InspectionFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    #renderer_classes = (InspectionRenderer,)
     queryset = Inspection.objects.none()
     serializer_class = InspectionDatatableSerializer
     page_size = 10
     
     def get_queryset(self):
-        # import ipdb; ipdb.set_trace()
-        user = self.request.user
         if is_compliance_internal_user(self.request):
             return Inspection.objects.all()
         return Inspection.objects.none()
@@ -236,8 +169,6 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
     serializer_class = InspectionSerializer
 
     def get_queryset(self):
-        # import ipdb; ipdb.set_trace()
-        user = self.request.user
         if is_compliance_internal_user(self.request):
             return Inspection.objects.all()
         return Inspection.objects.none()
@@ -353,9 +284,6 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
     def get_inspection_team(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            #serializer = InspectionTeamSerializer(instance)
-            #team = EmailUser.objects.select_related('inspection_team').get(id=instance.id)
-            #qs = EmailUser.objects.filter(instance.inspection_team)
             serializer = EmailUserSerializer(
                 instance.inspection_team.all(),
                 context={
@@ -377,7 +305,6 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
             raise serializers.ValidationError(str(e))
 
     def check_authorised_to_update(self,request,inspection_team_allowed=False):
-        print("check_authorised_to_update")
         instance = self.get_object()
         user = self.request.user
         user_auth_groups = ComplianceManagementSystemGroupPermission.objects.filter(emailuser=user)
@@ -390,8 +317,6 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
             return False
         
     def check_authorised_to_create(self,request):
-        print("check_authorised_to_create")
-
         region_id = None if not request.data.get('region_id') else request.data.get('region_id')
         district_id = None if not request.data.get('district_id') else request.data.get('district_id')
         user = self.request.user
@@ -458,7 +383,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
                 if not instance:
                     instance = self.get_object()
                 if workflow:
-                    action = 'add' # 'add', 'remove or 'clear'
+                    action = 'add'
                     user_id = user_id
                 else:
                     action = request.data.get('action') # 'add', 'remove or 'clear'
@@ -467,13 +392,9 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
                 if user_id:
                     user_id = int(user_id)
 
-                #if action and user_list:
                 if action and user_id:
-                    #users = EmailUser.objects.filter(id__in=user_list)
                     user = EmailUser.objects.get(id=user_id)
                     team_member_list = instance.inspection_team.all()
-                    #if action == 'set' and users:
-                     #   instance.inspection_team.set(user_list)
                     if action == 'add':
                         if user not in team_member_list:
                             instance.inspection_team.add(user)
@@ -536,7 +457,6 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
     def form_data(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            
             InspectionFormDataRecord.process_form(
                 request,
                 instance,
@@ -554,7 +474,6 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
 
     @action(detail=False, methods=['GET', ])
     def can_user_create(self, request, *args, **kwargs):
-
        # Find groups which has permissions determined above
        allowed_groups = ComplianceManagementSystemGroup.objects.filter(Q(name=settings.GROUP_INSPECTION_OFFICER)|Q(name=settings.GROUP_MANAGER))
        for allowed_group in allowed_groups:
@@ -589,8 +508,15 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
 
         queryset = queryset.filter(reduce(operator.and_, q_list)) if len(q_list) else queryset
 
-        serializer = InspectionOptimisedSerializer(queryset, many=True)
-        return Response(serializer.data)
+        data = queryset.annotate(
+            lat=Func("location__wkb_geometry", function="ST_Y", output_field=FloatField()),
+            lon=Func("location__wkb_geometry", function="ST_X", output_field=FloatField()),
+        ).values(
+            'id',
+            'lat',
+            'lon',
+        )
+        return Response(data)
 
 
     #@action(detail=True, methods=['PUT', ])

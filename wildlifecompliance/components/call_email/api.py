@@ -1,53 +1,30 @@
 import json
-import re
 import operator
 import traceback
-import os
-import base64
 from functools import reduce
-import geojson
-from django.db.models import Q, Min, Max
+from django.db.models import Q, Func, FloatField, Value
 from django.db import transaction
 from django.http import HttpResponse
-from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
-from django.conf import settings
 
 from wildlifecompliance import settings
-from django.contrib import messages
-from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
-from django.utils import timezone
-from rest_framework import viewsets, serializers, status, generics, views, filters, mixins
-import rest_framework.exceptions as rest_exceptions
+from rest_framework import viewsets, serializers, status, filters, mixins
 from rest_framework.decorators import (
     action,
     renderer_classes,
-    parser_classes,
-    api_view
 )
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser, BasePermission
-from rest_framework.pagination import PageNumberPagination
-from collections import OrderedDict
-from django.core.cache import cache
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address
-from ledger_api_client.country_models import Country
-from ledger_api_client.utils import calculate_excl_gst
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from django.urls import reverse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect
 from wildlifecompliance.components.main.api import save_location
 from wildlifecompliance.components.main.process_document import process_generic_document
 from wildlifecompliance.components.main.email import prepare_mail
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.users.api import generate_dummy_email
-from wildlifecompliance.components.users.serializers import (
-    UserAddressSerializer,
-    ComplianceUserDetailsSerializer,
-)
-from wildlifecompliance.helpers import is_customer, is_internal, is_compliance_management_user
+from wildlifecompliance.helpers import is_internal, is_compliance_management_user
 from wildlifecompliance.components.call_email.models import (
     CallEmail,
     Classification,
@@ -65,13 +42,8 @@ from wildlifecompliance.components.call_email.models import (
 from wildlifecompliance.components.call_email.serializers import (
     CallEmailSerializer,
     ClassificationSerializer,
-    CallTypeSerializer,
-    WildcareSpeciesTypeSerializer,
-    WildcareSpeciesSubTypeSerializer,
-    ComplianceFormDataRecordSerializer,
     CallEmailLogEntrySerializer,
     LocationSerializer,
-    #CallEmailUserActionSerializer,
     LocationSerializer,
     ReportTypeSerializer,
     SaveCallEmailSerializer,
@@ -79,39 +51,24 @@ from wildlifecompliance.components.call_email.serializers import (
     ReportTypeSchemaSerializer,
     ReferrerSerializer,
     LocationSerializerOptimized,
-    CallEmailOptimisedSerializer,
     EmailUserSerializer,
     SaveEmailUserSerializer,
     MapLayerSerializer,
-    #ComplianceWorkflowLogEntrySerializer,
     CallEmailDatatableSerializer,
     SaveUserAddressSerializer,
-    #InspectionTypeSerializer,
-    # ExternalOrganisationSerializer,
     CallEmailAllocatedGroupSerializer,
     UpdateAssignedToIdSerializer
     )
-# from utils import SchemaParser
-
-from wildlifecompliance.components.main.utils import (
-    get_full_name
-)
 
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 from rest_framework_datatables.filters import DatatablesFilterBackend
-from rest_framework_datatables.renderers import DatatablesRenderer
-
 from wildlifecompliance.components.call_email.email import send_mail
 from django.db.models.functions import Concat
-from django.db.models import Value
 
 
 class CallEmailFilterBackend(DatatablesFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
-        #import ipdb; ipdb.set_trace()
-        # Get built-in DRF datatables queryset first to join with search text, then apply additional filters
-        #super_queryset = super(CallEmailFilterBackend, self).filter_queryset(request, queryset, view).distinct()
 
         total_count = queryset.count()
         status_filter = request.GET.get('status_description')
@@ -153,22 +110,15 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
                 Q(assigned_to_id__in=email_user_ids)
             ).values_list('id', flat=True))
 
-            queryset = queryset.filter(id__in=search_text_callemail_ids).distinct() #| super_queryset
+            queryset = queryset.filter(id__in=search_text_callemail_ids).distinct()
 
         status_filter = status_filter.lower() if status_filter else 'all'
         if status_filter != 'all':
-            status_filter_callemail_ids = []
-            for call_email in queryset:
-                if status_filter == call_email.get_status_display().lower():
-                    status_filter_callemail_ids.append(call_email.id)
-            queryset = queryset.filter(id__in=status_filter_callemail_ids)
+            queryset = queryset.filter(status=status_filter)
+
         classification_filter = classification_filter.lower() if classification_filter else 'all'
         if classification_filter != 'all':
-            classification_filter_callemail_ids = []
-            for call_email in queryset:
-                if classification_filter in call_email.classification.name.lower() if call_email.classification else '':
-                    classification_filter_callemail_ids.append(call_email.id)
-            queryset = queryset.filter(id__in=classification_filter_callemail_ids)
+            queryset = queryset.filter(classification__name=classification_filter)
 
         if date_from:
             queryset = queryset.filter(lodged_on__gte=date_from)
@@ -196,22 +146,13 @@ class CallEmailFilterBackend(DatatablesFilterBackend):
         else:
             queryset = queryset.order_by('-number')
 
-
         setattr(view, '_datatables_total_count', total_count)
         return queryset
-
-
-#class CallEmailRenderer(DatatablesRenderer):
-#    def render(self, data, accepted_media_type=None, renderer_context=None):
-#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-#        return super(CallEmailRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
 class CallEmailPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (CallEmailFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    #renderer_classes = (CallEmailRenderer,)
     queryset = CallEmail.objects.none()
     serializer_class = CallEmailDatatableSerializer
     page_size = 10
@@ -267,8 +208,15 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
 
         queryset = queryset.filter(reduce(operator.and_, q_list)) if len(q_list) else queryset
 
-        serializer = CallEmailOptimisedSerializer(queryset, many=True)
-        return Response(serializer.data)
+        data = queryset.annotate(
+            lat=Func("location__wkb_geometry", function="ST_Y", output_field=FloatField()),
+            lon=Func("location__wkb_geometry", function="ST_X", output_field=FloatField()),
+        ).values(
+            'id',
+            'lat',
+            'lon',
+        )
+        return Response(data)
     
     @action(detail=False, methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
@@ -385,7 +333,6 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -409,29 +356,10 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
-
-    #TODO replace/remove
-    #@action(detail=True, methods=['GET', ])
-    #def action_log(self, request, *args, **kwargs):
-    #    try:
-    #        instance = self.get_object()
-    #        qs = instance.action_logs.all()
-    #        serializer = CallEmailUserActionSerializer(qs, many=True)
-    #        return Response(serializer.data)
-    #    except serializers.ValidationError:
-    #        print(traceback.print_exc())
-    #        raise
-    #    except ValidationError as e:
-    #        print(traceback.print_exc())
-    #        raise serializers.ValidationError(repr(e.error_dict))
-    #    except Exception as e:
-    #        print(traceback.print_exc())
-    #        raise serializers.ValidationError(str(e))
 
     @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
@@ -458,7 +386,6 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 instance = self.get_object()
                 request_data = request.data.copy()
                 request_data['call_email'] = u'{}'.format(instance.id)
-                # request.data['staff'] = u'{}'.format(request.user.id)
                 if request_data.get('comms_log_id'):
                     comms_instance = CallEmailLogEntry.objects.get(id=request_data.get('comms_log_id'))
                     serializer = CallEmailLogEntrySerializer(comms_instance, data=request_data)
@@ -507,20 +434,11 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                     request_data.get('location', {}).get('properties', {}).get('postcode', {}) or
                     request_data.get('location', {}).get('properties', {}).get('details', {})
                 ):
-                    #returned_location = self.save_location(request)
                     location_request_data = request.data.get('location')
                     returned_location = save_location(location_request_data)
                     if returned_location:
                         request_data.update({'location_id': returned_location.get('id')})
 
-                #if request_data.get('report_type'):
-                 #   request_data.update({'report_type_id': request_data.get('report_type', {}).get('id')})
-
-                # Initial allocated_group_id must be volunteers
-                #compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
-                #permission = Permission.objects.filter(codename='volunteer').filter(content_type_id=compliance_content_type.id).first()
-                #group = CompliancePermissionGroup.objects.filter(permissions=permission).first()
-                #request_data.update({'allocated_group_id': group.id})
                 serializer = CreateCallEmailSerializer(data=request_data, partial=True)
                 serializer.is_valid(raise_exception=True)
                 if serializer.is_valid():
@@ -533,9 +451,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                             new_instance.number), request)
                     new_returned = CallEmailSerializer(instance=new_instance, context={'request': request}).data
                     # Ensure classification_id and report_type_id is returned for Vue template evaluation
-                    # new_returned.update({'classification_id': request_data.get('classification_id')})
                     new_returned.update({'report_type_id': request_data.get('report_type_id')})
-                    # new_returned.update({'referrer_id': request_data.get('referrer_id')})
                     if request_data.get('location'):
                         new_returned.update({'location_id': request_data.get('location').get('id')})
 
@@ -551,10 +467,8 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                         # Serializer returns CallEmail.data for HTTP response
                         duplicate = CallEmailSerializer(instance=new_instance, context={'request': request})
                         headers = self.get_success_headers(duplicate.data)
-
-                        # duplicate.data.update({'classification_id': request_data.get('classification_id')})
                         duplicate.data.update({'report_type_id': request_data.get('report_type_id')})
-                        # duplicate.data.update({'referrer_id': request_data.get('referrer_id')})
+
                         if request_data.get('location'):
                             duplicate.data.update({'location_id': request_data.get('location').get('id')})
                         return Response(
@@ -675,8 +589,6 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                         headers=headers
                     )
 
-    #@action(detail=True, methods=['POST', ])
-    #def call_email_save(self, request, *args, **kwargs):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer_data, headers = self.common_save(instance, request)
@@ -701,13 +613,8 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                     if returned_location:
                         request_data.update({'location_id': returned_location.get('id')})
 
-                # self.save_email_user(request)
-
                 if request_data.get('renderer_data'):
                     self.form_data(request)
-
-                #if request_data.get('report_type_id'):
-                 #   request_data.update({'report_type_id': request_data.get('report_type', {}).get('id')})
 
                 if instance.report_type and 'report_type_id' in request.data.keys() and not request.data.get('report_type_id'):
                         del request.data['report_type_id']
@@ -736,11 +643,8 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
     @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def workflow_action(self, request, *args, **kwargs):
-        print("workflow_action")
-        print(request.data)
         try:
             with transaction.atomic():
-                #import ipdb; ipdb.set_trace()
                 instance = self.get_object()
                 comms_log_id = request.data.get('call_email_comms_log_id')
                 if comms_log_id and comms_log_id != 'null':
@@ -751,29 +655,21 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
 
                 # Set CallEmail status depending on workflow type
                 workflow_type = request.data.get('workflow_type')
-                #region_id = None if not request.data.get('region_id') else request.data.get('region_id')
-                #district_id = None if not request.data.get('district_id') else request.data.get('district_id')
                 instance.assigned_to_id = None if not request.data.get('assigned_to_id') else request.data.get('assigned_to_id')
                 instance.inspection_type_id = None if not request.data.get('inspection_type_id') else request.data.get('inspection_type_id')
                 instance.case_priority_id = None if not request.data.get('case_priority_id') else request.data.get('case_priority_id')
                 # should be set by back end
-                #instance.allocated_group_id = None if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
                 instance.advice_details = None if not request.data.get('advice_details') else request.data.get('advice_details')
 
                 if workflow_type == 'forward_to_regions':
-                    #instance.set_allocated_group('triage_call_email', region_id=region_id, district_id=district_id)
                     instance.forward_to_regions(request)
                 elif workflow_type == 'forward_to_wildlife_protection_branch':
-                    #instance.set_allocated_group('triage_call_email', region_id=region_id, district_id=district_id)
                     instance.forward_to_wildlife_protection_branch(request)
                 elif workflow_type == 'allocate_for_follow_up':
-                    #instance.set_allocated_group('officer', region_id=region_id, district_id=district_id)
                     instance.allocate_for_follow_up(request)
                 elif workflow_type == 'allocate_for_inspection':
-                    #instance.set_allocated_group('officer', region_id=region_id, district_id=district_id)
                     instance.allocate_for_inspection(request)
                 elif workflow_type == 'allocate_for_case':
-                    #instance.set_allocated_group('officer', region_id=region_id, district_id=district_id)
                     instance.allocate_for_case(request)
                 elif workflow_type == 'close':
                     instance.close(request)
@@ -788,14 +684,12 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 instance.save()
 
                 if workflow_type == 'close':
-                    #email_data = prepare_mail(request, instance, workflow_entry, send_mail, email_type="close")
                     email_data = prepare_mail(request=request, instance=instance, workflow_entry=workflow_entry, 
                             send_mail=send_mail, recipient_id=[request.user.id,], email_type="close")
                 elif workflow_type in ['forward_to_regions', 'forward_to_wildlife_protection_branch']:
                     email_data = prepare_mail(request=request, instance=instance, workflow_entry=workflow_entry, send_mail=send_mail)
                 elif workflow_type in ['offence', 'sanction_outcome']:
                     email_data = prepare_mail(request=request, instance=instance, workflow_entry=workflow_entry, send_mail=send_mail, recipient_id=[request.user.id,])
-                    #email_data = prepare_mail(request, instance, workflow_entry, send_mail, request.user.id)
                 elif workflow_type in ['allocate_for_follow_up', 'allocate_for_inspection', 'allocate_for_case']:
                     email_data = prepare_mail(request=request, instance=instance, workflow_entry=workflow_entry, send_mail=send_mail, recipient_id=[instance.assigned_to.id,])
 
@@ -874,8 +768,6 @@ class ClassificationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ClassificationSerializer
 
     def get_queryset(self):
-        #user = self.request.user
-        #if is_internal(self.request):
         if is_compliance_management_user(self.request):
             return Classification.objects.all()
         return Classification.objects.none()
@@ -883,8 +775,6 @@ class ClassificationViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['GET', ])    
     def classification_choices(self, request, *args, **kwargs):
         res_obj = [] 
-        #for choice in Classification.NAME_CHOICES:
-            # res_obj.append({'id': choice[0], 'display': choice[1]});
         for choice in Classification.objects.all():
             res_obj.append({'id': choice.id, 'display': choice.get_name_display()})
         res_json = json.dumps(res_obj)
@@ -896,7 +786,6 @@ class LOVCollectionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CallEmailSerializer
 
     def get_queryset(self):
-        user = self.request.user
         if is_compliance_management_user(self.request):
             return CallEmail.objects.all()
         return CallEmail.objects.none()
@@ -937,25 +826,25 @@ class LOVCollectionViewSet(viewsets.ReadOnlyModelViewSet):
             age_choices.append({
                 'id': choice[0], 
                 'display': choice[1]
-                });
+                })
         gender_choices = []
         for choice in CallEmail.GENDER_CHOICES:
             gender_choices.append({
                 'id': choice[0], 
                 'display': choice[1]
-                });
+                })
         baby_kangaroo_choices = []
         for choice in CallEmail.BABY_KANGAROO_CHOICES:
             baby_kangaroo_choices.append({
                 'id': choice[0], 
                 'display': choice[1]
-                });
+                })
         entangled_choices = []
         for choice in CallEmail.ENTANGLED_CHOICES:
             entangled_choices.append({
                 'id': choice[0], 
                 'display': choice[1]
-                });
+                })
 
         res_json = {
         "classification_types": classification_types,
@@ -976,8 +865,6 @@ class ReferrerViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ReferrerSerializer
 
     def get_queryset(self):
-        #user = self.request.user
-        #if is_internal(self.request):
         if is_compliance_management_user(self.request): 
             return Referrer.objects.all()
         return Referrer.objects.none()
@@ -988,8 +875,6 @@ class ReportTypeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ReportTypeSerializer
 
     def get_queryset(self):
-        #user = self.request.user
-        #if is_internal(self.request):
         if is_compliance_management_user(self.request):
             return ReportType.objects.all()
         return ReportType.objects.none()
@@ -997,18 +882,9 @@ class ReportTypeViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['GET', ])
     @renderer_classes((JSONRenderer,))
     def get_distinct_queryset(self, request, *args, **kwargs):
-        user = self.request.user
         return_list = []
-        #if is_internal(self.request):
         if is_internal(self.request) or is_compliance_management_user(self.request):
-            valid_records = ReportType.objects.values('report_type').annotate(Max('version'))
-            for record in valid_records:
-                qs_record = ReportType.objects \
-                    .filter(report_type=record['report_type']) \
-                    .filter(version=record['version__max']) \
-                    .values('id', 'report_type', 'version')[0]
-
-                return_list.append(qs_record)
+            return_list = list(ReportType.objects.distinct('report_type').order_by('-version').values('id', 'report_type', 'version'))
         return Response(return_list)
 
     @action(detail=True, methods=['GET',])
@@ -1039,8 +915,6 @@ class LocationViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.R
     serializer_class = LocationSerializer
 
     def get_queryset(self):
-        #user = self.request.user
-        #if is_internal(self.request):
         if is_compliance_management_user(self.request): 
             return Location.objects.all()
         return Location.objects.none()
@@ -1077,7 +951,6 @@ class LocationViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.R
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -1095,7 +968,6 @@ class EmailUserViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         exclude_staff = self.request.GET.get('exclude_staff')
-        #if is_internal(self.request):
         if is_compliance_management_user(self.request):
             if exclude_staff == 'true':
                 return EmailUser.objects.filter(is_staff=False)
@@ -1109,8 +981,6 @@ class MapLayerViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class =  MapLayerSerializer
 
     def get_queryset(self):
-        #user = self.request.user
-        #if is_internal(self.request):
         if is_compliance_management_user(self.request):
             return MapLayer.objects.filter(availability__exact=True)
         return MapLayer.objects.none()

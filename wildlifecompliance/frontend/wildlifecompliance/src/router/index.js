@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import MyUserDetails from '@/components/user/manage_my_user_details.vue'
 import Organisations from '@/components/user/manage_organisations.vue'
 import ManageOrganisation from '@/components/external/organisations/manage.vue'
 import ProfileDashTable from '@/components/user/profile_dashboard.vue'
@@ -14,16 +13,6 @@ Vue.use(Router)
 const router = new Router({
     mode: 'history',
     routes: [
-        {
-          path: '/firsttime',
-          name: 'first-time',
-          component: MyUserDetails
-        },
-        {
-          path: '/account',
-          name: 'account',
-          component: MyUserDetails
-        },
         {
           path: '/ledger-ui/accounts',
           name: 'organisation',
@@ -41,7 +30,6 @@ const router = new Router({
 router.beforeEach(async (to, from, next) => {
     const res = await Vue.http.get(api_endpoints.is_compliance_management_callemail_readonly_user);
     const isComplianceManagementCallemailReadonlyUser = res.body.compliance_management_callemail_readonly_user;
-    //if (to.name !=="internal-call-email-dash" && isComplianceManagementCallemailReadonlyUser) next({name:"internal-call-email-dash"})
     if (!([
         "first-time",
         "account",
