@@ -49,9 +49,6 @@ from wildlifecompliance.helpers import is_internal, is_customer, is_compliance_i
 from django.db.models.functions import Concat
 from django.db.models import Value
 
-#specify mandatory fields (to avoid migration issues with changing nullability)
-OFFENDER_PERSON_MANDATORY_FIELDS = ('first_name', 'last_name', 'dob', 'address_street', 'address_locality', 'address_state', 'address_country', 'address_postcode')
-
 class OffenceFilterBackend(DatatablesFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
@@ -564,19 +561,22 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                         if 'person_id' in item:
                         
                             if item['person_id'] == "new":
-                                offender_person = OffenderPerson.objects.create(
-                                    email=item['email'],
-                                    first_name=item['first_name'],
-                                    last_name=item['last_name'],
-                                    dob=dob,
-                                    phone_number=item['phone_number'],
-                                    mobile_number=item['mobile_number'],
-                                    address_street=item['address_street'],
-                                    address_locality=item['address_locality'],
-                                    address_state=item['address_state'],
-                                    address_country=item['address_country'],
-                                    address_postcode=item['address_postcode'],
-                                )
+                                offender_person_data = {
+                                    "email":item['email'],
+                                    "first_name":item['first_name'],
+                                    "last_name":item['last_name'],
+                                    "dob":dob,
+                                    "phone_number":item['phone_number'],
+                                    "mobile_number":item['mobile_number'],
+                                    "address_street":item['address_street'],
+                                    "address_locality":item['address_locality'],
+                                    "address_state":item['address_state'],
+                                    "address_country":item['address_country'],
+                                    "address_postcode":item['address_postcode'],
+                                }
+                                offender_person = OffenderPersonSerializer(data=offender_person_data)
+                                offender_person.is_valid(raise_exception=True)
+                                offender_person.save()
 
                             else:
                                 try:
@@ -731,19 +731,22 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                             except:
                                 dob = ''
 
-                            offender_person = OffenderPerson.objects.create(
-                                    email=dict['email'],
-                                    first_name=dict['first_name'],
-                                    last_name=dict['last_name'],
-                                    dob=dob,
-                                    phone_number=dict['p_number'],
-                                    mobile_number=dict['m_number'],
-                                    address_street=address['line1'],
-                                    address_locality=address['locality'],
-                                    address_state=address['state'],
-                                    address_country=address['country'],
-                                    address_postcode=address['postcode'],
-                                )
+                            offender_person_data = {
+                                "email":dict['email'],
+                                "first_name":dict['first_name'],
+                                "last_name":dict['last_name'],
+                                "dob":dob,
+                                "phone_number":dict['p_number'],
+                                "mobile_number":dict['m_number'],
+                                "address_street":dict['line1'],
+                                "address_locality":dict['locality'],
+                                "address_state":dict['state'],
+                                "address_country":dict['country'],
+                                "address_postcode":dict['postcode'],
+                            }
+                            offender_person = OffenderPersonSerializer(data=offender_person_data)
+                            offender_person.is_valid(raise_exception=True)
+                            offender_person.save()
                         else:
                             try:
                                 offender_person = OffenderPerson.objects.get(id=dict["person_id"])

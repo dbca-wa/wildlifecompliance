@@ -504,7 +504,7 @@ export default {
                                 if (row.offender.removed){
                                     ret_str = ret_str + '<a href="#" class="restore_button" data-offender-uuid="' + row.offender.uuid + '">Restore</a>';
                                 } else {
-                                    if (row.offender.id != null && row.offender.id != 'new') {
+                                    if (row.offender.id != null && row.offender.id != undefined && row.offender.id != 'new') {
                                         ret_str = ret_str + '<a href="#" class="edit_button" data-offender-id="' + row.offender.person.id + '">Edit</a></br>';
                                     }
                                     if (!row.offender.number_linked_sanction_outcomes_active){
@@ -1151,14 +1151,19 @@ export default {
                 current_offender = vm.current_offender;
             }
 
-            if (
-                current_offender &&
-                current_offender.first_name &&
-                current_offender.last_name &&
-                current_offender.dob
-            ) {
-                let address = current_offender.residential_address;
+            let address = current_offender.residential_address;
+            let required_fields = [current_offender.first_name, current_offender.last_name, current_offender.dob, address.line1, address.locality, address.state, address.country, address.postcode];
+            let missing = false;
 
+            required_fields.forEach(field => {
+                if (!field) {
+                    missing = true;
+                }
+            });
+            
+            if (
+                current_offender && !missing
+            ) {
                 let person_id = 'new';
                 let id_in_table = false
                 //if from an existing offender person, set id to the id of that offender
@@ -1208,11 +1213,15 @@ export default {
                         address_postcode: address.postcode,
                     };
                     this.offence.offenders.push(offender_obj);
+
+                    this.constructOffendersTable();
+                    this.setCurrentOffenderEmpty();
+                    this.uuid++;
                 }
+            } else if (missing) {
+                await swal("Error", "Name, Address, and Date of Birth Required", "error");
             }
-            this.constructOffendersTable();
-            this.setCurrentOffenderEmpty();
-            this.uuid++;
+            
         },
         addAllegedOffenceClicked: function() {
             if (this.current_alleged_offence && this.current_alleged_offence.id) {

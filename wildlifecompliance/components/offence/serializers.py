@@ -49,7 +49,17 @@ class OffenderPersonSerializer(serializers.ModelSerializer):
             'address_country',
             'address_postcode',
         )
+        read_only_fields = ('id',)
 
+    def is_valid(self, raise_exception=False):
+        valid = super(OffenderPersonSerializer, self).is_valid()
+        #specify mandatory fields (to avoid migration issues with changing nullability)
+        OFFENDER_PERSON_MANDATORY_FIELDS = ('first_name', 'last_name', 'dob', 'address_street', 'address_locality', 'address_state', 'address_country', 'address_postcode')
+        for field in OFFENDER_PERSON_MANDATORY_FIELDS:
+            if not self.validated_data.get(field):
+                raise serializers.ValidationError("{} not provided".format(field))
+        return valid
+    
 class OffenderSerializer(serializers.ModelSerializer):
     person = OffenderPersonSerializer(read_only=True,)
     #organisation = OrganisationSerializer(read_only=True,)

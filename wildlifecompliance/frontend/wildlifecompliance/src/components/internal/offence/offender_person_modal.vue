@@ -233,11 +233,11 @@ export default {
                 this.$nextTick(()=>{
                     this.$parent.$router.go()
                 });
+                this.close();
             }
         } catch(err) {
             this.processError(err);
-        } finally {
-            this.close();
+            this.processingDetails = false;
         }
     },
     processError: async function(err) {
