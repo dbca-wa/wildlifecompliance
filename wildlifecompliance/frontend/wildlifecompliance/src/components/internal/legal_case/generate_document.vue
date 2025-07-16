@@ -38,7 +38,7 @@
                 <div v-if="errorResponse" class="form-group">
                     <div class="row">
                         <div class="col-sm-12">
-                            <strong>Error: {{ errorResponse }}</strong>
+                            <span style="white-space: pre; color: red"><strong>Error: {{ errorResponse }}</strong></span>
                         </div>
                     </div>
                 </div>

@@ -254,7 +254,7 @@
                 <div v-if="errorResponse" class="form-group">
                     <div class="row">
                         <div class="col-sm-12">
-                            <strong><span style="white-space: pre;" v-html="errorResponse"></span></strong>
+                            <strong><span style="white-space: pre; color: red;" v-html="errorResponse"></span></strong>
                         </div>
                     </div>
                 </div>

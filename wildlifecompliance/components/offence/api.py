@@ -201,6 +201,15 @@ class OffenderViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            print(traceback.print_exc())
+            if hasattr(e, 'error_dict'):
+                raise serializers.ValidationError(repr(e.error_dict))
+            else:
+                raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
