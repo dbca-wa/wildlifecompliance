@@ -57,7 +57,8 @@ from wildlifecompliance.components.call_email.serializers import (
     CallEmailDatatableSerializer,
     SaveUserAddressSerializer,
     CallEmailAllocatedGroupSerializer,
-    UpdateAssignedToIdSerializer
+    UpdateAssignedToIdSerializer,
+    CallEmailUserActionSerializer
     )
 
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
@@ -357,6 +358,23 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
                 raise serializers.ValidationError(repr(e[0]))
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
+
+    @action(detail=True, methods=['GET', ])
+    def action_log(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            qs = instance.action_logs.all()
+            serializer = CallEmailUserActionSerializer(qs, many=True)
+            return Response(serializer.data)
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(repr(e.error_dict))
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
