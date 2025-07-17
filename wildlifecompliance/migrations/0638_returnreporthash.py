@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('wildlifecompliance', '0637_alter_inspectiontypeapprovaldocument__file'),
+        ('wildlifecompliance', '0629_sanctionoutcome_allocated_group'),
     ]
 
     operations = [

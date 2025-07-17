@@ -57,7 +57,8 @@ from wildlifecompliance.components.call_email.serializers import (
     CallEmailDatatableSerializer,
     SaveUserAddressSerializer,
     CallEmailAllocatedGroupSerializer,
-    UpdateAssignedToIdSerializer
+    UpdateAssignedToIdSerializer,
+    CallEmailUserActionSerializer
     )
 
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
@@ -357,6 +358,23 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
                 raise serializers.ValidationError(repr(e[0]))
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
+
+    @action(detail=True, methods=['GET', ])
+    def action_log(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            qs = instance.action_logs.all()
+            serializer = CallEmailUserActionSerializer(qs, many=True)
+            return Response(serializer.data)
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(repr(e.error_dict))
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
@@ -884,7 +902,7 @@ class ReportTypeViewSet(viewsets.ReadOnlyModelViewSet):
     def get_distinct_queryset(self, request, *args, **kwargs):
         return_list = []
         if is_internal(self.request) or is_compliance_management_user(self.request):
-            return_list = list(ReportType.objects.distinct('report_type').order_by('-version').values('id', 'report_type', 'version'))
+            return_list = list(ReportType.objects.order_by('report_type','-version').distinct('report_type').values('id', 'report_type', 'version'))
         return Response(return_list)
 
     @action(detail=True, methods=['GET',])

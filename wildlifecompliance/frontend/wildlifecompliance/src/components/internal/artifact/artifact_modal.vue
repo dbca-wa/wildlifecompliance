@@ -29,7 +29,7 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <strong>
-                                <span style="white-space: pre;">{{ errorResponse }}</span>
+                                <span style="white-space: pre; color: red">{{ errorResponse }}</span>
                             </strong>
                         </div>
                     </div>

@@ -213,7 +213,7 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <strong>
-                                <span style="white-space: pre;" v-html="errorResponse"></span>
+                                <span style="white-space: pre; color: red;" v-html="errorResponse"></span>
                             </strong>
                         </div>
                     </div>
@@ -651,7 +651,9 @@ export default {
       vm.newPersonBeingCreated = false;
     },
     addOffenderClicked: async function() {
+      console.log("addOffenderClicked")
       let vm = this;
+      this.errorResponse = "";
 
       let current_offender;
       if (
@@ -664,11 +666,21 @@ export default {
           current_offender = vm.current_offender;
       }
 
+      let address = {};
+      let missing = false;
+      if (!(current_offender && 'residential_address' in current_offender)) {          
+          missing = true;
+      } else {
+          address = current_offender.residential_address;
+          let required_fields = [current_offender.first_name, current_offender.last_name, current_offender.dob, address.line1, address.locality, address.state, address.country, address.postcode];
+          required_fields.forEach(field => {
+                if (!field) {
+                    missing = true;
+                }
+            });
+      }
       if (
-        current_offender &&
-        current_offender.first_name &&
-        current_offender.last_name &&
-        current_offender.dob
+        current_offender && !missing
       ) {
         //NOTE: we assume individual if data type not specified
         if ((!('data_type' in current_offender) || current_offender.data_type !== undefined) || current_offender.data_type == "individual") {
@@ -692,7 +704,13 @@ export default {
               residential_address: current_offender.residential_address
             })
             .draw();
-        }
+            this.setCurrentOffenderEmpty();
+            this.uuid++;
+        }  
+      } else if (current_offender && missing) {
+          this.errorResponse = "Name, Address, and Date of Birth Required";
+          console.log(this.errorResponse)
+      }
         //TODO do we need org offenders?
         /*else if (current_offender.data_type == "organisation") {
           vm.offender_count++;
@@ -705,9 +723,7 @@ export default {
             })
             .draw();
         }*/
-        this.setCurrentOffenderEmpty();
-        this.uuid++;
-      }
+        
     },
     addAllegedOffenceClicked: function() {
         if (this.current_alleged_offence && this.current_alleged_offence.id) {

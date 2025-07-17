@@ -470,6 +470,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 CSRF_TRUSTED_ORIGINS_STRING = decouple.config("CSRF_TRUSTED_ORIGINS", default='[]')
 CSRF_TRUSTED_ORIGINS = json.loads(str(CSRF_TRUSTED_ORIGINS_STRING))
 
-FILE_UPLOAD_PERMISSIONS = None
-
 REPORTING_EMAIL = env('REPORTING_EMAIL', '').lower()
+
+# This is needed so that the chmod is not called in django/core/files/storage.py
+# (_save method of FileSystemStorage class)
+# As it causes a permission exception when using azure network drives
+FILE_UPLOAD_PERMISSIONS = None

@@ -835,13 +835,13 @@ class CreateCallEmailSerializer(serializers.ModelSerializer):
             'id', 
             )
 
-#TODO replace/remove
-#class CallEmailUserActionSerializer(serializers.ModelSerializer):
-#    who = serializers.CharField(source='who.get_full_name')
-#
-#    class Meta:
-#        model = CallEmailUserAction
-#        fields = '__all__'
+
+class CallEmailUserActionSerializer(serializers.ModelSerializer):
+    who = serializers.CharField(source='who.get_full_name')
+
+    class Meta:
+        model = CallEmailUserAction
+        fields = '__all__'
 
 
 class CallEmailLogEntrySerializer(CommunicationLogEntrySerializer):

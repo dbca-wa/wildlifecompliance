@@ -147,6 +147,7 @@
                                                     {% if request.user.is_superuser %}
                                                         <li><a href="{% url 'mgt-commands' %}">Management Commands</a></li>
                                                     {% endif %}
+                                                    <li><a href="{{ LEDGER_UI_URL }}/ledger/account-management/">Accounts Management</a></li>
                                                     <li role="separator" class="divider"></li>
                                                 {% endif %}
 

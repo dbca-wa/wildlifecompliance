@@ -140,7 +140,7 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <strong>
-                                <span style="white-space: pre;" v-html="errorResponse"></span>
+                                <span style="white-space: pre; color: red;" v-html="errorResponse"></span>
                             </strong>
                         </div>
                     </div>
@@ -233,15 +233,16 @@ export default {
                 this.$nextTick(()=>{
                     this.$parent.$router.go()
                 });
+                this.close();
             }
         } catch(err) {
             this.processError(err);
-        } finally {
-            this.close();
+            this.processingDetails = false;
         }
     },
     processError: async function(err) {
         let errorText = '';
+        console.log(err)
         if (err.body){
             if (err.body.non_field_errors) {
                 // When non field errors raised

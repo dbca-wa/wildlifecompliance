@@ -6,6 +6,7 @@ venv*/
 node_modules/
 mooring/cache/*
 .ropeproject/
+session_store/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
