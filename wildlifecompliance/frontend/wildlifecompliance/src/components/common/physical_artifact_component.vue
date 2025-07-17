@@ -211,13 +211,15 @@
                                 <div :id="detailsTab" :class="detailsTabClass" v-bind:key="artifactType">
                                     <FormSection :formCollapse="false" label="Details">
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <div v-if="detailsSchemaVisibility" v-for="(item, index) in detailsSchema">
-                                              <compliance-renderer-block
-                                                 :component="item"
-                                                 :readonlyForm="readonlyForm"
-                                                 v-bind:key="`compliance_renderer_block${index}`"
-                                                @update-temp-doc-coll-id="addToTemporaryDocumentCollectionList"
-                                                />
+                                            <div v-if="detailsSchemaVisibility">
+                                                <div v-for="(item, index) in detailsSchema">
+                                                <compliance-renderer-block
+                                                    :component="item"
+                                                    :readonlyForm="readonlyForm"
+                                                    v-bind:key="`compliance_renderer_block${index}`"
+                                                    @update-temp-doc-coll-id="addToTemporaryDocumentCollectionList"
+                                                    />
+                                                </div>
                                             </div>
                                         </div></div>
                                     </FormSection>
@@ -225,12 +227,14 @@
                                 <div :id="storageTab" :class="storageTabClass">
                                     <FormSection :formCollapse="false" label="Storage" v-bind:key="artifactType">
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <div v-if="storageSchemaVisibility" v-for="(item, index) in storageSchema">
-                                              <compliance-renderer-block
-                                                 :component="item"
-                                                 :readonlyForm="readonlyForm"
-                                                 v-bind:key="`compliance_renderer_block${index}`"
-                                                />
+                                            <div v-if="storageSchemaVisibility"> 
+                                                <div v-for="(item, index) in storageSchema">
+                                                <compliance-renderer-block
+                                                    :component="item"
+                                                    :readonlyForm="readonlyForm"
+                                                    v-bind:key="`compliance_renderer_block${index}`"
+                                                    />
+                                                </div>
                                             </div>
                                         </div></div>
                                     </FormSection>

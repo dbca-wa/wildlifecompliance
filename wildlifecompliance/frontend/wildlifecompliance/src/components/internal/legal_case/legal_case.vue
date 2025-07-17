@@ -398,8 +398,8 @@ import _ from 'lodash';
 import RunningSheetHistory from './running_sheet_history'
 import LegalCaseWorkflow from './legal_case_workflow'
 //import TreeSelect from "@/components/compliance_forms/treeview.vue";
-import TreeSelect from '@riophae/vue-treeselect'
-import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+import TreeSelect from 'vue3-treeselect'
+//import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import BriefOfEvidence from './brief_of_evidence';
 import ProsecutionBrief from './prosecution_brief';
 import CourtProceedings from './court_proceedings';

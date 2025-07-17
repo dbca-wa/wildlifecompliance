@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import Router from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
 import Organisations from '@/components/user/manage_organisations.vue'
 import ManageOrganisation from '@/components/external/organisations/manage.vue'
 import ProfileDashTable from '@/components/user/profile_dashboard.vue'
@@ -8,10 +8,9 @@ import EditProfile from '@/components/user/profile_manage.vue'
 import external_routes from '@/components/external/routes'
 import internal_routes from '@/components/internal/routes'
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
-Vue.use(Router)
 
-const router = new Router({
-    mode: 'history',
+const router = new createRouter({
+    mode: createWebHistory(),
     routes: [
         {
           path: '/ledger-ui/accounts',
@@ -42,4 +41,5 @@ router.beforeEach(async (to, from, next) => {
     }
     else next()
 });
-export { router as default }
+
+export default router;

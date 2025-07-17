@@ -14,7 +14,7 @@
                         <div v-for="(a, a_idx) in visibleRequests" v-bind:key="`ret_amend_${a_idx}`">
                             <p v-if="a.text"><b>Details:</b>
                                 <div v-for="(t, t_idx) in splitText(a.text)" v-bind:key="`ret_text_${t_idx}`">{{t}}<br></div>
-                            <p/> 
+                            </p> 
                         </div>
                     </div>
                 </div>

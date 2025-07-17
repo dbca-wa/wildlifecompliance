@@ -454,12 +454,14 @@
                                 </div>
                             </div> -->
                             
-                            <div v-if="rendererVisibility"  v-for="(item, index) in current_schema">
+                            <div v-if="rendererVisibility">  
+                              <div v-for="(item, index) in current_schema">
                               <compliance-renderer-block
                                  :component="item"
                                  :readonlyForm="readonlyForm"
                                  v-bind:key="`compliance_renderer_block_${index}`"
                                 />
+                                </div>
                             </div>
                           </FormSection>
             

@@ -72,8 +72,7 @@
                                             <label class="control-label pull-left"  for="Name">Assessor Group</label>
                                             <select class="form-control" v-model="selectedAssessor">
                                                 <option 
-                                                    v-for="(assessor, idx) in assessorGroup"
-                                                    v-if="isAssessorRelevant(assessor)"
+                                                    v-for="(assessor, idx) in relevantAssessorGroup"
                                                     :id="assessor.id"
                                                     :value="assessor"
                                                     :selected="!selectedAssessor"
@@ -186,6 +185,13 @@ export default {
             'allCurrentActivities',
             'allCurrentActivitiesWithAssessor',
         ]),
+        relevantAssessorGroup: function() {
+            let relevantAssessors = [];
+            array.forEach(assessor => {
+                relevantAssessors.add(isAssessorRelevant(assessor));
+            });
+            return relevantAssessors;
+        },
         applicationDetailsVisible: function() {
             this.$nextTick(() => {
                 this.eventListeners();

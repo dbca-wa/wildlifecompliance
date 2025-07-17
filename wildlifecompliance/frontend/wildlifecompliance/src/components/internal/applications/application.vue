@@ -25,15 +25,17 @@
                             </div>
                             <div class="col-sm-12 top-buffer-s">
                                 <strong>Lodged on</strong><br/>
-                                {{ application.lodgement_date | formatDate}}
+                                {{ formatDate(application.lodgement_date) }}
                             </div>
                             <div class="col-sm-12 top-buffer-s">
                                 <table class="table small-table">
+                                    <thead>
                                     <tr>
                                         <th>Lodgement</th>
                                         <th>Date</th>
                                         <th>Action</th>
                                     </tr>
+                                    </thead>
                                 </table>
                             </div>
                         </div>
@@ -62,29 +64,29 @@
                              <div class="col-sm-12 top-buffer-s" v-show="showAssignToOfficer" >
                                 <strong>Assigned Officer</strong><br/>
                                 <div class="form-group">
-                                    <template>
+                                    <div>
                                         <select ref="assigned_officer" class="form-control" v-model="selectedActivity.assigned_officer">
                                             <option v-for="member in selectedActivity.licensing_officers" :value="member.id" v-bind:key="member.id">{{member.first_name}} {{member.last_name}}</option>
                                         </select>
                                         <a @click.prevent="assignToMe()" class="actionBtn pull-right">Assign to me</a>
-                                    </template>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-12 top-buffer-s" v-show="showAssignToApprover && !application_workflow_state" >
                                 <strong>Assigned Approver</strong><br/>
                                 <div class="form-group">
-                                    <template>
+                                    <div>
                                         <div>
                                         <select ref="assigned_approver" class="form-control" v-model="selectedActivity.assigned_approver" >
                                             <option v-for="member in selectedActivity.issuing_officers" :value="member.id" v-bind:key="member.id">{{member.first_name}} {{member.last_name}}</option>
                                         </select>
                                         <a @click.prevent="makeMeApprover()" class="actionBtn pull-right">Assign to me</a>
                                         </div>
-                                    </template>                                    
+                                    </div>                                    
                                 </div>
                             </div>
 
-                            <template v-if="isFinalised">
+                            <div v-if="isFinalised">
                                 <div>
                                     <div class="col-sm-12">
                                         <div class="separator"></div>
@@ -97,13 +99,13 @@
                                         <a class="actionBtn" v-if="(!showingApplication || !this.unfinishedActivities.length) && !showingConditions" @click.prevent="toggleConditions({show: true})">Show Conditions</a>
                                     </div>
                                 </div>
-                            </template>
-                            <template v-if="isFinalised">
+                            </div>
+                            <div v-if="isFinalised">
                                 <div class="col-sm-12">
                                     <div class="separator"></div>
                                 </div>
-                            </template>
-                            <template v-if="(canIssueDecline && approvingApplication && !application_workflow_state) || notOfficerWorkflow">
+                            </div>
+                            <div v-if="(canIssueDecline && approvingApplication && !application_workflow_state) || notOfficerWorkflow">
                                 <div>
                                     <div class="col-sm-12">
                                         <div class="separator"></div>
@@ -121,14 +123,14 @@
                                         <a class="actionBtn" v-if="!showingApplication && !showingConditions" @click.prevent="actionConditionLink()">Show Conditions</a>
                                     </div>
                                 </div>
-                            </template>
-                            <template v-if="(canIssueDecline && approvingApplication && !application_workflow_state) || notOfficerWorkflow">
+                            </div>
+                            <div v-if="(canIssueDecline && approvingApplication && !application_workflow_state) || notOfficerWorkflow">
                                 <div class="col-sm-12">
                                     <div class="separator"></div>
                                 </div>
-                            </template>
+                            </div>
                               <div class="col-sm-12 top-buffer-s" >
-                                <template v-if="showingApplication">
+                                <div v-if="showingApplication">
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <strong>Action</strong><br/>
@@ -153,8 +155,8 @@
                                             <button v-else class="btn btn-primary top-buffer-s col-xs-12" @click.prevent="actionConditionButton()">Assessments &amp; Conditions</button><br/>
                                         </div>
                                     </div>
-                                </template>
-                                <template v-else>
+                                </div>
+                                <div v-else>
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <strong>Action</strong><br/>
@@ -181,7 +183,7 @@
                                             <button class="btn btn-primary top-buffer-s col-xs-12" @click.prevent="proposedDecline()">Propose Decline</button>
                                         </div>
                                     </div>  
-                                </template>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -191,13 +193,13 @@
         <div class="col-md-1"></div>
         <div class="col-md-8">
             <div class="row">
-                <template v-if="canIssueDecline && isofficerfinalisation">
+                <div v-if="canIssueDecline && isofficerfinalisation">
                     <IssueLicence :application="application" :licence_activity_tab="selected_activity_tab_id" :applicantType="applicantType" @action-tab="actionTabListener" />
-                </template>
+                </div>
 
                 <ApplicationAssessments @action-tab="actionTabListener" v-if="isSendingToAssessor || showingConditions" />
 
-                <template v-if="applicationDetailsVisible && showingApplication">
+                <div v-if="applicationDetailsVisible && showingApplication">
                     <div>
                     <ul class="nav nav-pills mb-3" id="tabs-main" data-tabs="tabs">
                         <li class="nav-item"><a ref="applicantTab" class="nav-link" data-toggle="pill" v-on:click="selectApplicantTab()" :href="'#'+applicantTab">Applicant</a></li>
@@ -596,7 +598,7 @@
                 </div>
             </div>
         </div>
-    </template>
+    </div>
 
     <!-- Final Decision display -->
     <div v-show="showFinalDecision">
@@ -626,8 +628,8 @@
                                     <strong>&nbsp;</strong><br/>
                                     <strong>Licence Activity: {{ activity.activity_name_str }}</strong><br/>
                                     <strong>Decision: {{ activity.processing_status.id === 'declined' ? activity.processing_status.name : activity.decision_action }}</strong><br/>
-                                    <strong>Start date: {{ activity.processing_status.id === 'declined' ? '' : activity.start_date | formatDateNoTime }}</strong><br/>
-                                    <strong>Expiry date: {{ activity.processing_status.id === 'declined' ? '' : activity.expiry_date | formatDateNoTime }}</strong>                                    
+                                    <strong>Start date: {{ activity.processing_status.id === 'declined' ? '' : formatDateNoTime(activity.start_date) }}</strong><br/>
+                                    <strong>Expiry date: {{ activity.processing_status.id === 'declined' ? '' : formatDateNoTime(activity.expiry_date) }}</strong>                                    
                                 </div>
                             </div>
                         </div>
@@ -767,14 +769,6 @@ export default {
         CommsLogs,
         AmendmentRequestDetails,
         SecureBaseLink,
-    },
-    filters: {
-        formatDate: function(data){
-            return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
-        },
-        formatDateNoTime: function(data){
-            return data ? moment(data).format('DD/MM/YYYY'): '';
-        },       
     },
     watch: {
     },
@@ -1121,6 +1115,12 @@ export default {
         },
     },
     methods: {
+        formatDate: function(data){
+            return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
+        },
+        formatDateNoTime: function(data){
+            return data ? moment(data).format('DD/MM/YYYY'): '';
+        },    
         ...mapActions({
             load: 'loadApplication',
             revert: 'revertApplication',

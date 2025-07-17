@@ -15,15 +15,17 @@
                     <div class="col-sm-12"><br/></div>
                     <div class="col-sm-12 top-buffer-s">
                         <strong>Lodged on</strong><br/>
-                        {{ returns.lodgement_date | formatDate}}
+                        {{ formatDate(returns.lodgement_date) }}
                     </div>
                     <div class="col-sm-12 top-buffer-s">
                         <table class="table small-table">
-                            <tr>
-                                <th>Lodgement</th>
-                                <th>Date</th>
-                                <th>Action</th>
-                            </tr>
+                            <thead>
+                                <tr>
+                                    <th>Lodgement</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
                         </table>
                     </div>
                 </div>
@@ -44,12 +46,12 @@
                     <div v-show="showAssignToList" class="col-sm-12 top-buffer-s">
                         <strong>Assigned Officer</strong><br/>
                         <div class="form-group">
-                            <template>
+                            <div>
                                 <select ref="assigned_to" class="form-control" v-model="returns.assigned_to">
                                     <option v-for="member in returns.activity_curators" :value="member.id" v-bind:key="member.id">{{member.first_name}} {{member.last_name}}</option>
                                 </select>
                                 <a @click.prevent="assignToMe()" class="actionBtn pull-right">Assign to me</a>
-                            </template>
+                            </div>
                         </div>
                     </div>
                     <div v-show="!showAssignToList" class="col-sm-12 top-buffer-s">
@@ -95,9 +97,7 @@ export default {
         AmendmentRequest,
     },
     filters: {
-        formatDate: function(data){
-            return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
-        }
+        
     },
     data() {
         let vm = this;
@@ -145,6 +145,9 @@ export default {
         },
     },
     methods: {
+        formatDate: function(data){
+            return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
+        },
         ...mapActions([
             'setReturnsTabId',
             'setReturnsSpecies',

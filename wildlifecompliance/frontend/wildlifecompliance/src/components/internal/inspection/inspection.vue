@@ -292,15 +292,17 @@
 
                         <div :id="cTab" class="tab-pane fade in">
                             <FormSection :formCollapse="false" label="Checklist">
-                                <div class="col-sm-12 form-group"><div class="row">
-                                        <div v-if="rendererVisibility" v-for="(item, index) in current_schema">
+                                <div class="col-sm-12 form-group">
+                                  <div v-if="rendererVisibility" class="row">
+                                      <div v-for="(item, index) in current_schema">
                                       <compliance-renderer-block
                                          :component="item"
                                          :readonlyForm="readonlyForm"
                                          v-bind:key="`compliance_renderer_block${index}`"
                                         />
                                     </div>
-                                </div></div>
+                                </div>
+                              </div>
                             </FormSection>
                         </div>
                         <div :id="oTab" class="tab-pane fade in">

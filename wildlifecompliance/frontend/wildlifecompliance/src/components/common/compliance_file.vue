@@ -26,9 +26,11 @@
             </div>
             <div v-if="show_spinner"><i class='fa fa-2x fa-spinner fa-spin'></i></div>
         </div>
-        <div v-if="!readonly" v-for="n in repeat">
-            <div v-if="isRepeatable || (!isRepeatable && num_documents()==0)">
-                <input :name="name" type="file" :data-que="n" :accept="fileTypes" @change="handleChangeWrapper"/>
+        <div v-if="!readonly">
+            <div v-for="n in repeat">
+                <div v-if="isRepeatable || (!isRepeatable && num_documents()==0)">
+                    <input :name="name" type="file" :data-que="n" :accept="fileTypes" @change="handleChangeWrapper"/>
+                </div>
             </div>
         </div>
     </div>

@@ -10,7 +10,7 @@
 
 export default {
     props: {
-        formatted_text: {
+        formatted_text_prop: {
             type: String,
             default: ""
         },
@@ -34,6 +34,11 @@ export default {
             $summernoterElement : null,
             raw_text: "",
             summernote_display: null,
+        }
+    },
+    computed: {
+        formatted_text: function() {
+            return this.formatted_text_prop;
         }
     },
     watch: {

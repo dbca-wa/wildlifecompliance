@@ -66,15 +66,17 @@
                             </div>
                             <div class="col-sm-12 top-buffer-s">
                                 <strong>Lodged on</strong><br/>
-                                {{ application.lodgement_date | formatDate}}
+                                {{ formatDate(application.lodgement_date) }}
                             </div>
                             <div class="col-sm-12 top-buffer-s">
                                 <table class="table small-table">
+                                    <thead>
                                     <tr>
                                         <th>Lodgement</th>
                                         <th>Date</th>
                                         <th>Action</th>
                                     </tr>
+                                    </thead>
                                 </table>
                             </div>
                         </div>
@@ -107,7 +109,7 @@
                                     <div v-if="activity_assessment.assessor_group.name">
                                         <div>Assessment for {{activity_assessment.assessor_group.name.split('Wildlife Compliance - Assessors:')[1]}}</div>
 
-                                        <template>
+                                        <div>
                                             <!-- display selects when Assessor has been allocated -->
                                             <select v-if="activity_assessment.assigned_assessor!=null" ref="assigned_assessor" class="form-control" v-model="activity_assessment.assigned_assessor.id">
                                                 <option :value="null"></option>                                                
@@ -119,14 +121,14 @@
                                                 <option v-for="member in activity_assessment.assessors" :value="member.id" v-bind:key="member.id">{{member.first_name}} {{member.last_name}}</option>
                                             </select>
                                             <a @click.prevent="makeMeAssessor(activity_assessment)" class="actionBtn pull-right">Assign to me</a>
-                                        </template>
+                                        </div>
                            
                                     </div>
                                 </div>
 
                             </div>
 
-                            <template v-if="isFinalised">
+                            <div v-if="isFinalised">
                                 <div>
                                     <div class="col-sm-12">
                                         <strong>Application</strong><br/>
@@ -137,14 +139,14 @@
                                         <div class="separator"></div>
                                     </div>
                                 </div>
-                            </template>
-                            <template v-if="isFinalised">
+                            </div>
+                            <div v-if="isFinalised">
                                 <div class="col-sm-12">
                                     <div class="separator"></div>
                                 </div>
-                            </template>
+                            </div>
 
-                            <template v-if="!showBackToProcessingButton">
+                            <div v-if="!showBackToProcessingButton">
                                 <div>
                                     <div class="col-sm-12">
                                         <div class="separator"></div>
@@ -155,15 +157,15 @@
                                         <a class="actionBtn" v-else @click.prevent="toggleApplication({show: false, showFinalised: false})">Hide Application</a><br/>
                                     </div>
                                 </div>
-                            </template>
-                            <template v-if="!showBackToProcessingButton">
+                            </div>
+                            <div v-if="!showBackToProcessingButton">
                                 <div class="col-sm-12">
                                     <div class="separator"></div>
                                 </div>
-                            </template>
+                            </div>
 
                               <div class="col-sm-12 top-buffer-s" >
-                                <template v-if="showingApplication">
+                                <div v-if="showingApplication">
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <strong>Action</strong><br/>
@@ -174,8 +176,8 @@
                                             <button class="btn btn-primary top-buffer-s col-xs-12" @click.prevent="toggleAssessments()">Assessments &amp; Conditions</button><br/>
                                         </div>
                                     </div>   
-                                </template>
-                                <template v-else>
+                                </div>
+                                <div v-else>
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <strong>Action</strong><br/>
@@ -196,7 +198,7 @@
                                             <button class="btn btn-primary top-buffer-s col-xs-12" @click.prevent="openAssessmentModal()">Complete Assessments</button><br/>
                                         </div>
                                     </div>                                   
-                                </template>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -210,7 +212,7 @@
 
                     <ApplicationAssessments v-if="!applicationDetailsVisible" />
 
-                    <template v-if="applicationDetailsVisible">
+                    <div v-if="applicationDetailsVisible">
                         <ul class="nav nav-pills mb-3" id="tabs-main">
                             <li class="nav-item" v-for="(activity, index) in allCurrentActivities">
                                 <a :class="{'nav-link amendment-highlight': application.has_amendment}"
@@ -257,7 +259,7 @@
                             </div>
                         </div>
                         </div>
-                    </template>
+                    </div>
 
                     <InspectionRequest ref="inspection"  @inspection-created="requestedInspection"></InspectionRequest>                    
 
@@ -266,7 +268,6 @@
         </div>
 
     </div>
-</div>
 </template>
 <script>
 import Application from '../../form.vue';
@@ -331,11 +332,6 @@ export default {
         CommsLogs,
         modal,
         InspectionRequest,
-    },
-    filters: {
-        formatDate: function(data){
-            return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
-        }
     },
     watch: {
     },
@@ -478,6 +474,9 @@ export default {
         },
     },
     methods: {
+        formatDate: function(data){
+            return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
+        },
         ...mapActions({
             load: 'loadApplication',
             revert: 'revertApplication',

@@ -10,7 +10,7 @@
                     <div class="dropdown">
                         <ul class="list-unstyled">
                             <li class="open">
-                                <h5>Sections</span></h5>
+                                <h5>Sections</h5>
                                 <ul class="dropdown-menu dropdown-panel">
                                     <li v-for="(tab, tab_idx) in renderer_tabs" class='dropdown-submenu'>
                                         <a tabindex='-1' class='section-menu' v-on:click="sectionClick(tab)">

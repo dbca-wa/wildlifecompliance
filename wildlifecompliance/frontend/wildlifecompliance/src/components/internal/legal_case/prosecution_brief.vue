@@ -286,8 +286,8 @@ import 'eonasdan-bootstrap-datetimepicker';
 require("select2/dist/css/select2.min.css");
 require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
 import _ from 'lodash';
-import TreeSelect from '@riophae/vue-treeselect'
-import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+import TreeSelect from 'vue3-treeselect'
+//import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import filefield from '@/components/common/compliance_file.vue';
 
 
