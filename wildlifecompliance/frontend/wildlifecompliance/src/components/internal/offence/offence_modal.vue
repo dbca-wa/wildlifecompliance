@@ -494,11 +494,6 @@ export default {
         return {'id': 1, 'data_type': 'individual'}
     },
   },
-  filters: {
-    formatDate: function(data) {
-      return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-    }
-  },
   methods: {
     ...mapActions("offenceStore", {
       setAllegedOffenceIds: "setAllegedOffenceIds",

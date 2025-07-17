@@ -315,11 +315,6 @@ export default {
             return this.legal_case.court_proceedings ? true : false;
         },
     },
-    filters: {
-        formatDate: function(data) {
-            return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-        }
-    },
     methods: {
         ...mapActions('legalCaseStore', {
             setCourtProceedingsJournalEntry: 'setCourtProceedingsJournalEntry',

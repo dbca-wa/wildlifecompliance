@@ -891,11 +891,6 @@ export default {
         return keyCombination;
     },
   },
-  filters: {
-    formatDate: function(data) {
-      return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-    }
-  },
   methods: {
     ...mapActions('legalCaseStore', {
       loadLegalCase: 'loadLegalCase',

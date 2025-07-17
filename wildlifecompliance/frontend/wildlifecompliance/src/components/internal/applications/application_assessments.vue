@@ -156,11 +156,6 @@ export default {
             default: false,
         },
     },
-    filters: {
-        formatDate: function(data){
-            return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
-        }
-    },
     watch: {
     },
     computed: {

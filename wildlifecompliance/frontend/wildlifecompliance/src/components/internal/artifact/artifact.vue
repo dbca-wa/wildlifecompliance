@@ -246,11 +246,6 @@ export default {
         return related_items_visibility;
     },
   },
-  filters: {
-    formatDate: function(data) {
-      return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-    }
-  },
   methods: {
       ...mapActions('documentArtifactStore', {
           saveDocumentArtifact: 'saveDocumentArtifact',

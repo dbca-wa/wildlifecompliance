@@ -326,9 +326,6 @@ export default {
     }
   },
   methods: {
-    formatDate: function(data){
-        return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
-    },
     commaToNewline(s){
         return s.replace(/[,;]/g, '\n');
     },

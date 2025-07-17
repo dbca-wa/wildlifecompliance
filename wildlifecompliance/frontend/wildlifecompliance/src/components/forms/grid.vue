@@ -13,11 +13,11 @@
           <CommentBlock :label="label" :name="name" :field_data="getDeficiencyField" />
 
           <div class="grid-container">
-              <div>
-                  <label v-if="headers" v-for="header in headers" >
+              <div v-if="headers">
+                  <label v-for="header in headers" >
                       <input class="form-control" v-model="header.label" disabled="disabled" />
                       <div class="grid-item" v-for ="(field, row_no) in field_data" >
-                          <div id="header.name" v-for="(title,key) in field" v-if="key == header.name"
+                          <div id="header.name" v-for="(title,key) in field"
                               :name="`${name}::${header.name}`" :key="`f_${key}`" >
 
                               <div v-if="header.type === 'date'" >

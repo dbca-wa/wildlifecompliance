@@ -31,7 +31,7 @@
                             </div>
                             <div class="col-md-6" v-if="isAddEntry && !isStockEntry">
                                 <select class="form-control" v-model="entryActivity">
-                                    <option v-for="(activity, activityId) in filteredActivityList" v-if="activity['auto']=='false'" :value="activityId">{{activity['label']}}</option>
+                                    <option v-for="(activity, activityId) in filteredAutoActivityList"" :value="activityId">{{activity['label']}}</option>
                                 </select>
                             </div>
                             <div class="col-md-3" v-if="isChangeEntry && !isStockEntry">
@@ -210,12 +210,21 @@ export default {
       isStockEntry: function() {
         return this.entryActivity==='stock'?true:false;
       },
-      filteredActivityList: function() {
+      filteredActivityList: function() { //TODO fix this (possible source of incorrect return counts?)
         let filteredList = Object.assign({}, this.activityList)
         if (filteredList['stock'] && !this.isStockEntry) {
           delete filteredList['stock']
         }
   
+        return filteredList
+      },
+      filteredAutoActivityList: function() {
+        let filteredList = []
+        this.filteredActivityList.forEach(activity => {
+          if (activity['auto'] == false) {
+            filteredList.add(activity);
+          }
+        });
         return filteredList
       }
     },

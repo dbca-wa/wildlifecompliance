@@ -580,8 +580,8 @@
                                                 <div class="container">
                                                     <p class="pull-right" style="margin-top:5px;">
                                                         <span style="margin-right: 5px; font-size: 18px; display: block;" v-if="updatedFee" >
-                                                            <strong>Updated application fee: {{application.application_fee | toCurrency}}</strong>
-                                                            <strong>licence fee: {{application.licence_fee | toCurrency}}</strong>
+                                                            <strong>Updated application fee: {{toCurrency(application.application_fee)}}</strong>
+                                                            <strong>licence fee: {{toCurrency(application.licence_fee)}}</strong>
                                                         </span>
                                                         <button v-if="showSpinner && showRequestSpinner" type="button" disabled class="btn btn-primary" >Save Changes</button> 
                                                         <button v-else-if="showSpinner && !showRequestSpinner" type="button" class="btn btn-primary" ><i class="fa fa-spinner fa-spin"/>Saving</button>                                                    
@@ -1115,9 +1115,6 @@ export default {
         },
     },
     methods: {
-        formatDate: function(data){
-            return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
-        },
         formatDateNoTime: function(data){
             return data ? moment(data).format('DD/MM/YYYY'): '';
         },    

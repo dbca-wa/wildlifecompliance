@@ -59,17 +59,21 @@ Vue.http.interceptors.push( function ( request, next ) {
   next();
 } );
 
-Vue.filter('toCurrency', function(value) {
-                if (typeof value !== "number") {
-                    return value;
-                }
-                var formatter = new Intl.NumberFormat('en-AU', {
-                    style: 'currency',
-                    currency: 'AUD',
-                    minimumFractionDigits: 2
-                });
-                return formatter.format(value);
-            });
+Vue.method('toCurrency', function(value) {
+    if (typeof value !== "number") {
+        return value;
+    }
+    var formatter = new Intl.NumberFormat('en-AU', {
+        style: 'currency',
+        currency: 'AUD',
+        minimumFractionDigits: 2
+    });
+    return formatter.format(value);
+});
+
+Vue.method('formatDate', function(data) {
+    return data ? moment(data).format('DD/MM/YYYY'): '';
+})
 
 var mapbox_access_token = '';
 

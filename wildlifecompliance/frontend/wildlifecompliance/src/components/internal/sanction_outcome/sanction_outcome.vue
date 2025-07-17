@@ -374,7 +374,7 @@
                                                 <label>Payment due date:</label>
                                             </div>
                                             <div class="col-sm-3">
-                                                <span>{{ formatDate(item.due_date_applied) }}</span>
+                                                <span>{{ formatSODate(item.due_date_applied) }}</span>
                                             </div>
                                             <div class="col-sm-2">
                                                 <label>Reason:</label>
@@ -1068,8 +1068,7 @@ export default {
             await this.loadRemediationAction({ remediation_action_id: remediation_action_id });
             this.constructRemediationActionsTable();
         },
-        formatDate: function(d){
-            console.log('formatDate');
+        formatSODate: function(d){
             if (d === 'overdue'){
                 return 'Overdue';
             }

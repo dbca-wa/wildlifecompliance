@@ -51,8 +51,8 @@
                             <div class="container">
                                 <p class="pull-right" style="margin-top:5px;">
                                     <span v-if="showCardPayButton || showCashPayButton" style="margin-right: 5px; font-size: 18px; display: block;">
-                                        <strong>Estimated application fee: {{adjusted_application_fee | toCurrency}}</strong>
-                                        <strong>Estimated licence fee: {{application.licence_fee | toCurrency}}</strong>
+                                        <strong>Estimated application fee: {{toCurrency(adjusted_application_fee)}}</strong>
+                                        <strong>Estimated licence fee: {{toCurrency(application.licence_fee)}}</strong>
                                     </span>
                                     <input v-if="!isProcessing && canDiscardActivity" type="button" @click.prevent="discardActivity" class="btn btn-danger" value="Discard Activity"/>
                                     <input v-if="!isProcessing" type="button" @click.prevent="saveExit" class="btn btn-primary" value="Save and Exit"/>

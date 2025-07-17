@@ -126,11 +126,6 @@ export default {
             required: true,
         },
     },
-    filters: {
-      formatDate: function(data) {
-          return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-      }
-    },
     methods: {
         tokenToUrl: function(description) {
             console.log("tokenToUrl")

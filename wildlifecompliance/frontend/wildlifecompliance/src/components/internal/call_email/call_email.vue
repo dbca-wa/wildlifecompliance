@@ -828,11 +828,6 @@ export default {
         return entangled_other_checked;
     },
   },
-  filters: {
-    formatDate: function(data) {
-      return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-    }
-  },
   methods: {
     ...mapActions('callemailStore', {
       loadCallEmail: 'loadCallEmail',

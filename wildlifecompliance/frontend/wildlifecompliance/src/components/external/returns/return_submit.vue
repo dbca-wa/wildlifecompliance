@@ -12,18 +12,20 @@
                 <strong>Your Return has been submitted successfully.</strong>
                 <br/>
                 <table>
+                    <thead>
                     <tr>
                         <td><strong>Reference number:&nbsp;</strong></td>
                         <td><strong>{{returns.lodgement_number}}</strong></td>
                     </tr>
                     <tr>
                         <td><strong>Lodgement date:</strong></td>
-                        <td><strong> {{returns.lodgement_date|formatDate}}</strong></td>
+                        <td><strong> {{ formatDate(returns.lodgement_date) }}</strong></td>
                     </tr>
                     <tr>
                         <td><strong>Invoice:</strong></td>
                         <td><a :href="returns.invoice_url" target="_blank"><i style="color:red" class="fa fa-file-pdf-o"></i></a></td>
                     </tr>
+                    </thead>
                 </table>
                 <a href="/" style="margin-top:15px;" class="btn btn-primary">Back to dashboard</a>
             </div>
@@ -66,11 +68,6 @@ export default {
     ...mapActions([
         'setReturns',
     ]),
-  },
-  filters:{
-        formatDate: function(data){
-            return data ? moment(data).format('DD/MM/YYYY'): '';
-        }
   },
 }
 </script>

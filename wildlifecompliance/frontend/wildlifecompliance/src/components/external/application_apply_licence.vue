@@ -46,9 +46,9 @@
                                             <div class="row">
 
 
-                                                <div  v-if="category.checked" class="col-sm-9">
+                                                <div v-if="category.checked && selected_apply_org_id != ''" class="col-sm-9">
 
-                                                    <div v-if="!(selected_apply_org_id != '' && type.not_for_organisation == true)" v-for="(type,index1) in category.activity" class="checkbox margin-left-20">
+                                                    <div v-for="(type,index1) in categoryActivity" class="checkbox margin-left-20">
                                                         <input type="checkbox" ref="selected_activity_type" name ="activity" :value="type.id" :id = "type.id" v-model="category.activity[index1].selected" @change="handleActivityCheckboxChange(index,index1)"> {{type.short_name}}
 
                                                         <div v-if="type.selected">
@@ -61,7 +61,7 @@
                                                                         v-model="type.purpose[index2].selected"
                                                                         @change="handlePurposeCheckboxChange(index,$event)">
                                                                             {{purpose.name}}
-                                                                            <span> ({{parseFloat(purpose.base_application_fee) | toCurrency}} + {{parseFloat(purpose.base_licence_fee) | toCurrency}})</span>
+                                                                            <span> ({{toCurrency(parseFloat(purpose.base_application_fee))}} + {{toCurrency(parseFloat(purpose.base_licence_fee))}})</span>
                                                                 </div>
 
                                                                 <div v-else class ="col-sm-12">
@@ -87,8 +87,8 @@
                                 <button v-if="showSpinner" type="button" class="btn btn-primary pull-right" style="margin-left: 10px;" disabled><i class="fa fa-spinner fa-spin" />Continue</button>
                                 <button v-else @click.prevent="submit()" type="button" class="btn btn-primary pull-right" style="margin-left: 10px;">Continue</button>
                                 <div class="pull-right" style="font-size: 18px;">
-                                    <strong>Estimated application fee: {{application_fee | toCurrency}}</strong><br>
-                                    <strong>Estimated licence fee: {{licence_fee | toCurrency}}</strong><br>
+                                    <strong>Estimated application fee: {{toCurrency(application_fee)}}</strong><br>
+                                    <strong>Estimated licence fee: {{toCurrency(licence_fee)}}</strong><br>
                                 </div>
                             </div>
                         </form>
@@ -171,6 +171,15 @@ export default {
   components: {
   },
   computed: {
+        categoryActivity: function() {
+            let activityList = [];
+            this.category.activity.forEach(activity => {
+                if (!(activity.type.not_for_organisation == true)) {
+                    activityList.add(activity);
+                }
+            });
+            return activityList;
+        },
         ...mapGetters([
             'selected_apply_org_id',
             'selected_apply_proxy_id',

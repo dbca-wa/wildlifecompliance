@@ -188,11 +188,6 @@ export default {
       //     }
       // },
     },
-    filters: {
-      formatDate: function(data) {
-          return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-      }
-    },
     methods: {
       ...mapActions('legalCaseStore', {
           saveInspection: 'saveLegalCase',

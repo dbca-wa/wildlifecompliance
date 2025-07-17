@@ -50,11 +50,6 @@ export default {
     CommsLogs,
     MenuAccess,
   },
-  filters: {
-    formatDate: function(data){
-            return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
-    }
-  },
   data: function() {
     return {
         tabs: {

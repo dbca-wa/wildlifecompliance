@@ -638,11 +638,6 @@ export default {
         return this.inspection.inspection_team;
     },
   },
-  filters: {
-    formatDate: function(data) {
-      return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-    }
-  },
   watch: {
       inspectionTeam: {
           handler: function (){
