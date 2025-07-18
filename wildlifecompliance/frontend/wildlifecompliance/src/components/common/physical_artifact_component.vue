@@ -309,7 +309,6 @@ import Vue from "vue";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import filefield from '@/components/common/compliance_file.vue';
-//import { required, minLength, between } from 'vuelidate/lib/validators'
 import 'bootstrap/dist/css/bootstrap.css';
 import 'eonasdan-bootstrap-datetimepicker';
 import moment from 'moment';

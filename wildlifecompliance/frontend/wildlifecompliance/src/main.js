@@ -1,6 +1,7 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
+import { createApp } from 'vue';
 import resource from 'vue-resource';
 import App from './App';
 import router from './router';
@@ -11,7 +12,7 @@ import RendererBlock from '@/components/common/renderer_block.vue';
 import ComplianceRendererBlock from '@/components/common/compliance_renderer_block.vue';
 import VueScrollTo from 'vue-scrollto';
 import Affix from 'vue-affix';
-import Vuelidate from 'vuelidate'
+import { useVuelidate } from '@vuelidate/core'
 
 import { extendMoment } from 'moment-range';
  
@@ -44,7 +45,13 @@ Vue.config.productionTip = false
 Vue.use( resource );
 Vue.use( VueScrollTo );
 Vue.use( Affix );
-Vue.use(Vuelidate)
+
+export default {
+  setup () {
+    return { v$: useVuelidate() }
+  },
+}
+
 Vue.component('renderer-block', RendererBlock);
 Vue.component('compliance-renderer-block', ComplianceRendererBlock);
 
@@ -59,22 +66,6 @@ Vue.http.interceptors.push( function ( request, next ) {
   next();
 } );
 
-Vue.method('toCurrency', function(value) {
-    if (typeof value !== "number") {
-        return value;
-    }
-    var formatter = new Intl.NumberFormat('en-AU', {
-        style: 'currency',
-        currency: 'AUD',
-        minimumFractionDigits: 2
-    });
-    return formatter.format(value);
-});
-
-Vue.method('formatDate', function(data) {
-    return data ? moment(data).format('DD/MM/YYYY'): '';
-})
-
 var mapbox_access_token = '';
 
 Vue.mixin({
@@ -82,20 +73,39 @@ Vue.mixin({
         retrieveMapboxAccessToken: async function(){
             let ret_val = await $.ajax('/api/geocoding_address_search_token');
             return ret_val;
+        },
+        toCurrency: function(value) {
+            if (typeof value !== "number") {
+                return value;
+            }
+            var formatter = new Intl.NumberFormat('en-AU', {
+                style: 'currency',
+                currency: 'AUD',
+                minimumFractionDigits: 2
+            });
+            return formatter.format(value);
+        },
+        formatDate: function(data) {
+            return data ? moment(data).format('DD/MM/YYYY'): '';
         }
     },
 })
 
+const app = createApp(App);
+
+app.use(router);
+router.isReady().then(() => app.mount('#app'));
+
 /* eslint-disable no-new */
-Vue.prototype.current_tab = '';
-window.vue = new Vue( {
-    el: '#app',
-    store,
-    router,
-    template: '<App/>',
-    components: {
-        App
-    },
-})
+//Vue.prototype.current_tab = '';
+//window.vue = new Vue( {
+//    el: '#app',
+//    store,
+//    router,
+//    template: '<App/>',
+//    components: {
+//        App
+//    },
+//})
 
 Vue.config.devtools = true

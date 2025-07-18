@@ -38,7 +38,6 @@ import Vue from "vue";
 import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
-import { required, minLength, between } from 'vuelidate/lib/validators'
 import datatable from '@vue-utils/datatable.vue'
 
 export default {

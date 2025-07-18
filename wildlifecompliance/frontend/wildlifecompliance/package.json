@@ -11,6 +11,8 @@
   "dependencies": {
     "@vue/cli-service": "^5.0.8",
     "@vue/compat": "^3.5.17",
+    "@vuelidate/core": "^2.0.3",
+    "@vuelidate/validators": "^2.0.4",
     "awesomplete": "^1.1.7",
     "bootstrap": "^5.3.7",
     "datatables.net-buttons-bs": "^3.2.4",
@@ -42,7 +44,6 @@
     "vue-router": "^4.5.1",
     "vue-scrollto": "^2.20.0",
     "vue3-treeselect": "^0.1.10",
-    "vuelidate": "^0.7.7",
     "vuex": "^4.1.0"
   },
   "browserslist": [

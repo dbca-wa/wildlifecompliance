@@ -116,7 +116,7 @@ import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import filefield from '@/components/common/compliance_file.vue';
 require("select2/dist/css/select2.min.css");
 require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
-import { required, minLength, between } from 'vuelidate/lib/validators'
+import { required } from '@vuelidate/validators'
 
 export default {
     name: "CallEmailWorking",

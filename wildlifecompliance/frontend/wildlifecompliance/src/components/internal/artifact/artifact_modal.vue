@@ -46,7 +46,7 @@ import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import filefield from '@/components/common/compliance_file.vue';
-import { required, minLength, between } from 'vuelidate/lib/validators'
+import { required } from '@vuelidate/validators'
 
 export default {
     name: "ArtifactModal",

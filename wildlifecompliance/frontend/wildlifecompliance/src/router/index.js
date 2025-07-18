@@ -10,7 +10,8 @@ import internal_routes from '@/components/internal/routes'
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 
 const router = new createRouter({
-    mode: createWebHistory(),
+    history: createWebHistory(),
+    strict: false,
     routes: [
         {
           path: '/ledger-ui/accounts',
