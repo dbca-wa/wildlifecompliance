@@ -147,7 +147,7 @@ export default {
         saveExit: async function() {
             try {
                 await this.saveRemediationAction();
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
                 this.$router.push({ name: 'external-sanction-outcome-dash' });
             } catch (err) {
                 this.processError(err);
@@ -156,7 +156,7 @@ export default {
         save: async function() {
             try {
                 await this.saveRemediationAction();
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
             } catch (err) {
                 this.processError(err);
             }
@@ -189,7 +189,7 @@ export default {
                     }
                 }
             }
-            await swal("Error", errorText, "error");
+            await swal.fire("Error", errorText, "error");
         },
     }
 }

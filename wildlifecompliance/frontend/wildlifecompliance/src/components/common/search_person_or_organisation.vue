@@ -337,7 +337,7 @@ export default {
                 this.setInput(value);
             } else if (obj.errorMessage) {
                 let errorMessage = obj.errorMessage
-                await swal("Error", errorMessage, "error");
+                await swal.fire("Error", errorMessage, "error");
             }
         },
         initAwesomplete: function() {

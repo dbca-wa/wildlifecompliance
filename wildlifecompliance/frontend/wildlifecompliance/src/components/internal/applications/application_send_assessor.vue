@@ -93,7 +93,7 @@ export default {
                         emulateJSON:true,
                     }).then((response)=>{
                         //vm.$parent.loading.splice('processing contact',1);
-                        swal(
+                        swal.fire(
                              'Send to Assessor',
                              'This application has been sent to the selected group for assessment.',
                              'success'

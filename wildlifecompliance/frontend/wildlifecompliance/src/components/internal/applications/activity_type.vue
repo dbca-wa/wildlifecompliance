@@ -132,7 +132,7 @@
                 let formData = new FormData(vm.form);
                 formData.append('action', 'process');
                 vm.$http.post(vm.application_form_url,formData).then(res=>{
-                  swal(
+                  swal.fire(
                     'Processed',
                     'Your application has been processed',
                     'success'

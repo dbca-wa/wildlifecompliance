@@ -141,7 +141,7 @@ export default {
                         vm.creatingProfile = false;
                         vm.profile = response;
                         if (vm.profile.postal_address == null){ vm.profile.postal_address = {}; }
-                        swal({
+                        swal.fire({
                             title: 'Create Profile',
                             html: 'Your profile has been successfully created.<br/><br/>' + vm.profile.name + '<br/>' + vm.profile.email,
                             type: 'success',

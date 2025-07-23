@@ -259,7 +259,7 @@ export default {
             this.$http.post('/infringement_penalty/' + sanction_outcome_id + '/').then(res=>{
                     window.location.href = "/ledger/checkout/checkout/payment-details/";
                 },err=>{
-                    swal(
+                    swal.fire(
                         'Submit Error',
                         helpers.apiVueResourceError(err),
                         'error'

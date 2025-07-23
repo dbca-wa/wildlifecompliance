@@ -350,7 +350,7 @@ export default {
             vm.updateAssignedOfficerSelect();
         }).catch((error) => {
             vm.updateAssignedOfficerSelect();
-            swal(
+            swal.fire(
                 'Application Error',
                 helpers.apiVueResourceError(error),
                 'error'
@@ -400,7 +400,7 @@ export default {
     },
     acceptRequest: function() {
         let vm = this;
-        swal({
+        swal.fire({
             title: "Accept Organisation Request",
             text: "Are you sure you want to accept this organisation request?",
             type: "question",
@@ -432,7 +432,7 @@ export default {
     },
     amendmentRequest: function() {
         let vm = this;
-        swal({
+        swal.fire({
             title: "Amendment Request",
             text: "Request a new letter from the user.",
             type: "question",
@@ -444,7 +444,7 @@ export default {
             if (result) {
                 let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result)))
                 .then((response) => {
-                    swal({
+                    swal.fire({
                         title: "Amendment Request",
                         text: "A new letter has been requested.",
                         type: "success"}
@@ -466,7 +466,7 @@ export default {
     },
     declineRequest: function() {
         let vm = this;
-        swal({
+        swal.fire({
             title: "Decline Organisation Request",
             text: "Are you sure you want to decline this organisation request?",
             type: "question",

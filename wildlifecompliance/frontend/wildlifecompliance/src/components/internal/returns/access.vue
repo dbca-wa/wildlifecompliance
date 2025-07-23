@@ -223,7 +223,7 @@ export default {
                 // this.revert();
                 // this.updateAssignedOfficerSelect();
                 console.log(error)
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -250,7 +250,7 @@ export default {
                     // this.revert();
                     // this.updateAssignedOfficerSelect();
                     console.log(error)
-                    swal(
+                    swal.fire(
                         'Returns Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -269,7 +269,7 @@ export default {
                     console.log(error)
                     // this.revert();
                     // this.updateAssignedOfficerSelect();
-                    swal(
+                    swal.fire(
                         'Returns Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -291,7 +291,7 @@ export default {
             
             },(error)=>{
                 console.log(error);
-                swal('Error',
+                swal.fire('Error',
                     'There was an error saving your return details.<br/>' + error.body,
                     'error'
                 )
@@ -316,7 +316,7 @@ export default {
 
             },(error)=>{
                 console.log(error);
-                swal('Error',
+                swal.fire('Error',
                         'There was an error accepting the return.<br/>' + error.body,
                         'error'
                 )

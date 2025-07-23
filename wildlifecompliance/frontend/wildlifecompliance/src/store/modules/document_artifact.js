@@ -164,17 +164,14 @@ export const documentArtifactStore = {
                 } else {
                     let errorMessage = ''
                     if (err.statusText && err.data && err.data.non_field_errors && err.data.non_field_errors.length > 0) {
-                        //await swal("Error", err.data.non_field_errors[0], "error");
                         errorMessage = err.data.non_field_errors[0];
                     } else if (err.bodyText) {
-                        //await swal("Error", err.data.non_field_errors[0], "error");
                         errorMessage = err.bodyText;
                     } else {
-                        //await swal("Error", "There was an error saving the record", "error");
                         errorMessage = "There was an error saving the record";
                     }
                     commit("updateErrorMessage", errorMessage);
-                    await swal("Error", errorMessage, "error");
+                    await swal.fire("Error", errorMessage, "error");
                 }
             }
             // internal arg used when file upload triggers record creation
@@ -183,7 +180,7 @@ export const documentArtifactStore = {
             }
             // update legal_case
             else if (!create && !state.document_artifact.error_message) {
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
             }
         },
         setDocumentArtifact({ commit, }, document_artifact) {

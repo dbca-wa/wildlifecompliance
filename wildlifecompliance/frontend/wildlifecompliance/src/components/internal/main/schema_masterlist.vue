@@ -356,7 +356,7 @@ export default {
                     self.$refs.schema_masterlist_table.vmDataTable.ajax.reload();
                     self.close();
                 }, (error) => {
-                    swal(
+                    swal.fire(
                         'Save Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -371,7 +371,7 @@ export default {
                     self.$refs.schema_masterlist_table.vmDataTable.ajax.reload();
                     self.close();
                 },(error)=>{
-                    swal(
+                    swal.fire(
                         'Save Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -419,7 +419,7 @@ export default {
                 self.$refs.schema_masterlist_table.row_of_data = self.$refs.schema_masterlist_table.vmDataTable.row('#'+$(this).attr('data-rowid'));
                 self.masterlist.id = self.$refs.schema_masterlist_table.row_of_data.data().id;
 
-                swal({
+                swal.fire({
                     title: "Delete Masterlist",
                     text: "Are you sure you want to delete?",
                     type: "question",
@@ -433,7 +433,7 @@ export default {
                         .then((response) => {
                             self.$refs.schema_masterlist_table.vmDataTable.ajax.reload();
                         }, (error) => {
-                            swal(
+                            swal.fire(
                                 'Delete Error',
                                 helpers.apiVueResourceError(error),
                                 'error'
@@ -493,7 +493,7 @@ export default {
                     this.answerTypes = res.all_answer_types
 
             }).catch((error) => {
-                swal(
+                swal.fire(
                     'Get Application Selects Error',
                     helpers.apiVueResourceError(error),
                     'error'

@@ -899,7 +899,7 @@ export default {
     },
     async addWorkflow(workflow_type) {
       if (!this.locationExists) {
-            await swal({
+            await swal.fire({
                 title: 'Mandatory Field',
                 html: "Location must be specified",
                 type: "error",

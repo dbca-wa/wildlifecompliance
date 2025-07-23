@@ -418,7 +418,7 @@ export default {
                 vm.updatingContact = false;
                 vm.user = response;
                 if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
-                swal({
+                swal.fire({
                     title: 'Update Contact Details',
                     html: 'User contact details has been successfully updated.',
                     type: 'success',
@@ -429,7 +429,7 @@ export default {
                 for (var key in error.body) {
                     error_msg += key + ': ' + error.body[key] + '<br/>';
                 }
-                swal({
+                swal.fire({
                     title: 'Update Contact Details',
                     html: 'There was an error updating the user contact details.<br/>' + error_msg,
                     type: 'error'
@@ -445,7 +445,7 @@ export default {
                 vm.updatingAddress = false;
                 vm.user = response;
                 if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
-                swal({
+                swal.fire({
                     title: 'Update Address Details',
                     html: 'User address details has been successfully updated.',
                     type: 'success',
@@ -456,7 +456,7 @@ export default {
                 for (var key in error.body) {
                     error_msg += key + ': ' + error.body[key] + '<br/>';
                 }
-                swal({
+                swal.fire({
                     title: 'Update Address Details',
                     html: 'There was an error updating the user address details.<br/>' + error_msg,
                     type: 'error'
@@ -466,7 +466,7 @@ export default {
         unlinkUser: function(org){
             let vm = this;
             let org_name = org.name;
-            swal({
+            swal.fire({
                 title: "Unlink From Organisation",
                 text: "Are you sure you want to unlink this user from "+org.name+" ?",
                 type: "question",
@@ -483,7 +483,7 @@ export default {
                             if (vm.user.wildlifecompliance_organisations && vm.user.wildlifecompliance_organisations.length > 0){
                               vm.managesOrg = 'Yes'
                             }
-                            swal(
+                            swal.fire(
                                 'Unlink',
                                 'The user has been successfully unlinked from '+org_name+'.',
                                 'success'
@@ -529,7 +529,7 @@ export default {
             data.append('identification2', vm.uploadedID);
             if (vm.uploadedID == null){
                 vm.uploadingID = false;
-                swal({
+                swal.fire({
                         title: 'Upload ID',
                         html: 'Please select a file to upload.',
                         type: 'error'
@@ -552,7 +552,7 @@ export default {
                     for (var key in error.body) {
                         error_msg += key + ': ' + error.body[key] + '<br/>';
                     }
-                    swal({
+                    swal.fire({
                         title: 'Upload ID',
                         html: 'There was an error uploading your ID.<br/>' + error_msg,
                         type: 'error'

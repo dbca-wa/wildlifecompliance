@@ -329,7 +329,7 @@ export default {
             let new_organisation = vm.newOrg;
             for (var organisation in vm.current_user.wildlifecompliance_organisations) {
                 if (new_organisation.abn && vm.current_user.wildlifecompliance_organisations[organisation].abn == new_organisation.abn) {
-                    swal({
+                    swal.fire({
                         title: 'Checking Organisation',
                         html: 'You are already associated with this organisation.',
                         type: 'info'
@@ -362,7 +362,7 @@ export default {
                         error_msg += key + ': ' + error.body[key] + '<br/>';
                     }
                 }
-                swal({
+                swal.fire({
                     title: 'Checking Organisation',
                     html: 'There was an error checking this organisation.<br/>' + error_msg,
                     type: 'error'
@@ -376,7 +376,7 @@ export default {
                 emulateJSON:true
             }).then((response) => {
                 if (response.valid){
-                    swal(
+                    swal.fire(
                         'Validate Pins',
                         'The pins you entered have been validated and your request will be processed by Organisation Administrator.',
                         'success'
@@ -395,7 +395,7 @@ export default {
                     });
 
                 }else {
-                    swal(
+                    swal.fire(
                         'Validate Pins',
                         'The pins you entered were incorrect', 
                         'error'
@@ -418,7 +418,7 @@ export default {
             vm.newOrg.abn = vm.newOrg.abn == null ? '' : vm.newOrg.abn
             if (vm.newOrg.name == '' || vm.newOrg.abn == '' || vm.uploadedFile == null){
                 vm.registeringOrg = false;
-                swal(
+                swal.fire(
                     'Error submitting organisation request',
                     'Please enter the organisation details and attach a file before submitting your request.',
                     'error'
@@ -431,7 +431,7 @@ export default {
                     vm.uploadedFile = null;
                     vm.addingCompany = false;
                     vm.resetNewOrg();
-                    swal({
+                    swal.fire({
                         title: 'Sent',
                         html: 'Your organisation request has been successfully submitted.',
                         type: 'success',
@@ -450,7 +450,7 @@ export default {
                             error_msg += key + ': ' + error.body[key] + '<br/>';
                         }
                     }
-                    swal(
+                    swal.fire(
                         'Error submitting organisation request',
                         error_msg,
                         'error'
@@ -465,7 +465,7 @@ export default {
             let new_organisation = vm.newOrg;
             for (var organisation in vm.current_user.wildlifecompliance_organisations) {
                 if (new_organisation.abn && vm.current_user.wildlifecompliance_organisations[organisation].abn == new_organisation.abn) {
-                    swal({
+                    swal.fire({
                         title: 'Checking Organisation',
                         html: 'You are already associated with this organisation.',
                         type: 'info'
@@ -485,7 +485,7 @@ export default {
             vm.newOrg.abn = vm.newOrg.abn == null ? '' : vm.newOrg.abn
             if (vm.newOrg.name == '' || vm.newOrg.abn == '' || vm.uploadedFile == null){
                 vm.registeringOrg = false;
-                swal(
+                swal.fire(
                     'Error submitting organisation request',
                     'Please enter the organisation details and attach a file before submitting your request.',
                     'error'
@@ -498,7 +498,7 @@ export default {
                     vm.uploadedFile = null;
                     vm.addingCompany = false;
                     vm.resetNewOrg();
-                    swal({
+                    swal.fire({
                         title: 'Sent',
                         html: 'Your organisation request has been successfully submitted.',
                         type: 'success',
@@ -517,7 +517,7 @@ export default {
                             error_msg += key + ': ' + error.body[key] + '<br/>';
                         }
                     }
-                    swal(
+                    swal.fire(
                         'Error submitting organisation request',
                         error_msg,
                         'error'
@@ -535,7 +535,7 @@ export default {
             }).then((response) => {
                 vm.uploadedFile = null;
                 vm.resetNewOrg();
-                swal({
+                swal.fire({
                     title: 'Sent',
                     html: 'Your organisation request has been successfully submitted.',
                     type: 'success',
@@ -549,7 +549,7 @@ export default {
                 for (var key in error.body) {
                     error_msg += key + ': ' + error.body[key] + '<br/>';
                 }
-                swal(
+                swal.fire(
                     'Error submitting organisation request',
                     error_msg,
                     'error'
@@ -586,7 +586,7 @@ export default {
             let vm = this;
             let org_name = org.name;
         
-            swal({
+            swal.fire({
                 title: "Unlink From Organisation",
                 text: "Are you sure you want to be unlinked from "+org.name+" ?",
                 type: "question",
@@ -604,7 +604,7 @@ export default {
                         }).catch((error) => {
                             console.log(error);
                         });
-                        swal(
+                        swal.fire(
                             'Unlink',
                             'You have been successfully unlinked from '+org_name+'.',
                             'success'
@@ -614,7 +614,7 @@ export default {
                         for (var key in error.body) {
                             if (key == 'non_field_errors') { error_msg += error.body[key] + '<br/>'; }
                         }
-                        swal(
+                        swal.fire(
                             'Unlink',
                             'There was an error unlinking you from '+org_name+'.' + error_msg,
                             'error'

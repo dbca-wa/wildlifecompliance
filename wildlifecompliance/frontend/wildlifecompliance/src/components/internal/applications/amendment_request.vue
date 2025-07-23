@@ -153,7 +153,7 @@ export default {
                         emulateJSON:true,
                     }).then((response)=>{
                         //vm.$parent.loading.splice('processing contact',1);
-                        swal({
+                        swal.fire({
                              title: 'Sent',
                              text: 'An email has been sent to applicant with the request to amend this Application',
                              type: 'question',

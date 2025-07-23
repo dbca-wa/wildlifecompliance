@@ -164,7 +164,7 @@ export default {
             this.spreadsheetReturn = 'yes'
             this.refresh_grid = true
         },exception=>{
-		        swal('Error Uploading', exception.body.error, 'error');
+		        swal.fire('Error Uploading', exception.body.error, 'error');
         });
     },
     getSpecies: async function(_id){

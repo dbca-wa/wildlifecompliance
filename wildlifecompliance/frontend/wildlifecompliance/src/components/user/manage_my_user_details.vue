@@ -605,7 +605,7 @@ export default {
             params += '&dob=' + vm.current_user.dob;
             if (vm.current_user.first_name == '' || vm.current_user.last_name == '' || (vm.current_user.dob == null || vm.current_user.dob == '')){
                 let error_msg = 'Please ensure all fields are filled in.';
-                swal({
+                swal.fire({
                     title: 'Update Personal Details',
                     html: 'There was an error updating your personal details.<br/>' + error_msg,
                     type: 'error'
@@ -619,7 +619,7 @@ export default {
                 vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.current_user.id+'/update_personal')),JSON.stringify(vm.current_user),{
                     emulateJSON:true
                 }).then((response) => {
-                    swal({
+                    swal.fire({
                         title: 'Update Personal Details',
                         html: 'Your personal details has been successfully updated.',
                         type: 'success',
@@ -644,7 +644,7 @@ export default {
                             error_msg += key + ': ' + error.body[key] + '<br/>';
                         }
                     }
-                    swal({
+                    swal.fire({
                         title: 'Update Personal Details',
                         html: 'There was an error updating your personal details.<br/>' + error_msg,
                         type: 'error'
@@ -654,7 +654,7 @@ export default {
                 vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.current_user.id+'/update_personal')),JSON.stringify(vm.current_user),{
                     emulateJSON:true
                 }).then((response) => {
-                    swal({
+                    swal.fire({
                         title: 'Update Personal Details',
                         html: 'Your personal details has been successfully updated.',
                         type: 'success',
@@ -680,7 +680,7 @@ export default {
                             error_msg += key + ': ' + error.body[key] + '<br/>';
                         }
                     }
-                    swal({
+                    swal.fire({
                         title: 'Update Personal Details',
                         html: 'There was an error updating your personal details.<br/>' + error_msg,
                         type: 'error'
@@ -697,7 +697,7 @@ export default {
                 vm.updatingContact = false;
                 vm.current_user = response;
                 if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
-                swal({
+                swal.fire({
                     title: 'Update Contact Details',
                     html: 'Your contact details has been successfully updated.',
                     type: 'success',
@@ -715,7 +715,7 @@ export default {
                 for (var key in error.body) {
                     error_msg += key + ': ' + error.body[key] + '<br/>';
                 }
-                swal({
+                swal.fire({
                     title: 'Update Contact Details',
                     html: 'There was an error updating your contact details.<br/>' + error_msg,
                     type: 'error'
@@ -731,7 +731,7 @@ export default {
                 vm.updatingAddress = false;
                 vm.current_user = response;
                 if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
-                swal({
+                swal.fire({
                     title: 'Update Address Details',
                     html: 'Your address details has been successfully updated.',
                     type: 'success',
@@ -743,7 +743,7 @@ export default {
                 for (var key in error.body) {
                     error_msg += key + ': ' + error.body[key] + '<br/>';
                 }
-                swal({
+                swal.fire({
                     title: 'Update Address Details',
                     html: 'There was an error updating your address details.<br/>' + error_msg,
                     type: 'error'
@@ -762,7 +762,7 @@ export default {
             let new_organisation = vm.newOrg;
             for (var organisation in vm.current_user.wildlifecompliance_organisations) {
                 if (new_organisation.abn && vm.current_user.wildlifecompliance_organisations[organisation].abn == new_organisation.abn) {
-                    swal({
+                    swal.fire({
                         title: 'Checking Organisation',
                         html: 'You are already associated with this organisation.',
                         type: 'info'
@@ -795,7 +795,7 @@ export default {
                         error_msg += key + ': ' + error.body[key] + '<br/>';
                     }
                 }
-                swal({
+                swal.fire({
                     title: 'Checking Organisation',
                     html: 'There was an error checking this organisation.<br/>' + error_msg,
                     type: 'error'
@@ -809,7 +809,7 @@ export default {
                 emulateJSON:true
             }).then((response) => {
                 if (response.valid){
-                    swal(
+                    swal.fire(
                         'Validate Pins',
                         'The pins you entered have been validated and your request will be processed by Organisation Administrator.',
                         'success'
@@ -828,7 +828,7 @@ export default {
                         console.log(error);
                     });
                 }else {
-                    swal(
+                    swal.fire(
                         'Validate Pins',
                         'The pins you entered were incorrect', 
                         'error'
@@ -849,7 +849,7 @@ export default {
             data.append('identification2', vm.uploadedID);
             if (vm.uploadedID == null){
                 vm.uploadingID = false;
-                swal({
+                swal.fire({
                         title: 'Upload ID',
                         html: 'Please select a file to upload.',
                         type: 'error'
@@ -870,7 +870,7 @@ export default {
                     for (var key in error.body) {
                         error_msg += key + ': ' + error.body[key] + '<br/>';
                     }
-                    swal({
+                    swal.fire({
                         title: 'Upload ID',
                         html: 'There was an error uploading your ID.<br/>' + error_msg,
                         type: 'error'
@@ -890,7 +890,7 @@ export default {
             vm.newOrg.abn = vm.newOrg.abn == null ? '' : vm.newOrg.abn
             if (vm.newOrg.name == '' || vm.newOrg.abn == '' || vm.uploadedFile == null){
                 vm.registeringOrg = false;
-                swal(
+                swal.fire(
                     'Error submitting organisation request',
                     'Please enter the organisation details and attach a file before submitting your request.',
                     'error'
@@ -903,7 +903,7 @@ export default {
                     vm.uploadedFile = null;
                     vm.addingCompany = false;
                     vm.resetNewOrg();
-                    swal({
+                    swal.fire({
                         title: 'Sent',
                         html: 'Your organisation request has been successfully submitted.',
                         type: 'success',
@@ -922,7 +922,7 @@ export default {
                             error_msg += key + ': ' + error.body[key] + '<br/>';
                         }
                     }
-                    swal(
+                    swal.fire(
                         'Error submitting organisation request',
                         error_msg,
                         'error'
@@ -937,7 +937,7 @@ export default {
             let new_organisation = vm.newOrg;
             for (var organisation in vm.current_user.wildlifecompliance_organisations) {
                 if (new_organisation.abn && vm.current_user.wildlifecompliance_organisations[organisation].abn == new_organisation.abn) {
-                    swal({
+                    swal.fire({
                         title: 'Checking Organisation',
                         html: 'You are already associated with this organisation.',
                         type: 'info'
@@ -957,7 +957,7 @@ export default {
             vm.newOrg.abn = vm.newOrg.abn == null ? '' : vm.newOrg.abn
             if (vm.newOrg.name == '' || vm.newOrg.abn == '' || vm.uploadedFile == null){
                 vm.registeringOrg = false;
-                swal(
+                swal.fire(
                     'Error submitting organisation request',
                     'Please enter the organisation details and attach a file before submitting your request.',
                     'error'
@@ -970,7 +970,7 @@ export default {
                     vm.uploadedFile = null;
                     vm.addingCompany = false;
                     vm.resetNewOrg();
-                    swal({
+                    swal.fire({
                         title: 'Sent',
                         html: 'Your organisation request has been successfully submitted.',
                         type: 'success',
@@ -989,7 +989,7 @@ export default {
                             error_msg += key + ': ' + error.body[key] + '<br/>';
                         }
                     }
-                    swal(
+                    swal.fire(
                         'Error submitting organisation request',
                         error_msg,
                         'error'
@@ -1007,7 +1007,7 @@ export default {
             }).then((response) => {
                 vm.uploadedFile = null;
                 vm.resetNewOrg();
-                swal({
+                swal.fire({
                     title: 'Sent',
                     html: 'Your organisation request has been successfully submitted.',
                     type: 'success',
@@ -1021,7 +1021,7 @@ export default {
                 for (var key in error.body) {
                     error_msg += key + ': ' + error.body[key] + '<br/>';
                 }
-                swal(
+                swal.fire(
                     'Error submitting organisation request',
                     error_msg,
                     'error'
@@ -1069,7 +1069,7 @@ export default {
             let org_name = org.name;
             
 
-            swal({
+            swal.fire({
                 title: "Unlink From Organisation",
                 text: "Are you sure you want to be unlinked from "+org.name+" ?",
                 type: "question",
@@ -1088,7 +1088,7 @@ export default {
                         }).catch((error) => {
                             console.log(error);
                         });
-                        swal(
+                        swal.fire(
                             'Unlink',
                             'You have been successfully unlinked from '+org_name+'.',
                             'success'
@@ -1098,7 +1098,7 @@ export default {
                         for (var key in error.body) {
                             if (key == 'non_field_errors') { error_msg += error.body[key] + '<br/>'; }
                         }
-                        swal(
+                        swal.fire(
                             'Unlink',
                             'There was an error unlinking you from '+org_name+'.' + error_msg,
                             'error'

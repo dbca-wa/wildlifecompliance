@@ -802,7 +802,7 @@ export default {
         save: async function(){
             try {
                 await this.saveOffence({'fr_date': this.date_from, 'fr_time': this.time_from, 'to_date': this.date_to, 'to_time': this.time_to});
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
 
                 this.constructOffendersTable();
                 this.constructAllegedOffencesTable();
@@ -826,7 +826,7 @@ export default {
             try {
                 //await this.saveOffence();
                 await this.saveOffence({'fr_date': this.date_from, 'fr_time': this.time_from, 'to_date': this.date_to, 'to_time': this.time_to});
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
 
                 // remove redundant eventListeners
                 window.removeEventListener('beforeunload', this.leaving);
@@ -864,7 +864,7 @@ export default {
             } else {
                 errorText += err.message;
             }
-            await swal("Error", errorText, "error");
+            await swal.fire("Error", errorText, "error");
         },
         updateAssignedToId: async function (body) {
             //this.setAssignedToId(body.assigned_to_id);
@@ -1219,7 +1219,7 @@ export default {
                     this.uuid++;
                 }
             } else if (missing) {
-                await swal("Error", "Name, Address, and Date of Birth Required", "error");
+                await swal.fire("Error", "Name, Address, and Date of Birth Required", "error");
             }
             
         },

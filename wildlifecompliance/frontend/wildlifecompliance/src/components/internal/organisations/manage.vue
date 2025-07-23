@@ -457,7 +457,7 @@ export default {
                 let name = $(e.target).data('name');
                 let email = $(e.target).data('email');
                 let id = $(e.target).data('id');
-                swal({
+                swal.fire({
                     title: "Delete Contact",
                     text: "Are you sure you want to remove "+ name + "("+ email + ") as a contact  ?",
                     type: "error",
@@ -486,7 +486,7 @@ export default {
                 vm.updatingDetails = false;
                 vm.org = response;
                 if (vm.org.address == null){ vm.org.address = {}; }
-                swal(
+                swal.fire(
                     'Saved',
                     'Organisation details have been saved',
                     'success'
@@ -498,7 +498,7 @@ export default {
         },
         addedContact: function() {
             let vm = this;
-            swal(
+            swal.fire(
                 'Added',
                 'The contact has been successfully added.',
                 'success'
@@ -511,7 +511,7 @@ export default {
             vm.$http.delete(helpers.add_endpoint_json(api_endpoints.organisation_contacts,id),{
                 emulateJSON:true
             }).then((response) => {
-                swal(
+                swal.fire(
                     'Contact Deleted', 
                     'The contact was successfully deleted',
                     'success'
@@ -519,7 +519,7 @@ export default {
                 vm.$refs.contacts_datatable.vmDataTable.ajax.reload();
             }, (error) => {
                 console.log(error);
-                swal(
+                swal.fire(
                     'Contact Deleted', 
                     'The contact could not be deleted because of the following error '+error,
                     'error'
@@ -534,7 +534,7 @@ export default {
             }).then((response) => {
                 vm.updatingAddress = false;
                 vm.org = response;
-                swal(
+                swal.fire(
                     'Saved',
                     'Address details have been saved',
                     'success'
@@ -566,7 +566,7 @@ export default {
             data.append('identification', vm.uploadedID);
             if (vm.uploadedID == null){
                 vm.uploadingID = false;
-                swal({
+                swal.fire({
                         title: 'Upload ID',
                         html: 'Please select a file to upload.',
                         type: 'error'
@@ -577,7 +577,7 @@ export default {
                 }).then((response) => {
                     vm.uploadingID = false;
                     vm.uploadedID = null;
-                    swal({
+                    swal.fire({
                         title: 'Upload ID',
                         html: 'The organisation ID has been successfully uploaded.',
                         type: 'success',
@@ -591,7 +591,7 @@ export default {
                     for (var key in error.body) {
                         error_msg += key + ': ' + error.body[key] + '<br/>';
                     }
-                    swal({
+                    swal.fire({
                         title: 'Upload ID',
                         html: 'There was an error uploading the organisation ID.<br/>' + error_msg,
                         type: 'error'

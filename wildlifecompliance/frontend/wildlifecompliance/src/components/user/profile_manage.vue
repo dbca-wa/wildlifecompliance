@@ -137,7 +137,7 @@ export default {
 						vm.updatingProfile = false;
 						vm.profile = response;
 						if (vm.profile.postal_address == null){ vm.profile.postal_address = {}; }
-						swal(
+						swal.fire(
 							'Update Profile',
 							'Your profile has been successfully updated.',
 							'success'

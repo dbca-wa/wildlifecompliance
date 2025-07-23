@@ -270,7 +270,7 @@ export default {
                 let name = $(e.target).data('name');
                 let email = $(e.target).data('email');
                 let id = $(e.target).data('id');
-                swal({
+                swal.fire({
                     title: "Delete Contact",
                     text: "Are you sure you want to remove "+ name + " (" + email + ") as a contact?",
                     type: "error",
@@ -302,7 +302,7 @@ export default {
                 vm.contact_user.phone_number= phone 
 
 
-                swal({
+                swal.fire({
                     title: "Contact Accept",
                     text: "Are you sure you want to accept contact request " + name + " (" + email + ")?",
                     showCancelButton: true,
@@ -312,7 +312,7 @@ export default {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/accept_user'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
-                            swal({
+                            swal.fire({
                                 title: 'Contact Accept',
                                 text: 'You have successfully accepted ' + name + '.',
                                 type: 'success',
@@ -322,7 +322,7 @@ export default {
                             },(error) => {
                             });
                         }, (error) => {
-                            swal('Contact Accept','There was an error accepting ' + name + '.','error')
+                            swal.fire('Contact Accept','There was an error accepting ' + name + '.','error')
                         });
                     }
                 },(error) => {
@@ -348,7 +348,7 @@ export default {
                 vm.contact_user.phone_number= phone
 
 
-                swal({
+                swal.fire({
                     title: "Contact Accept (Previously Declined)",
                     text: "Are you sure you want to accept the previously declined contact request for " + name + " (" + email + ")?",
                     showCancelButton: true,
@@ -358,7 +358,7 @@ export default {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/accept_declined_user'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
-                            swal({
+                            swal.fire({
                                 title: 'Contact Accept (Previously Declined)',
                                 text: 'You have successfully accepted ' + name + '.',
                                 type: 'success',
@@ -368,7 +368,7 @@ export default {
                             },(error) => {
                             });
                         }, (error) => {
-                            swal('Contact Accept (Previously Declined)','There was an error accepting ' + name + '.','error')
+                            swal.fire('Contact Accept (Previously Declined)','There was an error accepting ' + name + '.','error')
                         });
                     }
                 },(error) => {
@@ -396,7 +396,7 @@ export default {
                 // console.log(vm.contact_user)
 
 
-                swal({
+                swal.fire({
                     title: "Contact Decline",
                     text: "Are you sure you want to decline the contact request for " + name + " (" + email + ")?",
                     showCancelButton: true,
@@ -406,7 +406,7 @@ export default {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/decline_user'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
-                            swal({
+                            swal.fire({
                                 title: 'Contact Decline',
                                 text: 'You have successfully declined ' + name + '.',
                                 type: 'success',
@@ -416,7 +416,7 @@ export default {
                             },(error) => {
                             });
                         }, (error) => {
-                            swal('Contact Decline','There was an error declining ' + name + '.','error')
+                            swal.fire('Contact Decline','There was an error declining ' + name + '.','error')
                         });
                     }
                 },(error) => {
@@ -444,7 +444,7 @@ export default {
                 vm.contact_user.phone_number= phone 
 
 
-                swal({
+                swal.fire({
                     title: "Unlink",
                     text: "Are you sure you want to unlink " + name + " (" + email + ")?",
                     showCancelButton: true,
@@ -454,7 +454,7 @@ export default {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/unlink_user'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
-                            swal({
+                            swal.fire({
                                 title: 'Unlink',
                                 text: 'You have successfully unlinked ' + name + '.',
                                 type: 'success',
@@ -468,7 +468,7 @@ export default {
                             for (var key in error.body) {
                               if (key == 'non_field_errors') { error_msg += error.body[key] + '<br/>'; }
                             }
-                            swal(
+                            swal.fire(
                               'Unlink User',
                               'There was an error unlinking ' + name + ' from the Organisation.' + error_msg,
                               'error'
@@ -498,7 +498,7 @@ export default {
                 vm.contact_user.phone_number= phone 
 
 
-                swal({
+                swal.fire({
                     title: "Organisation Admin",
                     text: "Are you sure you want to make " + name + " (" + email + ") an Organisation Admin?",
                     showCancelButton: true,
@@ -508,7 +508,7 @@ export default {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/make_admin_user'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
-                            swal({
+                            swal.fire({
                                 title: 'Organisation Admin',
                                 text: 'You have successfully made ' + name + ' an Organisation Admin.',
                                 type: 'success',
@@ -518,7 +518,7 @@ export default {
                             },(error) => {
                             });
                         }, (error) => {
-                            swal('Organisation Admin','There was an error making ' + name + ' an Organisation Admin.','error')
+                            swal.fire('Organisation Admin','There was an error making ' + name + ' an Organisation Admin.','error')
                         });
                     }
                 },(error) => {
@@ -544,7 +544,7 @@ export default {
                 vm.contact_user.phone_number= phone 
 
 
-                swal({
+                swal.fire({
                     title: "Organisation User",
                     text: "Are you sure you want to make " + name + " (" + email + ") an Organisation User?",
                     showCancelButton: true,
@@ -554,7 +554,7 @@ export default {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/make_user'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
-                            swal({
+                            swal.fire({
                                 title: 'Organisation User',
                                 text: 'You have successfully made ' + name + ' an Organisation User.',
                                 type: 'success',
@@ -568,7 +568,7 @@ export default {
                             for (var key in error.body) {
                               if (key == 'non_field_errors') { error_msg += error.body[key] + '<br/>'; }
                             }
-                            swal(
+                            swal.fire(
                               'Organisation User',
                               'There was an error making ' + name + ' an Organisation User.' + error_msg,
                               'error'
@@ -600,7 +600,7 @@ export default {
                 vm.contact_user.phone_number= phone 
 
 
-                swal({
+                swal.fire({
                     title: "Suspend User",
                     text: "Are you sure you want to Suspend  " + name + " (" + email + ")?",
                     showCancelButton: true,
@@ -610,7 +610,7 @@ export default {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/suspend_user'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
-                            swal({
+                            swal.fire({
                                 title: 'Suspend User',
                                 text: 'You have successfully suspended ' + name + ' as a User.',
                                 type: 'success',
@@ -624,7 +624,7 @@ export default {
                             for (var key in error.body) {
                               if (key == 'non_field_errors') { error_msg += error.body[key] + '<br/>'; }
                             }
-                            swal(
+                            swal.fire(
                               'Suspend User',
                               'There was an error suspending ' + name + ' as a User.' + error_msg,
                               'error'
@@ -655,7 +655,7 @@ export default {
                 vm.contact_user.phone_number= phone 
 
 
-                swal({
+                swal.fire({
                     title: "Reinstate User",
                     text: "Are you sure you want to Reinstate  " + name + " (" + email + ")?",
                     showCancelButton: true,
@@ -665,7 +665,7 @@ export default {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/reinstate_user'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
-                            swal({
+                            swal.fire({
                                 title: 'Reinstate User',
                                 text: 'You have successfully reinstated ' + name + '.',
                                 type: 'success',
@@ -675,7 +675,7 @@ export default {
                             },(error) => {
                             });
                         }, (error) => {
-                            swal('Reinstate User','There was an error reinstating ' + name + '.','error')
+                            swal.fire('Reinstate User','There was an error reinstating ' + name + '.','error')
                         });
                     }
                 },(error) => {
@@ -701,7 +701,7 @@ export default {
                 vm.contact_user.phone_number= phone
 
 
-                swal({
+                swal.fire({
                     title: "Relink User",
                     text: "Are you sure you want to Relink  " + name + " (" + email + ")?",
                     showCancelButton: true,
@@ -711,7 +711,7 @@ export default {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/relink_user'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
-                            swal({
+                            swal.fire({
                                 title: 'Relink User',
                                 text: 'You have successfully relinked ' + name + '.',
                                 type: 'success',
@@ -721,7 +721,7 @@ export default {
                             },(error) => {
                             });
                         }, (error) => {
-                            swal('Relink User','There was an error relink ' + name + '.','error')
+                            swal.fire('Relink User','There was an error relink ' + name + '.','error')
                         });
                     }
                 },(error) => {
@@ -747,7 +747,7 @@ export default {
                 vm.contact_user.phone_number= phone;
                 vm.contact_user.user_role.id = role;
 
-                swal({
+                swal.fire({
                     title: "Organisation Consultant",
                     text: "Are you sure you want to make " + name + " (" + email + ") an Organisation Consultant?",
                     showCancelButton: true,
@@ -757,7 +757,7 @@ export default {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/make_consultant'),JSON.stringify(vm.contact_user),{
                             emulateJSON:true
                         }).then((response) => {
-                            swal({
+                            swal.fire({
                                 title: 'Organisation Consultant',
                                 text: 'You have successfully made ' + name + ' an Organisation Consultant.',
                                 type: 'success',
@@ -771,7 +771,7 @@ export default {
                             for (var key in error.body) {
                               if (key == 'non_field_errors') { error_msg += error.body[key] + '<br/>'; }
                             }
-                            swal(
+                            swal.fire(
                               'Organisation Consultant',
                               'There was an error making ' + name + ' an Organisation Consultant.' + error_msg,
                               'error'
@@ -786,7 +786,7 @@ export default {
         },
         addedContact: function() {
             let vm = this;
-            swal(
+            swal.fire(
                 'Added',
                 'The contact has been successfully added.',
                 'success'
@@ -799,14 +799,14 @@ export default {
             vm.$http.delete(helpers.add_endpoint_json(api.organisation_contacts,id),{
                 emulateJSON:true
             }).then((response) => {
-                swal(
+                swal.fire(
                     'Contact Deleted', 
                     'The contact was successfully deleted.',
                     'success'
                 )
                 vm.$refs.contacts_datatable.vmDataTable.ajax.reload();
             }, (error) => {
-                swal(
+                swal.fire(
                     'Contact Deleted', 
                     'The contact could not be deleted because of the following error: ' + error,
                     'error'
@@ -818,7 +818,7 @@ export default {
             let org = vm.org;
             let org_name = org.name;
             let person = helpers.copyObject(d);
-            swal({
+            swal.fire({
                 title: "Unlink From Organisation",
                 text: "Are you sure you want to unlink " + person.name + " from " + org.name + "?",
                 type: "question",
@@ -831,7 +831,7 @@ export default {
                     }).then((response) => {
                         vm.org = response;
                         if (vm.org.address == null){ vm.org.address = {}; }
-                        swal({
+                        swal.fire({
                             title: 'Unlink',
                             text: 'You have successfully unlinked ' + person.name + ' from ' + org_name + '.',
                             type: 'success',
@@ -845,7 +845,7 @@ export default {
                         for (var key in error.body) {
                           if (key == 'non_field_errors') { error_msg += error.body[key] + '<br/>'; }
                         }
-                        swal(
+                        swal.fire(
                           'Unlink User',
                           'There was an error unlinking ' + person.name + ' from the Organisation.' + error_msg,
                           'error'

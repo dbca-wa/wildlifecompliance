@@ -622,7 +622,7 @@ export default {
             }
             else
             {
-                swal({
+                swal.fire({
                     text:'Unable to determine application type.',
                     title:'Application type missing',
                     type:'error'
@@ -645,7 +645,7 @@ export default {
                             },(error)=>{
                                 this.spinner = false
                                 this.setApplicationWorkflowState({bool: false});
-                                swal(
+                                swal.fire(
                                     'Application Error',
                                     helpers.apiVueResourceError(error),
                                     'error'
@@ -656,7 +656,7 @@ export default {
                 },(error)=>{
                     this.spinner = false
                     this.setApplicationWorkflowState({bool: false});
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -666,7 +666,7 @@ export default {
             }
             else
             {
-                swal({
+                swal.fire({
                     text:'Applicant address missing, please ensure the applicant organisation/submitter address details are set.',
                     title:'Applicant address missing',
                     type:'error'
@@ -781,7 +781,7 @@ export default {
                 
             }).catch((error) => {
                
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'

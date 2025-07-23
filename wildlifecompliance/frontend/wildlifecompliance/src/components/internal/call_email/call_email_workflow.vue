@@ -324,7 +324,7 @@ export default {
               }
           } catch(err) {
               this.errorResponse = 'Error:' + err.statusText;
-              await swal({
+              await swal.fire({
                   title: 'Mandatory Field',
                   html: helpers.formatError(err),
                   type: "error",

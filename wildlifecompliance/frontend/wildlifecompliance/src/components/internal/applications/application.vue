@@ -1256,7 +1256,7 @@ export default {
         },
         acceptIdRequest: async function() {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Accept ID Check",
                 text: "Are you sure you want to accept this ID Check?",
                 type: "question",
@@ -1276,7 +1276,7 @@ export default {
         },
         resetIdRequest: async function() {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Reset ID Check",
                 text: "Are you sure you want to reset this ID Check?",
                 type: "question",
@@ -1296,7 +1296,7 @@ export default {
         },
         updateIdRequest: async function() {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Request Update ID Check",
                 text: "Are you sure you want to request this ID Check update?",
                 type: "question",
@@ -1316,7 +1316,7 @@ export default {
         },
         acceptCharacterRequest: async function() {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Accept Character Check",
                 text: "Are you sure you want to accept this Character Check?",
                 type: "question",
@@ -1336,7 +1336,7 @@ export default {
         },
         resetCharacterRequest: async function() {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Reset Character Check",
                 text: "Are you sure you want to reset this Character Check?",
                 type: "question",
@@ -1356,7 +1356,7 @@ export default {
         },
         acceptReturnRequest: async function() {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Accept Return Check",
                 text: "Are you sure you want to accept this Return Check?",
                 type: "question",
@@ -1376,7 +1376,7 @@ export default {
         },
         resetReturnRequest: async function() {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Reset Return Check",
                 text: "Are you sure you want to reset this Return Check?",
                 type: "question",
@@ -1404,7 +1404,7 @@ export default {
             await this.saveFormData({ url: this.form_data_application_url }).then(response => {
                 // this.spinner = false;
                 this.resetUpdateFeeStatus();
-                showNotification && swal(
+                showNotification && swal.fire(
                     'Saved',
                     'Your application has been saved',
                     'success'
@@ -1423,7 +1423,7 @@ export default {
                     }, 1);
                     return false;
                 }
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -1522,7 +1522,7 @@ export default {
                     this.condition_spinner = false;
                     this.spinner = false;
                     console.log(error)
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -1558,7 +1558,7 @@ export default {
                     this.condition_spinner = false;
                     this.spinner = false;
                     console.log(error)
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -1590,7 +1590,7 @@ export default {
             }, (error) => {
                 vm.revert();
                 vm.updateAssignedOfficerSelect();
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -1628,7 +1628,7 @@ export default {
                 }, (error) => {
                     this.revert();
                     this.updateAssignedOfficerSelect();
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -1644,7 +1644,7 @@ export default {
                 }, (error) => {
                     this.revert();
                     this.updateAssignedOfficerSelect();
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -1671,7 +1671,7 @@ export default {
                 }, (error) => {
                     this.revert();
                     this.updateAssignedApproverSelect();
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -1687,7 +1687,7 @@ export default {
                 }, (error) => {
                     this.revert();
                     this.updateAssignedOfficerSelect();
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -1712,7 +1712,7 @@ export default {
             }, (error) => {
                 this.revert();
                 this.updateAssignedApproverSelect();
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -1731,7 +1731,7 @@ export default {
                 this.refreshFromResponse(response);
             }, (error) => {
                 this.revert();
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -1889,7 +1889,7 @@ export default {
                 },(error)=>{
 
                     console.log(error)
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -1934,7 +1934,7 @@ export default {
             }
         },
         actionOfficerReturnButton: async function(){
-            swal({
+            swal.fire({
                 title: 'Return to Officer - Conditions',
                 html:`
                     Please provide the reason for returning this licensed activity back to officer for review.
@@ -1963,7 +1963,7 @@ export default {
 
                     }, (error) => {
                         this.revert();
-                        swal(
+                        swal.fire(
                             'Application Error',
                             helpers.apiVueResourceError(error),
                             'error'

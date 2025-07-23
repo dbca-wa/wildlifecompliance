@@ -187,7 +187,7 @@ export default {
                       self.spinner_continue = false;
                       if (andContinue) { 
 
-                        swal( 'Save', 
+                        swal.fire( 'Save', 
                               'Return Details Saved', 
                               'success'
                         )
@@ -205,7 +205,7 @@ export default {
                       self.spinner_exit = false;
                       self.spinner_continue = false;
                       console.log(error);
-                      swal('Error',
+                      swal.fire('Error',
                            'There was an error saving your return details.<br/>' + error.body,
                            'error'
                       )
@@ -237,7 +237,7 @@ export default {
                       self.disable_continue = false;
                       self.spinner_submit = false;
                       console.log(error);
-                      swal('Error',
+                      swal.fire('Error',
                            'There was an error saving and submitting your return details.<br/>' + error.body,
                            'error'
                       )
@@ -271,7 +271,7 @@ export default {
                        self.spinner_exit = false;
                        self.spinner_submit = false;
                        console.log(error);
-                       swal('Error',
+                       swal.fire('Error',
                             'There was an error submitting your return details.<br/>' + error.body,
                             'error'
                        )
@@ -306,7 +306,7 @@ export default {
                        self.spinner_exit = false;
                        self.spinner_submit = false;
                        console.log(error);
-                       swal('Error',
+                       swal.fire('Error',
                             'There was an error submitting your return details.<br/>' + error.body,
                             'error'
                        )

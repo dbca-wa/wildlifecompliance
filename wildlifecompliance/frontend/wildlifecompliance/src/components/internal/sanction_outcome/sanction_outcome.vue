@@ -1140,7 +1140,7 @@ export default {
                 console.log('save()');
                 let returned_so = await this.saveSanctionOutcome();
 
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
 
                 this.constructAllegedCommittedOffencesTable();
                 this.updateObjectHash()
@@ -1151,7 +1151,7 @@ export default {
         saveExit: async function() {
             try {
                 await this.saveSanctionOutcome();
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
 
                 // remove redundant eventListeners
                 window.removeEventListener('beforeunload', this.leaving);
@@ -1185,7 +1185,7 @@ export default {
                     }
                 }
             }
-            await swal("Error", errorText, "error");
+            await swal.fire("Error", errorText, "error");
         },
         destroyed: function() {
             window.removeEventListener('beforeunload', this.leaving);

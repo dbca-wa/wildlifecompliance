@@ -253,7 +253,7 @@ export default {
                     self.close();
 
                 }, (error) => {
-                    swal(
+                    swal.fire(
                         'Save Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -271,7 +271,7 @@ export default {
                     self.close();
 
                 },(error)=>{
-                    swal(
+                    swal.fire(
                         'Save Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -312,7 +312,7 @@ export default {
                 self.$refs.schema_purpose_table.row_of_data = self.$refs.schema_purpose_table.vmDataTable.row('#'+$(this).attr('data-rowid'));
                 self.sectionPurpose.id = self.$refs.schema_purpose_table.row_of_data.data().id;
 
-                swal({
+                swal.fire({
                     title: "Delete Purpose Section",
                     text: "Are you sure you want to delete?",
                     type: "question",

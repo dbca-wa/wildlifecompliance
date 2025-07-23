@@ -318,7 +318,7 @@ export default {
                     self.close();
 
                 }, (error) => {
-                    swal(
+                    swal.fire(
                         'Save Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -336,7 +336,7 @@ export default {
                     self.close();
 
                 },(error)=>{
-                    swal(
+                    swal.fire(
                         'Save Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -386,7 +386,7 @@ export default {
                 self.$refs.schema_group_table.row_of_data = self.$refs.schema_group_table.vmDataTable.row('#'+$(this).attr('data-rowid'));
                 self.sectionGroup.id = self.$refs.schema_group_table.row_of_data.data().id;
 
-                swal({
+                swal.fire({
                     title: "Delete Section Group",
                     text: "Are you sure you want to delete?",
                     type: "question",

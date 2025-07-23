@@ -178,7 +178,7 @@ export default {
                     vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/cancel_purposes'),JSON.stringify(data),{
                             emulateJSON:true,
                         }).then((response)=>{
-                            swal(
+                            swal.fire(
                                     'Cancel Purposes',
                                     'The selected licenced purposes have been Cancelled.',
                                     'success'
@@ -193,7 +193,7 @@ export default {
                         });
                 } else {
                     vm.actioningPurposes = false;
-                    swal(
+                    swal.fire(
                          'Cancel Purpose',
                          'Please select at least once licenced purpose to Cancel.',
                          'error'
@@ -206,7 +206,7 @@ export default {
                     vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/suspend_purposes'),JSON.stringify(data),{
                             emulateJSON:true,
                         }).then((response)=>{
-                            swal(
+                            swal.fire(
                                     'Suspend Purposes',
                                     'The selected licenced purposes have been Suspended.',
                                     'success'
@@ -221,7 +221,7 @@ export default {
                         });
                 } else {
                     vm.actioningPurposes = false;
-                    swal(
+                    swal.fire(
                          'Suspend Purpose',
                          'Please select at least once licenced purpose to Suspend.',
                          'error'
@@ -234,7 +234,7 @@ export default {
                     vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/surrender_purposes'),JSON.stringify(data),{
                             emulateJSON:true,
                         }).then((response)=>{
-                            swal(
+                            swal.fire(
                                     'Surrender Purposes',
                                     'The selected licenced purposes have been Surrendered.',
                                     'success'
@@ -249,7 +249,7 @@ export default {
                         });
                 } else {
                     vm.actioningPurposes = false;
-                    swal(
+                    swal.fire(
                          'Surrender Purpose',
                          'Please select at least once licenced purpose to Surrender.',
                          'error'
@@ -262,7 +262,7 @@ export default {
                     vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/reactivate_renew_purposes'),JSON.stringify(data),{
                             emulateJSON:true,
                         }).then((response)=>{
-                            swal(
+                            swal.fire(
                                     'Reactivate Renew Purposes',
                                     'Renew for the selected licenced purposes has been Reactivated.',
                                     'success'
@@ -277,7 +277,7 @@ export default {
                         });
                 } else {
                     vm.actioningPurposes = false;
-                    swal(
+                    swal.fire(
                          'Reactivate Renew Purpose',
                          'Please select at least once licenced purpose to Reactivate Renew.',
                          'error'
@@ -303,7 +303,7 @@ export default {
                         });
                 } else {
                     vm.actioningPurposes = false;
-                    swal(
+                    swal.fire(
                          'Reissue Purpose',
                          'Please select at least once licenced purpose to Reissue.',
                          'error'
@@ -316,7 +316,7 @@ export default {
                     vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/reinstate_purposes'),JSON.stringify(data),{
                             emulateJSON:true,
                         }).then((response)=>{
-                            swal(
+                            swal.fire(
                                     'Reinstate Purposes',
                                     'The selected licenced purposes have been Reinstated.',
                                     'success'
@@ -331,7 +331,7 @@ export default {
                         });
                 } else {
                     vm.actioningPurposes = false;
-                    swal(
+                    swal.fire(
                          'Reinstate Purpose',
                          'Please select at least once licenced purpose to Reinstate.',
                          'error'

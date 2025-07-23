@@ -146,7 +146,7 @@ export default {
                         let species_id = this.returns.sheet_species;
                         this.setReturns(response);
                         this.returns.sheet_species = species_id;
-                        swal(
+                        swal.fire(
                              'Sent',
                              'An email has been sent to the Licensee with the request to amend this Return.',
                              'success'

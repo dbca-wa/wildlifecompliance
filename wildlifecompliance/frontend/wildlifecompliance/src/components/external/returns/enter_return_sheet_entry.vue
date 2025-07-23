@@ -424,7 +424,7 @@ export default {
                       //this.returns.sheet_species = species_id;
                     },(error)=>{
                       console.log(error);
-                      swal('Error',
+                      swal.fire('Error',
                             'There was an error with transferring.<br/>' + error.body,
                             'error'
                       )

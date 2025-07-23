@@ -556,7 +556,7 @@ export default {
         },
         discardApplication:function (application_id) {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Discard Application",
                 text: "Are you sure you want to discard this application?",
                 type: "warning",
@@ -567,14 +567,14 @@ export default {
                 if (result) {
                     vm.$http.delete(api_endpoints.discard_application(application_id))
                     .then((response) => {
-                        swal(
+                        swal.fire(
                             'Discarded',
                             'Your application has been discarded',
                             'success'
                         )
                         vm.visibleDatatable.vmDataTable.ajax.reload();
                     }, (error) => {
-                        swal(
+                        swal.fire(
                             'Discard Error',
                             helpers.apiVueResourceError(error),
                             'error'
@@ -601,7 +601,7 @@ export default {
             }).then(res=>{
                     window.location.href = res;
                 },err=>{
-                    swal(
+                    swal.fire(
                         'Submit Error',
                         helpers.apiVueResourceError(err),
                         'error'
@@ -612,7 +612,7 @@ export default {
             this.$http.post(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/application_fee_checkout/'), application_id).then(res=>{
                     window.location.href = res;
                 },err=>{
-                    swal(
+                    swal.fire(
                         'Submit Error',
                         helpers.apiVueResourceError(err),
                         'error'
@@ -627,7 +627,7 @@ export default {
                     this.activities = res;
 
                 },err=>{
-                    swal(
+                    swal.fire(
                         'Get Activity Error',
                         helpers.apiVueResourceError(err),
                         'error'

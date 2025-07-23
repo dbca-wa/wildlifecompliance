@@ -228,7 +228,7 @@ export const inspectionStore = {
                     // return "There was an error saving the record";
                     return err;
                 } else {
-                    await swal("Error", "There was an error saving the record", "error");
+                    await swal.fire("Error", "There was an error saving the record", "error");
                 }
                 //return window.location.href = "/internal/inspection/";
                 //console.log(savedInspection);
@@ -239,7 +239,7 @@ export const inspectionStore = {
                 }
                 // update inspection
                 else if (!create && !error) {
-                    await swal("Saved", "The record has been saved", "success");
+                    await swal.fire("Saved", "The record has been saved", "success");
                 }
                 return savedInspection;
             }

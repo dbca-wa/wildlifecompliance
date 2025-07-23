@@ -169,14 +169,14 @@ export default {
             this.setReturns(response);
             this.returns.sheet_species = species_id;
 
-            swal( 'Save', 
+            swal.fire( 'Save', 
                 'Return Details Saved', 
                 'success' )
         
         },(error)=>{
             this.spinner = false
             console.log(error);
-            swal('Error',
+            swal.fire('Error',
                 'There was an error saving your return details.<br/>' + error.body,
                 'error'
             )
@@ -223,7 +223,7 @@ export default {
             this.spinner_continue = false;
             if (andContinue) { 
 
-            swal( 'Save', 
+            swal.fire( 'Save', 
                     'Return Details Saved', 
                     'success'
             )
@@ -241,7 +241,7 @@ export default {
             this.spinner_exit = false;
             this.spinner_continue = false;
             console.log(error);
-            swal('Error',
+            swal.fire('Error',
                 'There was an error saving your return details.<br/>' + error.body,
                 'error'
             )

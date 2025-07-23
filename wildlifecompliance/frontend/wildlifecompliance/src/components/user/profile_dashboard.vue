@@ -110,7 +110,7 @@ export default {
             let vm = this;
             vm.$http.delete(api_endpoints.profiles + "/" + id + '/'
             ).then((response) => {
-                swal(
+                swal.fire(
                     'Delete Profile',
                     'Your profile, ' + name + ' (' + email + ') has been successfully deleted.',
                     'success'
@@ -118,7 +118,7 @@ export default {
                 vm.$refs.profile_datatable.vmDataTable.ajax.reload();
             }, (error) => {
                 console.log(error);
-                swal(
+                swal.fire(
                     'Delete Profile',
                     'There was an error deleting the profile, ' + name + ' (' + email + ').',
                     'error'
@@ -132,7 +132,7 @@ export default {
                 let name = $(e.target).data('name');
                 let email = $(e.target).data('email');
                 let id = $(e.target).data('id');
-                swal({
+                swal.fire({
                     title: "Delete Profile",
                     text: 'Are you sure you want to delete this profile, ' + name + ' (' + email + ')?',
                     type: "error",

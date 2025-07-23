@@ -195,7 +195,7 @@ export default {
     discardActivity: function(e) {
       let swal_title = 'Discard Selected Activity';
       let swal_html = `Are you sure you want to discard activity: ${this.selected_activity_tab_name}?`;
-      swal({
+      swal.fire({
           title: swal_title,
           html: swal_html,
           type: "question",
@@ -204,7 +204,7 @@ export default {
           confirmButtonColor: '#d9534f',
       }).then((result) => {
         this.$http.delete(this.activity_discard_url, {params: {'activity_id': this.selected_activity_tab_id}}).then(res=>{
-            swal(
+            swal.fire(
               'Activity Discarded',
               `${this.selected_activity_tab_name} has been discarded from this application.`,
               'success'
@@ -230,7 +230,7 @@ export default {
               });
             }
         },err=>{
-          swal(
+          swal.fire(
             'Error',
             helpers.apiVueResourceError(err),
             'error'
@@ -255,7 +255,7 @@ export default {
     saveExit: async function(e) {
       let is_saved = await this.save_form();
       if (is_saved) {
-          swal(
+          swal.fire(
             'Saved',
             'Your application has been saved',
             'success'
@@ -291,7 +291,7 @@ export default {
             }, 1);
         }
 
-        swal(
+        swal.fire(
             'Error',
             'There was an error saving your application',
             'error'
@@ -304,7 +304,7 @@ export default {
     save: async function(e) {
       let is_saved = await this.save_form();
       if (is_saved) {
-          swal(
+          swal.fire(
             'Saved',
             'Your application has been saved',
             'success'
@@ -331,7 +331,7 @@ export default {
         let vm = this;
         let swal_title = 'Submit Application'
         let swal_html = 'Are you sure you want to submit this application?'
-        swal({
+        swal.fire({
             title: swal_title,
             html: swal_html,
             type: "question",
@@ -354,7 +354,7 @@ export default {
                       });
 
                   },err=>{
-                      swal(
+                      swal.fire(
                           'Submit Error',
                           helpers.apiVueResourceError(err),
                           'error'
@@ -372,7 +372,7 @@ export default {
             }
 
         },(error) => {
-            swal(
+            swal.fire(
                 'Error',
                 'There was an error submitting your application',
                 'error'
@@ -386,7 +386,7 @@ export default {
         let vm = this;
         let swal_title = 'Checkout and Submit Application'
         let swal_html = 'Are you sure you want to pay and submit this application?<br><br>'
-        swal({
+        swal.fire({
             title: swal_title,
             html: swal_html,
             type: "question",
@@ -406,7 +406,7 @@ export default {
                     .then(res=>{
                         window.location.href = res;
                     },err=>{
-                        swal(
+                        swal.fire(
                             'Submit Error',
                             helpers.apiVueResourceError(err),
                             'error'
@@ -431,7 +431,7 @@ export default {
                 vm.isProcessing = false;
             }
         },(error) => {
-            swal(
+            swal.fire(
                 'Error',
                 'There was an error submitting your application',
                 'error'
@@ -445,7 +445,7 @@ export default {
         let vm = this;
         let swal_title = 'Submit Application and Record Payment'
         let swal_html = 'Are you sure you want to submit this application?'
-        swal({
+        swal.fire({
             title: swal_title,
             html: swal_html,
             type: "question",
@@ -469,7 +469,7 @@ export default {
                   });
 
                 },err=>{
-                      swal(
+                      swal.fire(
                           'Submit Error',
                           helpers.apiVueResourceError(err),
                           'error'
@@ -486,7 +486,7 @@ export default {
 
             }
         },(error) => {
-            swal(
+            swal.fire(
                 'Error',
                 'There was an error submitting your application',
                 'error'

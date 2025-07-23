@@ -310,13 +310,13 @@ export const callemailStore = {
                 let fetchUrl = helpers.add_endpoint_join(api_endpoints.call_email, state.call_email.id + "/call_email_save_person/");
                 const savedEmailUser = await Vue.http.post(fetchUrl, state.call_email);
                 await dispatch("setEmailUser", savedEmailUser.body);
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
             } catch (err) {
                 //console.log(err);
                 if (err.body.non_field_errors){
-                    await swal("Error", err.body.non_field_errors[0], "error");
+                    await swal.fire("Error", err.body.non_field_errors[0], "error");
                 } else {
-                    await swal("Error", "There was an error saving the record", "error");
+                    await swal.fire("Error", "There was an error saving the record", "error");
                 }
             }
         },
@@ -386,7 +386,7 @@ export const callemailStore = {
                     try {
                         savedCallEmail = await Vue.http.post(draftUrl, payload)
                     }catch(err) {
-                        await swal({
+                        await swal.fire({
                             title: 'Error',
                             html: helpers.formatError(err),
                             type: "error",
@@ -400,7 +400,7 @@ export const callemailStore = {
                         )
                         savedCallEmail = await Vue.http.put(fetchUrl, payload)
                     }catch(err) {
-                        await swal({
+                        await swal.fire({
                             title: 'Mandatory Field',
                             html: helpers.formatError(err),
                             type: "error",
@@ -417,7 +417,7 @@ export const callemailStore = {
                     // return "There was an error saving the record";
                     return err;
                 } else {
-                    await swal("Error", "There was an error saving the record", "error");
+                    await swal.fire("Error", "There was an error saving the record", "error");
                 }
                 //return window.location.href = "/internal/call_email/";
             }
@@ -427,7 +427,7 @@ export const callemailStore = {
             }
             else if (crud !== 'create') {
                 if (!internal) {
-                    await swal("Saved", "The record has been saved", "success");
+                    await swal.fire("Saved", "The record has been saved", "success");
                 } else {
                     return savedCallEmail;
                 }

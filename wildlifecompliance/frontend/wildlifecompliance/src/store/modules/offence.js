@@ -181,7 +181,6 @@ export const offenceStore = {
             }
         },
         async saveOffence({dispatch, state, commit}, params) {
-            //try{
                 console.log('params');
                 console.log(params);
                 // Construct url endpoint
@@ -206,21 +205,6 @@ export const offenceStore = {
                     }
                 }
 
-               // // Format date
-               // if (payload.occurrence_date_from) {
-               //     payload.occurrence_date_from = moment(payload.occurrence_date_from, 'DD/MM/YYYY').format('YYYY-MM-DD');
-               // }
-               // if (payload.occurrence_date_to) {
-               //     payload.occurrence_date_to = moment(payload.occurrence_date_to, 'DD/MM/YYYY').format('YYYY-MM-DD');
-               // }
-               // // Format time
-               // if (payload.occurrence_time_from) {
-               //     payload.occurrence_time_from = moment(payload.occurrence_time_from, 'LT').format('HH:mm');
-               // }
-               // if (payload.occurrence_time_to) {
-               //     payload.occurrence_time_to = moment(payload.occurrence_time_to, 'LT').format('HH:mm');
-               // }
-
                 console.log('payload offence');
                 console.log(payload);
 
@@ -231,21 +215,7 @@ export const offenceStore = {
 
                 // Restore returned data into the stre
                 commit("updateOffence", savedOffence.body);
-
-                // Display message
-           //     await swal("Saved", "The record has been saved", "success");
-
-                // Return the saved data just in case needed
                 return savedOffence;
-          //  } catch (err) {
-          //      console.log('catch(err) in offence.js');
-
-          //      if (err.body.non_field_errors){
-          //          await swal("Error", err.body.non_field_errors[0], "error");
-          //      } else {
-          //          await swal("Error", "There was an error saving the record", "error");
-          //      }
-          //  }
         },
         async createOffence({dispatch, state}){
             console.log('createOffence');

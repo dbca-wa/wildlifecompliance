@@ -326,7 +326,7 @@ export default {
                 vm.updatingContact = false;
                 // vm.user = response;
                 if (vm.call_email.email_user.residential_address == null){ vm.call_email.email_user.residential_address = {}; }
-                swal({
+                swal.fire({
                     title: 'Update Contact Details',
                     html: 'User contact details has been successfully updated.',
                     type: 'success',
@@ -337,7 +337,7 @@ export default {
                 for (var key in error.body) {
                     error_msg += key + ': ' + error.body[key] + '<br/>';
                 }
-                swal({
+                swal.fire({
                     title: 'Update Contact Details',
                     html: 'There was an error updating the user contact details.<br/>' + error_msg,
                     type: 'error'
@@ -353,7 +353,7 @@ export default {
                 vm.updatingAddress = false;
                 vm.call_email.email_user = response;
                 if (vm.call_email.email_user.residential_address == null){ vm.call_email.email_user.residential_address = {}; }
-                swal({
+                swal.fire({
                     title: 'Update Address Details',
                     html: 'User address details has been successfully updated.',
                     type: 'success',
@@ -364,7 +364,7 @@ export default {
                 for (var key in error.body) {
                     error_msg += key + ': ' + error.body[key] + '<br/>';
                 }
-                swal({
+                swal.fire({
                     title: 'Update Address Details',
                     html: 'There was an error updating the user address details.<br/>' + error_msg,
                     type: 'error'

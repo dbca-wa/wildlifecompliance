@@ -83,7 +83,7 @@ export default {
                     }
                 }
             }
-            await swal("Error", errorText, "error");
+            await swal.fire("Error", errorText, "error");
         },
     }
 }

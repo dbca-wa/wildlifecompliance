@@ -445,14 +445,14 @@ export default {
                 let fetchUrl = ''
                 if (payload.id) {
                     if (!payload.email) {
-                        await swal("Error", "Ensure the email field is not blank", "error");
+                        await swal.fire("Error", "Ensure the email field is not blank", "error");
                         return;
                     } else {
                         fetchUrl = helpers.add_endpoint_join(api_endpoints.compliance_management_users, payload.id + '/update_person/');
                     }
                 } else {
                     if (!payload.first_name || !payload.last_name || !payload.dob || (this.emailRequired && !payload.email)) {
-                        await swal("Error", "Fill out all Personal Details and email fields", "error");
+                        await swal.fire("Error", "Fill out all Personal Details and email fields", "error");
                         return;
                     } else {
                         fetchUrl = api_endpoints.compliance_management_users;
@@ -466,12 +466,12 @@ export default {
                 Object.assign(this.email_user, savedEmailUser.body);
                 this.email_user.dob = moment(this.email_user.dob, 'YYYY-MM-DD').format('DD/MM/YYYY');
                 if (!(parentSave === 'parentSave')) {
-                    await swal("Saved", "Person has been saved", "success");
+                    await swal.fire("Saved", "Person has been saved", "success");
                 }
                 this.$emit('person-saved', {'person': savedEmailUser.body, 'errorMessage': null});
             } catch (err) {
                 if (err.bodyText) {
-                    await swal("Error", err.bodyText, "error");
+                    await swal.fire("Error", err.bodyText, "error");
                     //this.$emit('person-saved', { 'person': null, 'errorMessage': err.bodyText });
                 }
             }

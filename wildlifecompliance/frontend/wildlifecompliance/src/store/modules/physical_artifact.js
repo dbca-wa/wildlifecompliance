@@ -190,7 +190,7 @@ export const physicalArtifactStore = {
                     // return "There was an error saving the record";
                     return err;
                 } else {
-                    await swal("Error", "There was an error saving the record", "error");
+                    await swal.fire("Error", "There was an error saving the record", "error");
                 }
             }
             // internal arg used when file upload triggers record creation
@@ -199,7 +199,7 @@ export const physicalArtifactStore = {
             }
             // update legal_case
             else if (!create) {
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
             }
         },
         setPhysicalArtifact({ commit, }, physical_artifact) {

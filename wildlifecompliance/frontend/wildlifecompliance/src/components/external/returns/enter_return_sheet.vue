@@ -239,7 +239,7 @@ export default {
     },
     addSheetRow: function () {
       if (document.getElementById("species_selector").value === '' || null) {
-        swal(
+        swal.fire(
           'Select Specie',
           'Please select a specie before adding a new entry.',
           'error'

@@ -550,28 +550,19 @@ export default {
             // this.saveFormData({ url: this.form_data_comments_url }).then(response => {
 
                 this.saveFormData({ url: this.form_data_application_url }).then(response => {   
-                    showNotification && swal(
+                    showNotification && swal.fire(
                         'Saved',
                         'Your application has been saved',
                         'success'
                     )     
                 }, error => {
                     console.log('Failed to save Application: ', error);
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
                     )
                 });
-
-            // }, error => {
-            //     console.log('Failed to save comments: ', error);
-            //     swal(
-            //         'Application Error',
-            //         helpers.apiVueResourceError(error),
-            //         'error'
-            //     )
-            // });
         },
         save_wo: function() {
             return this.save({ showNotification: false });
@@ -639,7 +630,7 @@ export default {
                     this.setApplication(response);
                 }, (error) => {
                     this.revert();
-                       swal(
+                       swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -659,7 +650,7 @@ export default {
                     this.setApplication(response);
                 }, (error) => {
                     this.revert();
-                       swal(
+                       swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -678,7 +669,7 @@ export default {
                     this.setApplication(response);
                 }, (error) => {
                     this.revert();
-                       swal(
+                       swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -708,7 +699,7 @@ export default {
                 for (var key in error.body) {
                     error_msg += error.body[key] + '<br/>';
                 }
-                swal({
+                swal.fire({
                     title: 'Assessment Error',
                     html: 'There was an error completing assessment.<br/>' + error_msg,
                     type: 'error'

@@ -244,7 +244,7 @@ export default {
     submit: function() {
         let vm = this;
         vm.spinner = true;
-        swal({
+        swal.fire({
             title: "Create Application",
             text: "Are you sure you want to create an application?",
             type: "question",
@@ -371,7 +371,7 @@ export default {
 
         // if no selections, display error do not continue
         if(count_total_purposes == 0){
-            swal({
+            swal.fire({
                 title: "Create Application",
                 text: "Please ensure at least one licence purpose is selected",
                 type: "error",
@@ -398,7 +398,7 @@ export default {
             }, err => {
                 console.log(err);
                 vm.spinner = false;
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(err),
                     'error'
@@ -432,7 +432,7 @@ export default {
         }, err => {
             console.log(err);
             vm.spinner = false;
-            swal(
+            swal.fire(
                 'Application Error',
                 helpers.apiVueResourceError(err),
                 'error'

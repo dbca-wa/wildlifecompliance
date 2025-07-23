@@ -269,7 +269,6 @@ export default {
             errorText += err.message;
         }
         this.errorResponse = errorText;
-        //await swal("Error", errorText, "error");
     },
     cancel: function() {
         this.processingDetails = false;

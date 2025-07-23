@@ -316,7 +316,7 @@ export default {
         saveAssessment: function(e) {
             this.savingAssessment = true;
             this.saveAssessmentData().then(() => {
-                swal(
+                swal.fire(
                     'Save Assessment',
                     'Your assessment has been saved.',
                     'success'
@@ -324,7 +324,7 @@ export default {
                     this.savingAssessment = false;
                 });
             }, error => {
-                swal(
+                swal.fire(
                     'Error',
                     'There was an error saving your assessment',
                     'error'
@@ -437,7 +437,7 @@ export default {
             this.$refs.send_to_assessor.assessment.licence_activity=this.selected_activity_tab_id;
             this.$refs.send_to_assessor.assessment.text='';
             if (this.selectedAssessor.id == null || this.selectedAssessor.display_name == null){
-              swal(
+              swal.fire(
                 'Error',
                 'Please select an Assessor Group to send the request to.',
                 'error'
@@ -486,21 +486,21 @@ export default {
                     // this.$parent.refreshFromResponse(response);
                     this.refreshAssessorDatatables();
                     this.close();
-                    swal(
+                    swal.fire(
                         'Complete Assessment',
                         'The assessment has been successfully completed',
                         'success'
                     )
                 }, (error) => {
                     this.revert();
-                    swal(
+                    swal.fire(
                         'Error',
                         helpers.apiVueResourceError(error),
                         'error'
                     )
                 });
             }, error => {
-                swal(
+                swal.fire(
                     'Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -606,7 +606,7 @@ export default {
 
                 let assessment_id = $(e.target).data('assessmentid');
                 vm.$http.post(helpers.add_endpoint_json(api_endpoints.assessment,(assessment_id+'/remind_assessment'))).then((response)=>{
-                    swal(
+                    swal.fire(
                             'Sent',
                             'An email has been sent to assessor with the request to assess this Application',
                             'success'
@@ -627,7 +627,7 @@ export default {
 
                 let assessment_id = $(e.target).data('assessmentid');
                 vm.$http.post(helpers.add_endpoint_json(api_endpoints.assessment,(assessment_id+'/resend_assessment'))).then((response)=>{
-                    swal(
+                    swal.fire(
                             'Sent',
                             'An email has been sent to assessor with the request to re-assess this Application',
                             'success'
@@ -653,7 +653,7 @@ export default {
                 let assessment_id = $(e.target).data('assessmentid');
                 vm.$http.post(helpers.add_endpoint_json(api_endpoints.assessment,(assessment_id+'/recall_assessment'))).then((response)=>{
                     //vm.$parent.loading.splice('processing contact',1);
-                    swal(
+                    swal.fire(
                             'Success',
                             'An assessment for this Application has been recalled',
                             'success'
