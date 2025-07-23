@@ -64,7 +64,7 @@
 //import $ from 'jquery'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import {helpers,api_endpoints} from "@/utils/hooks.js"
+import {helpers,api_endpoints,fetch} from "@/utils/hooks.js"
 export default {
     name:'Add-Organisation-Contact',
     components:{
@@ -111,11 +111,12 @@ export default {
         },
         fetchContact: function(id){
             let vm = this;
-            vm.$http.get(api_endpoints.contact(id)).then((response) => {
-                vm.contact = response.body; vm.isModalOpen = true;
-            },(error) => {
+            let request = fetch.fetchUrl(api_endpoints.contact(id))
+            request.then((response) => {
+                vm.contact = response; vm.isModalOpen = true;
+            }).catch((error) => {
                 console.log(error);
-            } );
+            });
         },
         sendData:function(){
             let vm = this;

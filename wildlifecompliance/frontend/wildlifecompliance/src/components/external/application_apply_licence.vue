@@ -308,8 +308,8 @@ export default {
                 'purpose_ids': purpose_ids,
                 'licence_type': this.selected_apply_licence_select,
             }).then(res => {
-                this.application_fee = res.body.fees.application;
-                this.licence_fee = res.body.fees.licence;
+                this.application_fee = res.fees.application;
+                this.licence_fee = res.fees.licence;
 
         }, err => {
             console.log(err);
@@ -389,7 +389,7 @@ export default {
             vm.$http.post('/api/application.json',JSON.stringify(data),{emulateJSON:true}).then(res => {
                 vm.setApplicationWorkflowState({bool: false});
                 vm.setReceptionMethodId({pay_method: this.customer_pay_method});
-                vm.application = res.body;
+                vm.application = res;
                 vm.spinner = false;
                 vm.$router.push({
                     name:"draft_application",
@@ -423,7 +423,7 @@ export default {
         vm.$http.post('/api/application.json',JSON.stringify(data),{emulateJSON:true}).then(res => {
             vm.setApplicationWorkflowState({bool: false});
             vm.setReceptionMethodId({pay_method: this.customer_pay_method});
-            vm.application = res.body;
+            vm.application = res;
             vm.spinner = false;
             vm.$router.push({
                 name:"draft_application",

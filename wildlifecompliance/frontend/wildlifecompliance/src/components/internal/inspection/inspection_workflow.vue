@@ -136,7 +136,7 @@ export default {
               group_permission: this.groupPermission,
               });
               if (allocatedGroupResponse.ok) {
-                  this.allocated_group_id = allocatedGroupResponse.body.group_id;
+                  this.allocated_group_id = allocatedGroupresponse.group_id;
               } else {
                   // Display http error response on modal
                   this.errorResponse = allocatedGroupResponse.statusText;

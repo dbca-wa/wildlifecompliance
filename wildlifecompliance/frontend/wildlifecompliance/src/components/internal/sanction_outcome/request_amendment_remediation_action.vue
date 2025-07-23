@@ -107,10 +107,8 @@ export default {
         },
         constructOptionsReasons: async function() {
             let get_url = '/api/sanction_outcome/reasons/'
-            let res = await Vue.http.get(get_url, {});
-            console.log('res.body');
-            console.log(res.body);
-            this.amendment_request_reasons = res.body;
+            let res = await fetchUrl(get_url, {});
+            this.amendment_request_reasons = res;
         },
         ok: async function () {
             try {

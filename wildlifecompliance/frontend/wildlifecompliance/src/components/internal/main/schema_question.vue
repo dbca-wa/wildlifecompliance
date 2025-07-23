@@ -228,7 +228,7 @@ import alert from '@vue-utils/alert.vue'
 import SchemaOption from './schema_add_option.vue'
 import {
   api_endpoints,
-  helpers
+  helpers, fetch
 }
 from '@/utils/hooks'
 
@@ -424,26 +424,26 @@ export default {
             if (this.filterQuestionPurpose==='All') {
                 return true
             }
-            this.$http.get(helpers.add_endpoint_json(api_endpoints.schema_question,'1/get_question_sections'),{
+            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_question,'1/get_question_sections'),{
                 params: { licence_purpose_id: this.filterQuestionPurpose },
             }).then((res)=>{
-                this.schemaGroups = res.body.question_groups; 
-                this.schemaSections = res.body.question_sections;
-            },err=>{
-
+                this.schemaGroups = res.question_groups; 
+                this.schemaSections = res.question_sections;
+            }).catch((error) => {
+                console.log(error);
             });
         },
         filterQuestionSection: function(){
             if (this.filterQuestionSection==='All') {
                 return true
             }
-            this.$http.get(helpers.add_endpoint_json(api_endpoints.schema_question,'1/get_question_parents'),{
+            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_question,'1/get_question_parents'),{
                 params: { section_id: this.filterQuestionSection },
             }).then((res)=>{
                 this.sectionQuestion.section = this.filterQuestionSection;
-                this.parentList = res.body.question_parents;
-            },err=>{
-
+                this.parentList = res.question_parents;
+            }).catch((error) => {
+                console.log(error)
             });
         },
     },
@@ -464,13 +464,6 @@ export default {
             if (!this.isModalOpen || g_id == '' || g_id == null) {
                 return true
             }
-            // this.$http.get(helpers.add_endpoint_json(api_endpoints.schema_question,'1/get_question_order'),{
-            //     params: { group_id: g_id },
-            // }).then((res)=>{
-            //     this.sectionQuestion.order = res.body.question_order;
-            // },err=>{
-
-            // });
             return true;
         },
         filterQuestionParent: function(q_id){
@@ -760,17 +753,18 @@ export default {
         },
         initSelects: async function() {
 
-            await this.$http.get(helpers.add_endpoint_join(api_endpoints.schema_question,'1/get_question_selects')).then(res=>{
+            let request = fetch.fetchUrl(helpers.add_endpoint_join(api_endpoints.schema_question,'1/get_question_selects'))
+            request.then(res=>{
 
-                    this.masterlist = res.body.all_masterlist;
-                    this.schemaPurposes = res.body.all_purpose;
-                    this.schemaSections = res.body.all_section;
-                    this.schemaGroups = res.body.all_group
+                    this.masterlist = res.all_masterlist;
+                    this.schemaPurposes = res.all_purpose;
+                    this.schemaSections = res.all_section;
+                    this.schemaGroups = res.all_group
 
-            },err=>{
-                swal(
+            }).catch((error) => {
+                swal.fire(
                     'Get Application Selects Error',
-                    helpers.apiVueResourceError(err),
+                    helpers.apiVueResourceError(error),
                     'error'
                 )
             });

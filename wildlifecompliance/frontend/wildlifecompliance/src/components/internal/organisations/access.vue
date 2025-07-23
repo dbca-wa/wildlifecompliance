@@ -298,14 +298,15 @@ export default {
   },
   watch: {},
   beforeRouteEnter: function(to, from, next){
-    Vue.http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,to.params.access_id)).then((response) => {
+    let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,to.params.access_id))
+    request.then((response) => {
         next(vm => {
-            vm.access = response.body
+            vm.access = response
             vm.requestType = vm.access.role == 'employee' ? '(Administrator)' : '(Consultant)'
         })
-    },(error) => {
+    }).catch((error) => {
         console.log(error);
-    })
+    });
   },
   components: {
     datatable,
@@ -332,10 +333,10 @@ export default {
     fetchAccessGroupMembers: function(){
         let vm = this;
         vm.loading.push('Loading Access Group Members');
-        vm.$http.get(api_endpoints.organisation_access_group_members).then((response) => {
-            vm.organisation_access_group_members = response.body
+        let request = fetch.fetchUrl(api_endpoints.organisation_access_group_members).then((response) => {
+            vm.organisation_access_group_members = response
             vm.loading.splice('Loading Access Group Members',1);
-        },(error) => {
+        }).catch((error) => {
             console.log(error);
             vm.loading.splice('Loading Access Group Members',1);
         })
@@ -343,11 +344,11 @@ export default {
     },
     assignToMe: function(){
         let vm = this;
-        vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/assign_to_me')))
+        let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/assign_to_me')))
         .then((response) => {
-            vm.access = response.body;
+            vm.access = response;
             vm.updateAssignedOfficerSelect();
-        }, (error) => {
+        }).catch((error) => {
             vm.updateAssignedOfficerSelect();
             swal(
                 'Application Error',
@@ -366,11 +367,11 @@ export default {
             vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/assign_officer')),JSON.stringify(data),{
                 emulateJSON:true
             }).then((response) => {
-                vm.access = response.body;
+                vm.access = response;
                 vm.updateAssignedOfficerSelect();
-            }, (error) => {
+            }).catch((error) => {
                 vm.updateAssignedOfficerSelect();
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -378,13 +379,13 @@ export default {
             });
         }
         else{
-            vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/unassign_officer')))
+            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/unassign_officer')))
             .then((response) => {
-                vm.access = response.body;
+                vm.access = response;
                 vm.updateAssignedOfficerSelect();
-            }, (error) => {
+            }).catch((error) => {
                 vm.updateAssignedOfficerSelect();
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -407,16 +408,16 @@ export default {
             confirmButtonText: 'Accept'
         }).then((result) => {
             if (result) {
-                vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/accept')))
+                let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/accept')))
                 .then((response) => {
-                    swal({
+                    swal.fire({
                         title: "Accept Organisation Request",
                         text: "The organisation access request has been accepted.",
                         type: "success"}
                     );
-                    vm.access = response.body;
-                }, (error) => {
-                    swal({
+                    vm.access = response;
+                }).catch((error) => {
+                    swal.fire({
                         title: "Accept Organisation Request",
                         text: "There was an error accepting the organisation access request.",
                         type: "error"}
@@ -424,8 +425,8 @@ export default {
                     console.log(error);
                 });
             }
-        },(error) => {
-
+        }).catch((error) => {
+            console.log(error)
         });
 
     },
@@ -441,16 +442,16 @@ export default {
             confirmButtonText: 'Send Request'
         }).then((result) => {
             if (result) {
-                vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result)))
+                let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result)))
                 .then((response) => {
                     swal({
                         title: "Amendment Request",
                         text: "A new letter has been requested.",
                         type: "success"}
                     );
-                    vm.access = response.body;
-                }, (error) => {
-                    swal({
+                    vm.access = response;
+                }).catch((error) => {
+                    swal.fire({
                         title: "Amendment Request",
                         text: "There was an error sending the amendment request request.",
                         type: "error"}
@@ -458,8 +459,8 @@ export default {
                     console.log(error);
                 });
             }
-        },(error) => {
-
+        }).catch((error) => {
+            console.log(error)
         });
 
     },
@@ -473,16 +474,16 @@ export default {
             confirmButtonText: 'Accept'
         }).then((result) => {
             if (result) {
-                vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/decline')))
+                let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/decline')))
                 .then((response) => {
-                    swal({
+                    swal.fire({
                         title: "Decline Organisation Request",
                         text: "The organisation access request has been declined.",
                         type: "success"}
                     );
-                    vm.access = response.body;
-                }, (error) => {
-                    swal({
+                    vm.access = response;
+                }).catch((error) => {
+                    swal.fire({
                         title: "Decline Organisation Request",
                         text: "There was an error declining the organisation access request.",
                         type: "error"}

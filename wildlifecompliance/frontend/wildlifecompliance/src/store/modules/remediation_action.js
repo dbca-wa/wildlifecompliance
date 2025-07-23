@@ -42,13 +42,13 @@ export const remediationActionStore = {
     },
     actions: {
         async loadRemediationAction({ dispatch, }, { remediation_action_id }) {
-            const returnedRemediationAction = await Vue.http.get(
+            const returnedRemediationAction = await fetch.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.remediation_action, 
                         remediation_action_id)
                     );
 
-            await dispatch("setRemediationAction", returnedRemediationAction.body);
+            await dispatch("setRemediationAction", returnedRemediationAction);
         },
         async saveRemediationAction({ dispatch, state }) {
             // Construct url endpoint

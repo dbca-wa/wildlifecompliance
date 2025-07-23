@@ -636,7 +636,7 @@ export default {
             this.$http.post(helpers.add_endpoint_json(
                     api_endpoints.applications, (this.application.id+'/add_assessment_inspection')
                 ), JSON.stringify(data)).then((response) => {
-                    this.setApplication(response.body);
+                    this.setApplication(response);
                 }, (error) => {
                     this.revert();
                        swal(
@@ -656,7 +656,7 @@ export default {
             this.$http.post(helpers.add_endpoint_json(
                     api_endpoints.applications, (this.application.id+'/assign_application_assessment')
                 ), JSON.stringify(data)).then((response) => {
-                    this.setApplication(response.body);
+                    this.setApplication(response);
                 }, (error) => {
                     this.revert();
                        swal(
@@ -675,7 +675,7 @@ export default {
             this.$http.post(helpers.add_endpoint_json(
                     api_endpoints.applications, (this.application.id+'/assign_application_assessment')
                 ), JSON.stringify(data)).then((response) => {
-                    this.setApplication(response.body);
+                    this.setApplication(response);
                 }, (error) => {
                     this.revert();
                        swal(
@@ -699,7 +699,7 @@ export default {
             this.setOriginalApplication(this.application);            
             vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/complete_application_assessments')
                 ), JSON.stringify(data)).then((response) => {
-                    this.setApplication(response.body);
+                    this.setApplication(response);
                     this.$router.push({name:"internal-dash"});               
             }, (error) => {
                 //console.log(error)

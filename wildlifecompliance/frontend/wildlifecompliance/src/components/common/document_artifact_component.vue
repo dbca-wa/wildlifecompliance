@@ -982,17 +982,6 @@ export default {
             );
             $(vm.$refs.document_artifact_interviewer).append(option).trigger('change');
         }
-
-        /*
-        // retrieve department_users from backend cache
-        let returned_department_users = await this.$http.get(api_endpoints.department_users)
-        Object.assign(this.departmentStaffList, returned_department_users.body)
-        this.departmentStaffList.splice(0, 0,
-          {
-            pk: "",
-            name: "",
-          });
-          */
     },
 };
 </script>

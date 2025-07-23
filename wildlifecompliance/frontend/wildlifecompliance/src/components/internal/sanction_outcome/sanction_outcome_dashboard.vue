@@ -334,7 +334,7 @@ export default {
         },
         payInfringementPenalty: function(sanction_outcome_id){
             this.$http.post('/infringement_penalty/' + sanction_outcome_id + '/').then(res=>{
-                    window.location.href = res.body;
+                    window.location.href = res;
                 },err=>{
                     swal(
                         'Submit Error',

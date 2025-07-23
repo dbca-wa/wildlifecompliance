@@ -344,11 +344,11 @@ export default {
             vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,'existence'),JSON.stringify(this.newOrg),{
                 emulateJSON:true
             }).then((response) => {
-                this.newOrg.exists = response.body.exists;
-                this.newOrg.id = response.body.id;
+                this.newOrg.exists = response.exists;
+                this.newOrg.id = response.id;
                 this.newOrg.detailsChecked = false;
-                if (response.body.first_five) {
-                  this.newOrg.first_five = response.body.first_five;
+                if (response.first_five) {
+                  this.newOrg.first_five = response.first_five;
                   this.newOrg.detailsChecked = true;
                 }
                 this.newOrg.detailsChecked = this.newOrg.exists ? this.newOrg.detailsChecked : true;
@@ -375,7 +375,7 @@ export default {
             vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,(vm.newOrg.id+'/validate_pins')),JSON.stringify(this.newOrg),{
                 emulateJSON:true
             }).then((response) => {
-                if (response.body.valid){
+                if (response.valid){
                     swal(
                         'Validate Pins',
                         'The pins you entered have been validated and your request will be processed by Organisation Administrator.',
@@ -385,11 +385,15 @@ export default {
                     vm.uploadedFile = null;
                     vm.addingCompany = false;
                     vm.resetNewOrg();
-                    Vue.http.get(api_endpoints.my_user_details).then((response) => {
-                        vm.current_user = response.body
+
+                    let request = fetch.fetchUrl(api_endpoints.my_user_details)
+                    request.then((response) => {
+                        vm.current_user = response
                         if ( vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0 ) { vm.managesOrg = 'Yes' }
-                    },(error) => {
-                    })
+                    }).catch((error) => {
+                        console.log(error);
+                    });
+
                 }else {
                     swal(
                         'Validate Pins',
@@ -562,27 +566,26 @@ export default {
         },
         fetchOrgRequestPending:function (){
             let vm =this;
-            vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_pending_requests')).then((response)=>{
-                vm.orgRequest_pending = response.body;
+            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_pending_requests')).then((response)=>{
+                vm.orgRequest_pending = response;
                 vm.loading.splice('fetching pending organisation requests',1);
-            },(response)=>{
-                vm.loading.splice('fetching pending organisation requests',1);
+            }).catch((error) => {
+                console.log(error)
             });
         },
         fetchOrgRequestAmendmentRequested:function (){
             let vm =this;
-            vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_amendment_requested_requests')).then((response)=>{
-                vm.orgRequest_amendment_requested = response.body;
+            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_amendment_requested_requests')).then((response)=>{
+                vm.orgRequest_amendment_requested = response;
                 vm.loading.splice('fetching amendment requested organisation requests',1);
-            },(response)=>{
-                vm.loading.splice('fetching amendment requested organisation requests',1);
+            }).catch((error) => {
+                console.log(error)
             });
         },
         unlinkUser: function(org){
             let vm = this;
             let org_name = org.name;
-            
-
+        
             swal({
                 title: "Unlink From Organisation",
                 text: "Are you sure you want to be unlinked from "+org.name+" ?",
@@ -594,11 +597,13 @@ export default {
                     vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'),JSON.stringify(vm.current_user),{
                         emulateJSON:true
                     }).then((response) => {
-                        Vue.http.get(api_endpoints.my_user_details).then((response) => {
-                            vm.current_user = response.body
+                        let request = fetch.fetchUrl(api_endpoints.my_user_details)
+                        request.then((response) => {
+                            vm.current_user = response
                             if ( vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0 ) { vm.managesOrg = 'Yes' }
-                        },(error) => {
-                        })
+                        }).catch((error) => {
+                            console.log(error);
+                        });
                         swal(
                             'Unlink',
                             'You have been successfully unlinked from '+org_name+'.',
@@ -621,18 +626,20 @@ export default {
         },
     },
     beforeRouteEnter: function(to,from,next){
-        Vue.http.get(api_endpoints.my_user_details).then((response) => {
-            if (to.name == 'first-time' && response.body.address_details && response.body.personal_details && response.body.contact_details && response.body.has_complete_first_time){
+        let request = fetch.fetchUrl(api_endpoints.my_user_details)
+        request.then((response) => {
+            if (to.name == 'first-time' && response.address_details && response.personal_details && response.contact_details && response.has_complete_first_time){
                 window.location.href='/';
             }
             else{
                 next(vm => {
-                    vm.current_user = response.body
+                    vm.current_user = response
                     if (vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0) { vm.managesOrg = 'Yes' }
                 });
             }
-        },(error) => {
-        })
+        }).catch((error) => {
+            console.log(error);
+        });
     },
     mounted: function(){
         this.fetchOrgRequestPending();
@@ -644,9 +651,12 @@ export default {
                 $(chev).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
             },100);
         });
-        Vue.http.get(api_endpoints.is_new_user).then((response) => {
-            this.new_user = response.body;
-        })
+        let request = fetch.fetchUrl(api_endpoints.is_new_user)
+        request.then((response) => {
+            this.new_user = response;
+        }).catch((error) => {
+            console.log(error);
+        });
     }
 }
 </script>

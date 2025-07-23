@@ -627,8 +627,9 @@ export default {
                         vm.updatingPersonal = false;
                         vm.current_user.personal_details = true;
                         if (vm.completedProfile) {
-                            vm.$http.get(api_endpoints.user_profile_completed).then((response) => {
-                            },(error) => {
+                            let request = fetch.fetchUrl(api_endpoints.user_profile_completed).then((response) => {
+                            }).catch((error) => {
+                                console.log(error)
                             })
                         }
                     });
@@ -662,8 +663,9 @@ export default {
                         vm.current_user.personal_details = true;
                         vm.current_user.personal_details = true;
                         if (vm.completedProfile) {
-                            vm.$http.get(api_endpoints.user_profile_completed).then((response) => {
-                            },(error) => {
+                            let request = fetch.fetchUrl(api_endpoints.user_profile_completed).then((response) => {
+                            }).catch((error) => {
+                                console.log(error)
                             })
                         }
                     });
@@ -693,7 +695,7 @@ export default {
                 emulateJSON:true
             }).then((response) => {
                 vm.updatingContact = false;
-                vm.current_user = response.body;
+                vm.current_user = response;
                 if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
                 swal({
                     title: 'Update Contact Details',
@@ -701,8 +703,9 @@ export default {
                     type: 'success',
                 })
                 if (vm.completedProfile) {
-                    vm.$http.get(api_endpoints.user_profile_completed).then((response) => {
-                    },(error) => {
+                    let request = fetch.fetchUrl(api_endpoints.user_profile_completed).then((response) => {
+                    }).catch((error) => {
+                        console.log(error)
                     })
                 }
             }, (error) => {
@@ -726,7 +729,7 @@ export default {
                 emulateJSON:true
             }).then((response) => {
                 vm.updatingAddress = false;
-                vm.current_user = response.body;
+                vm.current_user = response;
                 if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
                 swal({
                     title: 'Update Address Details',
@@ -746,8 +749,9 @@ export default {
                     type: 'error'
                 })
                 if (vm.completedProfile) {
-                    vm.$http.get(api_endpoints.user_profile_completed).then((response) => {
-                    },(error) => {
+                    let request = fetch.fetchUrl(api_endpoints.user_profile_completed).then((response) => {
+                    }).catch((error) => {
+                        console.log(error)
                     })
                 }
             });
@@ -773,11 +777,11 @@ export default {
             vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,'existence'),JSON.stringify(this.newOrg),{
                 emulateJSON:true
             }).then((response) => {
-                this.newOrg.exists = response.body.exists;
-                this.newOrg.id = response.body.id;
+                this.newOrg.exists = response.exists;
+                this.newOrg.id = response.id;
                 this.newOrg.detailsChecked = false;
-                if (response.body.first_five) {
-                  this.newOrg.first_five = response.body.first_five;
+                if (response.first_five) {
+                  this.newOrg.first_five = response.first_five;
                   this.newOrg.detailsChecked = true;
                 }
                 this.newOrg.detailsChecked = this.newOrg.exists ? this.newOrg.detailsChecked : true;
@@ -804,7 +808,7 @@ export default {
             vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,(vm.newOrg.id+'/validate_pins')),JSON.stringify(this.newOrg),{
                 emulateJSON:true
             }).then((response) => {
-                if (response.body.valid){
+                if (response.valid){
                     swal(
                         'Validate Pins',
                         'The pins you entered have been validated and your request will be processed by Organisation Administrator.',
@@ -814,12 +818,15 @@ export default {
                     vm.uploadedFile = null;
                     vm.addingCompany = false;
                     vm.resetNewOrg();
-                    Vue.http.get(api_endpoints.my_user_details).then((response) => {
-                        vm.current_user = response.body
+
+                    let request = fetch.fetchUrl(api_endpoints.my_user_details)
+                    request.then((response) => {
+                        vm.current_user = response;
                         if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
                         if ( vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0 ) { vm.managesOrg = 'Yes' }
-                    },(error) => {
-                    })
+                    }).catch((error) => {
+                        console.log(error);
+                    });
                 }else {
                     swal(
                         'Validate Pins',
@@ -853,8 +860,8 @@ export default {
                 }).then((response) => {
                     vm.uploadingID = false;
                     vm.uploadedID = null;
-                    vm.uploadedID = response.body.identification2;
-                    vm.current_user.identification2 = response.body.identification2;
+                    vm.uploadedID = response.identification2;
+                    vm.current_user.identification2 = response.identification2;
                 }, (error) => {
                     console.log(error);
                     vm.uploadingID = false;
@@ -1032,29 +1039,29 @@ export default {
         fetchCountries:function (){
             let vm =this;
             vm.loading.push('fetching countries');
-            vm.$http.get(api_endpoints.countries).then((response)=>{
-                vm.countries = response.body;
+            let request = fetch.fetchUrl(api_endpoints.countries).then((response)=>{
+                vm.countries = response;
                 vm.loading.splice('fetching countries',1);
-            },(response)=>{
-                vm.loading.splice('fetching countries',1);
+            }).catch((error) => {
+                console.log(error)
             });
         },
         fetchOrgRequestPending:function (){
             let vm =this;
-            vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_pending_requests')).then((response)=>{
-                vm.orgRequest_pending = response.body;
+            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_pending_requests')).then((response)=>{
+                vm.orgRequest_pending = response;
                 vm.loading.splice('fetching pending organisation requests',1);
-            },(response)=>{
-                vm.loading.splice('fetching pending organisation requests',1);
+            }).catch((error) => {
+                console.log(error)
             });
         },
         fetchOrgRequestAmendmentRequested:function (){
             let vm =this;
-            vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_amendment_requested_requests')).then((response)=>{
-                vm.orgRequest_amendment_requested = response.body;
+            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_amendment_requested_requests')).then((response)=>{
+                vm.orgRequest_amendment_requested = response;
                 vm.loading.splice('fetching amendment requested organisation requests',1);
-            },(response)=>{
-                vm.loading.splice('fetching amendment requested organisation requests',1);
+            }).catch((error) => {
+                console.log(error)
             });
         },
         unlinkUser: function(org){
@@ -1073,12 +1080,14 @@ export default {
                     vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'),JSON.stringify(vm.current_user),{
                         emulateJSON:true
                     }).then((response) => {
-                        Vue.http.get(api_endpoints.my_user_details).then((response) => {
-                            vm.current_user = response.body
+                        let request = fetch.fetchUrl(api_endpoints.my_user_details)
+                        request.then((response) => {
+                            vm.current_user = response
                             if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
                             if ( vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0 ) { vm.managesOrg = 'Yes' }
-                        },(error) => {
-                        })
+                        }).catch((error) => {
+                            console.log(error);
+                        });
                         swal(
                             'Unlink',
                             'You have been successfully unlinked from '+org_name+'.',
@@ -1096,14 +1105,16 @@ export default {
                         )
                     });
                 }
-            },(error) => {
+            }).catch((error) => {
+                console.log(error)
             }); 
         },
         userProfileCompleted: function(){
             let vm = this;
-            vm.$http.get(api_endpoints.user_profile_completed).then((response) => {
+            let request = fetch.fetchUrl(api_endpoints.user_profile_completed).then((response) => {
                 window.location.href='/';
-            },(error) => {
+            }).catch((error) => {
+                console.log(error)
             })
         },
         eventListeners:function () {
@@ -1121,20 +1132,22 @@ export default {
         },
     },
     beforeRouteEnter: function(to,from,next){
-        Vue.http.get(api_endpoints.my_user_details).then((response) => {
-            if (to.name == 'first-time' && response.body.address_details && response.body.personal_details && response.body.contact_details && response.body.has_complete_first_time){
+        let request = fetch.fetchUrl(api_endpoints.my_user_details)
+        request.then((response) => {
+            if (to.name == 'first-time' && response.address_details && response.personal_details && response.contact_details && response.has_complete_first_time){
                 window.location.href='/';
             }
             else{
                 next(vm => {
-                    vm.current_user = response.body
+                    vm.current_user = response
                     if (vm.current_user.residential_address == null){ vm.current_user.residential_address = {}; }
                     if (vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0) { vm.managesOrg = 'Yes' }
                     if (vm.current_user.identification2){ vm.uploadedID = vm.current_user.identification2; }
                 });
             }
-        },(error) => {
-        })
+        }).catch((error) => {
+            console.log(error);
+        });
     },
     mounted: function(){
         this.fetchCountries();
@@ -1147,9 +1160,14 @@ export default {
                 $(chev).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
             },100);
         });
-        Vue.http.get(api_endpoints.is_new_user).then((response) => {
-            this.new_user = response.body;
-        })
+
+        let request = fetch.fetchUrl(api_endpoints.is_new_user)
+        request.then((response) => {
+            this.new_user = response;
+        }).catch((error) => {
+            console.log(error);
+        });
+
         this.$nextTick(()=>{
             this.eventListeners();
         });

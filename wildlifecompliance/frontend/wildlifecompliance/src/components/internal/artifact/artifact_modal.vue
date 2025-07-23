@@ -152,10 +152,10 @@ export default {
               group_permission: 'officer',
               });
               if (allocatedGroupResponse.ok) {
-                  console.log(allocatedGroupResponse.body.allocated_group);
-                  //this.allocatedGroup = Object.assign({}, allocatedGroupResponse.body.allocated_group);
-                  Vue.set(this, 'allocatedGroup', allocatedGroupResponse.body.allocated_group);
-                  this.allocated_group_id = allocatedGroupResponse.body.group_id;
+                  console.log(allocatedGroupresponse.allocated_group);
+                  //this.allocatedGroup = Object.assign({}, allocatedGroupresponse.allocated_group);
+                  Vue.set(this, 'allocatedGroup', allocatedGroupresponse.allocated_group);
+                  this.allocated_group_id = allocatedGroupresponse.group_id;
               } else {
                   // Display http error response on modal
                   this.errorResponse = allocatedGroupResponse.statusText;

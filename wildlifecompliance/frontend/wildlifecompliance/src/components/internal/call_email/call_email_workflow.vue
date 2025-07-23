@@ -264,8 +264,8 @@ export default {
                       region_id: this.regionId,
                       district_id: this.districtId ? this.districtId : null,
                   });
-                  Vue.set(this, 'allocatedGroup', allocatedGroupResponse.body);
-                  this.allocated_group_id = allocatedGroupResponse.body.group_id;
+                  Vue.set(this, 'allocatedGroup', allocatedGroupresponse);
+                  this.allocated_group_id = allocatedGroupresponse.group_id;
               } catch(error) {
                   // Display http error response on modal
                   this.errorResponse = error.body[0];

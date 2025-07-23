@@ -29,7 +29,7 @@
 <script>
 import {
     api_endpoints,
-    helpers
+    helpers, fetch
 }
 from '@/utils/hooks';
 import '@/scss/dashboards/application.scss';
@@ -303,9 +303,10 @@ export default {
         },
         async fetchConditions(){
             let vm = this;
-            await vm.$http.get(api_endpoints.application_standard_conditions).then((response) => {
-                vm.conditions = response.body
-            },(error) => {
+            let request = fetch.fetchUrl(api_endpoints.application_standard_conditions)
+            request.then((response) => {
+                vm.conditions = response
+            }).catch((error) => {
                 console.log(error);
             })
         },
@@ -318,10 +319,11 @@ export default {
         },
         async editCondition(_id){
             let vm = this;
-            await vm.$http.get(helpers.add_endpoint_json(api_endpoints.application_conditions,_id)).then((response) => {
-                response.body.standard ? $(this.$refs.condition_detail.$refs.standard_req).val(response.body.standard_condition).trigger('change'): '';
-                this.addCondition(response.body);
-            },(error) => {
+            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.application_conditions,_id))
+            request.then((response) => {
+                response.standard ? $(this.$refs.condition_detail.$refs.standard_req).val(response.standard_condition).trigger('change'): '';
+                this.addCondition(response);
+            }).catch((error) => {
                 console.log(error);
             })
         },
@@ -359,10 +361,10 @@ export default {
         },
         async sendDirection(req,direction){
             let movement = direction == 'down'? 'move_down': 'move_up';
-            await this.$http.get(helpers.add_endpoint_json(api_endpoints.application_conditions,req+'/'+movement)).then((response) => {
-            },(error) => {
-                console.log(error);
-                
+            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.application_conditions,req+'/'+movement))
+            request.then((response) => {
+            }).catch((error) => {
+                console.log(error); 
             })
         },
         async moveUp(e) {

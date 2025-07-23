@@ -1071,9 +1071,9 @@ export default {
                             api_endpoints.report_types,
                             this.call_email.report_type_id + '/get_schema',
                             );
-              let returnedData = await Vue.http.get(url);
-              let returnedSchema = returnedData.body.schema;
-              let returnedAdviceUrl = returnedData.body.adviceurl;
+              let returnedData = await fetch.fetchUrl(url);
+              let returnedSchema = returnedData.schema;
+              let returnedAdviceUrl = returnedData.adviceurl;
               /*
               let returned_schema = await cache_helper.getSetCache(
                 'CallEmail_ReportTypeSchema', 
@@ -1108,7 +1108,7 @@ export default {
             url,
             payload
         );
-        await this.setCallEmail(res.body); 
+        await this.setCallEmail(res); 
     },
     addEventListeners: function() {
       let vm = this;
@@ -1208,32 +1208,24 @@ export default {
     // load drop-down select lists
     
     /// large LOV(List Of Values) object
-    const lovResponse = await Vue.http.get('/api/lov_collection/lov_collection_choices/');
-    this.lovCollection = lovResponse.body;
+    const lovResponse = await fetch.fetchUrl('/api/lov_collection/lov_collection_choices/');
+    this.lovCollection = lovResponse;
 
     // classification_types
-    //let returned_classification_types = await Vue.http.get('/api/classification/classification_choices/');
     Object.assign(this.classification_types, this.lovCollection.classification_types);
     // call_types
-    //let returned_call_types = await Vue.http.get('/api/call_type/call_type_choices/');
     Object.assign(this.call_types, this.lovCollection.call_type_choices);
     //Wildcare Species Types
-    //let returned_wildcare_species_types = await Vue.http.get('/api/wildcare_species_type/wildcare_species_type_choices/');
     Object.assign(this.wildcare_species_types, this.lovCollection.wildcare_species_types);
     //Wildcare Species Sub Types
-    //let returned_wildcare_species_sub_types = await Vue.http.get('/api/wildcare_species_sub_type/wildcare_species_sub_type_choices/');
     Object.assign(this.wildcare_species_sub_types, this.lovCollection.wildcare_species_sub_types);
     // Entangled choices
-    //let returned_entangled_choices = await Vue.http.get('/api/call_email/entangled_choices/');
     Object.assign(this.entangled_choices, this.lovCollection.entangled_choices);
     // Gender choices
-    //let returned_gender_choices = await Vue.http.get('/api/call_email/gender_choices/');
     Object.assign(this.gender_choices, this.lovCollection.gender_choices);
     // Pinky/Joey choices
-    //let returned_baby_kangaroo_choices = await Vue.http.get('/api/call_email/baby_kangaroo_choices/');
     Object.assign(this.baby_kangaroo_choices, this.lovCollection.baby_kangaroo_choices);
     // Age choices
-    //let returned_age_choices = await Vue.http.get('/api/call_email/age_choices/');
     Object.assign(this.age_choices, this.lovCollection.age_choices);
     //report_types
     let returned_report_types = await cache_helper.getSetCacheList('CallEmail_ReportTypes', helpers.add_endpoint_json(

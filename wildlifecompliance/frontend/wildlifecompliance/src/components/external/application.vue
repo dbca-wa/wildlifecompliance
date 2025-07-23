@@ -211,7 +211,7 @@ export default {
             );
 
             // No activities left? Redirect out of the application screen.
-            if(res.body.processing_status === 'discarded') {
+            if(res.processing_status === 'discarded') {
               this.$router.push({
                   name:"external-applications-dash",
               });
@@ -346,7 +346,7 @@ export default {
                   this.isProcessing = true;
                   vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/submit'),{}).then(res=>{
 
-                      this.setApplication(res.body);
+                      this.setApplication(res);
                       this.isProcessing = false;
                       vm.$router.push({
                           name: 'submit_application',
@@ -404,7 +404,7 @@ export default {
 
                     vm.$http.post(helpers.add_endpoint_join(api_endpoints.applications,vm.application.id+'/application_fee_checkout/'), {})
                     .then(res=>{
-                        window.location.href = res.body;
+                        window.location.href = res;
                     },err=>{
                         swal(
                             'Submit Error',
@@ -461,7 +461,7 @@ export default {
                 vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/application_fee_reception'),{
                   emulateJSON:true
                 }).then(res=>{
-                  this.setApplication(res.body);
+                  this.setApplication(res);
                   this.isProcessing = false;
                   vm.$router.push({
                       name: 'submit_application',

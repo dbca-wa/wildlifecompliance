@@ -228,7 +228,7 @@
 
 <script>
 //import {$,swal,bus,datetimepicker,api_endpoints,helpers,Moment,validate} from "@/utils/hooks.js"
-import {api_endpoints,helpers} from "@/utils/hooks.js"
+import {api_endpoints,helpers,fetch} from "@/utils/hooks.js"
 export default {
     name:"reports",
     data:function () {
@@ -318,14 +318,14 @@ export default {
             if (vm.oracle_form.valid()){
                 let data = vm.oracleDatePicker.data("DateTimePicker").date().format('DD/MM/YYYY');
                 let override = vm.oracle_override ? 'true': 'false';
-                vm.$http.get('/api/oracle_job?date='+data+'&override='+override).then((response) => {
-                    swal({
+                let request = fetch.fetchUrl('/api/oracle_job?date='+data+'&override='+override).then((response) => {
+                    swal.fire({
                         type: 'success',
                         title: 'Job Success', 
                         text: 'The oracle job was completed successfully', 
                     })
-                },(error) => {
-                    swal({
+                }).catch((error) => {
+                    swal.fire({
                         type: 'error',
                         title: 'Oracle Job Error', 
                         text: helpers.apiVueResourceError(error), 
@@ -333,43 +333,6 @@ export default {
                 })
             }
         },
-        //getBookingSettlementsReport(){
-        //    let vm = this;
-
-        //    if (vm.booking_settlements_form.valid()){
-        //        let data = vm.bookingSettlementsDatePicker.data("DateTimePicker").date()
-        //        console.log('=== data ===');
-        //        console.log(data);
-        //        data = data.format('DD/MM/YYYY');
-        //        var url = '/api/reports/booking_settlements?date='+data; 
-        //        window.location.assign(url);
-        //        /*vm.$http.get(url).then((response) => {
-        //        },(error) => {
-        //            swal({
-        //                type: 'error',
-        //                title: 'BPOINT Settlement Report Error', 
-        //                text: helpers.apiVueResourceError(error), 
-        //            })
-        //        })*/
-        //    }
-        //},
-        //getBookingsReport(){
-        //    let vm = this;
-
-        //    if (vm.bookings_form.valid()){
-        //        let data = vm.bookingsDatePicker.data("DateTimePicker").date().format('DD/MM/YYYY');
-        //        var url = '/api/reports/bookings?date='+data; 
-        //        window.location.assign(url);
-        //        /*vm.$http.get(url).then((response) => {
-        //        },(error) => {
-        //            swal({
-        //                type: 'error',
-        //                title: 'BPOINT Settlement Report Error', 
-        //                text: helpers.apiVueResourceError(error), 
-        //            })
-        //        })*/
-        //    }
-        //},
         fetchRegions:function () {
             let vm = this;
             $.get('/api/regions?format=json',function (data) {

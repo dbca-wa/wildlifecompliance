@@ -209,11 +209,11 @@
             }
         },
         created: async function() {
-            const returnedComplianceUserData = await Vue.http.get('/api/my_compliance_user_details/')
-            Object.assign(this.complianceUser, returnedComplianceUserData.body);
+            const returnedComplianceUserData = await fetch.fetchUrl('/api/my_compliance_user_details/')
+            Object.assign(this.complianceUser, returnedComplianceUserData);
             //let returned_classification_types = await cache_helper.getSetCacheList('CallEmail_ClassificationTypes', '/api/classification/classification_choices/');
-            let returned_classification_types = await Vue.http.get('/api/classification/classification_choices/');
-            Object.assign(this.classification_types, returned_classification_types.body);
+            let returned_classification_types = await fetch.fetchUrl('/api/classification/classification_choices/');
+            Object.assign(this.classification_types, returned_classification_types);
             this.classification_types.splice(0, 0, {id: 'all', display: 'All'});
 
             let returned_status_choices = await cache_helper.getSetCacheList('CallEmail_StatusChoices', '/api/call_email/status_choices');

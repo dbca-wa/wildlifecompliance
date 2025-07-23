@@ -815,7 +815,7 @@ export default {
         }
 
         let inspectionTeamResponse = await Vue.http.post(inspectionTeamUrl, payload);
-        await this.setInspection(inspectionTeamResponse.body);
+        await this.setInspection(inspectionTeamresponse);
         this.$nextTick(() => {
             this.constructInspectionTeamTable()
         });

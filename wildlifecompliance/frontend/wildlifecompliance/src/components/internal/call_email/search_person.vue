@@ -324,7 +324,7 @@ export default {
                 emulateJSON:true
             }).then((response) => {
                 vm.updatingContact = false;
-                // vm.user = response.body;
+                // vm.user = response;
                 if (vm.call_email.email_user.residential_address == null){ vm.call_email.email_user.residential_address = {}; }
                 swal({
                     title: 'Update Contact Details',
@@ -351,7 +351,7 @@ export default {
                 emulateJSON:true
             }).then((response) => {
                 vm.updatingAddress = false;
-                vm.call_email.email_user = response.body;
+                vm.call_email.email_user = response;
                 if (vm.call_email.email_user.residential_address == null){ vm.call_email.email_user.residential_address = {}; }
                 swal({
                     title: 'Update Address Details',

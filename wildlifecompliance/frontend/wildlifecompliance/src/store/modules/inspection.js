@@ -135,17 +135,16 @@ export const inspectionStore = {
     actions: {
         async loadInspection({ dispatch, commit }, { inspection_id }) {
             try {
-                const returnedInspection = await Vue.http.get(
+                const returnedInspection = await fetch.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.inspection, 
                         inspection_id)
                     );
 
                 /* Set Inspection object */
-                //await dispatch("setInspection", returnedInspection.body);
-                await dispatch("setInspection", returnedInspection.body);
+                await dispatch("setInspection", returnedInspection);
 
-                for (let form_data_record of returnedInspection.body.data) {
+                for (let form_data_record of returnedInspection.data) {
                     await dispatch("setFormValue", {
                         key: form_data_record.field_name,
                         value: {

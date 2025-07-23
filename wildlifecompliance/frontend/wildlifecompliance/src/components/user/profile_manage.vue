@@ -92,7 +92,7 @@
 <script>
 import Vue from 'vue'
 import $ from 'jquery'
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { api_endpoints, helpers, fetch } from '@/utils/hooks'
 import utils from '@/components/internal/utils'
 export default {
     name: 'EditProfile',
@@ -119,12 +119,12 @@ export default {
             let vm = this;
             vm.updatingProfile = true;
 			let params = '?email=' + vm.profile.email + '&exclude_user=' + vm.current_user.id;
-			vm.$http.get(helpers.add_endpoint_join(api_endpoints.users,params),JSON.stringify(vm.profile),{
+			let request = fetch.fetchUrl(helpers.add_endpoint_join(api_endpoints.users,params),JSON.stringify(vm.profile),{
 					emulateJSON:true
 				}).then((response) => {
-					if (response.body.length > 0) {
+					if (response.length > 0) {
 						vm.updatingProfile = false;
-						swal({
+						swal.fire({
 							title: 'Update Profile',
 							html: 'This email address is already associated with an existing account or profile.',
 							type: 'error'
@@ -135,14 +135,14 @@ export default {
 						emulateJSON:true
 					}).then((response) => {
 						vm.updatingProfile = false;
-						vm.profile = response.body;
+						vm.profile = response;
 						if (vm.profile.postal_address == null){ vm.profile.postal_address = {}; }
 						swal(
 							'Update Profile',
 							'Your profile has been successfully updated.',
 							'success'
 						)
-					}, (error) => {
+					}).catch((error) => {
 						vm.updatingProfile = false;
 						let error_msg = '<br/>';
 						for (var key in error.body) {
@@ -154,15 +154,15 @@ export default {
 								error_msg += key + ': ' + error.body[key] + '<br/>';
 							}
 						}
-						swal({
+						swal.fire({
 							title: 'Update Profile',
 							html: 'There was an error updating the profile.<br/>' + error_msg,
 							type: 'error'
 						})
 					});
-				}, (error) => {
+				}).catch((error) => {
 					vm.updatingProfile = false;
-					swal({
+					swal.fire({
 						title: 'Update Profile',
 						html: 'There was an error updating the profile.',
 						type: 'error'

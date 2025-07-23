@@ -37,7 +37,7 @@ import alert from '@vue-utils/alert.vue'
 //import api_endpoints from '../api'
 import {
     api_endpoints,
-    helpers
+    helpers, fetch
 } from "@/utils/hooks.js"
 export default {
     name:'Send-to-Assessor',
@@ -103,7 +103,7 @@ export default {
                         for (var i=0;i<vm.$parent.$refs.assessorDatatable.length;i++){
                             vm.$parent.$refs.assessorDatatable[i].vmDataTable.ajax.reload();
                         }
-                        vm.$http.get(helpers.add_endpoint_json(api_endpoints.applications,assessment.application+'/internal_application')).then((res) => {
+                        let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,assessment.application+'/internal_application')).then((res) => {
                             vm.$emit('refreshFromResponse',res);
                         });
                         vm.close();

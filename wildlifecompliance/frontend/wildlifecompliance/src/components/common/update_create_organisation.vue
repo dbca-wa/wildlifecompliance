@@ -312,7 +312,7 @@ export default {
             //     emulateJSON:true
             // }).then((response) => {
             //     vm.updatingDetails = false;
-            //     vm.org = response.body;
+            //     vm.org = response;
             //     if (vm.org.address == null){ vm.org.address = {}; }
             //     swal(
             //         'Saved',
@@ -373,7 +373,7 @@ export default {
         //        emulateJSON:true
         //    }).then((response) => {
         //        vm.updatingAddress = false;
-        //        vm.org = response.body;
+        //        vm.org = response;
         //        swal(
         //            'Saved',
         //            'Address details have been saved',

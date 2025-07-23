@@ -235,13 +235,13 @@ export const userStore = {
         },
         loadCurrentUser({ dispatch, commit }, { url }) {
             return new Promise((resolve, reject) => {
-                Vue.http.get(url).then(res => {
-                    dispatch('setCurrentUser', res.body);
-                    dispatch('setCurrentUserId', res.body.identification ? true : res.body.is_internal ? true : false);
+                let request = fetch.fetchUrl(url)
+                request.then(res => {
+                    dispatch('setCurrentUser', res);
+                    dispatch('setCurrentUserId', res.identification ? true : res.is_internal ? true : false);
                     resolve();
-                },
-                err => {
-                    console.log(err);
+                }).catch((error) => {
+                    console.log(error);
                     reject();
                 });
             })

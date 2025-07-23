@@ -82,8 +82,9 @@ import LicenceHistory from './licence_history_modal.vue';
 import { mapActions, mapGetters } from 'vuex'
 import {
     api_endpoints,
-    helpers
-}from '@/utils/hooks'
+    helpers,
+    fetch
+} from '@/utils/hooks'
 import '@/scss/dashboards/licence.scss';
 export default {
     name: 'LicenceTableDash',
@@ -487,21 +488,22 @@ export default {
                         var licence_id = $(this).attr('lic-id');
                         vm.licence_action = 'reactivate-renew';
                         vm.selected_licence_id = licence_id;
-                        vm.$http.get(helpers.add_endpoint_join(
+                        let request = fetch.fetchUrl(helpers.add_endpoint_join(
                             api_endpoints.licences,licence_id+
                             '/get_latest_purposes_for_licence_activity_and_action/?licence_activity_id='+
-                            licence_activity_id+'&action='+vm.licence_action)).then(res=>{
-                                if (res.body) {
-                                    vm.action_purpose_list = res.body;
-                                    vm.$refs.licence_action_purposes.isModalOpen = true;
-                                }
-                            }, (error) => {
-                                swal(
-                                    'Reactivate Renew Activity Error',
-                                    helpers.apiVueResourceError(error),
-                                    'error'
-                                )
-                            });
+                            licence_activity_id+'&action='+vm.licence_action))
+                        request.then(res=>{
+                            if (res) {
+                                vm.action_purpose_list = res;
+                                vm.$refs.licence_action_purposes.isModalOpen = true;
+                            }
+                        }, (error) => {
+                            swal(
+                                'Reactivate Renew Activity Error',
+                                helpers.apiVueResourceError(error),
+                                'error'
+                            )
+                        });
                     }
                 },(error) => {
                 });
@@ -569,23 +571,6 @@ export default {
                                     'error'
                                 )
                             });
-
-                        // vm.$http.get(helpers.add_endpoint_join(
-                        //     api_endpoints.licences,licence_id+
-                        //     '/get_latest_purposes_for_licence_activity_and_action/?licence_activity_id='+
-                        //     licence_activity_id+'&action='+vm.licence_action+'&selected_activity_id='+select_activity_id)).then(res=>{
-                        //         if (res.body) {
-                        //             vm.action_purpose_list = res.body;
-                        //             vm.$refs.licence_action_purposes.selectedActivityId = select_activity_id;
-                        //             vm.$refs.licence_action_purposes.isModalOpen = true;
-                        //         }
-                        //     }, (error) => {
-                        //         swal(
-                        //             'Surrender Activity Error',
-                        //             helpers.apiVueResourceError(error),
-                        //             'error'
-                        //         )
-                        //     });
                     }
                 },(error) => {
                 });
@@ -653,22 +638,6 @@ export default {
                                         'error'
                                 )
                             });
-                        // vm.$http.get(helpers.add_endpoint_join(
-                        //     api_endpoints.licences,licence_id+
-                        //     '/get_latest_purposes_for_licence_activity_and_action/?licence_activity_id='+
-                        //     licence_activity_id+'&action='+vm.licence_action+'&selected_activity_id='+select_activity_id)).then(res=>{
-                        //         if (res.body) {
-                        //             vm.action_purpose_list = res.body;
-                        //             vm.$refs.licence_action_purposes.selectedActivityId = select_activity_id;
-                        //             vm.$refs.licence_action_purposes.isModalOpen = true;
-                        //         }
-                        //     }, (error) => {
-                        //         swal(
-                        //             'Cancel Activity Error',
-                        //             helpers.apiVueResourceError(error),
-                        //             'error'
-                        //         )
-                        //     });
                     }
                 },(error) => {
                 });
@@ -736,23 +705,6 @@ export default {
                                         'error'
                                 )
                             });
-
-                        // vm.$http.get(helpers.add_endpoint_join(
-                        //     api_endpoints.licences,licence_id+
-                        //     '/get_latest_purposes_for_licence_activity_and_action/?licence_activity_id='+
-                        //     licence_activity_id+'&action='+vm.licence_action+'&selected_activity_id='+select_activity_id)).then(res=>{
-                        //         if (res.body) {
-                        //             vm.action_purpose_list = res.body;
-                        //             vm.$refs.licence_action_purposes.selectedActivityId = select_activity_id;
-                        //             vm.$refs.licence_action_purposes.isModalOpen = true;
-                        //         }
-                        //     }, (error) => {
-                        //         swal(
-                        //             'Suspend Activity Error',
-                        //             helpers.apiVueResourceError(error),
-                        //             'error'
-                        //         )
-                        //     });
                     }
                 },(error) => {
                 });
@@ -801,7 +753,7 @@ export default {
                         vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.selected_licence_id+'/reissue_purposes'),JSON.stringify(data),{
                                 emulateJSON:true,
                             }).then((response)=>{
-                                let app_id = response.body.current_application.id
+                                let app_id = response.current_application.id
                                 vm.$router.push({name:"internal-application", params:{application_id: app_id}});
                                 vm.$emit('refreshFromResponse',response);
                             },(error)=>{
@@ -811,23 +763,6 @@ export default {
                                     'error'
                                 )
                             });
-                        // vm.$http.get(helpers.add_endpoint_join(
-                        //     api_endpoints.licences,licence_id+'/get_latest_purposes_for_licence_activity_and_action/?licence_activity_id='+
-                        //     licence_activity_id+'&action='+vm.licence_action+'&selected_activity_id='+select_activity_id)).then(res=>{
-
-                        //         if (res.body) {
-                        //             vm.action_purpose_list = res.body;
-                        //             vm.$refs.licence_action_purposes.selectedActivityId = select_activity_id;
-                        //             vm.$refs.licence_action_purposes.isModalOpen = true;
-                        //         }
-                        //     }, (error) => {
-                        //         swal(
-                        //             'Reissue Activity Error',
-                        //             helpers.apiVueResourceError(error),
-                        //             'error'
-                        //         )
-                        //     }
-                        // );
                     }
                 },(error) => {
                 });
@@ -896,22 +831,6 @@ export default {
                                     'error'
                                 )
                             });
-                        // vm.$http.get(helpers.add_endpoint_join(
-                        //     api_endpoints.licences,licence_id+
-                        //     '/get_latest_purposes_for_licence_activity_and_action/?licence_activity_id='+
-                        //     licence_activity_id+'&action='+vm.licence_action+'&selected_activity_id='+select_activity_id)).then(res=>{
-                        //         if (res.body) {
-                        //             vm.action_purpose_list = res.body;
-                        //             vm.$refs.licence_action_purposes.selectedActivityId = select_activity_id;
-                        //             vm.$refs.licence_action_purposes.isModalOpen = true;
-                        //         }
-                        //     }, (error) => {
-                        //         swal(
-                        //             'Reinstate Activity Error',
-                        //             helpers.apiVueResourceError(error),
-                        //             'error'
-                        //         )
-                        //     });
                     }
                 },(error) => {
                 });

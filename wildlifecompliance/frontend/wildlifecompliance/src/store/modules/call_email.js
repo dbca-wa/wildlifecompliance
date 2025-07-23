@@ -279,16 +279,16 @@ export const callemailStore = {
     actions: {
         async loadCallEmail({ dispatch, commit }, { call_email_id }) {
             try {
-                const returnedCallEmail = await Vue.http.get(
+                const returnedCallEmail = await fetch.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.call_email, 
                         call_email_id)
                     );
 
                 /* Set CallEmail object */
-                await dispatch("setCallEmail", returnedCallEmail.body);
+                await dispatch("setCallEmail", returnedCallEmail);
 
-                for (let form_data_record of returnedCallEmail.body.data) {
+                for (let form_data_record of returnedCallEmail.data) {
                     await dispatch("setFormValue", {
                         key: form_data_record.field_name,
                         value: {

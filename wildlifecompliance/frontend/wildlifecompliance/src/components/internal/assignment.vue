@@ -76,7 +76,7 @@ export default {
                 url,
                 payload
             );
-            this.$emit('update-assigned-to-id', res.body);
+            this.$emit('update-assigned-to-id', res);
         },
         getAllocatedGroup: async function(id_list) {
             if (this.allowed_groups == null) {
@@ -88,7 +88,7 @@ export default {
                 'id_list': id_list,
             });
             if (allocatedGroupResponse.ok) {
-                Vue.set(this, 'allowed_groups', allocatedGroupResponse.body);
+                Vue.set(this, 'allowed_groups', allocatedGroupresponse);
             } 
         },        
     },

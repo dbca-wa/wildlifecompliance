@@ -60,7 +60,7 @@ import L from 'leaflet';
 import 'leaflet.markercluster';  /* This should be imported after leaflet */
 import 'leaflet.locatecontrol';
 import Awesomplete from 'awesomplete';
-import { api_endpoints, helpers, cache_helper } from '@/utils/hooks'
+import { api_endpoints, helpers, cache_helper, fetch } from '@/utils/hooks'
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 
 import 'leaflet/dist/leaflet.css';
@@ -388,8 +388,8 @@ export default {
         addOtherLayers(){
             var overlayMaps = {};
 
-            this.$http.get('/api/map_layers/').then(response => {
-                let layers = response.body.results;
+            let request = fetch.fetchUrl('/api/map_layers/').then(response => {
+                let layers = response.results;
                 for (var i = 0; i < layers.length; i++){
                     let l = L.tileLayer.wmts(
                         'https://kmi.dpaw.wa.gov.au/geoserver/gwc/service/wmts',
@@ -475,8 +475,8 @@ export default {
                         /* dynamically construct content of the popup */
                         myMarker.on('click', (ev)=>{
                             let popup = ev.target.getPopup();
-                            self.$http.get('/api/inspection/' + inspection.id).then(response => {
-                                let inspection = response.body;
+                            let request = fetch.fetchUrl('/api/inspection/' + inspection.id).then(response => {
+                                let inspection = response;
                                 popup.setContent(self.construct_content(inspection, coords));
                             });
                         })

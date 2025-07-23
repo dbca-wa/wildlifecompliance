@@ -376,12 +376,12 @@ export default {
             try {
               const res = await vm.$http.post('/api/search_reference.json',{"reference_number": vm.referenceWord,});
               console.log(res)
-              if (res.body.url_string) {
-                  window.location.href = res.body.url_string;
-              } else if (res.body.error) {
-                  console.log(res.body.error)
+              if (res.url_string) {
+                  window.location.href = res.url_string;
+              } else if (res.error) {
+                  console.log(res.error)
                   vm.errors = true;
-                  vm.errorString = res.body.error;
+                  vm.errorString = res.error;
               }
             } catch(error) {
               //console.log(error);
@@ -428,7 +428,7 @@ export default {
               searchReturn: vm.searchReturn,
               is_internal: true,
             }).then(res => {
-              vm.results = res.body;
+              vm.results = res;
               vm.$refs.keyword_search_datatable.vmDataTable.clear()
               vm.$refs.keyword_search_datatable.vmDataTable.rows.add(vm.results);
               vm.$refs.keyword_search_datatable.vmDataTable.draw();

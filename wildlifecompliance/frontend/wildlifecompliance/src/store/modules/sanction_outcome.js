@@ -69,25 +69,23 @@ export const sanctionOutcomeStore = {
     },
     actions: {
         async loadRemediationAction({ dispatch, }, { remediation_action_id }){
-            const returned = await Vue.http.get(
+            const returned = await fetch.fetchUrl(
                 helpers.add_endpoint_json(
                     api_endpoints.remediation_action, 
                     remediation_action_id)
                 );
-            console.log('returned.body');
-            console.log(returned.body);
+            console.log(returned);
 
             await dispatch("setRemediationAction", returned.body);
         },
         async loadSanctionOutcome({ dispatch, }, { sanction_outcome_id }) {
             try {
-                const returnedSanctionOutcome = await Vue.http.get(
+                const returnedSanctionOutcome = await fetch.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.sanction_outcome, 
                         sanction_outcome_id)
                     );
-                console.log('loadSanctionOutcome');
-                console.log(returnedSanctionOutcome.body);
+                console.log(returnedSanctionOutcome);
 
                 await dispatch("setSanctionOutcome", returnedSanctionOutcome.body);
             } catch (err) {

@@ -363,21 +363,21 @@ export default {
             url,
             payload
         );
-        await this.setLegalCase(res.body);
+        await this.setLegalCase(res);
         this.constructRunningSheetTableWrapper();
     },
   },
   created: async function() {
       if (this.$route.params.artifact_id) {
-          const returnedArtifact = await Vue.http.get(
+          const returnedArtifact = await fetch.fetchUrl(
               helpers.add_endpoint_json(
                   api_endpoints.artifact,
                   this.$route.params.artifact_id)
               );
-          let artifactId = returnedArtifact.body.id
-          let artifactObjectType = returnedArtifact.body.artifact_object_type
+          let artifactId = returnedArtifact.id
+          let artifactObjectType = returnedArtifact.artifact_object_type
           //this.artifactStatusDisplay = returnedArtifact.body.status ? returnedArtifact.body.status.name : '';
-          this.baseArtifact = _.cloneDeep(returnedArtifact.body);
+          this.baseArtifact = _.cloneDeep(returnedArtifact);
           //Object.assign(this.baseArtifact, returnedArtifact.body);
           console.log(artifactId)
           console.log(artifactObjectType)

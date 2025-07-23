@@ -418,9 +418,9 @@ export default {
         this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/sheet_pay_transfer'),_data,{
                       emulateJSON:true,
                     }).then((response)=>{
-                            window.location.href = res.body;
+                            window.location.href = res;
                       //let species_id = this.returns.sheet_species;
-                      //this.setReturns(response.body);
+                      //this.setReturns(response);
                       //this.returns.sheet_species = species_id;
                     },(error)=>{
                       console.log(error);

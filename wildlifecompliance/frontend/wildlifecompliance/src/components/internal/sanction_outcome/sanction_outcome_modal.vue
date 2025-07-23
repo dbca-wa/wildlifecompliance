@@ -982,22 +982,22 @@ export default {
             // This modal is used not onfly from an offence but also from the several entities, such as call_email, inspection, etc.
             let returned = null;
             if (this.$parent.call_email && this.$parent.call_email.id) {
-                returned = await Vue.http.get("/api/offence/filter_by_call_email.json", {
+                returned = await fetch.fetchUrl("/api/offence/filter_by_call_email.json", {
                     params: { call_email_id: this.$parent.call_email.id }
                 });
-                this.options_for_offences = returned.body;
+                this.options_for_offences = returned;
             } else if (this.$parent.inspection && this.$parent.inspection.id) {
-                returned = await Vue.http.get("/api/offence/filter_by_inspection.json", {
+                returned = await fetch.fetchUrl("/api/offence/filter_by_inspection.json", {
                     params: { inspection_id: this.$parent.inspection.id }
                 });
-                this.options_for_offences = returned.body;
+                this.options_for_offences = returned;
             } else if (this.$parent.offence && this.$parent.offence.id) {
                 this.options_for_offences = [this.$parent.offence];
             } else if (this.$parent.legal_case && this.$parent.legal_case.id) {
-                returned = await Vue.http.get("/api/offence/filter_by_legal_case.json", {
+                returned = await fetch.fetchUrl("/api/offence/filter_by_legal_case.json", {
                     params: { legal_case_id: this.$parent.legal_case.id }
                 });
-                this.options_for_offences = returned.body;
+                this.options_for_offences = returned;
             }
         },
         createDocumentActionUrl: async function() {

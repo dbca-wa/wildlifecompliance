@@ -93,7 +93,7 @@
 <script>
 import Vue from 'vue'
 import $ from 'jquery'
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { api_endpoints, helpers, fetch } from '@/utils/hooks'
 import utils from '@/components/internal/utils'
 export default {
     name: 'CreateProfile',
@@ -122,13 +122,13 @@ export default {
             vm.profile.user = vm.current_user.id;
             vm.profile.auth_identity = true;
             let params = '?email=' + encodeURIComponent(vm.profile.email) + '&exclude_user=' + vm.current_user.id;
-            vm.$http.get(helpers.add_endpoint_join(api_endpoints.emailidentities,params),JSON.stringify(vm.profile),{
+            let request = fetch.fetchUrl(helpers.add_endpoint_join(api_endpoints.emailidentities,params),JSON.stringify(vm.profile),{
                     emulateJSON:true
                 }).then((response) => {
                     console.log(response);
-                    if (response.body.length > 0) {
+                    if (response.length > 0) {
                         vm.creatingProfile = false;
-                        swal({
+                        swal.fire({
                             title: 'Create Profile',
                             html: 'This email address is already associated with an existing account or profile.',
                             type: 'error'
@@ -139,7 +139,7 @@ export default {
                         emulateJSON:true
                     }).then((response) => {
                         vm.creatingProfile = false;
-                        vm.profile = response.body;
+                        vm.profile = response;
                         if (vm.profile.postal_address == null){ vm.profile.postal_address = {}; }
                         swal({
                             title: 'Create Profile',
@@ -147,7 +147,7 @@ export default {
                             type: 'success',
                             onClose: vm.$router.push('/profiles')
                         })
-                    }, (error) => {
+                    }).catch((error) => {
                         vm.creatingProfile = false;
                         let error_msg = '<br/>';
                         for (var key in error.body) {
@@ -159,15 +159,15 @@ export default {
                                 error_msg += key + ': ' + error.body[key] + '<br/>';
                             }
                         }
-                        swal({
+                        swal.fire({
                             title: 'Create Profile',
                             html: 'There was an error creating the profile.<br/>' + error_msg,
                             type: 'error'
                         })
                     });
-                }, (error) => {
+                }).catch((error) => {
                     vm.creatingProfile = false;
-                    swal({
+                    swal.fire({
                         title: 'Create Profile',
                         html: 'There was an error creating the profile.',
                         type: 'error'

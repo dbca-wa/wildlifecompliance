@@ -108,7 +108,7 @@ import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import {
   api_endpoints,
-  helpers
+  helpers, fetch
 }
 from '@/utils/hooks'
 export default {
@@ -342,15 +342,16 @@ export default {
         },
         initSelects: async function() {
 
-            await this.$http.get(helpers.add_endpoint_join(api_endpoints.schema_purpose,'1/get_purpose_selects')).then(res=>{
+            let request = fetch.fetchUrl(helpers.add_endpoint_join(api_endpoints.schema_purpose,'1/get_purpose_selects'))
+            request.then(res=>{
 
-                    this.schemaPurposes = res.body.all_purpose
+                    this.schemaPurposes = res.all_purpose
 
-            },err=>{
+            }).catch((error) => {
 
-                swal(
+                swal.fire(
                     'Get Application Selects Error',
-                    helpers.apiVueResourceError(err),
+                    helpers.apiVueResourceError(error),
                     'error'
                 )
             });

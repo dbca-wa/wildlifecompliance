@@ -176,17 +176,18 @@ export const applicationStore = {
         }, 
         loadApplication({ dispatch, state, commit }, { url }) {
             return new Promise((resolve, reject) => {
-                Vue.http.get(url).then(res => {
-                    dispatch('setOriginalApplication', res.body);
-                    dispatch('setApplication', res.body);
+                let request = fetch.fetchUrl(url)
+                request.then(res => {
+                    dispatch('setOriginalApplication', res);
+                    dispatch('setApplication', res);
                     dispatch('setApplication', {
                        ...state.application,
-                       application_fee: res.body.adjusted_paid_amount.application_fee,
-                       licence_fee: res.body.adjusted_paid_amount.licence_fee,
+                       application_fee: res.adjusted_paid_amount.application_fee,
+                       licence_fee: res.adjusted_paid_amount.licence_fee,
                        update_fee: false,
                        assess: false,
                     });
-                    for(let form_data_record of res.body.data) {
+                    for(let form_data_record of res.data) {
                         dispatch('setFormValue', {
                             key: form_data_record.field_name,
                             value: {
@@ -203,13 +204,12 @@ export const applicationStore = {
                             }
                         });
                     }
-                    dispatch('setIdCheckStatus', res.body.id_check_status.id);
-                    dispatch('setCharacterCheckStatus', res.body.character_check_status.id);
-                    dispatch('setReturnCheckStatus', res.body.return_check_status.id);
+                    dispatch('setIdCheckStatus', res.id_check_status.id);
+                    dispatch('setCharacterCheckStatus', res.character_check_status.id);
+                    dispatch('setReturnCheckStatus', res.return_check_status.id);
                     resolve();
-                },
-                err => {
-                    console.log(err);
+                }).catch((error) => {
+                    console.log(error);
                     reject();
                 });
             })
@@ -232,8 +232,8 @@ export const applicationStore = {
             }).then(res => {
                 dispatch('setApplication', {
                     ...state.application,
-                    application_fee: res.body.fees.application,
-                    licence_fee: res.body.fees.licence,
+                    application_fee: res.fees.application,
+                    licence_fee: res.fees.licence,
                     update_fee: true,
                     assess: true,
                 });
@@ -263,11 +263,11 @@ export const applicationStore = {
                         'licence_activity_id': activity_data.licence_activity_id,
                         'licence_activity_workflow': activity_data.workflow,
                 }).then(res => {
-                    dispatch('setApplication', res.body);
+                    dispatch('setApplication', res);
                     dispatch('setApplication', {
                         ...state.application,
-                        application_fee: res.body.adjusted_paid_amount.application_fee,
-                        licence_fee: res.body.adjusted_paid_amount.licence_fee,
+                        application_fee: res.adjusted_paid_amount.application_fee,
+                        licence_fee: res.adjusted_paid_amount.licence_fee,
                         update_fee: false,
                         assess: false,
                     });

@@ -105,16 +105,16 @@ export const physicalArtifactStore = {
     actions: {
         async loadPhysicalArtifact({ dispatch, commit }, { physical_artifact_id }) {
             try {
-                const returnedPhysicalArtifact = await Vue.http.get(
+                const returnedPhysicalArtifact = await fetch.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.physical_artifact,
                         physical_artifact_id)
                     );
 
                 console.log(returnedPhysicalArtifact)
-                commit("updatePhysicalArtifact", returnedPhysicalArtifact.body);
+                commit("updatePhysicalArtifact", returnedPhysicalArtifact);
 
-                for (let form_data_record of returnedPhysicalArtifact.body.data) {
+                for (let form_data_record of returnedPhysicalArtifact.data) {
                     await dispatch("setFormValue", {
                         key: form_data_record.field_name,
                         value: {

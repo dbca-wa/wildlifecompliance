@@ -176,7 +176,7 @@ export default {
                       emulateJSON:true,
                     }).then((response)=>{
                       let species_id = self.returns.sheet_species;
-                      self.setReturns(response.body);
+                      self.setReturns(response);
                       self.returns.sheet_species = species_id;
                       self.returns.species = species_id;
                       self.is_saving = false
@@ -256,7 +256,7 @@ export default {
                       emulateJSON:true,
                     }).then((response)=>{
                        let species_id = self.returns.sheet_species;
-                       self.setReturns(response.body);
+                       self.setReturns(response);
                        self.returns.sheet_species = species_id;
                        self.disable_continue = false;
                        self.disable_exit = false;
@@ -295,9 +295,9 @@ export default {
                        self.spinner_exit = false;
                        self.spinner_submit = false;
 
-                       window.location.href = res.body;
+                       window.location.href = res;
                        //let species_id = self.returns.sheet_species;
-                       //self.setReturns(response.body);
+                       //self.setReturns(response);
                        //self.returns.sheet_species = species_id;
                     },(error)=>{
                        self.disable_continue = false;

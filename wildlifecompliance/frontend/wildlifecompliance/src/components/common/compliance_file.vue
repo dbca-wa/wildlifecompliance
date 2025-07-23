@@ -173,8 +173,8 @@ export default {
                 formData.append('csrfmiddlewaretoken', this.csrf_token);
                 let res = await Vue.http.post(this.document_action_url, formData)
                 //let res = await Vue.http.post(this.documentActionUrl, formData)
-                this.documents = res.body.filedata;
-                this.commsLogId = res.body.comms_instance_id;
+                this.documents = res.filedata;
+                this.commsLogId = res.comms_instance_id;
                 //console.log(vm.documents);
             }
             this.show_spinner = false;
@@ -194,11 +194,11 @@ export default {
             formData.append('csrfmiddlewaretoken', this.csrf_token);
             if (this.document_action_url) {
                 let res = await Vue.http.post(this.document_action_url, formData)
-                this.documents = res.body.filedata;
+                this.documents = res.filedata;
                 //this.documents = await this.get_documents()
-                this.commsLogId = res.body.comms_instance_id;
+                this.commsLogId = res.comms_instance_id;
             }
-            //vm.documents = res.body;
+            //vm.documents = res;
             this.show_spinner = false;
 
         },
@@ -236,7 +236,7 @@ export default {
             if (this.documentActionUrl === 'temporary_document' && !this.temporary_document_collection_id) {
                 // If temporary_document, create TemporaryDocumentCollection object and allow document_action_url to update
                 let res = await Vue.http.post(this.document_action_url)
-                this.temporary_document_collection_id = res.body.id
+                this.temporary_document_collection_id = res.id
                 await this.$emit('update-temp-doc-coll-id',
                     {
                         "temp_doc_id": this.temporary_document_collection_id,
@@ -271,8 +271,8 @@ export default {
                 formData.append('csrfmiddlewaretoken', this.csrf_token);
                 let res = await Vue.http.post(this.document_action_url, formData)
                 
-                this.documents = res.body.filedata;
-                this.commsLogId = res.body.comms_instance_id;
+                this.documents = res.filedata;
+                this.commsLogId = res.comms_instance_id;
                 this.show_spinner = false;
             } else {
                 console.log("no documentActionUrl");

@@ -130,7 +130,7 @@ import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import {
   api_endpoints,
-  helpers
+  helpers, fetch
 }
 from '@/utils/hooks'
 export default {
@@ -150,12 +150,12 @@ export default {
             this.$refs.schema_group_table.vmDataTable.draw();
         },
         filterGroupSection: function() {
-            this.$http.get(helpers.add_endpoint_json(api_endpoints.schema_group,'1/get_group_sections'),{
+            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_group,'1/get_group_sections'),{
                 params: { licence_purpose_id: this.filterGroupSection },
             }).then((res)=>{
-                this.schemaSections = res.body.group_sections;
-            },err=>{
-
+                this.schemaSections = res.group_sections;
+            }).catch((error) => {
+                console.log(error);
             });
         },
     },
@@ -416,16 +416,17 @@ export default {
         },
         initSelects: async function() {
 
-            await this.$http.get(helpers.add_endpoint_join(api_endpoints.schema_group,'1/get_group_selects')).then(res=>{
+            let request = fetch.fetchUrl(helpers.add_endpoint_join(api_endpoints.schema_group,'1/get_group_selects'))
+            request.then(res=>{
 
-                    this.schemaPurposes = res.body.all_purpose
-                    this.schemaSections = res.body.all_section
+                    this.schemaPurposes = res.all_purpose
+                    this.schemaSections = res.all_section
 
-            },err=>{
+            }).catch((error) => {
 
-                swal(
+                swal.fire(
                     'Get Application Selects Error',
-                    helpers.apiVueResourceError(err),
+                    helpers.apiVueResourceError(error),
                     'error'
                 )
             });

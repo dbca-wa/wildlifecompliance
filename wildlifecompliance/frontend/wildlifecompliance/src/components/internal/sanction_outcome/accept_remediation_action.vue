@@ -133,7 +133,7 @@ export default {
         },
         sendData: async function () {
             let get_url = '/api/remediation_action/' + this.remediation_action_id + '/accept/'
-            let res = await Vue.http.get(get_url, {});
+            let res = await fetch.fetchUrl(get_url, {});
             return res
         },
     },

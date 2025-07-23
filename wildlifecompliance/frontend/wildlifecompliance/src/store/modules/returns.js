@@ -31,10 +31,10 @@ export const returnsStore = {
     actions: {
         loadReturns({ dispatch, commit }, { url }) {
             return new Promise((resolve, reject) => {
-                Vue.http.get(url).then(res => {
-
-                    if (res.body.format !== 'sheet') {    // Return Sheets utilise Non-rendered data.
-                        var obj = res.body.table[0]['data'][0]
+                let request = fetch.fetchUrl(url)
+                request.then(res => {
+                    if (res.format !== 'sheet') {    // Return Sheets utilise Non-rendered data.
+                        var obj = res.table[0]['data'][0]
                         for(let form_data_record of Object.keys(obj)) {
                             let deficiency_key = form_data_record + '-deficiency-field'    
                             dispatch('setFormValue', {
@@ -48,11 +48,10 @@ export const returnsStore = {
                         }
                     }
 
-                    dispatch('setReturns', res.body);
+                    dispatch('setReturns', res);
                     resolve();
-                },
-                err => {
-                    console.log(err);
+                }).catch((error) => {
+                    console.log(error);
                     reject();
                 });
             })

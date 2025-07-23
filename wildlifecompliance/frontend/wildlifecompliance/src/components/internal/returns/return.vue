@@ -166,7 +166,7 @@ export default {
         }).then((response)=>{
             this.spinner = false;
             let species_id = this.returns.sheet_species;
-            this.setReturns(response.body);
+            this.setReturns(response);
             this.returns.sheet_species = species_id;
 
             swal( 'Save', 
@@ -212,7 +212,7 @@ export default {
             emulateJSON:true,
         }).then((response)=>{
             let species_id = this.returns.sheet_species;
-            this.setReturns(response.body);
+            this.setReturns(response);
             this.returns.sheet_species = species_id;
             this.returns.species = species_id;
             this.is_saving = false

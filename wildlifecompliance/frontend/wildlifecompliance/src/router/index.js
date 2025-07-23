@@ -28,8 +28,8 @@ const router = new createRouter({
     ]
 });
 router.beforeEach(async (to, from, next) => {
-    const res = await Vue.http.get(api_endpoints.is_compliance_management_callemail_readonly_user);
-    const isComplianceManagementCallemailReadonlyUser = res.body.compliance_management_callemail_readonly_user;
+    const res = await fetch.fetchUrl(api_endpoints.is_compliance_management_callemail_readonly_user);
+    const isComplianceManagementCallemailReadonlyUser = res.compliance_management_callemail_readonly_user;
     if (!([
         "first-time",
         "account",

@@ -1132,7 +1132,7 @@ export default {
                 emulateJSON:true
             }).then((response) => {
                 vm.updatingDetails = false;
-                vm.org = response.body;
+                vm.org = response;
                 if (vm.org.address == null){ vm.org.address = {}; }
                 swal(
                     'Saved',
@@ -1180,7 +1180,7 @@ export default {
                 emulateJSON:true
             }).then((response) => {
                 vm.updatingAddress = false;
-                vm.org = response.body;
+                vm.org = response;
                 swal(
                     'Saved',
                     'Address details have been saved.',
@@ -1207,7 +1207,7 @@ export default {
                     vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'),{'user':person.id},{
                         emulateJSON:true
                     }).then((response) => {
-                        vm.org = response.body;
+                        vm.org = response;
                         if (vm.org.address == null){ vm.org.address = {}; }
                         swal({
                             title: 'Unlink',

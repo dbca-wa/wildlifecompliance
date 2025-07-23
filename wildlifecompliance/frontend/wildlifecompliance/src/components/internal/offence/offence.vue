@@ -1399,14 +1399,12 @@ export default {
         },
         searchOrganisation: function(id) {
           return new Promise((resolve, reject) => {
-            Vue.http.get("/api/search_organisation/" + id).then(
-              response => {
-                resolve(response.body);
-              },
-              error => {
+            let request = fetch.fetchUrl("/api/search_organisation/" + id)
+            request.then((response) => {
+                resolve(response);
+            }).catch((error) => {
                 reject(error);
-              }
-            );
+            });
           });
         },
         setCurrentOffender: function(data_type, id, source) {

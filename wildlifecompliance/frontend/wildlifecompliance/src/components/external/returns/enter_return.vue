@@ -71,7 +71,7 @@ import CommsLogs from '@common-components/comms_logs.vue'
 import AmendmentRequestDetails from './return_amendment.vue';
 import {
   api_endpoints,
-  helpers
+  helpers, fetch
 }
 from '@/utils/hooks'
 var select2 = require('select2');
@@ -151,12 +151,12 @@ export default {
         }).then((response)=>{
             if (this.replaceReturn === 'no') {
               let idx1 = this.returns.table[0]['data'].length
-              for (let idx2=0; idx2 < response.body[0]['data'].length; idx2++) {
-                this.returns.table[0]['data'][idx1++] = response.body[0]['data'][idx2]
+              for (let idx2=0; idx2 < response[0]['data'].length; idx2++) {
+                this.returns.table[0]['data'][idx1++] = response[0]['data'][idx2]
               }
             }
             if (this.replaceReturn === 'yes') {
-              this.returns.table[0]['data'] = response.body[0]['data']
+              this.returns.table[0]['data'] = response[0]['data']
               this.replaceReturn = 'no'
             }
             this.species_cache[this.returns.species] = this.returns.table[0]['data']
@@ -184,18 +184,12 @@ export default {
         // load species json from ajax
         this.refresh_grid = false
         this.returns.species = specie_id
-        await this.$http.get(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/species_data_details/?species_id='+specie_id+'&'))
-          .then((response)=>{
-            this.returns.table[0]['data'] = response.body[0]['data']     
-            // cache currently displayed species json
-            // this.species_cache[specie_id] = this.returns.table[0]['data']
-
-          },exception=>{
-
-            swal('Error with Species data', exception.body.error, 'error');
-          });
-
-
+        let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/species_data_details/?species_id='+specie_id+'&'))
+        request.then((response)=>{
+          this.returns.table[0]['data'] = response[0]['data']     
+        }).catch((error) => {
+          swal.fire('Error with Species data', helpers.apiVueResourceError(error), 'error');
+        });
       };  // end 
       this.replaceReturn = 'no'
       this.nilReturn = 'no'

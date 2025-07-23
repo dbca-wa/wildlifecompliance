@@ -116,7 +116,7 @@ import SendToAssessor from './application_send_assessor.vue';
 
 import {
     api_endpoints,
-    helpers
+    helpers, fetch
 }
 from '@/utils/hooks';
 export default {
@@ -294,9 +294,9 @@ export default {
         openAssessmentModal: function(assessment_id) {
             this.isModalOpen = true;
             this.viewingAssessmentId = assessment_id;
-            this.$http.get(`${api_endpoints.assessment}${this.viewingAssessmentId}`).then((response) => {
-                    this.assessment = response.body;
-            },(error) => {
+            let request = fetch.fetchUrl(`${api_endpoints.assessment}${this.viewingAssessmentId}`).then((response) => {
+                    this.assessment = response;
+            }).catch((error) => {
                 console.log(error);
             })
         },
@@ -517,7 +517,7 @@ export default {
             this.$http.post(helpers.add_endpoint_json(api_endpoints.assessor_group,'user_list'),JSON.stringify(data),{
                 emulateJSON:true,
             }).then((response) => {
-                this.assessorGroup = response.body;
+                this.assessorGroup = response;
             },(error) => {
                 console.log(error);
             });
@@ -633,7 +633,7 @@ export default {
                             'success'
                     )
                     vm.refreshAssessorDatatables();
-                    vm.$http.get(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/internal_application')).then((res) => {
+                    let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/internal_application')).then((res) => {
                         vm.refreshFromResponse(res);
                     });
 
@@ -659,7 +659,7 @@ export default {
                             'success'
                     )
                     vm.refreshAssessorDatatables();
-                    vm.$http.get(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/internal_application')).then((res) => {
+                    let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/internal_application')).then((res) => {
                         vm.refreshFromResponse(res);
                     });
                 },(error)=>{

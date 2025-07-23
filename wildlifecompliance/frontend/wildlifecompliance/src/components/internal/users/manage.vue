@@ -292,7 +292,7 @@
 </template>
 
 <script>
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { api_endpoints, helpers, fetch } from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
 import ApplicationDashTable from '@common-components/applications_dashboard.vue'
 import LicenceDashTable from '@common-components/licences_dashboard.vue'
@@ -416,7 +416,7 @@ export default {
                 emulateJSON:true
             }).then((response) => {
                 vm.updatingContact = false;
-                vm.user = response.body;
+                vm.user = response;
                 if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
                 swal({
                     title: 'Update Contact Details',
@@ -443,7 +443,7 @@ export default {
                 emulateJSON:true
             }).then((response) => {
                 vm.updatingAddress = false;
-                vm.user = response.body;
+                vm.user = response;
                 if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
                 swal({
                     title: 'Update Address Details',
@@ -477,8 +477,8 @@ export default {
                     vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'),JSON.stringify(vm.user),{
                         emulateJSON:true
                     }).then((response) => {
-                        vm.$http.get(helpers.add_endpoint_json(api_endpoints.users,vm.user.id)).then((response) => {
-                            vm.user = response.body
+                        let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,vm.user.id)).then((response) => {
+                            vm.user = response
                             if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
                             if (vm.user.wildlifecompliance_organisations && vm.user.wildlifecompliance_organisations.length > 0){
                               vm.managesOrg = 'Yes'
@@ -488,17 +488,19 @@ export default {
                                 'The user has been successfully unlinked from '+org_name+'.',
                                 'success'
                             )
-                        },(error) => {
+                        }).catch((error) => {
+                            console.log(error)
                         })
-                    }, (error) => {
-                        swal(
+                    }).catch((error) => {
+                        swal.fire(
                             'Unlink',
                             'There was an error unlinking the user from '+org_name+'.',
                             'error'
                         )
                     });
                 }
-            },(error) => {
+            }).catch((error) => {
+                console.log(error)
             });
         },
         readFileID: async function() {
@@ -538,10 +540,10 @@ export default {
                 }).then((response) => {
                     vm.uploadingID = false;
                     vm.uploadedID = null;
-                    //vm.uploadedID = response.body.identification;
-                    //vm.user.identification = response.body.identification;
-                    vm.uploadedID = response.body.identification2;
-                    vm.user.identification2 = response.body.identification2;
+                    //vm.uploadedID = response.identification;
+                    //vm.user.identification = response.identification;
+                    vm.uploadedID = response.identification2;
+                    vm.user.identification2 = response.identification2;
                 }, (error) => {
                     console.log(error);
                     vm.uploadingID = false;

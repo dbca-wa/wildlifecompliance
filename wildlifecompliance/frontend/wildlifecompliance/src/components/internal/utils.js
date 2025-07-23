@@ -7,7 +7,7 @@ export default {
         return new Promise ((resolve,reject) => {
             let request = fetch.fetchUrl(helpers.add_endpoint_json(api.applications,id))
             request.then((response) => {
-                resolve(response.body);
+                resolve(response);
             }).catch((error) => {
                 reject(error);
             });
@@ -17,7 +17,7 @@ export default {
         return new Promise ((resolve,reject) => {
             let request = fetch.fetchUrl(api.organisations)
             request.then((response) => {
-                resolve(response.body);
+                resolve(response);
             }).catch((error) => {
                 reject(error);
             });
@@ -27,7 +27,7 @@ export default {
         return new Promise ((resolve,reject) => {
             let request = fetch.fetchUrl(helpers.add_endpoint_json(api.organisations,id))
             request.then((response) => {
-                resolve(response.body);
+                resolve(response);
             }).catch((error) => {
                 reject(error);
             });
@@ -37,7 +37,7 @@ export default {
         return new Promise ((resolve,reject) => {
             let request = fetch.fetchUrl(helpers.add_endpoint_json(api.my_organisations,id))
             request.then((response) => {
-                resolve(response.body);
+                resolve(response);
             }).catch((error) => {
                 reject(error);
             });
@@ -47,7 +47,7 @@ export default {
         return new Promise ((resolve,reject) => {
             let request = fetch.fetchUrl(helpers.add_endpoint_join(api.users,id + '/pending_org_requests'))
             request.then((response) => {
-                resolve(response.body);
+                resolve(response);
             }).catch((error) => {
                 reject(error);
             });
@@ -57,7 +57,7 @@ export default {
         return new Promise ((resolve,reject) => {
             let request = fetch.fetchUrl(helpers.add_endpoint_json(api.profiles,id))
             request.then((response) => {
-                resolve(response.body);
+                resolve(response);
             }).catch((error) => {
                 reject(error);
             });
@@ -67,7 +67,7 @@ export default {
         return new Promise ((resolve,reject) => {
             let request = fetch.fetchUrl(api.users)
             request.then((response) => {
-                resolve(response.body);
+                resolve(response);
             }).catch((error) => {
                 reject(error);
             });
@@ -77,7 +77,7 @@ export default {
         return new Promise ((resolve,reject) => {
             let request = fetch.fetchUrl(helpers.add_endpoint_json(api.users,id))
             request.then((response) => {
-                resolve(response.body);
+                resolve(response);
             }).catch((error) => {
                 reject(error);
             });
@@ -87,7 +87,7 @@ export default {
         return new Promise ((resolve,reject) => {
             let request = fetch.fetchUrl(helpers.add_endpoint_json(api.offenders,id))
             request.then((response) => {
-                resolve(response.body);
+                resolve(response);
             }).catch((error) => {
                 reject(error);
             });
@@ -97,7 +97,7 @@ export default {
         return new Promise ((resolve,reject) => {
             let request = fetch.fetchUrl(api.my_user_details)
             request.then((response) => {
-                resolve(response.body);
+                resolve(response);
             }).catch((error) => {
                 reject(error);
             });
@@ -107,7 +107,7 @@ export default {
         return new Promise ((resolve,reject) => {
             let request = fetch.fetchUrl(api.countries)
             request.then((response) => {
-                resolve(response.body);
+                resolve(response);
             }).catch((error) => {
                 reject(error);
             });

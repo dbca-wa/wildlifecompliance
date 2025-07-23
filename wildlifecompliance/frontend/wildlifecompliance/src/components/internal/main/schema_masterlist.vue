@@ -112,7 +112,7 @@ import SchemaHeader from './schema_add_header.vue'
 import SchemaExpander from './schema_add_expander.vue'
 import {
   api_endpoints,
-  helpers
+  helpers, fetch
 }
 from '@/utils/hooks'
 export default {
@@ -487,14 +487,15 @@ export default {
         },
         initSelects: async function() {
 
-            await this.$http.get(helpers.add_endpoint_join(api_endpoints.schema_masterlist,'1/get_masterlist_selects')).then(res=>{
+            let request = fetch.fetchUrl(helpers.add_endpoint_join(api_endpoints.schema_masterlist,'1/get_masterlist_selects'))
+            request.then(res=>{
 
-                    this.answerTypes = res.body.all_answer_types
+                    this.answerTypes = res.all_answer_types
 
-            },err=>{
+            }).catch((error) => {
                 swal(
                     'Get Application Selects Error',
-                    helpers.apiVueResourceError(err),
+                    helpers.apiVueResourceError(error),
                     'error'
                 )
             });

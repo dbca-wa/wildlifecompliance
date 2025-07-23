@@ -81,7 +81,8 @@ require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
 import { mapActions, mapGetters } from 'vuex'
 import {
     api_endpoints,
-    helpers
+    helpers,
+    fetch
 }from '@/utils/hooks'
 import '@/scss/dashboards/application.scss';
 export default {
@@ -598,7 +599,7 @@ export default {
                 application_id,
                 activity_id
             }).then(res=>{
-                    window.location.href = res.body;
+                    window.location.href = res;
                 },err=>{
                     swal(
                         'Submit Error',
@@ -609,7 +610,7 @@ export default {
         },
         payApplicationFee: function(application_id) {
             this.$http.post(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/application_fee_checkout/'), application_id).then(res=>{
-                    window.location.href = res.body;
+                    window.location.href = res;
                 },err=>{
                     swal(
                         'Submit Error',
@@ -623,7 +624,7 @@ export default {
                 application_id
             }).then(res=>{
 
-                    this.activities = res.body;
+                    this.activities = res;
 
                 },err=>{
                     swal(
@@ -818,19 +819,19 @@ export default {
         },
         initialiseSelects: async function() {
 
-            await this.$http.get(helpers.add_endpoint_join(api_endpoints.applications,'1/get_application_selects')).then(res=>{
-
-                    this.application_status = res.body.all_status
-                    this.application_licence_types = res.body.all_category
-                    this.application_activities = res.body.all_activity
-                },err=>{
-
-                    swal(
-                        'Get Application Selects Error',
-                        helpers.apiVueResourceError(err),
-                        'error'
-                    )
-                });
+            let request = fetch.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,'1/get_application_selects'))
+            request.then(res=>{
+                this.application_status = res.all_status
+                this.application_licence_types = res.all_category
+                this.application_activities = res.all_activity
+            }).catch((error) => {
+                console.log(error)
+                swal.fire(
+                    'Get Application Selects Error',
+                    helpers.apiVueResourceError(error),
+                    'error'
+                )
+            });
         },
     },
     mounted: function(){

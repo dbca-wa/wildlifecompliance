@@ -1266,7 +1266,7 @@ export default {
                 if (result) {
                     await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_id_check')))
                     .then((response) => {
-                        vm.setIdCheckStatus(response.body.id_check_status);
+                        vm.setIdCheckStatus(response.id_check_status);
                     }, (error) => {
                         console.log(error);
                     });
@@ -1286,7 +1286,7 @@ export default {
                 if (result) {
                     await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_id_check')))
                     .then((response) => {
-                        vm.setIdCheckStatus(response.body.id_check_status);
+                        vm.setIdCheckStatus(response.id_check_status);
                     }, (error) => {
                         console.log(error);
                     });
@@ -1306,7 +1306,7 @@ export default {
                 if (result) {
                     await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/request_id_check')))
                     .then((response) => {
-                        vm.setIdCheckStatus(response.body.id_check_status);
+                        vm.setIdCheckStatus(response.id_check_status);
                     }, (error) => {
                         console.log(error);
                     });
@@ -1326,7 +1326,7 @@ export default {
                 if (result) {
                     await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_character_check')))
                     .then((response) => {
-                        vm.setCharacterCheckStatus(response.body.character_check_status);
+                        vm.setCharacterCheckStatus(response.character_check_status);
                     }, (error) => {
                         console.log(error);
                     });
@@ -1346,7 +1346,7 @@ export default {
                 if (result) {
                     await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_character_check')))
                     .then((response) => {
-                        vm.setCharacterCheckStatus(response.body.character_check_status);
+                        vm.setCharacterCheckStatus(response.character_check_status);
                     }, (error) => {
                         console.log(error);
                     });
@@ -1366,7 +1366,7 @@ export default {
                 if (result) {
                     await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_return_check')))
                     .then((response) => {
-                        vm.setReturnCheckStatus(response.body.return_check_status);
+                        vm.setReturnCheckStatus(response.return_check_status);
                     }, (error) => {
                         console.log(error);
                     });
@@ -1386,7 +1386,7 @@ export default {
                 if (result) {
                     await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_return_check')))
                     .then((response) => {
-                        vm.setReturnCheckStatus(response.body.return_check_status);
+                        vm.setReturnCheckStatus(response.return_check_status);
                     }, (error) => {
                         console.log(error);
                     });
@@ -1603,8 +1603,8 @@ export default {
             $(vm.$refs.assigned_approver).trigger('change');
         },
         refreshFromResponse:function(response){
-            this.setOriginalApplication(response.body);
-            this.setApplication(response.body);
+            this.setOriginalApplication(response);
+            this.setApplication(response);
             this.$nextTick(() => {
                 this.initialiseAssignedOfficerSelect(true);
                 this.updateAssignedOfficerSelect();

@@ -168,7 +168,7 @@ export default {
             formData.append('csrfmiddlewaretoken', vm.csrf_token);
             vm.$http.post(vm.application_document_action, formData)
                 .then(res=>{
-                    vm.documents = res.body;
+                    vm.documents = res;
                     //console.log(vm.documents);
                     vm.show_spinner = false;
                 });
@@ -187,7 +187,7 @@ export default {
             vm.$http.post(vm.application_document_action, formData)
                 .then(res=>{
                     vm.documents = vm.get_documents()
-                    //vm.documents = res.body;
+                    //vm.documents = res;
                     vm.show_spinner = false;
                 });
 
@@ -221,7 +221,7 @@ export default {
 
             vm.$http.post(vm.application_document_action, formData)
                 .then(res=>{
-                    vm.documents = res.body;
+                    vm.documents = res;
                 },err=>{
                 });
 

@@ -305,8 +305,8 @@
             },
             getUserCanCreate: async function() {
                 let url = helpers.add_endpoint_join(api_endpoints.inspection, 'can_user_create/');
-                let res = await Vue.http.get(url);
-                this.canUserCreateNewInspection = res.body;
+                let res = await fetch.fetchUrl(url);
+                this.canUserCreateNewInspection = res;
             },
             createInspectionUrl: async function () {
                 const newInspectionId = await this.saveInspection({ create: true });

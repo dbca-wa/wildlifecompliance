@@ -224,8 +224,8 @@ export default {
                 district_id: this.district_id ? this.district_id : null,
               });
               if (allocatedGroupResponse.ok) {
-                  Vue.set(this, 'allocatedGroup', allocatedGroupResponse.body);
-                  this.allocated_group_id = allocatedGroupResponse.body.group_id;
+                  Vue.set(this, 'allocatedGroup', allocatedGroupresponse);
+                  this.allocated_group_id = allocatedGroupresponse.group_id;
               } else {
                   // Display http error response on modal
                   this.errorResponse = allocatedGroupResponse.statusText;
@@ -246,7 +246,7 @@ export default {
           if (is_valid_form) {
               const response = await this.sendData();
               if (response.ok) {
-                  const returnedInspection = response.body;
+                  const returnedInspection = response;
                   // For Inspection Dashboard
                   if (this.$parent.$refs.inspection_table) {
                       this.$parent.$refs.inspection_table.vmDataTable.ajax.reload()

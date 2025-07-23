@@ -52,14 +52,14 @@ module.exports = {
         var error_str = '';
         var text = null;
         if (resp.status === 400) {
-            if (Array.isArray(resp.body)){
-                text = resp.body[0];
+            if (Array.isArray(resp)){
+                text = resp[0];
             }
-            else if (typeof resp.body == 'object'){
-                text = resp.body;
+            else if (typeof resp == 'object'){
+                text = resp;
             }
             else{
-                text = resp.body;
+                text = resp;
             }
 
             if (typeof text == 'object'){

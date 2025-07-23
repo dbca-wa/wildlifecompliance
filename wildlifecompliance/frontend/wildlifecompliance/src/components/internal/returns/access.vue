@@ -197,7 +197,7 @@ export default {
             });
         },
         refreshFromResponse:function(response){
-            this.setReturns(response.body);
+            this.setReturns(response);
             this.$nextTick(() => {
                 this.initAssignedOfficerSelect(true);
                 this.updateAssignedOfficerSelect();

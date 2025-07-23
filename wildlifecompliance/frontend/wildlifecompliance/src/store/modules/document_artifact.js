@@ -96,14 +96,14 @@ export const documentArtifactStore = {
     actions: {
         async loadDocumentArtifact({ dispatch, commit }, { document_artifact_id }) {
             try {
-                const returnedDocumentArtifact = await Vue.http.get(
+                const returnedDocumentArtifact = await fetch.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.document_artifact,
                         document_artifact_id)
                     );
 
                 console.log(returnedDocumentArtifact)
-                commit("updateDocumentArtifact", returnedDocumentArtifact.body);
+                commit("updateDocumentArtifact", returnedDocumentArtifact);
 
             } catch (err) {
                 console.log(err);

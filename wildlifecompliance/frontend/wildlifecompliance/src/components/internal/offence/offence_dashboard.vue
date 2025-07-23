@@ -238,8 +238,8 @@ export default {
     methods: {
         getUserCanCreate: async function() {
             let url = helpers.add_endpoint_join(api_endpoints.offence, 'can_user_create/');
-            let res = await Vue.http.get(url);
-            this.canUserCreateNewOffence = res.body;
+            let res = await fetch.fetchUrl(url);
+            this.canUserCreateNewOffence = res;
         },
         createOffence: function() {
 //            this.setCreateOffenceBindId()

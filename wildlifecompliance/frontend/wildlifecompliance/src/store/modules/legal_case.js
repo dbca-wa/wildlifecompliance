@@ -255,14 +255,14 @@ export const legalCaseStore = {
     actions: {
         async loadLegalCase({ dispatch, commit }, { legal_case_id }) {
             try {
-                const returnedLegalCase = await Vue.http.get(
+                const returnedLegalCase = await fetch.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.legal_case, 
                         legal_case_id)
                     );
                 console.log('*** in loadLegalCase ***');
                 console.log(returnedLegalCase);
-                commit("updateLegalCase", returnedLegalCase.body);
+                commit("updateLegalCase", returnedLegalCase);
 
             } catch (err) {
                 console.log(err);
@@ -270,7 +270,7 @@ export const legalCaseStore = {
         },
         async loadLegalCaseNoRunningSheet({ dispatch, commit }, { legal_case_id }) {
             try {
-                const returnedLegalCase = await Vue.http.get(
+                const returnedLegalCase = await fetch.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.legal_case,
                         legal_case_id + '/no_running_sheet'
@@ -278,7 +278,7 @@ export const legalCaseStore = {
                 );
                 console.log('*** in loadLegalCase ***');
                 console.log(returnedLegalCase);
-                commit("updateLegalCaseNoRunningSheet", returnedLegalCase.body);
+                commit("updateLegalCaseNoRunningSheet", returnedLegalCase);
 
             } catch (err) {
                 console.log(err);

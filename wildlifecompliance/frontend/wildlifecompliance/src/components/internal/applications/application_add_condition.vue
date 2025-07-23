@@ -134,7 +134,7 @@
 //import $ from 'jquery'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import {helpers,api_endpoints} from "@/utils/hooks.js"
+import {helpers,api_endpoints,fetch} from "@/utils/hooks.js"
 
 var select2 = require('select2');
 require("select2/dist/css/select2.min.css");
@@ -244,16 +244,17 @@ export default {
         },
         fetchContact: function(id){
             let vm = this;
-            vm.$http.get(api_endpoints.contact(id)).then((response) => {
-                vm.contact = response.body; vm.isModalOpen = true;
-            },(error) => {
+            let request = fetch.fetchUrl(api_endpoints.contact(id))
+            request.then((response) => {
+                vm.contact = response; vm.isModalOpen = true;
+            }).catch((error) => {
                 console.log(error);
             } );
         },
         fetchReturnTypes() {
-            this.$http.get(api_endpoints.return_types).then((response) => {
-                this.return_types = response.body;
-            },(error) => {
+            let request = fetch.fetchUrl(api_endpoints.return_types).then((response) => {
+                this.return_types = response;
+            }).catch((error) => {
                 console.log(error);
             })
         },
