@@ -258,10 +258,6 @@ export default {
         }
 
     },
-    watch:{
-    },
-    computed: {
-    },
     methods: {
         delay(callback, ms) {
             var timer = 0;

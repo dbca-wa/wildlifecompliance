@@ -117,8 +117,6 @@ export default {
                     this.creatingPerson = false;
                 } else if (this.entity.id && this.entity.data_type === 'organisation') {
                     this.displayUpdateCreatePerson = false;
-                    // TODO: swap following two lines once create org implemented
-                    //this.displayUpdateCreateOrganisation = true;
                     this.displayUpdateCreateOrganisation = false;
                     this.creatingOrganisation = false;
                 }

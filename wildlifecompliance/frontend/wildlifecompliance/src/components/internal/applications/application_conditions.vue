@@ -172,8 +172,6 @@ export default {
             }
         }
     },
-    watch:{
-    },
     components:{
         datatable,
         ConditionDetail

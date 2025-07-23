@@ -459,12 +459,6 @@ export default {
                     this.setStatementId(null);
                 }
                 this.setStatementVisibility();
-                /*
-                if (this.statementVisibilityArray.includes(this.artifactType)) {
-                    console.log("statementVisibility true")
-                    this.statementVisibility = true;
-                }
-                */
             },
             //deep: true,
         },

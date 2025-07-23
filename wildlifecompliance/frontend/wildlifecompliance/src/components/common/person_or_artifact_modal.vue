@@ -154,10 +154,7 @@ export default {
     watch: {
         tabSelected: {
             handler: async function (){
-                //await this.cancelArtifactComponent();
                 this.uuid += 1;
-                //this.urlProtocol = 'https';
-                //this.urlText = '';
             }
         }
     },

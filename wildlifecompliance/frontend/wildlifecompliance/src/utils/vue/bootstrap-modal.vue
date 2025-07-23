@@ -115,16 +115,19 @@
             document.body.className = document.body.className.replace(/\s?modal-open/, '');
         },
         watch: {
-            show (value) {
-                if (value) {
-                    document.body.className += ' modal-open';
-                }
-                else {
+            show: {
+                handler: function(value) {
+                    if (value) {
+                        document.body.className += ' modal-open';
+                    }
+                    else {
 
-                    window.setTimeout(() => {
-                        document.body.className = document.body.className.replace(/\s?modal-open/, '');
-                    }, this.duration || 0);
-                }
+                        window.setTimeout(() => {
+                            document.body.className = document.body.className.replace(/\s?modal-open/, '');
+                        }, this.duration || 0);
+                    }
+                },
+                deep: true,
             }
         },
         methods: {

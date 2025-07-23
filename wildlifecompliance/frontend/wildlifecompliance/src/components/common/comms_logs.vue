@@ -214,10 +214,6 @@ export default {
     components:{
         AddCommLog
     },
-    watch:{
-    },
-    computed: {
-    },
     methods:{
         commaToNewline(s){
             return s.replace(/[,;]/g, '\n');

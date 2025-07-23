@@ -94,11 +94,14 @@ export default {
     },
     watch: 
     {
-        allowed_group_ids(after,before) {
-            if (before === undefined && after !== undefined) {
-                this.getAllocatedGroup(this.allowed_group_ids);
-                this.assign_to_id = this.assigned_to_id; 
-            }
+        allowed_group_ids: {
+            handler: function (after,before) {
+                if (before === undefined && after !== undefined) {
+                    this.getAllocatedGroup(this.allowed_group_ids);
+                    this.assign_to_id = this.assigned_to_id; 
+                }
+            },
+            deep: true,
         }
     },
     mounted: function() {

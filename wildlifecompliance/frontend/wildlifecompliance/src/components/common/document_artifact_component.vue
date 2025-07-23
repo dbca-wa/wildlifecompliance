@@ -415,36 +415,9 @@ export default {
         artifactType: {
             handler: function (){
                 this.setStatementVisibility();
-                //this.setPersonProvidingStatementLabel();
-                //this.setInterviewerLabel();
-                /*
-                if (
-                    // legal case exists and Document Type is not a statementArtifactType
-                    (this.legalCaseExists && this.artifactType && !this.statementArtifactTypes.includes(this.artifactType)) ||
-                    // OR document_artifact already has a linked statement
-                    (this.document_artifact && this.document_artifact.statement)
-                    )
-                {
-                    console.log("statementVisibility true")
-                    this.statementVisibility = true;
-                } else {
-                    console.log("statementVisibility false")
-                    this.statementVisibility = false;
-                }
-                */
             },
             deep: true,
         },
-        /*
-        legalCaseId: {
-            handler: async function() {
-                if (this.legal_case && this.legal_case.id) {
-                    await this.setDocumentArtifactLegalId(this.legal_case.id)
-                }
-            },
-        },
-        */
-
     },
     computed: {
         ...mapGetters('documentArtifactStore', {

@@ -19,17 +19,10 @@ export default {
         return {
             applications_url: helpers.add_endpoint_join(api_endpoints.applications_paginated,'internal_datatable_list/?format=datatables'),
         }
-    
     },
-    watch: {},
     components: {
         ApplicationDashTable,
         AssessmentDashTable,
     },
-    computed: {
-    },
-    methods: {},
-    mounted: function () {
-    }
 }
 </script>

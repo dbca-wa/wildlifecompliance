@@ -333,8 +333,6 @@ export default {
         modal,
         InspectionRequest,
     },
-    watch: {
-    },
     computed: {
         ...mapGetters([
             'application',

@@ -90,12 +90,6 @@ export default {
     components:{
         datatable
     },
-    watch:{
-    },
-    computed: {
-    },
-    methods:{
-    },
     mounted: function(){
         let vm = this;
         $( 'a[data-toggle="collapse"]' ).on( 'click', function () {

@@ -112,32 +112,8 @@ export default {
               this.$route.params.artifact_id + "/action_log"
             ),
             baseArtifact: {},
-            //artifactStatusDisplay: '',
-            /*
-            hashAttributeWhitelist: [
-              'allocated_group_id',
-              'case_created_date',
-              'case_created_time',
-              'details',
-              'title',
-              'legal_case_priority_id',
-              'region_id',
-              'district_id',
-            ],
-            */
-
       };
   },
-    /*
-  watch: {
-        baseArtifact: {
-            handler: function (){
-                //this.setStatusDisplay();
-            },
-            deep: true,
-        },
-  },
-  */
   components: {
     CommsLogs,
     FormSection,

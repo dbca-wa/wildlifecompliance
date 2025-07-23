@@ -19,14 +19,8 @@ export default {
         }
 
     },
-    watch: {},
     components: {
         ReturnDashTable,
     },
-    computed: {
-    },
-    methods: {},
-    mounted: function () {
-    }
 }
 </script>

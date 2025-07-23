@@ -19,14 +19,8 @@ export default {
         }
     
     },
-    watch: {},
     components: {
         LicenceDashTable,
     },
-    computed: {
-    },
-    methods: {},
-    mounted: function () {
-    }
 }
 </script>

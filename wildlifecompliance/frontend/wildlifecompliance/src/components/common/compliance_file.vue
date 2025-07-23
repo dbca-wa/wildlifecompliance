@@ -116,7 +116,6 @@ export default {
             deep: true
         },
     },
-
     methods:{
         handleChange: function (e) {
             let vm = this;

@@ -111,10 +111,6 @@ export default {
             role:null,
         }
     },
-    watch: {
-    },
-    computed: {
-    },
     methods: {
         createProfile: function() {
             let vm = this;

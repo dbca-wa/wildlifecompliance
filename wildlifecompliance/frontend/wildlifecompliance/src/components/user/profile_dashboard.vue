@@ -98,8 +98,6 @@ export default {
     components:{
         datatable
     },
-    watch:{
-    },
     computed: {
         is_external: function(){
             return this.level == 'external';

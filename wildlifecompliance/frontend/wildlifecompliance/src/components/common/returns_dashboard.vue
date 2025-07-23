@@ -186,12 +186,9 @@ export default {
             table.column(2).search(value).draw();
         },
         filterDueDateFrom: function(value){
-            //this.dateSearch()
-            //this.filterReturnStatus = 'All'
             this.visibleDatatable.vmDataTable.draw();
         },
         filterDueDateTo: function(value){
-            //this.dateSearch()
             this.visibleDatatable.vmDataTable.draw();
         },
     },

@@ -44,12 +44,5 @@ export default {
         LicenceDashTable,
         ReturnDashTable,
     },
-    watch: {},
-    computed: {
-    },
-    methods: {
-    },
-    mounted: function () {
-    }
 }
 </script>

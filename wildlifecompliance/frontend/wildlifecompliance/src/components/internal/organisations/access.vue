@@ -296,7 +296,6 @@ export default {
         requestType : null,
     }
   },
-  watch: {},
   beforeRouteEnter: function(to, from, next){
     let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,to.params.access_id))
     request.then((response) => {

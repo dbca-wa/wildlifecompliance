@@ -257,12 +257,15 @@ export default {
         }
     },
     watch: {
-        searchKeywords: function() {
-            if (this.searchKeywords.length > 0){
-                this.hasSearchKeywords = true;
-            } else {
-                this.hasSearchKeywords = false;
-            };
+        searchKeywords: {
+            handler: function (){
+                if (this.searchKeywords.length > 0){
+                    this.hasSearchKeywords = true;
+                } else {
+                    this.hasSearchKeywords = false;
+                };
+            },
+            deep: true,
         }
     },
     components: {

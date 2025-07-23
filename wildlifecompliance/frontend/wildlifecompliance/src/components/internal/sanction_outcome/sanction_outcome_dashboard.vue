@@ -272,7 +272,6 @@ export default {
         });
     },
     watch: {
-
         filterType: function () {
             this.$refs.sanction_outcome_table.vmDataTable.draw();
         },

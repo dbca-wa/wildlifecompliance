@@ -447,8 +447,6 @@ export default {
             });
         },
     },
-    computed: {    
-    },
     methods: {
         delay(callback, ms) {
             var timer = 0;

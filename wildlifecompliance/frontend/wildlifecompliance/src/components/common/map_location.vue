@@ -103,15 +103,7 @@ export default {
         idSearchInput: vm.guid + "SearchInput",
         idBasemapSat: vm.guid + "BasemapSat",
         idBasemapOsm: vm.guid + "BasemapOsm"
-    };
-  },
-    computed: {
-     //   marker_lat: function() {
-     //       return this.marker_latitude;
-     //   },
-     //   marker_lng: function() {
-     //       return this.marker_longitude;
-     //   },
+      };
     },
     watch: {
         marker_latitude: function(){

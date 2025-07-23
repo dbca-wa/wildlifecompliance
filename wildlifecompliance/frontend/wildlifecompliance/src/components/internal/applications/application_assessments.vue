@@ -156,8 +156,6 @@ export default {
             default: false,
         },
     },
-    watch: {
-    },
     computed: {
         ...mapGetters([
             'application',

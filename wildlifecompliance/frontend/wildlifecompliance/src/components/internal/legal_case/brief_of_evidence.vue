@@ -309,16 +309,6 @@ export default {
             default: true,
         },
   },
-    /*
-  watch: {
-      readonlyForm: {
-          handler: function (newVal, oldVal){
-              this.showHideTreeControls();
-          },
-          deep: true
-      },
-  },
-  */
   computed: {
     ...mapGetters('legalCaseStore', {
       legal_case: "legal_case",

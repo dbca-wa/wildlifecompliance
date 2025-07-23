@@ -19,14 +19,8 @@ export default {
         }
     
     },
-    watch: {},
     components: {
         UserDashTable,
     },
-    computed: {
-    },
-    methods: {},
-    mounted: function () {
-    }
 }
 </script>

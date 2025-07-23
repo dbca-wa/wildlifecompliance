@@ -770,8 +770,6 @@ export default {
         AmendmentRequestDetails,
         SecureBaseLink,
     },
-    watch: {
-    },
     computed: {
         ...mapGetters([
             'application',

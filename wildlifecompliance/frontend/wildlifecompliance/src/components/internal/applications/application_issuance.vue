@@ -320,8 +320,6 @@ export default {
             spinner:false,
         }
     },
-    watch:{
-    },
     computed:{
         ...mapGetters([
             'selected_activity_tab_id',

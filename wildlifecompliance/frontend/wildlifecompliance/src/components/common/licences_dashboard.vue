@@ -306,9 +306,6 @@ export default {
         filterLicenceType: function(){
             this.$refs.licence_datatable.vmDataTable.draw();
         },
-//        filterLicenceStatus: function(){
-//            this.$refs.licence_datatable.vmDataTable.draw();
-//        },
         filterLicenceIssuedFrom: function(){
             this.$refs.licence_datatable.vmDataTable.draw();
         },

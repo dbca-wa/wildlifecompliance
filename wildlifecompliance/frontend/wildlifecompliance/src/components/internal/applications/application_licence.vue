@@ -35,10 +35,6 @@ import datatable from '@vue-utils/datatable.vue'
 import { mapGetters } from 'vuex'
 export default {
     name: 'InternalApplicationLicenceDetails',
-    watch:{
-    },
-    components:{
-    },
     computed:{
         ...mapGetters([
             'application',

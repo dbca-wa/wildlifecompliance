@@ -303,16 +303,6 @@ export default {
     TreeSelect,
     filefield,
   },
-    /*
-  watch: {
-      readonlyForm: {
-          handler: function (newVal, oldVal){
-              this.showHideTreeControls();
-          },
-          deep: true
-      },
-  },
-  */
   props:{
         readonly: {
             type: Boolean,

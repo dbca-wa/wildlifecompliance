@@ -205,13 +205,6 @@ export default {
     datatable,
     Returns,
   },
-  // watch:{
-  //   filterActivityType: function(value){
-  //     let table = this.$refs.return_datatable.vmDataTable
-  //     value = value != 'All' ? value : ''
-  //     table.column(2).search(value).draw();
-  //   },
-  // },
   computed: {
      ...mapGetters([
         'isReturnsLoaded',

@@ -118,8 +118,6 @@ export default {
         alert,
         datatable,
     },
-    props:{
-    },
     watch:{
         filterTablePurpose: function() {
             this.$refs.schema_purpose_table.vmDataTable.draw();

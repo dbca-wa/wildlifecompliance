@@ -25,7 +25,6 @@ export default {
             preferredDashboard: null,
         }
     },
-    watch: {},
     components: {
         ApplicationDashTable,
         AssessmentDashTable,

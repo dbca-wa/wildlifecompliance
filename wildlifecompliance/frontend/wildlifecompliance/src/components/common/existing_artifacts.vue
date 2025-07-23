@@ -82,8 +82,6 @@ export default {
   components: {
     datatable,
   },
-  watch: {
-  },
   computed: {
     ...mapGetters('documentArtifactStore', {
       document_artifact: "document_artifact",

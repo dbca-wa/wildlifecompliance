@@ -110,10 +110,6 @@ export default {
             updatingProfile: false,
         }
     },
-    watch: {
-    },
-    computed: {
-    },
     methods: {
         updateProfile: function() {
             let vm = this;
