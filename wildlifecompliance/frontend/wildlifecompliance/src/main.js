@@ -10,8 +10,6 @@ import api_endpoints from './api';
 import store from './store';
 import RendererBlock from '@/components/common/renderer_block.vue';
 import ComplianceRendererBlock from '@/components/common/compliance_renderer_block.vue';
-import VueScrollTo from 'vue-scrollto';
-import Affix from 'vue-affix';
 import { useVuelidate } from '@vuelidate/core'
 
 import { extendMoment } from 'moment-range';
@@ -43,8 +41,6 @@ import '@/../node_modules/datatables.net-buttons-bs/css/buttons.bootstrap.min.cs
 //Vue.config.devtools = true;
 Vue.config.productionTip = false
 Vue.use( resource );
-Vue.use( VueScrollTo );
-Vue.use( Affix );
 
 export default {
   setup () {
@@ -92,7 +88,7 @@ Vue.mixin({
 })
 
 const app = createApp(App);
-
+app.use(store)
 app.use(router);
 router.isReady().then(() => app.mount('#app'));
 

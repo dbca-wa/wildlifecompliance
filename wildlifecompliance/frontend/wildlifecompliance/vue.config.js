@@ -66,6 +66,9 @@ module.exports = defineConfig({
             new webpack.ProvidePlugin({
                 Buffer: ['buffer', 'Buffer'],
             }),
+            new webpack.DefinePlugin({
+                __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
+            }),
         ],
         devServer: {
             host: '0.0.0.0',
