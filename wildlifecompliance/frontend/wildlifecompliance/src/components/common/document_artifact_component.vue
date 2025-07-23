@@ -920,30 +920,13 @@ export default {
             }
             return comparison;
         },
-
-      //createDocumentActionUrl: async function(done) {
-      //  if (!this.inspection.id) {
-      //      // create inspection and update vuex
-      //      let returned_inspection = await this.saveInspection({ create: true, internal: true })
-      //      await this.loadInspection({inspection_id: returned_inspection.body.id});
-      //  }
-      //  // populate filefield document_action_url
-      //  this.$refs.comms_log_file.document_action_url = this.inspection.createInspectionProcessCommsLogsDocumentUrl;
-      //  return done(true);
-      //},
-
     },
     mounted: function() {
       this.$nextTick(async () => {
           this.addEventListeners();
-          /*
-          if (this.legal_case && this.legal_case.id) {
-              this.setDocumentArtifactLegalId(this.legal_case.id)
-          */
       });
     },
-    beforeDestroy: async function() {
-        console.log("beforeDestroy")
+    beforeUnmount: async function() {
         await this.setDocumentArtifact({});
     },
     created: async function() {

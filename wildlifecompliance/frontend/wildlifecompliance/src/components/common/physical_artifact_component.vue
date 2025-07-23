@@ -1012,15 +1012,9 @@ export default {
           this.addEventListeners();
       });
     },
-    beforeDestroy: async function() {
-        //console.log("beforeDestroy")
+    beforeUnmount: async function() {
         await this.setPhysicalArtifact({});
     },
-    /*
-    destroyed: function() {
-        console.log("destroyed")
-    },
-    */
     created: async function() {
         console.log("created")
         if (this.$route.params.physical_artifact_id) {

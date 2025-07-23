@@ -4,7 +4,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="conditionForm">
-                        <alert :v-model:show="showError" type="danger"><strong>{{errorString}}</strong></alert>
+                        <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <label class="radio-inline control-label"><input type="radio" name="conditionType" :value="true" v-model="condition.standard">Standard Condition</label>

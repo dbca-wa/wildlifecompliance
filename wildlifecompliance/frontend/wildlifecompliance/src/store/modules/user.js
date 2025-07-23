@@ -189,7 +189,7 @@ export const userStore = {
             Vue.set(state.selected_activity_tab_workflow_state, key, value);
         },
         [UPDATE_CURRENT_USER] (state, user) {
-            Vue.set(state, 'current_user', {...user});
+            state.current_user = user;
         },
         [UPDATE_CURRENT_USER_ID] (state, bool) {
             state.current_user_id = bool;
