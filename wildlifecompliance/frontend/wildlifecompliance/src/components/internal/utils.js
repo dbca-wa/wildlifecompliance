@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import api from './api'
-import {helpers} from '@/utils/hooks' 
+import {helpers, fetch} from '@/utils/hooks' 
 
 export default {
     fetchApplication: function(id){

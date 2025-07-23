@@ -195,7 +195,7 @@
 <script>
 import Vue from 'vue'
 import $ from 'jquery'
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { api_endpoints, helpers, fetch } from '@/utils/hooks'
 import SecureBaseLink from '@/components/common/securebase_link.vue';
 export default {
     name: 'MyUserDetails',

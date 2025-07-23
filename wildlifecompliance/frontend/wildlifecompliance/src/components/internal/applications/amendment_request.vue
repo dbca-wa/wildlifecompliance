@@ -52,7 +52,7 @@
 import Vue from 'vue'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import {helpers, api_endpoints} from "@/utils/hooks.js"
+import {helpers, api_endpoints, fetch} from "@/utils/hooks.js"
 import { mapGetters } from 'vuex'
 export default {
     name:'amendment-request',
@@ -166,22 +166,11 @@ export default {
                             vm.close();
                             this.$router.push({name:"internal-dash",});
                         })
-
-                        //vm.$emit('refreshFromResponse',response);
-                        // Vue.http.get(`/api/application/${vm.application_id}/internal_application.json`).then((res)=>
-                        // {
-                        //     vm.$emit('refreshFromResponse',res);
-                            
-                        // },(error)=>{
-                        //     console.log(error);
-                        // });
-
                     },(error)=>{
                         console.log(error);
                         vm.errors = true;
                         vm.errorString = helpers.apiVueResourceError(error);
                         vm.amendingApplication = true;
-                        
                     });
                 
         },
@@ -189,9 +178,7 @@ export default {
             let vm = this;
             vm.validation_form = $(vm.form).validate({
                 rules: {
-                    reason: "required"
-                    
-                     
+                    reason: "required"                   
                 },
                 messages: {              
                     reason: "field is required",

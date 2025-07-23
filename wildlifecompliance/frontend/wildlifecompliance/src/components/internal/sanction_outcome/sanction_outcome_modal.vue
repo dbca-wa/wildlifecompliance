@@ -274,7 +274,7 @@ import modal from "@vue-utils/bootstrap-modal.vue";
 import datatable from "@vue-utils/datatable.vue";
 import filefield from "@/components/common/compliance_file.vue";
 import { mapGetters, mapActions } from "vuex";
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
 import utils from "../utils";
 import $ from "jquery";
 import "jquery-ui/ui/widgets/draggable.js";

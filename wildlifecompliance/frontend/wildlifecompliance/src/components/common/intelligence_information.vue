@@ -32,7 +32,7 @@
 <script>
     import $ from 'jquery'
     import Vue from 'vue'
-    import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+    import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
     import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
     import FormSection from "@/components/forms/section_toggle.vue";
     import filefield from '@/components/common/compliance_file.vue';

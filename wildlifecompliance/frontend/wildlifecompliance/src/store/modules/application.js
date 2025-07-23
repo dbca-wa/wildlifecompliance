@@ -11,7 +11,7 @@ import {
     UPDATE_APPLICATION_ASSESS_STATUS,
 } from '@/store/mutation-types';
 
-
+import { fetch } from "@/utils/hooks";
 export const applicationStore = {
     state: {
         original_application: {},

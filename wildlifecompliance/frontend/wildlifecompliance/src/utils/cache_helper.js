@@ -1,6 +1,6 @@
 import localforage from 'localforage';
 import Vue from 'vue';
-
+import { fetch } from '@/utils/hooks';
 /*
  * Functions below are named after 'Cache' but no cache functionality is used.
  * On the firefox, cache fanctionality doesn't work very well, therefore it has been removed

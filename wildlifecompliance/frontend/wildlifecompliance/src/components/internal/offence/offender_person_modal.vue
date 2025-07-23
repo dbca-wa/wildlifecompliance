@@ -154,7 +154,7 @@
 </template>
 
 <script>
-import { api_endpoints, helpers } from "@/utils/hooks";
+import { api_endpoints, helpers, fetch } from "@/utils/hooks";
 import utils from '@/components/internal/utils'
 import modal from "@vue-utils/bootstrap-modal.vue";
 import "bootstrap/dist/css/bootstrap.css";

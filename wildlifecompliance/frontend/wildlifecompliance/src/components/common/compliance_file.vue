@@ -39,7 +39,8 @@
 <script>
 import {
   api_endpoints,
-  helpers
+  helpers,
+  fetch
 }
 from '@/utils/hooks';
 //import CommentBlock from './comment_block.vue';

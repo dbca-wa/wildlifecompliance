@@ -7,7 +7,7 @@ import CreateProfile from '@/components/user/profile_create.vue'
 import EditProfile from '@/components/user/profile_manage.vue'
 import external_routes from '@/components/external/routes'
 import internal_routes from '@/components/internal/routes'
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, fetch } from "@/utils/hooks";
 
 const router = new createRouter({
     history: createWebHistory(),

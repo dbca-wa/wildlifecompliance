@@ -232,7 +232,7 @@ import Awesomplete from "awesomplete";
 import modal from "@vue-utils/bootstrap-modal.vue";
 import datatable from "@vue-utils/datatable.vue";
 import { mapGetters, mapActions } from "vuex";
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
 import MapLocationOffence from "./map_location_offence1";
 import SearchPersonOrganisation from "@common-components/search_person_or_organisation.vue";
 //import CreateNewPerson from "@common-components/create_new_person.vue";

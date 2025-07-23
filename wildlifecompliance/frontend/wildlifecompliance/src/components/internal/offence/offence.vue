@@ -309,7 +309,7 @@ import FormSection from "@/components/forms/section_toggle.vue";
 import Assignment from "../assignment.vue";
 import datatable from '@vue-utils/datatable.vue'
 import utils from "../utils";
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import CommsLogs from "@common-components/comms_logs.vue";
 import FileField from '@/components/common/compliance_file.vue';

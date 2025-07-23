@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import api from './api'
-import {api_endpoints, helpers} from '@/utils/hooks' 
+import {api_endpoints, helpers, fetch} from '@/utils/hooks' 
 
 export default {
     fetchCurrentUser: function (){
