@@ -18,14 +18,11 @@ module.exports = {
     my_user_details: '/api/my_user_details/',
     assessor_group:'/api/assessor_group/',
     emailidentities: '/api/emailidentities/',
-    //profiles: '/api/profiles/',
-    //my_profiles: '/api/my_profiles/',
     assessment:'/api/assessment/',
     assessment_paginated:'/api/assessment_paginated/',
     amendment:'/api/amendment/',
     is_new_user: '/api/is_new_user/',
     user_profile_completed: '/api/user_profile_completed/',
-    //countries: "https://restcountries.eu/rest/v1/?fullText=true/",
     countries: '/api/countries',
     is_compliance_management_callemail_readonly_user: '/api/is_compliance_management_callemail_readonly_user',
     application_type:"/api/application_type/",
@@ -52,14 +49,10 @@ module.exports = {
     remediation_action: "/api/remediation_action/",
     classification: "/api/classification/",
     lov_collection: "/api/lov_collection/",
-    //call_type : "/api/call_type/",
-    //wildcare_species_type : "/api/wildcare_species_type/",
-    //wildcare_species_sub_type : "/api/wildcare_species_sub_type/",
     report_types: "/api/report_types/",
     referrers: "/api/referrers/",
     location: "/api/location/",
     compliancepermissiongroup: '/api/compliancepermissiongroup/',
-    //region_district: '/api/region_district/',
     regions: '/api/regions/',
     districts: '/api/districts/',
     case_priorities: '/api/case_priorities/',
@@ -70,7 +63,6 @@ module.exports = {
     compliance_management_users: '/api/compliance_management_users/',
     legal_case: '/api/legal_case/',
     legal_case_priorities: '/api/legal_case_priorities/',
-    //document_artifact_types: '/api/document_artifact_types/',
     document_artifact_types: '/api/document_artifact/document_type_choices/',
     physical_artifact_types: '/api/physical_artifact_types/',
     artifact: '/api/artifact/',
@@ -81,14 +73,6 @@ module.exports = {
     geocoding_address_search_token: '/api/geocoding_address_search_token/',
     geocoding_address_search: `https://api.mapbox.com/geocoding/v5/mapbox.places/`,
     system_preference: '/api/system_preference/',
-    /*
-    geocoding_address_search: async function() {
-        //const token = await Vue.http.get('/api/geocoding_address_search_token');
-        const token = await $.ajax({url: '/api/geocoding_address_search_token/'});
-        console.log(token)
-        return `https://api.mapbox.com/geocoding/v5/mapbox.places?access_token=${token}`;
-    }
-    */
     schema_masterlist:"/api/schema_masterlist/",
     schema_masterlist_paginated:"/api/schema_masterlist_paginated/",
     schema_purpose:"/api/schema_purpose/",

@@ -39,7 +39,6 @@
     "sweetalert2": "^11.4.8",
     "vue": "^3.5.17",
     "vue-loader": "^17.4.2",
-    "vue-resource": "^1.5.3",
     "vue-router": "^4.5.1",
     "vue3-treeselect": "^0.1.10",
     "vuex": "^4.1.0"
