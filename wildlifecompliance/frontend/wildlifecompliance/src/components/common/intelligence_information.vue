@@ -150,9 +150,9 @@
                     )
                 }
                 console.log(url)
-                const response = await Vue.http.get(url);
+                const response = await fetch.fetchUrl(url);
                 console.log(response)
-                this.intelligenceText = response.body.intelligence_text;
+                this.intelligenceText = response.intelligence_text;
             });
         }
     }
