@@ -158,7 +158,7 @@
                                 <label class="col-sm-3">Planned for (Date)</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="plannedForDatePicker">
-                                        <input :disabled="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="inspection.planned_for_date" />
+                                        <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="inspection.planned_for_date" />
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
                                         </span>
@@ -168,7 +168,7 @@
                                 <label class="col-sm-3">Planned for (Time)</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" id="plannedForTimePicker">
-                                      <input :disabled="readonlyForm" type="text" class="form-control" placeholder="HH:MM" v-model="inspection.planned_for_time"/>
+                                      <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="inspection.planned_for_time"/>
                                       <span class="input-group-addon">
                                           <span class="glyphicon glyphicon-calendar"></span>
                                       </span>
@@ -383,7 +383,6 @@ import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
 import 'bootstrap/dist/css/bootstrap.css';
-import 'eonasdan-bootstrap-datetimepicker';
 import Offence from '../offence/offence_modal';
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal';
 import filefield from '@/components/common/compliance_file.vue';
@@ -950,30 +949,6 @@ export default {
     },
     addEventListeners: function() {
       let vm = this;
-      let el_fr_date = $(vm.$refs.plannedForDatePicker);
-      let el_fr_time = $(vm.$refs.plannedForTimePicker);
-
-      // "From" field
-      el_fr_date.datetimepicker({
-        format: "DD/MM/YYYY",
-        minDate: "now",
-        showClear: true
-      });
-      el_fr_date.on("dp.change", function(e) {
-        if (el_fr_date.data("DateTimePicker").date()) {
-          vm.inspection.planned_for_date = e.date.format("DD/MM/YYYY");
-        } else if (el_fr_date.data("date") === "") {
-          vm.inspection.planned_for_date = "";
-        }
-      });
-      el_fr_time.datetimepicker({ format: "LT", showClear: true });
-      el_fr_time.on("dp.change", function(e) {
-        if (el_fr_time.data("DateTimePicker").date()) {
-          vm.inspection.planned_for_time = e.date.format("LT");
-        } else if (el_fr_time.data("date") === "") {
-          vm.inspection.planned_for_time = "";
-        }
-      });
       $('#inspection-team-table').on(
           'click',
           '.remove_button',

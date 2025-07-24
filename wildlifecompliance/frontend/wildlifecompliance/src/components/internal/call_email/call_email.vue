@@ -204,7 +204,7 @@
                                 <label class="col-sm-3">Date of call</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="dateOfCallPicker">
-                                        <input :disabled="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="call_email.date_of_call"/>
+                                        <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="call_email.date_of_call"/>
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
                                         </span>
@@ -213,7 +213,7 @@
                                 <label class="col-sm-3">Time of call</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" id="timeOfCallPicker">
-                                      <input :disabled="readonlyForm" type="text" class="form-control" placeholder="HH:MM" v-model="call_email.time_of_call"/>
+                                      <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="call_email.time_of_call"/>
                                       <span class="input-group-addon">
                                           <span class="glyphicon glyphicon-calendar"></span>
                                       </span>
@@ -247,7 +247,7 @@
                                 <label class="col-sm-3">{{ occurrenceDateLabel }}</label>
                                 <div class="col-sm-4">
                                     <div class="input-group date" ref="occurrenceDateFromPicker">
-                                        <input :disabled="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="call_email.occurrence_date_from" />
+                                        <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="call_email.occurrence_date_from" />
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
                                         </span>
@@ -256,7 +256,7 @@
                                 <div v-show="call_email.occurrence_from_to">
                                     <div class="col-sm-4">
                                         <div class="input-group date" ref="occurrenceDateToPicker">
-                                            <input :disabled="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="call_email.occurrence_date_to" />
+                                            <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="call_email.occurrence_date_to" />
                                             <span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
@@ -269,7 +269,7 @@
                               <label class="col-sm-3">{{ occurrenceTimeLabel }}</label>
                               <div class="col-sm-3">
                                   <div class="input-group date" id="occurrenceTimeStartPicker">
-                                    <input :disabled="readonlyForm" type="text" class="form-control" placeholder="HH:MM" v-model="call_email.occurrence_time_start"/>
+                                    <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="call_email.occurrence_time_start"/>
                                     <span class="input-group-addon">
                                         <span class="glyphicon glyphicon-calendar"></span>
                                     </span>
@@ -279,7 +279,7 @@
                                   <label class="col-sm-3">Occurrence time to</label>
                                   <div class="col-sm-3">
                                       <div class="input-group date" id="occurrenceTimeEndPicker">
-                                        <input :disabled="readonlyForm" type="text" class="form-control" placeholder="HH:MM" v-model="call_email.occurrence_time_end"/>
+                                        <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="call_email.occurrence_time_end"/>
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
                                         </span>
@@ -551,7 +551,6 @@ import CallWorkflow from './call_email_workflow';
 import Offence from '../offence/offence_modal';
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal';
 import 'bootstrap/dist/css/bootstrap.css';
-import 'eonasdan-bootstrap-datetimepicker';
 require("select2/dist/css/select2.min.css");
 require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
 import Inspection from '../inspection/create_inspection_modal';
@@ -1112,78 +1111,6 @@ export default {
     },
     addEventListeners: function() {
       let vm = this;
-      let el_fr_date = $(vm.$refs.occurrenceDateFromPicker);
-      let el_fr_time = $(vm.$refs.occurrenceTimeFromPicker);
-      let el_to_date = $(vm.$refs.occurrenceDateToPicker);
-      let el_to_time = $(vm.$refs.occurrenceTimeToPicker);
-      let el_date_of_call = $(vm.$refs.dateOfCallPicker);
-      let el_time_of_call = $(vm.$refs.timeOfCallPicker);
-
-      // "From" field
-      el_fr_date.datetimepicker({
-        format: "DD/MM/YYYY",
-        maxDate: "now",
-        showClear: true
-      });
-      el_fr_date.on("dp.change", function(e) {
-        if (el_fr_date.data("DateTimePicker").date()) {
-          vm.call_email.occurrence_date_from = e.date.format("DD/MM/YYYY");
-        } else if (el_fr_date.data("date") === "") {
-          vm.call_email.occurrence_date_from = "";
-        }
-      });
-      el_fr_time.datetimepicker({ format: "LT", showClear: true });
-      el_fr_time.on("dp.change", function(e) {
-        if (el_fr_time.data("DateTimePicker").date()) {
-          vm.call_email.occurrence_time_from = e.date.format("LT");
-        } else if (el_fr_time.data("date") === "") {
-          vm.call_email.occurrence_time_from = "";
-        }
-      });
-
-      // "To" field
-      el_to_date.datetimepicker({
-        format: "DD/MM/YYYY",
-        maxDate: "now",
-        showClear: true
-      });
-      el_to_date.on("dp.change", function(e) {
-        if (el_to_date.data("DateTimePicker").date()) {
-          vm.call_email.occurrence_date_to = e.date.format("DD/MM/YYYY");
-        } else if (el_to_date.data("date") === "") {
-          vm.call_email.occurrence_date_to = "";
-        }
-      });
-      el_to_time.datetimepicker({ format: "LT", showClear: true });
-      el_to_time.on("dp.change", function(e) {
-        if (el_to_time.data("DateTimePicker").date()) {
-          vm.call_email.occurrence_time_to = e.date.format("LT");
-        } else if (el_to_time.data("date") === "") {
-          vm.call_email.occurrence_time_to = "";
-        }
-      });
-      // Date/Time of call
-      el_date_of_call.datetimepicker({
-        format: "DD/MM/YYYY",
-        maxDate: "now",
-        //useCurrent: true,
-        //showClear: true
-      });
-      el_date_of_call.on("dp.change", function(e) {
-        if (el_date_of_call.data("DateTimePicker").date()) {
-          vm.call_email.date_of_call = e.date.format("DD/MM/YYYY");
-        } else if (el_date_of_call.data("date") === "") {
-          vm.call_email.date_of_call = "";
-        }
-      });
-      el_time_of_call.datetimepicker({ format: "LT", showClear: true });
-      el_time_of_call.on("dp.change", function(e) {
-        if (el_time_of_call.data("DateTimePicker").date()) {
-          vm.call_email.time_of_call = e.date.format("LT");
-        } else if (el_time_of_call.data("date") === "") {
-          vm.call_email.time_of_call = "";
-        }
-      });
       window.addEventListener('beforeunload', this.leaving);
       window.addEventListener('onblur', this.leaving);
     },

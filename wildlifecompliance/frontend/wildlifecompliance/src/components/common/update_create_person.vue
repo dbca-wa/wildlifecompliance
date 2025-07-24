@@ -37,7 +37,7 @@
                                 <div class="input-group date" ref="dobDatePicker">
                                     <input 
                                     :disabled="personalDetailsReadOnly && !allowCreateEdit" 
-                                    type="text" 
+                                    type="date" 
                                     class="form-control" 
                                     placeholder="DD/MM/YYYY" 
                                     v-model="email_user.dob" 
@@ -155,7 +155,6 @@ import $ from "jquery";
 import { api_endpoints, helpers, fetch } from '@/utils/hooks'
 import utils from '../internal/utils'
 import "bootstrap/dist/css/bootstrap.css"
-import 'eonasdan-bootstrap-datetimepicker';
 //import moment from 'moment'
 
 export default {
@@ -338,25 +337,6 @@ export default {
 
     },
     methods: {
-        addEventListeners: function() {
-          //let vm = this;
-          let el_fr_date = $(this.$refs.dobDatePicker);
-          //let el_fr_time = $(vm.$refs.plannedForTimePicker);
-
-          // "From" field
-          el_fr_date.datetimepicker({
-            format: "DD/MM/YYYY",
-            maxDate: "now",
-            showClear: true
-          });
-          el_fr_date.on("dp.change", (e) => {
-            if (el_fr_date.data("DateTimePicker").date()) {
-              this.email_user.dob = e.date.format("DD/MM/YYYY");
-            } else if (el_fr_date.data("date") === "") {
-              this.email_user.dob = "";
-            }
-          });
-        },
         setExistingPerson: function(id){
             //let vm = this;
 

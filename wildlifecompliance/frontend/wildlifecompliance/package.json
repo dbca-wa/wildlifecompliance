@@ -17,7 +17,6 @@
     "bootstrap": "^5.3.7",
     "datatables.net-buttons-bs": "^3.2.4",
     "datatables.net-responsive-bs": "^3.0.5",
-    "eonasdan-bootstrap-datetimepicker": "^4.17.49",
     "es6-promise": "^4.2.8",
     "font-awesome": "^4.7.0",
     "jquery": "^3.7.1",

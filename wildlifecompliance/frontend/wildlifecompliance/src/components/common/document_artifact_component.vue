@@ -184,7 +184,7 @@
                                             <label class="col-sm-3">Date</label>
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="artifactDatePicker">
-                                                    <input :disabled="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="document_artifact.artifact_date" />
+                                                    <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="document_artifact.artifact_date" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -193,7 +193,7 @@
                                             <label class="col-sm-3">Time</label>
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="artifactTimePicker">
-                                                  <input :disabled="readonlyForm" type="text" class="form-control" placeholder="HH:MM" v-model="document_artifact.artifact_time"/>
+                                                  <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="document_artifact.artifact_time"/>
                                                   <span class="input-group-addon">
                                                       <span class="glyphicon glyphicon-calendar"></span>
                                                   </span>
@@ -242,7 +242,6 @@ import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
 import filefield from '@/components/common/compliance_file.vue';
 import 'bootstrap/dist/css/bootstrap.css';
-import 'eonasdan-bootstrap-datetimepicker';
 import moment from 'moment';
 import SearchPersonOrganisation from './search_person_or_organisation'
 import FormSection from "@/components/forms/section_toggle.vue";
@@ -777,57 +776,6 @@ export default {
 
         addEventListeners: function() {
             let vm = this;
-            let el_fr_date = $(vm.$refs.artifactDatePicker);
-            let el_fr_time = $(vm.$refs.artifactTimePicker);
-
-            // "From" field
-            el_fr_date.datetimepicker({
-            format: "DD/MM/YYYY",
-            maxDate: "now",
-            showClear: true
-            });
-            el_fr_date.on("dp.change", function(e) {
-                console.log(e)
-                if (el_fr_date.data("DateTimePicker").date()) {
-                  vm.document_artifact.artifact_date = e.date.format("DD/MM/YYYY");
-                } else if (el_fr_date.data("date") === "") {
-                  vm.document_artifact.artifact_date = "";
-                }
-            });
-            el_fr_time.datetimepicker({ format: "LT", showClear: true });
-            el_fr_time.on("dp.change", function(e) {
-                console.log(e)
-                if (el_fr_time.data("DateTimePicker").date()) {
-                  vm.document_artifact.artifact_time = e.date.format("LT");
-                } else if (el_fr_time.data("date") === "") {
-                  vm.document_artifact.artifact_time = "";
-                }
-            });
-            /*
-            // department_users
-            $(vm.$refs.document_artifact_department_users).select2({
-                    "theme": "bootstrap",
-                    allowClear: true,
-                    placeholder:""
-                }).
-                on("select2:select",function (e) {
-                    console.log(e)
-                    let selected = $(e.currentTarget);
-                    let selectedData = selected.val();
-                    console.log(selectedData)
-                    vm.setOfficerInterviewerWrapper(selectedData);
-                    //vm.setInterviewerEmail(selectedData);
-                    //vm.setSelectedCustodian(selectedData);
-                    //let custodianData = e.params.data
-                    //console.log(custodianData)
-                    //Object.assign(vm.selectedCustodian, custodianData);
-                }).
-                on("select2:unselect",function (e) {
-                    var selected = $(e.currentTarget);
-                    vm.setInterviewerEmail('');
-                    //vm.selectedCustodian = {}
-                });
-                */
             // department_users
             $(vm.$refs.document_artifact_interviewer).select2({
                     minimumInputLength: 2,

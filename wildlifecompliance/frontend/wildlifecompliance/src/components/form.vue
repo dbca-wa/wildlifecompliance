@@ -20,7 +20,6 @@ from '@/utils/hooks'
     import '@/scss/forms/form.scss';
     import RendererForm from '@/components/common/renderer.vue';
     require('../../node_modules/bootstrap/dist/css/bootstrap.css');
-    require('../../node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css');
     require('../../node_modules/font-awesome/css/font-awesome.min.css');
     export default {
         components: {

@@ -37,7 +37,7 @@
                                 <div class="input-group date" ref="dobDatePicker">
                                     <input 
                                     name="dob"
-                                    type="text" 
+                                    type="date" 
                                     class="form-control" 
                                     placeholder="DD/MM/YYYY" 
                                     v-model="offender_person.dob" 
@@ -159,7 +159,6 @@ import utils from '@/components/internal/utils'
 import modal from "@vue-utils/bootstrap-modal.vue";
 import "bootstrap/dist/css/bootstrap.css";
 import Vue from "vue";
-import 'eonasdan-bootstrap-datetimepicker';
 
 export default {
   name: "Offender",
@@ -278,22 +277,6 @@ export default {
         this.processingDetails = false;
         this.isModalOpen = false;
     },
-    addEventListeners: function() {
-          let el_dob_date = $(this.$refs.dobDatePicker);
-
-          el_dob_date.datetimepicker({
-            format: "DD/MM/YYYY",
-            maxDate: "now",
-            showClear: true
-          });
-          el_dob_date.on("dp.change", (e) => {
-            if (el_dob_date.data("DateTimePicker").date()) {
-              this.offender_person.dob = e.date.format("DD/MM/YYYY");
-            } else if (el_dob_date.data("date") === "") {
-              this.offender_person.dob = "";
-            }
-          });
-    },
     loadCountries: function(){
         let vm = this;
         let initialisers = [
@@ -318,7 +301,6 @@ export default {
       let vm = this;
       vm.$nextTick(()=>{
           vm.loadCountries();
-          vm.addEventListeners();
       })
   }  
 };

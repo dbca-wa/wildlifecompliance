@@ -19,7 +19,7 @@
             <label class="flexItemTitleDatetime">Date</label>
             <div class="flexItemDatetime">
                 <div class="input-group date" ref="courtDatePicker">
-                    <input :readonly="readonlyForm" type="text" class="form-control" :value="court_date" />
+                    <input :readonly="readonlyForm" type="date" class="form-control" :value="court_date" />
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
@@ -29,7 +29,7 @@
             <label class="flexItemTitleDatetime">Time</label>
             <div class="flexItemDatetime">
                 <div class="input-group date" ref="courtTimePicker">
-                    <input :readonly="readonlyForm" type="text" class="form-control" :value="court_time" />
+                    <input :readonly="readonlyForm" type="time" class="form-control" :value="court_time" />
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
@@ -53,7 +53,6 @@ import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
 import datatable from '@vue-utils/datatable.vue'
 import 'bootstrap/dist/css/bootstrap.css';
-import 'eonasdan-bootstrap-datetimepicker';
 import _ from 'lodash';
 
 export default {
@@ -145,39 +144,6 @@ export default {
         },
         addEventListeners: function() {
             let vm = this;
-            let el_court_date = $(vm.$refs.courtDatePicker);
-            let el_court_time = $(vm.$refs.courtTimePicker);
-
-            // Date
-            el_court_date.datetimepicker({
-                format: "DD/MM/YYYY",
-                showClear: true,
-                date: vm.court_datetime,
-            });
-            el_court_date.on("dp.change", function(e) {
-                if (el_court_date.data("DateTimePicker").date()) {
-                    vm.court_date = e.date.format('DD/MM/YYYY');
-                } else if (el_court_date.data("date") === "") {
-                    vm.court_date = null;
-                }
-                vm.emitEvent();
-            });
-
-            // Time
-            el_court_time.datetimepicker({
-                format: "LT", 
-                showClear: true,
-                date: vm.court_datetime,
-            });
-            el_court_time.on("dp.change", function(e) {
-                if (el_court_time.data("DateTimePicker").date()) {
-                    vm.court_time = e.date.format('LT');
-                } else if (el_court_time.data("date") === "") {
-                    vm.court_time = null;
-                }
-                vm.emitEvent();
-            });
-
             // Comments
             let el_comments = $(vm.$refs.courtComments);
             el_comments.on('keyup', function(e){
