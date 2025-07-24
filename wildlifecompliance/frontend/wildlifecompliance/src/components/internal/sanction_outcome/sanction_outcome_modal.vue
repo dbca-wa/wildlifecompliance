@@ -181,7 +181,7 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="dueDatePicker">
-                                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" :value="current_remediation_action.due_date" />
+                                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" :value="current_remediation_action.due_date" />
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
                                         </span>
@@ -224,7 +224,7 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="dateOfIssuePicker">
-                                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="sanction_outcome.date_of_issue" :disabled="!sanction_outcome.issued_on_paper"/>
+                                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="sanction_outcome.date_of_issue" :disabled="!sanction_outcome.issued_on_paper"/>
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
                                         </span>
@@ -238,7 +238,7 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="timeOfIssuePicker">
-                                        <input type="text" class="form-control" placeholder="HH:MM" v-model="sanction_outcome.time_of_issue" :disabled="!sanction_outcome.issued_on_paper" />
+                                        <input type="time" class="form-control" placeholder="HH:MM" v-model="sanction_outcome.time_of_issue" :disabled="!sanction_outcome.issued_on_paper" />
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
                                         </span>
@@ -773,48 +773,6 @@ export default {
         },
         addEventListeners: function() {
             let vm = this;
-            let el_issue_date = $(vm.$refs.dateOfIssuePicker);
-            let el_issue_time = $(vm.$refs.timeOfIssuePicker);
-            let el_due_date = $(vm.$refs.dueDatePicker);
-
-            // Issue "Date" field
-            el_issue_date.datetimepicker({
-              format: "DD/MM/YYYY",
-              maxDate: "now",
-              showClear: true
-            });
-            el_issue_date.on("dp.change", function(e) {
-              if (el_issue_date.data("DateTimePicker").date()) {
-                vm.sanction_outcome.date_of_issue = e.date.format("DD/MM/YYYY");
-              } else if (el_issue_date.data("date") === "") {
-                vm.sanction_outcome.date_of_issue = null;
-              }
-            });
-
-            // Issue "Time" field
-            el_issue_time.datetimepicker({ format: "LT", showClear: true });
-            el_issue_time.on("dp.change", function(e) {
-              if (el_issue_time.data("DateTimePicker").date()) {
-                vm.sanction_outcome.time_of_issue = e.date.format("LT");
-              } else if (el_issue_time.data("date") === "") {
-                vm.sanction_outcome.time_of_issue = null;
-              }
-            });
-
-            // Due "Date" field
-            el_due_date.datetimepicker({
-              minDate: moment().millisecond(0).second(0).minute(0).hour(0),
-              format: "DD/MM/YYYY",
-              showClear: true
-            });
-            el_due_date.on("dp.change", function(e) {
-              if (el_due_date.data("DateTimePicker").date()) {
-                vm.current_remediation_action.due_date = e.date.format("DD/MM/YYYY");
-              } else if (el_due_date.data("date") === "") {
-                vm.current_remediation_action.due_date = null;
-              }
-            });
-
             $("#tbl_remediation_actions").on("click", ".remove_button", vm.removeClicked);
             $("#tbl_alleged_offence").on("click", ".alleged_offence_include", vm.aco_include_clicked);
         },

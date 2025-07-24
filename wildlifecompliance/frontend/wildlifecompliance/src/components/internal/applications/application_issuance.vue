@@ -47,7 +47,7 @@
                                                                             </div>
                                                                             <div class="col-sm-3">
                                                                                 <div class="input-group date" v-if="getPickedPurpose(p.purpose.id).isProposed" :ref="`start_date_${p.id}`" style="width: 100%;">
-                                                                                    <input :readonly="p.processing_status!=='reissue' && (!canEditLicenceDates && p.proposed_end_date)" type="text" class="form-control" :name="`start_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_start_date">
+                                                                                    <input :readonly="p.processing_status!=='reissue' && (!canEditLicenceDates && p.proposed_end_date)" type="date" class="form-control" :name="`start_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_start_date">
                                                                                     <span class="input-group-addon">
                                                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                                                     </span>
@@ -55,7 +55,7 @@
                                                                             </div>                                                                                                                                                 
                                                                             <div class="col-sm-3">                                                        
                                                                                 <div class="input-group date" v-if="getPickedPurpose(p.purpose.id).isProposed" :ref="`end_date_${p.id}`" style="width: 100%;">
-                                                                                    <input :readonly="p.processing_status!=='reissue' && (!canEditLicenceDates && p.proposed_end_date)" type="text" class="form-control" :name="`end_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_end_date">
+                                                                                    <input :readonly="p.processing_status!=='reissue' && (!canEditLicenceDates && p.proposed_end_date)" type="date" class="form-control" :name="`end_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_end_date">
                                                                                     <span class="input-group-addon">
                                                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                                                     </span>
@@ -786,10 +786,6 @@ export default {
                 )
             });
         },
-       
-        eventListeners(){
-            this.initDatePicker();
-        },
 
         initFirstTab: function(force){
             const tab = $('#tabs-main li:first-child a')[0];
@@ -818,41 +814,6 @@ export default {
             ).length;
         },
 
-        //Initialise Date Picker
-        initDatePicker: function() {
-            for (let a=0; a<this.application.activities.length; a++){
-                let activity = this.application.activities[a];
-                for (let p=0; p<activity.proposed_purposes.length; p++){
-                    let purpose = activity.proposed_purposes[p]
-                    let start_date = 'start_date_' + purpose.id
-                    $(`[name='${start_date}']`).datetimepicker(this.datepickerOptions);
-                    $(`[name='${start_date}']`).on('dp.change', function(e){
-                        if ($(`[name='${start_date}']`).data('DateTimePicker') && $(`[name='${start_date}']`).data('DateTimePicker').date()) {
-                            purpose.proposed_start_date =  e.date.format('DD/MM/YYYY');
-                        }
-                        else if ($(`[name='${start_date}']`).data('date') === "") {
-                            purpose.proposed_start_date = "";
-                        }
-                        else {
-                            purpose.proposed_start_date = "";
-                        }
-                    });
-                    let end_date = 'end_date_' + purpose.id
-                    $(`[name='${end_date}']`).datetimepicker(this.datepickerOptions);
-                    $(`[name='${end_date}']`).on('dp.change', function(e){
-                        if ($(`[name='${end_date}']`).data('DateTimePicker') && $(`[name='${end_date}']`).data('DateTimePicker').date()) {
-                            purpose.proposed_end_date =  e.date.format('DD/MM/YYYY');
-                        }
-                        else if ($(`[name='${end_date}']`).data('date') === "") {
-                            purpose.proposed_end_date = "";
-                        }
-                        else {
-                            purpose.proposed_end_date = "";
-                        }
-                    });
-                }
-            }
-        }
     },
     updated: function(){
         this.eventListeners();

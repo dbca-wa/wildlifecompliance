@@ -20,7 +20,7 @@
             <div>
                 <label class="">Lodged From</label>
                 <div class="input-group date" ref="lodgementDateFromPicker">
-                    <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedFrom" />
+                    <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedFrom" />
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
@@ -29,7 +29,7 @@
             <div>
                 <label class="">Lodged To</label>
                 <div class="input-group date" ref="lodgementDateToPicker">
-                    <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedTo" />
+                    <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedTo" />
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
@@ -211,9 +211,6 @@ export default {
         vm.initMap();
         vm.loadLocations();
         vm.initAwesomplete();
-        vm.$nextTick(() => {
-            vm.addEventListeners();
-        });
     },
     watch: {
         filterStatus: function () {
@@ -254,33 +251,6 @@ export default {
     methods: {
         ...mapActions('callemailStore', {
         }),
-        addEventListeners: function () {
-            let vm = this;
-            let el_fr = $(vm.$refs.lodgementDateFromPicker);
-            let el_to = $(vm.$refs.lodgementDateToPicker);
-
-            // Date "From" field
-            el_fr.datetimepicker({ format: 'DD/MM/YYYY', maxDate: 'now', showClear: true });
-            el_fr.on('dp.change', function (e) {
-                if (el_fr.data('DateTimePicker').date()) {
-                    vm.filterLodgedFrom = e.date.format('DD/MM/YYYY');
-                    el_to.data('DateTimePicker').minDate(e.date);
-                } else if (el_fr.data('date') === "") {
-                    vm.filterLodgedFrom = "";
-                }
-            });
-
-            // Date "To" field
-            el_to.datetimepicker({ format: 'DD/MM/YYYY', maxDate: 'now', showClear: true });
-            el_to.on('dp.change', function (e) {
-                if (el_to.data('DateTimePicker').date()) {
-                    vm.filterLodgedTo = e.date.format('DD/MM/YYYY');
-                    el_fr.data('DateTimePicker').maxDate(e.date);
-                } else if (el_to.data('date') === "") {
-                    vm.filterLodgedTo = "";
-                }
-            });
-        },
         initAwesomplete: function(){
             var self = this;
             var element_search = document.getElementById('search-input');

@@ -23,7 +23,7 @@ import 'select2';
 import "sweetalert2/dist/sweetalert2.css";
 import 'jquery-validation';
 
-import 'datatables.net-buttons-bs';
+//import 'datatables.net-buttons-bs';
 import 'datatables.net-responsive-bs';
 
 import 'select2-bootstrap-theme/dist/select2-bootstrap.min.css';
@@ -37,7 +37,7 @@ require( '../node_modules/font-awesome/css/font-awesome.min.css' );
 
 import '@/../node_modules/datatables.net-bs/css/dataTables.bootstrap.min.css';
 import '@/../node_modules/datatables.net-responsive-bs/css/responsive.bootstrap.min.css';
-import '@/../node_modules/datatables.net-buttons-bs/css/buttons.bootstrap.min.css';
+//import '@/../node_modules/datatables.net-buttons-bs/css/buttons.bootstrap.min.css';
 
 //Vue.config.devtools = true;
 Vue.config.productionTip = false

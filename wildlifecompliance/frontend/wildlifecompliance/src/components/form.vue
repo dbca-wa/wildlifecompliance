@@ -12,10 +12,10 @@
 <script>
     import Vue from 'vue'
     import {
-  api_endpoints,
-  helpers
-}
-from '@/utils/hooks'
+    api_endpoints,
+    helpers
+    }
+    from '@/utils/hooks'
     import bs from 'bootstrap'
     import '@/scss/forms/form.scss';
     import RendererForm from '@/components/common/renderer.vue';

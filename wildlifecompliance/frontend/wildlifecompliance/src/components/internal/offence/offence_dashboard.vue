@@ -23,7 +23,7 @@
                 <div class="col-md-3">
                     <label class="">Date from:</label>
                     <div class="input-group date" ref="issueDateFromPicker">
-                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFromPicker" />
+                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFromPicker" />
                         <span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
                         </span>
@@ -32,7 +32,7 @@
                 <div class="col-md-3">
                     <label class="">Date to:</label>
                     <div class="input-group date" ref="issueDateToPicker">
-                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateToPicker" />
+                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateToPicker" />
                         <span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
                         </span>
@@ -224,12 +224,6 @@ export default {
             this.$refs.offence_table.vmDataTable.draw();
         },
     },
-    mounted(){
-        let vm = this;
-        vm.$nextTick(() => {
-            vm.addEventListeners();
-        });
-    },
     created: async function() {
         this.constructOptionsType();
         this.constructOptionsStatus();
@@ -242,56 +236,10 @@ export default {
             this.canUserCreateNewOffence = res;
         },
         createOffence: function() {
-//            this.setCreateOffenceBindId()
-//            this.offenceInitialised = true;
-//            this.$nextTick(() => {
-//                this.$refs.add_offence.isModalOpen = true;
-//            });
-
             this.uuid += 1;
             this.offenceInitialised = true;
             this.$nextTick(() => {
                 this.$refs.add_offence.isModalOpen = true;
-            });
-        },
-      //  setCreateOffenceBindId: function() {
-      //      let timeNow = Date.now()
-      //      this.createOffenceBindId = 'inspection' + timeNow.toString();
-
-      //      console.log('setCreateOffenceBindId');
-      //      console.log(this.createOffenceBindId);
-      //  },
-        addEventListeners: function () {
-            this.attachFromDatePicker();
-            this.attachToDatePicker();
-        },
-        attachFromDatePicker: function(){
-            let vm = this;
-            let el_fr = $(vm.$refs.issueDateFromPicker);
-            let el_to = $(vm.$refs.issueDateToPicker);
-
-            el_fr.datetimepicker({ format: 'DD/MM/YYYY', maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_fr.on('dp.change', function (e) {
-                if (el_fr.data('DateTimePicker').date()) {
-                    vm.filterDateFromPicker = e.date.format('DD/MM/YYYY');
-                    el_to.data('DateTimePicker').minDate(e.date);
-                } else if (el_fr.data('date') === "") {
-                    vm.filterDateFromPicker = "";
-                }
-            });
-        },
-        attachToDatePicker: function(){
-            let vm = this;
-            let el_fr = $(vm.$refs.issueDateFromPicker);
-            let el_to = $(vm.$refs.issueDateToPicker);
-            el_to.datetimepicker({ format: 'DD/MM/YYYY', maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_to.on('dp.change', function (e) {
-                if (el_to.data('DateTimePicker').date()) {
-                    vm.filterDateToPicker = e.date.format('DD/MM/YYYY');
-                    el_fr.data('DateTimePicker').maxDate(e.date);
-                } else if (el_to.data('date') === "") {
-                    vm.filterDateToPicker = "";
-                }
             });
         },
         constructOptionsType: async function() {

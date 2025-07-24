@@ -30,7 +30,7 @@
                 <div class="form-group">
                     <label for="">Lodged From</label>
                     <div class="input-group date" ref="lodgementDateFromPicker">
-                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedFrom">
+                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedFrom">
                         <span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
                         </span>
@@ -41,7 +41,7 @@
                 <div class="form-group">
                     <label for="">Lodged To</label>
                     <div class="input-group date" ref="lodgementDateToPicker">
-                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedTo">
+                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedTo">
                         <span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
                         </span>
@@ -268,26 +268,6 @@
                     params: {call_email_id: newCallId}
                     });
             },
-            addEventListeners: function () {
-                let vm = this;
-                // Initialise Application Date Filters
-                $(vm.$refs.lodgementDateToPicker).datetimepicker(vm.datepickerOptions);
-                $(vm.$refs.lodgementDateToPicker).on('dp.change', function (e) {
-                    if ($(vm.$refs.lodgementDateToPicker).data('DateTimePicker').date()) {
-                        vm.filterLodgedTo = e.date.format('DD/MM/YYYY');
-                    } else if ($(vm.$refs.lodgementDateToPicker).data('date') === "") {
-                        vm.filterLodgedTo = "";
-                    }
-                });
-                $(vm.$refs.lodgementDateFromPicker).datetimepicker(vm.datepickerOptions);
-                $(vm.$refs.lodgementDateFromPicker).on('dp.change', function (e) {
-                    if ($(vm.$refs.lodgementDateFromPicker).data('DateTimePicker').date()) {
-                        vm.filterLodgedFrom = e.date.format('DD/MM/YYYY');
-                    } else if ($(vm.$refs.lodgementDateFromPicker).data('date') === "") {
-                        vm.filterLodgedFrom = "";
-                    }
-                });
-            },
             initialiseSearch: function () {
                 this.dateSearch();
             },
@@ -333,7 +313,6 @@
             });
             this.$nextTick(async () => {
                 await vm.initialiseSearch();
-                await vm.addEventListeners();
             });
         }
     }

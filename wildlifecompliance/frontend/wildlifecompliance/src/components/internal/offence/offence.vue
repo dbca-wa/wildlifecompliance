@@ -94,7 +94,7 @@
                                         <label class="col-sm-3">{{ occurrenceDateLabel }}</label>
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="occurrenceDateFromPicker">
-                                                <input :readonly="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" :value="date_from" />
+                                                <input :readonly="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" :value="date_from" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -103,7 +103,7 @@
                                         <div v-show="offence.occurrence_from_to">
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="occurrenceDateToPicker">
-                                                    <input :readonly="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" :value="date_to" />
+                                                    <input :readonly="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" :value="date_to" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -116,7 +116,7 @@
                                         <label class="col-sm-3">{{ occurrenceTimeLabel }}</label>
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="occurrenceTimeFromPicker">
-                                                <input :readonly="readonlyForm" type="text" class="form-control" placeholder="HH:MM" :value="time_from" />
+                                                <input :readonly="readonlyForm" type="time" class="form-control" placeholder="HH:MM" :value="time_from" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -125,7 +125,7 @@
                                         <div v-show="offence.occurrence_from_to">
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="occurrenceTimeToPicker">
-                                                    <input :readonly="readonlyForm" type="text" class="form-control" placeholder="HH:MM" :value="time_to" />
+                                                    <input :readonly="readonlyForm" type="time" class="form-control" placeholder="HH:MM" :value="time_to" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -1462,69 +1462,6 @@ export default {
         },
         addEventListeners: function() {
             let vm = this;
-            let el_fr_date = $(vm.$refs.occurrenceDateFromPicker);
-            let el_fr_time = $(vm.$refs.occurrenceTimeFromPicker);
-            let el_to_date = $(vm.$refs.occurrenceDateToPicker);
-            let el_to_time = $(vm.$refs.occurrenceTimeToPicker);
-
-            // "From" Date field
-            el_fr_date.datetimepicker({
-                format: "DD/MM/YYYY",
-                maxDate: moment().millisecond(0).second(0).minute(0).hour(0),
-                showClear: true,
-                date: vm.offence.occurrence_datetime_from,
-            });
-            el_fr_date.on("dp.change", function(e) {
-                if (el_fr_date.data("DateTimePicker").date()) {
-                    vm.date_from = e.date.format('DD/MM/YYYY');
-                    el_to_date.data("DateTimePicker").minDate(e.date);
-                } else if (el_fr_date.data("date") === "") {
-                    vm.date_from = null;
-                }
-            });
-            // "From" Time field
-            el_fr_time.datetimepicker({
-                format: "LT",
-                showClear: true,
-                date: vm.offence.occurrence_datetime_from,
-            });
-            el_fr_time.on("dp.change", function(e) {
-                if (el_fr_time.data("DateTimePicker").date()) {
-                    vm.time_from = e.date.format('LT');
-                } else if (el_fr_time.data("date") === "") {
-                    vm.time_from = null;
-                }
-            });
-
-            // "To" Date field
-            el_to_date.datetimepicker({
-                format: "DD/MM/YYYY",
-                maxDate: moment().millisecond(0).second(0).minute(0).hour(0),
-                minDate: vm.offence.occurrence_datetime_from,
-                showClear: true,
-                date: vm.offence.occurrence_datetime_to,
-            });
-            el_to_date.on("dp.change", function(e) {
-                if (el_to_date.data("DateTimePicker").date()) {
-                    vm.date_to = e.date.format('DD/MM/YYYY');
-                    //el_fr_date.data("DateTimePicker").maxDate(e.date);
-                } else if (el_to_date.data("date") === "") {
-                    vm.date_to = null;
-                }
-            });
-            // "To" Time field
-            el_to_time.datetimepicker({
-                format: "LT",
-                showClear: true,
-                date: vm.offence.occurrence_datetime_to,
-            });
-            el_to_time.on("dp.change", function(e) {
-                if (el_to_time.data("DateTimePicker").date()) {
-                    vm.time_to = e.date.format('LT');
-                } else if (el_to_time.data("date") === "") {
-                    vm.time_to = null;
-                }
-            });
 
             $("#alleged-offence-table").on("click", ".remove_button", vm.removeAllegedOffenceClicked);
             $("#alleged-offence-table").on("click", ".restore_button", vm.restoreAllegedOffenceClicked);

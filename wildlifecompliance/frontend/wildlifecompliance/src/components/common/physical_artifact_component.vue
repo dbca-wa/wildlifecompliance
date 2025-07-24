@@ -258,7 +258,7 @@
                                             <label class="col-sm-3">Date</label>
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="disposalDatePicker">
-                                                    <input :disabled="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="physical_artifact.disposal_date" />
+                                                    <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="physical_artifact.disposal_date" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -920,23 +920,6 @@ export default {
                 (e) => {
                     this.emitPhysicalArtifact(e);
                 });
-
-            //Disposal Date
-            let disposal_date_control = $(vm.$refs.disposalDatePicker);
-            // "From" field
-            disposal_date_control.datetimepicker({
-            format: "DD/MM/YYYY",
-            maxDate: "now",
-            showClear: true
-            });
-            disposal_date_control.on("dp.change", function(e) {
-                //console.log(e)
-                if (disposal_date_control.data("DateTimePicker").date()) {
-                  vm.physical_artifact.disposal_date = e.date.format("DD/MM/YYYY");
-                } else if (disposal_date_control.data("date") === "") {
-                  vm.physical_artifact.disposal_date = "";
-                }
-            });
         },
         compare: function(a, b) {
             const nameA = a.name.toLowerCase();

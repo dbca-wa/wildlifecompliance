@@ -23,7 +23,7 @@
                         <div class="col-md-3">
                             <label for="">Date of Birth</label>
                             <div class="input-group date" ref="filterDateOfBirthPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateOfBirth">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateOfBirth">
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
@@ -188,16 +188,6 @@ export default {
         },
         addEventListeners: function(){
             let vm = this;
-            // Initialise Date of Birth Filter
-            $(vm.$refs.filterDateOfBirthPicker).datetimepicker(vm.datepickerOptions);
-            $(vm.$refs.filterDateOfBirthPicker).on('dp.change', function(e){
-                if ($(vm.$refs.filterDateOfBirthPicker).data('DateTimePicker').date()) {
-                    vm.filterDateOfBirth =  e.date.format('DD/MM/YYYY');
-                }
-                else if ($(vm.$refs.filterDateOfBirthPicker).data('date') === "") {
-                    vm.filterDateOfBirth = "";
-                }
-             });
             // Apply on behalf of listener
             vm.$refs.user_datatable.vmDataTable.on('click', 'a[apply-on-behalf-of]', function(e) {
                 e.preventDefault();

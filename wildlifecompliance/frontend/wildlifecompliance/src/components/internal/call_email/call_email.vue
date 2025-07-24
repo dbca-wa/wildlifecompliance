@@ -1073,12 +1073,6 @@ export default {
               let returnedData = await fetch.fetchUrl(url);
               let returnedSchema = returnedData.schema;
               let returnedAdviceUrl = returnedData.adviceurl;
-              /*
-              let returned_schema = await cache_helper.getSetCache(
-                'CallEmail_ReportTypeSchema', 
-                this.call_email.id.toString(), 
-                url);
-              */
               if (returnedSchema) {
                 this.current_schema = returnedSchema;
               }
@@ -1131,8 +1125,6 @@ export default {
     if (this.$route.params.call_email_id) {
       await this.loadCallEmail({ call_email_id: this.$route.params.call_email_id });
     }
-    // await this.loadComplianceAllocatedGroup(this.call_email.allocated_group_id);
-    // load drop-down select lists
     
     /// large LOV(List Of Values) object
     const lovResponse = await fetch.fetchUrl('/api/lov_collection/lov_collection_choices/');
@@ -1179,7 +1171,6 @@ export default {
     for (let referrer_id of this.call_email.selected_referrers) {
         this.referrersSelected.push(referrer_id)
     }
-    //Object.assign(this.referrersSelected, this.call_email.selected_referrers)
 
     // load current CallEmail renderer schema
     if (this.call_email && this.call_email.report_type_id) {
@@ -1189,13 +1180,6 @@ export default {
         this.loadReportAdviceUrl(this.call_email.report_type.advice_url);
     }
 
-    // regionDistricts
-    // let returned_region_districts = await cache_helper.getSetCacheList(
-    //   'RegionDistricts', 
-    //   api_endpoints.region_district
-    //   );
-    // Object.assign(this.regionDistricts, returned_region_districts);
-    
     // Apply current timestamp to date and time of call
     if (!this.call_email.date_of_call && this.call_email.can_user_edit_form) {
         this.setDateOfCall(moment().format('DD/MM/YYYY'));
@@ -1218,30 +1202,9 @@ export default {
               $( chev ).toggleClass( "glyphicon-chevron-down glyphicon-chevron-up" );
           }, 100 );
       });
-      // Time field controls
-      $('#occurrenceTimeStartPicker').datetimepicker({
-              format: 'LT'
-          });
-      $('#occurrenceTimeEndPicker').datetimepicker({
-              format: 'LT'
-          });
-      $('#occurrenceTimeStartPicker').on('dp.change', function(e) {
-          vm.setOccurrenceTimeStart(e.date.format('LT'));
-      });
-      $('#occurrenceTimeEndPicker').on('dp.change', function(e) {
-          vm.setOccurrenceTimeEnd(e.date.format('LT'));
-      }); 
-      $('#timeOfCallPicker').datetimepicker({
-              format: 'LT'
-          });
-      $('#timeOfCallPicker').on('dp.change', function(e) {
-          vm.setTimeOfCall(e.date.format('LT'));
-      }); 
       vm.$nextTick(() => {
           vm.addEventListeners();
-          //this.calculateHash();
       });
-
   }
 };
 </script>

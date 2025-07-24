@@ -25,7 +25,7 @@
                         <div class="col-md-3">
                             <label for="">Due Date From</label>
                             <div class="input-group date" ref="dueDateFromPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDueDateFrom">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDueDateFrom">
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
@@ -34,7 +34,7 @@
                         <div class="col-md-3">
                             <label for="">Due Date To</label>
                             <div class="input-group date" ref="dueDateToPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDueDateTo">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDueDateTo">
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
@@ -201,30 +201,6 @@ export default {
         },
     },
     methods:{
-        addEventListeners: function(){
-            let vm = this;
-            // Initialise Application Date Filters
-             $(vm.$refs.dueDateToPicker).datetimepicker(vm.datepickerOptions);
-             $(vm.$refs.dueDateToPicker).on('dp.change', function(e){
-                 if ($(vm.$refs.dueDateToPicker).data('DateTimePicker').date()) {
-                     vm.filterDueDateTo =  e.date.format('DD/MM/YYYY');
-                 }
-                 else if ($(vm.$refs.dueDateToPicker).data('date') === "") {
-                     vm.filterDueDateTo = "";
-                 }
-              });
-             $(vm.$refs.dueDateFromPicker).datetimepicker(vm.datepickerOptions);
-             $(vm.$refs.dueDateFromPicker).on('dp.change',function (e) {
-                 if ($(vm.$refs.dueDateFromPicker).data('DateTimePicker').date()) {
-                     vm.filterDueDateFrom = e.date.format('DD/MM/YYYY');
-                     $(vm.$refs.dueDateToPicker).data("DateTimePicker").minDate(e.date);
-                 }
-                 else if ($(vm.$refs.dueDateFromPicker).data('date') === "") {
-                     vm.filterDueDateFrom = "";
-                 }
-             });
-             // End of Due Date Filters
-        },
         delay(callback, ms) {
             var timer = 0;
             return function () {
@@ -278,7 +254,6 @@ export default {
     mounted: function(){
         let vm = this;
         this.$nextTick(() => {
-            vm.addEventListeners();
             vm.initialiseSearch();
         });
     }

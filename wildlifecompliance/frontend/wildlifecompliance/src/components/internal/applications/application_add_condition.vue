@@ -50,7 +50,7 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <div class="input-group date" ref="due_date" style="width: 70%;">
-                                            <input type="text" class="form-control" name="due_date" placeholder="DD/MM/YYYY" v-model="condition.due_date">
+                                            <input type="date" class="form-control" name="due_date" placeholder="DD/MM/YYYY" v-model="condition.due_date">
                                             <span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
@@ -235,10 +235,6 @@ export default {
             $(this.$refs.standard_req).val(null).trigger('change');
             this.errors = false;
             $('.has-error').removeClass('has-error');
-            const datePicker = $(this.$refs.due_date).data('DateTimePicker');
-            if(datePicker) {
-                datePicker.clear();
-            }
             this.showDueDate = false;
             this.validation_form.resetForm();
         },
@@ -410,18 +406,6 @@ export default {
        vm.setConditionSelector();
        if (vm.condition.free_condition || vm.condition.due_date){
             vm.showDueDate=true;
-       }
-       // Initialise Date Picker
-       if (!vm.condition.standard || vm.showDueDate) {
-            $(vm.$refs.due_date).datetimepicker(vm.datepickerOptions);
-            $(vm.$refs.due_date).on('dp.change', function(e){
-                if ($(vm.$refs.due_date).data('DateTimePicker').date()) {
-                    vm.condition.due_date =  e.date.format('DD/MM/YYYY');
-                }
-                else if ($(vm.$refs.due_date).data('date') === "") {
-                    vm.condition.due_date = "";
-                }
-            });       
        }
    },
    mounted:function () {

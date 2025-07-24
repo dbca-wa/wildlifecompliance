@@ -8,7 +8,7 @@
                         <label class="col-sm-3">New due date</label>
                         <div class="col-sm-3">
                             <div class="input-group date" ref="newDueDatePicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="new_due_date" />
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="new_due_date" />
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
@@ -178,16 +178,14 @@ export default {
         },
         addEventListeners: function () {
             console.log('in addEventListeners');
-
+            //TODO apply min and max date validation
             let vm = this;
-            let el_fr_date = $(vm.$refs.newDueDatePicker);
+            
             let options = { format: "DD/MM/YYYY" };
 
             if (vm.due_date_max){
                 options['maxDate'] = vm.extendMaxDate;
             }
-
-            console.log(vm.comingDueDate);
 
             if (vm.comingDueDate){
                 // Copy comingDuDate object
@@ -198,16 +196,6 @@ export default {
                 // Enter a default value to the input box
                 vm.new_due_date = coming_due_date.getDate() + '/' + (coming_due_date.getMonth() + 1) + '/' + coming_due_date.getFullYear();
             }
-
-            el_fr_date.datetimepicker(options);
-
-            el_fr_date.on("dp.change", function(e) {
-                if (el_fr_date.data("DateTimePicker").date()) {
-                    vm.new_due_date = e.date.format("DD/MM/YYYY");
-                } else if (el_fr_date.data("date") === "") {
-                    vm.new_due_date = null;
-                }
-            });
         },
         ok: async function () {
             try {

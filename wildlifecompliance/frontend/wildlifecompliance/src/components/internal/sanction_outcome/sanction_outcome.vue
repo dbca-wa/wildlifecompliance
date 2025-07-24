@@ -1191,33 +1191,7 @@ export default {
             window.removeEventListener('beforeunload', this.leaving);
             window.removeEventListener('onblur', this.leaving);
         },
-        setUpDateTimePicker: function() {
-            let vm = this;
-            let el_issue_date = $(vm.$refs.dateOfIssuePicker);
-            let el_issue_time = $(vm.$refs.timeOfIssuePicker);
-
-            // Issue "Date" field
-            el_issue_date.datetimepicker({ format: "DD/MM/YYYY", maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_issue_date.on("dp.change", function(e) {
-              if (el_issue_date.data("DateTimePicker").date()) {
-                vm.sanction_outcome.date_of_issue = e.date.format("DD/MM/YYYY");
-              } else if (el_issue_date.data("date") === "") {
-                vm.sanction_outcome.date_of_issue = null;
-              }
-            });
-
-            // Issue "Time" field
-            el_issue_time.datetimepicker({ format: "LT", showClear: true });
-            el_issue_time.on("dp.change", function(e) {
-              if (el_issue_time.data("DateTimePicker").date()) {
-                vm.sanction_outcome.time_of_issue = e.date.format("LT");
-              } else if (el_issue_time.data("date") === "") {
-                vm.sanction_outcome.time_of_issue = null;
-              }
-            });
-        },
         addEventListeners: function() {
-            this.setUpDateTimePicker();
             $("#alleged-committed-offence-table").on("click", ".remove_alleged_committed_offence", this.removeAllegedOffenceClicked);
             $("#alleged-committed-offence-table").on("click", ".restore_alleged_committed_offence", this.restoreAllegedOffenceClicked);
             $("#alleged-committed-offence-table").on("click", ".include_alleged_committed_offence", this.includeAllegedOffenceClicked);

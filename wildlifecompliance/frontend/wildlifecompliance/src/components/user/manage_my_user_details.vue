@@ -60,7 +60,7 @@
                                 <!-- <input type="date" class="form-control" name="dob" placeholder="" max="2100-12-31" v-model="current_user.dob"> -->
                                 <div class="input-group date" ref="dob" style="width: 100%;">
                                     <input v-if="!canUpdateDOB" disabled type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="current_user.legal_dob">
-                                    <input v-else type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="current_user.dob">
+                                    <input v-else type="date" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="current_user.dob">
                                     <span class="input-group-addon">
                                         <span class="glyphicon glyphicon-calendar"></span>
                                     </span>
@@ -1116,19 +1116,6 @@ export default {
             }).catch((error) => {
                 console.log(error)
             })
-        },
-        eventListeners:function () {
-            const self = this
-            let _dob = 'dob';
-            $(`[name='${_dob}']`).datetimepicker(self.datepickerOptions);
-            $(`[name='${_dob}']`).on('dp.change', function(e){
-                if ($(`[name='${_dob}']`).data('DateTimePicker').date()) {
-                    self.current_user.dob =  e.date.format('DD/MM/YYYY');
-                }
-                else if ($(`[name='${_dob}']`).data('date') === "") {
-                    self.current_user.dob = "";
-                }
-            });
         },
     },
     beforeRouteEnter: function(to,from,next){

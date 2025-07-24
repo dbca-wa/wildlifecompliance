@@ -1050,14 +1050,6 @@ export default {
   mounted: function() {
       let vm = this;
 
-      // Time field controls
-      $('#plannedForTimePicker').datetimepicker({
-              format: 'LT'
-          });
-      $('#plannedForTimePicker').on('dp.change', function(e) {
-          vm.setPlannedForTime(e.date.format('LT'));
-      });
-
       // Initialise select2 for officer list
       $(vm.$refs.inspectionteam).select2({
           "theme": "bootstrap",

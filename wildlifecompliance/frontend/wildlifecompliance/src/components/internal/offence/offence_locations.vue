@@ -20,7 +20,7 @@
             <div>
                 <label class="">Date From</label>
                 <div class="input-group date" ref="lodgementDateFromPicker">
-                    <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFrom" />
+                    <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFrom" />
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
@@ -29,7 +29,7 @@
             <div>
                 <label class="">Date To</label>
                 <div class="input-group date" ref="lodgementDateToPicker">
-                    <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateTo" />
+                    <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateTo" />
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
@@ -212,9 +212,6 @@ export default {
         vm.initMap();
         vm.loadLocations();
         vm.initAwesomplete();
-        vm.$nextTick(() => {
-            vm.addEventListeners();
-        });
     },
     watch: {
         filterStatus: function () {
@@ -248,36 +245,7 @@ export default {
             }
         }
     },
-    computed: {
-    },
     methods: {
-        addEventListeners: function () {
-            let vm = this;
-            let el_fr = $(vm.$refs.lodgementDateFromPicker);
-            let el_to = $(vm.$refs.lodgementDateToPicker);
-
-            // Date "From" field
-            el_fr.datetimepicker({ format: 'DD/MM/YYYY', maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_fr.on('dp.change', function (e) {
-                if (el_fr.data('DateTimePicker').date()) {
-                    vm.filterDateFrom = e.date.format('DD/MM/YYYY');
-                    el_to.data('DateTimePicker').minDate(e.date);
-                } else if (el_fr.data('date') === "") {
-                    vm.filterDateFrom = "";
-                }
-            });
-
-            // Date "To" field
-            el_to.datetimepicker({ format: 'DD/MM/YYYY', maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_to.on('dp.change', function (e) {
-                if (el_to.data('DateTimePicker').date()) {
-                    vm.filterDateTo = e.date.format('DD/MM/YYYY');
-                    el_fr.data('DateTimePicker').maxDate(e.date);
-                } else if (el_to.data('date') === "") {
-                    vm.filterDateTo = "";
-                }
-            });
-        },
         initAwesomplete: function(){
             var self = this;
             var element_search = document.getElementById('search-input');

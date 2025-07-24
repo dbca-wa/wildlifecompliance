@@ -46,7 +46,7 @@
                         <div class="col-md-3">
                             <label for="">Lodged From</label>
                             <div class="input-group date" ref="applicationDateFromPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedFrom">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedFrom">
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
@@ -55,7 +55,7 @@
                         <div class="col-md-3">
                             <label for="">Lodged To</label>
                             <div class="input-group date" ref="applicationDateToPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedTo">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedTo">
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
@@ -637,26 +637,6 @@ export default {
         addEventListeners: function(){
             let vm = this;
             // Initialise Application Date Filters
-            $(vm.$refs.applicationDateToPicker).datetimepicker(vm.datepickerOptions);
-            $(vm.$refs.applicationDateToPicker).on('dp.change', function(e){
-                if ($(vm.$refs.applicationDateToPicker).data('DateTimePicker').date()) {
-                    vm.filterApplicationLodgedTo =  e.date.format('DD/MM/YYYY');
-                }
-                else if ($(vm.$refs.applicationDateToPicker).data('date') === "") {
-                    vm.filterApplicationLodgedTo = "";
-                }
-             });
-            $(vm.$refs.applicationDateFromPicker).datetimepicker(vm.datepickerOptions);
-            $(vm.$refs.applicationDateFromPicker).on('dp.change',function (e) {
-                if ($(vm.$refs.applicationDateFromPicker).data('DateTimePicker').date()) {
-                    vm.filterApplicationLodgedFrom = e.date.format('DD/MM/YYYY');
-                    $(vm.$refs.applicationDateToPicker).data("DateTimePicker").minDate(e.date);
-                }
-                else if ($(vm.$refs.applicationDateFromPicker).data('date') === "") {
-                    vm.filterApplicationLodgedFrom = "";
-                    $(vm.$refs.applicationDateToPicker).data("DateTimePicker").minDate(false);
-                }
-            });
             // External Discard listener
             vm.visibleDatatable.vmDataTable.on('click', 'a[data-discard-application]', function(e) {
                 e.preventDefault();

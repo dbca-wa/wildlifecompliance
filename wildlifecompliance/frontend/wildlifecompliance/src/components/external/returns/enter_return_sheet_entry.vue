@@ -44,7 +44,7 @@
                             </div>
                             <div class="col-md-6">
                               <div class="input-group date" ref="activityDateToPicker" name="activityDateToPicker" required="true">
-                                  <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="entryActivityDate" id="entryActivityDate">
+                                  <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="entryActivityDate" id="entryActivityDate">
                                   <span class="input-group-addon">
                                       <span class="glyphicon glyphicon-calendar"></span>
                                   </span>
@@ -579,20 +579,11 @@ export default {
 
         return is_correct;
       }, 
-      //Initialise Date Picker
-      initDatePicker: function() {
-        const vm = this;
-        $(vm.$refs.activityDateToPicker).datetimepicker(vm.datepickerOptions);
-        $('#entryActivityDate').blur(function(e){
-            vm.entryActivityDate =  $(this).val();
-          });
-      }
     },
     mounted: function() {
       let vm = this;
       vm.form = document.forms.sheetEntryForm;
       vm.addFormValidations();
-      vm.initDatePicker();
     }
 }
 </script>

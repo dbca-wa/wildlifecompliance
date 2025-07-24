@@ -30,7 +30,7 @@
                 <div class="form-group">
                     <label for="">Planned From</label>
                     <div class="input-group date" ref="plannedDateFromPicker">
-                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterPlannedFrom">
+                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterPlannedFrom">
                         <span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
                         </span>
@@ -41,7 +41,7 @@
                 <div class="form-group">
                     <label for="">Planned To</label>
                     <div class="input-group date" ref="plannedDateToPicker">
-                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterPlannedTo">
+                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterPlannedTo">
                         <span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
                         </span>
@@ -316,31 +316,6 @@
                     params: { inspection_id: newInspectionId}
                     });
             },
-            addEventListeners: function () {
-                let vm = this;
-                // Initialise Planned Date Filters
-                $(vm.$refs.plannedDateToPicker).datetimepicker(vm.datepickerOptions);
-                $(vm.$refs.plannedDateFromPicker).datetimepicker(vm.datepickerOptions);
-                // Add Date Filter events
-                $(vm.$refs.plannedDateToPicker).on('dp.change', function (e) {
-                    if ($(vm.$refs.plannedDateToPicker).data('DateTimePicker').date()) {
-                        // if From Date set, disable dates earlier than the from date
-                        $(vm.$refs.plannedDateFromPicker).data("DateTimePicker").maxDate(e.date)
-                        vm.filterPlannedTo = e.date.format('DD/MM/YYYY');
-                    } else if ($(vm.$refs.plannedDateToPicker).data('date') === "") {
-                        vm.filterPlannedTo = "";
-                    }
-                });
-                $(vm.$refs.plannedDateFromPicker).on('dp.change', function (e) {
-                    if ($(vm.$refs.plannedDateFromPicker).data('DateTimePicker').date()) {
-                        // if To Date set, disable dates later than the To date
-                        $(vm.$refs.plannedDateToPicker).data("DateTimePicker").minDate(e.date)
-                        vm.filterPlannedFrom = e.date.format('DD/MM/YYYY');
-                    } else if ($(vm.$refs.plannedDateFromPicker).data('date') === "") {
-                        vm.filterPlannedFrom = "";
-                    }
-                });
-            },
             initialiseSearch: function () {
                 this.dateSearch();
             },
@@ -386,7 +361,6 @@
             });
             this.$nextTick(async () => {
                 await vm.initialiseSearch();
-                await vm.addEventListeners();
             });
             
             

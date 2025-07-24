@@ -43,7 +43,7 @@
                         <div class="col-md-3">
                             <label for="">Issued From</label>
                             <div class="input-group date" ref="licenceDateFromPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLicenceIssuedFrom">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLicenceIssuedFrom">
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
@@ -52,7 +52,7 @@
                         <div class="col-md-3">
                             <label for="">Issued To</label>
                             <div class="input-group date" ref="licenceDateToPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLicenceIssuedTo">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLicenceIssuedTo">
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
@@ -333,27 +333,6 @@ export default {
         ]),
         addEventListeners: function(){
             let vm = this;
-            // Initialise Licence Issued Date Filters
-            $(vm.$refs.licenceDateToPicker).datetimepicker(vm.datepickerOptions);
-            $(vm.$refs.licenceDateToPicker).on('dp.change', function(e){
-                if ($(vm.$refs.licenceDateToPicker).data('DateTimePicker').date()) {
-                    vm.filterLicenceIssuedTo =  e.date.format('DD/MM/YYYY');
-                }
-                else if ($(vm.$refs.licenceDateToPicker).data('date') === "") {
-                    vm.filterLicenceIssuedTo = "";
-                }
-             });
-            $(vm.$refs.licenceDateFromPicker).datetimepicker(vm.datepickerOptions);
-            $(vm.$refs.licenceDateFromPicker).on('dp.change',function (e) {
-                if ($(vm.$refs.licenceDateFromPicker).data('DateTimePicker').date()) {
-                    vm.filterLicenceIssuedFrom = e.date.format('DD/MM/YYYY');
-                    $(vm.$refs.licenceDateToPicker).data("DateTimePicker").minDate(e.date);
-                }
-                else if ($(vm.$refs.licenceDateFromPicker).data('date') === "") {
-                    vm.filterLicenceIssuedFrom = "";
-                    $(vm.$refs.licenceDateToPicker).data("DateTimePicker").minDate(false);
-                }
-            });
             // Add Activity/Purpose listener
             vm.$refs.licence_datatable.vmDataTable.on('click', 'a[add-activity-purpose]', function(e) {
                 e.preventDefault();
