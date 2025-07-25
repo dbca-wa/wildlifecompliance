@@ -115,9 +115,9 @@ export default {
             action_purpose_list: [],
             selected_licence_id: null,
             licence_action: '',
-            dateFormat: 'DD/MM/YYYY',
+            dateFormat: 'YYYY-MM-DD',
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -157,8 +157,8 @@ export default {
                         d.category_name = vm.filterLicenceType;
 //                        d.status = vm.filterLicenceStatus.id;
                         d.holder = vm.filterLicenceHolder;
-                        d.date_from = vm.filterLicenceIssuedFrom != '' && vm.filterLicenceIssuedFrom != null ? moment(vm.filterLicenceIssuedFrom, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
-                        d.date_to = vm.filterLicenceIssuedTo != '' && vm.filterLicenceIssuedTo != null ? moment(vm.filterLicenceIssuedTo, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                        d.date_from = vm.filterLicenceIssuedFrom != '' && vm.filterLicenceIssuedFrom != null ? moment(vm.filterLicenceIssuedFrom, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
+                        d.date_to = vm.filterLicenceIssuedTo != '' && vm.filterLicenceIssuedTo != null ? moment(vm.filterLicenceIssuedTo, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
                     }
                 },
                 columns: [

@@ -128,7 +128,7 @@ export default {
             refundsStartPicker:null,
             refundsEndPicker:null,
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false
             },
@@ -173,7 +173,7 @@ export default {
             let vm = this;
             
             if (vm.oracle_form.valid()){
-                let data = vm.oracleDatePicker.data("DateTimePicker").date().format('DD/MM/YYYY');
+                let data = vm.oracleDatePicker.data("DateTimePicker").date().format('YYYY-MM-DD');
                 let override = vm.oracle_override ? 'true': 'false';
                 let request = fetch.fetchUrl('/api/oracle_job?date='+data+'&override='+override).then((response) => {
                     swal.fire({
@@ -240,8 +240,8 @@ export default {
 
             if (vm.refund_form.valid()) {
                 var values = {
-                    "start": vm.refundsStartPicker.data("DateTimePicker").date().format('DD/MM/YYYY'),
-                    "end" :vm.refundsEndPicker.data("DateTimePicker").date().format('DD/MM/YYYY'),
+                    "start": vm.refundsStartPicker.data("DateTimePicker").date().format('YYYY-MM-DD'),
+                    "end" :vm.refundsEndPicker.data("DateTimePicker").date().format('YYYY-MM-DD'),
                 }
                 var url = api_endpoints.booking_refunds +"?"+ $.param(values);
                 window.location.assign(url);

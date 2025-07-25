@@ -50,9 +50,9 @@ export default {
             pBody: 'pBody' + vm._uid,
             datatable_id: 'profile-datatable-'+vm._uid,
             // Filters for Profiles 
-            dateFormat: 'DD/MM/YYYY',
+            dateFormat: 'YYYY-MM-DD',
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,

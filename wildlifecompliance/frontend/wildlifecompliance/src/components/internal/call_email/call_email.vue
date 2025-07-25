@@ -1182,7 +1182,7 @@ export default {
 
     // Apply current timestamp to date and time of call
     if (!this.call_email.date_of_call && this.call_email.can_user_edit_form) {
-        this.setDateOfCall(moment().format('DD/MM/YYYY'));
+        this.setDateOfCall(moment().format('YYYY-MM-DD'));
     }
     if (!this.call_email.time_of_call && this.call_email.can_user_edit_form) {
         this.setTimeOfCall(moment().format('LT'));

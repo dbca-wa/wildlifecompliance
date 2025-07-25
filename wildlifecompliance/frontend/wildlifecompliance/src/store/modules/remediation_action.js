@@ -20,7 +20,7 @@ export const remediationActionStore = {
                 ...remediation_action
             });
             if (state.remediation_action.due_date) {
-                state.remediation_action.due_date = moment(state.remediation_action.due_date, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.remediation_action.due_date = moment(state.remediation_action.due_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
 
             let remediationActionDocumentUrl = helpers.add_endpoint_join(

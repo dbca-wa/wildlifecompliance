@@ -347,7 +347,7 @@ export default {
                     this.email_user.residential_address = this.getDefaultAddress()
                 }
                 if (this.email_user.dob) {
-                    this.email_user.dob = moment(this.email_user.dob, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                    this.email_user.dob = moment(this.email_user.dob, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 }
             });
         },
@@ -420,7 +420,7 @@ export default {
                     payload.residential_address = null;
                 }
                 if (payload.dob) {
-                    payload.dob = moment(payload.dob, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.dob = moment(payload.dob, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 }
                 let fetchUrl = ''
                 if (payload.id) {
@@ -444,7 +444,7 @@ export default {
                     savedEmailUser.body.residential_address = this.getDefaultAddress()
                 }
                 Object.assign(this.email_user, savedEmailUser.body);
-                this.email_user.dob = moment(this.email_user.dob, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                this.email_user.dob = moment(this.email_user.dob, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 if (!(parentSave === 'parentSave')) {
                     await swal.fire("Saved", "Person has been saved", "success");
                 }

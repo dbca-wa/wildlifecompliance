@@ -117,7 +117,7 @@ export default {
             console.log('*** in extendMinDateDisplay ***');
             if (this.comingDueDate){
                 let due_date_plus_1 = moment(this.comingDueDate).add(1, 'days');
-                return due_date_plus_1.format('DD/MM/YYYY');
+                return due_date_plus_1.format('YYYY-MM-DD');
             } else {
                 return '';
             }
@@ -125,7 +125,7 @@ export default {
         extendMaxDateDisplay: function() {
             if (this.extendMaxDate){
                 let extend_max_date = moment(this.extendMaxDate);
-                return extend_max_date.format('DD/MM/YYYY');
+                return extend_max_date.format('YYYY-MM-DD');
             } else {
                 return '';
             }
@@ -136,7 +136,7 @@ export default {
         comingDueDateDisplay: function() {
             if(this.comingDueDate){
                 let due_date = moment(this.comingDueDate)
-                return due_date.format('DD/MM/YYYY');
+                return due_date.format('YYYY-MM-DD');
             } else {
                 return '';
             }

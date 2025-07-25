@@ -29,7 +29,7 @@ export const legalCaseStore = {
             });
             console.log('updateLegalCase');
             if (state.legal_case.case_created_date) {
-                state.legal_case.case_created_date = moment(state.legal_case.case_created_date, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.legal_case.case_created_date = moment(state.legal_case.case_created_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             // default doc
             let defaultDocumentUrl = helpers.add_endpoint_join(
@@ -314,7 +314,7 @@ export const legalCaseStore = {
                 state.legal_case.court_proceedings.court_dates = temp_court_dates;
 
                 if (payload.case_created_date) {
-                    payload.case_created_date = moment(payload.planned_for_date, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.case_created_date = moment(payload.planned_for_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 } else if (payload.case_created_date === '') {
                     payload.case_created_date = null;
                 }

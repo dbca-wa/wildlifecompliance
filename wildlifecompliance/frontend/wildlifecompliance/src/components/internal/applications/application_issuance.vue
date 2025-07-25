@@ -310,7 +310,7 @@ export default {
                 selected_purpose_ids: [],
                 },
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -757,8 +757,8 @@ export default {
                     if (purpose.proposed_start_date != null && purpose.proposed_start_date.charAt(2)==='/'){
                         continue
                     }
-                    let date1 = moment(purpose.proposed_start_date, 'YYYY-MM-DD').format('DD/MM/YYYY')
-                    let date2 = moment(purpose.proposed_end_date, 'YYYY-MM-DD').format('DD/MM/YYYY')
+                    let date1 = moment(purpose.proposed_start_date, 'YYYY-MM-DD').format('YYYY-MM-DD')
+                    let date2 = moment(purpose.proposed_end_date, 'YYYY-MM-DD').format('YYYY-MM-DD')
                     if (purpose.proposed_start_date == null){
                         date1 = '';
                         date2 = ''

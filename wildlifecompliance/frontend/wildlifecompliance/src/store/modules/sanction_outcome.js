@@ -30,7 +30,7 @@ export const sanctionOutcomeStore = {
                 ...sanction_outcome
             });
             if (state.sanction_outcome.date_of_issue) {
-                state.sanction_outcome.date_of_issue = moment(state.sanction_outcome.date_of_issue, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.sanction_outcome.date_of_issue = moment(state.sanction_outcome.date_of_issue, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             if (state.sanction_outcome.time_of_issue) {
                 state.sanction_outcome.time_of_issue = moment(state.sanction_outcome.time_of_issue, 'HH:mm:ss').format('LT');

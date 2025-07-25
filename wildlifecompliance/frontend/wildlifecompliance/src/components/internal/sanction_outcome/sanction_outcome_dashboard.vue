@@ -156,7 +156,7 @@ export default {
                         searchable: true,
                         orderable: true,
                         mRender: function (data, type, full) {
-                            return data != '' && data != null ? moment(data).format('DD/MM/YYYY') : '';
+                            return data != '' && data != null ? moment(data).format('YYYY-MM-DD') : '';
                         }
                     },
                     {
@@ -164,7 +164,7 @@ export default {
                         searchable: false,
                         orderable: false,
                         mRender: function (data, type, full){
-                            return data != '' && data != null ? moment(data).format('DD/MM/YYYY') : '';
+                            return data != '' && data != null ? moment(data).format('YYYY-MM-DD') : '';
                         }
                     },
                     {

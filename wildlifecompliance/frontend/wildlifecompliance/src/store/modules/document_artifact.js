@@ -23,7 +23,7 @@ export const documentArtifactStore = {
             });
             // format artifact_date for vue
             if (state.document_artifact.artifact_date) {
-                state.document_artifact.artifact_date = moment(state.document_artifact.artifact_date, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.document_artifact.artifact_date = moment(state.document_artifact.artifact_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             // format artifact time from 24 to 12 hour
             if (state.document_artifact.artifact_time) {
@@ -34,7 +34,7 @@ export const documentArtifactStore = {
             /*
             console.log('updateDocumentArtifact');
             if (state.document_artifact.artifact_date) {
-                state.document_artifact.artifact_date = moment(state.document_artifact.artifact_date, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.document_artifact.artifact_date = moment(state.document_artifact.artifact_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             */
             // default doc implemented in Artifact model/viewset
@@ -119,14 +119,14 @@ export const documentArtifactStore = {
                 console.log(payload);
                 /*
                 if (payload.artifact_date) {
-                    payload.artifact_date = moment(payload.artifact_date, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.artifact_date = moment(payload.artifact_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 } else if (payload.artifact_date === '') {
                     payload.artifact_date = null;
                 }
                 */
                 // format artifact date for backend save
                 if (payload.artifact_date) {
-                    payload.artifact_date = moment(payload.artifact_date, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.artifact_date = moment(payload.artifact_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 } else if (payload.artifact_date === '') {
                     payload.artifact_date = null;
                 }

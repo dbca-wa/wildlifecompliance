@@ -89,7 +89,7 @@ export default {
         },
         return_date_format: {
             type: String,
-            default: 'DD/MM/YYYY',
+            default: 'YYYY-MM-DD',
         },
         return_time_format: {
             type: String,
@@ -172,7 +172,7 @@ export default {
         if (this.court_datetime){
             let court_datetime_obj = moment(new Date(this.court_datetime.getTime()));
             // Assign date as String type
-            this.court_date = court_datetime_obj.format('DD/MM/YYYY');
+            this.court_date = court_datetime_obj.format('YYYY-MM-DD');
             // Assign time as String type
             this.court_time = court_datetime_obj.format('LT');
         }

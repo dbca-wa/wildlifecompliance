@@ -71,9 +71,9 @@ export default {
             filterDateFrom: '',
             filterDateTo: '',
             */
-            dateFormat: 'DD/MM/YYYY',
+            dateFormat: 'YYYY-MM-DD',
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -136,7 +136,7 @@ export default {
                         searchable: true,
                         orderable: true,
                         mRender: function (data, type, full) {
-                            return data != '' && data != null ? moment(data).format('DD/MM/YYYY') : '';
+                            return data != '' && data != null ? moment(data).format('YYYY-MM-DD') : '';
                         }
                     },
                     {
@@ -184,7 +184,7 @@ export default {
                                     let ra = full.remediation_actions[i];
                                     body += '<tr>' +
                                         //td + ra.description + td_close +
-                                        td + moment(ra.due_date).format('DD/MM/YYYY') + td_close +
+                                        td + moment(ra.due_date).format('YYYY-MM-DD') + td_close +
                                         td + ra.status.name + td_close +
                                         td + ra.user_action + td_close
                                     '</tr>'

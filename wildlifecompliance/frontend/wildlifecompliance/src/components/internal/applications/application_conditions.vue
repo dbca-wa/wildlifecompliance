@@ -49,7 +49,7 @@ export default {
         return {
             form: null,
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 allowInputToggle:true
             },
@@ -88,7 +88,7 @@ export default {
                     {
                         data: "due_date",
                         mRender:function (data,type,full) {
-                            return data != '' && data != null ? moment(data).format('DD/MM/YYYY'): '';
+                            return data != '' && data != null ? moment(data).format('YYYY-MM-DD'): '';
                         },
                         orderable: false
                     },
@@ -261,7 +261,7 @@ export default {
             var showDueDate = false
             if(preloadedCondition) {
                 this.viewedCondition = preloadedCondition;
-                this.viewedCondition.due_date = preloadedCondition.due_date != null ? moment(preloadedCondition.due_date).format('DD/MM/YYYY'): '';
+                this.viewedCondition.due_date = preloadedCondition.due_date != null ? moment(preloadedCondition.due_date).format('YYYY-MM-DD'): '';
                 showDueDate=this.viewedCondition.require_return
             }
             else {

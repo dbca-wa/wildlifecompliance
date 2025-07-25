@@ -1155,11 +1155,12 @@ class ReturnData(object):
             schema = Schema(resource.get('schema'))
             headers = []
             for f in schema.fields:
+                f_type = f.type.name if f.type and hasattr(f.type, 'name') else ''
                 header = {
                     "label": f.data['label'],
                     "name": f.data['name'],
                     "required": f.required,
-                    "type": f.type.name,
+                    "type": f_type,
                     "readonly": False,
                 }
                 if f.is_species:

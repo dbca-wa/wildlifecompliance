@@ -89,9 +89,9 @@ export default {
             filterApplicationLodgedFrom: '',
             filterApplicationLodgedTo: '',
             filterApplicationSubmitter: 'All',
-            dateFormat: 'DD/MM/YYYY',
+            dateFormat: 'YYYY-MM-DD',
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -122,8 +122,8 @@ export default {
                         d.category_name = vm.filterApplicationLicenceType;
                         d.status = vm.filterApplicationStatus.id;
                         d.submitter = vm.filterApplicationSubmitter;
-                        d.date_from = vm.filterApplicationLodgedFrom != '' && vm.filterApplicationLodgedFrom != null ? moment(vm.filterApplicationLodgedFrom, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
-                        d.date_to = vm.filterApplicationLodgedTo != '' && vm.filterApplicationLodgedTo != null ? moment(vm.filterApplicationLodgedTo, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                        d.date_from = vm.filterApplicationLodgedFrom != '' && vm.filterApplicationLodgedFrom != null ? moment(vm.filterApplicationLodgedFrom, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
+                        d.date_to = vm.filterApplicationLodgedTo != '' && vm.filterApplicationLodgedTo != null ? moment(vm.filterApplicationLodgedTo, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
                     }
                 },
                 columns: [

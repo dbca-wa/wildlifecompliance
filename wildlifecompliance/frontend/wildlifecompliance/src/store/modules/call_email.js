@@ -131,7 +131,7 @@ export const callemailStore = {
                 ...call_email
             });
             if (state.call_email.occurrence_date_from) {
-                state.call_email.occurrence_date_from = moment(state.call_email.occurrence_date_from, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.call_email.occurrence_date_from = moment(state.call_email.occurrence_date_from, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             if (state.call_email.occurrence_time_start) {
                 state.call_email.occurrence_time_start = moment(state.call_email.occurrence_time_start, 'HH:mm').format('hh:mm A');
@@ -139,7 +139,7 @@ export const callemailStore = {
                 state.call_email.occurrence_time_start = null;
             }
             if (state.call_email.occurrence_date_to) {
-                state.call_email.occurrence_date_to = moment(state.call_email.occurrence_date_to, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.call_email.occurrence_date_to = moment(state.call_email.occurrence_date_to, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             if (state.call_email.occurrence_time_end) {
                 state.call_email.occurrence_time_end = moment(state.call_email.occurrence_time_end, 'HH:mm').format('hh:mm A');
@@ -147,7 +147,7 @@ export const callemailStore = {
                 state.call_email.occurrence_time_end = null;
             }
             if (state.call_email.date_of_call) {
-                state.call_email.date_of_call = moment(state.call_email.date_of_call, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.call_email.date_of_call = moment(state.call_email.date_of_call, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             if (state.call_email.time_of_call) {
                 state.call_email.time_of_call = moment(state.call_email.time_of_call, 'HH:mm').format('hh:mm A');
@@ -329,7 +329,7 @@ export const callemailStore = {
                 let payload = new Object();
                 Object.assign(payload, state.call_email);
                 if (payload.occurrence_date_from) {
-                    payload.occurrence_date_from = moment(payload.occurrence_date_from, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.occurrence_date_from = moment(payload.occurrence_date_from, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 } else if (payload.occurrence_date_from === '') {
                     payload.occurrence_date_from = null;
                 }
@@ -339,7 +339,7 @@ export const callemailStore = {
                     payload.occurrence_time_start = null;
                 }
                 if (payload.occurrence_date_to) {
-                    payload.occurrence_date_to = moment(payload.occurrence_date_to, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.occurrence_date_to = moment(payload.occurrence_date_to, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 } else if (payload.occurrence_date_to === '') {
                     payload.occurrence_date_to = null;
                 }
@@ -349,7 +349,7 @@ export const callemailStore = {
                     payload.occurrence_time_end = null;
                 }
                 if (payload.date_of_call) {
-                    payload.date_of_call = moment(payload.date_of_call, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.date_of_call = moment(payload.date_of_call, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 } else if (payload.date_of_call === '') {
                     payload.date_of_call = null;
                 }

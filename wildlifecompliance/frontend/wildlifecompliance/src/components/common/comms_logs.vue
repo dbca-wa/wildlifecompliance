@@ -61,7 +61,7 @@ export default {
     data() {
         let vm = this;
         return {
-            dateFormat: 'DD/MM/YYYY',
+            dateFormat: 'YYYY-MM-DD',
             actionsTable: null,
             popoversInitialised: false,
             actionsDtOptions:{

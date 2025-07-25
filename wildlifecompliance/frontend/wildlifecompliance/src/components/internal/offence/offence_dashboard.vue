@@ -125,7 +125,7 @@ export default {
                         searchable: true,
                         orderable: true,
                         mRender: function (data, type, full) {
-                            return data != '' && data != null ? moment(data).format('DD/MM/YYYY') : '';
+                            return data != '' && data != null ? moment(data).format('YYYY-MM-DD') : '';
                         }
                     },
                     {

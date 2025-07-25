@@ -473,7 +473,7 @@ export default {
             orgRequest_amendment_requested:[],
             new_user: false,
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,

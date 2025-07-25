@@ -337,7 +337,7 @@ export default {
             returns_url: api_endpoints.returns_paginated+'user_datatable_list?format=datatables&user_id='+vm.$route.params.user_id,
             orgRequest_pending: [],
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,

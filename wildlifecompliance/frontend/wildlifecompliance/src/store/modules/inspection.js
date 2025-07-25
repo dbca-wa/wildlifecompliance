@@ -63,7 +63,7 @@ export const inspectionStore = {
                 ); 
             }
             if (state.inspection.planned_for_date) {
-                state.inspection.planned_for_date = moment(state.inspection.planned_for_date, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.inspection.planned_for_date = moment(state.inspection.planned_for_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             // format artifact time from 24 to 12 hour
             if (state.inspection.planned_for_time) {
@@ -189,7 +189,7 @@ export const inspectionStore = {
                 Object.assign(payload, state.inspection);
                 console.log(payload);
                 if (payload.planned_for_date) {
-                    payload.planned_for_date = moment(payload.planned_for_date, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.planned_for_date = moment(payload.planned_for_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 } else if (payload.planned_for_date === '') {
                     payload.planned_for_date = null;
                 }

@@ -48,7 +48,7 @@ export default {
     },
     methods: {
         format: function(activity_date) {
-            return moment(activity_date).format('DD/MM/YYYY');
+            return moment(activity_date).format('YYYY-MM-DD');
         },
     },
 }

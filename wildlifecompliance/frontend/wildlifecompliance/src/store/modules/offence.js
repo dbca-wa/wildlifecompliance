@@ -86,10 +86,10 @@ export const offenceStore = {
                 };
             }
             if (offence.occurrence_date_from) {
-                offence.occurrence_date_from = moment(offence.occurrence_date_from, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                offence.occurrence_date_from = moment(offence.occurrence_date_from, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             if (offence.occurrence_date_to) {
-                offence.occurrence_date_to = moment(offence.occurrence_date_to, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                offence.occurrence_date_to = moment(offence.occurrence_date_to, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             if (offence.occurrence_time_from) {
                 offence.occurrence_time_from = moment(offence.occurrence_time_from, 'HH:mm:ss').format('LT');

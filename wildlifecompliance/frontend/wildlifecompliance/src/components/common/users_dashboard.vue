@@ -72,9 +72,9 @@ export default {
             filterCharacterFlagged: 'All',
             character_flagged_options: ['True','False'],
             filterDateOfBirth: '',
-            dateFormat: 'DD/MM/YYYY',
+            dateFormat: 'YYYY-MM-DD',
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -98,7 +98,7 @@ export default {
                     // adding extra GET params for Custom filtering
                     "data": function (d) {
                         d.character_flagged = vm.filterCharacterFlagged;
-                        d.dob = vm.filterDateOfBirth != '' && vm.filterDateOfBirth != null ? moment(vm.filterDateOfBirth, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                        d.dob = vm.filterDateOfBirth != '' && vm.filterDateOfBirth != null ? moment(vm.filterDateOfBirth, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
                     }
                 },
                 columns: [

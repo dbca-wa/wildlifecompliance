@@ -86,11 +86,11 @@
                 statusChoices: [],
                 //inspectionTypes: [],
                 
-                dateFormat: 'DD/MM/YYYY',
+                dateFormat: 'YYYY-MM-DD',
                 legalCaseInitialised: false,
                 createLegalCaseBindId: '',
                 // datepickerOptions: {
-                //     format: 'DD/MM/YYYY',
+                //     format: 'YYYY-MM-DD',
                 //     showClear: true,
                 //     useCurrent: false,
                 //     keepInvalid: true,
@@ -120,8 +120,8 @@
                         'dataSrc': 'data',
                         'data': function(d) {
                             d.status_description = vm.filterStatus;
-                            d.date_from = vm.filterPlannedFrom != '' && vm.filterPlannedFrom != null ? moment(vm.filterPlannedFrom, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
-                            d.date_to = vm.filterPlannedTo != '' && vm.filterPlannedTo != null ? moment(vm.filterPlannedTo, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                            d.date_from = vm.filterPlannedFrom != '' && vm.filterPlannedFrom != null ? moment(vm.filterPlannedFrom, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
+                            d.date_to = vm.filterPlannedTo != '' && vm.filterPlannedTo != null ? moment(vm.filterPlannedTo, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
                         }
                     },
                     //dom: 'lBfrtip',

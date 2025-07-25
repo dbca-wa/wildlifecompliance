@@ -81,9 +81,9 @@ export default {
             filterReturnStatus: 'All',
             filterDueDateFrom: '',
             filterDueDateTo: '',
-            dateFormat: 'DD/MM/YYYY',
+            dateFormat: 'YYYY-MM-DD',
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -102,8 +102,8 @@ export default {
                     "dataSrc": 'data',
                     "data": function (d) {
                         d.status = vm.filterReturnStatus;
-                        d.date_from = vm.filterDueDateFrom != '' && vm.filterDueDateFrom != null ? moment(vm.filterDueDateFrom, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
-                        d.date_to = vm.filterDueDateTo != '' && vm.filterDueDateTo != null ? moment(vm.filterDueDateTo, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                        d.date_from = vm.filterDueDateFrom != '' && vm.filterDueDateFrom != null ? moment(vm.filterDueDateFrom, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
+                        d.date_to = vm.filterDueDateTo != '' && vm.filterDueDateTo != null ? moment(vm.filterDueDateTo, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
                     }
                 },
                 columns: [

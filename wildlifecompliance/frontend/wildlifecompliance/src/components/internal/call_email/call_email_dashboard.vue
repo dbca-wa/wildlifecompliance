@@ -98,9 +98,9 @@
                 status_choices: [],
                 filterLodgedFrom: '',
                 filterLodgedTo: '',
-                dateFormat: 'DD/MM/YYYY',
+                dateFormat: 'YYYY-MM-DD',
                 datepickerOptions: {
-                    format: 'DD/MM/YYYY',
+                    format: 'YYYY-MM-DD',
                     showClear: true,
                     useCurrent: false,
                     keepInvalid: true,
@@ -133,8 +133,8 @@
                         "data": function(d) {
                             d.status_description = vm.filterStatus;
                             d.classification_description = vm.filterClassification;
-                            d.date_from = vm.filterLodgedFrom != '' && vm.filterLodgedFrom != null ? moment(vm.filterLodgedFrom, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
-                            d.date_to = vm.filterLodgedTo != '' && vm.filterLodgedTo != null ? moment(vm.filterLodgedTo, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                            d.date_from = vm.filterLodgedFrom != '' && vm.filterLodgedFrom != null ? moment(vm.filterLodgedFrom, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
+                            d.date_to = vm.filterLodgedTo != '' && vm.filterLodgedTo != null ? moment(vm.filterLodgedTo, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
                         }
                     },
                     dom: 'lBfrtip',

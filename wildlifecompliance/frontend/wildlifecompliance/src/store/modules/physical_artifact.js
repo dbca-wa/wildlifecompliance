@@ -24,7 +24,7 @@ export const physicalArtifactStore = {
             console.log('updatePhysicalArtifact');
             // format artifact_date for vue
             if (state.physical_artifact.artifact_date) {
-                state.physical_artifact.artifact_date = moment(state.physical_artifact.artifact_date, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.physical_artifact.artifact_date = moment(state.physical_artifact.artifact_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             // format artifact time from 24 to 12 hour
             if (state.physical_artifact.artifact_time) {
@@ -34,7 +34,7 @@ export const physicalArtifactStore = {
             }
             // format disposal_date for vue
             if (state.physical_artifact.disposal_date) {
-                state.physical_artifact.disposal_date = moment(state.physical_artifact.disposal_date, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.physical_artifact.disposal_date = moment(state.physical_artifact.disposal_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             // default doc implemented in Artifact model/viewset
             let defaultDocumentUrl = helpers.add_endpoint_join(
@@ -140,7 +140,7 @@ export const physicalArtifactStore = {
                 console.log(payload);
                 // format artifact date for backend save
                 if (payload.artifact_date) {
-                    payload.artifact_date = moment(payload.artifact_date, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.artifact_date = moment(payload.artifact_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 } else if (payload.artifact_date === '') {
                     payload.artifact_date = null;
                 }
@@ -152,7 +152,7 @@ export const physicalArtifactStore = {
                 }
                 // format disposal date for backend save
                 if (payload.disposal_date) {
-                    payload.disposal_date = moment(payload.disposal_date, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.disposal_date = moment(payload.disposal_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 } else if (payload.disposal_date === '') {
                     payload.disposal_date = null;
                 }

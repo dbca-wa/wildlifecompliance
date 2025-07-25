@@ -171,7 +171,7 @@ export default {
         activityList: {'0': {'label': null, 'licence': false, 'pay': false}},
         initialQty: 0,
         datepickerOptions:{
-            format: 'DD/MM/YYYY',
+            format: 'YYYY-MM-DD',
             showClear:true,
             useCurrent:false,
             keepInvalid:true,

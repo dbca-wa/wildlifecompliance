@@ -80,7 +80,7 @@ Vue.mixin({
             return formatter.format(value);
         },
         formatDate: function(data) {
-            return data ? moment(data).format('DD/MM/YYYY'): '';
+            return data ? moment(data).format('YYYY-MM-DD'): '';
         }
     },
 })

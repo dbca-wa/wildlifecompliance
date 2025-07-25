@@ -183,7 +183,7 @@ export default {
             successString: '',
             success:false,
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -212,7 +212,7 @@ export default {
     },
     watch: {
         due_date: function(){
-            this.validDate = moment(this.condition.due_date,'DD/MM/YYYY').isValid();
+            this.validDate = moment(this.condition.due_date,'YYYY-MM-DD').isValid();
         },
     },
     methods:{
