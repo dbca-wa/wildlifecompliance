@@ -95,18 +95,18 @@
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="occurrenceDateFromPicker">
                                                 <input :readonly="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" :value="date_from" />
-                                                <span class="input-group-addon">
+                                                <!--<span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>
+                                                </span>-->
                                             </div>
                                         </div>
                                         <div v-show="offence.occurrence_from_to">
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="occurrenceDateToPicker">
                                                     <input :readonly="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" :value="date_to" />
-                                                    <span class="input-group-addon">
+                                                    <!--<span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>
+                                                    </span>-->
                                                 </div>
                                             </div>
                                         </div>
@@ -117,18 +117,18 @@
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="occurrenceTimeFromPicker">
                                                 <input :readonly="readonlyForm" type="time" class="form-control" placeholder="HH:MM" :value="time_from" />
-                                                <span class="input-group-addon">
+                                                <!--<span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>
+                                                </span>-->
                                             </div>
                                         </div>
                                         <div v-show="offence.occurrence_from_to">
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="occurrenceTimeToPicker">
                                                     <input :readonly="readonlyForm" type="time" class="form-control" placeholder="HH:MM" :value="time_to" />
-                                                    <span class="input-group-addon">
+                                                    <!--<span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>
+                                                    </span>-->
                                                 </div>
                                             </div>
                                         </div>

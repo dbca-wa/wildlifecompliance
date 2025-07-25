@@ -44,18 +44,18 @@
                             <label for="">Issued From</label>
                             <div class="input-group date" ref="licenceDateFromPicker">
                                 <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLicenceIssuedFrom">
-                                <span class="input-group-addon">
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>
                         <div class="col-md-3">
                             <label for="">Issued To</label>
                             <div class="input-group date" ref="licenceDateToPicker">
                                 <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLicenceIssuedTo">
-                                <span class="input-group-addon">
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>
                     </div>

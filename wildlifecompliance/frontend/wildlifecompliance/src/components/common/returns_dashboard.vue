@@ -26,18 +26,18 @@
                             <label for="">Due Date From</label>
                             <div class="input-group date" ref="dueDateFromPicker">
                                 <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDueDateFrom">
-                                <span class="input-group-addon">
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>
                         <div class="col-md-3">
                             <label for="">Due Date To</label>
                             <div class="input-group date" ref="dueDateToPicker">
                                 <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDueDateTo">
-                                <span class="input-group-addon">
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>
                     </div><br/>

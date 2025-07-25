@@ -61,9 +61,9 @@
                                 <div class="input-group date" ref="dob" style="width: 100%;">
                                     <input v-if="!canUpdateDOB" disabled type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="current_user.legal_dob">
                                     <input v-else type="date" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="current_user.dob">
-                                    <span class="input-group-addon">
+                                    <!--<span class="input-group-addon">
                                         <span class="glyphicon glyphicon-calendar"></span>
-                                    </span>
+                                    </span>-->
                                 </div>
                             </div>
                           </div>

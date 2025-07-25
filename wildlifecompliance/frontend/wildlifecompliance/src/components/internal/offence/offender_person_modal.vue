@@ -42,9 +42,9 @@
                                     placeholder="DD/MM/YYYY" 
                                     v-model="offender_person.dob" 
                                     />
-                                    <span class="input-group-addon">
+                                    <!--<span class="input-group-addon">
                                         <span class="glyphicon glyphicon-calendar"></span>
-                                    </span>
+                                    </span>-->
                                 </div>
                             </div>
                         </div>

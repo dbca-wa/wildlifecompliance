@@ -145,18 +145,18 @@
                                                     <div class="col-sm-3">
                                                         <div class="input-group date" ref="artifactDatePicker">
                                                             <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="physical_artifact.artifact_date" />
-                                                            <span class="input-group-addon">
+                                                            <!--<span class="input-group-addon">
                                                                 <span class="glyphicon glyphicon-calendar"></span>
-                                                            </span>
+                                                            </span>-->
                                                         </div>
                                                     </div>
                                                     <label class="col-sm-3">Time</label>
                                                     <div class="col-sm-3">
                                                         <div class="input-group date" ref="artifactTimePicker">
                                                           <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="physical_artifact.artifact_time"/>
-                                                          <span class="input-group-addon">
+                                                          <!--<span class="input-group-addon">
                                                               <span class="glyphicon glyphicon-calendar"></span>
-                                                          </span>
+                                                          </span>-->
                                                         </div>
                                                     </div>
                                                 </div>
@@ -259,9 +259,9 @@
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="disposalDatePicker">
                                                     <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="physical_artifact.disposal_date" />
-                                                    <span class="input-group-addon">
+                                                    <!--<span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>
+                                                    </span>-->
                                                 </div>
                                             </div>
                                         </div></div>

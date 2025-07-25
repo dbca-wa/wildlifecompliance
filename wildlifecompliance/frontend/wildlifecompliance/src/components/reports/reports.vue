@@ -12,9 +12,9 @@
                                       <label for="">Start Date</label>
                                       <div class="input-group date"  id="accountsDateStartPicker">
                                           <input type="date" class="form-control" name="start" placeholder="DD/MM/YYYY" required >
-                                          <span class="input-group-addon">
+                                          <!--<span class="input-group-addon">
                                               <span class="glyphicon glyphicon-calendar"></span>
-                                          </span>
+                                          </span>-->
                                       </div>
                                     </div>
                                 </div>
@@ -23,9 +23,9 @@
                                       <label for="">End Date</label>
                                       <div class="input-group date" id="accountsDateEndPicker">
                                           <input type="date" class="form-control" name="end"  placeholder="DD/MM/YYYY" required>
-                                          <span class="input-group-addon">
+                                          <!--<span class="input-group-addon">
                                               <span class="glyphicon glyphicon-calendar"></span>
-                                          </span>
+                                          </span>-->
                                       </div>
                                     </div>
                                 </div>
@@ -36,9 +36,9 @@
                                       <label for="">Bank Start Date</label>
                                       <div class="input-group date" id="flatDateStartPicker">
                                           <input type="date" class="form-control" name="banked_start"  placeholder="DD/MM/YYYY" required>
-                                          <span class="input-group-addon">
+                                          <!--<span class="input-group-addon">
                                               <span class="glyphicon glyphicon-calendar"></span>
-                                          </span>
+                                          </span>-->
                                       </div>
                                     </div>
                                 </div>
@@ -47,9 +47,9 @@
                                       <label for="">Bank End Date</label>
                                       <div class="input-group date" id="flatDateEndPicker">
                                           <input type="date" class="form-control" name="banked_end"  placeholder="DD/MM/YYYY" required>
-                                          <span class="input-group-addon">
+                                          <!--<span class="input-group-addon">
                                               <span class="glyphicon glyphicon-calendar"></span>
-                                          </span>
+                                          </span>-->
                                       </div>
                                     </div>
                                 </div>
@@ -81,9 +81,9 @@
                                       <label for="">Date</label>
                                       <div class="input-group date" ref="oracleDatePicker">
                                           <input type="text" class="form-control" name="oracle_date"  placeholder="DD/MM/YYYY" required>
-                                          <span class="input-group-addon">
+                                          <!--<span class="input-group-addon">
                                               <span class="glyphicon glyphicon-calendar"></span>
-                                          </span>
+                                          </span>-->
                                       </div>
                                     </div>
                                     <div class="form-group">

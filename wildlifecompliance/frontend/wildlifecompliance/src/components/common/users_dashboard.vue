@@ -24,9 +24,9 @@
                             <label for="">Date of Birth</label>
                             <div class="input-group date" ref="filterDateOfBirthPicker">
                                 <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateOfBirth">
-                                <span class="input-group-addon">
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>
                     </div>

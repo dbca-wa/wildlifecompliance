@@ -21,18 +21,18 @@
                 <label class="">Date From</label>
                 <div class="input-group date" ref="lodgementDateFromPicker">
                     <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFrom" />
-                    <span class="input-group-addon">
+                    <!--<span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+                    </span>-->
                 </div>
             </div>
             <div>
                 <label class="">Date To</label>
                 <div class="input-group date" ref="lodgementDateToPicker">
                     <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateTo" />
-                    <span class="input-group-addon">
+                    <!--<span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+                    </span>-->
                 </div>
             </div>
         </div>

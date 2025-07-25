@@ -9,9 +9,9 @@
                         <div class="col-sm-3">
                             <div class="input-group date" ref="newDueDatePicker">
                                 <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="new_due_date" />
-                                <span class="input-group-addon">
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>
                         current due date: {{ comingDueDateDisplay }} <br />

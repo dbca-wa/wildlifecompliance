@@ -20,9 +20,9 @@
             <div class="flexItemDatetime">
                 <div class="input-group date" ref="courtDatePicker">
                     <input :readonly="readonlyForm" type="date" class="form-control" :value="court_date" />
-                    <span class="input-group-addon">
+                    <!--<span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+                    </span>-->
                 </div>
             </div>
 
@@ -30,9 +30,9 @@
             <div class="flexItemDatetime">
                 <div class="input-group date" ref="courtTimePicker">
                     <input :readonly="readonlyForm" type="time" class="form-control" :value="court_time" />
-                    <span class="input-group-addon">
+                    <!--<span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+                    </span>-->
                 </div>
             </div>
 

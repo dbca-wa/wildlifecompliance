@@ -63,9 +63,9 @@
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="occurrenceDateFromPicker">
                                         <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="offence.occurrence_date_from" />
-                                        <span class="input-group-addon">
+                                        <!--<span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                        </span>-->
                                     </div>
                                 </div>
                                 <label v-show="offence.occurrence_from_to" class="col-sm-1">to</label>
@@ -73,9 +73,9 @@
                                     <div class="col-sm-3">
                                         <div class="input-group date" ref="occurrenceDateToPicker">
                                             <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="offence.occurrence_date_to" />
-                                            <span class="input-group-addon">
+                                            <!--<span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>
+                                            </span>-->
                                         </div>
                                     </div>
                                 </div>
@@ -86,9 +86,9 @@
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="occurrenceTimeFromPicker">
                                         <input type="time" class="form-control" placeholder="HH:MM" v-model="offence.occurrence_time_from" />
-                                        <span class="input-group-addon">
+                                        <!--<span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                        </span>-->
                                     </div>
                                 </div>
                                 <label v-show="offence.occurrence_from_to" class="col-sm-1">to</label>
@@ -96,9 +96,9 @@
                                     <div class="col-sm-3">
                                         <div class="input-group date" ref="occurrenceTimeToPicker">
                                             <input type="time" class="form-control" placeholder="HH:MM" v-model="offence.occurrence_time_to" />
-                                            <span class="input-group-addon">
+                                            <!--<span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>
+                                            </span>-->
                                         </div>
                                     </div>
                                 </div>

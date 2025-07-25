@@ -182,9 +182,9 @@
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="dueDatePicker">
                                         <input type="date" class="form-control" placeholder="DD/MM/YYYY" :value="current_remediation_action.due_date" />
-                                        <span class="input-group-addon">
+                                        <!--<span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                        </span>-->
                                     </div>
                                 </div>
                             </div></div>
@@ -225,9 +225,9 @@
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="dateOfIssuePicker">
                                         <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="sanction_outcome.date_of_issue" :disabled="!sanction_outcome.issued_on_paper"/>
-                                        <span class="input-group-addon">
+                                        <!--<span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                        </span>-->
                                     </div>
                                 </div>
                             </div></div>
@@ -239,9 +239,9 @@
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="timeOfIssuePicker">
                                         <input type="time" class="form-control" placeholder="HH:MM" v-model="sanction_outcome.time_of_issue" :disabled="!sanction_outcome.issued_on_paper" />
-                                        <span class="input-group-addon">
+                                        <!--<span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                        </span>-->
                                     </div>
                                 </div>
                             </div></div>

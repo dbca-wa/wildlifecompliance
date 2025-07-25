@@ -31,9 +31,9 @@
                     <label for="">Planned From</label>
                     <div class="input-group date" ref="plannedDateFromPicker">
                         <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterPlannedFrom">
-                        <span class="input-group-addon">
+                        <!--<span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
+                        </span>-->
                     </div>
                 </div>
             </div>
@@ -42,9 +42,9 @@
                     <label for="">Planned To</label>
                     <div class="input-group date" ref="plannedDateToPicker">
                         <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterPlannedTo">
-                        <span class="input-group-addon">
+                        <!--<span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
+                        </span>-->
                     </div>
                 </div>
             </div>

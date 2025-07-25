@@ -159,9 +159,9 @@
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="plannedForDatePicker">
                                         <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="inspection.planned_for_date" />
-                                        <span class="input-group-addon">
+                                        <!--<span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                        </span>-->
                                     </div>
                                 </div>
 
@@ -169,9 +169,9 @@
                                 <div class="col-sm-3">
                                     <div class="input-group date" id="plannedForTimePicker">
                                       <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="inspection.planned_for_time"/>
-                                      <span class="input-group-addon">
+                                      <!--<span class="input-group-addon">
                                           <span class="glyphicon glyphicon-calendar"></span>
-                                      </span>
+                                      </span>-->
                                     </div>
                                 </div>
                             </div></div>

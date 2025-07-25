@@ -33,18 +33,18 @@
                 <label class="">Issue date from:</label>
                 <div class="input-group date" ref="issueDateFromPicker">
                     <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFromPicker" />
-                    <span class="input-group-addon">
+                    <!--<span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+                    </span>-->
                 </div>
             </div>
             <div class="col-md-3">
                 <label class="">Issue date to:</label>
                 <div class="input-group date" ref="issueDateToPicker">
                     <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateToPicker" />
-                    <span class="input-group-addon">
+                    <!--<span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+                    </span>-->
                 </div>
             </div>
         </div>

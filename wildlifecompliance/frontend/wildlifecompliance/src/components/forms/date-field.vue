@@ -18,9 +18,9 @@
             </div>
             <div v-else class='input-group date'>
                 <input type="date" :readonly="readonly" :name="name" class="form-control" placeholder="DD/MM/YYYY" v-model="value" :required="isRequired" :title="value"/>
-                <span class="input-group-addon">
+                <!--<span class="input-group-addon">
                     <span class="glyphicon glyphicon-calendar"></span>
-                </span>
+                </span>-->
             </div>
         </div>
     </div>

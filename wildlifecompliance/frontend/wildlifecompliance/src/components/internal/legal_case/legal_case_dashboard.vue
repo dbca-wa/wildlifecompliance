@@ -21,9 +21,9 @@
                     <label for="">Planned From</label>
                     <div class="input-group date" ref="caseCreatedDateFromPicker">
                         <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterCaseCreatedFrom">
-                        <span class="input-group-addon">
+                        <!--<span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
+                        </span>-->
                     </div>
                 </div>
             </div>
@@ -32,9 +32,9 @@
                     <label for="">Planned To</label>
                     <div class="input-group date" ref="caseCreatedDateToPicker">
                         <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterCaseCreatedTo">
-                        <span class="input-group-addon">
+                        <!--<span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
+                        </span>-->
                     </div>
                 </div>
             </div>

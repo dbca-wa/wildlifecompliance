@@ -51,9 +51,9 @@
                                     <div class="col-sm-9">
                                         <div class="input-group date" ref="due_date" style="width: 70%;">
                                             <input type="date" class="form-control" name="due_date" placeholder="DD/MM/YYYY" v-model="condition.due_date">
-                                            <span class="input-group-addon">
+                                            <!--<span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>
+                                            </span>-->
                                         </div>
                                     </div>
                                 </div>
