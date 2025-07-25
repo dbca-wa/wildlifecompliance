@@ -157,7 +157,7 @@
 import { api_endpoints, helpers, fetch } from "@/utils/hooks";
 import utils from '@/components/internal/utils'
 import modal from "@vue-utils/bootstrap-modal.vue";
-import "bootstrap/dist/css/bootstrap.css";
+
 import Vue from "vue";
 
 export default {

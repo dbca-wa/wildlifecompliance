@@ -35,7 +35,7 @@ import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
 import filefield from '@/components/common/compliance_file.vue';
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+
 
 export default {
     name: "OffenceWorkflow",

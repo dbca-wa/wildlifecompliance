@@ -318,7 +318,7 @@ import SearchOffender from './search_offenders.vue'
 //import CreateNewPerson from "@common-components/create_new_person.vue";
 import MapLocation from "../../common/map_location";
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal';
-import 'bootstrap/dist/css/bootstrap.css';
+
 import "awesomplete/awesomplete.css";
 import RelatedItems from "@common-components/related_items.vue";
 import moment from 'moment';

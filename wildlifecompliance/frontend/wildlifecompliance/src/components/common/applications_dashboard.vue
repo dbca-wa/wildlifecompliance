@@ -1,15 +1,13 @@
 <template id="application_dashboard">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Applications <small v-if="is_external">View existing applications and lodge new ones</small>
-                        <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pBody">
+            <FormSection
+                :form-collapse="false"
+                label="Applications"
+                index="applications"
+                subtitle="View existing applications and lodge new ones"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -70,14 +68,13 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </template>
 <script>
 import datatable from '@/utils/vue/datatable.vue'
-require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+
 import { mapActions, mapGetters } from 'vuex'
 import {
     api_endpoints,
@@ -85,6 +82,7 @@ import {
     fetch
 }from '@/utils/hooks'
 import '@/scss/dashboards/application.scss';
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'ApplicationTableDash',
     props: {
@@ -509,7 +507,8 @@ export default {
         }
     },
     components:{
-        datatable
+        datatable,
+        FormSection
     },
     watch:{
         filterApplicationStatus: function() {

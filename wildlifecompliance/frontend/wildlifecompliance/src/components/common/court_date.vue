@@ -52,7 +52,7 @@ import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
 import datatable from '@vue-utils/datatable.vue'
-import 'bootstrap/dist/css/bootstrap.css';
+
 import _ from 'lodash';
 
 export default {

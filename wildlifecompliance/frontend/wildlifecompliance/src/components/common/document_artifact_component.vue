@@ -241,7 +241,7 @@ import Vue from "vue";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
 import filefield from '@/components/common/compliance_file.vue';
-import 'bootstrap/dist/css/bootstrap.css';
+
 import moment from 'moment';
 import SearchPersonOrganisation from './search_person_or_organisation'
 import FormSection from "@/components/forms/section_toggle.vue";

@@ -80,7 +80,6 @@ INSTALLED_APPS += [
     'reversion',
     'reversion_compare',
     'django.contrib.humanize',
-    'bootstrap3',
     'wildlifecompliance',
     'wildlifecompliance.components.main',
     'wildlifecompliance.components.applications',
@@ -243,19 +242,6 @@ TEMPLATES[0]["OPTIONS"]["context_processors"].append(
     "wildlifecompliance.context_processors.authorised_index"
 )
 TEMPLATES[0]["OPTIONS"]["context_processors"].append('wildlifecompliance.context_processors.wildlifecompliance_processor')
-
-del BOOTSTRAP3['css_url']
-#BOOTSTRAP3 = {
-#    'jquery_url': '//static.dbca.wa.gov.au/static/libs/jquery/2.2.1/jquery.min.js',
-#    'base_url': '//static.dbca.wa.gov.au/static/libs/twitter-bootstrap/3.3.6/',
-#    'css_url': None,
-#    'theme_url': None,
-#    'javascript_url': None,
-#    'javascript_in_head': False,
-#    'include_jquery': False,
-#    'required_css_class': 'required-form-field',
-#    'set_placeholder': False,
-#}
 
 CACHE_TIMEOUT_2_HOURS = 60 * 60 * 2
 CACHE_KEY_FILE_EXTENSION_WHITELIST = "file-extension-whitelist"

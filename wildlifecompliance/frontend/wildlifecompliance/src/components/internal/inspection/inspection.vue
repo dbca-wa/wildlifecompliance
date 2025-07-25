@@ -382,7 +382,7 @@ import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
-import 'bootstrap/dist/css/bootstrap.css';
+
 import Offence from '../offence/offence_modal';
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal';
 import filefield from '@/components/common/compliance_file.vue';
@@ -390,7 +390,7 @@ import InspectionWorkflow from './inspection_workflow.vue';
 import RelatedItems from "@common-components/related_items.vue";
 import MapLocation from "../../common/map_location";
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+
 import hash from 'object-hash';
 
 

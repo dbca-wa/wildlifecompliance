@@ -550,9 +550,9 @@ import moment from 'moment';
 import CallWorkflow from './call_email_workflow';
 import Offence from '../offence/offence_modal';
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal';
-import 'bootstrap/dist/css/bootstrap.css';
+
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+
 import Inspection from '../inspection/create_inspection_modal';
 import RelatedItems from "@common-components/related_items.vue";
 import hash from 'object-hash';

@@ -309,11 +309,11 @@ import Vue from "vue";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
 import filefield from '@/components/common/compliance_file.vue';
-import 'bootstrap/dist/css/bootstrap.css';
+
 import moment from 'moment';
 import SearchPersonOrganisation from './search_person_or_organisation'
 //require("select2/dist/css/select2.min.css");
-//require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+//
 import FormSection from "@/components/forms/section_toggle.vue";
 import RelatedItems from "@common-components/related_items.vue";
 import datatable from '@vue-utils/datatable.vue'

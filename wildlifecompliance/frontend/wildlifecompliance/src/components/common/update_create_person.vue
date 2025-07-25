@@ -154,8 +154,6 @@ import Vue from 'vue';
 import $ from "jquery";
 import { api_endpoints, helpers, fetch } from '@/utils/hooks'
 import utils from '../internal/utils'
-import "bootstrap/dist/css/bootstrap.css"
-//import moment from 'moment'
 
 export default {
     name: "update-create-person",
