@@ -2,12 +2,6 @@
 
 {% load static %}
 
-{% block left_menu_items %}
-    <li><a href="{% url 'wc_contact' %}">Contact Us</a></li>
-    <li><a href="{% url 'wc_further_info' %}">Further Information</a></li>
-    <li><a href="{% url 'wc_infringement' %}">Infringement Notice</a></li>
-{% endblock %}
-
 {% block messages %}
 {% endblock %}
 
@@ -33,7 +27,6 @@
                             Once logged in, you can add additional email addresses as profiles to your account.
                         </strong></p>
                         -->
-                        {% bootstrap_messages %}
 			    <a class="btn btn-primary" href="{{ BASE_URL }}ssologin">Login</a>
                         <hr>
                         <h4>
