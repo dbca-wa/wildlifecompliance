@@ -1,4 +1,4 @@
-{% extends 'webtemplate_dbca/base_b5_auth_session.html' %}
+{% extends "ledgerui/accounts_base_b5.html" %}
 {% load static %}
 
 {% load users %}
@@ -42,15 +42,7 @@
     <div class="navbar-nav">
         <div class="nav-item">
             {% if request.user.is_authenticated %}
-            {% if is_compliance_management_user and not is_compliance_internal_login %}
-            <a class="navbar-brand" href="/external/"><div style="inline"><img src="{% static 'wildlifecompliance/img/dpaw_small.png' %}">Home</div></a>
-            {% elif is_wildlifecompliance_officer and not prefer_compliance_management %}
-            <a class="navbar-brand" href="/external/"><div style="inline"><img src="{% static 'wildlifecompliance/img/dpaw_small.png' %}">Home</div></a>
-            {% elif is_compliance_internal_login and prefer_compliance_management %}
-            <a class="navbar-brand" href="/external/"><div style="inline"><img src="{% static 'wildlifecompliance/img/dpaw_small.png' %}">Home</div></a>
-            {% else %}
-            <a class="navbar-brand" href="/external/"><div style="inline"><img src="{% static 'wildlifecompliance/img/dpaw_small.png' %}">Home</div></a>
-            {% endif %}
+            <a class="navbar-brand" href="/external/"><img src="{% static 'wildlifecompliance/img/dpaw_small.png' %}">Home</a>
             {% endif %}
         </div>
     </div>

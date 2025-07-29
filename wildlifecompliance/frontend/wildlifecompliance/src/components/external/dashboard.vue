@@ -2,7 +2,7 @@
 <div class="container" id="externalDash">
     <div class="row">
         <div class="col-sm-12">
-            <div class="well well-sm">
+            <div class="card bg-light p-3 mb-3">
                 <p>
                     Welcome to the Wildlife Licensing online system dashboard.<br/><br/> Here you can access your existing licences, view any applications in progress, lodge new<br/> applications or submit information required to comply with conditions listed
                     on your licence

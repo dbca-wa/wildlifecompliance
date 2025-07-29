@@ -5,26 +5,26 @@
 {% is_wildlifecompliance_payment_officer as is_payment_officer %}
 
 {% if is_wildlifecompliance_admin_login %}
-    <li><a href="/internal/schema">Manage Licence Schema</a></li>
+    <li><a class="dropdown-item" href="/internal/schema">Manage Licence Schema</a></li>
     {% if request.user.is_superuser %}
-        <li><a href="{% url 'mgt-commands' %}">Management Commands</a></li>
+        <li><a class="dropdown-item" href="{% url 'mgt-commands' %}">Management Commands</a></li>
     {% endif %}
-    <li><a href="{{ LEDGER_UI_URL }}/ledger/account-management/">Accounts Management</a></li>
+    <li><a class="dropdown-item" href="{{ LEDGER_UI_URL }}/ledger/account-management/">Accounts Management</a></li>
     <li role="separator" class="divider"></li>
 {% endif %}
 
 {% if is_payment_officer %}
-    <li><a  class="dropdown-item" href="{{ LEDGER_UI_URL }}/reports?system_id={{ LEDGER_SYSTEM_ID }} ">Reports</a></li>
+    <li><a class="dropdown-item" class="dropdown-item" href="{{ LEDGER_UI_URL }}/reports?system_id={{ LEDGER_SYSTEM_ID }} ">Reports</a></li>
 {% endif %}
 
 
-<li><a href="/ledger-ui/accounts">Manage Account</a></li>
+<li><a class="dropdown-item" href="/ledger-ui/accounts">Manage Account</a></li>
 {% for org in request.user.wildlifecompliance_organisations.all %}
     {% for org_contact in org.contacts.all%}
         {% if org_contact.email == request.user.email %}
             {% if org_contact.user_status == 'active' %}
                 {% if org_contact.is_admin or org_contact.check_consultant %}
-                    <li><a href="/ledger-ui/organisation/{{org.organisation_id}}">Manage {{org.name}} </a></li>
+                    <li><a class="dropdown-item" href="/ledger-ui/organisation/{{org.organisation_id}}">Manage {{org.name}} </a></li>
                 {% endif %}
             {% endif %}
         {% endif %}
