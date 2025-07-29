@@ -236,9 +236,11 @@ var select2 = require('select2');
 require("select2/dist/css/select2.min.css");
 
 
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name:'schema-question',
     components: {
+        FormSection,
         modal,
         alert,
         datatable,

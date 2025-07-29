@@ -1,13 +1,9 @@
 <template>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Return
-                <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
-                    <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                </a>
-            </h3>
-        </div>
-        <div class="panel-body panel-collapse in" :id="pdBody">
+    <FormSection
+        :form-collapse="false"
+        label="Return"
+    >
+      <div class="panel panel-default">
             <div class="col-sm-16">
                 <div>
                     <AmendmentRequestDetails v-show="is_external"/>
@@ -22,7 +18,7 @@
             </div>
         </div>
         <input type='hidden' name="table_name" :value="returns.table[0].name" />
-    </div>
+    </FormSection>
 </template>
 
 <script>
@@ -35,6 +31,7 @@ import {
   helpers
 }
 from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
   name: 'externalReturnQuestion',
   data() {
@@ -51,6 +48,7 @@ export default {
     ]),
   },
   components: {
+    FormSection,
     AmendmentRequestDetails,
   },
   methods: {

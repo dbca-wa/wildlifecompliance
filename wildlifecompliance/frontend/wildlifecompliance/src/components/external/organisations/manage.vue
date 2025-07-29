@@ -2,15 +2,13 @@
     <div class="container" v-if="org && loaded" id="userInfo">
         <div class="row" >
             <div class="col-sm-12">
-                <div class="panel panel-default" >
-                  <div class="panel-heading">
-                    <h3 class="panel-title">Contact Details<small> View and update the organisation's contact details</small>
-                        <a class="panelClicker" :href="'#'+cBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="cBody">
-                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                        </a>
-                    </h3>
-                  </div>
-                  <div class="panel-body collapse" :id="cBody">
+                <FormSection
+                    :form-collapse="false"
+                    label="Contact Details"
+                    index="contact_details"
+                    subtitle="View and update the organisation's contact details"
+                >
+                    <div class="panel panel-default" >
                         <form class="form-horizontal" action="index.html" method="post">
                             <div class="col-sm-12">
                                 <button @click.prevent="addContact()" style="margin-bottom:10px;" class="btn btn-primary pull-right">Add Contact</button>
@@ -19,20 +17,18 @@
                             <datatable ref="contacts_datatable" id="organisation_contacts_datatable" :dtOptions="contacts_options" :dtHeaders="contacts_headers"/>
                         </form>
                   </div>
-                </div>
+                </FormSection>
             </div>
         </div>
         <div v-if="myorgperms.is_admin && org && loaded" class="row">
             <div class="col-sm-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Linked Persons<small> Manage the user accounts linked to the organisation</small>
-                            <a class="panelClicker" :href="'#'+oBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="oBody">
-                                <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                            </a>
-                        </h3>
-                    </div>
-                    <div class="panel-body collapse" :id="oBody">
+                <FormSection
+                    :form-collapse="false"
+                    label="Linked Persons"
+                    index="linked_persons"
+                    subtitle="Manage the user accounts linked to the organisation"
+                >
+                    <div class="panel panel-default">
                         <div class="col-sm-12 row">
                             <h6>Use the Organisation Administrator pin codes if you want the new user to be linked as organisation administrator.<br> Use the Organisation User pin codes if you want the new user to be linked as organisation user.</h6>
                         </div>
@@ -79,7 +75,7 @@
                             <datatable ref="contacts_datatable_user" id="organisation_contacts_datatable_ref" :dtOptions="contacts_options_ref" :dtHeaders="contacts_headers_ref"/>
                         </div>
                     </div>
-                </div>
+                </FormSection>
             </div>
         </div>
         <AddContact v-if="loaded" ref="add_contact" :org_id="org_id" />
@@ -92,6 +88,7 @@ import datatable from '@vue-utils/datatable.vue'
 import utils from '../utils'
 import api from '../api'
 import AddContact from '@common-components/add_contact.vue'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'Organisation',
     data () {
@@ -220,7 +217,8 @@ export default {
     },
     components: {
         datatable,
-        AddContact
+        AddContact,
+        FormSection
     },
     beforeRouteEnter: function(to, from, next){
         let id = [utils.fetchOrganisationId(to.params.org_id)];

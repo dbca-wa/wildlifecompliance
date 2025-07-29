@@ -279,6 +279,7 @@ import IntelligenceInformation from '@common-components/intelligence_information
 import CommsLogs from '@common-components/comms_logs.vue'
 import utils from '../utils'
 import api from '../api'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'Organisation',
     data () {
@@ -391,6 +392,7 @@ export default {
         }
     },
     components: {
+        FormSection,
         datatable,
         ApplicationDashTable,
         LicenceDashTable,

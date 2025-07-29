@@ -5,7 +5,7 @@
                 :form-collapse="false"
                 label="Applications"
                 index="applications"
-                subtitle="View existing applications and lodge new ones"
+                :subtitle=subtitle
             >
                 <div class="panel panel-default">
                     <div class="row">
@@ -545,6 +545,12 @@ export default {
         is_external: function(){
             return this.level == 'external';
         },
+        subtitle: function() {
+            if (this.is_external) {
+                return "View existing applications and lodge new ones";
+            }
+            return "";
+        }
     },
     methods:{
         ...mapActions([

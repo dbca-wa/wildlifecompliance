@@ -9,15 +9,11 @@
                 title="Assessment Record" large>
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Assessment Details
-                                    <a class="panelClicker" :href="'#'+panelBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="panelBody">
-                                        <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                    </a>
-                                </h3>
-                            </div>
-                            <div class="panel-body panel-collapse collapse in" :id="panelBody">
+                        <FormSection
+                            :form-collapse="false"
+                            label="Assessment Details"
+                        >
+                            <div class="panel panel-default">
                                 <form class="form-horizontal" name="assessment_form" method="put">
                                     <div class="col-sm-12">
                                         <div class="form-group">
@@ -41,7 +37,7 @@
                                     
                                 </form>
                             </div>
-                        </div>
+                        </FormSection>
                     </div>
                 </div>
             </modal>
@@ -58,15 +54,11 @@
             <div class="tab-content">
                 <div v-if="selectedActivity" :id="`${selectedActivity.id}`">
                     <div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">{{isLicensingOfficer ? 'Send to Assessor' : 'Assessments'}}
-                                    <a class="panelClicker" :href="`#${selectedActivity.id}`+assessorsBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="assessorsBody">
-                                        <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                    </a>
-                                </h3>
-                            </div>
-                            <div class="panel-body panel-collapse collapse in" :id="`${selectedActivity.id}`+assessorsBody">
+                        <FormSection
+                            :form-collapse="false"
+                            :label=title
+                        >
+                            <div class="panel panel-default">
                                 <div v-if="canSendToAssessor" class="row">
                                     <div class="col-sm-10" style="margin-bottom: 10px">
                                             <label class="control-label pull-left"  for="Name">Assessor Group</label>
@@ -92,7 +84,7 @@
                                         :onMount="eventListeners"/>
                                 </div>
                             </div>
-                        </div>
+                        </FormSection>
                         <div :id="`${selectedActivity.id}`" class="tab-pane fade in">
                             <Conditions
                                 :key="`assessor_condition_${selected_activity_tab_id}`"
@@ -119,6 +111,7 @@ import {
     helpers, fetch
 }
 from '@/utils/hooks';
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'ApplicationAssessments',
     data: function() {
@@ -144,6 +137,7 @@ export default {
         }
     },
     components: {
+        FormSection,
         datatable,
         modal,
         Application,
@@ -178,6 +172,13 @@ export default {
             'allCurrentActivities',
             'allCurrentActivitiesWithAssessor',
         ]),
+        title: function() {
+            if (this.isLicensingOfficer) {
+                return "Send to Assessor"
+            } else {
+                return "Assessments"
+            }
+        },
         relevantAssessorGroup: function() {
             let relevantAssessors = [];
             array.forEach(assessor => {

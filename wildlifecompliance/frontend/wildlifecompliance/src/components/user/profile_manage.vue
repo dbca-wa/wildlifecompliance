@@ -94,6 +94,7 @@ import Vue from 'vue'
 import $ from 'jquery'
 import { api_endpoints, helpers, fetch } from '@/utils/hooks'
 import utils from '@/components/internal/utils'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'EditProfile',
     data () {
@@ -165,6 +166,9 @@ export default {
 					})
 				});
         },
+    },
+    components: {
+        FormSection,
     },
     beforeRouteEnter: function(to, from, next){
         let initialisers = [

@@ -1,13 +1,9 @@
 <template lang="html">
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h4 class="panel-title">Options
-                <a class="panelClicker" :href="`#`+pOptionBody" data-toggle="collapse" data-parent="#userInfo" expanded="true" :aria-controls="pOptionBody">
-                    <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                </a>
-            </h4>
-        </div>
-        <div class="panel-body panel-collapse collapse" :id="``+pOptionBody">
+    <FormSection
+        :form-collapse="false"
+        label="Options"
+    >
+        <div class="panel panel-primary">
             <div class="row">
                 <div v-for="(a, aidx) in addedOptions" v-bind:key="`a_${aidx}`">
 
@@ -36,10 +32,11 @@
                 </div>
             </div>
         </div>
-    </div>
+    </FormSection>
 </template>
 
 <script>
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name:"schema-add-option",
     props: {
@@ -65,7 +62,8 @@ export default {
             }],
         };
     },
-    computed:{
+    components: {
+        FormSection,
     },
     methods: {
         addOption: function() {

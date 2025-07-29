@@ -1,18 +1,12 @@
 <template>
 <div class="container" id="internalSearch">
-    <!--UserDashTable level="internal" :url="users_url" />
-    <OrganisationDashTable /-->
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Person and Organisation Search
-                        <a :href="'#'+rBody" data-toggle="collapse"  data-parent="#personOrgSearch" expanded="true" :aria-controls="rBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="kBody">
+            <FormSection
+                :form-collapse="false"
+                label="Person and Organisation SearchReturn"
+            >
+                <div class="panel panel-default">
                     <div class="form-group">
                         <div class="row">   
                             <div class="form-check form-check-inline col-md-3">
@@ -49,20 +43,16 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
     <div v-if="showSearchKeywords" class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Keywords
-                        <a :href="'#'+kBody" data-toggle="collapse"  data-parent="#keywordInfo" expanded="true" :aria-controls="kBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="kBody">
+            <FormSection
+                :form-collapse="false"
+                label="Keywords"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                       <div>
                         <div class="form-group">
@@ -117,20 +107,16 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Reference Number
-                        <a :href="'#'+rBody" data-toggle="collapse"  data-parent="#referenceNumberInfo" expanded="true" :aria-controls="rBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="rBody">
+            <FormSection
+                :form-collapse="false"
+                label="Reference Number"
+            >
+                <div class="panel panel-default">
                     <div class="row col-lg-12">
                         <span>Search on the following items via Reference Number:</span>
                         <ul>
@@ -166,7 +152,7 @@
                         <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </div>
@@ -184,6 +170,7 @@ import {
 }
 from '@/utils/hooks'
 import utils from './utils'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'SearchDashboard',
     data() {
@@ -269,6 +256,7 @@ export default {
         }
     },
     components: {
+        FormSection,
         alert,
         datatable,
         UserDashTable,

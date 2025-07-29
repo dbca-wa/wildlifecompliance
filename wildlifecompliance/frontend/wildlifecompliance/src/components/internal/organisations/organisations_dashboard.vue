@@ -26,6 +26,7 @@ import {
     api_endpoints,
     helpers
 }from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'OrganisationDashTable',
     data() {
@@ -87,7 +88,8 @@ export default {
             }
         }
     },
-    components:{
+    components: {
+        FormSection,
         datatable
     },
     mounted: function(){

@@ -1,13 +1,9 @@
 <template>
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">{{ sheetTitle }}
-            <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
-                <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-            </a>
-        </h3>
-    </div>
-    <div class="panel-body panel-collapse in" :id="pdBody">
+<FormSection
+    :form-collapse="false"
+    :label=sheetTitle
+>
+  <div class="panel panel-default">
         <div class="col-sm-12">
             <div class="row">
                 <div class="col-md-6">
@@ -56,7 +52,7 @@
         </div>
     </div>
     <SheetEntry ref="sheet_entry"></SheetEntry>
-</div>
+</FormSection>
 </template>
 
 <script>
@@ -74,6 +70,7 @@ import {
 }
 from '@/utils/hooks'
 import '@/scss/forms/return_sheet.scss';
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
   name: 'externalReturnSheet',
   props: {
@@ -200,7 +197,8 @@ export default {
         }
     }
   },
-  components:{
+  components: {
+    FormSection,
     SheetEntry,
     datatable,
     Returns,

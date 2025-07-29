@@ -1,13 +1,9 @@
 <template lang="html">
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h4 class="panel-title">Expanders
-                <a class="panelClicker" :href="`#`+pExpanderBody" data-toggle="collapse" data-parent="#userInfo" expanded="true" :aria-controls="pExpanderBody">
-                    <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                </a>
-            </h4>
-        </div>
-        <div class="panel-body panel-collapse collapse" :id="``+pExpanderBody">
+    <FormSection
+        :form-collapse="false"
+        label="Expanders"
+    >
+        <div class="panel panel-primary">
             <div class="row">
                 <div v-for="(e, eidx) in addedExpanders" v-bind:key="`e_${eidx}`">
 
@@ -33,10 +29,11 @@
                 </div>
             </div>
         </div>
-    </div>
+    </FormSection>
 </template>
 
 <script>
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name:"schema-add-expander",
     props: {
@@ -54,7 +51,8 @@ export default {
             },
         };
     },
-    computed:{
+    components: {
+        FormSection,
     },
     methods: {
         addExpander: function() {

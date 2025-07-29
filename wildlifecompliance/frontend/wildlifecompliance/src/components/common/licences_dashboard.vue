@@ -1,15 +1,13 @@
 <template id="licence_dashboard">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Licences <small v-if="is_external">View existing licences and amend or renew them</small>
-                        <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pBody">
+            <FormSection
+                :form-collapse="false"
+                label="Licences"
+                index="licences"
+                :subtitle=subtitle
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -66,7 +64,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
         <LicenceActionPurposes ref="licence_action_purposes" :licence_activity_purposes="action_purpose_list" :licence_id="selected_licence_id" :action="licence_action" @refreshFromResponse="refreshFromResponse"></LicenceActionPurposes>
         <InspectionRequest ref="inspection" @inspection-created="requestedInspection"></InspectionRequest>
@@ -86,6 +84,7 @@ import {
     fetch
 } from '@/utils/hooks'
 import '@/scss/dashboards/licence.scss';
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'LicenceTableDash',
     props: {
@@ -108,7 +107,6 @@ export default {
             pBody: 'pBody' + vm._uid,
             datatable_id: 'licence-datatable-'+vm._uid,
             filterLicenceType: 'All',
-//            filterLicenceStatus: 'All',
             filterLicenceIssuedFrom: '',
             filterLicenceIssuedTo: '',
             filterLicenceHolder: 'All',
@@ -301,6 +299,7 @@ export default {
         LicenceActionPurposes,
         InspectionRequest,
         LicenceHistory,
+        FormSection
     },
     watch:{
         filterLicenceType: function(){
@@ -322,7 +321,13 @@ export default {
         },
         is_external: function(){
             return this.level == 'external';
-        },        
+        },       
+        subtitle: function() {
+            if (this.is_external) {
+                return "View existing licences and amend or renew them";
+            }
+            return "";
+        } 
     },
     methods:{
         ...mapActions([

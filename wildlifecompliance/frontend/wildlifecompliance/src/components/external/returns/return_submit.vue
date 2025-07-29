@@ -1,13 +1,9 @@
 <template>
-    <div class="panel panel-default">
-        <div class="panel-heading" v-show="false">
-            <h3 class="panel-title">Return
-                <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
-                    <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                </a>
-            </h3>
-        </div>
-        <div class="panel-body panel-collapse in" :id="pdBody">
+    <FormSection
+        :form-collapse="false"
+        label="Return"
+    >
+        <div class="panel panel-default">
             <div v-if="isReturnsLoaded" class="col-sm-offset-3 col-sm-6 borderDecoration">
                 <strong>Your Return has been submitted successfully.</strong>
                 <br/>
@@ -35,7 +31,7 @@
             </div>
         </div>
         <input type='hidden' name="table_name" :value="returns.table[0].name" />
-    </div>
+    </FormSection>
 </template>
 
 <script>
@@ -47,6 +43,7 @@ import {
   helpers
 }
 from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
   name: 'ReturnConfirmation',
   data() {
@@ -54,6 +51,9 @@ export default {
     return {
       pdBody: 'pdBody' + vm._uid,
     }
+  },
+  components: {
+    FormSection,
   },
   computed: {
     ...mapGetters([

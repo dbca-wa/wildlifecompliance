@@ -303,6 +303,7 @@ import CommsLogs from '@common-components/comms_logs.vue'
 import IntelligenceInformation from '@common-components/intelligence_information.vue'
 import SecureBaseLink from '@common-components/securebase_link.vue';
 import utils from '../utils'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'User',
     data () {
@@ -346,6 +347,7 @@ export default {
         }
     },
     components: {
+        FormSection,
         datatable,
         ApplicationDashTable,
         LicenceDashTable,

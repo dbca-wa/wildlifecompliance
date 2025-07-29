@@ -214,15 +214,11 @@
 
                     <div class="col-md-12" v-if="showingApplicant">
                         <div class="row">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Applicant
-                                        <a class="panelClicker" :href="'#'+detailsBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="detailsBody">
-                                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                        </a>
-                                    </h3> 
-                                </div>
-                                <div v-if="applicantType == 'org'" class="panel-body panel-collapse collapse in" :id="detailsBody">
+                            <FormSection
+                                :form-collapse="false"
+                                label="Applicant"
+                            >
+                                <div v-if="applicantType == 'org'" class="panel panel-default">
                                       <form class="form-horizontal">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Name</label>
@@ -238,7 +234,7 @@
                                           </div>
                                       </form>
                                 </div>
-                                <div v-if="applicantType == 'proxy'" class="panel-body panel-collapse collapse in" :id="detailsBody">
+                                <div v-if="applicantType == 'proxy'" class="panel panel-default">
                                       <form class="form-horizontal">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Given Name(s)</label>
@@ -260,7 +256,7 @@
                                           </div>
                                       </form>
                                 </div>
-                                <div v-if="applicantType == 'submitter'" class="panel-body panel-collapse collapse in" :id="detailsBody">
+                                <div v-if="applicantType == 'submitter'" class="panel panel-default">
                                       <form class="form-horizontal">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Given Name(s)</label>
@@ -282,63 +278,16 @@
                                           </div>
                                       </form>
                                 </div>
-                            </div>
+                            </FormSection>
                         </div>
                     </div>
-                    <!--<div class="col-md-12">
-                        <div class="row">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Identification
-                                        <a class="panelClicker" :href="'#'+identificationBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="identificationBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                </div>
-                                <div v-if="applicantType == 'org' && application.org_applicant.organisation.identification" class="panel-body panel-collapse collapse" :id="identificationBody">
-                                      <form class="form-horizontal">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Identification</label>
-                                            <div class="col-sm-8">
-                                                <img width="100%" name="applicantIdentification" v-bind:src="application.org_applicant.organisation.identification" />
-                                            </div>
-                                          </div>
-                                      </form>
-                                </div>
-                                <div v-if="applicantType == 'proxy' && application.proxy_applicant.identification2" class="panel-body panel-collapse collapse" :id="identificationBody">
-                                      <form class="form-horizontal">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Identification</label>
-                                            <div class="col-sm-8">
-                                                <img width="100%" name="applicantIdentification" v-bind:src="application.proxy_applicant.identification2" />
-                                            </div>
-                                          </div>
-                                      </form>
-                                </div>
-                                <div v-if="applicantType == 'submitter' && application.submitter.identification2" class="panel-body panel-collapse collapse" :id="identificationBody">
-                                      <form class="form-horizontal">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Identification</label>
-                                            <div class="col-sm-8">
-                                                <span class="btn btn-link btn-file pull-left"><SecureBaseLink link_name="Uploaded Photo ID" :link_data="{'customer_id': application.submitter.id}" /></span>
-                                            </div>
-                                          </div>
-                                      </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>-->
                     <div class="col-md-12">
                         <div class="row">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Address Details
-                                        <a class="panelClicker" :href="'#'+addressBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="addressBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3> 
-                                </div>
-                                <div v-if="applicantType == 'org' && application.org_applicant.address" class="panel-body panel-collapse collapse" :id="addressBody">
+                            <FormSection
+                                :form-collapse="false"
+                                label="Address Details"
+                            >
+                                <div v-if="applicantType == 'org' && application.org_applicant.address" class="panel panel-default">
                                       <form class="form-horizontal">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Street</label>
@@ -370,7 +319,7 @@
                                           </div>
                                        </form>
                                 </div>
-                                <div v-if="applicantType == 'proxy' && application.proxy_applicant.residential_address" class="panel-body panel-collapse collapse" :id="addressBody">
+                                <div v-if="applicantType == 'proxy' && application.proxy_applicant.residential_address" class="panel panel-default">
                                       <form class="form-horizontal">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Street</label>
@@ -402,7 +351,7 @@
                                           </div>
                                        </form>
                                 </div>
-                                <div v-if="applicantType == 'submitter' && application.submitter.residential_address" class="panel-body panel-collapse collapse" :id="addressBody">
+                                <div v-if="applicantType == 'submitter' && application.submitter.residential_address" class="panel panel-default">
                                       <form class="form-horizontal">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Street</label>
@@ -434,24 +383,20 @@
                                           </div>
                                        </form>
                                 </div>
-                            </div>
+                            </FormSection>
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="row">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Contact Details
-                                        <a class="panelClicker" :href="'#'+contactsBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="contactsBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                </div>
-                                <div v-if="applicantType == 'org'" class="panel-body panel-collapse collapse" :id="contactsBody">
+                            <FormSection
+                                :form-collapse="false"
+                                label="Contact Details"
+                            >
+                                <div v-if="applicantType == 'org'" class="panel panel-default">
                                     <table ref="contacts_datatable" :id="contacts_table_id" class="hover table table-striped table-bordered dt-responsive" cellspacing="0" width="100%">
                                     </table>
                                 </div>
-                                <div v-if="applicantType == 'proxy'" class="panel-body panel-collapse collapse" :id="contactsBody">
+                                <div v-if="applicantType == 'proxy'" class="panel panel-default">
                                   <form class="form-horizontal">
                                       <div class="form-group">
                                         <label for="" class="col-sm-3 control-label">Phone</label>
@@ -473,7 +418,7 @@
                                       </div>
                                   </form>
                                 </div>
-                                <div v-if="applicantType == 'submitter'" class="panel-body panel-collapse collapse" :id="contactsBody">
+                                <div v-if="applicantType == 'submitter'" class="panel panel-default">
                                   <form class="form-horizontal">
                                       <div class="form-group">
                                         <label for="" class="col-sm-3 control-label">Phone</label>
@@ -495,22 +440,16 @@
                                       </div>
                                   </form>
                                 </div>
-
-                            </div>
+                            </FormSection>
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class ="row">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Check List
-                                    <a class="panelClicker" :href="'#'+checksBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="checksBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                    </a>
-                                </h3>
-
-                            </div>
-                            <div class="panel-body panel-collapse collapse" :id="checksBody">
+                        <FormSection
+                            :form-collapse="false"
+                            label="Check List"
+                        >
+                            <div class="panel panel-default">
                                 <div class="row">
                                     <div class="col-sm-4">ID Check</div>
                                     <div class="col-sm-4">
@@ -545,12 +484,8 @@
                                     </div>
                                 </div>
                             </div>
-
-
-                        </div>
+                        </FormSection>
                     </div>
-
-
                     </div>
                 </div>
 
@@ -614,15 +549,11 @@
         <div class="row">
             <div class="col-md-12">          
                 <div class="row">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Decision
-                                <a class="panelClicker" :href="'#'+decisionBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="decisionBody">
-                                    <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                </a>
-                            </h3>
-                        </div>
-                        <div class="panel-body panel-collapse collapse" :id="decisionBody">
+                    <FormSection
+                        :form-collapse="false"
+                        label="Decision"
+                    >
+                        <div class="panel panel-default">
                             <div v-for="activity in application.activities.filter(activity => ['issue_refund','issued'].includes(activity.decision_action))">
                                 <div class="col-sm-12">
                                     <strong>&nbsp;</strong><br/>
@@ -633,7 +564,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </FormSection>
                 </div>
             </div>
         </div>
@@ -675,6 +606,7 @@ import {
     helpers
 }
 from '@/utils/hooks';
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'InternalApplication',
     data: function() {
@@ -759,6 +691,7 @@ export default {
         }
     },
     components: {
+        FormSection,
         Application,
         datatable,
         ProposedDecline,

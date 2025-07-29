@@ -18,15 +18,11 @@
                 <div :id="dTab" class="tab-pane fade in active">
                     <div class="row">
                         <div class="col-sm-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                <h3 class="panel-title">Personal Details
-                                    <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
-                                        <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                    </a>
-                                </h3>
-                                </div>
-                                <div class="panel-body collapse in" :id="pdBody">
+                            <FormSection
+                                :form-collapse="false"
+                                label="Personal Details"
+                            >
+                                <div class="panel panel-default">
                                     <div v-if="objectAlert" class="alert alert-danger">
                                         <p>test alert</p>
                                     </div>
@@ -57,20 +53,16 @@
                                         </div>
                                     </form>
                                 </div>
-                            </div>
+                            </FormSection>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                <h3 class="panel-title">Address Details
-                                    <a class="panelClicker" :href="'#'+adBody" data-toggle="collapse" expanded="false"  data-parent="#userInfo" :aria-controls="adBody">
-                                        <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                    </a>
-                                </h3>
-                                </div>
-                                <div v-if="loading.length == 0" class="panel-body collapse in" :id="adBody">
+                            <FormSection
+                                :form-collapse="false"
+                                label="Address Details"
+                            >
+                                <div v-if="loading.length == 0" class="panel panel-default">
                                     <form class="form-horizontal" action="index.html" method="post">
                                         <div class="form-group">
                                         <label for="" class="col-sm-3 control-label">Street</label>
@@ -120,20 +112,16 @@
                                         </div>  -->
                                     </form>
                                 </div>
-                            </div>
+                            </FormSection>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                <h3 class="panel-title">Contact Details <small></small>
-                                    <a class="panelClicker" :href="'#'+cdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="cdBody">
-                                        <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                    </a>
-                                </h3>
-                                </div>
-                                <div class="panel-body collapse in" :id="cdBody">
+                            <FormSection
+                                :form-collapse="false"
+                                label="Contact Details"
+                            >
+                                <div class="panel panel-default">
                                     <form class="form-horizontal" action="index.html" method="post">
                                         <div class="form-group">
                                         <label for="" class="col-sm-3 control-label">Phone</label>
@@ -166,7 +154,7 @@
                                         </div> -->
                                     </form>
                                 </div>
-                            </div>
+                            </FormSection>
                         </div>
                     </div>
                     <div class="row" v-if="isEditable">
@@ -205,6 +193,7 @@ import PersonSearch from "@common-components/search_person_or_organisation.vue";
 import 'awesomplete/awesomplete.css';
 import utils from '../utils'
 
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: "search-person",
     data: function(){
@@ -240,6 +229,7 @@ export default {
         }
     },
     components: {
+        FormSection,
         datatable,
         ApplicationDashTable,
         LicenceDashTable,

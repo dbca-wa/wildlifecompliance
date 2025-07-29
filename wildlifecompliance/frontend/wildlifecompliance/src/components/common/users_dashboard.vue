@@ -1,15 +1,13 @@
 <template id="user_dashboard">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">People <small v-if="is_external">View people details</small>
-                        <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#peopleInfo" expanded="true" :aria-controls="pBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pBody">
+            <FormSection
+                :form-collapse="false"
+                label="People"
+                index="people"
+                :subtitle=subtitle
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -36,7 +34,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </template>
@@ -47,6 +45,7 @@ import {
     api_endpoints,
     helpers
 }from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'UserDashTable',
     props: {
@@ -156,7 +155,8 @@ export default {
         }
     },
     components:{
-        datatable
+        datatable,
+        FormSection
     },
     watch:{
         filterDateOfBirth: function(){
@@ -170,7 +170,12 @@ export default {
         is_external: function(){
             return this.level == 'external';
         },
-        
+        subtitle: function() {
+            if (this.is_external) {
+                return "View people details";
+            }
+            return "";
+        }
     },
     methods: {
         ...mapActions([

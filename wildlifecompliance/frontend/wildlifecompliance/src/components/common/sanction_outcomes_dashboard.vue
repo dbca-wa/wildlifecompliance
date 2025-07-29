@@ -1,15 +1,13 @@
 <template id="returns_dashboard">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Sanction Outcomes <small v-if="is_external">View any sanction outcome issued to you, pay any infringement notice and follow up on any remediation action</small>
-                        <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pBody">
+            <FormSection
+                :form-collapse="false"
+                label="Sanction Outcomes"
+                index="sanction_outcomes"
+                :subtitle=subtitle
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -70,7 +68,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </template>
@@ -78,7 +76,7 @@
 <script>
 import datatable from '@/utils/vue/datatable.vue'
 import { api_endpoints, helpers, cache_helper } from '@/utils/hooks'
-
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'SanctionOutcomeTableDash',
     props: {
@@ -242,7 +240,8 @@ export default {
         }
     },
     components:{
-        datatable
+        datatable,
+        FormSection
     },
     watch:{
         filterType: function () {
@@ -270,6 +269,12 @@ export default {
         is_external: function(){
             return this.level == 'external';
         },
+        subtitle: function() {
+            if (this.is_external) {
+                return "View any sanction outcome issued to you, pay any infringement notice and follow up on any remediation action";
+            }
+            return "";
+        }
     },
     created: async function(){
         this.constructOptionsType();

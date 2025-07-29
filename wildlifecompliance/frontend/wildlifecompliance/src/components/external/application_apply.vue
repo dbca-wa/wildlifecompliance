@@ -2,18 +2,12 @@
     <div class="container" v-if="application">
         <div class="row">
             <div class="col-sm-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">New Application for
-                            <span v-if="selected_apply_org_id">{{ selected_apply_org_id_details.name }} ({{ selected_apply_org_id_details.abn }})</span>
-                            <span v-if="selected_apply_proxy_id">{{ selected_apply_proxy_id_details.first_name }} {{ selected_apply_proxy_id_details.last_name }} ({{ selected_apply_proxy_id_details.email }})</span>
-                            <span v-if="!selected_apply_org_id && !selected_apply_proxy_id">yourself</span>
-                            <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                                <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                            </a>
-                        </h3>
-                    </div>
-                    <div class="panel-body collapse in" :id="pBody">
+                <FormSection
+                    :form-collapse="false"
+                    :label="title"
+                    index="apply"
+                >
+                    <div class="panel panel-default">
                         <form class="form-horizontal" name="orgForm" method="post">
                             <div class="col-sm-12">
                                 <div class="row">
@@ -45,7 +39,7 @@
                             </div>
                         </form>
                     </div>
-                </div>
+                </FormSection>
             </div>
         </div>
     </div>
@@ -60,6 +54,7 @@ from '@/utils/hooks'
 import { mapActions, mapGetters } from 'vuex'
 import utils from './utils'
 import internal_utils from '@/components/internal/utils'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
   data: function() {
     let vm = this;
@@ -78,6 +73,7 @@ export default {
     }
   },
   components: {
+    FormSection
   },
   computed: {
     ...mapGetters([
@@ -87,6 +83,15 @@ export default {
     ]),
     isLoading: function() {
       return this.loading.length > 0
+    },
+    title: function() {
+        if (this.selected_apply_org_id && this.selected_apply_org_id_details != undefined) {
+            return this.applicationTitle + " for " + this.selected_apply_org_id_details.name + " " + this.selected_apply_org_id_details.abn
+        } else if (this.selected_apply_proxy_id && this.selected_apply_proxy_id_details != undefined) {
+            return this.applicationTitle + " for " + this.selected_apply_proxy_id_details.first_name + " " + this.selected_apply_proxy_id_details.last_name + " " + selected_apply_proxy_id_details.email
+        } else {
+            return this.applicationTitle + " for yourself"
+        }
     },
   },
   methods: {

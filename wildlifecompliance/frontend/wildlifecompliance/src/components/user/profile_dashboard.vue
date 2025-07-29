@@ -28,6 +28,7 @@ import {
     helpers
 }from '@/utils/hooks'
 
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'ProfileDashTable',
     props: {
@@ -95,7 +96,8 @@ export default {
             }
         }
     },
-    components:{
+    components: {
+        FormSection,
         datatable
     },
     computed: {

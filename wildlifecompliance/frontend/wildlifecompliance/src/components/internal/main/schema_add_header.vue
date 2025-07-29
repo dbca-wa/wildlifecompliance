@@ -1,13 +1,9 @@
 <template lang="html">
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h4 class="panel-title">Headers
-                <a class="panelClicker" :href="`#`+pHeaderBody" data-toggle="collapse" data-parent="#userInfo" expanded="true" :aria-controls="pHeaderBody">
-                    <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                </a>
-            </h4>
-        </div>
-        <div class="panel-body panel-collapse collapse" :id="``+pHeaderBody">
+    <FormSection
+        :form-collapse="false"
+        label="Headers"
+    >
+        <div class="panel panel-primary">
             <div class="row">
                 <div v-for="(h, hidx) in addedHeaders" v-bind:key="`h_${hidx}`" >
 
@@ -48,10 +44,11 @@
                 </div>
             </div>
         </div>
-    </div>
+    </FormSection>
 </template>
 
 <script>
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name:"schema-add-header",
     props: {
@@ -71,7 +68,8 @@ export default {
             colSizeInfoMsg: "When entering values for all headers, make sure the total sum is 12. You have two options for each header: either select a custom size or leave it blank. If you select a custom size, ensure that all headers have a value, and the sum of all selected values equals 12. If you want equal column sizes, leave all headers blank."
         };
     },
-    computed:{
+    components: {
+        FormSection,
     },
     methods: {
         addHeader: function() {

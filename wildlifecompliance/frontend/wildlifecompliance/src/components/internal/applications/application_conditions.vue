@@ -1,30 +1,23 @@
 <template id="application_conditions">
-
-                <div :class="isLicensingOfficer ? 'col-md-12 conditions-table' : 'col-md-12'" > 
-                    <div class="row">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Proposed Conditions
-                                    <a class="panelClicker" :href="'#'+panelBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="panelBody">
-                                        <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                    </a>
-                                </h3>
-                            </div>
-                            <div class="panel-body panel-collapse collapse in" :id="panelBody">
-                                <form class="form-horizontal" action="index.html" method="post">
-                                    <div class="col-sm-12">
-                                        <button v-if="canAddConditions" @click.prevent="addCondition()" style="margin-bottom:10px;" class="btn btn-primary pull-right">Add Condition</button>
-                                    </div>
-                                    <datatable ref="conditions_datatable" :id="'conditions-datatable-'+_uid" :dtOptions="condition_options" :dtHeaders="condition_headers"/>
-                                </form>
-                            </div>
+    <div :class="isLicensingOfficer ? 'col-md-12 conditions-table' : 'col-md-12'" > 
+        <div class="row">
+            <FormSection
+                :form-collapse="false"
+                label="Proposed Conditions"
+            >
+                <div class="panel panel-default">
+                    <form class="form-horizontal" action="index.html" method="post">
+                        <div class="col-sm-12">
+                            <button v-if="canAddConditions" @click.prevent="addCondition()" style="margin-bottom:10px;" class="btn btn-primary pull-right">Add Condition</button>
                         </div>
-                    </div>
-                    <ConditionDetail ref="condition_detail" :application_id="application.id" :conditions="conditions" :licence_activity_tab="selected_activity_tab_id"
-                    :condition="viewedCondition" :purposes="purposes"/>
-                </div>       
-
-            
+                        <datatable ref="conditions_datatable" :id="'conditions-datatable-'+_uid" :dtOptions="condition_options" :dtHeaders="condition_headers"/>
+                    </form>
+                </div>
+            </FormSection>
+        </div>
+        <ConditionDetail ref="condition_detail" :application_id="application.id" :conditions="conditions" :licence_activity_tab="selected_activity_tab_id"
+        :condition="viewedCondition" :purposes="purposes"/>
+    </div>       
 </template>
 <script>
 import {
@@ -36,6 +29,7 @@ import '@/scss/dashboards/application.scss';
 import datatable from '@vue-utils/datatable.vue';
 import ConditionDetail from './application_add_condition.vue';
 import { mapActions, mapGetters } from 'vuex'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'InternalApplicationConditions',
     props: {
@@ -172,7 +166,8 @@ export default {
             }
         }
     },
-    components:{
+    components: {
+        FormSection,
         datatable,
         ConditionDetail
     },

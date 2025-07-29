@@ -11,15 +11,11 @@
                     </div>
                     <div class="tab-content">
                         <div class="row" v-for="(item, index) in selectedActivity" v-bind:key="`issue_activity_content_${index}`">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Issue/Decline - {{item.name}}
-                                        <a class="panelClicker" :href="'#'+panelBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="panelBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                </div>
-                                <div class="panel-body panel-collapse collapse in" :id="panelBody">
+                            <FormSection
+                                :form-collapse="false"
+                                :label="`Issue/Decline - ${item.name}`"
+                            >
+                                <div class="panel panel-default">
                                     <form class="form-horizontal" action="index.html" method="post">
                                         <div class="col-sm-12">
                                             <div class="form-group">
@@ -29,16 +25,12 @@
                                                     <div class="col-sm-12"><label class="control-label pull-left">&nbsp;</label></div>
                                                     <div class="col-sm-12">
                                                         <div v-for="(p, index) in applicationSelectedActivitiesForPurposes" v-bind:key="`p_${index}`">
-                                
-                                                            <div class="panel panel-primary">
-                                                                <div class="panel-heading">
-                                                                    <h4 class="panel-title">{{p.purpose.short_name}}
-                                                                        <a class="panelClicker" :href="`#${index}`+purposeBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="purposeBody">
-                                                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                                                        </a>
-                                                                    </h4>
-                                                                </div>
-                                                                <div class="panel-body panel-collapse collapse" :id="`${index}`+purposeBody">
+                                                            <FormSection
+                                                                :form-collapse="false"
+                                                                :label=p.purpose.short_name
+                                                                :index=index
+                                                            >
+                                                                <div class="panel panel-primary">
                                                                     <div class="row">
                                                                         <div class="col-sm-12">
                                                                             <div class="col-sm-3">
@@ -103,7 +95,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
+                                                            </FormSection>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -119,16 +111,12 @@
                                         
                                     </form>
                                 </div>
-                            </div>
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Emailing
-                                        <a class="panelClicker" :href="'#'+emailPanelBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="emailPanelBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                </div>
-                                <div class="panel-body panel-collapse collapse in" :id="emailPanelBody">
+                            </FormSection>
+                            <FormSection
+                                :form-collapse="false"
+                                label="Emailing"
+                            >
+                                <div class="panel panel-default">
                                     <div class="row">
                                         <div class="col-sm-3">
                                             
@@ -163,20 +151,16 @@
                                         </div>                                    
                                     </div>
                                 </div>
-                            </div>
+                            </FormSection>
                         </div>
                     </div> <!-- end of tab content -->
 
                     <div class="row" v-if="licence.activity.some(activity => activity.final_status === 'issued')">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Issue
-                                    <a class="panelClicker" :href="'#'+issuePanelBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="issuePanelBody">
-                                        <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                    </a>
-                                </h3>
-                            </div>
-                            <div class="panel-body panel-collapse collapse in" :id="issuePanelBody">
+                        <FormSection
+                            :form-collapse="false"
+                            label="Issue"
+                        >
+                            <div class="panel panel-default">
                                 <div class="row">
                                     <div class="col-sm-3">
                                         <label class="control-label pull-left"  for="details">ID Check</label>
@@ -216,7 +200,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </FormSection>
                     </div>
 
                     <p v-if="(applicantType == 'org' && application.org_applicant.address) 
@@ -257,9 +241,11 @@ import { mapGetters, mapActions } from 'vuex'
 import filefield from '@/components/common/compliance_file.vue'
 import summernote from '@/components/purpose_details_summernote'
 
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'InternalApplicationIssuance',
-    components:{
+    components: {
+        FormSection,
         filefield,
         summernote,
     },    

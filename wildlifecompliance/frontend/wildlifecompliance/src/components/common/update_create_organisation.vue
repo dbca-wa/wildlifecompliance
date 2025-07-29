@@ -2,16 +2,12 @@
     <div class="container-fluid" id="internalOrgInfo">
        <div class="row">
             <div class="col-sm-12">
-                <div class="panel panel-default">
-                  <div class="panel-heading">
-                    <h3 class="panel-title">Organisation Details
-                        <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                  </div>
-                  <div class="panel-body collapse in" :id="pdBody">
-                      <!--form class="form-horizontal" name="personal_form" method="post"-->
+                <FormSection
+                :form-collapse="false"
+                label="Organisation Details"
+                index="org_details"
+                >
+                    <div class="panel panel-default">
                       <div class="form-horizontal">
                           <div class="form-group">
                             <label for="" class="col-sm-3 control-label">Name</label>
@@ -25,24 +21,19 @@
                                 <input type="text" class="form-control" name="last_name" placeholder="" v-model="organisation.abn">
                             </div>
                           </div>
-                       <!--/form-->
                        </div>
-                  </div>
-                </div>
+                    </div>
+                </FormSection>
             </div>
        </div>
        <div class="row">
             <div class="col-sm-12">
-                <div class="panel panel-default">
-                  <div class="panel-heading">
-                    <h3 class="panel-title">Address Details
-                        <a class="panelClicker" :href="'#'+adBody" data-toggle="collapse" expanded="false"  data-parent="#userInfo" :aria-controls="adBody">
-                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                        </a>
-                    </h3>
-                  </div>
-                  <div class="panel-body collapse " :id="adBody">
-                      <!--form class="form-horizontal" action="index.html" method="post"-->
+                <FormSection
+                :form-collapse="false"
+                label="Address Details"
+                index="address_details"
+                >
+                    <div class="panel panel-default">
                       <div class="form-horizontal">
                           <div class="form-group">
                             <label for="" class="col-sm-3 control-label">Street</label>
@@ -74,10 +65,9 @@
                                 </select>
                             </div>
                           </div>
-                       <!--/form-->
                        </div>
                   </div>
-                </div>
+                </FormSection>
             </div>
         </div>
         <div class="form-group">
@@ -99,7 +89,7 @@ import datatable from '@vue-utils/datatable.vue'
 import AddContact from '@common-components/add_contact.vue'
 import utils from '../internal/utils'
 import api from '../internal/api'
-
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'Organisation',
     data () {
@@ -125,6 +115,7 @@ export default {
     },
     components: {
         datatable,
+        FormSection
     },
     created: async function() {
         // Populate country drop-down list

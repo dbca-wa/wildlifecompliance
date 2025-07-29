@@ -197,9 +197,11 @@ import Vue from 'vue'
 import $ from 'jquery'
 import { api_endpoints, helpers, fetch } from '@/utils/hooks'
 import SecureBaseLink from '@/components/common/securebase_link.vue';
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'MyUserDetails',
     components: {
+        FormSection,
         SecureBaseLink,
     },
     data () {

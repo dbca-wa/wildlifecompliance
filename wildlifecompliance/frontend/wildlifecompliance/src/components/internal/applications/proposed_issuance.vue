@@ -13,16 +13,12 @@
 
                                         <div v-show="selected_activity_tab_id === a.licence_activity">
                                             <div v-for="(p, p_idx) in a.proposed_purposes" v-bind:key="`p_${p_idx}`">
-                                
-                                                <div class="panel panel-primary">
-                                                    <div class="panel-heading">
-                                                        <h4 class="panel-title">{{p.purpose.short_name}}
-                                                            <a class="panelClicker" :href="`#${p_idx}${index}`+purposeBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="purposeBody">
-                                                                <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                                            </a>
-                                                        </h4>
-                                                    </div>
-                                                    <div class="panel-body panel-collapse collapse" :id="`${p_idx}${index}`+purposeBody">
+                                                <FormSection
+                                                    :form-collapse="false"
+                                                    :label=p.purpose.short_name
+                                                    :index=p_idx
+                                                >
+                                                    <div class="panel panel-primary">
                                                         <div class="row">
                                                             <div class="col-sm-12">
                                                                 <div class="col-sm-3">
@@ -81,7 +77,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </FormSection>
 
                                             </div>
                                         </div>
@@ -183,6 +179,7 @@ import { mapGetters } from 'vuex'
 import filefield from '@/components/common/compliance_file.vue'
 import summernote from '@/components/purpose_details_summernote'
 
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name:'Proposed-Licence',
     components:{
@@ -193,6 +190,9 @@ export default {
     },
     props:{
         can_view_richtext_src: Boolean,
+    },
+    components: {
+        FormSection,
     },
     data:function () {
         let vm = this;

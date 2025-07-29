@@ -1,15 +1,12 @@
 <template id="assessment_dashboard">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Applications referred to me
-                        <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pBody">
+            <FormSection
+                :form-collapse="false"
+                label="Applications referred to me"
+                index="assessments"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -66,7 +63,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </template>
@@ -76,6 +73,7 @@ import {
     api_endpoints,
     helpers
 }from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'AssessmentTableDash',
     data() {
@@ -238,7 +236,8 @@ export default {
         }
     },
     components:{
-        datatable
+        datatable,
+        FormSection
     },
     watch:{
         filterApplicationActivity: function() {

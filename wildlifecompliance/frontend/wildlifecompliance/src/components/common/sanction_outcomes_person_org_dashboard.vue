@@ -1,22 +1,19 @@
 <template id="sanction_outcome_person_org_dashboard">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Sanction Outcomes
-                        <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pBody">
+            <FormSection
+                :form-collapse="false"
+                label="Sanction Outcomes"
+                index="sanction_outcomes"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-lg-12">
                             <datatable ref="sanction_outcome_table" id="datatable_id" :dtOptions="table_options" :dtHeaders="table_headers"/>
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </template>
@@ -24,7 +21,7 @@
 <script>
 import datatable from '@/utils/vue/datatable.vue'
 import { api_endpoints, helpers, cache_helper } from '@/utils/hooks'
-
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'SanctionOutcomePersonOrgTableDash',
     props: {
@@ -207,7 +204,8 @@ export default {
         }
     },
     components:{
-        datatable
+        datatable,
+        FormSection
     },
 }
 </script>

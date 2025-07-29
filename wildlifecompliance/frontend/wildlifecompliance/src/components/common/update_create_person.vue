@@ -1,13 +1,12 @@
 <template lang="html">
     <div :id="elementId">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Personal Details
-                        <span class="glyphicon  pull-right" @click="isPersonalDetailsOpen=!isPersonalDetailsOpen" :class="isPersonalDetailsOpen ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down'"></span>
-                    </h3>
-                </div>
-                <div class="panel-body in" :id="pdBody">
+            <FormSection
+                :form-collapse="false"
+                label="Personal Details"
+                index="personal_details"
+            >
+                <div class="panel panel-default">
                     <div v-if="objectAlert" class="alert alert-danger">
                         <p>test alert</p>
                     </div>
@@ -50,15 +49,14 @@
                         </div>
                     </form>
                 </div>
-            </div>
+            </FormSection>
 
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                <h3 class="panel-title">Address Details
-                    <span class="glyphicon  pull-right" @click="isAddressDetailsOpen=!isAddressDetailsOpen" :class="isAddressDetailsOpen ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down'"></span>
-                </h3>
-                </div>
-                <div class="panel-body in" :id="adBody">
+            <FormSection
+                :form-collapse="false"
+                label="Address Details"
+                index="address_details"
+            >
+                <div class="panel panel-default">
                     <form class="form-horizontal" action="index.html" method="post">
                         <div class="form-group">
                         <label for="" class="col-sm-3 control-label">Street</label>
@@ -102,15 +100,14 @@
                         </div>
                     </form>
                 </div>
-            </div>
+            </FormSection>
 
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                <h3 class="panel-title">Contact Details <small></small>
-                    <span class="glyphicon  pull-right" @click="isContactDetailsOpen=!isContactDetailsOpen" :class="isContactDetailsOpen ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down'"></span>
-                </h3>
-                </div>
-                <div class="panel-body collapse in" :id="cdBody">
+            <FormSection
+                :form-collapse="false"
+                label="Contact Details"
+                index="contact_details"
+            >
+                <div class="panel panel-default">
                     <form class="form-horizontal" action="index.html" method="post">
                         <div class="form-group">
                         <label for="" class="col-sm-3 control-label">Phone</label>
@@ -137,7 +134,7 @@
                         </div>
                     </form>
                 </div>
-            </div>
+            </FormSection>
 
             <input v-if="allowSaveUser"
             :disabled="!saveButtonEnabled"
@@ -154,7 +151,7 @@ import Vue from 'vue';
 import $ from "jquery";
 import { api_endpoints, helpers, fetch } from '@/utils/hooks'
 import utils from '../internal/utils'
-
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: "update-create-person",
 
@@ -256,6 +253,9 @@ export default {
             type: Boolean,
             default: false,
         },
+    },
+    components:{
+        FormSection
     },
     computed: {
         personId: function() {

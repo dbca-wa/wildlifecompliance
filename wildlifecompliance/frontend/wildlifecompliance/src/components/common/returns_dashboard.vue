@@ -1,15 +1,13 @@
 <template id="returns_dashboard">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Returns <small v-if="is_external">View submitted returns and submit new ones</small>
-                        <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pBody">
+            <FormSection
+                :form-collapse="false"
+                label="Returns"
+                index="returns"
+                :subtitle=subtitle
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -47,7 +45,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </template>
@@ -57,6 +55,7 @@ import {
     api_endpoints,
     helpers
 }from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'ReturnTableDash',
     props: {
@@ -177,7 +176,8 @@ export default {
         }
     },
     components:{
-        datatable
+        datatable,
+        FormSection
     },
     watch:{
         filterReturnStatus: function(value){
@@ -199,6 +199,12 @@ export default {
         visibleDatatable: function() {
             return this.$refs.return_datatable;
         },
+        subtitle: function() {
+            if (this.is_external) {
+                return "View submitted returns and submit new ones";
+            }
+            return "";
+        }
     },
     methods:{
         delay(callback, ms) {

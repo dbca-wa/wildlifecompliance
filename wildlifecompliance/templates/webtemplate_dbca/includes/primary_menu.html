@@ -1,10 +1,12 @@
 {% load users %}
 {% load static %}
+{% load tagutils %}
 {% is_officer as is_officer_login %}
 {% is_wildlifecompliance_officer as is_wildlifecompliance_officer %}
 {% is_compliance_internal_user as is_compliance_internal_login %}
 {% prefer_compliance_management as prefer_compliance_management %}
 {% is_compliance_management_user as is_compliance_management_user %}
+{% COMPLIANCE_LINKS_ENABLED as compliance_links_enabled %}
 
 {% is_internal as is_internal_login %}
 

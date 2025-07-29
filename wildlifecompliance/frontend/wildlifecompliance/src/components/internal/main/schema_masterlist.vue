@@ -115,9 +115,11 @@ import {
   helpers, fetch
 }
 from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name:'schemaMasterlistModal',
     components: {
+        FormSection,
         modal,
         alert,
         datatable,

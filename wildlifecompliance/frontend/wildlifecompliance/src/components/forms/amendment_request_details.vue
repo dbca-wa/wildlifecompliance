@@ -2,15 +2,11 @@
     <div v-if="isApplicationLoaded && !application_readonly && isVisible">
         <div v-if="visibleRequests.length" class="row" style="color:red;">
             <div class="col-lg-12 pull-right">
+                <FormSection
+                    :form-collapse="false"
+                    label="An amendment has been requested for this Application"
+                >
                 <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title" style="color:red;">An amendment has been requested for this Application
-                        <a class="panelClicker" :href="'#pBody'" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="'pBody'">
-                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                        </a>
-                    </h3>
-                    </div>
-                    <div class="panel-body collapse in" :id="'pBody'">
                     <div v-for="a in visibleRequests">
                         <p><b>Activity:</b> {{a.licence_activity.name}}</p>
                         <p><b>Reason:</b> {{a.reason.name}}</p>
@@ -18,7 +14,7 @@
                             <div v-for="t in splitText(a.text)">{{t}}<br></div></p> 
                     </div>
                 </div>
-                </div>
+                </FormSection>
             </div>
         </div>
     </div>
@@ -30,6 +26,7 @@ import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import { splitText } from "@/utils/helpers.js";
 
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
   name:'amendment-request-details',
   data: function() {
@@ -41,6 +38,9 @@ export default {
           type: Number,
           required: true
       }
+  },
+  components: {
+    FormSection,
   },
   computed: {
     ...mapGetters([

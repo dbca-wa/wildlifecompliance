@@ -2,15 +2,12 @@
     <div class="container" >
         <div class="row">
             <div class="col-sm-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Apply on behalf of
-                            <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                                <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                            </a>
-                        </h3>
-                    </div>
-                    <div class="panel-body collapse in" :id="pBody">
+                <FormSection
+                :form-collapse="false"
+                label="Apply on behalf of"
+                index="apply"
+                >
+                    <div class="panel panel-default">
                         <form class="form-horizontal" name="personal_form" method="post">
                             <div class="col-sm-12">
                                     <!-- <p><strong>Note: If you are applying for a Taking licence, it cannot be applied for on behalf of an organisation.</strong></p> -->
@@ -34,7 +31,7 @@
                             </div>
                         </form>
                     </div>
-                </div>
+                </FormSection>
             </div>
         </div>
     </div>
@@ -48,6 +45,7 @@ import {
 from '@/utils/hooks'
 import { mapActions, mapGetters } from 'vuex'
 import utils from './utils'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
   data: function() {
     let vm = this;
@@ -66,6 +64,7 @@ export default {
     }
   },
   components: {
+    FormSection
   },
   computed: {
     isLoading: function() {
