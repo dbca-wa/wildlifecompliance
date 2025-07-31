@@ -16,9 +16,9 @@ export const remediationActionStore = {
     mutations: {
         updateRemediationAction(state, remediation_action) {
             console.log('updateRemediationAction');
-            Vue.set(state, 'remediation_action', {
+            state.remediation_action = {
                 ...remediation_action
-            });
+            };
             if (state.remediation_action.due_date) {
                 state.remediation_action.due_date = moment(state.remediation_action.due_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
@@ -28,16 +28,16 @@ export const remediationActionStore = {
                 state.remediation_action.id + "/process_default_document/"
                 )
             console.log(remediationActionDocumentUrl);
-            Vue.set(state.remediation_action, 'remediationActionDocumentUrl', remediationActionDocumentUrl); 
+            state.remediation_action.remediationActionDocumentUrl = remediationActionDocumentUrl; 
 
             let commsLogsDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.remediation_action,
                 state.remediation_action.id + "/process_comms_log_document/"
                 )
-            Vue.set(state.remediation_action, 'commsLogsDocumentUrl', commsLogsDocumentUrl); 
+            state.remediation_action.commsLogsDocumentUrl = commsLogsDocumentUrl; 
         },
         updateCanUserAction(state, can_user_action) {
-            Vue.set(state.remediation_action, 'can_user_action', can_user_action);
+            state.remediation_action.can_user_action = can_user_action;
         },
     },
     actions: {

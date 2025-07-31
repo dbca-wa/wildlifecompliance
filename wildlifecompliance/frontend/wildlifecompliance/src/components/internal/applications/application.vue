@@ -583,7 +583,7 @@
     <div v-else>
         <br/><br/><br/><br/><br/><br/><br/><br/>
         <div class="col-md-12">
-            <center><i class="fa fa-4x fa-spinner fa-spin"/></center>
+            <div style="text-align:center;"><i class="fa fa-4x fa-spinner fa-spin"/></div>
         </div>
     </div>
 

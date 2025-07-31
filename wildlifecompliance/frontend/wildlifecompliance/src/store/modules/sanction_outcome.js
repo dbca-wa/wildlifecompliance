@@ -26,9 +26,9 @@ export const sanctionOutcomeStore = {
             }
         },
         updateSanctionOutcome(state, sanction_outcome) {
-            Vue.set(state, 'sanction_outcome', {
+            state.sanction_outcome = {
                 ...sanction_outcome
-            });
+            };
             if (state.sanction_outcome.date_of_issue) {
                 state.sanction_outcome.date_of_issue = moment(state.sanction_outcome.date_of_issue, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
@@ -39,31 +39,31 @@ export const sanctionOutcomeStore = {
                 api_endpoints.sanction_outcome,
                 state.sanction_outcome.id + "/process_default_document/"
                 )
-            Vue.set(state.sanction_outcome, 'sanctionOutcomeDocumentUrl', sanctionOutcomeDocumentUrl); 
+            state.sanction_outcome.sanctionOutcomeDocumentUrl = sanctionOutcomeDocumentUrl; 
 
             let commsLogsDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.sanction_outcome,
                 state.sanction_outcome.id + "/process_comms_log_document/"
                 )
-            Vue.set(state.sanction_outcome, 'commsLogsDocumentUrl', commsLogsDocumentUrl); 
+            state.sanction_outcome.commsLogsDocumentUrl = commsLogsDocumentUrl; 
         },
         updateAssignedToId(state, assigned_to_id) {
-            Vue.set(state.sanction_outcome, 'assigned_to_id', assigned_to_id);
+            state.sanction_outcome.assigned_to_id = assigned_to_id;
         },
         updateCanUserAction(state, can_user_action) {
-            Vue.set(state.sanction_outcome, 'can_user_action', can_user_action);
+            state.sanction_outcome.can_user_action = can_user_action;
         },
         updateRelatedItems(state, related_items) {
-            Vue.set(state.sanction_outcome, 'related_items', related_items);
+            state.sanction_outcome.related_items = related_items;
         },
         updateRegistrationHolder(state, data) {
             if (data.data_type === 'individual') {
-                Vue.set(state.sanction_outcome, 'registration_holder_id', data.id);
+                state.sanction_outcome.registration_holder_id = data.id;
             }
         },
         updateDriver(state, data) {
             if (data.data_type === 'individual') {
-                Vue.set(state.sanction_outcome, 'driver_id', data.id);
+                state.sanction_outcome.driver_id = data.id;
             }
         },
     },

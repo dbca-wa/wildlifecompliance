@@ -18,59 +18,46 @@ export const documentArtifactStore = {
     },
     mutations: {
         updateDocumentArtifact(state, document_artifact) {
-            Vue.set(state, 'document_artifact', {
+            state.document_artifact = {
                 ...document_artifact
-            });
+            };
             // format artifact_date for vue
             if (state.document_artifact.artifact_date) {
-                state.document_artifact.artifact_date = moment(state.document_artifact.artifact_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
+                state.document_artifact.artifact_date = moment(state.document_artifact.artifact_date,'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             // format artifact time from 24 to 12 hour
             if (state.document_artifact.artifact_time) {
-                state.document_artifact.artifact_time = moment(state.document_artifact.artifact_time, 'HH:mm').format('hh:mm A');
+                state.document_artifact.artifact_time = moment(state.document_artifact.artifact_time,'HH:mm').format('hh:mm A');
             } else if (state.document_artifact.artifact_time === '') {
                 state.document_artifact.artifact_time = null;
             }
-            /*
-            console.log('updateDocumentArtifact');
-            if (state.document_artifact.artifact_date) {
-                state.document_artifact.artifact_date = moment(state.document_artifact.artifact_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
-            }
-            */
             // default doc implemented in Artifact model/viewset
             let defaultDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.artifact,
                 state.document_artifact.id + "/process_default_document/"
                 )
-            Vue.set(state.document_artifact, 'defaultDocumentUrl', defaultDocumentUrl); 
+            state.document_artifact.defaultDocumentUrl = defaultDocumentUrl; 
             // comms log doc implemented in Artifact model/viewset
             let commsLogsDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.artifact,
                 state.document_artifact.id + "/process_comms_log_document/"
                 )
-            Vue.set(state.document_artifact, 'commsLogsDocumentUrl', commsLogsDocumentUrl); 
-            /*
-            let createLegalCaseProcessCommsLogsDocumentUrl = helpers.add_endpoint_join(
-                api_endpoints.legal_case,
-                state.legal_case.id + "/create_legal_case_process_comms_log_document/"
-                )
-            Vue.set(state.legal_case, 'createLegalCaseProcessCommsLogsDocumentUrl', createLegalCaseProcessCommsLogsDocumentUrl);
-            */
+            state.document_artifact.commsLogsDocumentUrl = commsLogsDocumentUrl; 
         },
         updateRelatedItems(state, related_items) {
-            Vue.set(state.document_artifact, 'related_items', related_items);
+            state.document_artifact.related_items = related_items;
         },
         updatePersonProvidingStatementId(state, person_providing_statement_id) {
-            Vue.set(state.document_artifact, 'person_providing_statement_id', person_providing_statement_id);
+            state.document_artifact.person_providing_statement_id = person_providing_statement_id;
         },
         updateInterviewerEmail(state, email) {
-            Vue.set(state.document_artifact, 'interviewer_email', email);
+            state.document_artifact.interviewer_email = email;
         },
         updateTemporaryDocumentCollectionId(state, temp_doc_id) {
-            Vue.set(state.document_artifact, 'temporary_document_collection_id', temp_doc_id);
+            state.document_artifact.temporary_document_collection_id = temp_doc_id;
         },
         updateOffenderId(state, offender_id) {
-            Vue.set(state.document_artifact, 'offender_id', offender_id);
+            state.document_artifact.offender_id = offender_id;
         },
         updateOfficerInterviewer(state, officer_interviewer) {
             console.log(officer_interviewer)
@@ -78,20 +65,14 @@ export const documentArtifactStore = {
             officerInterviewerConcise.email = officer_interviewer.email
             officerInterviewerConcise.given_name = officer_interviewer.given_name
             officerInterviewerConcise.surname = officer_interviewer.surname
-            Vue.set(state.document_artifact, 'officer_interviewer', officerInterviewerConcise);
+            state.document_artifact.officer_interviewer = officerInterviewerConcise;
         },
         updateOfficerInterviewerId(state, officer_interviewer_id) {
-            Vue.set(state.document_artifact, 'officer_interviewer_id', officer_interviewer_id);
+            state.document_artifact.officer_interviewer_id = officer_interviewer_id;
         },
         updateErrorMessage(state, errorMessage) {
-            Vue.set(state.document_artifact, 'error_message', errorMessage);
+            state.document_artifact.error_message = errorMessage;
         },
-        /*
-        updateDocumentArtifactLegalId(state, legal_case_id) {
-            console.log(legal_case_id)
-            Vue.set(state.document_artifact, 'legal_case_id', legal_case_id);
-        },
-        */
     },
     actions: {
         async loadDocumentArtifact({ dispatch, commit }, { document_artifact_id }) {

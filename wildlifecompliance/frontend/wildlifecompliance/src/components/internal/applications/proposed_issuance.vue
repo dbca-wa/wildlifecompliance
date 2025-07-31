@@ -187,12 +187,10 @@ export default {
         alert,
         filefield,
         summernote,
+        FormSection,
     },
     props:{
         can_view_richtext_src: Boolean,
-    },
-    components: {
-        FormSection,
     },
     data:function () {
         let vm = this;

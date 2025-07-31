@@ -186,7 +186,7 @@ export const userStore = {
             state.selected_activity_tab_name = tab_name;
         },
         [UPDATE_SELECTED_TAB_WORKFLOW_STATE] (state, { key, value }) {
-            Vue.set(state.selected_activity_tab_workflow_state, key, value);
+            state.selected_activity_tab_workflow_state[key] = value;
         },
         [UPDATE_CURRENT_USER] (state, user) {
             state.current_user = user;

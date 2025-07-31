@@ -18,9 +18,9 @@ export const physicalArtifactStore = {
     },
     mutations: {
         updatePhysicalArtifact(state, physical_artifact) {
-            Vue.set(state, 'physical_artifact', {
+            state.physical_artifact = {
                 ...physical_artifact
-            });
+            };
             console.log('updatePhysicalArtifact');
             // format artifact_date for vue
             if (state.physical_artifact.artifact_date) {
@@ -41,44 +41,32 @@ export const physicalArtifactStore = {
                 api_endpoints.artifact,
                 state.physical_artifact.id + "/process_default_document/"
                 )
-            Vue.set(state.physical_artifact, 'defaultDocumentUrl', defaultDocumentUrl); 
+            state.physical_artifact.defaultDocumentUrl = defaultDocumentUrl; 
             // comms log doc implemented in Artifact model/viewset
             let commsLogsDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.artifact,
                 state.physical_artifact.id + "/process_comms_log_document/"
                 )
-            Vue.set(state.physical_artifact, 'commsLogsDocumentUrl', commsLogsDocumentUrl);
+            state.physical_artifact.commsLogsDocumentUrl = commsLogsDocumentUrl;
             // renderer
             let rendererDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.physical_artifact,
                 state.physical_artifact.id + "/process_renderer_document/"
                 )
-            Vue.set(state.physical_artifact, 'rendererDocumentUrl', rendererDocumentUrl);
-            /*
-            let createLegalCaseProcessCommsLogsPhysicalUrl = helpers.add_endpoint_join(
-                api_endpoints.legal_case,
-                state.legal_case.id + "/create_legal_case_process_comms_log_physical/"
-                )
-            Vue.set(state.legal_case, 'createLegalCaseProcessCommsLogsPhysicalUrl', createLegalCaseProcessCommsLogsPhysicalUrl);
-            */
+            state.physical_artifact.rendererDocumentUrl = rendererDocumentUrl;
         },
         updateRelatedItems(state, related_items) {
-            Vue.set(state.physical_artifact, 'related_items', related_items);
+            state.physical_artifact.related_items = related_items;
         },
         updateOfficerId(state, id) {
-            Vue.set(state.physical_artifact, 'officer_id', id);
+            state.physical_artifact.officer_id = id;
         },
         updateCustodianId(state, id) {
-            Vue.set(state.physical_artifact, 'custodian_id', id);
+            state.physical_artifact.custodian_id = id;
         },
-        /*
-        updateTemporaryDocumentCollectionId(state, temp_doc_id) {
-            Vue.set(state.physical_artifact, 'temporary_document_collection_id', temp_doc_id);
-        },
-        */
         updateTemporaryDocumentCollectionList(state, {temp_doc_id, input_name}) {
             if (!state.physical_artifact.temporary_document_collection_list) {
-                Vue.set(state.physical_artifact, 'temporary_document_collection_list', []);
+                state.physical_artifact.temporary_document_collection_list = [];
             }
             state.physical_artifact.temporary_document_collection_list.push(
                 {   "temp_doc_id": temp_doc_id,
@@ -88,19 +76,14 @@ export const physicalArtifactStore = {
         },
         updateStatementId(state, statement_id) {
             console.log(statement_id)
-            Vue.set(state.physical_artifact, 'statement_id', statement_id);
+            state.physical_artifact.statement_id = statement_id;
         },
         updateUsedWithinCase(state, used_within_case) {
-            Vue.set(state.physical_artifact, 'used_within_case', used_within_case);
+            state.physical_artifact.used_within_case = used_within_case;
         },
         updateSensitiveNonDisclosable(state, sensitive_non_disclosable) {
-            Vue.set(state.physical_artifact, 'sensitive_non_disclosable', sensitive_non_disclosable);
+            state.physical_artifact.sensitive_non_disclosable = sensitive_non_disclosable;
         },
-        /*
-        updatePhysicalArtifactLegalId(state, legal_case_id) {
-            Vue.set(state.physical_artifact, 'legal_case_id', legal_case_id);
-        },
-        */
     },
     actions: {
         async loadPhysicalArtifact({ dispatch, commit }, { physical_artifact_id }) {

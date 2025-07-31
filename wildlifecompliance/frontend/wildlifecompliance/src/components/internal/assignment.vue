@@ -80,7 +80,7 @@ export default {
         },
         getAllocatedGroup: async function(id_list) {
             if (this.allowed_groups == null) {
-            Vue.set(this, 'allowed_groups', []);
+                this.allowed_groups = [];
             }
             let allocatedGroupResponse = await Vue.http.post(
             api_endpoints.allocated_group_members,
@@ -88,7 +88,7 @@ export default {
                 'id_list': id_list,
             });
             if (allocatedGroupResponse.ok) {
-                Vue.set(this, 'allowed_groups', allocatedGroupresponse);
+                this.allowed_groups = allocatedGroupresponse;
             } 
         },        
     },

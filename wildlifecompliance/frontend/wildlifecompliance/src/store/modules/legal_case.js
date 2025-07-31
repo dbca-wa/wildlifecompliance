@@ -24,9 +24,9 @@ export const legalCaseStore = {
     },
     mutations: {
         updateLegalCase(state, legal_case) {
-            Vue.set(state, 'legal_case', {
+            state.legal_case = {
                 ...legal_case
-            });
+            };
             console.log('updateLegalCase');
             if (state.legal_case.case_created_date) {
                 state.legal_case.case_created_date = moment(state.legal_case.case_created_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
@@ -35,67 +35,59 @@ export const legalCaseStore = {
             let defaultDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.legal_case,
                 state.legal_case.id + "/process_default_document/"
-                )
-            Vue.set(state.legal_case, 'defaultDocumentUrl', defaultDocumentUrl); 
+            )
+            state.legal_case.defaultDocumentUrl = defaultDocumentUrl; 
             // prosecution notice
             let prosecutionNoticeDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.legal_case,
                 state.legal_case.id + "/process_prosecution_notice_document/"
             )
-            Vue.set(state.legal_case, 'prosecutionNoticeDocumentUrl', prosecutionNoticeDocumentUrl); 
+            state.legal_case.prosecutionNoticeDocumentUrl = prosecutionNoticeDocumentUrl; 
             // court hearing notice
             let courtHearingNoticeDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.legal_case,
                 state.legal_case.id + "/process_court_hearing_notice_document/"
             )
-            Vue.set(state.legal_case, 'courtHearingNoticeDocumentUrl', courtHearingNoticeDocumentUrl); 
+            state.legal_case.courtHearingNoticeDocumentUrl = courtHearingNoticeDocumentUrl; 
             // Brief of evidence
             let briefOfEvidenceDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.legal_case,
                 state.legal_case.id + "/process_brief_of_evidence_document/"
                 )
-            Vue.set(state.legal_case, 'briefOfEvidenceDocumentUrl', briefOfEvidenceDocumentUrl); 
+            state.legal_case.briefOfEvidenceDocumentUrl = briefOfEvidenceDocumentUrl; 
             // Prosecution Brief
             let prosecutionBriefDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.legal_case,
                 state.legal_case.id + "/process_prosecution_brief_document/"
                 )
-            Vue.set(state.legal_case, 'prosecutionBriefDocumentUrl', prosecutionBriefDocumentUrl); 
+            state.legal_case.prosecutionBriefDocumentUrl = prosecutionBriefDocumentUrl; 
             // comms logs doc
             let commsLogsDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.legal_case,
                 state.legal_case.id + "/process_comms_log_document/"
                 )
-            Vue.set(state.legal_case, 'commsLogsDocumentUrl', commsLogsDocumentUrl); 
+            state.legal_case.commsLogsDocumentUrl = commsLogsDocumentUrl; 
             // createLegalCase comms logs doc - required?
             let createLegalCaseProcessCommsLogsDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.legal_case,
                 state.legal_case.id + "/create_legal_case_process_comms_log_document/"
                 )
-            Vue.set(state.legal_case, 'createLegalCaseProcessCommsLogsDocumentUrl', createLegalCaseProcessCommsLogsDocumentUrl);
+            state.legal_case.createLegalCaseProcessCommsLogsDocumentUrl = createLegalCaseProcessCommsLogsDocumentUrl;
             let courtOutcomeDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.legal_case,
                 state.legal_case.id + "/process_court_outcome_document/"
                 )
-            Vue.set(state.legal_case, 'processCourtOutcomeDocumentUrl', courtOutcomeDocumentUrl);
-            /*
-            let generatedDocumentsUrl = helpers.add_endpoint_join(
-                api_endpoints.legal_case,
-                state.legal_case.id + "/process_generated_documents/"
-                )
-            Vue.set(state.legal_case, 'generatedDocumentsUrl', generatedDocumentsUrl);
-            */
+            state.legal_case.processCourtOutcomeDocumentUrl = courtOutcomeDocumentUrl;
         },
         updateLegalCaseNoRunningSheet(state, legal_case) {
-            // 20200416: current requirement is to only update statement artifacts and related items
-            Vue.set(state.legal_case, 'related_items', legal_case.related_items);
-            Vue.set(state.legal_case, 'statement_artifacts', legal_case.statement_artifacts);
+            state.legal_case.related_items = legal_case.related_items;
+            state.legal_case.statement_artifacts = legal_case.statement_artifacts;
         },
         updateRelatedItems(state, related_items) {
-            Vue.set(state.legal_case, 'related_items', related_items);
+            state.legal_case.related_items = related_items;
         },
         updateRunningSheetEntries(state, running_sheet_entries) {
-            Vue.set(state.legal_case, 'running_sheet_entries', running_sheet_entries);
+            state.legal_case.running_sheet_entries = running_sheet_entries;
         },
         updateCourtProceedingsJournalEntry(state, journal_entry){
             let i = 0;
@@ -116,18 +108,13 @@ export const legalCaseStore = {
             }
         },
         updateAddRunningSheetEntry(state, running_sheet_entry) {
-            /*
-            if (!state.legal_case.running_sheet_entries) {
-                Vue.set(state.legal_case, 'running_sheet_entries', []);
-            }
-            */
             state.legal_case.running_sheet_entries.push(running_sheet_entry)
         },
         updateAddCourtProceedingsEntry(state, court_proceedings_entry) {
             state.legal_case.court_proceedings.journal_entries.push(court_proceedings_entry)
         },
         updateRunningSheetTransform(state, running_sheet_transform) {
-            Vue.set(state.legal_case, 'running_sheet_transform', running_sheet_transform);
+            state.legal_case.running_sheet_transform = running_sheet_transform;
         },
         updateCourtProceedingsTransform(state, journal_entry_transform) {
             if (!state.legal_case.court_proceedings.hasOwnProperty('journal_entries_transform')){
@@ -144,18 +131,11 @@ export const legalCaseStore = {
             state.legal_case.court_proceedings.date_entries_updated[date_entry.id] = date_entry;
         },
         updateBriefOfEvidence(state, brief_of_evidence) {
-            Vue.set(state.legal_case, 'brief_of_evidence', brief_of_evidence);
-            //Vue.set(state.legal_case.brief_of_evidence, 'legal_case_id', state.legal_case.id);
+            state.legal_case.brief_of_evidence = brief_of_evidence;
         },
         updateProsecutionBrief(state, prosecution_brief) {
-            Vue.set(state.legal_case, 'prosecution_brief', prosecution_brief);
-            //Vue.set(state.legal_case.brief_of_evidence, 'legal_case_id', state.legal_case.id);
+            state.legal_case.prosecution_brief = prosecution_brief;
         },
-        /*
-        updateBriefOfEvidencePhysicalArtifactDetailsList(state, physical_artifacts) {
-            Vue.set(state.legal_case, 'boe_physical_artifacts_details', physical_artifacts);
-        },
-        */
         updateRunningSheetEntryDescription(state, { recordNumber, description, userId }) {
             console.log(recordNumber)
             console.log(description)
@@ -172,85 +152,58 @@ export const legalCaseStore = {
         },
         updateRunningSheetPersonList(state, entity) {
             if (!state.legal_case.running_sheet_person_list) {
-                Vue.set(state.legal_case, 'running_sheet_person_list', []);
+                state.legal_case.running_sheet_person_list = [];
             }
             state.legal_case.running_sheet_person_list.push(entity)
         },
         updateBoeRoiTicked(state, boeRoiTicked) {
-            Vue.set(state.legal_case, 'boe_roi_ticked', []);
+            state.legal_case.boe_roi_ticked = [];
             for (let r of boeRoiTicked) {
                 state.legal_case.boe_roi_ticked.push(r)
             }
         },
         updateBoeOtherStatementsTicked(state, boeOtherStatementsTicked) {
-            Vue.set(state.legal_case, 'boe_other_statements_ticked', []);
+            state.legal_case.boe_other_statements_ticked = [];
             for (let r of boeOtherStatementsTicked) {
                 state.legal_case.boe_other_statements_ticked.push(r)
             }
         },
         updateBoePhysicalArtifactsTicked(state, boePhysicalArtifactsTicked) {
-            Vue.set(state.legal_case, 'boe_physical_artifacts_ticked', []);
+            state.legal_case.boe_physical_artifacts_ticked = [];
             for (let r of boePhysicalArtifactsTicked) {
                 state.legal_case.boe_physical_artifacts_ticked.push(r)
             }
         },
         updateBoeDocumentArtifactsTicked(state, boeDocumentArtifactsTicked) {
-            Vue.set(state.legal_case, 'boe_document_artifacts_ticked', []);
+            state.legal_case.boe_document_artifacts_ticked = [];
             for (let r of boeDocumentArtifactsTicked) {
                 state.legal_case.boe_document_artifacts_ticked.push(r)
             }
         },
         updatePbRoiTicked(state, pbRoiTicked) {
-            Vue.set(state.legal_case, 'pb_roi_ticked', []);
+            state.legal_case.pb_roi_ticked = [];
             for (let r of pbRoiTicked) {
                 state.legal_case.pb_roi_ticked.push(r)
             }
         },
         updatePbOtherStatementsTicked(state, pbOtherStatementsTicked) {
-            Vue.set(state.legal_case, 'pb_other_statements_ticked', []);
+            state.legal_case.pb_other_statements_ticked = [];
             for (let r of pbOtherStatementsTicked) {
                 state.legal_case.pb_other_statements_ticked.push(r)
             }
         },
         updatePbPhysicalArtifactsTicked(state, pbPhysicalArtifactsTicked) {
-            Vue.set(state.legal_case, 'pb_physical_artifacts_ticked', []);
+            state.legal_case.pb_physical_artifacts_ticked = [];
             for (let r of pbPhysicalArtifactsTicked) {
                 state.legal_case.pb_physical_artifacts_ticked.push(r)
             }
         },
         updatePbDocumentArtifactsTicked(state, pbDocumentArtifactsTicked) {
-            Vue.set(state.legal_case, 'pb_document_artifacts_ticked', []);
+            state.legal_case.pb_document_artifacts_ticked = [];
             for (let r of pbDocumentArtifactsTicked) {
                 state.legal_case.pb_document_artifacts_ticked.push(r)
             }
         },
-
-        /*
-        updatePhysicalArtifactSensitiveUnusedReason(state, reasonEvent) {
-            let inserted = false;
-            let artifactIdStr = reasonEvent.target.id.substring(7)
-            let artifactId = parseInt(artifactIdStr)
-            // create empty array if it does not exist
-            if (!state.legal_case.boe_sensitive_unused_reasons) {
-                Vue.set(state.legal_case, 'boe_sensitive_unused_reasons', []);
-            }
-            // update existing record, if exists
-            for (let record of state.legal_case.boe_sensitive_unused_reasons) {
-                if (record.id === artifactId) {
-                    record.reasons = reasonEvent.target.value;
-                    inserted = true;
-                }
-            }
-            // if record does not exist, create it
-            if (inserted === false) {
-                let newRecord = {
-                    "id": artifactId, 
-                    "reasons": reasonEvent.target.value
-                }
-                state.legal_case.boe_sensitive_unused_reasons.push(newRecord);
-            }
-        },
-        */
     },
     actions: {
         async loadLegalCase({ dispatch, commit }, { legal_case_id }) {

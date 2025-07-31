@@ -127,9 +127,9 @@ export const callemailStore = {
                     country: 'AU'
                 };
             }
-            Vue.set(state, 'call_email', {
+            state.call_email = {
                 ...call_email
-            });
+            };
             if (state.call_email.occurrence_date_from) {
                 state.call_email.occurrence_date_from = moment(state.call_email.occurrence_date_from, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
@@ -161,16 +161,16 @@ export const callemailStore = {
                 api_endpoints.call_email,
                 state.call_email.id + "/process_renderer_document/"
                 )
-            Vue.set(state.call_email, 'rendererDocumentUrl', rendererDocumentUrl); 
+            state.call_email.rendererDocumentUrl = rendererDocumentUrl; 
             let commsLogsDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.call_email,
                 state.call_email.id + "/process_comms_log_document/"
                 )
-            Vue.set(state.call_email, 'commsLogsDocumentUrl', commsLogsDocumentUrl); 
+            state.call_email.commsLogsDocumentUrl = commsLogsDocumentUrl; 
         },
         updateSchema(state, schema) {
             //state.call_email.schema = schema;
-            Vue.set(state.call_email, 'schema', schema);
+            state.call_email.schema = schema;
         },        
         updateClassificationTypes(state, classification_entry) {
             if (classification_entry) {
@@ -195,17 +195,17 @@ export const callemailStore = {
         },
         updateClassification(state, classification) {
             if (classification) {
-                Vue.set(state.call_email, 'classification', classification);
+                state.call_email.classification = classification;
             }
         },
         updateReportType(state, report_type) {
             if (report_type) {
-                Vue.set(state.call_email, 'report_type', report_type);
+                state.call_email.report_type = report_type;
             }
         },
         updateEmailUser(state, email_user){
             if (email_user){
-                Vue.set(state.call_email, 'email_user', email_user);
+                state.call_email.email_user = email_user;
             }
         },
         updateEmailUserEmpty(state){
@@ -221,13 +221,13 @@ export const callemailStore = {
                     country: 'AU'
                 }
             };
-            Vue.set(state.call_email, 'email_user', email_user_empty);
+            state.call_email = email_user = email_user_empty;
         },
         updateResidentialAddress(state, address){
-            Vue.set(state.call_email.email_user, 'residential_address', address);
+            state.call_email.email_user = residential_address = address;
         },
         updateLocation(state, location) {
-            Vue.set(state.call_email, 'location', location);
+            state.call_email = location = location;
         },
         updateLocationPoint(state, point) {
             state.call_email.location.geometry.coordinates = point;
@@ -246,8 +246,8 @@ export const callemailStore = {
             state.call_email.location.properties.details = "";
         },
         updateAllocatedGroupList(state, members) {
-            Vue.set(state.call_email, 'allocated_group', {});
-            Vue.set(state.call_email, 'allocated_group', members);
+            state.call_email = allocated_group = {};
+            state.call_email = allocated_group = members;
         },
         updateAllocatedGroupId(state, id) {
             state.call_email.allocated_group_id = id;
@@ -256,23 +256,23 @@ export const callemailStore = {
             state.call_email.region_id = id;
         },
         updateOccurrenceTimeStart(state, time) {
-            Vue.set(state.call_email, 'occurrence_time_start', time);
+            state.call_email = occurrence_time_start = time;
         },
         updateOccurrenceTimeEnd(state, time) {
-            Vue.set(state.call_email, 'occurrence_time_end', time);
+            state.call_email = occurrence_time_end = time;
         },
         updateTimeOfCall(state, time) {
-            Vue.set(state.call_email, 'time_of_call', time);
+            state.call_email = time_of_call = time;
         },
         updateDateOfCall(state, date) {
-            Vue.set(state.call_email, 'date_of_call', date);
+            state.call_email = date_of_call = date;
         },
         updateRelatedItems(state, related_items) {
-            Vue.set(state.call_email, 'related_items', related_items);
+            state.call_email = related_items = related_items;
         },
         updateCaller(state, data) {
             if (data.data_type === 'individual') {
-                Vue.set(state.call_email, 'email_user_id', data.id);
+                state.call_email = email_user_id = data.id;
             }
         },
     },

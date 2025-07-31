@@ -132,37 +132,37 @@ export const applicationStore = {
     },
     mutations: {
         [UPDATE_APPLICATION] (state, application) {
-            Vue.set(state, 'application', {...application});
+            state.application = {...application};
         },
         [UPDATE_ORIGINAL_APPLICATION] (state, application) {
-            Vue.set(state, 'original_application', {...application});
+            state.original_application = {...application};
         },
         [UPDATE_ORG_APPLICANT] (state, { key, value }) {
             if(state.application.org_applicant == null) {
-                Vue.set(state.application, "org_applicant", {});
+                state.application.org_applicant = {};
             }
-            Vue.set(state.application.org_applicant, key, value);
+            state.application.org_applicant[key] = value
         },
         [UPDATE_PROXY_APPLICANT] (state, { key, value }) {
             if(state.application.proxy_applicant == null) {
-                Vue.set(state.application, "proxy_applicant", {});
+                state.application.proxy_applicant = {};
             }
-            Vue.set(state.application.proxy_applicant, key, value);
+            state.application.proxy_applicant[key] = value;
         },
         [UPDATE_APPLICATION_CHECK_STATUS_ID] (state, id_status) {
-            Vue.set(state, 'id_check_status', id_status);
+            state.id_check_status = id_status;
         },
         [UPDATE_APPLICATION_CHECK_STATUS_CHARACTER] (state, character_status) {
-            Vue.set(state, 'character_check_status', character_status);
+            state.character_check_status = character_status;
         },
         [UPDATE_APPLICATION_CHECK_STATUS_RETURN] (state, return_status) {
-            Vue.set(state, 'return_check_status', return_status);
+            state.return_check_status = return_status;
         },
         [UPDATE_APPLICATION_FEE_STATUS] (state, fee_status) {
-            Vue.set(state.application, 'update_fee', fee_status);
+            state.application.update_fee = fee_status;
         },
         [UPDATE_APPLICATION_ASSESS_STATUS] (state, assess_status) {
-            Vue.set(state.application, 'assess', assess_status);
+            state.application.assess = assess_status;
         },
     },
     actions: {

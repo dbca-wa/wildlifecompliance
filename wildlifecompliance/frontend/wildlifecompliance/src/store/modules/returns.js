@@ -22,10 +22,10 @@ export const returnsStore = {
     },
     mutations: {
         [UPDATE_RETURNS] (state, returns) {
-            Vue.set(state, 'returns', {...returns});
+            state.returns = {...returns};
         },
         [UPDATE_RETURNS_ESTIMATE] (state, estimate) {
-            Vue.set(state, 'returns_estimate_fee', estimate);
+            state.returns_estimate_fee = estimate;
         },
     },
     actions: {

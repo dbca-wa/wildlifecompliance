@@ -38,13 +38,13 @@ export const inspectionStore = {
     },
     mutations: {
         updateInspection(state, inspection) {
-            Vue.set(state, 'inspection', {
+            state.inspection = {
                 ...inspection
-            });
+            };
             console.log('updateInspection');
             if (!inspection.location) {
                 /* When location is null, set default object */
-                Vue.set(state.inspection, 'location', 
+                state.inspection.location =
                     {
                         "type": "Feature",
                         properties: {
@@ -59,8 +59,7 @@ export const inspectionStore = {
                             "type": "Point",
                             "coordinates": [],
                         },
-                    }
-                ); 
+                    }; 
             }
             if (state.inspection.planned_for_date) {
                 state.inspection.planned_for_date = moment(state.inspection.planned_for_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
@@ -76,44 +75,44 @@ export const inspectionStore = {
                 api_endpoints.inspection,
                 state.inspection.id + "/process_inspection_report_document/"
                 )
-            Vue.set(state.inspection, 'inspectionReportDocumentUrl', inspectionReportDocumentUrl); 
+            state.inspection.inspectionReportDocumentUrl = inspectionReportDocumentUrl; 
             let rendererDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.inspection,
                 state.inspection.id + "/process_renderer_document/"
                 )
-            Vue.set(state.inspection, 'rendererDocumentUrl', rendererDocumentUrl); 
+            state.inspection.rendererDocumentUrl = rendererDocumentUrl; 
             let commsLogsDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.inspection,
                 state.inspection.id + "/process_comms_log_document/"
                 )
-            Vue.set(state.inspection, 'commsLogsDocumentUrl', commsLogsDocumentUrl); 
+            state.inspection.commsLogsDocumentUrl = commsLogsDocumentUrl; 
             let createInspectionProcessCommsLogsDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.inspection,
                 state.inspection.id + "/create_inspection_process_comms_log_document/"
                 )
-            Vue.set(state.inspection, 'createInspectionProcessCommsLogsDocumentUrl', createInspectionProcessCommsLogsDocumentUrl); 
+            state.inspection.createInspectionProcessCommsLogsDocumentUrl = createInspectionProcessCommsLogsDocumentUrl; 
         },
         updatePlannedForTime(state, time) {
-            Vue.set(state.inspection, 'planned_for_time', time);
+            state.inspection.planned_for_time = time;
         },
         updatePartyInspected(state, data) {
             if (data.data_type === 'individual') {
-                Vue.set(state.inspection, 'party_inspected', data.data_type);
-                Vue.set(state.inspection, 'individual_inspected_id', data.id);
+                state.inspection.party_inspected = data.data_type;
+                state.inspection.individual_inspected_id = data.id;
                 if (state.inspection.organisation_inspected_id) {
                     state.inspection.organisation_inspected_id = null;
                 }
             }
             if (data.data_type === 'organisation') {
-                Vue.set(state.inspection, 'party_inspected', data.data_type);
-                Vue.set(state.inspection, 'organisation_inspected_id', data.id);
+                state.inspection.party_inspected = data.data_type;
+                state.inspection.organisation_inspected_id = data.id;
                 if (state.inspection.individual_inspected_id) {
                     state.inspection.individual_inspected_id = null;
                 }
             }
         },
         updateRelatedItems(state, related_items) {
-            Vue.set(state.inspection, 'related_items', related_items);
+            state.inspection.related_items = related_items;
         },
         updateLocationPoint(state, point) {
             state.inspection.location.geometry.coordinates = point;

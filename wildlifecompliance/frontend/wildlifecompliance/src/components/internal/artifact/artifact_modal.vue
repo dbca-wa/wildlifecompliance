@@ -154,7 +154,7 @@ export default {
               if (allocatedGroupResponse.ok) {
                   console.log(allocatedGroupresponse.allocated_group);
                   //this.allocatedGroup = Object.assign({}, allocatedGroupresponse.allocated_group);
-                  Vue.set(this, 'allocatedGroup', allocatedGroupresponse.allocated_group);
+                  this.allocatedGroup = allocatedGroupresponse.allocated_group;
                   this.allocated_group_id = allocatedGroupresponse.group_id;
               } else {
                   // Display http error response on modal

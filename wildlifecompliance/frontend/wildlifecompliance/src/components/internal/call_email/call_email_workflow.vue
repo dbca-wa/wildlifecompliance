@@ -256,7 +256,7 @@ export default {
       },
       updateAllocatedGroup: async function() {
           this.errorResponse = "";
-          Vue.set(this, 'allocatedGroup', []);
+          this.allocatedGroup = [];
           if (this.groupPermission && this.regionId) {
               try {
                   let allocatedGroupResponse = await this.loadAllocatedGroup({
@@ -264,7 +264,7 @@ export default {
                       region_id: this.regionId,
                       district_id: this.districtId ? this.districtId : null,
                   });
-                  Vue.set(this, 'allocatedGroup', allocatedGroupresponse);
+                  this.allocatedGroup = allocatedGroupresponse;
                   this.allocated_group_id = allocatedGroupresponse.group_id;
               } catch(error) {
                   // Display http error response on modal

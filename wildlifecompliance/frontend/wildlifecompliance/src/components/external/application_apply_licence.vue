@@ -89,7 +89,7 @@
                             <div class="col-sm-12">
                                 <div class="row">
                                     <br/><br/><br/><br/>
-                                    <center><i class="fa fa-4x fa-spinner fa-spin"/></center>
+                                    <div style="text-align:center;"><i class="fa fa-4x fa-spinner fa-spin"/></div>
                                     <br/><br/><br/><br/>
                                 </div>
                             </div>

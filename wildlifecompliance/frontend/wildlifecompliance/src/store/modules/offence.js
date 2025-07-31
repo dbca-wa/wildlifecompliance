@@ -39,10 +39,10 @@ export const offenceStore = {
     },
     mutations: {
         updateAllegedOffenceIds(state, ids) {
-            Vue.set(state.offence, 'alleged_offences', ids);
+            state.offence.alleged_offences = ids;
         },
         updateOffenders(state, offenders) {
-            Vue.set(state.offence, 'offenders', offenders);
+            state.offence.offenders = offenders;
         },
         updateTemporaryDocumentCollectionId(state, id){
             state.offence.temporary_document_collection_id = id;
@@ -97,7 +97,7 @@ export const offenceStore = {
             if (offence.occurrence_time_to) {
                 offence.occurrence_time_to = moment(offence.occurrence_time_to, 'HH:mm:ss').format('LT');
             }
-            Vue.set(state, 'offence', offence);
+            state.offence = offence;
         },
         updateOffenceEmpty(state){
             let offence = {
@@ -136,7 +136,7 @@ export const offenceStore = {
                 allocated_group_id: null,
                 lodgement_number: '',
             };
-            Vue.set(state, 'offence', offence);
+            state.offence = offence;
         },
         updateLocationPoint(state, point) {
             state.offence.location.geometry.coordinates = point;
@@ -155,13 +155,13 @@ export const offenceStore = {
             state.offence.location.properties.details = "";
         },
         updateAssignedToId(state, assigned_to_id) {
-            Vue.set(state.offence, 'assigned_to_id', assigned_to_id);
+            state.offence.assigned_to_id = assigned_to_id;
         },
         updateCanUserAction(state, can_user_action) {
-            Vue.set(state.offence, 'can_user_action', can_user_action);
+            state.offence.can_user_action = can_user_action;
         },
         updateRelatedItems(state, related_items) {
-            Vue.set(state.offence, 'related_items', related_items);
+            state.offence.related_items = related_items;
         },
     },
     actions: {

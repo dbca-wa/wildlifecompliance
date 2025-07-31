@@ -125,7 +125,7 @@ export default {
           );
         Object.assign(this.countries, returned_country_list);
         // Set selected country to Australia
-        Vue.set(this.organisation.address, 'country', 'AU');
+        this.organisation.address.country = 'AU';
     },
     methods: {
         save: async function() {

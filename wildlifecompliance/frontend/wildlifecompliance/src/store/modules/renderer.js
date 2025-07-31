@@ -91,23 +91,23 @@ export const rendererStore = {
     },
     mutations: {
         [UPDATE_RENDERER_TABS] (state, tabs) {
-            Vue.set(state, 'tabs', tabs);
+            state.tabs = tabs;
         },
         [UPDATE_RENDERER_SECTIONS] (state, sections) {
-            Vue.set(state, 'sections', {...sections});
+            state.sections = {...sections};
         },
         [UPDATE_VISIBLE_COMPONENT] (state, { key, value }) {
-            Vue.set(state.visible_components, key, value);
+            state.visible_components[key] = value;
         },
         [TOGGLE_FINALISED_TABS] (state, visible) {
-            Vue.set(state.visibility, 'exclude_decisions', visible ? [] : ['issued', 'declined']);
+            state.visibility.exclude_decisions = visible ? [] : ['issued', 'declined'];
         },
         [UPDATE_FORM_DATA] (state, form_data) {
             if(form_data == null) {
-                Vue.set(state, 'form_data', {});
+                state.form_data = {};
             }
             else {
-                Vue.set(state, 'form_data', {...form_data});
+                state.form_data = {...form_data};
             }
         },
         [UPDATE_FORM_FIELD] (state, { key, value }) {
@@ -115,7 +115,7 @@ export const rendererStore = {
             for(let idx in value) {
                 currentValue[idx] = value[idx];
             }
-            Vue.set(state.form_data, key, currentValue);
+            state.form_data[key] = currentValue;
         },
         [REMOVE_FORM_FIELD] (state, key) {
             Vue.delete(state.form_data, key);
