@@ -34,15 +34,11 @@
                     <div class="tab-pane fade" id="pills-details" role="tabpanel" aria-labelledby="pills-details-tab">
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Organisation Details
-                                        <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
-                                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse in" :id="pdBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Organisation Details"
+                                >
+                                    <div class="panel panel-default">
                                       <form class="form-horizontal" name="personal_form" method="post">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Name</label>
@@ -64,54 +60,16 @@
                                           </div>
                                        </form>
                                   </div>
-                                </div>
+                                </FormSection>
                             </div>
                         </div>
-                        <!-- div class="row">
-                            <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Identification<small> Upload organisation ID</small>
-                                        <a class="panelClicker" :href="'#'+idBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="idBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse" :id="idBody">
-                                      <form class="form-horizontal" name="id_form" method="post">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Identification</label>
-                                            <div class="col-sm-6">
-                                                <img v-if="org.organisation.identification" width="100%" name="identification" v-bind:src="org.organisation.identification" />
-                                            </div>
-                                          </div>
-                                          <div class="form-group">
-                                            <div class="col-sm-12">
-                                                -- output order in reverse due to pull-right at runtime --
-                                                <button v-if="!uploadingID" class="pull-right btn btn-primary" @click.prevent="uploadID()">Upload</button>
-                                                <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Uploading</button>
-                                                <span class="pull-right" style="margin-left:10px;margin-top:10px;margin-right:10px">{{uploadedIDFileName}}</span>
-                                                <span class="btn btn-primary btn-file pull-right">
-                                                    Select ID to Upload<input type="file" ref="uploadedID" @change="readFileID()"/>
-                                                </span>
-                                            </div>
-                                          </div>
-                                       </form>
-                                  </div>
-                                </div>
-                            </div>
-                        </div -->
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Address Details
-                                        <a class="panelClicker" :href="'#'+adBody" data-toggle="collapse" expanded="false"  data-parent="#userInfo" :aria-controls="adBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div v-if="loading.length == 0" class="panel-body collapse" :id="adBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Address Details"
+                                >
+                                    <div class="panel panel-default">
                                       <form class="form-horizontal" action="index.html" method="post">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Street</label>
@@ -150,42 +108,35 @@
                                             </div>
                                           </div>
                                        </form>
-                                  </div>
-                                </div>
+                                    </div>
+                                </FormSection>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Contact Details
-                                        <a class="panelClicker" :href="'#'+cdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="cdBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse" :id="cdBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Contact Details"
+                                >
+                                    <div class="panel panel-default">
                                         <form class="form-horizontal" action="index.html" method="post">
                                             <div class="col-sm-12">
                                                 <button @click.prevent="addContact()" style="margin-bottom:10px;" class="btn btn-primary pull-right">Add Contact</button>
                                             </div>
                                             <datatable ref="contacts_datatable" id="organisation_contacts_datatable" :dtOptions="contacts_options" :dtHeaders="contacts_headers"/>
                                         </form>
-                                  </div>
-                                </div>
+                                    </div>
+                                </FormSection>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Linked Persons<small> - Manage the user accounts linked to the organisation</small>
-                                        <a class="panelClicker" :href="'#'+oBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="oBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse" :id="oBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Linked Persons"
+                                    subtitle="Manage the user accounts linked to the organisation"
+                                >
+                                    <div class="panel panel-default">
                                     <div class ="row">
                                         <form class="form-horizontal" action="index.html" method="post">
                                             <div class="col-sm-6">
@@ -230,8 +181,8 @@
                                     <div>
                                         <datatable ref="contacts_datatable_user" id="organisation_contacts_datatable_ref" :dtOptions="contacts_options_ref" :dtHeaders="contacts_headers_ref" />
                                     </div>
-                                  </div>
-                                </div>
+                                    </div>
+                                </FormSection>
                             </div>
                         </div>
                     </div> 

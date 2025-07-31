@@ -3,15 +3,11 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Schema Section Question
-                        <a :href="'#'+pQuestionBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pQuestionBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pQuestionBody">
+            <FormSection
+                :form-collapse="false"
+                label="Schema Section Question"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -63,7 +59,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 

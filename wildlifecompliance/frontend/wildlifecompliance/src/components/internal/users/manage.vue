@@ -27,15 +27,11 @@
                   <div class="tab-pane fade" id="pills-details" role="tabpanel" aria-labelledby="pills-details-tab">
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Personal Details
-                                        <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
-                                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse in" :id="pdBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Personal Details"
+                                >
+                                    <div class="panel panel-default">
                                       <form class="form-horizontal" name="personal_form" method="post">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Account Given Name(s)</label>
@@ -84,52 +80,17 @@
                                             </div>
                                           </div>
                                        </form>
-                                  </div>
-                                </div>
+                                    </div>
+                                </FormSection>
                             </div>
                         </div>
-                        <!--<div class="row">
-                            <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Identification
-                                        <a class="panelClicker" :href="'#'+idBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="idBody">
-                                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse in" :id="idBody">
-                                      <form class="form-horizontal" name="id_form" method="post">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Identification</label>
-                                            <div class="col-sm-9">
-                                                <span class="col-sm-3 btn btn-link btn-file pull-left" v-if="uploadedID"><SecureBaseLink link_name="Uploaded Photo ID" :link_data="{'customer_id': user.id}" /></span>
-                                                <span class="col-sm-3 btn btn-link btn-file pull-left" v-else-if="!uploadedID">Attach Photo ID<input type="file" ref="uploadedID" @change="readFileID()"/></span>
-                                                <span class="col-sm-3 btn btn-link btn-file pull-left" v-else >&nbsp;Uploading...</span>
-                                                <span v-if="uploadedID" class="btn btn-link btn-file pull-left">
-                                                    <a @click="removeID()" class="fa fa-trash-o" title="Remove file" style="cursor: pointer; color:red;" />
-                                                </span>
-                                            </div> 
-                                          </div>
-                                          <div class="form-group">
-                                            <div class="col-sm-12"></div>
-                                          </div>
-                                       </form>
-                                  </div>
-                                </div>
-                            </div>
-                        </div>-->
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Address Details
-                                        <a class="panelClicker" :href="'#'+adBody" data-toggle="collapse" expanded="false"  data-parent="#userInfo" :aria-controls="adBody">
-                                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div v-if="loading.length == 0" class="panel-body collapse in" :id="adBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Address Details"
+                                >
+                                    <div class="panel panel-default">
                                       <form class="form-horizontal" action="index.html" method="post">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Street</label>
@@ -169,20 +130,16 @@
                                           </div>
                                        </form>
                                   </div>
-                                </div>
+                                </FormSection>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Contact Details <small></small>
-                                        <a class="panelClicker" :href="'#'+cdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="cdBody">
-                                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse in" :id="cdBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Contact Details"
+                                >
+                                    <div class="panel panel-default">
                                       <form class="form-horizontal" action="index.html" method="post">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Phone</label>
@@ -210,20 +167,16 @@
                                           </div>
                                        </form>
                                   </div>
-                                </div>
+                                </FormSection>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Organisations <small></small>
-                                        <a class="panelClicker" :href="'#'+odBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="odBody">
-                                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse in" :id="odBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Organisations"
+                                >
+                                    <div class="panel panel-default">
                                       <div v-for="org in user.wildlifecompliance_organisations" v-bind:key="org.id">
                                           <div class="form-group">
                                             <label for="" class="col-sm-2 control-label" >Organisation</label>
@@ -251,7 +204,7 @@
                                           </div>
                                       </div>
                                   </div>
-                                </div>
+                                </FormSection>
                             </div>
                         </div>
                     </div> 

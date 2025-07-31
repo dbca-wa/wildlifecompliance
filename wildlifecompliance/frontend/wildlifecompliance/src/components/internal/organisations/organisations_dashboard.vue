@@ -1,22 +1,18 @@
 <template id="organisation_dashboard">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Organisations
-                        <a :href="'#'+oBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="oBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="oBody">
+            <FormSection
+                :form-collapse="false"
+                label="Organisations"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-lg-12">
                             <datatable ref="organisation_datatable" :id="datatable_id" :dtOptions="organisation_options" :dtHeaders="organisation_headers"/>
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </template>

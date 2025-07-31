@@ -2,9 +2,6 @@ import Vue from 'vue'
 import { createRouter, createWebHistory } from 'vue-router';
 import Organisations from '@/components/user/manage_organisations.vue'
 import ManageOrganisation from '@/components/external/organisations/manage.vue'
-import ProfileDashTable from '@/components/user/profile_dashboard.vue'
-import CreateProfile from '@/components/user/profile_create.vue'
-import EditProfile from '@/components/user/profile_manage.vue'
 import external_routes from '@/components/external/routes'
 import internal_routes from '@/components/internal/routes'
 import { api_endpoints, fetch } from "@/utils/hooks";

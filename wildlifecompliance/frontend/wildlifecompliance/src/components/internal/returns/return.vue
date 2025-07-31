@@ -6,15 +6,11 @@
         <div class="col-md-9">
 
         <template>
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Condition Details
-                    <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
-                        <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                    </a>
-                </h3>
-            </div>
-            <div class="panel-body panel-collapse in" :id="pdBody">
+        <FormSection
+            :form-collapse="false"
+            label="Condition Details"
+        >                
+            <div class="panel panel-default">
                 <div class="col-sm-12">
                     <form class="form-horizontal" name="return_form">
                         <div class="form-group">
@@ -41,7 +37,7 @@
                     </form>
                 </div>
             </div>
-        </div>
+        </FormSection>
         </template>
         <ReturnSheet v-if="returns.format==='sheet'"></ReturnSheet>
         <ReturnQuestion v-if="returns.format==='question'"></ReturnQuestion>

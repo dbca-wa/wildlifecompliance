@@ -3,16 +3,11 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Schema Masterlist Questions
-                        <a :href="'#'+pMasterListBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pMasterListBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pMasterListBody">
-
+            <FormSection
+                :form-collapse="false"
+                label="Schema Masterlist Questions"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-12">
                             <button class="btn btn-primary pull-right" @click.prevent="addTableEntry()" name="add-masterlist">New Question</button>
@@ -33,7 +28,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 

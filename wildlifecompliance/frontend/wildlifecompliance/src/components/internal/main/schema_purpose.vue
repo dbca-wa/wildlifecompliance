@@ -3,16 +3,11 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Schema Purpose Section
-                        <a :href="'#'+pPurposeBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pPurposeBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pPurposeBody">
-
+            <FormSection
+                :form-collapse="false"
+                label="Schema Purpose Section"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -42,7 +37,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 
