@@ -1,19 +1,19 @@
 <template lang="html">
-    <FormSection
+    <FormSectionToggle
         :form-collapse="false"
         :label=label
     >
         <div class="panel panel-default" >
           <slot></slot>
         </div>
-    </FormSection>
+    </FormSectionToggle>
 </template>
 
 <script>
-import FormSection from "@/components/forms/section_toggle.vue";
+import FormSectionToggle from "@/components/forms/section_toggle.vue";
 export default {
-    name:"FormSection",
-    props:["label","Index"],
+    name: "Section",
+    props:['label','Index'],
     data:function () {
         return {
             title:"Section title",
@@ -21,7 +21,7 @@ export default {
         }
     },
     components: {
-        FormSection,
+        FormSectionToggle,
     },
     computed:{
         section_id:function () {

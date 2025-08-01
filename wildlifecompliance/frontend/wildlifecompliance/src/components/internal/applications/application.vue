@@ -202,15 +202,15 @@
                 <div v-if="applicationDetailsVisible && showingApplication">
                     <div>
                     <ul class="nav nav-pills mb-3" id="tabs-main" data-tabs="tabs">
-                        <li class="nav-item"><a ref="applicantTab" class="nav-link" data-toggle="pill" v-on:click="selectApplicantTab()" :href="'#'+applicantTab">Applicant</a></li>
+                        <li class="nav-item"><a ref="applicantTab" class="nav-link" data-bs-toggle="pill" v-on:click="selectApplicantTab()" :href="'#'+applicantTab">Applicant</a></li>
                         <!-- <li class="nav-item"><a ref="applicationTab" class="nav-link" data-toggle="pill" :href="'#'+applicationTab">Application</a></li> -->
                         <li class="nav-item" v-for="(activity, index) in allCurrentActivities">
-                            <a :class="{'nav-link amendment-highlight': application.has_amendment}"
-                                data-toggle="pill" v-on:click="selectTab(activity)" :href="'#'+activityTab">{{activity.label}}</a>
+                            <a :class="{'nav-link amendment-highlight': application.has_amendment}" class="nav-link"
+                                data-bs-toggle="pill" v-on:click="selectTab(activity)" :href="'#'+activityTab">{{activity.label}}</a>
                         </li>
                     </ul>
                     <div class="tab-content">
-                    <div :id="applicantTab" class="tab-pane fade in active">
+                    <div :id="applicantTab" class="tab-pane fade">
 
                     <div class="col-md-12" v-if="showingApplicant">
                         <div class="row">

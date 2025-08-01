@@ -40,7 +40,8 @@
 <script>
 import {
   api_endpoints,
-  helpers
+  helpers,
+  fetch
 }
 from '@/utils/hooks';
 import CommentBlock from './comment_block.vue';
@@ -166,12 +167,11 @@ export default {
             formData.append('action', 'list');
             formData.append('input_name', vm.name);
             formData.append('csrfmiddlewaretoken', vm.csrf_token);
-            vm.$http.post(vm.application_document_action, formData)
-                .then(res=>{
-                    vm.documents = res;
-                    //console.log(vm.documents);
-                    vm.show_spinner = false;
-                });
+            let request = fetch.fetchUrl(vm.application_document_action, {method:'POST', formData})
+            request.then(res=>{
+                vm.documents = res;
+                vm.show_spinner = false;
+            });
 
         },
 

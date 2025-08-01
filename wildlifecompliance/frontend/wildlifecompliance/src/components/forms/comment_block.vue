@@ -63,7 +63,7 @@ import { mapGetters } from 'vuex';
 const CommentBlock = {
     props:{
         label: {
-            type: String | null,
+            type: [String, null],
             required: true,
         },
         name: {
@@ -71,7 +71,7 @@ const CommentBlock = {
             required: true,
         },
         field_data: {
-            type: Object | null,
+            type: [Object, null],
             required: true,
         },
     },

@@ -24,7 +24,6 @@
                                         <div class='dropdown-menu-right section-list' id='section-submenu' >
                                             <div v-for="(section, section_idx) in getSections(tab.id)"
                                                 v-on:click="selectTab(tab)"
-                                                v-scroll-to="`#${section.name}`"
                                                 class="menu-row">
                                                     <div>
                                                         <i class="fa fa-circle"></i>
