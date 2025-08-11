@@ -56,6 +56,7 @@
     import Checkbox from '@/components/forms/checkbox.vue'
     import Radio from '@/components/forms/radio.vue'
     import TableBlock from '@/components/forms/table.vue'
+
     export default {
         props:["readonly", "activity", "application", "id"],
         components: {TextField, TextArea, DateField, Checkbox, Radio, TableBlock},
@@ -108,10 +109,6 @@
                             var section_name = k;
                             var value = data[k]['answer'];
                             var label = data[k]['label'];
-                            //_elements.push(
-                            //    //<TextArea readonly={readonly} name={k} value={data[k]['answer']} label={data[k]['label']} />
-                            //    "<Table name='"+ section_name +"' value='"+ value +"' label='"+ label +"' />"
-                            //)
                             vm.element = {
                                     type: 'table',
                                     name: section_name,
@@ -125,22 +122,6 @@
                 }
                 return _elements;
             },
-            /*
-            process: function(e) {
-                let vm = this;
-                vm.form = document.forms.new_application;
-                let formData = new FormData(vm.form);
-                formData.append('action', 'process');
-                vm.$http.post(vm.application_form_url,formData).then(res=>{
-                  swal.fire(
-                    'Processed',
-                    'Your application has been processed',
-                    'success'
-                  )
-                },err=>{
-                });
-            },
-            */
         },
         computed: {
             application_iseditable_url: function() {

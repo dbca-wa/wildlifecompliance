@@ -53,7 +53,7 @@ export default {
     data: function() {
         let vm = this;
         return {
-            allowed_groups: [],//this.getAllocatedGroup(this.allowed_group_ids),
+            allowed_groups: [],
             assign_to_id: null,
         }         
     },
@@ -72,9 +72,9 @@ export default {
             } else {
                 payload = { 'assigned_to_id': this.assign_to_id };
             }
-            let res = await Vue.http.post(
+            let res = await fetch.fetchUrl(
                 url,
-                payload
+                {method:'POST', body:JSON.stringify(payload)}
             );
             this.$emit('update-assigned-to-id', res);
         },
@@ -82,11 +82,12 @@ export default {
             if (this.allowed_groups == null) {
                 this.allowed_groups = [];
             }
-            let allocatedGroupResponse = await Vue.http.post(
-            api_endpoints.allocated_group_members,
-            {
-                'id_list': id_list,
-            });
+            let allocatedGroupResponse = await fetch.fetchUrl(
+                api_endpoints.allocated_group_members,
+                {
+                    method:'POST',body:JSON.stringify({'id_list': id_list}),
+                }
+            );
             if (allocatedGroupResponse.ok) {
                 this.allowed_groups = allocatedGroupresponse;
             } 

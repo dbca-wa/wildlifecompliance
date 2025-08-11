@@ -253,13 +253,6 @@ export const userStore = {
             commit(UPDATE_CURRENT_USER, user);
         },
         async loadAllocatedGroup({}, {workflow_type, region_id, district_id}) {
-                /*
-            let url = helpers.add_endpoint_join(
-                api_endpoints.get_allocated_group_members,
-                api_endpoints.region_district,
-                region_district_id + '/get_compliance_group_by_region_district/'
-                );
-                */
             let returned = await Vue.http.post(
                 api_endpoints.allocated_group_members,
                 { 

@@ -141,13 +141,6 @@ export default {
             vm.show_spinner = false;
         },
 
-        /*
-        upload_file: function(e) {
-            let vm = this;
-            $("[id=save_and_continue_btn][value='Save Without Confirmation']").trigger( "click" );
-        },
-		*/
-
         get_documents: function() {
             let vm = this;
 

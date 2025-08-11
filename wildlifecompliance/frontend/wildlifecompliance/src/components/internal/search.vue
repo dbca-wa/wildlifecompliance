@@ -166,7 +166,8 @@ import OrganisationDashTable from '@internal-components/organisations/organisati
 import '@/scss/dashboards/search.scss';
 import {
   api_endpoints,
-  helpers
+  helpers,
+  fetch
 }
 from '@/utils/hooks'
 import utils from './utils'
@@ -262,16 +263,6 @@ export default {
         UserDashTable,
         OrganisationDashTable
     },
-    //beforeRouteEnter:function(to,from,next){
-        //let initialisers = [
-        //    utils.fetchOrganisations(),
-        //]
-        //Promise.all(initialisers).then(data => {
-        //    next(vm => {
-        //        vm.organisations = data[0].results;
-        //    });
-        //});
-    //},
     computed: {
         isLoading: function () {
             return this.loading.length == 0;
@@ -364,9 +355,9 @@ export default {
             vm.showSpinner = true;
             vm.errors = false;
             vm.errorString = '';
+
             try {
-              const res = await vm.$http.post('/api/search_reference.json',{"reference_number": vm.referenceWord,});
-              console.log(res)
+              const res = await fetch.fetchUrl('/api/search_reference.json',{method:'POST', body:JSON.stringify({'reference_number': vm.referenceWord})});
               if (res.url_string) {
                   window.location.href = res.url_string;
               } else if (res.error) {
@@ -375,7 +366,6 @@ export default {
                   vm.errorString = res.error;
               }
             } catch(error) {
-              //console.log(error);
               vm.errors = true;
               vm.errorString = helpers.apiVueResourceError(error);
             }
@@ -412,13 +402,19 @@ export default {
           if(this.searchKeywords.length > 0)
           {
             vm.searching=true;
-            vm.$http.post('/api/search_keywords.json',{
-              searchKeywords: vm.searchKeywords,
-              searchApplication: vm.searchApplication,
-              searchLicence: vm.searchLicence,
-              searchReturn: vm.searchReturn,
-              is_internal: true,
-            }).then(res => {
+
+            let request = fetch.fetchUrl('/api/search_keywords.json',{
+              method:'POST',
+              body: JSON.stringify({
+                'searchKeywords': vm.searchKeywords,
+                'searchApplication': vm.searchApplication,
+                'searchLicence': vm.searchLicence,
+                'searchReturn': vm.searchReturn,
+                'is_internal': true,
+            })
+            })
+
+            request.then(res => {
               vm.results = res;
               vm.$refs.keyword_search_datatable.vmDataTable.clear()
               vm.$refs.keyword_search_datatable.vmDataTable.rows.add(vm.results);

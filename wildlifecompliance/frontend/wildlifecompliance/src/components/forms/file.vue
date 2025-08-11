@@ -167,7 +167,7 @@ export default {
             formData.append('action', 'list');
             formData.append('input_name', vm.name);
             formData.append('csrfmiddlewaretoken', vm.csrf_token);
-            let request = fetch.fetchUrl(vm.application_document_action, {method:'POST', formData})
+            let request = fetch.fetchUrl(vm.application_document_action, {method:'POST', body:formData})
             request.then(res=>{
                 vm.documents = res;
                 vm.show_spinner = false;
@@ -184,13 +184,11 @@ export default {
             formData.append('document_id', file.id);
             formData.append('csrfmiddlewaretoken', vm.csrf_token);
 
-            vm.$http.post(vm.application_document_action, formData)
-                .then(res=>{
-                    vm.documents = vm.get_documents()
-                    //vm.documents = res;
-                    vm.show_spinner = false;
-                });
-
+            let request = fetch.fetchUrl(vm.application_document_action, {method:'POST', body:formData})
+            request.then(res=>{
+                vm.documents = vm.get_documents()
+                vm.show_spinner = false;
+            });
         },
         
         uploadFile(e){
@@ -219,11 +217,10 @@ export default {
             formData.append('_file', vm.uploadFile(e));
             formData.append('csrfmiddlewaretoken', vm.csrf_token);
 
-            vm.$http.post(vm.application_document_action, formData)
-                .then(res=>{
-                    vm.documents = res;
-                },err=>{
-                });
+            let request = fetch.fetchUrl(vm.application_document_action, {method:'POST', body:formData})
+            request.then(res=>{
+                vm.documents = res;
+            });
 
         },
 
