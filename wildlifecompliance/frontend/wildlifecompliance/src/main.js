@@ -3,6 +3,7 @@
 import Vue from 'vue';
 window._ = _;
 import $ from 'jquery';
+import 'jquery-validation';
 window.$ = $;
 import { createApp } from 'vue';
 import App from './App';
@@ -26,7 +27,6 @@ window.JSZip = jsZip;
 
 import 'select2';
 import "sweetalert2/dist/sweetalert2.css";
-import 'jquery-validation';
 
 import 'select2/dist/css/select2.min.css';
 import 'select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css';

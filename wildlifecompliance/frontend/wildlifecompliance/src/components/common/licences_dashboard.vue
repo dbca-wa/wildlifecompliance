@@ -674,9 +674,13 @@ export default {
 
                         data.purpose_ids_list = select_purpose_id;
                         data.selected_activity_id = select_activity_id;
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.selected_licence_id+'/suspend_purposes'),JSON.stringify(data),{
+                        let request = fetch_util.fetchUrl(
+                            helpers.add_endpoint_json(api_endpoints.licences,vm.selected_licence_id+'/suspend_purposes'),
+                            {method:'POST',body:JSON.stringify(data)},
+                            {
                                 emulateJSON:true,
-                            }).then((response)=>{
+                            })
+                        request.then((response)=>{
                                 vm.$refs.licence_datatable.vmDataTable.ajax.reload();
                                 vm.$emit('refreshFromResponse',response);
                             },(error)=>{

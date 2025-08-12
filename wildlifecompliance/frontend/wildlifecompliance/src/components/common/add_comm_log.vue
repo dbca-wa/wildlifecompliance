@@ -105,7 +105,6 @@
 </template>
 
 <script>
-//import $ from 'jquery'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import {helpers,fetch_util} from "@/utils/hooks.js"
@@ -221,13 +220,11 @@ export default {
                 }).then((response)=>{
                     vm.addingComms = false;
                     vm.close();
-                    //vm.$emit('refreshFromResponse',response);
                 },(error)=>{
                     vm.errors = true;
                     vm.addingComms = false;
                     vm.errorString = helpers.apiVueResourceError(error);
                 });
-            
         },
         addFormValidations: function() {
             let vm = this;

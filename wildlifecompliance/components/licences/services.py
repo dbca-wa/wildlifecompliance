@@ -1034,8 +1034,10 @@ class LicenceActioner(LicenceActionable):
                     _action.format(_activity.licence_activity.name), request)
 
             else:
-                selected_application.submitter.log_user_action(
-                    _action.format(_activity.licence_activity.name), request)
+                pass
+                #TODO fix or replace
+                #selected_application.submitter.log_user_action(
+                #    _action.format(_activity.licence_activity.name), request)
 
         '''
         Action process.
