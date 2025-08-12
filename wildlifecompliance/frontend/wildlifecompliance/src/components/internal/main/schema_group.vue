@@ -394,9 +394,11 @@ export default {
 
                     if (result) {
 
-                        await self.$http.delete(helpers.add_endpoint_json(api_endpoints.schema_group,(self.sectionGroup.id+'/delete_group')))
+                        let request = await fetch_util.fetchUrl(
+                            helpers.add_endpoint_json(api_endpoints.schema_group,(self.sectionGroup.id+'/delete_group')), {method:"DELETE"}
+                        )
     
-                        .then((response) => {
+                        request.then((response) => {
 
                             self.$refs.schema_group_table.vmDataTable.ajax.reload();
 

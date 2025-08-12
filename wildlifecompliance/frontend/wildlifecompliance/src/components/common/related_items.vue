@@ -179,7 +179,7 @@ export default {
             'comment': this.$refs.weak_links_lookup.comment,
         }
         // post payload to url, then
-        let relatedItems = await Vue.http.post(url, payload);
+        let relatedItems = await fetch.fetchUrl(url, {method:'POST', body:JSON.stringify(payload)});
         if (relatedItems.ok) {
             await this.parent_update_related_items(relatedItems.body);
             return relatedItems
@@ -198,7 +198,7 @@ export default {
             'second_object_id': secondObjectId,
         }
         // post payload to url, then
-        let relatedItems = await Vue.http.post(url, payload);
+        let relatedItems = await fetch.fetchUrl(url, {method:'POST', body:JSON.stringify(payload)});
         if (relatedItems.ok) {
             await this.parent_update_related_items(relatedItems.body);
         }

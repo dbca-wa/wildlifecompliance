@@ -794,9 +794,10 @@ export default {
         deleteContact: function(id){
             let vm = this;
             
-            vm.$http.delete(helpers.add_endpoint_json(api.organisation_contacts,id),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.organisation_contacts,id), {method:"DELETE"},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 swal.fire(
                     'Contact Deleted', 
                     'The contact was successfully deleted.',

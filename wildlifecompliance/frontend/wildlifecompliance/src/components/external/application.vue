@@ -204,7 +204,8 @@ export default {
           confirmButtonText: 'Discard',
           confirmButtonColor: '#d9534f',
       }).then((result) => {
-        this.$http.delete(this.activity_discard_url, {params: {'activity_id': this.selected_activity_tab_id}}).then(res=>{
+          let request = fetch_util.fetchUrl(this.activity_discard_url, {method:"DELETE", params: {'activity_id': this.selected_activity_tab_id}})
+          request.then(res=>{
             swal.fire(
               'Activity Discarded',
               `${this.selected_activity_tab_name} has been discarded from this application.`,

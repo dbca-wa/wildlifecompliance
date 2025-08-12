@@ -284,8 +284,8 @@ export default {
                 confirmButtonColor:'#d9534f'
             }).then((result) => {
                 if (result) {
-                    vm.$http.delete(helpers.add_endpoint_json(api_endpoints.application_conditions,_id+'/delete'))
-                    .then((response) => {
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.application_conditions,_id+'/delete'), {method:"DELETE"})
+                    request.then((response) => {
                         vm.$refs.conditions_datatable.vmDataTable.ajax.reload();
                     }, (error) => {
                         console.log(error);

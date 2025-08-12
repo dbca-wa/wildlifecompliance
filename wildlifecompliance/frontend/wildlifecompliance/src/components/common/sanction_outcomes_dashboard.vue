@@ -292,7 +292,8 @@ export default {
             });
         },
         payInfringementPenalty: function(sanction_outcome_id){
-            this.$http.post('/infringement_penalty/' + sanction_outcome_id + '/').then(res=>{
+            let request = fetch_util.fetchUrl('/infringement_penalty/' + sanction_outcome_id + '/',{method:'POST'})
+            request.then(res=>{
                     window.location.href = res;
                 },err=>{
                     swal.fire(

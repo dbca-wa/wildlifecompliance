@@ -309,10 +309,14 @@ export default {
             activity => activity.purpose.filter(
                 purpose => purpose.selected || (purpose.id == event.target.id && event.target.checked)
             ))).map(purpose => purpose.id);
-        this.$http.post('/api/application/estimate_price/', {
-                'purpose_ids': purpose_ids,
-                'licence_type': this.selected_apply_licence_select,
-            }).then(res => {
+        let request = fetch_util.fetchUrl('/api/application/estimate_price/', 
+            {
+                method:'POST', body:{
+                    'purpose_ids': purpose_ids,
+                    'licence_type': this.selected_apply_licence_select,
+                }
+            })
+        request.then(res => {
                 this.application_fee = res.fees.application;
                 this.licence_fee = res.fees.licence;
 
@@ -391,7 +395,8 @@ export default {
             data.customer_method_id = vm.customer_pay_method;
             data.selected_activity = vm.select_activity;
             data.selected_purpose = vm.select_purpose;
-            vm.$http.post('/api/application.json',JSON.stringify(data),{emulateJSON:true}).then(res => {
+            let request = fetch_util.fetchUrl('/api/application.json',{method:'POST', body:JSON.stringify(data)},{emulateJSON:true})
+            request.then(res => {
                 vm.setApplicationWorkflowState({bool: false});
                 vm.setReceptionMethodId({pay_method: this.customer_pay_method});
                 vm.application = res;
@@ -425,7 +430,8 @@ export default {
         data.customer_method_id = vm.customer_pay_method;
         data.selected_activity = vm.select_activity;
         data.selected_purpose = vm.select_purpose;
-        vm.$http.post('/api/application.json',JSON.stringify(data),{emulateJSON:true}).then(res => {
+        let request = fetch_util.fetchUrl('/api/application.json',{method:'POST', body:JSON.stringify(data)},{emulateJSON:true})
+        request.then(res => {
             vm.setApplicationWorkflowState({bool: false});
             vm.setReceptionMethodId({pay_method: this.customer_pay_method});
             vm.application = res;

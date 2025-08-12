@@ -422,8 +422,10 @@ export default {
                 }).then(async (result) => {
 
                     if (result) {
-                        await self.$http.delete(helpers.add_endpoint_json(api_endpoints.schema_masterlist,(self.masterlist.id+'/delete_masterlist')))
-                        .then((response) => {
+                        let request = await fetch_util.fetchUrl(
+                            helpers.add_endpoint_json(api_endpoints.schema_masterlist,(self.masterlist.id+'/delete_masterlist')), {method:"DELETE"}
+                        )
+                        request.then((response) => {
                             self.$refs.schema_masterlist_table.vmDataTable.ajax.reload();
                         }, (error) => {
                             swal.fire(

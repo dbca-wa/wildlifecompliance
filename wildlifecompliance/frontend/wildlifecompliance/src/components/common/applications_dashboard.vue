@@ -570,8 +570,8 @@ export default {
                 confirmButtonColor:'#d9534f'
             }).then((result) => {
                 if (result) {
-                    vm.$http.delete(api_endpoints.discard_application(application_id))
-                    .then((response) => {
+                    let request = fetch_util.fetchUrl(api_endpoints.discard_application(application_id), {method:"DELETE"})
+                    request.then((response) => {
                         swal.fire(
                             'Discarded',
                             'Your application has been discarded',

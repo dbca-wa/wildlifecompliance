@@ -437,7 +437,7 @@ export default {
                     }
                 }
 
-                savedEmailUser = await Vue.http.post(fetchUrl, payload);
+                savedEmailUser = await fetch.fetchUrl(fetchUrl,{method:'POST', body: payload});
                 if (!savedEmailUser.body.residential_address) {
                     savedEmailUser.body.residential_address = this.getDefaultAddress()
                 }

@@ -501,7 +501,8 @@ export default {
                 }).then((result) => {
                     if (result) {
                         var licence_id = $(this).attr('surrender-licence');
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/surrender_licence')).then((response)=>{
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/surrender_licence'),{method:'POST'})
+                        request.then((response)=>{
                                 swal.fire(
                                         'Surrender Licence',
                                         'The selected licence\'s current activities and purposes have been Surrendered.',
@@ -540,9 +541,13 @@ export default {
 
                         data.purpose_ids_list = select_purpose_id;
                         data.selected_activity_id = select_activity_id;
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.selected_licence_id+'/surrender_purposes'),JSON.stringify(data),{
+                        let request = fetch_util.fetchUrl(
+                            helpers.add_endpoint_json(api_endpoints.licences,vm.selected_licence_id+'/surrender_purposes'),
+                            {method:'POST',body:JSON.stringify(data)},
+                            {
                                 emulateJSON:true,
-                            }).then((response)=>{
+                            })
+                        request.then((response)=>{
                                 vm.$refs.licence_datatable.vmDataTable.ajax.reload();
                                 vm.$emit('refreshFromResponse',response);
                             },(error)=>{
@@ -568,20 +573,23 @@ export default {
                 }).then((result) => {
                     if (result) {
                         var licence_id = $(this).attr('cancel-licence');
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/cancel_licence')).then((response)=>{
-                                swal.fire(
-                                        'Cancel Licence',
-                                        'The selected licence\'s current activities and purposes have been Cancelled.',
-                                        'success'
-                                )
-                                vm.refreshFromResponse(response)
-                            },(error)=>{
-                                swal.fire(
-                                    'Cancel Licence Error',
-                                    helpers.apiVueResourceError(error),
-                                    'error'
-                                )
-                            });
+                        let request = fetch_util.fetchUrl(
+                            helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/cancel_licence'),
+                        {method:'POST'},)
+                        request.then((response)=>{
+                            swal.fire(
+                                    'Cancel Licence',
+                                    'The selected licence\'s current activities and purposes have been Cancelled.',
+                                    'success'
+                            )
+                            vm.refreshFromResponse(response)
+                        },(error)=>{
+                            swal.fire(
+                                'Cancel Licence Error',
+                                helpers.apiVueResourceError(error),
+                                'error'
+                            )
+                        });
                     }
                 },(error) => {
                 });
@@ -607,9 +615,13 @@ export default {
 
                         data.purpose_ids_list = select_purpose_id;
                         data.selected_activity_id = select_activity_id;
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.selected_licence_id+'/cancel_purposes'),JSON.stringify(data),{
+                        let request = fetch_util.fetchUrl(
+                            helpers.add_endpoint_json(api_endpoints.licences,vm.selected_licence_id+'/cancel_purposes'),
+                            {method:'POST',body:JSON.stringify(data)},
+                            {
                                 emulateJSON:true,
-                            }).then((response)=>{
+                            })
+                        request.then((response)=>{
                                 vm.$refs.licence_datatable.vmDataTable.ajax.reload();
                                 vm.$emit('refreshFromResponse',response);
                             },(error)=>{
@@ -635,7 +647,9 @@ export default {
                 }).then((result) => {
                     if (result) {
                         var licence_id = $(this).attr('suspend-licence');
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/suspend_licence')).then((response)=>{
+                        let request = fetch_util.fetchUrl(
+                            helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/suspend_licence'),{method:'POST'})
+                        request.then((response)=>{
                                 swal.fire(
                                         'Suspend Licence',
                                         'The selected licence\'s current activities and purposes have been Suspended.',
@@ -735,9 +749,13 @@ export default {
 
                         data.purpose_ids_list = select_purpose_id;
                         data.selected_activity_id = select_activity_id;
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.selected_licence_id+'/reissue_purposes'),JSON.stringify(data),{
+                        let request = fetch_util.fetchUrl(
+                            helpers.add_endpoint_json(api_endpoints.licences,vm.selected_licence_id+'/reissue_purposes'),
+                            {method:'POST',body:JSON.stringify(data)},
+                            {
                                 emulateJSON:true,
-                            }).then((response)=>{
+                            })
+                        request.then((response)=>{
                                 let app_id = response.current_application.id
                                 vm.$router.push({name:"internal-application", params:{application_id: app_id}});
                                 vm.$emit('refreshFromResponse',response);
@@ -764,7 +782,10 @@ export default {
                 }).then((result) => {
                     if (result) {
                         var licence_id = $(this).attr('reinstate-licence');
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/reinstate_licence')).then((response)=>{
+                        let request = fetch_util.fetchUrl(
+                            helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/reinstate_licence'),{method:'POST'}
+                        )
+                        request.then((response)=>{
                                 swal.fire(
                                         'Reinstate Licence',
                                         'The selected licence\'s suspended activities and purposes have been Reinstated.',
@@ -804,9 +825,13 @@ export default {
                         data.purpose_ids_list = select_purpose_id;
                         data.selected_activity_id = select_activity_id;
                         console.log(licence_id)
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.selected_licence_id+'/reinstate_purposes'),JSON.stringify(data),{
+                        let request = fetch_util.fetchUrl(
+                            helpers.add_endpoint_json(api_endpoints.licences,vm.selected_licence_id+'/reinstate_purposes'),
+                            {method:'POST',body:JSON.stringify(data)},
+                            {
                                 emulateJSON:true,
-                            }).then((response)=>{
+                            })
+                        request.then((response)=>{
                                 vm.$refs.licence_datatable.vmDataTable.ajax.reload();
                                 vm.$emit('refreshFromResponse',response);
                             },(error)=>{
@@ -969,9 +994,13 @@ export default {
                 "inspection_id": event.inspection,
             }
             let licence_id = this.$refs.selected_licence_id
-            this.$http.post(helpers.add_endpoint_json(
+            let request = fetch_util.fetchUrl(
+                helpers.add_endpoint_json(
                     api_endpoints.licences, (licence_id+'/add_licence_inspection')
-                ), JSON.stringify(data)).then((response) => {
+                ), 
+                {method:'POST',body:JSON.stringify(data)},
+            )
+            request.then((response) => {
                     swal.fire(
                             'Request Licence Inspection',
                             'The selected licence has an opened Inspection #' + event.inspection,

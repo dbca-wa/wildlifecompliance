@@ -82,7 +82,6 @@
 </template>
 
 <script>
-//import $ from 'jquery'
 import Vue from 'vue'
 import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
@@ -131,11 +130,8 @@ export default {
         save: async function() {
             this.show_spinner = true;
             let post_url = '/api/organisations_compliancemanagement/';
-            //let payload = new FormData();
-            //payload.append('organisation', this.organisation);
-            //console.log(payload)
             
-            let returnedOrganisation = await Vue.http.post(post_url, JSON.stringify(this.organisation));
+            let returnedOrganisation = await fetch.fetchUrl(post_url, {method:'POST', body:JSON.stringify(this.organisation)});
             console.log(returnedOrganisation)
             this.show_spinner = false;
         },
