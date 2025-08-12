@@ -603,7 +603,7 @@ import AmendmentRequestDetails from '@/components/forms/amendment_request_detail
 import SecureBaseLink from '@common-components/securebase_link.vue';
 import {
     api_endpoints,
-    helpers
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 import FormSection from "@/components/forms/section_toggle.vue";

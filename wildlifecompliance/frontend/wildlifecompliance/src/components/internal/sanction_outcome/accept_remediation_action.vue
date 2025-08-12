@@ -36,7 +36,7 @@
 import Vue from "vue";
 import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 require("select2/dist/css/select2.min.css");
 
 
@@ -133,7 +133,7 @@ export default {
         },
         sendData: async function () {
             let get_url = '/api/remediation_action/' + this.remediation_action_id + '/accept/'
-            let res = await fetch.fetchUrl(get_url, {});
+            let res = await fetch_util.fetchUrl(get_url, {});
             return res
         },
     },

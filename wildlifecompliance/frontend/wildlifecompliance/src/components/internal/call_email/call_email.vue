@@ -541,7 +541,7 @@ import FormSection from "@/components/forms/section_toggle.vue";
 import CommsLogs from "@common-components/comms_logs.vue";
 import MapLocation from "./map_location.vue";
 import datatable from '@vue-utils/datatable.vue'
-import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 //import SearchPerson from "./search_person.vue";
 import SearchPersonOrganisation from "@common-components/search_person_or_organisation.vue";
 import utils from "@/components/external/utils";
@@ -1070,7 +1070,7 @@ export default {
                             api_endpoints.report_types,
                             this.call_email.report_type_id + '/get_schema',
                             );
-              let returnedData = await fetch.fetchUrl(url);
+              let returnedData = await fetch_util.fetchUrl(url);
               let returnedSchema = returnedData.schema;
               let returnedAdviceUrl = returnedData.adviceurl;
               if (returnedSchema) {
@@ -1127,7 +1127,7 @@ export default {
     }
     
     /// large LOV(List Of Values) object
-    const lovResponse = await fetch.fetchUrl('/api/lov_collection/lov_collection_choices/');
+    const lovResponse = await fetch_util.fetchUrl('/api/lov_collection/lov_collection_choices/');
     this.lovCollection = lovResponse;
 
     // classification_types

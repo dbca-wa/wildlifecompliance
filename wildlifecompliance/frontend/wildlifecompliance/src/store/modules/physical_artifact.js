@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
     api_endpoints,
-    helpers, fetch
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 import moment from 'moment';
@@ -88,7 +88,7 @@ export const physicalArtifactStore = {
     actions: {
         async loadPhysicalArtifact({ dispatch, commit }, { physical_artifact_id }) {
             try {
-                const returnedPhysicalArtifact = await fetch.fetchUrl(
+                const returnedPhysicalArtifact = await fetch_util.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.physical_artifact,
                         physical_artifact_id)

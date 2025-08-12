@@ -9,7 +9,7 @@ import {
     REMOVE_FORM_FIELD,
 } from '@/store/mutation-types';
 
-import { fetch } from '@/utils/hooks';
+import { fetch_util } from '@/utils/hooks';
 
 export const rendererStore = {
     state: {

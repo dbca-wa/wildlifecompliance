@@ -84,7 +84,7 @@
 <script>
 //import $ from 'jquery'
 import Vue from 'vue'
-import { api_endpoints, helpers, cache_helper, fetch } from '@/utils/hooks'
+import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
 import AddContact from '@common-components/add_contact.vue'
 import utils from '../internal/utils'

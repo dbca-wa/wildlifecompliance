@@ -41,7 +41,7 @@
 import {
   api_endpoints,
   helpers,
-  fetch
+  fetch_util
 }
 from '@/utils/hooks';
 import CommentBlock from './comment_block.vue';
@@ -167,7 +167,7 @@ export default {
             formData.append('action', 'list');
             formData.append('input_name', vm.name);
             formData.append('csrfmiddlewaretoken', vm.csrf_token);
-            let request = fetch.fetchUrl(vm.application_document_action, {method:'POST', body:formData})
+            let request = fetch_util.fetchUrl(vm.application_document_action, {method:'POST', body:formData})
             request.then(res=>{
                 vm.documents = res;
                 vm.show_spinner = false;
@@ -184,7 +184,7 @@ export default {
             formData.append('document_id', file.id);
             formData.append('csrfmiddlewaretoken', vm.csrf_token);
 
-            let request = fetch.fetchUrl(vm.application_document_action, {method:'POST', body:formData})
+            let request = fetch_util.fetchUrl(vm.application_document_action, {method:'POST', body:formData})
             request.then(res=>{
                 vm.documents = vm.get_documents()
                 vm.show_spinner = false;
@@ -217,7 +217,7 @@ export default {
             formData.append('_file', vm.uploadFile(e));
             formData.append('csrfmiddlewaretoken', vm.csrf_token);
 
-            let request = fetch.fetchUrl(vm.application_document_action, {method:'POST', body:formData})
+            let request = fetch_util.fetchUrl(vm.application_document_action, {method:'POST', body:formData})
             request.then(res=>{
                 vm.documents = res;
             });

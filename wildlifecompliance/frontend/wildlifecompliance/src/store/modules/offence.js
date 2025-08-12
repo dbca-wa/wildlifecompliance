@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
     api_endpoints,
-    helpers, fetch
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 import moment from 'moment';
@@ -169,7 +169,7 @@ export const offenceStore = {
             console.log('*** loadOffende ***');
             try {
                 if (offence_id) {
-                    const returnedOffence = await fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.offence, offence_id));
+                    const returnedOffence = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.offence, offence_id));
                     console.log('*** returnedOffence.body ***')
                     console.log('returnedOffence.body')
                     await dispatch("setOffence", returnedOffence);

@@ -224,7 +224,7 @@ import alert from '@vue-utils/alert.vue'
 import SchemaOption from './schema_add_option.vue'
 import {
   api_endpoints,
-  helpers, fetch
+  helpers, fetch_util
 }
 from '@/utils/hooks'
 
@@ -422,7 +422,7 @@ export default {
             if (this.filterQuestionPurpose==='All') {
                 return true
             }
-            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_question,'1/get_question_sections'),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_question,'1/get_question_sections'),{
                 params: { licence_purpose_id: this.filterQuestionPurpose },
             }).then((res)=>{
                 this.schemaGroups = res.question_groups; 
@@ -435,7 +435,7 @@ export default {
             if (this.filterQuestionSection==='All') {
                 return true
             }
-            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_question,'1/get_question_parents'),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_question,'1/get_question_parents'),{
                 params: { section_id: this.filterQuestionSection },
             }).then((res)=>{
                 this.sectionQuestion.section = this.filterQuestionSection;
@@ -749,7 +749,7 @@ export default {
         },
         initSelects: async function() {
 
-            let request = fetch.fetchUrl(helpers.add_endpoint_join(api_endpoints.schema_question,'1/get_question_selects'))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.schema_question,'1/get_question_selects'))
             request.then(res=>{
 
                     this.masterlist = res.all_masterlist;

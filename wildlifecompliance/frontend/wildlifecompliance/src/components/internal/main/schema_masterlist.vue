@@ -107,7 +107,7 @@ import SchemaHeader from './schema_add_header.vue'
 import SchemaExpander from './schema_add_expander.vue'
 import {
   api_endpoints,
-  helpers, fetch
+  helpers, fetch_util
 }
 from '@/utils/hooks'
 import FormSection from "@/components/forms/section_toggle.vue";
@@ -480,7 +480,7 @@ export default {
         },
         initSelects: async function() {
 
-            let request = fetch.fetchUrl(helpers.add_endpoint_join(api_endpoints.schema_masterlist,'1/get_masterlist_selects'))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.schema_masterlist,'1/get_masterlist_selects'))
             request.then(res=>{
 
                     this.answerTypes = res.all_answer_types

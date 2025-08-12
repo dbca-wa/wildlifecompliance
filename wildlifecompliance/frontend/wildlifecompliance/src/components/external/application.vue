@@ -90,7 +90,8 @@ import { mapActions, mapGetters } from 'vuex'
 import AmendmentRequestDetails from '@/components/forms/amendment_request_details.vue';
 import {
   api_endpoints,
-  helpers
+  helpers,
+  fetch_util
 }
 from '@/utils/hooks';
 export default {

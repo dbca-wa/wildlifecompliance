@@ -77,7 +77,7 @@
     import datatable from '@vue-utils/datatable.vue'
     import MapLocations from "./map_locations.vue";
     import Vue from 'vue'
-    import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
+    import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
     import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
     import FormSection from "@/components/forms/section_toggle.vue";
     export default {
@@ -209,10 +209,10 @@
             }
         },
         created: async function() {
-            const returnedComplianceUserData = await fetch.fetchUrl('/api/my_compliance_user_details/')
+            const returnedComplianceUserData = await fetch_util.fetchUrl('/api/my_compliance_user_details/')
             Object.assign(this.complianceUser, returnedComplianceUserData);
             //let returned_classification_types = await cache_helper.getSetCacheList('CallEmail_ClassificationTypes', '/api/classification/classification_choices/');
-            let returned_classification_types = await fetch.fetchUrl('/api/classification/classification_choices/');
+            let returned_classification_types = await fetch_util.fetchUrl('/api/classification/classification_choices/');
             Object.assign(this.classification_types, returned_classification_types);
             this.classification_types.splice(0, 0, {id: 'all', display: 'All'});
 

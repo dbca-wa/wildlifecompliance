@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
     api_endpoints,
-    helpers, fetch
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 import moment from 'moment';
@@ -279,7 +279,7 @@ export const callemailStore = {
     actions: {
         async loadCallEmail({ dispatch, commit }, { call_email_id }) {
             try {
-                const returnedCallEmail = await fetch.fetchUrl(
+                const returnedCallEmail = await fetch_util.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.call_email, 
                         call_email_id)

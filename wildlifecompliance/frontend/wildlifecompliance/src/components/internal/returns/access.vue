@@ -87,7 +87,8 @@ import AmendmentRequest from './amendment_request.vue';
 import '@/scss/forms/form.scss';
 import {
     api_endpoints,
-    helpers
+    helpers,
+    fetch_util
 }
 from '@/utils/hooks'
 export default {

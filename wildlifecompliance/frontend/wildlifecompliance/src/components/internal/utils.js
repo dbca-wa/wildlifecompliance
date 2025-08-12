@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import api from './api'
-import {helpers, fetch} from '@/utils/hooks' 
+import {helpers, fetch_util} from '@/utils/hooks' 
 
 export default {
     fetchApplication: function(id){
         return new Promise ((resolve,reject) => {
-            let request = fetch.fetchUrl(helpers.add_endpoint_json(api.applications,id))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.applications,id))
             request.then((response) => {
                 resolve(response);
             }).catch((error) => {
@@ -13,9 +13,9 @@ export default {
             });
         });
     },
-    fetchOrganisations: function(id){
+    fetch_utilOrganisations: function(id){
         return new Promise ((resolve,reject) => {
-            let request = fetch.fetchUrl(api.organisations)
+            let request = fetch_util.fetchUrl(api.organisations)
             request.then((response) => {
                 resolve(response);
             }).catch((error) => {
@@ -23,9 +23,9 @@ export default {
             });
         });
     },
-    fetchOrganisation: function(id){
+    fetch_utilOrganisation: function(id){
         return new Promise ((resolve,reject) => {
-            let request = fetch.fetchUrl(helpers.add_endpoint_json(api.organisations,id))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.organisations,id))
             request.then((response) => {
                 resolve(response);
             }).catch((error) => {
@@ -33,9 +33,9 @@ export default {
             });
         });
     },
-    fetchOrganisationPermissions: function(id){
+    fetch_utilOrganisationPermissions: function(id){
         return new Promise ((resolve,reject) => {
-            let request = fetch.fetchUrl(helpers.add_endpoint_json(api.my_organisations,id))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.my_organisations,id))
             request.then((response) => {
                 resolve(response);
             }).catch((error) => {
@@ -43,9 +43,9 @@ export default {
             });
         });
     },
-    fetchOrgRequestPending:function (id){
+    fetch_utilOrgRequestPending:function (id){
         return new Promise ((resolve,reject) => {
-            let request = fetch.fetchUrl(helpers.add_endpoint_join(api.users,id + '/pending_org_requests'))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api.users,id + '/pending_org_requests'))
             request.then((response) => {
                 resolve(response);
             }).catch((error) => {
@@ -53,9 +53,9 @@ export default {
             });
         });
     },
-    fetchProfile: function(id){
+    fetch_utilProfile: function(id){
         return new Promise ((resolve,reject) => {
-            let request = fetch.fetchUrl(helpers.add_endpoint_json(api.profiles,id))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.profiles,id))
             request.then((response) => {
                 resolve(response);
             }).catch((error) => {
@@ -63,9 +63,9 @@ export default {
             });
         });
     },
-    fetchUsers: function(id){
+    fetch_utilUsers: function(id){
         return new Promise ((resolve,reject) => {
-            let request = fetch.fetchUrl(api.users)
+            let request = fetch_util.fetchUrl(api.users)
             request.then((response) => {
                 resolve(response);
             }).catch((error) => {
@@ -73,9 +73,9 @@ export default {
             });
         });
     },
-    fetchUser: function(id){
+    fetch_utilUser: function(id){
         return new Promise ((resolve,reject) => {
-            let request = fetch.fetchUrl(helpers.add_endpoint_json(api.users,id))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.users,id))
             request.then((response) => {
                 resolve(response);
             }).catch((error) => {
@@ -83,9 +83,9 @@ export default {
             });
         });
     },
-    fetchOffender: function(id){
+    fetch_utilOffender: function(id){
         return new Promise ((resolve,reject) => {
-            let request = fetch.fetchUrl(helpers.add_endpoint_json(api.offenders,id))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.offenders,id))
             request.then((response) => {
                 resolve(response);
             }).catch((error) => {
@@ -93,9 +93,9 @@ export default {
             });
         });
     },
-    fetchCurrentUser: function (){
+    fetch_utilCurrentUser: function (){
         return new Promise ((resolve,reject) => {
-            let request = fetch.fetchUrl(api.my_user_details)
+            let request = fetch_util.fetchUrl(api.my_user_details)
             request.then((response) => {
                 resolve(response);
             }).catch((error) => {
@@ -103,9 +103,9 @@ export default {
             });
         });
     },
-    fetchCountries: function (){
+    fetch_utilCountries: function (){
         return new Promise ((resolve,reject) => {
-            let request = fetch.fetchUrl(api.countries)
+            let request = fetch_util.fetchUrl(api.countries)
             request.then((response) => {
                 resolve(response);
             }).catch((error) => {

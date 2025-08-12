@@ -22,7 +22,7 @@
 <script>
 import {
     api_endpoints,
-    helpers, fetch
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 import '@/scss/dashboards/application.scss';
@@ -296,7 +296,7 @@ export default {
         },
         async fetchConditions(){
             let vm = this;
-            let request = fetch.fetchUrl(api_endpoints.application_standard_conditions)
+            let request = fetch_util.fetchUrl(api_endpoints.application_standard_conditions)
             request.then((response) => {
                 vm.conditions = response
             }).catch((error) => {
@@ -312,7 +312,7 @@ export default {
         },
         async editCondition(_id){
             let vm = this;
-            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.application_conditions,_id))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.application_conditions,_id))
             request.then((response) => {
                 response.standard ? $(this.$refs.condition_detail.$refs.standard_req).val(response.standard_condition).trigger('change'): '';
                 this.addCondition(response);
@@ -354,7 +354,7 @@ export default {
         },
         async sendDirection(req,direction){
             let movement = direction == 'down'? 'move_down': 'move_up';
-            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.application_conditions,req+'/'+movement))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.application_conditions,req+'/'+movement))
             request.then((response) => {
             }).catch((error) => {
                 console.log(error); 

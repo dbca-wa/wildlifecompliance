@@ -76,7 +76,7 @@
     import $ from 'jquery'
     import datatable from '@vue-utils/datatable.vue'
     import Vue from 'vue'
-    import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
+    import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
     import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
     import FormSection from "@/components/forms/section_toggle.vue";
     import InspectionModal from "./create_inspection_modal.vue";
@@ -305,7 +305,7 @@
             },
             getUserCanCreate: async function() {
                 let url = helpers.add_endpoint_join(api_endpoints.inspection, 'can_user_create/');
-                let res = await fetch.fetchUrl(url);
+                let res = await fetch_util.fetchUrl(url);
                 this.canUserCreateNewInspection = res;
             },
             createInspectionUrl: async function () {

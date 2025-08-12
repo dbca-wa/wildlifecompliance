@@ -232,7 +232,7 @@ import Awesomplete from "awesomplete";
 import modal from "@vue-utils/bootstrap-modal.vue";
 import datatable from "@vue-utils/datatable.vue";
 import { mapGetters, mapActions } from "vuex";
-import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import MapLocationOffence from "./map_location_offence1";
 import SearchPersonOrganisation from "@common-components/search_person_or_organisation.vue";
 //import CreateNewPerson from "@common-components/create_new_person.vue";
@@ -1027,7 +1027,7 @@ export default {
     },
     searchOrganisation: function(id) {
       return new Promise((resolve, reject) => {
-        let request = fetch.fetchUrl("/api/search_organisation/" + id)
+        let request = fetch_util.fetchUrl("/api/search_organisation/" + id)
         request.then((response) => {
             resolve(response);
         }).catch((error) => {

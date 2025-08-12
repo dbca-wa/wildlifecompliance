@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
     api_endpoints,
-    helpers, fetch
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 import {
@@ -235,7 +235,7 @@ export const userStore = {
         },
         loadCurrentUser({ dispatch, commit }, { url }) {
             return new Promise((resolve, reject) => {
-                let request = fetch.fetchUrl(url)
+                let request = fetch_util.fetchUrl(url)
                 request.then(res => {
                     dispatch('setCurrentUser', res);
                     dispatch('setCurrentUserId', res.identification ? true : res.is_internal ? true : false);

@@ -79,7 +79,7 @@ import { mapActions, mapGetters } from 'vuex'
 import {
     api_endpoints,
     helpers,
-    fetch
+    fetch_util
 }from '@/utils/hooks'
 import '@/scss/dashboards/application.scss';
 import FormSection from "@/components/forms/section_toggle.vue";
@@ -804,7 +804,7 @@ export default {
         },
         initialiseSelects: async function() {
 
-            let request = fetch.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,'1/get_application_selects'))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,'1/get_application_selects'))
             request.then(res=>{
                 this.application_status = res.all_status
                 this.application_licence_types = res.all_category

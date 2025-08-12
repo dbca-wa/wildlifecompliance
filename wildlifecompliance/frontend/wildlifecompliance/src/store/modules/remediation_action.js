@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
     api_endpoints,
-    helpers, fetch
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 
@@ -42,7 +42,7 @@ export const remediationActionStore = {
     },
     actions: {
         async loadRemediationAction({ dispatch, }, { remediation_action_id }) {
-            const returnedRemediationAction = await fetch.fetchUrl(
+            const returnedRemediationAction = await fetch_util.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.remediation_action, 
                         remediation_action_id)

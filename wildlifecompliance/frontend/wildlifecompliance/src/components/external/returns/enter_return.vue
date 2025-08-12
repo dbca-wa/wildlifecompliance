@@ -67,7 +67,7 @@ import CommsLogs from '@common-components/comms_logs.vue'
 import AmendmentRequestDetails from './return_amendment.vue';
 import {
   api_endpoints,
-  helpers, fetch
+  helpers, fetch_util
 }
 from '@/utils/hooks'
 var select2 = require('select2');
@@ -182,7 +182,7 @@ export default {
         // load species json from ajax
         this.refresh_grid = false
         this.returns.species = specie_id
-        let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/species_data_details/?species_id='+specie_id+'&'))
+        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/species_data_details/?species_id='+specie_id+'&'))
         request.then((response)=>{
           this.returns.table[0]['data'] = response[0]['data']     
         }).catch((error) => {

@@ -132,7 +132,7 @@ import datatable from '@vue-utils/datatable.vue'
 import CommsLogs from '@common-components/comms_logs.vue'
 import {
   api_endpoints,
-  helpers, fetch
+  helpers, fetch_util
 }
 from '@/utils/hooks'
 export default {
@@ -297,7 +297,7 @@ export default {
     }
   },
   beforeRouteEnter: function(to, from, next){
-    let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,to.params.access_id))
+    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,to.params.access_id))
     request.then((response) => {
         next(vm => {
             vm.access = response
@@ -329,10 +329,10 @@ export default {
     commaToNewline(s){
         return s.replace(/[,;]/g, '\n');
     },
-    fetchAccessGroupMembers: function(){
+    fetch_utilAccessGroupMembers: function(){
         let vm = this;
         vm.loading.push('Loading Access Group Members');
-        let request = fetch.fetchUrl(api_endpoints.organisation_access_group_members).then((response) => {
+        let request = fetch_util.fetchUrl(api_endpoints.organisation_access_group_members).then((response) => {
             vm.organisation_access_group_members = response
             vm.loading.splice('Loading Access Group Members',1);
         }).catch((error) => {
@@ -343,7 +343,7 @@ export default {
     },
     assignToMe: function(){
         let vm = this;
-        let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/assign_to_me')))
+        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/assign_to_me')))
         .then((response) => {
             vm.access = response;
             vm.updateAssignedOfficerSelect();
@@ -378,7 +378,7 @@ export default {
             });
         }
         else{
-            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/unassign_officer')))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/unassign_officer')))
             .then((response) => {
                 vm.access = response;
                 vm.updateAssignedOfficerSelect();
@@ -407,7 +407,7 @@ export default {
             confirmButtonText: 'Accept'
         }).then((result) => {
             if (result) {
-                let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/accept')))
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/accept')))
                 .then((response) => {
                     swal.fire({
                         title: "Accept Organisation Request",
@@ -441,7 +441,7 @@ export default {
             confirmButtonText: 'Send Request'
         }).then((result) => {
             if (result) {
-                let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result)))
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result)))
                 .then((response) => {
                     swal.fire({
                         title: "Amendment Request",
@@ -473,7 +473,7 @@ export default {
             confirmButtonText: 'Accept'
         }).then((result) => {
             if (result) {
-                let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/decline')))
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/decline')))
                 .then((response) => {
                     swal.fire({
                         title: "Decline Organisation Request",

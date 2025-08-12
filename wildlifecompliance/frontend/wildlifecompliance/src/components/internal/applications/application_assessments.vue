@@ -108,7 +108,7 @@ import SendToAssessor from './application_send_assessor.vue';
 
 import {
     api_endpoints,
-    helpers, fetch
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 import FormSection from "@/components/forms/section_toggle.vue";
@@ -293,7 +293,7 @@ export default {
         openAssessmentModal: function(assessment_id) {
             this.isModalOpen = true;
             this.viewingAssessmentId = assessment_id;
-            let request = fetch.fetchUrl(`${api_endpoints.assessment}${this.viewingAssessmentId}`).then((response) => {
+            let request = fetch_util.fetchUrl(`${api_endpoints.assessment}${this.viewingAssessmentId}`).then((response) => {
                     this.assessment = response;
             }).catch((error) => {
                 console.log(error);
@@ -632,7 +632,7 @@ export default {
                             'success'
                     )
                     vm.refreshAssessorDatatables();
-                    let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/internal_application')).then((res) => {
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/internal_application')).then((res) => {
                         vm.refreshFromResponse(res);
                     });
 
@@ -658,7 +658,7 @@ export default {
                             'success'
                     )
                     vm.refreshAssessorDatatables();
-                    let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/internal_application')).then((res) => {
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/internal_application')).then((res) => {
                         vm.refreshFromResponse(res);
                     });
                 },(error)=>{

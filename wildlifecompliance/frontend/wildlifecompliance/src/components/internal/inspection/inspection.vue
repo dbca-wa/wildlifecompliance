@@ -378,7 +378,7 @@ import SearchPersonOrganisation from "@/components/common/search_person_or_organ
 import Assignment from "../assignment.vue";
 import CommsLogs from "@common-components/comms_logs.vue";
 import datatable from '@vue-utils/datatable.vue'
-import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';

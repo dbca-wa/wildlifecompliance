@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
     api_endpoints,
-    helpers, fetch
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 import moment from 'moment';
@@ -208,7 +208,7 @@ export const legalCaseStore = {
     actions: {
         async loadLegalCase({ dispatch, commit }, { legal_case_id }) {
             try {
-                const returnedLegalCase = await fetch.fetchUrl(
+                const returnedLegalCase = await fetch_util.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.legal_case, 
                         legal_case_id)
@@ -223,7 +223,7 @@ export const legalCaseStore = {
         },
         async loadLegalCaseNoRunningSheet({ dispatch, commit }, { legal_case_id }) {
             try {
-                const returnedLegalCase = await fetch.fetchUrl(
+                const returnedLegalCase = await fetch_util.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.legal_case,
                         legal_case_id + '/no_running_sheet'
@@ -277,11 +277,6 @@ export const legalCaseStore = {
                     fetchUrl = api_endpoints.legal_case;
                     savedLegalCase = await Vue.http.post(fetchUrl, payload);
                 } else {
-                    /*
-                    if (createNewRow) {
-                        payload.create_new_running_sheet_entry = true;
-                    }
-                    */
                     if (createBriefOfEvidence) {
                         payload.create_brief_of_evidence = true;
                     }
@@ -291,11 +286,6 @@ export const legalCaseStore = {
                     if (fullHttpResponse) {
                         payload.full_http_response = true;
                     }
-                    /*
-                    if (noRunningSheet) {
-                        payload.no_running_sheet = true;
-                    }
-                    */
                     fetchUrl = helpers.add_endpoint_join(
                         api_endpoints.legal_case,
                         state.legal_case.id + '/'

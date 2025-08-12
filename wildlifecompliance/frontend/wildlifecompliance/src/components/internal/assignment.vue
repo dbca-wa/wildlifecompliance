@@ -25,7 +25,7 @@
 </template>
 <script>
 import Vue from "vue";
-import { api_endpoints, helpers, fetch } from "@/utils/hooks";
+import { api_endpoints, helpers, fetch_util } from "@/utils/hooks";
 export default {
     name: 'Assignment',
     props: {
@@ -72,7 +72,7 @@ export default {
             } else {
                 payload = { 'assigned_to_id': this.assign_to_id };
             }
-            let res = await fetch.fetchUrl(
+            let res = await fetch_util.fetchUrl(
                 url,
                 {method:'POST', body:JSON.stringify(payload)}
             );
@@ -82,7 +82,7 @@ export default {
             if (this.allowed_groups == null) {
                 this.allowed_groups = [];
             }
-            let allocatedGroupResponse = await fetch.fetchUrl(
+            let allocatedGroupResponse = await fetch_util.fetchUrl(
                 api_endpoints.allocated_group_members,
                 {
                     method:'POST',body:JSON.stringify({'id_list': id_list}),

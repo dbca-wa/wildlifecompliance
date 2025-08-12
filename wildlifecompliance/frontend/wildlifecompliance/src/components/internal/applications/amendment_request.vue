@@ -52,7 +52,7 @@
 import Vue from 'vue'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import {helpers, api_endpoints, fetch} from "@/utils/hooks.js"
+import {helpers, api_endpoints, fetch_util} from "@/utils/hooks.js"
 import { mapGetters } from 'vuex'
 export default {
     name:'amendment-request',
@@ -138,7 +138,7 @@ export default {
         },
         fetchAmendmentChoices: function(){
             let vm = this;
-            let request = fetch.fetchUrl('/api/amendment_request_reason_choices.json')
+            let request = fetch_util.fetchUrl('/api/amendment_request_reason_choices.json')
             request.then((response) => {
                 vm.reason_choices = response;                
             }).catch((error) => {

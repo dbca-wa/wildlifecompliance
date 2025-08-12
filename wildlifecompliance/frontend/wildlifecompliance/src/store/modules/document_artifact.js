@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
     api_endpoints,
-    helpers, fetch
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 import moment from 'moment';
@@ -77,7 +77,7 @@ export const documentArtifactStore = {
     actions: {
         async loadDocumentArtifact({ dispatch, commit }, { document_artifact_id }) {
             try {
-                const returnedDocumentArtifact = await fetch.fetchUrl(
+                const returnedDocumentArtifact = await fetch_util.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.document_artifact,
                         document_artifact_id)

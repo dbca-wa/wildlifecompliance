@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
     api_endpoints,
-    helpers, fetch
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 
@@ -69,7 +69,7 @@ export const sanctionOutcomeStore = {
     },
     actions: {
         async loadRemediationAction({ dispatch, }, { remediation_action_id }){
-            const returned = await fetch.fetchUrl(
+            const returned = await fetch_util.fetchUrl(
                 helpers.add_endpoint_json(
                     api_endpoints.remediation_action, 
                     remediation_action_id)
@@ -80,7 +80,7 @@ export const sanctionOutcomeStore = {
         },
         async loadSanctionOutcome({ dispatch, }, { sanction_outcome_id }) {
             try {
-                const returnedSanctionOutcome = await fetch.fetchUrl(
+                const returnedSanctionOutcome = await fetch_util.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.sanction_outcome, 
                         sanction_outcome_id)

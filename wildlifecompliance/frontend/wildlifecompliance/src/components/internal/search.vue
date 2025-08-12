@@ -167,7 +167,7 @@ import '@/scss/dashboards/search.scss';
 import {
   api_endpoints,
   helpers,
-  fetch
+  fetch_util
 }
 from '@/utils/hooks'
 import utils from './utils'
@@ -357,7 +357,7 @@ export default {
             vm.errorString = '';
 
             try {
-              const res = await fetch.fetchUrl('/api/search_reference.json',{method:'POST', body:JSON.stringify({'reference_number': vm.referenceWord})});
+              const res = await fetch_util.fetchUrl('/api/search_reference.json',{method:'POST', body:JSON.stringify({'reference_number': vm.referenceWord})});
               if (res.url_string) {
                   window.location.href = res.url_string;
               } else if (res.error) {
@@ -403,7 +403,7 @@ export default {
           {
             vm.searching=true;
 
-            let request = fetch.fetchUrl('/api/search_keywords.json',{
+            let request = fetch_util.fetchUrl('/api/search_keywords.json',{
               method:'POST',
               body: JSON.stringify({
                 'searchKeywords': vm.searchKeywords,

@@ -309,7 +309,7 @@ import FormSection from "@/components/forms/section_toggle.vue";
 import Assignment from "../assignment.vue";
 import datatable from '@vue-utils/datatable.vue'
 import utils from "../utils";
-import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import CommsLogs from "@common-components/comms_logs.vue";
 import FileField from '@/components/common/compliance_file.vue';
@@ -1399,7 +1399,7 @@ export default {
         },
         searchOrganisation: function(id) {
           return new Promise((resolve, reject) => {
-            let request = fetch.fetchUrl("/api/search_organisation/" + id)
+            let request = fetch_util.fetchUrl("/api/search_organisation/" + id)
             request.then((response) => {
                 resolve(response);
             }).catch((error) => {

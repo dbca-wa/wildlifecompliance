@@ -234,7 +234,7 @@
 <script>
 import {
     api_endpoints,
-    helpers, fetch
+    helpers, fetch_util
 }
 from '@/utils/hooks'
 import { mapGetters, mapActions } from 'vuex'
@@ -758,7 +758,7 @@ export default {
         fetchProposeIssue(){
             let vm = this;
             
-            let request = fetch.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,(vm.application.id+'/get_proposed_decisions/')))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,(vm.application.id+'/get_proposed_decisions/')))
             request.then((response) => {
                 vm.proposed_licence = response;
                 this.initialiseLicenceDetails();

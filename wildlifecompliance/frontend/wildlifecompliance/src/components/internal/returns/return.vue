@@ -92,7 +92,8 @@ import ReturnData from '../../external/returns/enter_return.vue'
 import CommsLogs from '@common-components/comms_logs.vue'
 import {
   api_endpoints,
-  helpers
+  helpers,
+  fetch_util
 }
 from '@/utils/hooks'
 import FormSection from "@/components/forms/section_toggle.vue";

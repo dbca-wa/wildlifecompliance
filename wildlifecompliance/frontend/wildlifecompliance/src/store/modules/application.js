@@ -11,7 +11,7 @@ import {
     UPDATE_APPLICATION_ASSESS_STATUS,
 } from '@/store/mutation-types';
 
-import { fetch } from "@/utils/hooks";
+import { fetch_util } from "@/utils/hooks";
 export const applicationStore = {
     state: {
         original_application: {},
@@ -176,7 +176,7 @@ export const applicationStore = {
         }, 
         loadApplication({ dispatch, state, commit }, { url }) {
             return new Promise((resolve, reject) => {
-                let request = fetch.fetchUrl(url)
+                let request = fetch_util.fetchUrl(url)
                 request.then(res => {
                     dispatch('setOriginalApplication', res);
                     dispatch('setApplication', res);

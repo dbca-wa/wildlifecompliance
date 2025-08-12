@@ -56,7 +56,7 @@ import { mapActions, mapGetters } from 'vuex'
 import CommsLogs from '@common-components/comms_logs.vue'
 import {
   api_endpoints,
-  helpers
+  helpers, fetch_util
 }
 from '@/utils/hooks'
 export default {

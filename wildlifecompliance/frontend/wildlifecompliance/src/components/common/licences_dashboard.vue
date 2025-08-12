@@ -81,7 +81,7 @@ import { mapActions, mapGetters } from 'vuex'
 import {
     api_endpoints,
     helpers,
-    fetch
+    fetch_util
 } from '@/utils/hooks'
 import '@/scss/dashboards/licence.scss';
 import FormSection from "@/components/forms/section_toggle.vue";
@@ -469,7 +469,7 @@ export default {
                         var licence_id = $(this).attr('lic-id');
                         vm.licence_action = 'reactivate-renew';
                         vm.selected_licence_id = licence_id;
-                        let request = fetch.fetchUrl(helpers.add_endpoint_join(
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_join(
                             api_endpoints.licences,licence_id+
                             '/get_latest_purposes_for_licence_activity_and_action/?licence_activity_id='+
                             licence_activity_id+'&action='+vm.licence_action))

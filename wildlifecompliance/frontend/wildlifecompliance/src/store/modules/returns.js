@@ -4,7 +4,7 @@ import {
     UPDATE_RETURNS_ESTIMATE,
 } from '@/store/mutation-types';
 
-import { fetch } from '@/utils/hooks';
+import { fetch_util } from '@/utils/hooks';
 
 export const returnsStore = {
     state: {
@@ -31,7 +31,7 @@ export const returnsStore = {
     actions: {
         loadReturns({ dispatch, commit }, { url }) {
             return new Promise((resolve, reject) => {
-                let request = fetch.fetchUrl(url)
+                let request = fetch_util.fetchUrl(url)
                 request.then(res => {
                     if (res.format !== 'sheet') {    // Return Sheets utilise Non-rendered data.
                         var obj = res.table[0]['data'][0]

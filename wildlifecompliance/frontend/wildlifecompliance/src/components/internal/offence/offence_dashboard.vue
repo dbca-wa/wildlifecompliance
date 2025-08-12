@@ -67,7 +67,7 @@ import $ from 'jquery'
 import datatable from '@vue-utils/datatable.vue'
 //import FormSection from "@/components/compliance_forms/section.vue";
 import FormSection from "@/components/forms/section_toggle.vue";
-import { api_endpoints, helpers, cache_helper, fetch } from '@/utils/hooks'
+import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
 import OffenceModal from "./offence_modal.vue";
 import MapLocations from "./offence_locations.vue";
 
@@ -232,7 +232,7 @@ export default {
     methods: {
         getUserCanCreate: async function() {
             let url = helpers.add_endpoint_join(api_endpoints.offence, 'can_user_create/');
-            let res = await fetch.fetchUrl(url);
+            let res = await fetch_util.fetchUrl(url);
             this.canUserCreateNewOffence = res;
         },
         createOffence: function() {

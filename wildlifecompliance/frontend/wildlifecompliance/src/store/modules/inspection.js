@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
     api_endpoints,
-    helpers, fetch
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 import moment from 'moment';
@@ -134,7 +134,7 @@ export const inspectionStore = {
     actions: {
         async loadInspection({ dispatch, commit }, { inspection_id }) {
             try {
-                const returnedInspection = await fetch.fetchUrl(
+                const returnedInspection = await fetch_util.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.inspection, 
                         inspection_id)
@@ -160,24 +160,6 @@ export const inspectionStore = {
                 console.log(err);
             }
         },
-        // async modifyInspectionTeam({ dispatch, state}, { user_id, action }) {
-        //     console.log("modifyInspectionTeam");
-        //     try {
-        //         const returnedInspection = await Vue.http.post(
-        //             helpers.add_endpoint_join(
-        //                 api_endpoints.inspection,
-        //                 state.inspection.id + '/modify_inspection_team/',
-        //             ),
-        //             { user_id, action }
-        //             );
-
-        //         /* Set Inspection object */
-        //         await dispatch("setInspection", returnedInspection.body);
-
-        //     } catch (err) {
-        //         console.log(err);
-        //     }
-        // },
         
         async saveInspection({ dispatch, state, rootGetters }, { create, internal }) {
             let inspectionId = null;

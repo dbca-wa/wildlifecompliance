@@ -40,7 +40,7 @@
 import {
   api_endpoints,
   helpers,
-  fetch
+  fetch_util
 }
 from '@/utils/hooks';
 //import CommentBlock from './comment_block.vue';

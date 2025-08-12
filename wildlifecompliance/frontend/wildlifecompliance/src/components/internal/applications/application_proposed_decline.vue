@@ -51,7 +51,7 @@
 //import $ from 'jquery'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import {helpers,api_endpoints} from "@/utils/hooks.js"
+import {helpers,api_endpoints,fetch_util} from "@/utils/hooks.js"
 import { mapGetters } from 'vuex'
 export default {
     name:'ProposedDecline',

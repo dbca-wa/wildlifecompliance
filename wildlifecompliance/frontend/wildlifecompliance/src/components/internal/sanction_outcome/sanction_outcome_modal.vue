@@ -274,7 +274,7 @@ import modal from "@vue-utils/bootstrap-modal.vue";
 import datatable from "@vue-utils/datatable.vue";
 import filefield from "@/components/common/compliance_file.vue";
 import { mapGetters, mapActions } from "vuex";
-import { api_endpoints, helpers, cache_helper, fetch } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "../utils";
 import $ from "jquery";
 import "jquery-ui/ui/widgets/draggable.js";
@@ -939,19 +939,19 @@ export default {
             // This modal is used not onfly from an offence but also from the several entities, such as call_email, inspection, etc.
             let returned = null;
             if (this.$parent.call_email && this.$parent.call_email.id) {
-                returned = await fetch.fetchUrl("/api/offence/filter_by_call_email.json", {
+                returned = await fetch_util.fetchUrl("/api/offence/filter_by_call_email.json", {
                     params: { call_email_id: this.$parent.call_email.id }
                 });
                 this.options_for_offences = returned;
             } else if (this.$parent.inspection && this.$parent.inspection.id) {
-                returned = await fetch.fetchUrl("/api/offence/filter_by_inspection.json", {
+                returned = await fetch_util.fetchUrl("/api/offence/filter_by_inspection.json", {
                     params: { inspection_id: this.$parent.inspection.id }
                 });
                 this.options_for_offences = returned;
             } else if (this.$parent.offence && this.$parent.offence.id) {
                 this.options_for_offences = [this.$parent.offence];
             } else if (this.$parent.legal_case && this.$parent.legal_case.id) {
-                returned = await fetch.fetchUrl("/api/offence/filter_by_legal_case.json", {
+                returned = await fetch_util.fetchUrl("/api/offence/filter_by_legal_case.json", {
                     params: { legal_case_id: this.$parent.legal_case.id }
                 });
                 this.options_for_offences = returned;

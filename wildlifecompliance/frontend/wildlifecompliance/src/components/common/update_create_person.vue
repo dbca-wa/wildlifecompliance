@@ -149,7 +149,7 @@
 <script>
 import Vue from 'vue';
 import $ from "jquery";
-import { api_endpoints, helpers, fetch } from '@/utils/hooks'
+import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import utils from '../internal/utils'
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {

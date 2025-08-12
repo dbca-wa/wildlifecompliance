@@ -60,7 +60,7 @@ import L from 'leaflet';
 import 'leaflet.markercluster';  /* This should be imported after leaflet */
 import 'leaflet.locatecontrol';
 import Awesomplete from 'awesomplete';
-import { api_endpoints, helpers, cache_helper, fetch } from '@/utils/hooks'
+import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 
 import 'leaflet/dist/leaflet.css';
@@ -361,7 +361,7 @@ export default {
         addOtherLayers(){
             var overlayMaps = {};
 
-            let request = fetch.fetchUrl('/api/map_layers/').then(response => {
+            let request = fetch_util.fetchUrl('/api/map_layers/').then(response => {
                 let layers = response.results;
                 for (var i = 0; i < layers.length; i++){
                     let l = L.tileLayer.wmts(
@@ -442,7 +442,7 @@ export default {
                         /* dynamically construct content of the popup */
                         myMarker.on('click', (ev)=>{
                             let popup = ev.target.getPopup();
-                            let request = fetch.fetchUrl('/api/call_email/' + call_email.id).then(response => {
+                            let request = fetch_util.fetchUrl('/api/call_email/' + call_email.id).then(response => {
                                 let call_email = response;
                                 popup.setContent(self.construct_content(call_email, coords));
                             });

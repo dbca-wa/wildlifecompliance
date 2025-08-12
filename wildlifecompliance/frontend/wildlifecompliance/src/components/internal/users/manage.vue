@@ -245,7 +245,7 @@
 </template>
 
 <script>
-import { api_endpoints, helpers, fetch } from '@/utils/hooks'
+import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
 import ApplicationDashTable from '@common-components/applications_dashboard.vue'
 import LicenceDashTable from '@common-components/licences_dashboard.vue'
@@ -432,7 +432,7 @@ export default {
                     vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'),JSON.stringify(vm.user),{
                         emulateJSON:true
                     }).then((response) => {
-                        let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,vm.user.id)).then((response) => {
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,vm.user.id)).then((response) => {
                             vm.user = response
                             if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
                             if (vm.user.wildlifecompliance_organisations && vm.user.wildlifecompliance_organisations.length > 0){

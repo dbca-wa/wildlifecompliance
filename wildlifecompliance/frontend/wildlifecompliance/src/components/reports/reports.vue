@@ -107,7 +107,7 @@
 
 <script>
 //import {$,swal,bus,datetimepicker,api_endpoints,helpers,Moment,validate} from "@/utils/hooks.js"
-import {api_endpoints,helpers,fetch} from "@/utils/hooks.js"
+import {api_endpoints,helpers,fetch_util} from "@/utils/hooks.js"
 export default {
     name:"reports",
     data:function () {
@@ -175,7 +175,7 @@ export default {
             if (vm.oracle_form.valid()){
                 let data = vm.oracleDatePicker.data("DateTimePicker").date().format('YYYY-MM-DD');
                 let override = vm.oracle_override ? 'true': 'false';
-                let request = fetch.fetchUrl('/api/oracle_job?date='+data+'&override='+override).then((response) => {
+                let request = fetch_util.fetchUrl('/api/oracle_job?date='+data+'&override='+override).then((response) => {
                     swal.fire({
                         type: 'success',
                         title: 'Job Success', 

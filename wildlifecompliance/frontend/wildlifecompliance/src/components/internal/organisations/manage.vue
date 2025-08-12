@@ -219,7 +219,7 @@
 <script>
 //import $ from 'jquery'
 import Vue from 'vue'
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
 import AddContact from '@common-components/add_contact.vue'
 import ApplicationDashTable from '@common-components/applications_dashboard.vue'

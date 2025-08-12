@@ -103,7 +103,7 @@ import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import {
   api_endpoints,
-  helpers, fetch
+  helpers, fetch_util
 }
 from '@/utils/hooks'
 import FormSection from "@/components/forms/section_toggle.vue";
@@ -337,7 +337,7 @@ export default {
         },
         initSelects: async function() {
 
-            let request = fetch.fetchUrl(helpers.add_endpoint_join(api_endpoints.schema_purpose,'1/get_purpose_selects'))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.schema_purpose,'1/get_purpose_selects'))
             request.then(res=>{
 
                     this.schemaPurposes = res.all_purpose

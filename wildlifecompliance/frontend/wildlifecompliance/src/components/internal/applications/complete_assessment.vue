@@ -279,7 +279,7 @@ import CommsLogs from '@common-components/comms_logs.vue';
 import InspectionRequest from '../inspection/create_inspection_modal'
 import {
     api_endpoints,
-    helpers
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 export default {

@@ -40,7 +40,7 @@
 import Vue from 'vue'
 import {
   api_endpoints,
-  helpers, fetch
+  helpers, fetch_util
 }
 from '@/utils/hooks'
 import { mapActions, mapGetters } from 'vuex'
@@ -94,7 +94,7 @@ export default {
     
     fetchOrgContact:function (){
             let vm =this;
-            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_pending_requests'))
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_pending_requests'))
             request.then((response)=>{
                 vm.orgRequest_pending = response;
                 vm.loading.splice('fetching pending organisation requests',1);

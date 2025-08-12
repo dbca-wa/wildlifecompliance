@@ -75,7 +75,7 @@
 
 <script>
 import datatable from '@/utils/vue/datatable.vue'
-import { api_endpoints, helpers, cache_helper } from '@/utils/hooks'
+import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'SanctionOutcomeTableDash',

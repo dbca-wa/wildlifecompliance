@@ -182,7 +182,7 @@
         
 <script>
 import Awesomplete from 'awesomplete';
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import datatable from '@vue-utils/datatable.vue'
 import ApplicationDashTable from '@common-components/applications_dashboard.vue'

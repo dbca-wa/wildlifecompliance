@@ -192,7 +192,7 @@
 <script>
 import Vue from 'vue'
 import $ from 'jquery'
-import { api_endpoints, helpers, fetch } from '@/utils/hooks'
+import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import SecureBaseLink from '@/components/common/securebase_link.vue';
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {
@@ -385,7 +385,7 @@ export default {
                     vm.addingCompany = false;
                     vm.resetNewOrg();
 
-                    let request = fetch.fetchUrl(api_endpoints.my_user_details)
+                    let request = fetch_util.fetchUrl(api_endpoints.my_user_details)
                     request.then((response) => {
                         vm.current_user = response
                         if ( vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0 ) { vm.managesOrg = 'Yes' }
@@ -565,7 +565,7 @@ export default {
         },
         fetchOrgRequestPending:function (){
             let vm =this;
-            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_pending_requests')).then((response)=>{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_pending_requests')).then((response)=>{
                 vm.orgRequest_pending = response;
                 vm.loading.splice('fetching pending organisation requests',1);
             }).catch((error) => {
@@ -574,7 +574,7 @@ export default {
         },
         fetchOrgRequestAmendmentRequested:function (){
             let vm =this;
-            let request = fetch.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_amendment_requested_requests')).then((response)=>{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_amendment_requested_requests')).then((response)=>{
                 vm.orgRequest_amendment_requested = response;
                 vm.loading.splice('fetching amendment requested organisation requests',1);
             }).catch((error) => {
@@ -596,7 +596,7 @@ export default {
                     vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'),JSON.stringify(vm.current_user),{
                         emulateJSON:true
                     }).then((response) => {
-                        let request = fetch.fetchUrl(api_endpoints.my_user_details)
+                        let request = fetch_util.fetchUrl(api_endpoints.my_user_details)
                         request.then((response) => {
                             vm.current_user = response
                             if ( vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0 ) { vm.managesOrg = 'Yes' }
@@ -625,7 +625,7 @@ export default {
         },
     },
     beforeRouteEnter: function(to,from,next){
-        let request = fetch.fetchUrl(api_endpoints.my_user_details)
+        let request = fetch_util.fetchUrl(api_endpoints.my_user_details)
         request.then((response) => {
             if (to.name == 'first-time' && response.address_details && response.personal_details && response.contact_details && response.has_complete_first_time){
                 window.location.href='/';
@@ -650,7 +650,7 @@ export default {
                 $(chev).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
             },100);
         });
-        let request = fetch.fetchUrl(api_endpoints.is_new_user)
+        let request = fetch_util.fetchUrl(api_endpoints.is_new_user)
         request.then((response) => {
             this.new_user = response;
         }).catch((error) => {

@@ -4,7 +4,7 @@ import Organisations from '@/components/user/manage_organisations.vue'
 import ManageOrganisation from '@/components/external/organisations/manage.vue'
 import external_routes from '@/components/external/routes'
 import internal_routes from '@/components/internal/routes'
-import { api_endpoints, fetch } from "@/utils/hooks";
+import { api_endpoints, fetch_util } from "@/utils/hooks";
 
 const router = new createRouter({
     history: createWebHistory(),
@@ -25,7 +25,7 @@ const router = new createRouter({
     ]
 });
 router.beforeEach(async (to, from, next) => {
-    const res = await fetch.fetchUrl(api_endpoints.is_compliance_management_callemail_readonly_user);
+    const res = await fetch_util.fetchUrl(api_endpoints.is_compliance_management_callemail_readonly_user);
     const isComplianceManagementCallemailReadonlyUser = res.compliance_management_callemail_readonly_user;
     if (!([
         "first-time",
