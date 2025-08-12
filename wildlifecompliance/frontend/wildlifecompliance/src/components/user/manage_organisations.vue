@@ -529,9 +529,13 @@ export default {
             vm.readFile();
             let data = new FormData();
             data.append('identification', vm.uploadedFile);
-            vm.$http.put(helpers.add_endpoint_json(api_endpoints.organisation_requests,orgReq.id+'/reupload_identification_amendment_request'),data,{
+            let request = fetch_util.fetchUrl(
+                helpers.add_endpoint_json(api_endpoints.organisation_requests,orgReq.id+'/reupload_identification_amendment_request')
+            ,{method:"PUT",body:JSON.stringify(data)},
+            {
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 vm.uploadedFile = null;
                 vm.resetNewOrg();
                 swal.fire({

@@ -398,7 +398,7 @@ export const callemailStore = {
                         api_endpoints.call_email, 
                         state.call_email.id + "/"
                         )
-                        savedCallEmail = await Vue.http.put(fetchUrl, payload)
+                        savedCallEmail = await fetch_util.fetchUrl(fetchUrl, {method:"PUT",body:JSON.stringify(payload)});
                     }catch(err) {
                         await swal.fire({
                             title: 'Mandatory Field',

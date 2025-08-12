@@ -132,7 +132,7 @@ export const documentArtifactStore = {
                         state.document_artifact.id + '/'
                         )
                     //console.log(payload);
-                    savedDocumentArtifact = await Vue.http.put(fetchUrl, payload);
+                    savedDocumentArtifact = await fetch_util.fetchUrl(fetchUrl, {method:"PUT",body:JSON.stringify(payload)});
                 }
                 await dispatch("setDocumentArtifact", savedDocumentArtifact.body);
                 documentArtifactId = savedDocumentArtifact.body.id;

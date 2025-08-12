@@ -121,19 +121,18 @@ export default {
         sendData:function(){
             let vm = this;
             vm.errors = false;
-            //vm.$parent.loading.push('processing contact');
             if (vm.contact.id){
                 let contact = vm.contact;
-                vm.$http.put(api_endpoints.organisation_contacts(contact.id),JSON.stringify(contact),{
+                let request = fetch_util.fetchUrl(api_endpoints.organisation_contacts(contact.id),
+                    {method:"PUT",body:JSON.stringify(contact)},{
                         emulateJSON:true,
-                    }).then((response)=>{
-                        //vm.$parent.loading.splice('processing contact',1);
+                    })
+                request.then((response)=>{
                         vm.close();
                     },(error)=>{
                         console.log(error);
                         vm.errors = true;
                         vm.errorString = helpers.apiVueResourceError(error);
-                        //vm.$parent.loading.splice('processing contact',1);
                     });
             } else {
                 let contact = JSON.parse(JSON.stringify(vm.contact));

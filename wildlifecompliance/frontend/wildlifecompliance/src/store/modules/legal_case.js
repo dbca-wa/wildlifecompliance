@@ -291,7 +291,7 @@ export const legalCaseStore = {
                         state.legal_case.id + '/'
                         )
                     console.log(payload);
-                    savedLegalCase = await Vue.http.put(fetchUrl, payload);
+                    savedLegalCase = await fetch_util.fetchUrl(fetchUrl, {method:"PUT",body:JSON.stringify(payload)});
                 }
                 if (fullHttpResponse && savedLegalCase.ok) {
                     console.log(savedLegalCase)

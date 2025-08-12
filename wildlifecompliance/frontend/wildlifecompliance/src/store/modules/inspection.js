@@ -189,7 +189,7 @@ export const inspectionStore = {
                 let fetchUrl = null;
                 if (create) {
                     fetchUrl = api_endpoints.inspection;
-                    savedInspection = await Vue.http.post(fetchUrl, payload);
+                    savedInspection = await fetch_util.fetchUrl(fetchUrl,{method:'POST', body:JSON.stringify(payload)});
                 } else {
                     // update Inspection
                     fetchUrl = helpers.add_endpoint_join(
@@ -197,7 +197,7 @@ export const inspectionStore = {
                         //state.inspection.id + "/inspection_save/"
                         state.inspection.id + '/'
                         )
-                    savedInspection = await Vue.http.put(fetchUrl, payload);
+                    savedInspection = await fetch_util.fetchUrl(fetchUrl,{method:'PUT', body:JSON.stringify(payload)});
                 }
                 await dispatch("setInspection", savedInspection.body);
                 inspectionId = savedInspection.body.id;

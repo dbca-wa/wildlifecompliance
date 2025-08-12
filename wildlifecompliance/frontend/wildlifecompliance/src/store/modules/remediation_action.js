@@ -58,7 +58,7 @@ export const remediationActionStore = {
             let payload = {};
             Object.assign(payload, state.remediation_action);
 
-            let savedRemediationAction = await Vue.http.put(putUrl, payload);
+            let savedRemediationAction = await fetch_util.fetchUrl(putUrl, {method:"PUT",body:JSON.stringify(payload)});
         },
         async submitRemediationAction({ dispatch, state }) {
             // Construct url endpoint

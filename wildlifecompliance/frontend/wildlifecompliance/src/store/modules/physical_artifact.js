@@ -162,7 +162,7 @@ export const physicalArtifactStore = {
                         state.physical_artifact.id + '/'
                         )
                     console.log(payload);
-                    savedPhysicalArtifact = await Vue.http.put(fetchUrl, payload);
+                    savedPhysicalArtifact = await fetch_util.fetchUrl(fetchUrl, {method:"PUT",body:JSON.stringify(payload)});
                 }
                 await dispatch("setPhysicalArtifact", savedPhysicalArtifact.body);
                 physicalArtifactId = savedPhysicalArtifact.body.id;

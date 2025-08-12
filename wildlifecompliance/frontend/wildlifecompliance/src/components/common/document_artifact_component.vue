@@ -750,7 +750,7 @@ export default {
                 "legal_case_id": this.legalCaseId
             }
             console.log(payload);
-            await Vue.http.put(fetchUrl, payload);
+            await fetch_util.fetchUrl(fetchUrl, {method:"PUT",body:JSON.stringify(payload)});
             let documentArtifactType = e.target.dataset.artifactType.replace(/~/g, ' ');
             let documentArtifactIdentifier = e.target.dataset.identifier.replace(/~/g, ' ').replace('null', '');
             this.$nextTick(() => {

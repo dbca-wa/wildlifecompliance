@@ -303,7 +303,9 @@ export default {
             return new Promise((resolve, reject) => {
                 let formData = new FormData(this.form);
                 formData.append('final_comment', this.assessment.final_comment);
-                this.$http.put(helpers.add_endpoint_json(api_endpoints.assessment,this.assessment.id+'/update_assessment'),formData,{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessment,this.assessment.id+'/update_assessment'),
+                {method:"PUT",body:formData},
+                {
                     emulateJSON:true
                 }).then(res=>{
                     resolve(res);

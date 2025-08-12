@@ -211,7 +211,7 @@ export const offenceStore = {
                 payload.status = 'open'
 
                 // Send data to the server
-                const savedOffence = await Vue.http.put(fetchUrl, payload);
+                const savedOffence = await fetch_util.fetchUrl(fetchUrl, {method:"PUT",body:JSON.stringify(payload)});
 
                 // Restore returned data into the stre
                 commit("updateOffence", savedOffence.body);
