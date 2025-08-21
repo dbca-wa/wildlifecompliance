@@ -308,7 +308,7 @@ export const callemailStore = {
         async saveCallEmailPerson({dispatch, state}){
             try{
                 let fetchUrl = helpers.add_endpoint_join(api_endpoints.call_email, state.call_email.id + "/call_email_save_person/");
-                const savedEmailUser = await Vue.http.post(fetchUrl, state.call_email);
+                const savedEmailUser = await fetch_util.fetchUrl(fetchUrl, {method:'POST', body:JSON.stringify(state.call_email)});
                 await dispatch("setEmailUser", savedEmailUser.body);
                 await swal.fire("Saved", "The record has been saved", "success");
             } catch (err) {
@@ -374,17 +374,17 @@ export const callemailStore = {
 
                 if (crud === 'create') {
                     const createUrl = api_endpoints.call_email;
-                    savedCallEmail = await Vue.http.post(createUrl, {});
+                    savedCallEmail = await fetch_util.fetchUrl(createUrl, {});
                 } else if (crud === 'duplicate') {
                     const createUrl = api_endpoints.call_email;
-                    savedCallEmail = await Vue.http.post(createUrl, payload);
+                    savedCallEmail = await fetch_util.fetchUrl(createUrl, {method:'POST', body:JSON.stringify(payload)});
                 } else if (crud === 'save') {
                         //---Save the draft call/email
                         const draftUrl = helpers.add_endpoint_join(
                         api_endpoints.call_email,
                         state.call_email.id + "/draft/")
                     try {
-                        savedCallEmail = await Vue.http.post(draftUrl, payload)
+                        savedCallEmail = await fetch_util.fetchUrl(draftUrl, {method:'POST', body:JSON.stringify(payload)})
                     }catch(err) {
                         await swal.fire({
                             title: 'Error',

@@ -191,27 +191,15 @@ export default {
             this.legal_case.id + "/journal_entry_history/"
         );
         let payload = { "journal_entry_number": this.journalHistoryEntryInstance };
-        let returnedJournalHist = await Vue.http.post(
-            fetchUrl, payload
+        let returnedJournalHist = await fetch_util.fetchUrl(
+            fetchUrl, {method:'POST', body:JSON.stringify(payload)}
         );
         if (returnedJournalHist && returnedJournalHist.body) {
             for (let v of returnedJournalHist.body.versions) {
                 let entryVersion = _.cloneDeep(v.entry_fields);
-                //entryVersion.description = this.tokenToUrl(entryVersion.description)
                 this.journalHist.push(entryVersion);
             }
         }
-        /*
-        for (let r of this.legal_case.running_sheet_entries) {
-          if (r.number === this.journalHistoryEntryInstance && r.versions && r.versions.length > 0) {
-              for (let rr of r.versions) {
-                  let entryVersion = _.cloneDeep(rr.entry_fields);
-                  entryVersion.description = this.tokenToUrl(entryVersion.description)
-                  this.journalHist.push(entryVersion);
-              }
-          }
-        }
-        */
         this.$nextTick(() => {
             this.constructRunningSheetTable();
         });

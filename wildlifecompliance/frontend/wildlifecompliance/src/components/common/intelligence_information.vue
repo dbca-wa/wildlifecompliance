@@ -123,7 +123,7 @@
                 //console.log("save")
                 this.saving=true;
                 this.$nextTick(async () => {
-                    await Vue.http.post(this.saveIntelligenceUrl, {'intelligence_text': this.intelligenceText});
+                    await fetch_util.fetchUrl(this.saveIntelligenceUrl, {method:'POST', body:JSON.stringify({'intelligence_text': this.intelligenceText})});
                 });
                 this.saving=false;
             }

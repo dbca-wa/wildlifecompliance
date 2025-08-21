@@ -174,7 +174,7 @@ export default {
           let inspectionRes = await this.saveInspection({create: false, internal: true })
           if (inspectionRes.ok) {
               try {
-                  let res = await Vue.http.post(post_url, payload);
+                  let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
                   console.log(res);
                   if (res.ok) {
                       return res

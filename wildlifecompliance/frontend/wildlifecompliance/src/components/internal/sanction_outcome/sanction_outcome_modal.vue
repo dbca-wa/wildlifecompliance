@@ -887,7 +887,7 @@ export default {
             payload.inspection_id = this.$parent.inspection ? this.$parent.inspection.id : null;
             payload.workflow_type = 'send_to_manager'  // Because this modal is used only when creating new sanction outcome to send to manager
 
-            const savedObj = await Vue.http.post(postUrl, payload);
+            const savedObj = await fetch_util.fetchUrl(postUrl, {method:'POST', body:JSON.stringify(payload)});
             return savedObj;
         },
         currentOffenderChanged: function() {
@@ -959,7 +959,7 @@ export default {
         },
         createDocumentActionUrl: async function() {
             // create sanction outcome and get id
-            let returned_sanction_outcome = await Vue.http.post(api_endpoints.sanction_outcome);
+            let returned_sanction_outcome = await fetch_util.fetchUrl(api_endpoints.sanction_outcome);
             this.sanction_outcome.id = returned_sanction_outcome.body.id;
 
             return helpers.add_endpoint_join(

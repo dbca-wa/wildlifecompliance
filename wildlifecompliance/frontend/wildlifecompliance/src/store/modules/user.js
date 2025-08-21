@@ -253,13 +253,13 @@ export const userStore = {
             commit(UPDATE_CURRENT_USER, user);
         },
         async loadAllocatedGroup({}, {workflow_type, region_id, district_id}) {
-            let returned = await Vue.http.post(
+            let returned = await fetch_util.fetchUrl(
                 api_endpoints.allocated_group_members,
-                { 
+                {method:'POST', body:JSON.stringify({ 
                     'workflow_type': workflow_type,
                     'region_id': region_id,
                     'district_id': district_id,
-                });
+                })});
             return returned;
         },
     }

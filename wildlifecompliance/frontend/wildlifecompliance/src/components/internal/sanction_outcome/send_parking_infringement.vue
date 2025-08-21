@@ -179,7 +179,7 @@ export default {
             let payload = new FormData();
             payload.append('details', this.details);
             this.$refs.comms_log_file.commsLogId ? payload.append('comms_log_id', this.$refs.comms_log_file.commsLogId) : null;
-            let res = await Vue.http.post(post_url, payload);
+            let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
             return res
         },
     },

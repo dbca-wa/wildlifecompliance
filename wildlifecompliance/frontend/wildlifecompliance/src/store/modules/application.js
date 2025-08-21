@@ -226,11 +226,11 @@ export const applicationStore = {
             //dispatch('refreshAddresses'); this would cause the organisation/proxy address to be removed from json response body, so has been commented out for now
         },
         refreshApplicationFees({ dispatch, state, getters, rootGetters }) {
-            Vue.http.post('/api/application/estimate_price/', {
+            fetch_util.fetchUrl('/api/application/estimate_price/', {method:'POST', body:JSON.stringify({
                     'application_id': getters.application_id,
                     'field_data': rootGetters.renderer_form_data,
-            })
-request.then(res => {
+            })})
+            request.then(res => {
                 dispatch('setApplication', {
                     ...state.application,
                     application_fee: res.fees.application,
@@ -259,12 +259,12 @@ request.then(res => {
         },
         setLicenceTypeData({ dispatch, state, getters, rootGetters }, activity_data) {
             return new Promise((resolve, reject) => {
-                Vue.http.post('/api/application/' + getters.application_id + '/update_licence_type_data/', {
+                fetch_util.fetchUrl('/api/application/' + getters.application_id + '/update_licence_type_data/', {method:'POST', body:JSON.stringify({
                         'application_id': getters.application_id,
                         'licence_activity_id': activity_data.licence_activity_id,
                         'licence_activity_workflow': activity_data.workflow,
-                })
-request.then(res => {
+                })})
+                request.then(res => {
                     dispatch('setApplication', res);
                     dispatch('setApplication', {
                         ...state.application,

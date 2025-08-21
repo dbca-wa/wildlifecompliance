@@ -13,7 +13,7 @@ export default {
             });
         });
     },
-    fetch_utilApplication: function(id){
+    fetchApplication: function(id){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.applications,id))
             request.then((response) => {
@@ -23,7 +23,7 @@ export default {
             });
         });
     },
-    fetch_utilCountries: function (){
+    fetchCountries: function (){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(api.countries)
             request.then((response) => {
@@ -33,7 +33,7 @@ export default {
             });
         });
     },
-    fetch_utilOrganisations: function(id){
+    fetchOrganisations: function(id){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(api.organisations)
             request.then((response) => {
@@ -43,7 +43,7 @@ export default {
             });
         });
     },
-    fetch_utilOrganisationPermissions: function(id){
+    fetchOrganisationPermissions: function(id){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.my_organisations,id))
             request.then((response) => {
@@ -53,7 +53,7 @@ export default {
             });
         });
     },
-    fetch_utilLicenceClasses: function(){
+    fetchLicenceClasses: function(){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(api.licences_class)
             request.then((response) => {
@@ -63,7 +63,7 @@ export default {
             });
         });
     },
-    fetch_utilLicenceAvailablePurposes: function(params){
+    fetchLicenceAvailablePurposes: function(params){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(api.licence_available_purposes, {"params": params})
             request.then((response) => {
@@ -73,7 +73,7 @@ export default {
             });
         });
     },
-    fetch_utilOrganisationId: function(org_id) {
+    fetchOrganisationId: function(org_id) {
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(api_endpoints.get_organisation_id(org_id))
             request.then((response) => {
@@ -83,7 +83,7 @@ export default {
             });
         });
     },
-    fetch_utilOrganisation: function(id){
+    fetchOrganisation: function(id){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.organisations,id))
             request.then((response) => {
@@ -93,7 +93,7 @@ export default {
             });
         });
     },
-    fetch_utilCurrentActiveLicenceApplication: function(params){
+    fetchCurrentActiveLicenceApplication: function(params){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(`${api.applications}active_licence_application`, {"params": params})
             request.then((response) => {

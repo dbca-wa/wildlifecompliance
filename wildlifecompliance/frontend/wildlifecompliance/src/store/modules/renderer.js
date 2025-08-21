@@ -152,8 +152,8 @@ export const rendererStore = {
         saveFormData({ dispatch, commit, getters, rootGetters }, { url, draft, submit }) {
             return new Promise((resolve, reject) => {
                 const post_data = Object.assign({'__draft': draft, '__update_fee': rootGetters.application.update_fee, '__submit': submit}, getters.renderer_form_data);
-                Vue.http.post(url, post_data)
-request.then(res => {
+                let request = fetch_util.fetchUrl(url, {method:'POST', body:JSON.stringify(post_data)})
+                request.then(res => {
                     resolve(res);
                 },
                 err => {
@@ -165,8 +165,8 @@ request.then(res => {
         finalDecisionData({ dispatch, commit, getters }, { url, draft }) {
             return new Promise((resolve, reject) => {
                 const post_data = Object.assign({'__draft': draft}, getters.renderer_form_data);
-                Vue.http.post(url, post_data)
-request.then(res => {
+                let request = fetch_util.fetchUrl(url, {method:'POST', body:JSON.stringify(post_data)})
+                request.then(res => {
                     resolve(res);
                 },
                 err => {
@@ -178,8 +178,8 @@ request.then(res => {
         assessmentData({ dispatch, commit, getters, rootGetters }, { url, draft }) {
             return new Promise((resolve, reject) => {
                 const post_data = Object.assign({'__draft': draft, '__update_fee': rootGetters.application.update_fee, '__assess': rootGetters.application.assess, '__licence_activity': rootGetters.selected_activity_tab_id}, getters.renderer_form_data);
-                Vue.http.post(url, post_data)
-request.then(res => {
+                let request = fetch_util.fetchUrl(url, {method:'POST', body:JSON.stringify(post_data)})
+                request.then(res => {
                     resolve(res);
                     dispatch('setApplication', res);
                     dispatch('setApplication', {

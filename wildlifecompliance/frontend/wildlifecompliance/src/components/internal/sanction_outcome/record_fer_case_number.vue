@@ -141,7 +141,7 @@ export default {
             let payload = new FormData();
             payload.append('fer_case_number_1st', this.ferCaseNumber1st);
             payload.append('fer_case_number_2nd', this.ferCaseNumber2nd);
-            let res = await Vue.http.post(post_url, payload);
+            let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
             return res
         },
     },

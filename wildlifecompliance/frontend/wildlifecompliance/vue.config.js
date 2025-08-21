@@ -46,10 +46,6 @@ module.exports = defineConfig({
             '@static-root',
             path.resolve(__dirname, '../../../staticfiles_wc/')
         );
-        config.resolve.alias.set(
-            'datetimepicker',
-            path.resolve(__dirname, 'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js')
-        );
     },
     configureWebpack: {
         devtool: 'source-map',

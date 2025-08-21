@@ -1332,9 +1332,7 @@ export default {
             this.missing_fields.length = 0;
             this.highlight_missing_fields();
 
-            await this.saveFormData({ url: this.form_data_application_url })
-request.then(response => {
-                // this.spinner = false;
+            await this.saveFormData({ url: this.form_data_application_url }).then(response => {
                 this.resetUpdateFeeStatus();
                 showNotification && swal.fire(
                     'Saved',

@@ -155,7 +155,7 @@ export const physicalArtifactStore = {
                 let fetchUrl = null;
                 if (create) {
                     fetchUrl = api_endpoints.physical_artifact;
-                    savedPhysicalArtifact = await Vue.http.post(fetchUrl, payload);
+                    savedPhysicalArtifact = await fetch_util.fetchUrl(fetchUrl, {method:'POST', body:JSON.stringify(payload)});
                 } else {
                     fetchUrl = helpers.add_endpoint_join(
                         api_endpoints.physical_artifact,

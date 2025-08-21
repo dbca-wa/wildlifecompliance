@@ -246,7 +246,7 @@ export const offenceStore = {
             console.log('payload');
             console.log(payload);
 
-            const savedOffence = await Vue.http.post(fetchUrl, payload);
+            const savedOffence = await fetch_util.fetchUrl(fetchUrl, {method:'POST', body:JSON.stringify(payload)});
             await dispatch("setOffence", savedOffence.body);
             return savedOffence;
         },

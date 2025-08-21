@@ -813,7 +813,7 @@ export default {
             'action': action
         }
 
-        let inspectionTeamResponse = await Vue.http.post(inspectionTeamUrl, payload);
+        let inspectionTeamResponse = await fetch_util.fetchUrl(inspectionTeamUrl, {method:'POST', body:JSON.stringify(payload)});
         await this.setInspection(inspectionTeamresponse);
         this.$nextTick(() => {
             this.constructInspectionTeamTable()

@@ -334,7 +334,7 @@ export default {
         } else {
             payload = { 'assigned_to_id': this.legal_case.assigned_to_id };
         }
-        let res = await Vue.http.post(
+        let res = await fetch_util.fetchUrl(
             url,
             payload
         );

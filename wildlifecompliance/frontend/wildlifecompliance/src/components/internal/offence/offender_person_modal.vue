@@ -214,11 +214,11 @@ export default {
         data.address_state = vm.offender_person.address_state;
         data.address_country = vm.offender_person.address_country;
         data.address_postcode = vm.offender_person.address_postcode;
-        let res = Vue.http.post(
+        let res = fetch_util.fetchUrl(
             helpers.add_endpoint_join(
                 api_endpoints.offenders,
                 this.offender_id + "/update_offender_person/"),
-                data
+                {method:'POST', body:JSON.stringify(data)}
             );
         return res
     },

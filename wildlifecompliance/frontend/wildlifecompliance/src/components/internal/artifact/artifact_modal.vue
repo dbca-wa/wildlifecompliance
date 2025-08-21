@@ -125,7 +125,6 @@ export default {
           this.temporary_document_collection_id = val;
       },
       updateDistricts: function() {
-        // this.district_id = null;
         this.availableDistricts = [];
         for (let region of this.regions) {
           if (this.region_id === region.id) {
@@ -153,7 +152,6 @@ export default {
               });
               if (allocatedGroupResponse.ok) {
                   console.log(allocatedGroupresponse.allocated_group);
-                  //this.allocatedGroup = Object.assign({}, allocatedGroupresponse.allocated_group);
                   this.allocatedGroup = allocatedGroupresponse.allocated_group;
                   this.allocated_group_id = allocatedGroupresponse.group_id;
               } else {
@@ -224,11 +222,6 @@ export default {
       },
       sendData: async function() {
           let post_url = '/api/legal_case/';
-          //if (!this.inspection.id) {
-          //    post_url = '/api/legal_case/';
-          //} else {
-          //    post_url = '/api/inspection/' + this.inspection.id + '/workflow_action/';
-          //}
           
           let payload = new FormData();
           payload.append('details', this.legalCaseDetails);
@@ -241,11 +234,8 @@ export default {
           this.allocated_group_id ? payload.append('allocated_group_id', this.allocated_group_id) : null;
           this.temporary_document_collection_id ? payload.append('temporary_document_collection_id', this.temporary_document_collection_id) : null;
 
-          //this.workflow_type ? payload.append('workflow_type', this.workflow_type) : null;
-          //!payload.has('allocated_group') ? payload.append('allocated_group', this.allocatedGroup) : null;
-
           try {
-              let res = await Vue.http.post(post_url, payload);
+              let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
               console.log(res);
               if (res.ok) {
                   return res
@@ -255,17 +245,6 @@ export default {
               }
           
       },
-      //createDocumentActionUrl: async function(done) {
-      //  if (!this.inspection.id) {
-      //      // create inspection and update vuex
-      //      let returned_inspection = await this.saveInspection({ create: true, internal: true })
-      //      await this.loadInspection({inspection_id: returned_inspection.body.id});
-      //  }
-      //  // populate filefield document_action_url
-      //  this.$refs.comms_log_file.document_action_url = this.inspection.createInspectionProcessCommsLogsDocumentUrl;
-      //  return done(true);
-      //},
-
     },
     created: async function() {
         // regions
@@ -282,12 +261,6 @@ export default {
               districts: [],
               region: null,
             });
-        // regionDistricts
-        // let returned_region_districts = await cache_helper.getSetCacheList(
-        //     'RegionDistricts', 
-        //     api_endpoints.region_district
-        //     );
-        // Object.assign(this.regionDistricts, returned_region_districts);
 
         // inspection_types
         let returned_legal_case_priorities = await cache_helper.getSetCacheList(

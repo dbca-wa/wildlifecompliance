@@ -275,7 +275,7 @@ export const legalCaseStore = {
                 let fetchUrl = null;
                 if (create) {
                     fetchUrl = api_endpoints.legal_case;
-                    savedLegalCase = await Vue.http.post(fetchUrl, payload);
+                    savedLegalCase = await fetch_util.fetchUrl(fetchUrl, {method:'POST', body:JSON.stringify(payload)});
                 } else {
                     if (createBriefOfEvidence) {
                         payload.create_brief_of_evidence = true;

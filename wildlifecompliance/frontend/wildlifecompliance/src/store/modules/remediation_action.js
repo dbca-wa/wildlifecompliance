@@ -68,7 +68,7 @@ export const remediationActionStore = {
             let payload = {};
             Object.assign(payload, state.remediation_action);
 
-            let ret = await Vue.http.post(submitUrl, payload);
+            let ret = await fetch_util.fetchUrl(submitUrl, {method:'POST', body:JSON.stringify(payload)});
             return ret.body;
         },
         setRemediationAction({ commit, }, remediation_action) {

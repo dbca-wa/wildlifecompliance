@@ -328,7 +328,7 @@ export default {
           !payload.has('allocated_group') ? payload.append('allocated_group', this.allocatedGroup) : null;
 
           try {
-              let res = await Vue.http.post(post_url, payload);
+              let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
               if (res.ok) {
                   return res
               }

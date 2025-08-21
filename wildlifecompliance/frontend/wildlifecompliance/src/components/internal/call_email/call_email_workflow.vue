@@ -318,7 +318,7 @@ export default {
           this.case_priority_id ? payload.append('case_priority_id', this.case_priority_id) : null;
           this.regionId ? payload.append('region_id', this.regionId) : null;
           try {
-              const res = await Vue.http.post(post_url, payload);
+              const res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
               if (res.ok) {
                   this.$router.push({ name: 'internal-call-email-dash' });
               }

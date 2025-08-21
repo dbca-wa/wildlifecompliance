@@ -455,15 +455,15 @@ export default {
                     journal_entry_id = r.id
                 }
             }
-            let returnedEntry = await Vue.http.post(
+            let returnedEntry = await fetch_util.fetchUrl(
                 helpers.add_endpoint_join(
                     api_endpoints.legal_case,
                     this.legal_case.id + '/delete_reinstate_journal_entry/',
                 ),
-                {
+                {method:'POST', body:JSON.stringify({
                     "journal_entry_id": journal_entry_id,
                     "deleted": true,
-                }
+                })}
             );
             if (returnedEntry.ok) {
                 // required for running_sheet_history
@@ -502,15 +502,15 @@ export default {
                     journal_entry_id = r.id
                 }
             }
-            let returnedEntry = await Vue.http.post(
+            let returnedEntry = await fetch_util.fetchUrl(
                 helpers.add_endpoint_join(
                     api_endpoints.legal_case,
                     this.legal_case.id + '/delete_reinstate_journal_entry/',
                 ),
-                {
+                {method:'POST', body:JSON.stringify({
                     "journal_entry_id": journal_entry_id,
                     "deleted": false,
-                }
+                })}
                 );
             if (returnedEntry.ok) {
                 // required for running_sheet_history
@@ -586,7 +586,7 @@ export default {
                 api_endpoints.legal_case,
                 this.legal_case.id + '/create_journal_entry/'
                 )
-            let updatedCourtProceedings = await Vue.http.post(fetchUrl, payload);
+            let updatedCourtProceedings = await fetch_util.fetchUrl(fetchUrl, {method:'POST', body:JSON.stringify(payload)});
             console.log(updatedCourtProceedings)
             if (updatedCourtProceedings.ok) {
                 await this.setAddCourtProceedingsEntry(updatedCourtProceedings.body);

@@ -205,7 +205,7 @@ export default {
             this.$refs.comms_log_file.commsLogId ? payload.append('comms_log_id', this.$refs.comms_log_file.commsLogId) : null;
             this.workflow_type ? payload.append('workflow_type', this.workflow_type) : null;
 
-            let res = await Vue.http.post(post_url, payload);
+            let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
             return res
         },
         uploadFile(target,file_obj){

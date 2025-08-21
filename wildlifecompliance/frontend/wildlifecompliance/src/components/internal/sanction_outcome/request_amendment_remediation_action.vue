@@ -165,7 +165,7 @@ export default {
                 'remediation_action_id': this.remediation_action_id
             }
             console.log(payload);
-            let res = await Vue.http.post(get_url, payload);
+            let res = await fetch_util.fetchUrl(get_url, {method:'POST', body:JSON.stringify(payload)});
             return res
         },
     },

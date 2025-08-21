@@ -1100,7 +1100,7 @@ export default {
             api_endpoints.legal_case,
             this.legal_case.id + '/create_running_sheet_entry/'
             )
-        let updatedRunningSheet = await Vue.http.post(fetchUrl, payload);
+        let updatedRunningSheet = await fetch_util.fetchUrl(fetchUrl, {method:'POST', body:JSON.stringify(payload)});
         console.log(updatedRunningSheet)
         if (updatedRunningSheet.ok) {
             await this.setAddRunningSheetEntry(updatedRunningSheet.body);
@@ -1153,32 +1153,6 @@ export default {
     },
     addWorkflow: function(workflow_type) {
         console.log(workflow_type)
-        /*
-        if (['brief_of_evidence', 'prosecution_brief'].includes(workflow_type)) {
-            // Save legal_case first
-            await this.save({
-                "create": false,
-                "internal": true
-            })
-            // workflow_action api method
-            //let post_url = '/api/legal_case/' + this.legal_case.id + '/workflow_action/'
-            let postUrl = helpers.add_endpoint_join(
-                api_endpoints.legal_case,
-                this.legal_case.id + '/workflow_action/'
-            );
-            let payload = new FormData();
-            workflow_type ? payload.append('workflow_type', workflow_type) : null;
-            let res = await Vue.http.post(postUrl, payload);
-
-        } else {
-            // open workflow modal
-            this.workflow_type = workflow_type;
-            this.updateWorkflowBindId();
-            this.$nextTick(() => {
-                this.$refs.legal_case_workflow.isModalOpen = true;
-            });
-        }
-        */
         // open workflow modal
         this.workflow_type = workflow_type;
         this.setLegalCaseWorkflowBindId();
@@ -1548,15 +1522,15 @@ export default {
                 running_sheet_id = r.id
             }
         }
-        let returnedEntry = await Vue.http.post(
+        let returnedEntry = await fetch_util.fetchUrl(
             helpers.add_endpoint_join(
                 api_endpoints.legal_case,
                 this.legal_case.id + '/delete_reinstate_running_sheet_entry/',
             ),
-            {
+            {method:'POST', body:JSON.stringify({
                 "running_sheet_id": running_sheet_id,
                 "deleted": true,
-            }
+            })}
             );
         if (returnedEntry.ok) {
             // required for running_sheet_history
@@ -1586,15 +1560,15 @@ export default {
                 running_sheet_id = r.id
             }
         }
-        let returnedEntry = await Vue.http.post(
+        let returnedEntry = await fetch_util.fetchUrl(
             helpers.add_endpoint_join(
                 api_endpoints.legal_case,
                 this.legal_case.id + '/delete_reinstate_running_sheet_entry/',
             ),
-            {
+            {method:'POST', body:JSON.stringify({
                 "running_sheet_id": running_sheet_id,
                 "deleted": false,
-            }
+            })}
             );
         if (returnedEntry.ok) {
             // required for running_sheet_history

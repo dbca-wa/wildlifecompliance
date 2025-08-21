@@ -125,7 +125,7 @@ export const documentArtifactStore = {
                 let fetchUrl = null;
                 if (create) {
                     fetchUrl = api_endpoints.document_artifact;
-                    savedDocumentArtifact = await Vue.http.post(fetchUrl, payload);
+                    savedDocumentArtifact = await fetch_util.fetchUrl(fetchUrl, {method:'POST', body:JSON.stringify(payload)});
                 } else {
                     fetchUrl = helpers.add_endpoint_join(
                         api_endpoints.document_artifact,
