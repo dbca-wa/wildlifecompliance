@@ -149,9 +149,10 @@ export default {
             let vm = this;
             vm.errors = false;
             let amendment = JSON.parse(JSON.stringify(vm.amendment));
-            vm.$http.post('/api/amendment.json',JSON.stringify(amendment),{
+            let request = fetch_util.fetchUrl('/api/amendment.json',{method:'POST', body:JSON.stringify(amendment)},{
                         emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                         //vm.$parent.loading.splice('processing contact',1);
                         swal.fire({
                              title: 'Sent',

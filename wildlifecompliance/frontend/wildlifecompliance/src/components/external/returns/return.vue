@@ -172,9 +172,10 @@ export default {
         });
         data.append('transfer', speciesJSON)
       }
-      await self.$http.post(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/save'),data,{
+      let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/save'),{method:'POST', body:JSON.stringify(data)},{
                       emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                       let species_id = self.returns.sheet_species;
                       self.setReturns(response);
                       self.returns.sheet_species = species_id;
@@ -220,9 +221,10 @@ export default {
       self.spinner_submit = true;
       var data = await self.get_table_data()
 
-      await self.$http.post(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/save_and_submit'),data,{
+      let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/save_and_submit'),{method:'POST', body:JSON.stringify(data)},{
                       emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                       // self.is_submitting = false;
                       self.disable_submit = false;
                       self.disable_exit = false;
@@ -252,30 +254,31 @@ export default {
       self.spinner_exit = true;
       self.spinner_submit = true;
       self.form=document.forms.external_returns_form;
-      self.$http.post(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/submit'),{
-                      emulateJSON:true,
-                    }).then((response)=>{
-                       let species_id = self.returns.sheet_species;
-                       self.setReturns(response);
-                       self.returns.sheet_species = species_id;
-                       self.disable_continue = false;
-                       self.disable_exit = false;
-                       self.disable_submit = false;
-                       self.spinner_exit = false;
-                       self.spinner_submit = false;
-                       this.$router.push({name:"external-applications-dash"});
-                    },(error)=>{
-                       self.disable_continue = false;
-                       self.disable_exit = false;
-                       self.disable_submit = false;
-                       self.spinner_exit = false;
-                       self.spinner_submit = false;
-                       console.log(error);
-                       swal.fire('Error',
-                            'There was an error submitting your return details.<br/>' + error.body,
-                            'error'
-                       )
-                    });
+      let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/submit'),{
+            emulateJSON:true,
+          })
+      request.then((response)=>{
+              let species_id = self.returns.sheet_species;
+              self.setReturns(response);
+              self.returns.sheet_species = species_id;
+              self.disable_continue = false;
+              self.disable_exit = false;
+              self.disable_submit = false;
+              self.spinner_exit = false;
+              self.spinner_submit = false;
+              this.$router.push({name:"external-applications-dash"});
+          },(error)=>{
+              self.disable_continue = false;
+              self.disable_exit = false;
+              self.disable_submit = false;
+              self.spinner_exit = false;
+              self.spinner_submit = false;
+              console.log(error);
+              swal.fire('Error',
+                  'There was an error submitting your return details.<br/>' + error.body,
+                  'error'
+              )
+          });
 
     },
     submit_and_checkout: async function(e) {
@@ -286,9 +289,10 @@ export default {
       self.spinner_exit = true;
       self.spinner_submit = true;
       self.form=document.forms.external_returns_form;
-      await self.$http.post(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/submit_and_checkout'),{
+      let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/submit_and_checkout'),{
                       emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                        self.disable_continue = false;
                        self.disable_exit = false;
                        self.disable_submit = false;

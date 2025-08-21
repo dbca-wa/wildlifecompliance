@@ -600,10 +600,13 @@ export default {
             };
         },
         payLicenceFee: function(application_id, activity_id) {
-            this.$http.post(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/licence_fee_checkout/'), {
-                application_id,
-                activity_id
-            }).then(res=>{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/licence_fee_checkout/'), 
+                {method:'POST', body:{
+                    application_id,
+                    activity_id
+                }}
+            )
+            request.then(res=>{
                     window.location.href = res;
                 },err=>{
                     swal.fire(
@@ -614,7 +617,12 @@ export default {
                 });
         },
         payApplicationFee: function(application_id) {
-            this.$http.post(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/application_fee_checkout/'), application_id).then(res=>{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/application_fee_checkout/'), 
+                {method:'POST', body:{
+                    application_id
+                }}
+            )
+            request.then(res=>{
                     window.location.href = res;
                 },err=>{
                     swal.fire(
@@ -625,19 +633,20 @@ export default {
                 });
         },
         getActivities: async function(application_id) {
-            await this.$http.post(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/get_activities/'), {
-                application_id
-            }).then(res=>{
-
-                    this.activities = res;
-
-                },err=>{
-                    swal.fire(
-                        'Get Activity Error',
-                        helpers.apiVueResourceError(err),
-                        'error'
-                    )
-                });
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/get_activities/'), 
+                {method:'POST', body:{
+                    application_id
+                }}
+            )
+            request.then(res=>{
+                this.activities = res;
+            },err=>{
+                swal.fire(
+                    'Get Activity Error',
+                    helpers.apiVueResourceError(err),
+                    'error'
+                )
+            });
         },
         addEventListeners: function(){
             let vm = this;

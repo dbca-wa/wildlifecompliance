@@ -140,9 +140,10 @@ export default {
             self.amendment.a_return = this.returns
             let amendment = JSON.parse(JSON.stringify(self.amendment));
 
-            self.$http.post('/api/returns_amendment.json',JSON.stringify(amendment),{
+            let request = fetch_util.fetchUrl('/api/returns_amendment.json',{method:'POST', body:JSON.stringify(amendment)},{
                         emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                         let species_id = this.returns.sheet_species;
                         this.setReturns(response);
                         this.returns.sheet_species = species_id;

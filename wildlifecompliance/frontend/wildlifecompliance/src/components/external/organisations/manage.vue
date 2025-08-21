@@ -222,7 +222,8 @@ export default {
     },
     beforeRouteEnter: function(to, from, next){
         let id = [utils.fetchOrganisationId(to.params.org_id)];
-        Promise.all(id).then(res => {
+        Promise.all(id)
+request.then(res => {
             let initialisers = [
                 utils.fetchOrganisation(res[0].id),
                 utils.fetchOrganisationPermissions(res[0].id)
@@ -240,7 +241,8 @@ export default {
     },
     beforeRouteUpdate: function(to, from, next){
         let id = [utils.fetchOrganisationId(to.params.org_id)];
-        Promise.all(id).then(res => {
+        Promise.all(id)
+request.then(res => {
             let initialisers = [
                 utils.fetchOrganisation(res[0].id),
                 utils.fetchOrganisationPermissions(res[0].id)
@@ -307,9 +309,10 @@ export default {
                     confirmButtonText: 'Accept'
                 }).then((result) => {
                     if (result){
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/accept_user'),JSON.stringify(vm.contact_user),{
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/accept_user'), {method:'POST', body:JSON.stringify(vm.contact_user)},{
                             emulateJSON:true
-                        }).then((response) => {
+                        })
+                        request.then((response) => {
                             swal.fire({
                                 title: 'Contact Accept',
                                 text: 'You have successfully accepted ' + name + '.',
@@ -353,9 +356,10 @@ export default {
                     confirmButtonText: 'Accept'
                 }).then((result) => {
                     if (result){
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/accept_declined_user'),JSON.stringify(vm.contact_user),{
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/accept_declined_user'), {method:'POST', body:JSON.stringify(vm.contact_user)},{
                             emulateJSON:true
-                        }).then((response) => {
+                        })
+                        request.then((response) => {
                             swal.fire({
                                 title: 'Contact Accept (Previously Declined)',
                                 text: 'You have successfully accepted ' + name + '.',
@@ -401,9 +405,10 @@ export default {
                     confirmButtonText: 'Accept'
                 }).then((result) => {
                     if (result){
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/decline_user'),JSON.stringify(vm.contact_user),{
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/decline_user'), {method:'POST', body:JSON.stringify(vm.contact_user)},{
                             emulateJSON:true
-                        }).then((response) => {
+                        })
+                        request.then((response) => {
                             swal.fire({
                                 title: 'Contact Decline',
                                 text: 'You have successfully declined ' + name + '.',
@@ -449,9 +454,10 @@ export default {
                     confirmButtonText: 'Accept'
                 }).then((result) => {
                     if (result){
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/unlink_user'),JSON.stringify(vm.contact_user),{
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/unlink_user'), {method:'POST', body:JSON.stringify(vm.contact_user)},{
                             emulateJSON:true
-                        }).then((response) => {
+                        })
+                        request.then((response) => {
                             swal.fire({
                                 title: 'Unlink',
                                 text: 'You have successfully unlinked ' + name + '.',
@@ -503,9 +509,10 @@ export default {
                     confirmButtonText: 'Accept'
                 }).then((result) => {
                     if (result) {
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/make_admin_user'),JSON.stringify(vm.contact_user),{
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/make_admin_user'), {method:'POST', body:JSON.stringify(vm.contact_user)},{
                             emulateJSON:true
-                        }).then((response) => {
+                        })
+                        request.then((response) => {
                             swal.fire({
                                 title: 'Organisation Admin',
                                 text: 'You have successfully made ' + name + ' an Organisation Admin.',
@@ -549,9 +556,10 @@ export default {
                     confirmButtonText: 'Accept'
                 }).then((result) => {
                     if (result) {
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/make_user'),JSON.stringify(vm.contact_user),{
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/make_user'), {method:'POST', body:JSON.stringify(vm.contact_user)},{
                             emulateJSON:true
-                        }).then((response) => {
+                        })
+                        request.then((response) => {
                             swal.fire({
                                 title: 'Organisation User',
                                 text: 'You have successfully made ' + name + ' an Organisation User.',
@@ -605,9 +613,10 @@ export default {
                     confirmButtonText: 'Accept'
                 }).then((result) => {
                     if (result) {
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/suspend_user'),JSON.stringify(vm.contact_user),{
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/suspend_user'), {method:'POST', body:JSON.stringify(vm.contact_user)},{
                             emulateJSON:true
-                        }).then((response) => {
+                        })
+                        request.then((response) => {
                             swal.fire({
                                 title: 'Suspend User',
                                 text: 'You have successfully suspended ' + name + ' as a User.',
@@ -660,9 +669,10 @@ export default {
                     confirmButtonText: 'Accept'
                 }).then((result) => {
                     if (result) {
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/reinstate_user'),JSON.stringify(vm.contact_user),{
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/reinstate_user'), {method:'POST', body:JSON.stringify(vm.contact_user)},{
                             emulateJSON:true
-                        }).then((response) => {
+                        })
+                        request.then((response) => {
                             swal.fire({
                                 title: 'Reinstate User',
                                 text: 'You have successfully reinstated ' + name + '.',
@@ -706,9 +716,10 @@ export default {
                     confirmButtonText: 'Accept'
                 }).then((result) => {
                     if (result) {
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/relink_user'),JSON.stringify(vm.contact_user),{
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/relink_user'), {method:'POST', body:JSON.stringify(vm.contact_user)},{
                             emulateJSON:true
-                        }).then((response) => {
+                        })
+                        request.then((response) => {
                             swal.fire({
                                 title: 'Relink User',
                                 text: 'You have successfully relinked ' + name + '.',
@@ -752,9 +763,10 @@ export default {
                     confirmButtonText: 'Accept'
                 }).then((result) => {
                     if (result) {
-                        vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/make_consultant'),JSON.stringify(vm.contact_user),{
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,vm.org.id+'/make_consultant'), {method:'POST', body:JSON.stringify(vm.contact_user)},{
                             emulateJSON:true
-                        }).then((response) => {
+                        })
+                        request.then((response) => {
                             swal.fire({
                                 title: 'Organisation Consultant',
                                 text: 'You have successfully made ' + name + ' an Organisation Consultant.',
@@ -825,9 +837,10 @@ export default {
                 confirmButtonText: 'Accept'
             }).then((result) => {
                 if (result) {
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'),{'user':person.id},{
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'),{method:'POST', body:JSON.stringify({'user':person.id})},{
                         emulateJSON:true
-                    }).then((response) => {
+                    })
+                    request.then((response) => {
                         vm.org = response;
                         if (vm.org.address == null){ vm.org.address = {}; }
                         swal.fire({

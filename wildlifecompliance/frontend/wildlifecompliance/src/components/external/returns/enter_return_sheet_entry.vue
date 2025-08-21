@@ -416,19 +416,20 @@ export default {
         };
       },
       payTransfer: async function(_data) {
-        this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/sheet_pay_transfer'),_data,{
-                      emulateJSON:true,
-                    }).then((response)=>{
-                            window.location.href = res;
-                      //let species_id = this.returns.sheet_species;
-                      //this.setReturns(response);
-                      //this.returns.sheet_species = species_id;
-                    },(error)=>{
-                      console.log(error);
-                      swal.fire('Error',
-                            'There was an error with transferring.<br/>' + error.body,
-                            'error'
-                      )
+        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/sheet_pay_transfer'),{method:'POST', body:JSON.stringify(_data)},{
+              emulateJSON:true,
+            })
+        request.then((response)=>{
+                    window.location.href = res;
+              //let species_id = this.returns.sheet_species;
+              //this.setReturns(response);
+              //this.returns.sheet_species = species_id;
+            },(error)=>{
+              console.log(error);
+              swal.fire('Error',
+                    'There was an error with transferring.<br/>' + error.body,
+                    'error'
+              )
         });
 
         return true
@@ -442,43 +443,44 @@ export default {
         row_data['species_id'] = self.returns.sheet_species;
         row_data['transfer'] = 'Notified';
         data.append('transfer', JSON.stringify(row_data))
-        self.$http.post(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/sheet_check_transfer'),data,{
-                      emulateJSON:true,
-                    }).then((response)=>{
+        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/sheet_check_transfer'),{method:'POST', body:JSON.stringify(data)},{
+              emulateJSON:true,
+            })
+        request.then((response)=>{
 
-                        if (self.isAddEntry) {
+                if (self.isAddEntry) {
 
-                            self.row_of_data.row.add(row_data).node().id = row_data.rowId;
-                            self.row_of_data.draw();
-                            self.species_cache[self.returns.sheet_species] = self.return_table.data();
+                    self.row_of_data.row.add(row_data).node().id = row_data.rowId;
+                    self.row_of_data.draw();
+                    self.species_cache[self.returns.sheet_species] = self.return_table.data();
 
-                        } else {  // Changing records only
+                } else {  // Changing records only
 
-                            self.row_of_data.data().activity = self.entryActivity;
-                            self.row_of_data.data().qty = self.entryQty;
-                            self.row_of_data.data().total = self.entryTotal;
-                            self.row_of_data.data().licence = self.entryLicence;
-                            self.row_of_data.data().comment = self.entryComment;
-                            self.row_of_data.data().transfer = self.entryTransfer;
-                            self.row_of_data.data().supplier = self.entrySupplier;
-                            self.row_of_data.invalidate().draw()
-                            self.species_cache[self.returns.sheet_species] = self.return_table.data();
-                        }
+                    self.row_of_data.data().activity = self.entryActivity;
+                    self.row_of_data.data().qty = self.entryQty;
+                    self.row_of_data.data().total = self.entryTotal;
+                    self.row_of_data.data().licence = self.entryLicence;
+                    self.row_of_data.data().comment = self.entryComment;
+                    self.row_of_data.data().transfer = self.entryTransfer;
+                    self.row_of_data.data().supplier = self.entrySupplier;
+                    self.row_of_data.invalidate().draw()
+                    self.species_cache[self.returns.sheet_species] = self.return_table.data();
+                }
 
-                        let transfer = {}  //{speciesID: {this.entryDateTime: row_data},}
-                        if (self.returns.sheet_species in self.species_transfer){
-                            transfer = self.species_transfer[self.returns.sheet_species]
-                        }
-                        transfer[self.entryDateTime] = row_data;
-                        self.species_transfer[self.returns.sheet_species] = transfer
-                        //self.close()
-                        is_valid = true;
+                let transfer = {}  //{speciesID: {this.entryDateTime: row_data},}
+                if (self.returns.sheet_species in self.species_transfer){
+                    transfer = self.species_transfer[self.returns.sheet_species]
+                }
+                transfer[self.entryDateTime] = row_data;
+                self.species_transfer[self.returns.sheet_species] = transfer
+                //self.close()
+                is_valid = true;
 
-                    },(error)=>{
-                        console.log(error)
-                        self.errors = true;
-                        //self.errorString = helpers.apiVueResourceError('Licence is not Valid.');
-                        self.errorString = 'Error with Validation'
+            },(error)=>{
+                console.log(error)
+                self.errors = true;
+                //self.errorString = helpers.apiVueResourceError('Licence is not Valid.');
+                self.errorString = 'Error with Validation'
         });
         return is_valid;
       },

@@ -340,9 +340,10 @@ export default {
                     return;
                 }
             }
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,'existence'),JSON.stringify(this.newOrg),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,'existence'), {method:'POST', body:JSON.stringify(this.newOrg)},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 this.newOrg.exists = response.exists;
                 this.newOrg.id = response.id;
                 this.newOrg.detailsChecked = false;
@@ -371,9 +372,10 @@ export default {
         validatePins: function() {
             let vm = this;
             vm.validatingPins = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,(vm.newOrg.id+'/validate_pins')),JSON.stringify(this.newOrg),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,(vm.newOrg.id+'/validate_pins')), {method:'POST', body:JSON.stringify(this.newOrg)},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 if (response.valid){
                     swal.fire(
                         'Validate Pins',
@@ -423,9 +425,10 @@ export default {
                     'error'
                 )
             } else {
-                vm.$http.post(api_endpoints.organisation_requests,data,{
+                let request = fetch_util.fetchUrl(api_endpoints.organisation_requests,{method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-                }).then((response) => {
+                })
+                request.then((response) => {
                     vm.registeringOrg = false;
                     vm.uploadedFile = null;
                     vm.addingCompany = false;
@@ -490,9 +493,10 @@ export default {
                     'error'
                 )
             } else {
-                vm.$http.post(api_endpoints.organisation_requests,data,{
+                let request = fetch_util.fetchUrl(api_endpoints.organisation_requests,{method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-                }).then((response) => {
+                })
+                request.then((response) => {
                     vm.registeringOrg = false;
                     vm.uploadedFile = null;
                     vm.addingCompany = false;
@@ -597,9 +601,10 @@ export default {
                 confirmButtonText: 'Accept'
             }).then((result) => {
                 if (result) {
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'),JSON.stringify(vm.current_user),{
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'), {method:'POST', body:JSON.stringify(vm.current_user)},{
                         emulateJSON:true
-                    }).then((response) => {
+                    })
+                    request.then((response) => {
                         let request = fetch_util.fetchUrl(api_endpoints.my_user_details)
                         request.then((response) => {
                             vm.current_user = response

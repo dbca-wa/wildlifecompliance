@@ -1195,8 +1195,8 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_id_check')))
-                    .then((response) => {
+                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_id_check')))
+                    request.then((response) => {
                         vm.setIdCheckStatus(response.id_check_status);
                     }, (error) => {
                         console.log(error);
@@ -1215,8 +1215,8 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_id_check')))
-                    .then((response) => {
+                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_id_check')))
+                    request.then((response) => {
                         vm.setIdCheckStatus(response.id_check_status);
                     }, (error) => {
                         console.log(error);
@@ -1235,8 +1235,8 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/request_id_check')))
-                    .then((response) => {
+                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/request_id_check')))
+                    request.then((response) => {
                         vm.setIdCheckStatus(response.id_check_status);
                     }, (error) => {
                         console.log(error);
@@ -1255,8 +1255,8 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_character_check')))
-                    .then((response) => {
+                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_character_check')))
+                    request.then((response) => {
                         vm.setCharacterCheckStatus(response.character_check_status);
                     }, (error) => {
                         console.log(error);
@@ -1275,8 +1275,8 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_character_check')))
-                    .then((response) => {
+                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_character_check')))
+                    request.then((response) => {
                         vm.setCharacterCheckStatus(response.character_check_status);
                     }, (error) => {
                         console.log(error);
@@ -1295,8 +1295,8 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_return_check')))
-                    .then((response) => {
+                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_return_check')))
+                    request.then((response) => {
                         vm.setReturnCheckStatus(response.return_check_status);
                     }, (error) => {
                         console.log(error);
@@ -1315,8 +1315,8 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_return_check')))
-                    .then((response) => {
+                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_return_check')))
+                    request.then((response) => {
                         vm.setReturnCheckStatus(response.return_check_status);
                     }, (error) => {
                         console.log(error);
@@ -1332,7 +1332,8 @@ export default {
             this.missing_fields.length = 0;
             this.highlight_missing_fields();
 
-            await this.saveFormData({ url: this.form_data_application_url }).then(response => {
+            await this.saveFormData({ url: this.form_data_application_url })
+request.then(response => {
                 // this.spinner = false;
                 this.resetUpdateFeeStatus();
                 showNotification && swal.fire(
@@ -1512,10 +1513,11 @@ export default {
             const data = {
                 "activity_id" : this.selectedActivity.licence_activity,
             }
-            await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_to_me')),JSON.stringify(data),{
+            let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_to_me')), {method:'POST', body:JSON.stringify(data)},{
                 emulateJSON:true
 
-            }).then((response) => {
+            })
+request.then((response) => {
                 // this.refreshFromResponse(response);
                 // vm.updateAssignedOfficerSelect();
             }, (error) => {
@@ -1551,9 +1553,10 @@ export default {
                 "activity_id" : this.selectedActivity.licence_activity,
             };
             if (!unassign){
-                await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_officer')),JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_officer')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-                }).then((response) => {
+                })
+request.then((response) => {
                     // this.refreshFromResponse(response);
                     // this.updateAssignedOfficerSelect();
                 }, (error) => {
@@ -1567,9 +1570,10 @@ export default {
                 });
             }
             else{
-                await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/unassign_officer')),JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/unassign_officer')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-                }).then((response) => {
+                })
+request.then((response) => {
                     // this.refreshFromResponse(response);
                     // this.updateAssignedOfficerSelect();
                 }, (error) => {
@@ -1594,9 +1598,10 @@ export default {
             }
 
             if (!unassign){
-                await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_activity_approver')),JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_activity_approver')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-                }).then((response) => {
+                })
+request.then((response) => {
                     // this.refreshFromResponse(response);
                     // this.updateAssignedApproverSelect();
                 }, (error) => {
@@ -1610,9 +1615,10 @@ export default {
                 });
             }
             else{
-                await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/unassign_activity_approver')),JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/unassign_activity_approver')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-                }).then((response) => {
+                })
+request.then((response) => {
                     // this.refreshFromResponse(response);
                     // this.updateAssignedOfficerSelect();
                 }, (error) => {
@@ -1634,10 +1640,11 @@ export default {
             const data = {
                 "activity_id" : this.selectedActivity.licence_activity,
             }
-            await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/make_me_activity_approver')),JSON.stringify(data),{
+            let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/make_me_activity_approver')), {method:'POST', body:JSON.stringify(data)},{
                 emulateJSON:true
 
-            }).then((response) => {
+            })
+request.then((response) => {
                 // this.refreshFromResponse(response);
                 // this.updateAssignedApproverSelect();
             }, (error) => {
@@ -1656,9 +1663,10 @@ export default {
                 'activity_id' : activity_id,
                 'status': status
             }
-            await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/update_activity_status')),JSON.stringify(data),{
+            let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/update_activity_status')), {method:'POST', body:JSON.stringify(data)},{
                 emulateJSON:true,
-            }).then((response) => {
+            })
+request.then((response) => {
                 this.refreshFromResponse(response);
             }, (error) => {
                 this.revert();
@@ -1886,7 +1894,7 @@ export default {
                         "activity_id" : this.selectedActivity.licence_activity,
                         "text": text
                     }
-                    await this.$http.post(helpers.add_endpoint_json(
+                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(
                             api_endpoints.applications, (this.application.id+'/return_to_officer')
                         ), JSON.stringify(data)).then((response) => {
 

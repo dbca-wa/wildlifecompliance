@@ -361,7 +361,8 @@ export default {
         addOtherLayers(){
             var overlayMaps = {};
 
-            let request = fetch_util.fetchUrl('/api/map_layers/').then(response => {
+            let request = fetch_util.fetchUrl('/api/map_layers/')
+request.then(response => {
                 let layers = response.results;
                 for (var i = 0; i < layers.length; i++){
                     let l = L.tileLayer.wmts(
@@ -442,7 +443,8 @@ export default {
                         /* dynamically construct content of the popup */
                         myMarker.on('click', (ev)=>{
                             let popup = ev.target.getPopup();
-                            let request = fetch_util.fetchUrl('/api/call_email/' + call_email.id).then(response => {
+                            let request = fetch_util.fetchUrl('/api/call_email/' + call_email.id)
+request.then(response => {
                                 let call_email = response;
                                 popup.setContent(self.construct_content(call_email, coords));
                             });

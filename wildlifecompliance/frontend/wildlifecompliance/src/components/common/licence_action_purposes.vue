@@ -175,9 +175,16 @@ export default {
                 if (vm.action_licence.purpose_ids_list.length > 0){
                     data.purpose_ids_list = vm.action_licence.purpose_ids_list
                     data.selected_activity_id = vm.selectedActivityId;
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/cancel_purposes'),JSON.stringify(data),{
+                    let request = fetch_util.fetchUrl(
+                        helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/cancel_purposes'),
+                        {
+                            method:'POST', body:JSON.stringify(data)
+                        },{
                             emulateJSON:true,
-                        }).then((response)=>{
+                        }
+                    )
+                    
+                    request.then((response)=>{
                             swal.fire(
                                     'Cancel Purposes',
                                     'The selected licenced purposes have been Cancelled.',
@@ -203,9 +210,12 @@ export default {
                 if (vm.action_licence.purpose_ids_list.length > 0){
                     data.purpose_ids_list = vm.action_licence.purpose_ids_list
                     data.selected_activity_id = vm.selectedActivityId;
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/suspend_purposes'),JSON.stringify(data),{
+                    let request = fetch_util.fetchUrl(
+                        helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/suspend_purposes'),
+                        {method:'POST', body:JSON.stringify(data)},{
                             emulateJSON:true,
-                        }).then((response)=>{
+                        })
+                    request.then((response)=>{
                             swal.fire(
                                     'Suspend Purposes',
                                     'The selected licenced purposes have been Suspended.',
@@ -231,9 +241,10 @@ export default {
                 if (vm.action_licence.purpose_ids_list.length > 0){
                     data.purpose_ids_list = vm.action_licence.purpose_ids_list
                     data.selected_activity_id = vm.selectedActivityId;
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/surrender_purposes'),JSON.stringify(data),{
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/surrender_purposes'),{method:'POST', body:JSON.stringify(data)},{
                             emulateJSON:true,
-                        }).then((response)=>{
+                        })
+                    request.then((response)=>{
                             swal.fire(
                                     'Surrender Purposes',
                                     'The selected licenced purposes have been Surrendered.',
@@ -259,9 +270,10 @@ export default {
                 if (vm.action_licence.purpose_ids_list.length > 0){
                     data.purpose_ids_list = vm.action_licence.purpose_ids_list
                     data.selected_activity_id = vm.selectedActivityId;
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/reactivate_renew_purposes'),JSON.stringify(data),{
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/reactivate_renew_purposes'), {method:'POST', body:JSON.stringify(data)},{
                             emulateJSON:true,
-                        }).then((response)=>{
+                        })
+                    request.then((response)=>{
                             swal.fire(
                                     'Reactivate Renew Purposes',
                                     'Renew for the selected licenced purposes has been Reactivated.',
@@ -287,9 +299,10 @@ export default {
                 if (vm.action_licence.purpose_ids_list.length > 0){
                     data.purpose_ids_list = vm.action_licence.purpose_ids_list
                     data.selected_activity_id = vm.selectedActivityId;
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/reissue_purposes'),JSON.stringify(data),{
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/reissue_purposes'), {method:'POST', body:JSON.stringify(data)},{
                             emulateJSON:true,
-                        }).then((response)=>{
+                        })
+                    request.then((response)=>{
                             vm.actioningPurposes = false;
                             let p1 = this.licence_activity_purposes.filter(pur => {
                                 return pur.purpose.id===this.action_licence.purpose_ids_list[0];
@@ -313,9 +326,10 @@ export default {
                 if (vm.action_licence.purpose_ids_list.length > 0){
                     data.purpose_ids_list = vm.action_licence.purpose_ids_list
                     data.selected_activity_id = vm.selectedActivityId;
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/reinstate_purposes'),JSON.stringify(data),{
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/reinstate_purposes'), {method:'POST', body:JSON.stringify(data)},{
                             emulateJSON:true,
-                        }).then((response)=>{
+                        })
+                    request.then((response)=>{
                             swal.fire(
                                     'Reinstate Purposes',
                                     'The selected licenced purposes have been Reinstated.',

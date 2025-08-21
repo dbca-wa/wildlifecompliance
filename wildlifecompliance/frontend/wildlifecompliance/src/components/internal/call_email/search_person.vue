@@ -310,9 +310,10 @@ export default {
         updateContact: function() {
             let vm = this;
             vm.updatingContact = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.call_email.email_user.id+'/update_contact')),JSON.stringify(vm.call_email.email_user),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,(vm.call_email.email_user.id+'/update_contact')), {method:'POST', body:JSON.stringify(vm.call_email.email_user)},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 vm.updatingContact = false;
                 // vm.user = response;
                 if (vm.call_email.email_user.residential_address == null){ vm.call_email.email_user.residential_address = {}; }
@@ -337,9 +338,10 @@ export default {
         updateAddress: function() {
             let vm = this;
             vm.updatingAddress = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.call_email.email_user.id+'/update_address')),JSON.stringify(vm.call_email.email_user.residential_address),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,(vm.call_email.email_user.id+'/update_address')), {method:'POST', body:JSON.stringify(vm.call_email.email_user.residential_address)},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 vm.updatingAddress = false;
                 vm.call_email.email_user = response;
                 if (vm.call_email.email_user.residential_address == null){ vm.call_email.email_user.residential_address = {}; }

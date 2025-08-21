@@ -138,17 +138,18 @@ export default {
             let propose_decline = JSON.parse(JSON.stringify(vm.propose_decline));
             vm.decliningApplication = true;
             if (propose_decline.activity.length > 0){
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,this.application_id+'/proposed_decline'),JSON.stringify(propose_decline),{
-                        emulateJSON:true,
-                    }).then((response)=>{
-                        vm.$router.push({
-                            name:"internal-dash",
-                        });     
-                    },(error)=>{
-                        vm.errors = true;
-                        vm.decliningApplication = false;
-                        vm.errorString = helpers.apiVueResourceError(error);
-                    });
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,this.application_id+'/proposed_decline'),{method:'POST', body:JSON.stringify(propose_decline)},{
+                    emulateJSON:true,
+                })
+                request.then((response)=>{
+                    vm.$router.push({
+                        name:"internal-dash",
+                    });     
+                },(error)=>{
+                    vm.errors = true;
+                    vm.decliningApplication = false;
+                    vm.errorString = helpers.apiVueResourceError(error);
+                });
             } else {
                 vm.decliningApplication = false;
                 swal.fire(

@@ -433,9 +433,10 @@ export default {
         updateDetails: function() {
             let vm = this;
             vm.updatingDetails = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,(vm.org.id+'/update_details')),JSON.stringify(vm.org),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,(vm.org.id+'/update_details')), {method:'POST', body:JSON.stringify(vm.org)},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 vm.updatingDetails = false;
                 vm.org = response;
                 if (vm.org.address == null){ vm.org.address = {}; }
@@ -485,9 +486,10 @@ export default {
         updateAddress: function() {
             let vm = this;
             vm.updatingAddress = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,(vm.org.id+'/update_address')),JSON.stringify(vm.org.address),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,(vm.org.id+'/update_address')), {method:'POST', body:JSON.stringify(vm.org.address)},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 vm.updatingAddress = false;
                 vm.org = response;
                 swal.fire(
@@ -528,9 +530,10 @@ export default {
                         type: 'error'
                 });
             } else {
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,(vm.org.id+'/upload_id')),data,{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,(vm.org.id+'/upload_id')),{method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-                }).then((response) => {
+                })
+                request.then((response) => {
                     vm.uploadingID = false;
                     vm.uploadedID = null;
                     swal.fire({

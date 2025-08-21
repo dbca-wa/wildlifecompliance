@@ -306,10 +306,11 @@ export default {
 
             if (data.id === '') {
 
-                await self.$http.post(api_endpoints.schema_group, JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(api_endpoints.schema_group, {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
 
-                }).then((response) => {
+                })
+                request.then((response) => {
 
                     self.$refs.schema_group_table.vmDataTable.ajax.reload();
                     self.close();
@@ -324,10 +325,11 @@ export default {
 
             } else {
 
-                await self.$http.post(helpers.add_endpoint_json(api_endpoints.schema_group,data.id+'/save_group'),JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_group,data.id+'/save_group'), {method:'POST', body:JSON.stringify(data)},{
                         emulateJSON:true,
 
-                }).then((response)=>{
+                })
+                request.then((response)=>{
 
                     self.$refs.schema_group_table.vmDataTable.ajax.reload();
                     self.close();

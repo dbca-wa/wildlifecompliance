@@ -367,9 +367,10 @@ export default {
         updateContact: function() {
             let vm = this;
             vm.updatingContact = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/update_contact')),JSON.stringify(vm.user),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/update_contact')), {method:'POST', body:JSON.stringify(vm.user)},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 vm.updatingContact = false;
                 vm.user = response;
                 if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
@@ -394,9 +395,10 @@ export default {
         updateAddress: function() {
             let vm = this;
             vm.updatingAddress = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/update_address')),JSON.stringify(vm.user.residential_address),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/update_address')), {method:'POST', body:JSON.stringify(vm.user.residential_address)},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 vm.updatingAddress = false;
                 vm.user = response;
                 if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
@@ -429,9 +431,10 @@ export default {
                 confirmButtonText: 'Accept'
             }).then((result) => {
                 if (result) {
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'),JSON.stringify(vm.user),{
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'), {method:'POST', body:JSON.stringify(vm.user)},{
                         emulateJSON:true
-                    }).then((response) => {
+                    })
+                    request.then((response) => {
                         let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,vm.user.id)).then((response) => {
                             vm.user = response
                             if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
@@ -490,13 +493,12 @@ export default {
                         type: 'error'
                 });
             } else {
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/upload_id')),data,{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/upload_id')),{method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-                }).then((response) => {
+                })
+                request.then((response) => {
                     vm.uploadingID = false;
                     vm.uploadedID = null;
-                    //vm.uploadedID = response.identification;
-                    //vm.user.identification = response.identification;
                     vm.uploadedID = response.identification2;
                     vm.user.identification2 = response.identification2;
                 }, (error) => {

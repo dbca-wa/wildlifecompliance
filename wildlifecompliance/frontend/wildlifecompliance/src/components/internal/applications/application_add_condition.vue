@@ -275,9 +275,10 @@ export default {
             }
             if (vm.condition.id){
                 vm.updatingCondition = true;
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.application_conditions,condition.id+'/update_condition'),JSON.stringify(condition),{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.application_conditions,condition.id+'/update_condition'), {method:'POST', body:JSON.stringify(condition)},{
                         emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                         vm.updatingCondition = false;
                         vm.$parent.updatedConditions();
                         vm.close();
@@ -288,9 +289,10 @@ export default {
                     });
             } else {
                 vm.addingCondition = true;
-                vm.$http.post(api_endpoints.application_conditions,JSON.stringify(condition),{
+                let request = fetch_util.fetchUrl(api_endpoints.application_conditions,{method:'POST', body:JSON.stringify(condition)},{
                         emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                         vm.addingCondition = false;
                         vm.close();
                         vm.$parent.updatedConditions();

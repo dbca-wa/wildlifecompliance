@@ -159,10 +159,11 @@ export default {
         this.form=document.forms.internal_returns_form;
         var data = new FormData(this.form);
 
-        this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/officer_comments'),data,{
+        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/officer_comments'),{method:'POST', body:JSON.stringify(data)},{
                       emulateJSON:true,
 
-        }).then((response)=>{
+        })
+        request.then((response)=>{
             this.spinner = false;
             let species_id = this.returns.sheet_species;
             this.setReturns(response);
@@ -207,9 +208,10 @@ export default {
         });
         data.append('transfer', speciesJSON)
       }
-      await this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/save'),data,{
+        let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/save'),{method:'POST', body:data},{
             emulateJSON:true,
-        }).then((response)=>{
+        })
+        request.then((response)=>{
             let species_id = this.returns.sheet_species;
             this.setReturns(response);
             this.returns.sheet_species = species_id;
@@ -220,7 +222,7 @@ export default {
             this.disable_continue = false;
             this.spinner_exit = false;
             this.spinner_continue = false;
-            if (andContinue) { 
+        if (andContinue) { 
 
             swal.fire( 'Save', 
                     'Return Details Saved', 

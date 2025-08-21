@@ -229,7 +229,8 @@ export const applicationStore = {
             Vue.http.post('/api/application/estimate_price/', {
                     'application_id': getters.application_id,
                     'field_data': rootGetters.renderer_form_data,
-            }).then(res => {
+            })
+request.then(res => {
                 dispatch('setApplication', {
                     ...state.application,
                     application_fee: res.fees.application,
@@ -262,7 +263,8 @@ export const applicationStore = {
                         'application_id': getters.application_id,
                         'licence_activity_id': activity_data.licence_activity_id,
                         'licence_activity_workflow': activity_data.workflow,
-                }).then(res => {
+                })
+request.then(res => {
                     dispatch('setApplication', res);
                     dispatch('setApplication', {
                         ...state.application,

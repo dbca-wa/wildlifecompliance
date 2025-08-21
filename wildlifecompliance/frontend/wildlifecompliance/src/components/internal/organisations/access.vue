@@ -344,7 +344,7 @@ export default {
     assignToMe: function(){
         let vm = this;
         let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/assign_to_me')))
-        .then((response) => {
+        request.then((response) => {
             vm.access = response;
             vm.updateAssignedOfficerSelect();
         }).catch((error) => {
@@ -363,9 +363,10 @@ export default {
         unassign = vm.access.assigned_officer != null && vm.access.assigned_officer != 'undefined' ? false: true;
         data = {'officer_id': vm.access.assigned_officer};
         if (!unassign){
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/assign_officer')),JSON.stringify(data),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/assign_officer')), {method:'POST', body:JSON.stringify(data)},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 vm.access = response;
                 vm.updateAssignedOfficerSelect();
             }).catch((error) => {
@@ -379,7 +380,7 @@ export default {
         }
         else{
             let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/unassign_officer')))
-            .then((response) => {
+            request.then((response) => {
                 vm.access = response;
                 vm.updateAssignedOfficerSelect();
             }).catch((error) => {
@@ -408,7 +409,7 @@ export default {
         }).then((result) => {
             if (result) {
                 let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/accept')))
-                .then((response) => {
+                request.then((response) => {
                     swal.fire({
                         title: "Accept Organisation Request",
                         text: "The organisation access request has been accepted.",
@@ -442,7 +443,7 @@ export default {
         }).then((result) => {
             if (result) {
                 let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result)))
-                .then((response) => {
+                request.then((response) => {
                     swal.fire({
                         title: "Amendment Request",
                         text: "A new letter has been requested.",
@@ -474,7 +475,7 @@ export default {
         }).then((result) => {
             if (result) {
                 let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/decline')))
-                .then((response) => {
+                request.then((response) => {
                     swal.fire({
                         title: "Decline Organisation Request",
                         text: "The organisation access request has been declined.",

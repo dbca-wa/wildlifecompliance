@@ -618,10 +618,11 @@ export default {
                 this.setApplicationWorkflowState({bool: true});
                 await this.finalDecisionData({ url: `/api/application/${this.application.id}/final_decision_data.json` }).then( async response => {
 
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/final_decision'),JSON.stringify(licence),{
+                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/final_decision'), {method:'POST', body:JSON.stringify(licence)},{
                                 emulateJSON:true,
 
-                            }).then((response)=>{
+                            })
+                request.then((response)=>{
                                 this.spinner = false
                                 this.setApplicationWorkflowState({bool: false});
                                 vm.$router.push({ name:"internal-dash", });

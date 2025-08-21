@@ -351,9 +351,10 @@ export default {
             vm.propose_issue.activities = vm.applicationSelectedActivitiesForPurposes.filter( a => {return vm.checkedActivities.includes(a.id)});
             let propose_issue = JSON.parse(JSON.stringify(vm.propose_issue));
             vm.issuingLicence = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,vm.application_id+'/proposed_licence'),JSON.stringify(vm.propose_issue),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application_id+'/proposed_licence'), {method:'POST', body:JSON.stringify(vm.propose_issue)},{
                     emulateJSON:true,
-                }).then((response)=>{
+                })
+            request.then((response)=>{
 
                     vm.$router.push({name:"internal-dash",});     
 

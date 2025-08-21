@@ -277,7 +277,8 @@ export default {
       this.missing_fields.length = 0;
       this.highlight_missing_fields();
 
-      await this.saveFormData({ url: this.application_form_data_url, draft: true , submit: is_submitting}).then(res=>{
+      let request = await this.saveFormData({ url: this.application_form_data_url, draft: true , submit: is_submitting});
+      request.then(res=>{
         this.isProcessing = false;
         is_saved = true;
 
@@ -346,8 +347,8 @@ export default {
                 let is_saved = await this.save_form(is_submitting);
                 if (is_saved) {
                   this.isProcessing = true;
-                  vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/submit'),{}).then(res=>{
-
+                  let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/submit'),{})
+                  request.then(res=>{
                       this.setApplication(res);
                       this.isProcessing = false;
                       vm.$router.push({
@@ -404,8 +405,8 @@ export default {
                 vm.isProcessing = true;
                 if (this.adjusted_application_fee > 0 || this.application.licence_fee > 0) { //refund not required.
 
-                    vm.$http.post(helpers.add_endpoint_join(api_endpoints.applications,vm.application.id+'/application_fee_checkout/'), {})
-                    .then(res=>{
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,vm.application.id+'/application_fee_checkout/'), {})
+                    request.then(res=>{
                         window.location.href = res;
                     },err=>{
                         swal.fire(
@@ -460,9 +461,10 @@ export default {
               
               if (is_saved) {
                 this.isProcessing = true;
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/application_fee_reception'),{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/application_fee_reception'),{
                   emulateJSON:true
-                }).then(res=>{
+                })
+                request.then(res=>{
                   this.setApplication(res);
                   this.isProcessing = false;
                   vm.$router.push({

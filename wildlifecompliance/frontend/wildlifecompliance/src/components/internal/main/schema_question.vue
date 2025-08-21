@@ -536,10 +536,11 @@ export default {
 
             if (data.id === '') {
 
-                await self.$http.post(api_endpoints.schema_question, JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(api_endpoints.schema_question, {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
 
-                }).then((response) => {
+                })
+                request.then((response) => {
 
                     self.$refs.schema_question_table.vmDataTable.ajax.reload();
                     self.close();
@@ -555,10 +556,11 @@ export default {
 
             } else {
 
-                await self.$http.post(helpers.add_endpoint_json(api_endpoints.schema_question,data.id+'/save_question'),JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_question,data.id+'/save_question'), {method:'POST', body:JSON.stringify(data)},{
                         emulateJSON:true,
 
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
 
                         self.$refs.schema_question_table.vmDataTable.ajax.reload();
                         self.close();

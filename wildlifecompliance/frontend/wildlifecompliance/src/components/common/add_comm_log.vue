@@ -216,8 +216,8 @@ export default {
             vm.errors = false;
             let comms = new FormData(vm.form); 
             vm.addingComms = true;
-            vm.$http.post(vm.url,comms,{
-                }).then((response)=>{
+            let request = fetch_util.fetchUrl(vm.url,{method:'POST', body:JSON.stringify(comms)},{})
+            request.then((response)=>{
                     vm.addingComms = false;
                     vm.close();
                 },(error)=>{

@@ -144,9 +144,10 @@ export default {
       this.refresh_grid = false
       let _data = new FormData(this.form);
       _data.append('spreadsheet', this.spreadsheet)
-      await this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/upload_details'),_data,{
+      let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/upload_details'),{method:'POST', body:JSON.stringify(_data)},{
                     emulateJSON:true,
-        }).then((response)=>{
+        })
+      request.then((response)=>{
             if (this.replaceReturn === 'no') {
               let idx1 = this.returns.table[0]['data'].length
               for (let idx2=0; idx2 < response[0]['data'].length; idx2++) {

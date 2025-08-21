@@ -89,9 +89,10 @@ export default {
             let vm = this;
             vm.errors = false;
             let assessment = JSON.parse(JSON.stringify(vm.assessment));
-            vm.$http.post('/api/assessment.json',JSON.stringify(assessment),{
+            let request = fetch_util.fetchUrl('/api/assessment.json', {method:'POST', body:JSON.stringify(assessment)},{
                         emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                         //vm.$parent.loading.splice('processing contact',1);
                         swal.fire(
                              'Send to Assessor',

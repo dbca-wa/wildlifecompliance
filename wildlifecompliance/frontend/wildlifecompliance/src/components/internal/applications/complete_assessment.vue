@@ -545,9 +545,9 @@ export default {
         },
         save: function(props = { showNotification: true }) {
             const { showNotification } = props;
-            // this.saveFormData({ url: this.form_data_comments_url }).then(response => {
 
-                this.saveFormData({ url: this.form_data_application_url }).then(response => {   
+            let request = this.saveFormData({ url: this.form_data_application_url })
+            request.then(response => {   
                     showNotification && swal.fire(
                         'Saved',
                         'Your application has been saved',
@@ -622,9 +622,10 @@ export default {
                 "inspection_id": event.inspection,
             }
             this.setOriginalApplication(this.application);
-            this.$http.post(helpers.add_endpoint_json(
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(
                     api_endpoints.applications, (this.application.id+'/add_assessment_inspection')
-                ), JSON.stringify(data)).then((response) => {
+                ), {method:'POST', body:JSON.stringify(data)})
+            request.then((response) => {
                     this.setApplication(response);
                 }, (error) => {
                     this.revert();
@@ -642,9 +643,10 @@ export default {
                 "assessor_id": this.current_user.id
             }
             this.setOriginalApplication(this.application);
-            this.$http.post(helpers.add_endpoint_json(
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(
                     api_endpoints.applications, (this.application.id+'/assign_application_assessment')
-                ), JSON.stringify(data)).then((response) => {
+                ), JSON.stringify(data))
+            request.then((response) => {
                     this.setApplication(response);
                 }, (error) => {
                     this.revert();
@@ -661,9 +663,10 @@ export default {
                 "assessor_id": assessment.assigned_assessor==null ? assessment.assigned_assessor_id : assessment.assigned_assessor
             }
             this.setOriginalApplication(this.application);
-            this.$http.post(helpers.add_endpoint_json(
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(
                     api_endpoints.applications, (this.application.id+'/assign_application_assessment')
-                ), JSON.stringify(data)).then((response) => {
+                ), JSON.stringify(data))
+            request.then((response) => {
                     this.setApplication(response);
                 }, (error) => {
                     this.revert();
@@ -686,8 +689,9 @@ export default {
                 "final_comment" : this.final_comment,
             }
             this.setOriginalApplication(this.application);            
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/complete_application_assessments')
-                ), JSON.stringify(data)).then((response) => {
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/complete_application_assessments')
+                ), JSON.stringify(data))
+            request.then((response) => {
                     this.setApplication(response);
                     this.$router.push({name:"internal-dash"});               
             }, (error) => {
@@ -774,23 +778,6 @@ export default {
         openAssessmentModal: function() {
             this.isModalOpen = true;
         },
-    },
-    updated: function(){
-        // let vm = this;
-        // if (!vm.panelClickersInitialised){
-        //     $('.panelClicker[data-toggle="collapse"]').on('click', function () {
-        //         var chev = $(this).children()[0];
-        //         window.setTimeout(function () {
-        //             $(chev).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
-        //         },100);
-        //     }); 
-        //     vm.panelClickersInitialised = true;
-        // }
-        // this.$nextTick(() => {
-        //     vm.initialiseSelects();
-        //     vm.form = document.forms.new_application;
-        //     vm.eventListeners();
-        // });
     },
     beforeRouteEnter: function(to, from, next) {
         next(vm => {

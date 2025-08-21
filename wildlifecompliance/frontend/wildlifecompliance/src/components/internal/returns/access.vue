@@ -213,10 +213,11 @@ export default {
             const data = {
                 // none.
             }
-            this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,(this.returns.id+'/assign_to_me')),JSON.stringify(data),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,(this.returns.id+'/assign_to_me')), {method:'POST', body:JSON.stringify(data)},{
                 emulateJSON:true
 
-            }).then((response) => {
+            })
+            request.then((response) => {
                 this.refreshFromResponse(response);
                 this.updateAssignedOfficerSelect();
 
@@ -240,10 +241,11 @@ export default {
                 'officer_id': this.returns.assigned_to,
             };
             if (!unassign){
-                this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,(this.returns.id+'/assign_officer')),JSON.stringify(data),{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,(this.returns.id+'/assign_officer')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
 
-                }).then((response) => {
+                })
+                request.then((response) => {
                     this.refreshFromResponse(response);
                     this.updateAssignedOfficerSelect();
 
@@ -259,10 +261,11 @@ export default {
                 });
             }
             else{
-                this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,(this.returns.id+'/unassign_officer')),JSON.stringify(data),{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,(this.returns.id+'/unassign_officer')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
 
-                }).then((response) => {
+                })
+                request.then((response) => {
                     this.refreshFromResponse(response);
                     this.updateAssignedOfficerSelect();
     
@@ -283,10 +286,11 @@ export default {
             this.form=document.forms.internal_returns_form;
             var data = new FormData(this.form);
 
-            this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/officer_comments'),data,{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/officer_comments'),{method:'POST', body:JSON.stringify(data)},{
                         emulateJSON:true,
 
-            }).then((response)=>{
+            })
+            request.then((response)=>{
 
                 return true // continue.
             
@@ -307,10 +311,11 @@ export default {
             await this.save_wo();
             this.form=document.forms.internal_returns_form;
 
-            this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/accept'),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/accept'),{
                             emulateJSON:true,
 
-            }).then((response)=>{
+            })
+            request.then((response)=>{
 
                 // Return to dashboard.
                 this.$router.push({name:"internal-dash"});

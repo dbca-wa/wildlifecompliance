@@ -307,7 +307,8 @@ export default {
                 {method:"PUT",body:formData},
                 {
                     emulateJSON:true
-                }).then(res=>{
+                })
+                request.then(res=>{
                     resolve(res);
                 },err=>{
                     reject(err);
@@ -474,13 +475,13 @@ export default {
                 data.selected_assessment_tab=this.selected_activity_tab_id;
                 data.application_id=this.application.id;
                 
-                this.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(this.application.id+'/complete_assessment')),
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications, {method:'POST', body:JSON.stringify(this.application.id+'/complete_assessment')}),
                 {
                     "selected_assessment_tab": this.selected_activity_tab_id,
                     "application_id": this.application_id,
                     "assessment_id": this.viewingAssessmentId,
                 })
-                .then((response) => {
+                request.then((response) => {
                     // FIXME: $parent causing local flags to loose settings
                     // and therefore not closing. Should be ok as assessor
                     // does not update applications.
@@ -515,9 +516,10 @@ export default {
         },
         fetchAssessorGroup: function(){
             let data = {'application_id' : this.application.id };
-            this.$http.post(helpers.add_endpoint_json(api_endpoints.assessor_group,'user_list'),JSON.stringify(data),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessor_group,'user_list'), {method:'POST', body:JSON.stringify(data)},{
                 emulateJSON:true,
-            }).then((response) => {
+            })
+            request.then((response) => {
                 this.assessorGroup = response;
             },(error) => {
                 console.log(error);
@@ -606,7 +608,8 @@ export default {
                 e.preventDefault();
 
                 let assessment_id = $(e.target).data('assessmentid');
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.assessment,(assessment_id+'/remind_assessment'))).then((response)=>{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessment, {method:'POST', body:JSON.stringify(assessment_id+'/remind_assessment')}))
+                request.then((response)=>{
                     swal.fire(
                             'Sent',
                             'An email has been sent to assessor with the request to assess this Application',
@@ -627,7 +630,8 @@ export default {
                 e.preventDefault();
 
                 let assessment_id = $(e.target).data('assessmentid');
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.assessment,(assessment_id+'/resend_assessment'))).then((response)=>{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessment,{method:'POST', body:JSON.stringify(assessment_id+'/resend_assessment')}))
+                request.then((response)=>{
                     swal.fire(
                             'Sent',
                             'An email has been sent to assessor with the request to re-assess this Application',
@@ -652,8 +656,8 @@ export default {
                 e.preventDefault();
 
                 let assessment_id = $(e.target).data('assessmentid');
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.assessment,(assessment_id+'/recall_assessment'))).then((response)=>{
-                    //vm.$parent.loading.splice('processing contact',1);
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessment,(assessment_id+'/recall_assessment')))
+                request.then((response)=>{
                     swal.fire(
                             'Success',
                             'An assessment for this Application has been recalled',
