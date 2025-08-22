@@ -295,15 +295,9 @@ export const legalCaseStore = {
                 }
                 if (fullHttpResponse && savedLegalCase.ok) {
                     console.log(savedLegalCase)
-                    await dispatch("setLegalCase", savedLegalCase.body);
+                    await dispatch("setLegalCase", savedLegalCase);
                 }
-                /*
-                if (noRunningSheet && savedLegalCase.ok) {
-                    console.log(savedLegalCase)
-                    await dispatch("setLegalCaseNoRunningSheet", savedLegalCase.body);
-                }
-                */
-                legalCaseId = savedLegalCase.body.id;
+                legalCaseId = savedLegalCase.id;
 
                 delete state.legal_case.court_proceedings.date_entries_updated
                 delete state.legal_case.court_proceedings.journal_entries_transform

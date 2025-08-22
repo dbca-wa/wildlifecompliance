@@ -1,8 +1,6 @@
 <template>
     <div class="container" id="internalCallEmailDash">
         <FormSection :label="`Call/Emails`" :Index="`0`">
-                  
-              
         <div class="row">
             <div class="col-md-3">
                 <div class="form-group">
@@ -31,9 +29,6 @@
                     <label for="">Lodged From</label>
                     <div class="input-group date" ref="lodgementDateFromPicker">
                         <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedFrom">
-                        <!--<span class="input-group-addon">
-                            <span class="glyphicon glyphicon-calendar"></span>
-                        </span>-->
                     </div>
                 </div>
             </div>
@@ -42,9 +37,6 @@
                     <label for="">Lodged To</label>
                     <div class="input-group date" ref="lodgementDateToPicker">
                         <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedTo">
-                        <!--<span class="input-group-addon">
-                            <span class="glyphicon glyphicon-calendar"></span>
-                        </span>-->
                     </div>
                 </div>
             </div>
@@ -76,9 +68,8 @@
     import $ from 'jquery'
     import datatable from '@vue-utils/datatable.vue'
     import MapLocations from "./map_locations.vue";
-    import Vue from 'vue'
-    import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
-    import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
+    import { cache_helper, fetch_util } from "@/utils/hooks";
+    import { mapGetters, mapActions } from "vuex";
     import FormSection from "@/components/forms/section_toggle.vue";
     export default {
         name: 'CallEmailDashTable',
@@ -89,12 +80,10 @@
                     is_volunteer: false,
                 },
                 classification_types: [],
-                // classificationChoices: [],
                 report_types: [],
                 // Filters
                 filterStatus: 'All',
                 filterClassification: 'All',
-                // statusChoices: [],
                 status_choices: [],
                 filterLodgedFrom: '',
                 filterLodgedTo: '',
@@ -126,8 +115,6 @@
                     responsive: true,
                     processing: true,
                     ajax: {
-                        //"url": helpers.add_endpoint_json(api_endpoints.call_email, 'datatable_list'),
-                        //"url": helpers.add_endpoint_json(api_endpoints.call_email_paginated, 'get_paginated_datatable'),
                         "url": "/api/call_email_paginated/get_paginated_datatable/?format=datatables",
                         "dataSrc": 'data',
                         "data": function(d) {
@@ -260,7 +247,7 @@
                 let newCallId = null
                 let savedCallEmail = await this.saveCallEmail({ route: false, crud: 'create'});
                 if (savedCallEmail) {
-                    newCallId = savedCallEmail.body.id;
+                    newCallId = savedCallEmail.id;
                 }
 
                 await this.$router.push({

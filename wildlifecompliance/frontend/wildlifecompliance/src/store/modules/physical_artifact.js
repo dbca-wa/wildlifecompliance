@@ -164,8 +164,8 @@ export const physicalArtifactStore = {
                     console.log(payload);
                     savedPhysicalArtifact = await fetch_util.fetchUrl(fetchUrl, {method:"PUT",body:JSON.stringify(payload)});
                 }
-                await dispatch("setPhysicalArtifact", savedPhysicalArtifact.body);
-                physicalArtifactId = savedPhysicalArtifact.body.id;
+                await dispatch("setPhysicalArtifact", savedPhysicalArtifact);
+                physicalArtifactId = savedPhysicalArtifact.id;
 
             } catch (err) {
                 console.log(err);

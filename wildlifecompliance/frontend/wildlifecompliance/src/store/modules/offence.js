@@ -170,8 +170,6 @@ export const offenceStore = {
             try {
                 if (offence_id) {
                     const returnedOffence = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.offence, offence_id));
-                    console.log('*** returnedOffence.body ***')
-                    console.log('returnedOffence.body')
                     await dispatch("setOffence", returnedOffence);
                 } else {
                     dispatch("setOffenceEmpty");
@@ -214,7 +212,7 @@ export const offenceStore = {
                 const savedOffence = await fetch_util.fetchUrl(fetchUrl, {method:"PUT",body:JSON.stringify(payload)});
 
                 // Restore returned data into the stre
-                commit("updateOffence", savedOffence.body);
+                commit("updateOffence", savedOffence);
                 return savedOffence;
         },
         async createOffence({dispatch, state}){
@@ -247,7 +245,7 @@ export const offenceStore = {
             console.log(payload);
 
             const savedOffence = await fetch_util.fetchUrl(fetchUrl, {method:'POST', body:JSON.stringify(payload)});
-            await dispatch("setOffence", savedOffence.body);
+            await dispatch("setOffence", savedOffence);
             return savedOffence;
         },
         setOffence({ commit, }, offence) {

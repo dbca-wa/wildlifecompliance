@@ -309,7 +309,7 @@ export const callemailStore = {
             try{
                 let fetchUrl = helpers.add_endpoint_join(api_endpoints.call_email, state.call_email.id + "/call_email_save_person/");
                 const savedEmailUser = await fetch_util.fetchUrl(fetchUrl, {method:'POST', body:JSON.stringify(state.call_email)});
-                await dispatch("setEmailUser", savedEmailUser.body);
+                await dispatch("setEmailUser", savedEmailUser);
                 await swal.fire("Saved", "The record has been saved", "success");
             } catch (err) {
                 //console.log(err);
@@ -320,7 +320,6 @@ export const callemailStore = {
                 }
             }
         },
-        //async saveCallEmail({ dispatch, state, rootGetters}, { crud, internal, close }) {
         async saveCallEmail({ dispatch, state, rootGetters}, { crud, internal }) {
             let callId = null;
             let savedCallEmail = null;
@@ -374,7 +373,7 @@ export const callemailStore = {
 
                 if (crud === 'create') {
                     const createUrl = api_endpoints.call_email;
-                    savedCallEmail = await fetch_util.fetchUrl(createUrl, {});
+                    savedCallEmail = await fetch_util.fetchUrl(createUrl, {method:'POST'});
                 } else if (crud === 'duplicate') {
                     const createUrl = api_endpoints.call_email;
                     savedCallEmail = await fetch_util.fetchUrl(createUrl, {method:'POST', body:JSON.stringify(payload)});
@@ -408,21 +407,17 @@ export const callemailStore = {
                     }
                 }
 
-                await dispatch("setCallEmail", savedCallEmail.body);
-                callId = savedCallEmail.body.id;
+                await dispatch("setCallEmail", savedCallEmail);
+                callId = savedCallEmail.id;
 
             } catch (err) {
-                //console.log(err);
                 if (internal) {
-                    // return "There was an error saving the record";
                     return err;
                 } else {
                     await swal.fire("Error", "There was an error saving the record", "error");
                 }
-                //return window.location.href = "/internal/call_email/";
             }
             if (crud === 'duplicate') {
-                console.log("hello???")
                 return window.location.href = "/internal/call_email/" + callId;
             }
             else if (crud !== 'create') {

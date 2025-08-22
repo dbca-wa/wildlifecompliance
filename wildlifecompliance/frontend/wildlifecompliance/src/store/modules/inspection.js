@@ -199,8 +199,8 @@ export const inspectionStore = {
                         )
                     savedInspection = await fetch_util.fetchUrl(fetchUrl,{method:'PUT', body:JSON.stringify(payload)});
                 }
-                await dispatch("setInspection", savedInspection.body);
-                inspectionId = savedInspection.body.id;
+                await dispatch("setInspection", savedInspection);
+                inspectionId = savedInspection;
 
             } catch (err) {
                 error = true;

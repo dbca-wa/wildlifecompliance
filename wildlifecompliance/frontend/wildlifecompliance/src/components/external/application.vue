@@ -405,7 +405,7 @@ export default {
                 vm.isProcessing = true;
                 if (this.adjusted_application_fee > 0 || this.application.licence_fee > 0) { //refund not required.
 
-                    let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,vm.application.id+'/application_fee_checkout/'), {})
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,vm.application.id+'/application_fee_checkout/'), {method:'POST'})
                     request.then(res=>{
                         window.location.href = res;
                     },err=>{

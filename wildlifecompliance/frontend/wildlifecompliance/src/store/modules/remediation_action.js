@@ -69,7 +69,7 @@ export const remediationActionStore = {
             Object.assign(payload, state.remediation_action);
 
             let ret = await fetch_util.fetchUrl(submitUrl, {method:'POST', body:JSON.stringify(payload)});
-            return ret.body;
+            return ret;
         },
         setRemediationAction({ commit, }, remediation_action) {
             commit("updateRemediationAction", remediation_action);

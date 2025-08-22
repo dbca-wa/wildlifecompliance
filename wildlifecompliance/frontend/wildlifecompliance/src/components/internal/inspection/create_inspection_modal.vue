@@ -341,7 +341,7 @@ export default {
         if (!this.inspection.id) {
             // create inspection and update vuex
             let returned_inspection = await this.saveInspection({ create: true, internal: true })
-            await this.loadInspection({inspection_id: returned_inspection.body.id});
+            await this.loadInspection({inspection_id: returned_inspection.id});
         }
         // populate filefield document_action_url
         this.$refs.comms_log_file.document_action_url = this.inspection.createInspectionProcessCommsLogsDocumentUrl;

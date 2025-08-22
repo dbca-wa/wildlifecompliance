@@ -134,8 +134,8 @@ export const documentArtifactStore = {
                     //console.log(payload);
                     savedDocumentArtifact = await fetch_util.fetchUrl(fetchUrl, {method:"PUT",body:JSON.stringify(payload)});
                 }
-                await dispatch("setDocumentArtifact", savedDocumentArtifact.body);
-                documentArtifactId = savedDocumentArtifact.body.id;
+                await dispatch("setDocumentArtifact", savedDocumentArtifact);
+                documentArtifactId = savedDocumentArtifact.id;
 
             } catch (err) {
                 console.log(err);

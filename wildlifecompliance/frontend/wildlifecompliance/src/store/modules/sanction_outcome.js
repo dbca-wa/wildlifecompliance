@@ -76,7 +76,7 @@ export const sanctionOutcomeStore = {
                 );
             console.log(returned);
 
-            await dispatch("setRemediationAction", returned.body);
+            await dispatch("setRemediationAction", returned);
         },
         async loadSanctionOutcome({ dispatch, }, { sanction_outcome_id }) {
             try {
@@ -87,7 +87,7 @@ export const sanctionOutcomeStore = {
                     );
                 console.log(returnedSanctionOutcome);
 
-                await dispatch("setSanctionOutcome", returnedSanctionOutcome.body);
+                await dispatch("setSanctionOutcome", returnedSanctionOutcome);
             } catch (err) {
                 console.log(err);
             }
@@ -122,7 +122,7 @@ export const sanctionOutcomeStore = {
             let savedSanctionOutcome = await fetch_util.fetchUrl(putUrl, {method:"PUT",body:JSON.stringify(payload)});
 
             // Update sanction outcome in the vuex store
-            await dispatch("setSanctionOutcome", savedSanctionOutcome.body);
+            await dispatch("setSanctionOutcome", savedSanctionOutcome);
 
             // Return the saved data just in case needed
             return savedSanctionOutcome;

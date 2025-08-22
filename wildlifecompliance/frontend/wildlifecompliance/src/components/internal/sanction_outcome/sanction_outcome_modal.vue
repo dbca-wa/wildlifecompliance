@@ -960,7 +960,7 @@ export default {
         createDocumentActionUrl: async function() {
             // create sanction outcome and get id
             let returned_sanction_outcome = await fetch_util.fetchUrl(api_endpoints.sanction_outcome);
-            this.sanction_outcome.id = returned_sanction_outcome.body.id;
+            this.sanction_outcome.id = returned_sanction_outcome.id;
 
             return helpers.add_endpoint_join(
                 api_endpoints.sanction_outcome,
