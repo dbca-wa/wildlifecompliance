@@ -1,6 +1,6 @@
 <template lang="html">
     <div class="row">
-        <template v-if="isApplicationLoaded && initialiseAssessmentOptions()">
+        <div v-if="isApplicationLoaded && initialiseAssessmentOptions()">
 
             <modal
                 transition="modal fade"
@@ -94,7 +94,7 @@
                     </div>
                 </div>
             </div>
-        </template>
+        </div>
         <SendToAssessor ref="send_to_assessor" @refreshFromResponse="refreshFromResponse"></SendToAssessor>
     </div>
 </template>
@@ -181,8 +181,8 @@ export default {
         },
         relevantAssessorGroup: function() {
             let relevantAssessors = [];
-            array.forEach(assessor => {
-                relevantAssessors.add(isAssessorRelevant(assessor));
+            this.assessorGroup.forEach(assessor => {
+                relevantAssessors.push(this.isAssessorRelevant(assessor));
             });
             return relevantAssessors;
         },

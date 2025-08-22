@@ -62,7 +62,6 @@ import { v4 as uuid } from 'uuid';
 export default {
     name: 'FormSection',
     props: {
-        // eslint-disable-next-line vue/require-default-prop, vue/require-prop-types
         label: {},
         subtitle: {
             type: String,
@@ -72,9 +71,7 @@ export default {
             type: String,
             default: 'text-muted',
         },
-        // eslint-disable-next-line vue/require-default-prop, vue/require-prop-types
         index: {},
-        // eslint-disable-next-line vue/require-default-prop, vue/require-prop-types
         hideHeader: {},
         customColor: {
             type: String,
@@ -88,7 +85,6 @@ export default {
             type: Boolean,
             required: false,
         },
-        // eslint-disable-next-line vue/prop-name-casing
         has_comment_value: {
             type: Boolean,
             required: false,
@@ -120,7 +116,6 @@ export default {
         },
     },
     mounted: function () {
-        // eslint-disable-next-line no-undef
         chevron_toggle.init();
     },
     methods: {

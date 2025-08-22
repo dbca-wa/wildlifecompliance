@@ -1,5 +1,5 @@
 <template id="application_conditions">
-    <div :class="isLicensingOfficer ? 'col-md-12 conditions-table' : 'col-md-12'" > 
+    <!--<div :class="isLicensingOfficer ? 'col-md-12 conditions-table' : 'col-md-12'" > 
         <div class="row">
             <FormSection
                 :form-collapse="false"
@@ -17,7 +17,7 @@
         </div>
         <ConditionDetail ref="condition_detail" :application_id="application.id" :conditions="conditions" :licence_activity_tab="selected_activity_tab_id"
         :condition="viewedCondition" :purposes="purposes"/>
-    </div>       
+    </div>-->       
 </template>
 <script>
 import {
@@ -34,7 +34,7 @@ export default {
     name: 'InternalApplicationConditions',
     props: {
         activity: {
-            type: Object | null,
+            type: Object,
             required: true
         }
     },
@@ -321,7 +321,7 @@ export default {
             })
         },
         updatedConditions(){
-            if (this.$refs.conditions_datatable.vmDataTable){
+            if (this.$refs.conditions_datatable !== undefined && this.$refs.conditions_datatable.vmDataTable){
                 this.$refs.conditions_datatable.vmDataTable.ajax.reload();            
             }
             // this.$refs.conditions_datatable.vmDataTable.ajax.reload();

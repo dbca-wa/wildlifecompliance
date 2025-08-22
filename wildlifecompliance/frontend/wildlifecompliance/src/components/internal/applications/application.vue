@@ -2068,7 +2068,6 @@ request.then((response) => {
             vm.initialiseOrgContactTable();
             vm.initialiseSelects();
             vm.form = document.forms.new_application;
-            // vm.eventListeners();
         });
     },
     mounted: function() {
