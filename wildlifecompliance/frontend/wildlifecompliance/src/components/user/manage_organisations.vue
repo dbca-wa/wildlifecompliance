@@ -92,7 +92,7 @@
                                     <label class="col-sm-12" style="text-align:left;">
                                       Please upload a letter with an organisation letterhead stating that you are a consultant for the organisation.
                                         <span class="btn btn-info btn-file">
-                                            Atttach File <input type="file" ref="uploadedFile" @change="readFile()"/>
+                                            Attach File <input type="file" ref="uploadedFile" @change="readFile()"/>
                                         </span>
                                         <span  style="margin-left:10px;margin-top:10px;">{{uploadedFileName}}</span>
                                     </label>

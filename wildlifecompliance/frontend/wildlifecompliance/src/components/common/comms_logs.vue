@@ -144,10 +144,6 @@ export default {
                         },
                     },
                     {
-                        title: 'Type',
-                        data: 'type',
-                    },
-                    {
                         title: 'To',
                         data: 'to',
                         render: function (value) {
