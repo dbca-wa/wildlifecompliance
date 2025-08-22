@@ -358,6 +358,7 @@ export default {
             if(this.selected_activity_tab_id && !force) {
 
                 let tabs = $('#tabs-main li')
+                let tab;
                 for (let i=0; i < tabs.length; i++){
 
                     if (tabs[i].innerText===this.selected_activity_tab_name){
