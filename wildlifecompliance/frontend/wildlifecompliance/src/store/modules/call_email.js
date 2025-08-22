@@ -221,13 +221,13 @@ export const callemailStore = {
                     country: 'AU'
                 }
             };
-            state.call_email = email_user = email_user_empty;
+            state.call_email.email_user = email_user_empty;
         },
         updateResidentialAddress(state, address){
-            state.call_email.email_user = residential_address = address;
+            state.call_email.email_user.residential_address = address;
         },
         updateLocation(state, location) {
-            state.call_email = location = location;
+            state.call_email.location = location;
         },
         updateLocationPoint(state, point) {
             state.call_email.location.geometry.coordinates = point;
@@ -246,8 +246,8 @@ export const callemailStore = {
             state.call_email.location.properties.details = "";
         },
         updateAllocatedGroupList(state, members) {
-            state.call_email = allocated_group = {};
-            state.call_email = allocated_group = members;
+            state.call_email.allocated_group = {};
+            state.call_email.allocated_group = members;
         },
         updateAllocatedGroupId(state, id) {
             state.call_email.allocated_group_id = id;
@@ -256,23 +256,23 @@ export const callemailStore = {
             state.call_email.region_id = id;
         },
         updateOccurrenceTimeStart(state, time) {
-            state.call_email = occurrence_time_start = time;
+            state.call_email.occurrence_time_start = time;
         },
         updateOccurrenceTimeEnd(state, time) {
-            state.call_email = occurrence_time_end = time;
+            state.call_email.occurrence_time_end = time;
         },
         updateTimeOfCall(state, time) {
-            state.call_email = time_of_call = time;
+            state.call_email.time_of_call = time;
         },
         updateDateOfCall(state, date) {
-            state.call_email = date_of_call = date;
+            state.call_email.date_of_call = date;
         },
         updateRelatedItems(state, related_items) {
-            state.call_email = related_items = related_items;
+            state.call_email.related_items = related_items;
         },
         updateCaller(state, data) {
             if (data.data_type === 'individual') {
-                state.call_email = email_user_id = data.id;
+                state.call_email.email_user_id = data.id;
             }
         },
     },
