@@ -1,11 +1,9 @@
 <template lang="html">
     <div class="container">
       <div class="row">
-        <div class="col-md-3">
-          <h3>Inspection: {{ inspection.number }}</h3>
-        </div>
 
-      </div>
+          <h3>Inspection: {{ inspection.number }}</h3>
+
           <div class="col-md-3">
             <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
 
@@ -103,7 +101,8 @@
 
           </div>
 
-          <div class="col-md-9" id="main-column">
+          <div class="col-md-1"></div>
+          <div class="col-md-8"> 
             <div class="row">
 
                 <div class="container-fluid">
@@ -389,7 +388,7 @@
 
             </div>
           </div>
-
+        </div>
         <div v-if="inspection.can_user_action" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
             <div class="navbar-inner">
                 <div class="container">

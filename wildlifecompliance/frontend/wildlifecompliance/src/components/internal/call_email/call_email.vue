@@ -1,13 +1,15 @@
 <template lang="html">
     <div class="container">
       <div class="row">
-        <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-3">
           <h3>Call/Email: {{ call_email.number }}</h3>
-        </div>
-        <div class="col-md-3 pull-right">
+          </div>
+          <div class="col-md-3">
           <input  v-if="call_email.user_is_volunteer" type="button" @click.prevent="duplicate" class="pull-right btn btn-primary" value="Create Duplicate Call/Email"/>  
+          </div>
         </div>
-      </div>
+      
           <div class="col-md-3">
             <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
             <div class="row">
@@ -139,10 +141,9 @@
 
           </div>
 
-          <div class="col-md-9" id="main-column">  
-            <div class="row">
-
-                <div class="container-fluid">
+          <div class="col-md-1"></div>
+          <div class="col-md-8"> 
+              <div class="row">
                     <ul id="pills-tab" class="nav nav-pills mb-3" role="tablist">
                         <li class="nav-item">
                           <a 
@@ -517,11 +518,9 @@
                             </FormSection>
                         </div>
                     </div>
-                </div>       
-
-
-            </div>          
+              </div>                
           </div>
+        </div>
 
         <div v-if="call_email.can_user_action" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
                         <div class="navbar-inner">

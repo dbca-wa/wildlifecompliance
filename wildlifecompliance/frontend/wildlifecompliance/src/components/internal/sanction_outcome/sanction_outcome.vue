@@ -1,11 +1,7 @@
 <template lang="html">
     <div class="container">
         <div class="row">
-            <div class="col-md-3">
-                <h3>Sanction Outcome: {{ displayLodgementNumber }}</h3>
-            </div>
-        </div>
-        <div>
+            <h3>Sanction Outcome: {{ displayLodgementNumber }}</h3>
             <div class="col-md-3">
                 <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
                 <div class="row">
@@ -139,7 +135,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-9" id="main-column">
+            <div class="col-md-1"></div>
+            <div class="col-md-8">
                 <div class="row">
                     <div class="container-fluid">
                         <ul id="pills-tab" class="nav nav-pills mb-3" role="tablist">

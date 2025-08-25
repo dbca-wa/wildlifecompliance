@@ -1,15 +1,12 @@
 <template lang="html">
     <div class="container">
         <div class="row">
-            <div class="col-md-5">
-                <h3>Remediation Action: {{ remediation_action.remediation_action_id }}</h3>
-            </div>
-        </div>
-        <div>
+            <h3>Remediation Action: {{ remediation_action.remediation_action_id }}</h3>
             <div class="col-md-3">
             </div>
 
-            <div class="col-md-9" id="main-column">
+            <div class="col-md-1"></div>
+            <div class="col-md-8"> 
                 <div class="row">
                     <div class="container-fluid">
                         <ul id="pills-tab" class="nav nav-pills mb-3" role="tablist">

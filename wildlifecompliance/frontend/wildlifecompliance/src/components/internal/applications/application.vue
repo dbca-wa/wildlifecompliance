@@ -572,8 +572,8 @@
     </div>
     <!-- End of Final Decision Display -->
 
-    </div>
-    </div>   
+            </div>
+        </div>   
     </div>
     <ProposedDecline ref="proposed_decline" @refreshFromResponse="refreshFromResponse"></ProposedDecline>
     <AmendmentRequest ref="amendment_request" @refreshFromResponse="refreshFromResponse"></AmendmentRequest>
