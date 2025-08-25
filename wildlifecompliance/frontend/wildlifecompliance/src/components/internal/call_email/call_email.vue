@@ -143,12 +143,34 @@
             <div class="row">
 
                 <div class="container-fluid">
-                    <ul class="nav nav-pills aho2">
-                        <li class="nav-item active"><a data-toggle="tab" :href="'#'+cTab">Call/Email</a></li>
-                        <li class="nav-item"><a data-toggle="tab" :href="'#'+rTab">Related Items</a></li>
+                    <ul id="pills-tab" class="nav nav-pills mb-3" role="tablist">
+                        <li class="nav-item">
+                          <a 
+                            class="nav-link active"
+                            data-bs-toggle="pill"
+                            :href="'#'+cTab"
+                            role="tab"
+                          >
+                            Call/Email
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a 
+                            class="nav-link"
+                            data-bs-toggle="pill"
+                            :href="'#'+rTab"
+                            role="tab"
+                          >
+                            Related Items
+                          </a>
+                        </li>
                     </ul>
-                    <div class="tab-content">
-                        <div :id="cTab" class="tab-pane fade in active">
+                    <div id="pills-tabContent" class="tab-content">
+                        <div 
+                          :id="cTab" 
+                          class="tab-pane fade in active show"
+                          role="tabpanel"
+                        >
 
                           <FormSection :formCollapse="false" label="Caller" Index="0">
                             
@@ -481,7 +503,11 @@
                           </FormSection>
 
                         </div>  
-                        <div :id="rTab" class="tab-pane fade in">
+                        <div 
+                          :id="rTab" 
+                          class="tab-pane fade in"
+                          role="tabpanel"
+                          >
                             <FormSection :formCollapse="false" label="Related Items">
                                 <div class="col-sm-12 form-group"><div class="row">
                                     <div class="col-sm-12" v-if="relatedItemsVisibility">

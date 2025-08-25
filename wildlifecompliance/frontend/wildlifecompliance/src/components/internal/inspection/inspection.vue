@@ -107,15 +107,52 @@
             <div class="row">
 
                 <div class="container-fluid">
-                    <ul class="nav nav-pills aho2">
-                        <li class="nav-item active"><a data-toggle="tab" :href="'#'+iTab">Inspection</a></li>
-                        <li class="nav-item"><a data-toggle="tab" :href="'#'+lTab" @click="mapTabClicked">Location</a></li>
-                        <li class="nav-item"><a data-toggle="tab" :href="'#'+cTab">Checklist</a></li>
-                        <li class="nav-item"><a data-toggle="tab" :href="'#'+oTab">Outcomes</a></li>
-                        <li class="nav-item"><a data-toggle="tab" :href="'#'+rTab">Related Items</a></li>
+                    <ul id="pills-tab" class="nav nav-pills mb-3" role="tablist">
+                        <li class="nav-item">
+                          <a class="nav-link active"
+                            data-bs-toggle="pill"
+                            role="tab"
+                            :href="'#'+iTab">
+                            Inspection
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link"
+                            data-bs-toggle="pill"
+                            role="tab"
+                            :href="'#'+lTab" 
+                            @click="mapTabClicked">
+                            Location
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link"
+                            data-bs-toggle="pill"
+                            role="tab" :href="'#'+cTab">
+                            Checklist
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link"
+                            data-bs-toggle="pill"
+                            role="tab" :href="'#'+oTab">
+                            Outcomes
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link"
+                            data-bs-toggle="pill"
+                            role="tab" :href="'#'+rTab">
+                            Related Items
+                          </a>
+                        </li>
                     </ul>
-                    <div class="tab-content">
-                        <div :id="iTab" class="tab-pane fade in active">
+                    <div id="pills-tabContent" class="tab-content">
+                        <div 
+                          :id="iTab" 
+                          class="tab-pane fade in active show"
+                          role="tabpanel"
+                        >
 
                           <FormSection :formCollapse="false" label="Inspection Details" Index="0">
 
@@ -247,7 +284,10 @@
 
                         </div>
 
-                        <div :id="lTab" class="tab-pane fade in">
+                        <div :id="lTab" 
+                          class="tab-pane fade in"
+                          role="tabpanel"
+                        >
                             <FormSection :formCollapse="false" label="Location">
                                     <MapLocation 
                                         v-if="inspection.location" 
@@ -290,7 +330,10 @@
                             </FormSection>
                         </div>
 
-                        <div :id="cTab" class="tab-pane fade in">
+                        <div :id="cTab" 
+                          class="tab-pane fade in"
+                          role="tabpanel"
+                        >
                             <FormSection :formCollapse="false" label="Checklist">
                                 <div class="col-sm-12 form-group">
                                   <div v-if="rendererVisibility" class="row">
@@ -305,7 +348,10 @@
                               </div>
                             </FormSection>
                         </div>
-                        <div :id="oTab" class="tab-pane fade in">
+                        <div :id="oTab" 
+                          class="tab-pane fade in"
+                          role="tabpanel"
+                        >
                             <FormSection :formCollapse="false" label="Inspection report">
                                 <div class="form-group">
                                     <div class="row">
@@ -325,7 +371,10 @@
                                 </div>
                             </FormSection>
                         </div>
-                        <div :id="rTab" class="tab-pane fade in">
+                        <div :id="rTab" 
+                          class="tab-pane fade in"
+                          role="tabpanel"
+                        >
                             <FormSection :formCollapse="false" label="Related Items">
                                 <div class="col-sm-12 form-group"><div class="row">
                                     <div class="col-sm-12" v-if="relatedItemsVisibility">

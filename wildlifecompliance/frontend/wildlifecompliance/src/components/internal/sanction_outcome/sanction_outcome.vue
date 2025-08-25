@@ -142,14 +142,26 @@
             <div class="col-md-9" id="main-column">
                 <div class="row">
                     <div class="container-fluid">
-                        <ul class="nav nav-pills aho2">
-                            <li class="nav-item active"><a data-toggle="tab" :href="'#'+soTab">{{ typeDisplay }}</a></li>
-                            <li class="nav-item" v-show="displayRemediationActions"><a data-toggle="tab" :href="'#'+raTab">Remediation Actions</a></li>
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+deTab">Details</a></li>
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+reTab">Related Items</a></li>
+                        <ul id="pills-tab" class="nav nav-pills mb-3" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+soTab">{{ typeDisplay }}</a></li>
+                            <li class="nav-item" v-show="displayRemediationActions">
+                                <a class="nav-link"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+raTab">Remediation Actions</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+deTab">Details</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+reTab">Related Items</a></li>
                         </ul>
-                        <div class="tab-content">
-                            <div :id="soTab" class="tab-pane fade in active">
+                        <div id="pills-tabContent" class="tab-content">
+                            <div :id="soTab" class="tab-pane fade in active show" role="tabpanel">
                                 <FormSection :formCollapse="false" :label="typeDisplay" Index="1">
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
@@ -258,7 +270,7 @@
                                 </FormSection>
                             </div>
 
-                            <div :id="raTab" class="tab-pane fade in">
+                            <div :id="raTab" class="tab-pane fade in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Remediation Actions" Index="2">
                                     <div class="col-sm-12 form-group">
                                         <div class="row col-sm-12">
@@ -273,7 +285,7 @@
                                 </FormSection>
                             </div>
 
-                            <div :id="deTab" class="tab-pane fade in">
+                            <div :id="deTab" class="tab-pane fade in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Details" Index="3">
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
@@ -387,7 +399,7 @@
                                 </FormSection>
                             </div>
 
-                            <div :id="reTab" class="tab-pane fade in">
+                            <div :id="reTab" class="tab-pane fade in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Related Items" Index="6">
                                     <div class="col-sm-12 form-group"><div class="row">
                                         <div class="col-sm-12">

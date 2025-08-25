@@ -12,12 +12,32 @@
             <div class="col-md-9" id="main-column">
                 <div class="row">
                     <div class="container-fluid">
-                        <ul class="nav nav-pills aho2">
-                            <li class="nav-item active"><a data-toggle="tab" :href="'#'+reTab">Remediation Action</a></li>
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+coTab">Confirmation</a></li>
+                        <ul id="pills-tab" class="nav nav-pills mb-3" role="tablist">
+                            <li class="nav-item">
+                                <a 
+                                    class="nav-link active"
+                                    data-bs-toggle="pill"
+                                    role="tab"
+                                    :href="'#'+reTab">
+                                    Remediation Action
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a 
+                                    class="nav-link"
+                                    data-bs-toggle="pill"
+                                    role="tab"
+                                    :href="'#'+coTab">
+                                    Confirmation
+                                </a>
+                            </li>
                         </ul>
-                        <div class="tab-content">
-                            <div :id="reTab" class="tab-pane fade in active">
+                        <div id="pills-tabContent" class="tab-content">
+                            <div 
+                                :id="reTab" 
+                                class="tab-pane fade in active show"
+                                role="tabpanel"
+                            >
                                 <FormSection :formCollapse="false" label="Remediation Action" Index="1">
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-4">
@@ -60,7 +80,11 @@
                                 </FormSection>
                             </div>
 
-                            <div :id="coTab" class="tab-pane fade in">
+                            <div 
+                                :id="coTab" 
+                                class="tab-pane fade in"
+                                role="tabpanel"
+                            >
                                 <FormSection :formCollapse="false" label="Confirmation" Index="2">
 
                                 </FormSection>

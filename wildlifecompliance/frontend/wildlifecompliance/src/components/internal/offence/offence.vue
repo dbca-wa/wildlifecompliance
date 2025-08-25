@@ -59,16 +59,45 @@
             <div class="col-md-9" id="main-column">
                 <div class="row">
                     <div class="container-fluid">
-                        <ul class="nav nav-pills aho2">
-                            <li class="nav-item active"><a data-toggle="tab" :href="'#'+offenceTab">Offence</a></li>
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+detailsTab">Details</a></li>
-                            <!-- li class="nav-item"><a data-toggle="tab" :href="'#'+documentTab">Document</a></li-->
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+offenderTab">Offender(s)</a></li>
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+locationTab" @click="mapOffenceClicked">Location</a></li>
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+relatedItemsTab">Related Items</a></li>
+                        <ul id="pills-tab" class="nav nav-pills mb-3" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+offenceTab">
+                                    Offence
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+detailsTab">
+                                    Details
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+offenderTab">
+                                    Offender(s)
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+locationTab" @click="mapOffenceClicked">
+                                    Location
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+relatedItemsTab">
+                                    Related Items
+                                </a>
+                            </li>
                         </ul>
-                        <div class="tab-content">
-                            <div :id="offenceTab" class="tab-pane fade in active">
+                        <div id="pills-tabContent" class="tab-content">
+                            <div :id="offenceTab" class="tab-pane fade in active show" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Offence" Index="0">
 
                                     <div class="col-sm-12 form-group"><div class="row">
@@ -95,18 +124,12 @@
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="occurrenceDateFromPicker">
                                                 <input :readonly="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" :value="date_from" />
-                                                <!--<span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>-->
                                             </div>
                                         </div>
                                         <div v-show="offence.occurrence_from_to">
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="occurrenceDateToPicker">
                                                     <input :readonly="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" :value="date_to" />
-                                                    <!--<span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>-->
                                                 </div>
                                             </div>
                                         </div>
@@ -117,18 +140,12 @@
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="occurrenceTimeFromPicker">
                                                 <input :readonly="readonlyForm" type="time" class="form-control" placeholder="HH:MM" :value="time_from" />
-                                                <!--<span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>-->
                                             </div>
                                         </div>
                                         <div v-show="offence.occurrence_from_to">
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="occurrenceTimeToPicker">
                                                     <input :readonly="readonlyForm" type="time" class="form-control" placeholder="HH:MM" :value="time_to" />
-                                                    <!--<span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>-->
                                                 </div>
                                             </div>
                                         </div>
@@ -153,12 +170,12 @@
                                     </div></div>
                                 </FormSection>
                             </div>
-                            <div :id="detailsTab" class="tab-pane face in">
+                            <div :id="detailsTab" class="tab-pane fade in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Details" Index="1">
                                     <textarea :readonly="readonlyForm" class="form-control" placeholder="add details" v-model="offence.details" />
                                 </FormSection>
                             </div>
-                            <div :id="documentTab" class="tab-pane face in">
+                            <div :id="documentTab" class="tab-pane fade in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Document" Index="1.5">
                                     <div class="form-group">
                                         <div class="row">
@@ -180,7 +197,7 @@
                                     </div>
                                 </FormSection>
                             </div>
-                            <div :id="offenderTab" class="tab-pane face in">
+                            <div :id="offenderTab" class="tab-pane fdce in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Offender(s)" Index="2">
                                     <!--div class="col-sm-12 form-group"><div class="row">
                                         <input :disabled="readonlyForm" class="col-sm-1" id="offender_individual" type="radio" v-model="offender_search_type" value="individual">
@@ -215,7 +232,7 @@
 
                                 </FormSection>
                             </div>
-                            <div :id="locationTab" class="tab-pane face in">
+                            <div :id="locationTab" class="tab-pane fade in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Location" Index="3">
                                     <MapLocation
                                         v-if="offence.location"
@@ -257,7 +274,7 @@
                                     </div>
                                 </FormSection>
                             </div>
-                            <div :id="relatedItemsTab" class="tab-pane face in">
+                            <div :id="relatedItemsTab" class="tab-pane fade in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Related Items" Index="4">
                                     <div class="col-sm-12 form-group"><div class="row">
                                         <div class="col-sm-12">
