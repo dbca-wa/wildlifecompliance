@@ -4,15 +4,15 @@
 
           <h3>Inspection: {{ inspection.number }}</h3>
 
-          <div class="col-md-3">
+          <div class="col-md-4">
             <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
 
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                         Workflow
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div class="row">
                             <div class="col-sm-12">
                                 <strong>Status</strong><br/>
@@ -30,21 +30,12 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                         Action
                     </div>
-                    <div class="panel-body panel-collapse">
-
-                        <!--div v-if="statusId ==='open' && this.call_email.can_user_action" class="row action-button">
-                          <div class="col-sm-12">
-                                <a ref="save" @click="save()" class="btn btn-primary btn-block">
-                                  Save
-                                </a>
-                          </div>
-                        </div-->
-
+                    <div class="card-body border-bottom">
                         <div class="row action-button">
                           <div v-if="sendToManagerVisibility" class="col-sm-12">
                                 <a ref="close" @click="addWorkflow('send_to_manager')" class="btn btn-primary btn-block">
@@ -101,7 +92,6 @@
 
           </div>
 
-          <div class="col-md-1"></div>
           <div class="col-md-8"> 
             <div class="row">
 

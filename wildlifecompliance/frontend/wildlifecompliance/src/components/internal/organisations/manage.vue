@@ -7,10 +7,8 @@
                 <h3>{{ org.name }} - {{org.abn}}</h3>
             </div>
         </div>        
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <CommsLogs :comms_url="comms_url" :logs_url="logs_url" comms_add_url="test"/>
-            </div>
-            <div class="col-md-1">
             </div>
             <div class="col-md-8">
                 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
@@ -392,12 +390,10 @@ export default {
         });
     },
     methods: {
-        set_tabs:function(){
+        /*set_tabs:function(){
             let vm = this;
-
-            /* set Applicant tab Active */
             $('#pills-tab a[href="#pills-details"]').tab('show');
-        },
+        },*/
 
         addContact: function(){
             this.$refs.add_contact.isModalOpen = true;
@@ -561,7 +557,7 @@ export default {
     },
     mounted: function(){
         let vm =this;
-        this.set_tabs();
+        //this.set_tabs();
         this.personal_form = document.forms.personal_form;
         this.eventListeners();
     },

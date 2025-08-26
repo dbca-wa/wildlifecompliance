@@ -71,10 +71,8 @@
                               <label class="form-check-label" for="searchReturn">Return with requirements</label>
                           </div>
                           <label for="" class="control-label col-lg-12">Keyword</label>
-                            <div class="col-md-8">
+                            <div class="col-md-9">
                               <input type="search"  class="form-control input-sm" name="details" placeholder="" v-model="keyWord"></input>
-                            </div>
-                            <div class="col-md-1">
                             </div>
                             <div class="col-md-3">
                               <input type="button" @click.prevent="addKeyword" class="btn btn-primary" value="Add"/>

@@ -2,10 +2,9 @@
     <div class="container">
         <div class="row">
             <h3>Remediation Action: {{ remediation_action.remediation_action_id }}</h3>
-            <div class="col-md-3">
+            <div class="col-md-4">
             </div>
 
-            <div class="col-md-1"></div>
             <div class="col-md-8"> 
                 <div class="row">
                     <div class="container-fluid">

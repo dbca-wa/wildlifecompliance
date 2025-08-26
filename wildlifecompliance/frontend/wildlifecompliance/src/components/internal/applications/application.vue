@@ -10,14 +10,14 @@
         </div>
         <div class="row" style="padding-bottom: 50px;">
         <h3>{{ headerLabel }}: {{ application.lodgement_number }}</h3>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                        Submission 
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div class="row">
                             <div class="col-sm-12">
                                 <strong>Submitted by</strong><br/>
@@ -42,12 +42,12 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                         Workflow 
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div class="row">
                             <div class="col-sm-12">
                                 <strong>Status</strong><br/>
@@ -190,7 +190,6 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-1"></div>
         <div class="col-md-8">
             <div class="row">
                 <div v-if="canIssueDecline && isofficerfinalisation">

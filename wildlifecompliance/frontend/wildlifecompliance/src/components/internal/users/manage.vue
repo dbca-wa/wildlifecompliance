@@ -8,23 +8,23 @@
             <div class="col-md-9">
                 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="pills-details-tab" data-toggle="pill" href="#pills-details" role="tab" aria-controls="pills-details" aria-selected="true">
+                        <a class="nav-link active" id="pills-details-tab" data-bs-toggle="pill" href="#pills-details" role="tab" aria-controls="pills-details" aria-selected="true">
                             Details
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="pills-licensing-tab" data-toggle="pill" href="#pills-licensing" role="tab" aria-controls="pills-licensing" aria-selected="false">
+                        <a class="nav-link" id="pills-licensing-tab" data-bs-toggle="pill" href="#pills-licensing" role="tab" aria-controls="pills-licensing" aria-selected="false">
                             Licensing
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="pills-compliance-tab" data-toggle="pill" href="#pills-compliance" role="tab" aria-controls="pills-compliance" aria-selected="false">
+                        <a class="nav-link" id="pills-compliance-tab" data-bs-toggle="pill" href="#pills-compliance" role="tab" aria-controls="pills-compliance" aria-selected="false">
                             Compliance
                         </a>
                     </li>
                 </ul>
-                <div class="tab-content" id="pills-tabContent">
-                  <div class="tab-pane fade" id="pills-details" role="tabpanel" aria-labelledby="pills-details-tab">
+                <div id="pills-tabContent" class="tab-content">
+                  <div class="tab-pane fade in active show" id="pills-details" role="tabpanel" aria-labelledby="pills-details-tab">
                         <div class="row">
                             <div class="col-sm-12">
                                 <FormSection
@@ -348,12 +348,10 @@ export default {
         });
     },
     methods: {
-        set_tabs:function(){
+        /*set_tabs:function(){
             let vm = this;
-
-            /* set Applicant tab Active */
             $('#pills-tab a[href="#pills-details"]').tab('show');
-        },
+        },*/
 
         eventListeners: function(){
             let vm = this;
@@ -520,7 +518,7 @@ export default {
     },
     mounted: function(){
         let vm = this;
-        vm.set_tabs();
+        //vm.set_tabs();
         this.personal_form = document.forms.personal_form;
     },
 }

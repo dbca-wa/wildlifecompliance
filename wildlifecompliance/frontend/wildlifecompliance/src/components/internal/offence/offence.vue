@@ -2,14 +2,14 @@
     <div class="container">
         <div class="row">
             <h3>Offence: {{ displayLodgementNumber }}</h3>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
-                <div class="row">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
+                <div class="">
+                    <div class="card mb-3">
+                        <div class="card-header">
                             Workflow
                         </div>
-                        <div class="panel-body panel-collapse">
+                        <div class="card-body border-bottom">
                             <div class="row">
                                 <div class="col-sm-12">
                                     <strong>Status</strong><br/>
@@ -27,12 +27,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
+                <div class="">
+                    <div class="card mb-3">
+                        <div class="card-header">
                             Action
                         </div>
-                        <div class="panel-body panel-collapse">
+                        <div class="card-body border-bottom">
                             <div v-if="visibilitySanctionOutcomeButton" class="row action-button">
                                 <div class="col-sm-12">
                                     <a @click="openSanctionOutcome()" class="btn btn-primary btn-block">
@@ -52,7 +52,6 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-1"></div>
             <div class="col-md-8"> 
                 <div class="row">
                     <div class="container-fluid">

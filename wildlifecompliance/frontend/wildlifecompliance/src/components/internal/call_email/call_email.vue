@@ -2,30 +2,28 @@
     <div class="container">
       <div class="row">
         <div class="row">
-          <div class="col-md-3">
+          <div class="col-md-10">
           <h3>Call/Email: {{ call_email.number }}</h3>
           </div>
-          <div class="col-md-3">
+          <div class="col-md-2">
           <input  v-if="call_email.user_is_volunteer" type="button" @click.prevent="duplicate" class="pull-right btn btn-primary" value="Create Duplicate Call/Email"/>  
           </div>
         </div>
       
-          <div class="col-md-3">
+          <div class="col-md-4">
             <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                         Workflow 
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div class="row">
                             <div class="col-sm-12">
                                 <strong>Status</strong><br/>
                                 {{ statusDisplay }}<br/>
                             </div>
                         </div>
-
-                        <!--div v-if="call_email.allocated_group && !(statusId === 'closed')" class="form-group"-->
                         <div v-if="assignToVisible" class="form-group">
                           <div class="row">
                             <div class="col-sm-12 top-buffer-s">
@@ -51,12 +49,12 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                         Action 
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div v-if="statusId ==='draft' && canUserAction" class="row action-button">
                           <div class="col-sm-12">
                                 <a ref="forwardToWildlifeProtectionBranch" @click="addWorkflow('forward_to_wildlife_protection_branch')" class="btn btn-primary btn-block">
@@ -141,7 +139,6 @@
 
           </div>
 
-          <div class="col-md-1"></div>
           <div class="col-md-8"> 
               <div class="row">
                     <ul id="pills-tab" class="nav nav-pills mb-3" role="tablist">
@@ -720,7 +717,6 @@ export default {
     }),
     ...mapGetters({
       renderer_form_data: 'renderer_form_data',
-      //current_user: 'current_user',
     }),
     locationExists: function() {
         if (this.call_email && 

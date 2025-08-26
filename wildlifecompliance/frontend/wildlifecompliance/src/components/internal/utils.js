@@ -13,7 +13,7 @@ export default {
             });
         });
     },
-    fetch_utilOrganisations: function(id){
+    fetchOrganisations: function(id){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(api.organisations)
             request.then((response) => {
@@ -23,7 +23,7 @@ export default {
             });
         });
     },
-    fetch_utilOrganisation: function(id){
+    fetchOrganisation: function(id){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.organisations,id))
             request.then((response) => {
@@ -33,7 +33,7 @@ export default {
             });
         });
     },
-    fetch_utilOrganisationPermissions: function(id){
+    fetchOrganisationPermissions: function(id){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.my_organisations,id))
             request.then((response) => {
@@ -43,7 +43,7 @@ export default {
             });
         });
     },
-    fetch_utilOrgRequestPending:function (id){
+    fetchOrgRequestPending:function (id){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api.users,id + '/pending_org_requests'))
             request.then((response) => {
@@ -53,7 +53,7 @@ export default {
             });
         });
     },
-    fetch_utilProfile: function(id){
+    fetchProfile: function(id){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.profiles,id))
             request.then((response) => {
@@ -63,7 +63,7 @@ export default {
             });
         });
     },
-    fetch_utilUsers: function(id){
+    fetchUsers: function(id){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(api.users)
             request.then((response) => {
@@ -73,7 +73,7 @@ export default {
             });
         });
     },
-    fetch_utilUser: function(id){
+    fetchUser: function(id){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.users,id))
             request.then((response) => {
@@ -83,7 +83,7 @@ export default {
             });
         });
     },
-    fetch_utilOffender: function(id){
+    fetchOffender: function(id){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.offenders,id))
             request.then((response) => {
@@ -93,7 +93,7 @@ export default {
             });
         });
     },
-    fetch_utilCurrentUser: function (){
+    fetchCurrentUser: function (){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(api.my_user_details)
             request.then((response) => {
@@ -103,7 +103,7 @@ export default {
             });
         });
     },
-    fetch_utilCountries: function (){
+    fetchCountries: function (){
         return new Promise ((resolve,reject) => {
             let request = fetch_util.fetchUrl(api.countries)
             request.then((response) => {
