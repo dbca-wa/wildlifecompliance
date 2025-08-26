@@ -63,18 +63,18 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import CommsLogs from "@common-components/comms_logs.vue";
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'eonasdan-bootstrap-datetimepicker';
+
 //import RelatedItems from "@common-components/related_items.vue";
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+
 import hash from 'object-hash';
 import _ from 'lodash';
 import DocumentArtifact from '@common-components/document_artifact_component'
@@ -92,8 +92,8 @@ export default {
             rowNumberSelected: '',
             tabSelected: '',
             objectHash: null,
-            oTab: 'runTab'+this._uid,
-            rTab: 'rTab'+this._uid,
+            oTab: 'runTab'+uuid(),
+            rTab: 'rTab'+uuid(),
             /*
             current_schema: [],
             workflowBindId: '',
@@ -112,32 +112,8 @@ export default {
               this.$route.params.artifact_id + "/action_log"
             ),
             baseArtifact: {},
-            //artifactStatusDisplay: '',
-            /*
-            hashAttributeWhitelist: [
-              'allocated_group_id',
-              'case_created_date',
-              'case_created_time',
-              'details',
-              'title',
-              'legal_case_priority_id',
-              'region_id',
-              'district_id',
-            ],
-            */
-
       };
   },
-    /*
-  watch: {
-        baseArtifact: {
-            handler: function (){
-                //this.setStatusDisplay();
-            },
-            deep: true,
-        },
-  },
-  */
   components: {
     CommsLogs,
     FormSection,
@@ -232,7 +208,7 @@ export default {
         let timeNow = Date.now()
         let bindId = null;
         if (this.artifactComponent && this.artifactComponent.id) {
-            bindId = 'artifact_' + this.artifactComponent.id + '_' + this._uid;
+            bindId = 'artifact_' + this.artifactComponent.id + '_' + uuid();
         } else {
             bindId = timeNow.toString();
         }
@@ -245,11 +221,6 @@ export default {
         }
         return related_items_visibility;
     },
-  },
-  filters: {
-    formatDate: function(data) {
-      return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-    }
   },
   methods: {
       ...mapActions('documentArtifactStore', {
@@ -364,25 +335,25 @@ export default {
         } else {
             payload = { 'assigned_to_id': this.legal_case.assigned_to_id };
         }
-        let res = await Vue.http.post(
+        let res = await fetch_util.fetchUrl(
             url,
             payload
         );
-        await this.setLegalCase(res.body);
+        await this.setLegalCase(res);
         this.constructRunningSheetTableWrapper();
     },
   },
   created: async function() {
       if (this.$route.params.artifact_id) {
-          const returnedArtifact = await Vue.http.get(
+          const returnedArtifact = await fetch_util.fetchUrl(
               helpers.add_endpoint_json(
                   api_endpoints.artifact,
                   this.$route.params.artifact_id)
               );
-          let artifactId = returnedArtifact.body.id
-          let artifactObjectType = returnedArtifact.body.artifact_object_type
+          let artifactId = returnedArtifact.id
+          let artifactObjectType = returnedArtifact.artifact_object_type
           //this.artifactStatusDisplay = returnedArtifact.body.status ? returnedArtifact.body.status.name : '';
-          this.baseArtifact = _.cloneDeep(returnedArtifact.body);
+          this.baseArtifact = _.cloneDeep(returnedArtifact);
           //Object.assign(this.baseArtifact, returnedArtifact.body);
           console.log(artifactId)
           console.log(artifactObjectType)

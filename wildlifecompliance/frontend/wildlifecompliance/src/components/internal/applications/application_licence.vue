@@ -1,15 +1,11 @@
 <template id="application_conditions">
     <div>
         <template v-if="isFinalised || isPartiallyFinalised">
-            <div class="panel panel-default" >
-                <div class="panel-heading">
-                    <h3 class="panel-title">Licence Details
-                        <a :href="'#licence_details'" class="panelClicker" data-toggle="collapse" expanded="true" :aria-controls="'licence_details'">
-                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="'licence_details'">
+            <FormSection
+                :form-collapse="false"
+                label="Licence Details"
+            >
+                <div class="panel panel-default" >
                     <ul>
                         <li v-for="(activity, index) in finalisedActivities" v-bind:key="`licence_row_${index}`" :id="`licence_${activity.id}`">
                             <div v-if="activity.processing_status.id=='accepted'">
@@ -21,7 +17,7 @@
                         </li>
                     </ul>
                 </div>
-            </div>
+            </FormSection>
         </template>
     </div>
 </template>
@@ -33,11 +29,11 @@ import {
 from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
 import { mapGetters } from 'vuex'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'InternalApplicationLicenceDetails',
-    watch:{
-    },
-    components:{
+    components: {
+        FormSection,
     },
     computed:{
         ...mapGetters([
@@ -52,10 +48,9 @@ export default {
     },
     methods: {
         format: function(activity_date) {
-            return moment(activity_date).format('DD/MM/YYYY');
+            return moment(activity_date).format('YYYY-MM-DD');
         },
     },
 }
 </script>
-<style scoped>
-</style>
+

@@ -51,14 +51,14 @@
         <!-- Application menu -->
         <div class="row" style="padding-bottom: 50px;">
         <h3>{{ headerLabel }}: {{ application.lodgement_number }}</h3>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                        Submission 
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div class="row">
                             <div class="col-sm-12">
                                 <strong>Submitted by</strong><br/>
@@ -66,27 +66,29 @@
                             </div>
                             <div class="col-sm-12 top-buffer-s">
                                 <strong>Lodged on</strong><br/>
-                                {{ application.lodgement_date | formatDate}}
+                                {{ formatDate(application.lodgement_date) }}
                             </div>
                             <div class="col-sm-12 top-buffer-s">
                                 <table class="table small-table">
+                                    <thead>
                                     <tr>
                                         <th>Lodgement</th>
                                         <th>Date</th>
                                         <th>Action</th>
                                     </tr>
+                                    </thead>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                         Workflow 
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div class="row">
                             <div class="col-sm-12">
                                 <strong>Status</strong><br/>
@@ -107,7 +109,7 @@
                                     <div v-if="activity_assessment.assessor_group.name">
                                         <div>Assessment for {{activity_assessment.assessor_group.name.split('Wildlife Compliance - Assessors:')[1]}}</div>
 
-                                        <template>
+                                        <div>
                                             <!-- display selects when Assessor has been allocated -->
                                             <select v-if="activity_assessment.assigned_assessor!=null" ref="assigned_assessor" class="form-control" v-model="activity_assessment.assigned_assessor.id">
                                                 <option :value="null"></option>                                                
@@ -119,14 +121,14 @@
                                                 <option v-for="member in activity_assessment.assessors" :value="member.id" v-bind:key="member.id">{{member.first_name}} {{member.last_name}}</option>
                                             </select>
                                             <a @click.prevent="makeMeAssessor(activity_assessment)" class="actionBtn pull-right">Assign to me</a>
-                                        </template>
+                                        </div>
                            
                                     </div>
                                 </div>
 
                             </div>
 
-                            <template v-if="isFinalised">
+                            <div v-if="isFinalised">
                                 <div>
                                     <div class="col-sm-12">
                                         <strong>Application</strong><br/>
@@ -137,14 +139,14 @@
                                         <div class="separator"></div>
                                     </div>
                                 </div>
-                            </template>
-                            <template v-if="isFinalised">
+                            </div>
+                            <div v-if="isFinalised">
                                 <div class="col-sm-12">
                                     <div class="separator"></div>
                                 </div>
-                            </template>
+                            </div>
 
-                            <template v-if="!showBackToProcessingButton">
+                            <div v-if="!showBackToProcessingButton">
                                 <div>
                                     <div class="col-sm-12">
                                         <div class="separator"></div>
@@ -155,15 +157,15 @@
                                         <a class="actionBtn" v-else @click.prevent="toggleApplication({show: false, showFinalised: false})">Hide Application</a><br/>
                                     </div>
                                 </div>
-                            </template>
-                            <template v-if="!showBackToProcessingButton">
+                            </div>
+                            <div v-if="!showBackToProcessingButton">
                                 <div class="col-sm-12">
                                     <div class="separator"></div>
                                 </div>
-                            </template>
+                            </div>
 
                               <div class="col-sm-12 top-buffer-s" >
-                                <template v-if="showingApplication">
+                                <div v-if="showingApplication">
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <strong>Action</strong><br/>
@@ -174,8 +176,8 @@
                                             <button class="btn btn-primary top-buffer-s col-xs-12" @click.prevent="toggleAssessments()">Assessments &amp; Conditions</button><br/>
                                         </div>
                                     </div>   
-                                </template>
-                                <template v-else>
+                                </div>
+                                <div v-else>
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <strong>Action</strong><br/>
@@ -196,7 +198,7 @@
                                             <button class="btn btn-primary top-buffer-s col-xs-12" @click.prevent="openAssessmentModal()">Complete Assessments</button><br/>
                                         </div>
                                     </div>                                   
-                                </template>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -204,13 +206,12 @@
             </div>
         </div>
         <!-- assessment dashboards -->
-        <div class="col-md-1"></div>
             <div class="col-md-8">
                 <div class="row">
 
                     <ApplicationAssessments v-if="!applicationDetailsVisible" />
 
-                    <template v-if="applicationDetailsVisible">
+                    <div v-if="applicationDetailsVisible">
                         <ul class="nav nav-pills mb-3" id="tabs-main">
                             <li class="nav-item" v-for="(activity, index) in allCurrentActivities">
                                 <a :class="{'nav-link amendment-highlight': application.has_amendment}"
@@ -257,7 +258,7 @@
                             </div>
                         </div>
                         </div>
-                    </template>
+                    </div>
 
                     <InspectionRequest ref="inspection"  @inspection-created="requestedInspection"></InspectionRequest>                    
 
@@ -266,9 +267,9 @@
         </div>
 
     </div>
-</div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Application from '../../form.vue';
 import modal from '@vue-utils/bootstrap-modal.vue'
 import { mapActions, mapGetters } from 'vuex'
@@ -278,7 +279,7 @@ import CommsLogs from '@common-components/comms_logs.vue';
 import InspectionRequest from '../inspection/create_inspection_modal'
 import {
     api_endpoints,
-    helpers
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 export default {
@@ -286,13 +287,13 @@ export default {
     data: function() {
         let vm = this;
         return {
-            applicantTab: 'applicantTab'+vm._uid,
-            applicationTab: 'applicationTab'+vm._uid,
-            activityTab: 'activityTab'+vm._uid+'_'+0,
-            detailsBody: 'detailsBody'+vm._uid,
-            identificationBody: 'identificationBody'+vm._uid,
-            addressBody: 'addressBody'+vm._uid,
-            checksBody: 'checksBody'+vm._uid,
+            applicantTab: 'applicantTab'+uuid(),
+            applicationTab: 'applicationTab'+uuid(),
+            activityTab: 'activityTab'+uuid()+'_'+0,
+            detailsBody: 'detailsBody'+uuid(),
+            identificationBody: 'identificationBody'+uuid(),
+            addressBody: 'addressBody'+uuid(),
+            checksBody: 'checksBody'+uuid(),
             isSendingToAssessor: false,
             assessorGroup:{},
             "selectedAssessor":{},
@@ -302,7 +303,7 @@ export default {
             showingApplication:false,
             isOfficerConditions:false,
             isofficerfinalisation:false,
-            application_assessor_datatable:vm._uid+'assessment-table',
+            application_assessor_datatable:uuid()+'assessment-table',
             assessors_headers:["Assessor Group","Date Sent","Status","Action"],
             assessors_options:{},
             DATE_TIME_FORMAT: 'DD/MM/YYYY HH:mm:ss',
@@ -331,13 +332,6 @@ export default {
         CommsLogs,
         modal,
         InspectionRequest,
-    },
-    filters: {
-        formatDate: function(data){
-            return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
-        }
-    },
-    watch: {
     },
     computed: {
         ...mapGetters([
@@ -551,31 +545,22 @@ export default {
         },
         save: function(props = { showNotification: true }) {
             const { showNotification } = props;
-            // this.saveFormData({ url: this.form_data_comments_url }).then(response => {
 
-                this.saveFormData({ url: this.form_data_application_url }).then(response => {   
-                    showNotification && swal(
+            let request = this.saveFormData({ url: this.form_data_application_url })
+            request.then(response => {   
+                    showNotification && swal.fire(
                         'Saved',
                         'Your application has been saved',
                         'success'
                     )     
                 }, error => {
                     console.log('Failed to save Application: ', error);
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
                     )
                 });
-
-            // }, error => {
-            //     console.log('Failed to save comments: ', error);
-            //     swal(
-            //         'Application Error',
-            //         helpers.apiVueResourceError(error),
-            //         'error'
-            //     )
-            // });
         },
         save_wo: function() {
             return this.save({ showNotification: false });
@@ -637,13 +622,14 @@ export default {
                 "inspection_id": event.inspection,
             }
             this.setOriginalApplication(this.application);
-            this.$http.post(helpers.add_endpoint_json(
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(
                     api_endpoints.applications, (this.application.id+'/add_assessment_inspection')
-                ), JSON.stringify(data)).then((response) => {
-                    this.setApplication(response.body);
+                ), {method:'POST', body:JSON.stringify(data)})
+            request.then((response) => {
+                    this.setApplication(response);
                 }, (error) => {
                     this.revert();
-                       swal(
+                       swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -657,13 +643,14 @@ export default {
                 "assessor_id": this.current_user.id
             }
             this.setOriginalApplication(this.application);
-            this.$http.post(helpers.add_endpoint_json(
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(
                     api_endpoints.applications, (this.application.id+'/assign_application_assessment')
-                ), JSON.stringify(data)).then((response) => {
-                    this.setApplication(response.body);
+                ), JSON.stringify(data))
+            request.then((response) => {
+                    this.setApplication(response);
                 }, (error) => {
                     this.revert();
-                       swal(
+                       swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -676,13 +663,14 @@ export default {
                 "assessor_id": assessment.assigned_assessor==null ? assessment.assigned_assessor_id : assessment.assigned_assessor
             }
             this.setOriginalApplication(this.application);
-            this.$http.post(helpers.add_endpoint_json(
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(
                     api_endpoints.applications, (this.application.id+'/assign_application_assessment')
-                ), JSON.stringify(data)).then((response) => {
-                    this.setApplication(response.body);
+                ), JSON.stringify(data))
+            request.then((response) => {
+                    this.setApplication(response);
                 }, (error) => {
                     this.revert();
-                       swal(
+                       swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -701,9 +689,10 @@ export default {
                 "final_comment" : this.final_comment,
             }
             this.setOriginalApplication(this.application);            
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/complete_application_assessments')
-                ), JSON.stringify(data)).then((response) => {
-                    this.setApplication(response.body);
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/complete_application_assessments')
+                ), JSON.stringify(data))
+            request.then((response) => {
+                    this.setApplication(response);
                     this.$router.push({name:"internal-dash"});               
             }, (error) => {
                 //console.log(error)
@@ -712,7 +701,7 @@ export default {
                 for (var key in error.body) {
                     error_msg += error.body[key] + '<br/>';
                 }
-                swal({
+                swal.fire({
                     title: 'Assessment Error',
                     html: 'There was an error completing assessment.<br/>' + error_msg,
                     type: 'error'
@@ -789,23 +778,6 @@ export default {
         openAssessmentModal: function() {
             this.isModalOpen = true;
         },
-    },
-    updated: function(){
-        // let vm = this;
-        // if (!vm.panelClickersInitialised){
-        //     $('.panelClicker[data-toggle="collapse"]').on('click', function () {
-        //         var chev = $(this).children()[0];
-        //         window.setTimeout(function () {
-        //             $(chev).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
-        //         },100);
-        //     }); 
-        //     vm.panelClickersInitialised = true;
-        // }
-        // this.$nextTick(() => {
-        //     vm.initialiseSelects();
-        //     vm.form = document.forms.new_application;
-        //     vm.eventListeners();
-        // });
     },
     beforeRouteEnter: function(to, from, next) {
         next(vm => {

@@ -1,30 +1,28 @@
 <template id="sanction_outcome_person_org_dashboard">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Sanction Outcomes
-                        <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pBody">
+            <FormSection
+                :form-collapse="false"
+                label="Sanction Outcomes"
+                index="sanction_outcomes"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-lg-12">
                             <datatable ref="sanction_outcome_table" id="datatable_id" :dtOptions="table_options" :dtHeaders="table_headers"/>
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import { api_endpoints, helpers, cache_helper } from '@/utils/hooks'
-
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'SanctionOutcomePersonOrgTableDash',
     props: {
@@ -62,8 +60,8 @@ export default {
             sanction_outcome_payment_statuses: [],
             */
 
-            pBody: 'pBody' + vm._uid,
-            datatable_id: 'return-datatable-'+vm._uid,
+            pBody: 'pBody' + uuid(),
+            datatable_id: 'return-datatable-'+uuid(),
             /*
             filterType: 'all',
             filterStatus: 'all',
@@ -71,9 +69,9 @@ export default {
             filterDateFrom: '',
             filterDateTo: '',
             */
-            dateFormat: 'DD/MM/YYYY',
+            dateFormat: 'YYYY-MM-DD',
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -136,7 +134,7 @@ export default {
                         searchable: true,
                         orderable: true,
                         mRender: function (data, type, full) {
-                            return data != '' && data != null ? moment(data).format('DD/MM/YYYY') : '';
+                            return data != '' && data != null ? moment(data).format('YYYY-MM-DD') : '';
                         }
                     },
                     {
@@ -184,7 +182,7 @@ export default {
                                     let ra = full.remediation_actions[i];
                                     body += '<tr>' +
                                         //td + ra.description + td_close +
-                                        td + moment(ra.due_date).format('DD/MM/YYYY') + td_close +
+                                        td + moment(ra.due_date).format('YYYY-MM-DD') + td_close +
                                         td + ra.status.name + td_close +
                                         td + ra.user_action + td_close
                                     '</tr>'
@@ -207,120 +205,8 @@ export default {
         }
     },
     components:{
-        datatable
+        datatable,
+        FormSection
     },
-    /*
-    watch:{
-        filterType: function () {
-            console.log('filterType');
-            this.$refs.sanction_outcome_table.vmDataTable.draw();
-        },
-        filterStatus: function () {
-            console.log('filterStatus');
-            this.$refs.sanction_outcome_table.vmDataTable.draw();
-        },
-        filterPaymentStatus: function () {
-            console.log('filterPaymentStatus');
-            this.$refs.sanction_outcome_table.vmDataTable.draw();
-        },
-        filterDateFrom: function () {
-            console.log('filterDateFrom')
-            this.$refs.sanction_outcome_table.vmDataTable.draw();
-        },
-        filterDateTo: function () {
-            console.log('filterDateTo')
-            this.$refs.sanction_outcome_table.vmDataTable.draw();
-        },
-    },
-    computed: {
-        is_external: function(){
-            return this.level == 'external';
-        },
-    },
-    created: async function(){
-        this.constructOptionsType();
-        this.constructOptionsStatus();
-        this.constructOptionsPaymentStatus();
-    },
-    methods:{
-        addEventListeners: function () {
-            this.attachFromDatePicker();
-            this.attachToDatePicker();
-
-            let vm = this;
-            // External Pay Fee listener
-            vm.$refs.sanction_outcome_table.vmDataTable.on('click', 'a[data-pay-infringement-penalty]', function(e) {
-                e.preventDefault();
-                var id = $(e.target).attr('data-pay-infringement-penalty');
-                vm.payInfringementPenalty(id);
-            });
-        },
-        payInfringementPenalty: function(sanction_outcome_id){
-            this.$http.post('/infringement_penalty/' + sanction_outcome_id + '/').then(res=>{
-                    window.location.href = "/ledger/checkout/checkout/payment-details/";
-                },err=>{
-                    swal(
-                        'Submit Error',
-                        helpers.apiVueResourceError(err),
-                        'error'
-                    )
-                });
-        },
-        attachFromDatePicker: function(){
-            let vm = this;
-            let el_fr = $(vm.$refs.issueDateFromPicker);
-            let el_to = $(vm.$refs.issueDateToPicker);
-
-            el_fr.datetimepicker({ format: 'DD/MM/YYYY', maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_fr.on('dp.change', function (e) {
-                if (el_fr.data('DateTimePicker').date()) {
-                    vm.filterDateFrom = e.date.format('DD/MM/YYYY');
-                    el_to.data('DateTimePicker').minDate(e.date);
-                } else if (el_fr.data('date') === "") {
-                    vm.filterDateFrom = "";
-                }
-            });
-        },
-        attachToDatePicker: function(){
-            let vm = this;
-            let el_fr = $(vm.$refs.issueDateFromPicker);
-            let el_to = $(vm.$refs.issueDateToPicker);
-            el_to.datetimepicker({ format: 'DD/MM/YYYY', maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_to.on('dp.change', function (e) {
-                if (el_to.data('DateTimePicker').date()) {
-                    vm.filterDateTo = e.date.format('DD/MM/YYYY');
-                    el_fr.data('DateTimePicker').maxDate(e.date);
-                } else if (el_to.data('date') === "") {
-                    vm.filterDateTo = "";
-                }
-            });
-        },
-        constructOptionsType: async function() {
-            let returned = await cache_helper.getSetCacheList('SanctionOutcomeTypes', '/api/sanction_outcome/types.json');
-            Object.assign(this.sanction_outcome_types, returned);
-            this.sanction_outcome_types.splice(0, 0, {id: 'all', display: 'All'});
-        },
-        constructOptionsStatus: async function() {
-            let returned = await cache_helper.getSetCacheList('SanctionOutcomeStatuses', '/api/sanction_outcome/statuses_for_external.json');
-            Object.assign(this.sanction_outcome_statuses, returned);
-            this.sanction_outcome_statuses.splice(0, 0, {id: 'all', display: 'All'});
-        },
-        constructOptionsPaymentStatus: async function() {
-            let returned = await cache_helper.getSetCacheList('SanctionOutcomePaymentStatuses', '/api/sanction_outcome/payment_statuses.json');
-            Object.assign(this.sanction_outcome_payment_statuses, returned);
-            this.sanction_outcome_payment_statuses.splice(0, 0, {id: 'all', display: 'All'});
-        },
-    },
-    mounted: function(){
-        let vm = this;
-        this.$nextTick(() => {
-            vm.addEventListeners();
-            //vm.initialiseSearch();
-        });
-    }
-    */
 }
 </script>
-
-<style scoped>
-</style>

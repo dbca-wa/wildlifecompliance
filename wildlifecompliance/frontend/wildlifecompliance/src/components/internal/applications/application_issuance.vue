@@ -11,15 +11,11 @@
                     </div>
                     <div class="tab-content">
                         <div class="row" v-for="(item, index) in selectedActivity" v-bind:key="`issue_activity_content_${index}`">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Issue/Decline - {{item.name}}
-                                        <a class="panelClicker" :href="'#'+panelBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="panelBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                </div>
-                                <div class="panel-body panel-collapse collapse in" :id="panelBody">
+                            <FormSection
+                                :form-collapse="false"
+                                :label="`Issue/Decline - ${item.name}`"
+                            >
+                                <div class="panel panel-default">
                                     <form class="form-horizontal" action="index.html" method="post">
                                         <div class="col-sm-12">
                                             <div class="form-group">
@@ -29,16 +25,12 @@
                                                     <div class="col-sm-12"><label class="control-label pull-left">&nbsp;</label></div>
                                                     <div class="col-sm-12">
                                                         <div v-for="(p, index) in applicationSelectedActivitiesForPurposes" v-bind:key="`p_${index}`">
-                                
-                                                            <div class="panel panel-primary">
-                                                                <div class="panel-heading">
-                                                                    <h4 class="panel-title">{{p.purpose.short_name}}
-                                                                        <a class="panelClicker" :href="`#${index}`+purposeBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="purposeBody">
-                                                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                                                        </a>
-                                                                    </h4>
-                                                                </div>
-                                                                <div class="panel-body panel-collapse collapse" :id="`${index}`+purposeBody">
+                                                            <FormSection
+                                                                :form-collapse="false"
+                                                                :label=p.purpose.short_name
+                                                                :index=index
+                                                            >
+                                                                <div class="panel panel-primary">
                                                                     <div class="row">
                                                                         <div class="col-sm-12">
                                                                             <div class="col-sm-3">
@@ -47,18 +39,18 @@
                                                                             </div>
                                                                             <div class="col-sm-3">
                                                                                 <div class="input-group date" v-if="getPickedPurpose(p.purpose.id).isProposed" :ref="`start_date_${p.id}`" style="width: 100%;">
-                                                                                    <input :readonly="p.processing_status!=='reissue' && (!canEditLicenceDates && p.proposed_end_date)" type="text" class="form-control" :name="`start_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_start_date">
-                                                                                    <span class="input-group-addon">
+                                                                                    <input :readonly="p.processing_status!=='reissue' && (!canEditLicenceDates && p.proposed_end_date)" type="date" class="form-control" :name="`start_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_start_date">
+                                                                                    <!--<span class="input-group-addon">
                                                                                         <span class="glyphicon glyphicon-calendar"></span>
-                                                                                    </span>
+                                                                                    </span>-->
                                                                                 </div>
                                                                             </div>                                                                                                                                                 
                                                                             <div class="col-sm-3">                                                        
                                                                                 <div class="input-group date" v-if="getPickedPurpose(p.purpose.id).isProposed" :ref="`end_date_${p.id}`" style="width: 100%;">
-                                                                                    <input :readonly="p.processing_status!=='reissue' && (!canEditLicenceDates && p.proposed_end_date)" type="text" class="form-control" :name="`end_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_end_date">
-                                                                                    <span class="input-group-addon">
+                                                                                    <input :readonly="p.processing_status!=='reissue' && (!canEditLicenceDates && p.proposed_end_date)" type="date" class="form-control" :name="`end_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_end_date">
+                                                                                    <!--<span class="input-group-addon">
                                                                                         <span class="glyphicon glyphicon-calendar"></span>
-                                                                                    </span>
+                                                                                    </span>-->
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -103,7 +95,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
+                                                            </FormSection>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -119,16 +111,12 @@
                                         
                                     </form>
                                 </div>
-                            </div>
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Emailing
-                                        <a class="panelClicker" :href="'#'+emailPanelBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="emailPanelBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                </div>
-                                <div class="panel-body panel-collapse collapse in" :id="emailPanelBody">
+                            </FormSection>
+                            <FormSection
+                                :form-collapse="false"
+                                label="Emailing"
+                            >
+                                <div class="panel panel-default">
                                     <div class="row">
                                         <div class="col-sm-3">
                                             
@@ -163,20 +151,16 @@
                                         </div>                                    
                                     </div>
                                 </div>
-                            </div>
+                            </FormSection>
                         </div>
                     </div> <!-- end of tab content -->
 
                     <div class="row" v-if="licence.activity.some(activity => activity.final_status === 'issued')">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Issue
-                                    <a class="panelClicker" :href="'#'+issuePanelBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="issuePanelBody">
-                                        <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                    </a>
-                                </h3>
-                            </div>
-                            <div class="panel-body panel-collapse collapse in" :id="issuePanelBody">
+                        <FormSection
+                            :form-collapse="false"
+                            label="Issue"
+                        >
+                            <div class="panel panel-default">
                                 <div class="row">
                                     <div class="col-sm-3">
                                         <label class="control-label pull-left"  for="details">ID Check</label>
@@ -216,7 +200,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </FormSection>
                     </div>
 
                     <p v-if="(applicantType == 'org' && application.org_applicant.address) 
@@ -248,18 +232,21 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import {
     api_endpoints,
-    helpers
+    helpers, fetch_util
 }
 from '@/utils/hooks'
 import { mapGetters, mapActions } from 'vuex'
 import filefield from '@/components/common/compliance_file.vue'
 import summernote from '@/components/purpose_details_summernote'
 
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'InternalApplicationIssuance',
-    components:{
+    components: {
+        FormSection,
         filefield,
         summernote,
     },    
@@ -293,10 +280,10 @@ export default {
 	}
 
         return {
-            panelBody: "application-issuance-"+vm._uid,
-            issuePanelBody: "app-issuance-check-"+vm._uid,
-            emailPanelBody: "app-issuance-email-"+vm._uid,
-            purposeBody: `purposeBody${vm._uid}`,
+            panelBody: "application-issuance-"+uuid(),
+            issuePanelBody: "app-issuance-check-"+uuid(),
+            emailPanelBody: "app-issuance-email-"+uuid(),
+            purposeBody: `purposeBody${uuid()}`,
             proposed_licence:{},
             licence:{
                 activity: [],
@@ -310,7 +297,7 @@ export default {
                 selected_purpose_ids: [],
                 },
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -319,8 +306,6 @@ export default {
             pickedPurposes: [],
             spinner:false,
         }
-    },
-    watch:{
     },
     computed:{
         ...mapGetters([
@@ -622,7 +607,7 @@ export default {
             }
             else
             {
-                swal({
+                swal.fire({
                     text:'Unable to determine application type.',
                     title:'Application type missing',
                     type:'error'
@@ -634,10 +619,11 @@ export default {
                 this.setApplicationWorkflowState({bool: true});
                 await this.finalDecisionData({ url: `/api/application/${this.application.id}/final_decision_data.json` }).then( async response => {
 
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/final_decision'),JSON.stringify(licence),{
+                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/final_decision'), {method:'POST', body:JSON.stringify(licence)},{
                                 emulateJSON:true,
 
-                            }).then((response)=>{
+                            })
+                request.then((response)=>{
                                 this.spinner = false
                                 this.setApplicationWorkflowState({bool: false});
                                 vm.$router.push({ name:"internal-dash", });
@@ -645,7 +631,7 @@ export default {
                             },(error)=>{
                                 this.spinner = false
                                 this.setApplicationWorkflowState({bool: false});
-                                swal(
+                                swal.fire(
                                     'Application Error',
                                     helpers.apiVueResourceError(error),
                                     'error'
@@ -656,7 +642,7 @@ export default {
                 },(error)=>{
                     this.spinner = false
                     this.setApplicationWorkflowState({bool: false});
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -666,7 +652,7 @@ export default {
             }
             else
             {
-                swal({
+                swal.fire({
                     text:'Applicant address missing, please ensure the applicant organisation/submitter address details are set.',
                     title:'Applicant address missing',
                     type:'error'
@@ -759,8 +745,8 @@ export default {
                     if (purpose.proposed_start_date != null && purpose.proposed_start_date.charAt(2)==='/'){
                         continue
                     }
-                    let date1 = moment(purpose.proposed_start_date, 'YYYY-MM-DD').format('DD/MM/YYYY')
-                    let date2 = moment(purpose.proposed_end_date, 'YYYY-MM-DD').format('DD/MM/YYYY')
+                    let date1 = moment(purpose.proposed_start_date, 'YYYY-MM-DD').format('YYYY-MM-DD')
+                    let date2 = moment(purpose.proposed_end_date, 'YYYY-MM-DD').format('YYYY-MM-DD')
                     if (purpose.proposed_start_date == null){
                         date1 = '';
                         date2 = ''
@@ -774,23 +760,19 @@ export default {
         fetchProposeIssue(){
             let vm = this;
             
-           vm.$http.get(helpers.add_endpoint_join(api_endpoints.applications,(vm.application.id+'/get_proposed_decisions/')))
-            .then((response) => {
-                vm.proposed_licence = response.body;
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,(vm.application.id+'/get_proposed_decisions/')))
+            request.then((response) => {
+                vm.proposed_licence = response;
                 this.initialiseLicenceDetails();
                 
-            }, (error) => {
+            }).catch((error) => {
                
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'
                 )
             });
-        },
-       
-        eventListeners(){
-            this.initDatePicker();
         },
 
         initFirstTab: function(force){
@@ -820,41 +802,6 @@ export default {
             ).length;
         },
 
-        //Initialise Date Picker
-        initDatePicker: function() {
-            for (let a=0; a<this.application.activities.length; a++){
-                let activity = this.application.activities[a];
-                for (let p=0; p<activity.proposed_purposes.length; p++){
-                    let purpose = activity.proposed_purposes[p]
-                    let start_date = 'start_date_' + purpose.id
-                    $(`[name='${start_date}']`).datetimepicker(this.datepickerOptions);
-                    $(`[name='${start_date}']`).on('dp.change', function(e){
-                        if ($(`[name='${start_date}']`).data('DateTimePicker') && $(`[name='${start_date}']`).data('DateTimePicker').date()) {
-                            purpose.proposed_start_date =  e.date.format('DD/MM/YYYY');
-                        }
-                        else if ($(`[name='${start_date}']`).data('date') === "") {
-                            purpose.proposed_start_date = "";
-                        }
-                        else {
-                            purpose.proposed_start_date = "";
-                        }
-                    });
-                    let end_date = 'end_date_' + purpose.id
-                    $(`[name='${end_date}']`).datetimepicker(this.datepickerOptions);
-                    $(`[name='${end_date}']`).on('dp.change', function(e){
-                        if ($(`[name='${end_date}']`).data('DateTimePicker') && $(`[name='${end_date}']`).data('DateTimePicker').date()) {
-                            purpose.proposed_end_date =  e.date.format('DD/MM/YYYY');
-                        }
-                        else if ($(`[name='${end_date}']`).data('date') === "") {
-                            purpose.proposed_end_date = "";
-                        }
-                        else {
-                            purpose.proposed_end_date = "";
-                        }
-                    });
-                }
-            }
-        }
     },
     updated: function(){
         this.eventListeners();

@@ -32,19 +32,19 @@
             <div class="col-md-3">
                 <label class="">Issue date from:</label>
                 <div class="input-group date" ref="issueDateFromPicker">
-                    <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFromPicker" />
-                    <span class="input-group-addon">
+                    <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFromPicker" />
+                    <!--<span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+                    </span>-->
                 </div>
             </div>
             <div class="col-md-3">
                 <label class="">Issue date to:</label>
                 <div class="input-group date" ref="issueDateToPicker">
-                    <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateToPicker" />
-                    <span class="input-group-addon">
+                    <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateToPicker" />
+                    <!--<span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+                    </span>-->
                 </div>
             </div>
         </div>
@@ -81,7 +81,7 @@ import $ from 'jquery'
 import datatable from '@vue-utils/datatable.vue'
 //import FormSection from "@/components/compliance_forms/section.vue";
 import FormSection from "@/components/forms/section_toggle.vue";
-import { api_endpoints, helpers, cache_helper } from '@/utils/hooks'
+import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
 
 export default {
     name: 'SanctionOutcomeTableDash',
@@ -156,7 +156,7 @@ export default {
                         searchable: true,
                         orderable: true,
                         mRender: function (data, type, full) {
-                            return data != '' && data != null ? moment(data).format('DD/MM/YYYY') : '';
+                            return data != '' && data != null ? moment(data).format('YYYY-MM-DD') : '';
                         }
                     },
                     {
@@ -164,7 +164,7 @@ export default {
                         searchable: false,
                         orderable: false,
                         mRender: function (data, type, full){
-                            return data != '' && data != null ? moment(data).format('DD/MM/YYYY') : '';
+                            return data != '' && data != null ? moment(data).format('YYYY-MM-DD') : '';
                         }
                     },
                     {
@@ -272,7 +272,6 @@ export default {
         });
     },
     watch: {
-
         filterType: function () {
             this.$refs.sanction_outcome_table.vmDataTable.draw();
         },
@@ -323,8 +322,6 @@ export default {
         },
         addEventListeners: function () {
             let vm = this;
-            this.attachFromDatePicker();
-            this.attachToDatePicker();
 
             vm.$refs.sanction_outcome_table.vmDataTable.on('click', 'a[data-pay-infringement-penalty]', function(e) {
                 e.preventDefault();
@@ -333,44 +330,16 @@ export default {
             });
         },
         payInfringementPenalty: function(sanction_outcome_id){
-            this.$http.post('/infringement_penalty/' + sanction_outcome_id + '/').then(res=>{
-                    window.location.href = res.body;
+            let request = fetch_util.fetchUrl('/infringement_penalty/' + sanction_outcome_id + '/')
+            request.then(res=>{
+                    window.location.href = res;
                 },err=>{
-                    swal(
+                    swal.fire(
                         'Submit Error',
                         helpers.apiVueResourceError(err),
                         'error'
                     )
                 });
-        },
-        attachFromDatePicker: function(){
-            let vm = this;
-            let el_fr = $(vm.$refs.issueDateFromPicker);
-            let el_to = $(vm.$refs.issueDateToPicker);
-
-            el_fr.datetimepicker({ format: 'DD/MM/YYYY', maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_fr.on('dp.change', function (e) {
-                if (el_fr.data('DateTimePicker').date()) {
-                    vm.filterDateFromPicker = e.date.format('DD/MM/YYYY');
-                    el_to.data('DateTimePicker').minDate(e.date);
-                } else if (el_fr.data('date') === "") {
-                    vm.filterDateFromPicker = "";
-                }
-            });
-        },
-        attachToDatePicker: function(){
-            let vm = this;
-            let el_fr = $(vm.$refs.issueDateFromPicker);
-            let el_to = $(vm.$refs.issueDateToPicker);
-            el_to.datetimepicker({ format: 'DD/MM/YYYY', maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_to.on('dp.change', function (e) {
-                if (el_to.data('DateTimePicker').date()) {
-                    vm.filterDateToPicker = e.date.format('DD/MM/YYYY');
-                    el_fr.data('DateTimePicker').maxDate(e.date);
-                } else if (el_to.data('date') === "") {
-                    vm.filterDateToPicker = "";
-                }
-            });
         },
         constructOptionsType: async function() {
             let returned = await cache_helper.getSetCacheList('SanctionOutcomeTypes', '/api/sanction_outcome/types.json');

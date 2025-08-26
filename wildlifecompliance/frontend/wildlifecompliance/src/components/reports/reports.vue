@@ -2,37 +2,6 @@
   <div class="container">
     <div id="report-form">
         <form  method="get" id="payments-form" action="/ledger/payments/api/report">
-            <!--
-            <div class="well well-sm">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="col-lg-12">
-                            <h3 style="margin-bottom:20px;">Select Region</h3>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                      <label for="">Region</label>
-                                      <select class="form-control" name="region" v-model="region">
-                                          <option value="">Kensington</option>
-                                          <option v-for="r in regions" :value="r.code">{{r.name}}</option>
-                                      </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6" v-show="region">
-                                    <div class="form-group">
-                                      <label for="">District</label>
-                                      <select class="form-control" name="region" v-model="district">
-                                          <option value="">All</option>
-                                          <option v-for="d in selected_region.districts" :value="d.code">{{d.name}}</option>
-                                      </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            -->
             <div class="well">
                 <div class="row">
                     <div class="col-md-12">
@@ -42,10 +11,10 @@
                                     <div class="form-group">
                                       <label for="">Start Date</label>
                                       <div class="input-group date"  id="accountsDateStartPicker">
-                                          <input type="text" class="form-control" name="start" placeholder="DD/MM/YYYY" required >
-                                          <span class="input-group-addon">
+                                          <input type="date" class="form-control" name="start" placeholder="DD/MM/YYYY" required >
+                                          <!--<span class="input-group-addon">
                                               <span class="glyphicon glyphicon-calendar"></span>
-                                          </span>
+                                          </span>-->
                                       </div>
                                     </div>
                                 </div>
@@ -53,10 +22,10 @@
                                     <div class="form-group">
                                       <label for="">End Date</label>
                                       <div class="input-group date" id="accountsDateEndPicker">
-                                          <input type="text" class="form-control" name="end"  placeholder="DD/MM/YYYY" required>
-                                          <span class="input-group-addon">
+                                          <input type="date" class="form-control" name="end"  placeholder="DD/MM/YYYY" required>
+                                          <!--<span class="input-group-addon">
                                               <span class="glyphicon glyphicon-calendar"></span>
-                                          </span>
+                                          </span>-->
                                       </div>
                                     </div>
                                 </div>
@@ -66,10 +35,10 @@
                                     <div class="form-group">
                                       <label for="">Bank Start Date</label>
                                       <div class="input-group date" id="flatDateStartPicker">
-                                          <input type="text" class="form-control" name="banked_start"  placeholder="DD/MM/YYYY" required>
-                                          <span class="input-group-addon">
+                                          <input type="date" class="form-control" name="banked_start"  placeholder="DD/MM/YYYY" required>
+                                          <!--<span class="input-group-addon">
                                               <span class="glyphicon glyphicon-calendar"></span>
-                                          </span>
+                                          </span>-->
                                       </div>
                                     </div>
                                 </div>
@@ -77,10 +46,10 @@
                                     <div class="form-group">
                                       <label for="">Bank End Date</label>
                                       <div class="input-group date" id="flatDateEndPicker">
-                                          <input type="text" class="form-control" name="banked_end"  placeholder="DD/MM/YYYY" required>
-                                          <span class="input-group-addon">
+                                          <input type="date" class="form-control" name="banked_end"  placeholder="DD/MM/YYYY" required>
+                                          <!--<span class="input-group-addon">
                                               <span class="glyphicon glyphicon-calendar"></span>
-                                          </span>
+                                          </span>-->
                                       </div>
                                     </div>
                                 </div>
@@ -98,96 +67,6 @@
                 </div>
             </div>
         </form>
-        <!--
-        <form id="refund_form">
-            <div class="well well-sm">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="col-lg-12">
-                            <h3 style="margin-bottom:20px;">Refunds Reports</h3>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                              <label for="">Start Date</label>
-                              <div class="input-group date"  id="refundsStartPicker">
-                                  <input type="text" class="form-control" name="refund_start_date" placeholder="DD/MM/YYYY">
-                                  <span class="input-group-addon">
-                                      <span class="glyphicon glyphicon-calendar"></span>
-                                  </span>
-                              </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                              <label for="">End Date</label>
-                              <div class="input-group date" id="refundsEndPicker">
-                                  <input type="text" class="form-control" name="refund_end_date"  placeholder="DD/MM/YYYY">
-                                  <span class="input-group-addon">
-                                      <span class="glyphicon glyphicon-calendar"></span>
-                                  </span>
-                              </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="col-sm-6">
-                                    <button @click.prevent="generateRefundReport()" class="btn btn-primary pull-left" >Generate Refund Reports</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-        -->
-            <!-- <div class="well well-sm">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <form ref="booking_settlements_form">
-                                            <h3 style="margin-bottom:20px;">Settlement Report</h3>
-                                            <div class="form-group">
-                                              <label for="">Date</label>
-                                              <div class="input-group date" ref="bookingSettlementsDatePicker">
-                                                  <input type="text" class="form-control" name="booking_settlement_date"  placeholder="DD/MM/YYYY" required>
-                                                  <span class="input-group-addon">
-                                                      <span class="glyphicon glyphicon-calendar"></span>
-                                                  </span>
-                                              </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <button @click.prevent="getBookingSettlementsReport()" class="btn btn-primary pull-left" >Generate Settlement Report</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    
-                                    <div class="col-sm-6">
-                                        <form ref="bookings_form">
-                                            <h3 style="margin-bottom:20px;">Bookings Report</h3>
-                                            <div class="form-group">
-                                              <label for="">Date</label>
-                                              <div class="input-group date" ref="bookingsDatePicker">
-                                                  <input type="text" class="form-control" name="bookings_date"  placeholder="DD/MM/YYYY" required>
-                                                  <span class="input-group-addon">
-                                                      <span class="glyphicon glyphicon-calendar"></span>
-                                                  </span>
-                                              </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <button @click.prevent="getBookingsReport()" class="btn btn-primary pull-left" >Generate Bookings Report</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                   
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
         <form ref="oracle_form">
             <div class="well well-sm">
                 <div class="row">
@@ -202,9 +81,9 @@
                                       <label for="">Date</label>
                                       <div class="input-group date" ref="oracleDatePicker">
                                           <input type="text" class="form-control" name="oracle_date"  placeholder="DD/MM/YYYY" required>
-                                          <span class="input-group-addon">
+                                          <!--<span class="input-group-addon">
                                               <span class="glyphicon glyphicon-calendar"></span>
-                                          </span>
+                                          </span>-->
                                       </div>
                                     </div>
                                     <div class="form-group">
@@ -228,7 +107,7 @@
 
 <script>
 //import {$,swal,bus,datetimepicker,api_endpoints,helpers,Moment,validate} from "@/utils/hooks.js"
-import {api_endpoints,helpers} from "@/utils/hooks.js"
+import {api_endpoints,helpers,fetch_util} from "@/utils/hooks.js"
 export default {
     name:"reports",
     data:function () {
@@ -249,7 +128,7 @@ export default {
             refundsStartPicker:null,
             refundsEndPicker:null,
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false
             },
@@ -287,28 +166,6 @@ export default {
             vm.oracle_form = $(vm.$refs.oracle_form);
             vm.booking_settlements_form = $(vm.$refs.booking_settlements_form);
             vm.bookings_form = $(vm.$refs.bookings_form);
-            vm.accountsDateStartPicker = $('#accountsDateStartPicker').datetimepicker(vm.datepickerOptions);
-            vm.accountsDateEndPicker = $('#accountsDateEndPicker').datetimepicker(vm.datepickerOptions);
-            vm.flatDateStartPicker = $('#flatDateStartPicker').datetimepicker(vm.datepickerOptions);
-            vm.flatDateEndPicker = $('#flatDateEndPicker').datetimepicker(vm.datepickerOptions);
-            vm.refundsStartPicker = $('#refundsStartPicker').datetimepicker(vm.datepickerOptions);
-            vm.refundsEndPicker = $('#refundsEndPicker').datetimepicker(vm.datepickerOptions);
-            vm.oracleDatePicker = $(vm.$refs.oracleDatePicker).datetimepicker(vm.datepickerOptions);
-            vm.bookingSettlementsDatePicker = $(vm.$refs.bookingSettlementsDatePicker).datetimepicker(vm.datepickerOptions);
-            vm.bookingsDatePicker = $(vm.$refs.bookingsDatePicker).datetimepicker(vm.datepickerOptions);
-
-            vm.flatDateStartPicker.on('dp.hide',function (e) {
-                vm.flatDateEndPicker.data("DateTimePicker").date(null);
-                vm.flatDateEndPicker.data("DateTimePicker").minDate(e.date);
-            });
-            vm.accountsDateStartPicker.on('dp.hide',function (e) {
-                vm.accountsDateEndPicker.data("DateTimePicker").date(null);
-                vm.accountsDateEndPicker.data("DateTimePicker").minDate(e.date);
-            });
-            vm.refundsStartPicker.on('dp.hide',function (e) {
-                vm.refundsEndPicker.data("DateTimePicker").date(null);
-                vm.refundsEndPicker.data("DateTimePicker").minDate(e.date);
-            });
             vm.addFormValidations();
             vm.fetchRegions();
         },
@@ -316,16 +173,16 @@ export default {
             let vm = this;
             
             if (vm.oracle_form.valid()){
-                let data = vm.oracleDatePicker.data("DateTimePicker").date().format('DD/MM/YYYY');
+                let data = vm.oracleDatePicker.data("DateTimePicker").date().format('YYYY-MM-DD');
                 let override = vm.oracle_override ? 'true': 'false';
-                vm.$http.get('/api/oracle_job?date='+data+'&override='+override).then((response) => {
-                    swal({
+                let request = fetch_util.fetchUrl('/api/oracle_job?date='+data+'&override='+override).then((response) => {
+                    swal.fire({
                         type: 'success',
                         title: 'Job Success', 
                         text: 'The oracle job was completed successfully', 
                     })
-                },(error) => {
-                    swal({
+                }).catch((error) => {
+                    swal.fire({
                         type: 'error',
                         title: 'Oracle Job Error', 
                         text: helpers.apiVueResourceError(error), 
@@ -333,43 +190,6 @@ export default {
                 })
             }
         },
-        //getBookingSettlementsReport(){
-        //    let vm = this;
-
-        //    if (vm.booking_settlements_form.valid()){
-        //        let data = vm.bookingSettlementsDatePicker.data("DateTimePicker").date()
-        //        console.log('=== data ===');
-        //        console.log(data);
-        //        data = data.format('DD/MM/YYYY');
-        //        var url = '/api/reports/booking_settlements?date='+data; 
-        //        window.location.assign(url);
-        //        /*vm.$http.get(url).then((response) => {
-        //        },(error) => {
-        //            swal({
-        //                type: 'error',
-        //                title: 'BPOINT Settlement Report Error', 
-        //                text: helpers.apiVueResourceError(error), 
-        //            })
-        //        })*/
-        //    }
-        //},
-        //getBookingsReport(){
-        //    let vm = this;
-
-        //    if (vm.bookings_form.valid()){
-        //        let data = vm.bookingsDatePicker.data("DateTimePicker").date().format('DD/MM/YYYY');
-        //        var url = '/api/reports/bookings?date='+data; 
-        //        window.location.assign(url);
-        //        /*vm.$http.get(url).then((response) => {
-        //        },(error) => {
-        //            swal({
-        //                type: 'error',
-        //                title: 'BPOINT Settlement Report Error', 
-        //                text: helpers.apiVueResourceError(error), 
-        //            })
-        //        })*/
-        //    }
-        //},
         fetchRegions:function () {
             let vm = this;
             $.get('/api/regions?format=json',function (data) {
@@ -420,8 +240,8 @@ export default {
 
             if (vm.refund_form.valid()) {
                 var values = {
-                    "start": vm.refundsStartPicker.data("DateTimePicker").date().format('DD/MM/YYYY'),
-                    "end" :vm.refundsEndPicker.data("DateTimePicker").date().format('DD/MM/YYYY'),
+                    "start": vm.refundsStartPicker.data("DateTimePicker").date().format('YYYY-MM-DD'),
+                    "end" :vm.refundsEndPicker.data("DateTimePicker").date().format('YYYY-MM-DD'),
                 }
                 var url = api_endpoints.booking_refunds +"?"+ $.param(values);
                 window.location.assign(url);

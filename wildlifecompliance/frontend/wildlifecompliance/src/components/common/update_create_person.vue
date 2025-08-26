@@ -1,13 +1,12 @@
 <template lang="html">
     <div :id="elementId">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Personal Details
-                        <span class="glyphicon  pull-right" @click="isPersonalDetailsOpen=!isPersonalDetailsOpen" :class="isPersonalDetailsOpen ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down'"></span>
-                    </h3>
-                </div>
-                <div class="panel-body in" :id="pdBody">
+            <FormSection
+                :form-collapse="false"
+                label="Personal Details"
+                index="personal_details"
+            >
+                <div class="panel panel-default">
                     <div v-if="objectAlert" class="alert alert-danger">
                         <p>test alert</p>
                     </div>
@@ -37,28 +36,27 @@
                                 <div class="input-group date" ref="dobDatePicker">
                                     <input 
                                     :disabled="personalDetailsReadOnly && !allowCreateEdit" 
-                                    type="text" 
+                                    type="date" 
                                     class="form-control" 
                                     placeholder="DD/MM/YYYY" 
                                     v-model="email_user.dob" 
                                      />
-                                    <span class="input-group-addon">
+                                    <!--<span class="input-group-addon">
                                         <span class="glyphicon glyphicon-calendar"></span>
-                                    </span>
+                                    </span>-->
                                 </div>
                             </div>
                         </div>
                     </form>
                 </div>
-            </div>
+            </FormSection>
 
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                <h3 class="panel-title">Address Details
-                    <span class="glyphicon  pull-right" @click="isAddressDetailsOpen=!isAddressDetailsOpen" :class="isAddressDetailsOpen ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down'"></span>
-                </h3>
-                </div>
-                <div class="panel-body in" :id="adBody">
+            <FormSection
+                :form-collapse="false"
+                label="Address Details"
+                index="address_details"
+            >
+                <div class="panel panel-default">
                     <form class="form-horizontal" action="index.html" method="post">
                         <div class="form-group">
                         <label for="" class="col-sm-3 control-label">Street</label>
@@ -102,15 +100,14 @@
                         </div>
                     </form>
                 </div>
-            </div>
+            </FormSection>
 
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                <h3 class="panel-title">Contact Details <small></small>
-                    <span class="glyphicon  pull-right" @click="isContactDetailsOpen=!isContactDetailsOpen" :class="isContactDetailsOpen ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down'"></span>
-                </h3>
-                </div>
-                <div class="panel-body collapse in" :id="cdBody">
+            <FormSection
+                :form-collapse="false"
+                label="Contact Details"
+                index="contact_details"
+            >
+                <div class="panel panel-default">
                     <form class="form-horizontal" action="index.html" method="post">
                         <div class="form-group">
                         <label for="" class="col-sm-3 control-label">Phone</label>
@@ -137,7 +134,7 @@
                         </div>
                     </form>
                 </div>
-            </div>
+            </FormSection>
 
             <input v-if="allowSaveUser"
             :disabled="!saveButtonEnabled"
@@ -150,14 +147,12 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from 'vue';
 import $ from "jquery";
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import utils from '../internal/utils'
-import "bootstrap/dist/css/bootstrap.css"
-import 'eonasdan-bootstrap-datetimepicker';
-//import moment from 'moment'
-
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: "update-create-person",
 
@@ -166,11 +161,11 @@ export default {
 
         return {
             mainElement: null,
-            elementId: 'create_new_person_' + vm._uid,
+            elementId: 'create_new_person_' + uuid(),
 
-            pdBody: 'pdBody'+vm._uid,
-            cdBody: 'cdBody'+vm._uid,
-            adBody: 'adBody'+vm._uid,
+            pdBody: 'pdBody'+uuid(),
+            cdBody: 'cdBody'+uuid(),
+            adBody: 'adBody'+uuid(),
             errorGivenName: false,
             errorLastName: false,
             errorDob: false,
@@ -260,6 +255,9 @@ export default {
             default: false,
         },
     },
+    components:{
+        FormSection
+    },
     computed: {
         personId: function() {
             return this.email_user.id;
@@ -338,25 +336,6 @@ export default {
 
     },
     methods: {
-        addEventListeners: function() {
-          //let vm = this;
-          let el_fr_date = $(this.$refs.dobDatePicker);
-          //let el_fr_time = $(vm.$refs.plannedForTimePicker);
-
-          // "From" field
-          el_fr_date.datetimepicker({
-            format: "DD/MM/YYYY",
-            maxDate: "now",
-            showClear: true
-          });
-          el_fr_date.on("dp.change", (e) => {
-            if (el_fr_date.data("DateTimePicker").date()) {
-              this.email_user.dob = e.date.format("DD/MM/YYYY");
-            } else if (el_fr_date.data("date") === "") {
-              this.email_user.dob = "";
-            }
-          });
-        },
         setExistingPerson: function(id){
             //let vm = this;
 
@@ -367,7 +346,7 @@ export default {
                     this.email_user.residential_address = this.getDefaultAddress()
                 }
                 if (this.email_user.dob) {
-                    this.email_user.dob = moment(this.email_user.dob, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                    this.email_user.dob = moment(this.email_user.dob, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 }
             });
         },
@@ -440,38 +419,38 @@ export default {
                     payload.residential_address = null;
                 }
                 if (payload.dob) {
-                    payload.dob = moment(payload.dob, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.dob = moment(payload.dob, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 }
                 let fetchUrl = ''
                 if (payload.id) {
                     if (!payload.email) {
-                        await swal("Error", "Ensure the email field is not blank", "error");
+                        await swal.fire("Error", "Ensure the email field is not blank", "error");
                         return;
                     } else {
                         fetchUrl = helpers.add_endpoint_join(api_endpoints.compliance_management_users, payload.id + '/update_person/');
                     }
                 } else {
                     if (!payload.first_name || !payload.last_name || !payload.dob || (this.emailRequired && !payload.email)) {
-                        await swal("Error", "Fill out all Personal Details and email fields", "error");
+                        await swal.fire("Error", "Fill out all Personal Details and email fields", "error");
                         return;
                     } else {
                         fetchUrl = api_endpoints.compliance_management_users;
                     }
                 }
 
-                savedEmailUser = await Vue.http.post(fetchUrl, payload);
+                savedEmailUser = await fetch.fetchUrl(fetchUrl,{method:'POST', body: payload});
                 if (!savedEmailUser.body.residential_address) {
                     savedEmailUser.body.residential_address = this.getDefaultAddress()
                 }
                 Object.assign(this.email_user, savedEmailUser.body);
-                this.email_user.dob = moment(this.email_user.dob, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                this.email_user.dob = moment(this.email_user.dob, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 if (!(parentSave === 'parentSave')) {
-                    await swal("Saved", "Person has been saved", "success");
+                    await swal.fire("Saved", "Person has been saved", "success");
                 }
                 this.$emit('person-saved', {'person': savedEmailUser.body, 'errorMessage': null});
             } catch (err) {
                 if (err.bodyText) {
-                    await swal("Error", err.bodyText, "error");
+                    await swal.fire("Error", err.bodyText, "error");
                     //this.$emit('person-saved', { 'person': null, 'errorMessage': err.bodyText });
                 }
             }

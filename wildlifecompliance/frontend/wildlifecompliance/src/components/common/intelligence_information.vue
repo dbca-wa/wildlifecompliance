@@ -32,7 +32,7 @@
 <script>
     import $ from 'jquery'
     import Vue from 'vue'
-    import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+    import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
     import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
     import FormSection from "@/components/forms/section_toggle.vue";
     import filefield from '@/components/common/compliance_file.vue';
@@ -123,7 +123,7 @@
                 //console.log("save")
                 this.saving=true;
                 this.$nextTick(async () => {
-                    await Vue.http.post(this.saveIntelligenceUrl, {'intelligence_text': this.intelligenceText});
+                    await fetch_util.fetchUrl(this.saveIntelligenceUrl, {method:'POST', body:JSON.stringify({'intelligence_text': this.intelligenceText})});
                 });
                 this.saving=false;
             }
@@ -150,9 +150,9 @@
                     )
                 }
                 console.log(url)
-                const response = await Vue.http.get(url);
+                const response = await fetch_util.fetchUrl(url);
                 console.log(response)
-                this.intelligenceText = response.body.intelligence_text;
+                this.intelligenceText = response.intelligence_text;
             });
         }
     }

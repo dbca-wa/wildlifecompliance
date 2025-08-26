@@ -11,7 +11,7 @@ import {
     UPDATE_APPLICATION_ASSESS_STATUS,
 } from '@/store/mutation-types';
 
-
+import { fetch_util } from "@/utils/hooks";
 export const applicationStore = {
     state: {
         original_application: {},
@@ -132,37 +132,37 @@ export const applicationStore = {
     },
     mutations: {
         [UPDATE_APPLICATION] (state, application) {
-            Vue.set(state, 'application', {...application});
+            state.application = {...application};
         },
         [UPDATE_ORIGINAL_APPLICATION] (state, application) {
-            Vue.set(state, 'original_application', {...application});
+            state.original_application = {...application};
         },
         [UPDATE_ORG_APPLICANT] (state, { key, value }) {
             if(state.application.org_applicant == null) {
-                Vue.set(state.application, "org_applicant", {});
+                state.application.org_applicant = {};
             }
-            Vue.set(state.application.org_applicant, key, value);
+            state.application.org_applicant[key] = value
         },
         [UPDATE_PROXY_APPLICANT] (state, { key, value }) {
             if(state.application.proxy_applicant == null) {
-                Vue.set(state.application, "proxy_applicant", {});
+                state.application.proxy_applicant = {};
             }
-            Vue.set(state.application.proxy_applicant, key, value);
+            state.application.proxy_applicant[key] = value;
         },
         [UPDATE_APPLICATION_CHECK_STATUS_ID] (state, id_status) {
-            Vue.set(state, 'id_check_status', id_status);
+            state.id_check_status = id_status;
         },
         [UPDATE_APPLICATION_CHECK_STATUS_CHARACTER] (state, character_status) {
-            Vue.set(state, 'character_check_status', character_status);
+            state.character_check_status = character_status;
         },
         [UPDATE_APPLICATION_CHECK_STATUS_RETURN] (state, return_status) {
-            Vue.set(state, 'return_check_status', return_status);
+            state.return_check_status = return_status;
         },
         [UPDATE_APPLICATION_FEE_STATUS] (state, fee_status) {
-            Vue.set(state.application, 'update_fee', fee_status);
+            state.application.update_fee = fee_status;
         },
         [UPDATE_APPLICATION_ASSESS_STATUS] (state, assess_status) {
-            Vue.set(state.application, 'assess', assess_status);
+            state.application.assess = assess_status;
         },
     },
     actions: {
@@ -176,17 +176,18 @@ export const applicationStore = {
         }, 
         loadApplication({ dispatch, state, commit }, { url }) {
             return new Promise((resolve, reject) => {
-                Vue.http.get(url).then(res => {
-                    dispatch('setOriginalApplication', res.body);
-                    dispatch('setApplication', res.body);
+                let request = fetch_util.fetchUrl(url)
+                request.then(res => {
+                    dispatch('setOriginalApplication', res);
+                    dispatch('setApplication', res);
                     dispatch('setApplication', {
                        ...state.application,
-                       application_fee: res.body.adjusted_paid_amount.application_fee,
-                       licence_fee: res.body.adjusted_paid_amount.licence_fee,
+                       application_fee: res.adjusted_paid_amount.application_fee,
+                       licence_fee: res.adjusted_paid_amount.licence_fee,
                        update_fee: false,
                        assess: false,
                     });
-                    for(let form_data_record of res.body.data) {
+                    for(let form_data_record of res.data) {
                         dispatch('setFormValue', {
                             key: form_data_record.field_name,
                             value: {
@@ -203,13 +204,12 @@ export const applicationStore = {
                             }
                         });
                     }
-                    dispatch('setIdCheckStatus', res.body.id_check_status.id);
-                    dispatch('setCharacterCheckStatus', res.body.character_check_status.id);
-                    dispatch('setReturnCheckStatus', res.body.return_check_status.id);
+                    dispatch('setIdCheckStatus', res.id_check_status.id);
+                    dispatch('setCharacterCheckStatus', res.character_check_status.id);
+                    dispatch('setReturnCheckStatus', res.return_check_status.id);
                     resolve();
-                },
-                err => {
-                    console.log(err);
+                }).catch((error) => {
+                    console.log(error);
                     reject();
                 });
             })
@@ -226,14 +226,15 @@ export const applicationStore = {
             //dispatch('refreshAddresses'); this would cause the organisation/proxy address to be removed from json response body, so has been commented out for now
         },
         refreshApplicationFees({ dispatch, state, getters, rootGetters }) {
-            Vue.http.post('/api/application/estimate_price/', {
+            fetch_util.fetchUrl('/api/application/estimate_price/', {method:'POST', body:JSON.stringify({
                     'application_id': getters.application_id,
                     'field_data': rootGetters.renderer_form_data,
-            }).then(res => {
+            })})
+            request.then(res => {
                 dispatch('setApplication', {
                     ...state.application,
-                    application_fee: res.body.fees.application,
-                    licence_fee: res.body.fees.licence,
+                    application_fee: res.fees.application,
+                    licence_fee: res.fees.licence,
                     update_fee: true,
                     assess: true,
                 });
@@ -258,16 +259,17 @@ export const applicationStore = {
         },
         setLicenceTypeData({ dispatch, state, getters, rootGetters }, activity_data) {
             return new Promise((resolve, reject) => {
-                Vue.http.post('/api/application/' + getters.application_id + '/update_licence_type_data/', {
+                fetch_util.fetchUrl('/api/application/' + getters.application_id + '/update_licence_type_data/', {method:'POST', body:JSON.stringify({
                         'application_id': getters.application_id,
                         'licence_activity_id': activity_data.licence_activity_id,
                         'licence_activity_workflow': activity_data.workflow,
-                }).then(res => {
-                    dispatch('setApplication', res.body);
+                })})
+                request.then(res => {
+                    dispatch('setApplication', res);
                     dispatch('setApplication', {
                         ...state.application,
-                        application_fee: res.body.adjusted_paid_amount.application_fee,
-                        licence_fee: res.body.adjusted_paid_amount.licence_fee,
+                        application_fee: res.adjusted_paid_amount.application_fee,
+                        licence_fee: res.adjusted_paid_amount.licence_fee,
                         update_fee: false,
                         assess: false,
                     });

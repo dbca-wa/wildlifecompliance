@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
     api_endpoints,
-    helpers
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 import {
@@ -186,10 +186,10 @@ export const userStore = {
             state.selected_activity_tab_name = tab_name;
         },
         [UPDATE_SELECTED_TAB_WORKFLOW_STATE] (state, { key, value }) {
-            Vue.set(state.selected_activity_tab_workflow_state, key, value);
+            state.selected_activity_tab_workflow_state[key] = value;
         },
         [UPDATE_CURRENT_USER] (state, user) {
-            Vue.set(state, 'current_user', {...user});
+            state.current_user = user;
         },
         [UPDATE_CURRENT_USER_ID] (state, bool) {
             state.current_user_id = bool;
@@ -235,13 +235,13 @@ export const userStore = {
         },
         loadCurrentUser({ dispatch, commit }, { url }) {
             return new Promise((resolve, reject) => {
-                Vue.http.get(url).then(res => {
-                    dispatch('setCurrentUser', res.body);
-                    dispatch('setCurrentUserId', res.body.identification ? true : res.body.is_internal ? true : false);
+                let request = fetch_util.fetchUrl(url)
+                request.then(res => {
+                    dispatch('setCurrentUser', res);
+                    dispatch('setCurrentUserId', res.identification ? true : res.is_internal ? true : false);
                     resolve();
-                },
-                err => {
-                    console.log(err);
+                }).catch((error) => {
+                    console.log(error);
                     reject();
                 });
             })
@@ -253,20 +253,13 @@ export const userStore = {
             commit(UPDATE_CURRENT_USER, user);
         },
         async loadAllocatedGroup({}, {workflow_type, region_id, district_id}) {
-                /*
-            let url = helpers.add_endpoint_join(
-                api_endpoints.get_allocated_group_members,
-                api_endpoints.region_district,
-                region_district_id + '/get_compliance_group_by_region_district/'
-                );
-                */
-            let returned = await Vue.http.post(
+            let returned = await fetch_util.fetchUrl(
                 api_endpoints.allocated_group_members,
-                { 
+                {method:'POST', body:JSON.stringify({ 
                     'workflow_type': workflow_type,
                     'region_id': region_id,
                     'district_id': district_id,
-                });
+                })});
             return returned;
         },
     }

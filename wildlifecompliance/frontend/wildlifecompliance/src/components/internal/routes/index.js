@@ -37,108 +37,55 @@ export default
         }
     },
     children: [
-        /*
         {
-            path: '/',
-            component: InternalDashboard,
-            name: 'internal-dash'
-        },
-        */
-        {
-            path: '/',
+            path: '/internal',
             component: DashboardSwitcher,
             name: 'internal-dash'
         },
-
         {
             path: 'licences',
             component: LicenceDashTable,
             name:"internal-licences-dash"
         },
         {
-            path: 'inspection',
-            component: {
-                render(c)
-                {
-                    return c('router-view')
-                }
-            },
-            children: [
-                {
-                    path: '/',
-                    component: InspectionDashTable,
-                    name:"internal-inspection-dash"
-                },
-                {
-                    path: ':inspection_id',
-                    component: Inspection,
-                    name:"view-inspection"
-                },
-            ]
+        path: 'inspection',
+            component: InspectionDashTable,
+            name:"internal-inspection-dash"
+        },
+        {
+            path: 'inspection/:inspection_id',
+            component: Inspection,
+            name:"view-inspection"
         },
         {
             path: 'legal_case',
-            component: {
-                render(c)
-                {
-                    return c('router-view')
-                }
-            },
-            children: [
-                {
-                    path: '/',
-                    component: LegalCaseDashTable,
-                    name:"internal-legal-case-dash"
-                },
-                {
-                    path: ':legal_case_id',
-                    component: LegalCase,
-                    name:"view-legal-case"
-                },
-            ]
+                component: LegalCaseDashTable,
+                name:"internal-legal-case-dash"
+        },
+        {
+            path: 'legal_case/:legal_case_id',
+            component: LegalCase,
+            name:"view-legal-case"
         },
         {
             path: 'object',
-            component: {
-                render(c)
-                {
-                    return c('router-view')
-                }
-            },
-            children: [
-                {
-                    path: '/',
-                    component: ArtifactDashTable,
-                    name:"internal-artifact-dash"
-                },
-                {
-                    path: ':artifact_id',
-                    component: Artifact,
-                    name: "view-artifact"
-                },
-            ]
+            component: ArtifactDashTable,
+            name:"internal-artifact-dash"
         },
-
+        {
+            path: 'object/:artifact_id',
+            component: Artifact,
+            name: "view-artifact"
+        },
         {
             path: 'offence',
-            component: {
-                render(c)
-                {
-                    return c('router-view')
-                }
-            },
-            children: [
-                {
-                    path: '/',
-                    component: OffenceDashTable,
-                    name:"internal-offence-dash"
-                },
-                {
-                    path: ':offence_id',
-                    component: Offence,
-                    name:"view-offence"
-                },
-            ]
+            component: OffenceDashTable,
+            name:"internal-offence-dash"
+        },
+        {
+            path: 'offence/:offence_id',
+            component: Offence,
+            name:"view-offence"
         },
         {
             path:'reports',
@@ -147,45 +94,23 @@ export default
         },
         {
             path: 'sanction_outcome',
-            component: {
-                render(c)
-                {
-                    return c('router-view')
-                }
-            },
-            children: [
-                {
-                    path: '/',
-                    component: SanctionOutcomeDashTable,
-                    name:"internal-sanction-outcome-dash"
-                },
-                {
-                    path: ':sanction_outcome_id',
-                    component: SanctionOutcome,
-                    name:"view-sanction-outcome"
-                },
-            ]
+            component: SanctionOutcomeDashTable,
+            name:"internal-sanction-outcome-dash"
+        },
+        {
+            path: 'sanction_outcome/:sanction_outcome_id',
+            component: SanctionOutcome,
+            name:"view-sanction-outcome"
         },
         {
             path: 'call_email',
-            component: {
-                render(c)
-                {
-                    return c('router-view')
-                }
-            },
-            children: [
-                {
-                    path: '/',
-                    component: CallEmailDashTable,
-                    name:"internal-call-email-dash"
-                },
-                {
-                    path: ':call_email_id',
-                    component: CallEmail,
-                    name:"view-call-email"
-                },
-            ]
+            component: CallEmailDashTable,
+            name:"internal-call-email-dash"
+        },
+        {
+            path: 'call_email/:call_email_id',
+            component: CallEmail,
+            name:"view-call-email"
         },
         {
             path: 'returns',
@@ -203,96 +128,43 @@ export default
         },
         {
             path: 'users',
-            component: {
-                render(c)
-                {
-                    return c('router-view')
-                }
-            },
-            children: [
-                {
-                    path: '/',
-                    component: UserDashTable,
-                    name:"internal-users-dash"
-                },
-                {
-                    path: ':user_id',
-                    component: User,
-                    name:"internal-user-detail"
-                },
-            ]
+            component: UserDashTable,
+            name:"internal-users-dash"
         },
         {
-            path: 'organisations',
-            component: {
-                render(c)
-                {
-                    return c('router-view')
-                }
-            },
-            children: [
-                {
-                    path: 'access',
-                    component: OrgAccessTable,
-                    name:"org-access-dash"
-                },
-                {
-                    path: 'access/:access_id',
-                    component: OrgAccess,
-                    name:"org-access"
-                },
-                {
-                    path: ':org_id',
-                    component: Organisation,
-                    name:"internal-org-detail"
-                },
- 
-            ]
+            path: 'users/:user_id',
+            component: User,
+            name:"internal-user-detail"
         },
         {
-            path: 'application',
-            component: {
-                render(c)
-                {
-                    return c('router-view')
-                }
-            },
-            
-            children: [
-                {
-                    path: ':application_id',
-                    component: {
-                        render(c)
-                        {
-                            return c('router-view')
-                        }
-                    },
-                    children: [
-                        {
-                            path: '/',
-                            component: Application,
-                            name:"internal-application"
-                        },
-                        
-                    ]
-                },
-                {
-                    path: 'assessment/:application_id',
-                    component: CompleteAssessment,
-                    name:"complete-assessment"
-                },
- 
-            ]
+            path: 'organisations/access',
+            component: OrgAccessTable,
+            name:"org-access-dash"
+        },
+        {
+            path: 'organisations/access/:access_id',
+            component: OrgAccess,
+            name:"org-access"
+        },
+        {
+            path: 'organisations/:org_id',
+            component: Organisation,
+            name:"internal-org-detail"
+        },
+        {
+            path: 'application/:application_id',
+            component: Application,
+            name:"internal-application"
+        },
+        {
+            path: 'assessment/:application_id',
+            component: CompleteAssessment,
+            name:"complete-assessment"
         },
         {
             path: 'schema',
             component: SchemaManager,
             name:"schema-manager"
         },
-        /*{
-            path: 'application',
-            component: Application,
-            name:"new_application"
-        }*/
     ]
 }

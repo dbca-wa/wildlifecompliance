@@ -3,16 +3,11 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Schema Section Groups
-                        <a :href="'#'+pGroupBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pGroupBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pGroupBody">
-
+            <FormSection
+                :form-collapse="false"
+                label="Schema Section Groups"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -54,7 +49,7 @@
                     </div>
                 </div>
 
-            </div>
+            </FormSection>
         </div>
     </div>
 
@@ -125,17 +120,20 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import {
   api_endpoints,
-  helpers
+  helpers, fetch_util
 }
 from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name:'schema-group',
     components: {
+        FormSection,
         modal,
         alert,
         datatable,
@@ -150,12 +148,12 @@ export default {
             this.$refs.schema_group_table.vmDataTable.draw();
         },
         filterGroupSection: function() {
-            this.$http.get(helpers.add_endpoint_json(api_endpoints.schema_group,'1/get_group_sections'),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_group,'1/get_group_sections'),{
                 params: { licence_purpose_id: this.filterGroupSection },
             }).then((res)=>{
-                this.schemaSections = res.body.group_sections;
-            },err=>{
-
+                this.schemaSections = res.group_sections;
+            }).catch((error) => {
+                console.log(error);
             });
         },
     },
@@ -163,8 +161,8 @@ export default {
         let vm = this;
         vm.schema_group_url = helpers.add_endpoint_join(api_endpoints.schema_group_paginated, 'schema_group_datatable_list/?format=datatables');
         return {
-            schema_group_id: 'schema-group-datatable-'+vm._uid,
-            pGroupBody: 'pGroupBody' + vm._uid,
+            schema_group_id: 'schema-group-datatable-'+uuid(),
+            pGroupBody: 'pGroupBody' + uuid(),
             isModalOpen:false,
             missing_fields: [],
             filterTablePurpose: 'All',
@@ -309,16 +307,17 @@ export default {
 
             if (data.id === '') {
 
-                await self.$http.post(api_endpoints.schema_group, JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(api_endpoints.schema_group, {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
 
-                }).then((response) => {
+                })
+                request.then((response) => {
 
                     self.$refs.schema_group_table.vmDataTable.ajax.reload();
                     self.close();
 
                 }, (error) => {
-                    swal(
+                    swal.fire(
                         'Save Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -327,16 +326,17 @@ export default {
 
             } else {
 
-                await self.$http.post(helpers.add_endpoint_json(api_endpoints.schema_group,data.id+'/save_group'),JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_group,data.id+'/save_group'), {method:'POST', body:JSON.stringify(data)},{
                         emulateJSON:true,
 
-                }).then((response)=>{
+                })
+                request.then((response)=>{
 
                     self.$refs.schema_group_table.vmDataTable.ajax.reload();
                     self.close();
 
                 },(error)=>{
-                    swal(
+                    swal.fire(
                         'Save Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -386,7 +386,7 @@ export default {
                 self.$refs.schema_group_table.row_of_data = self.$refs.schema_group_table.vmDataTable.row('#'+$(this).attr('data-rowid'));
                 self.sectionGroup.id = self.$refs.schema_group_table.row_of_data.data().id;
 
-                swal({
+                swal.fire({
                     title: "Delete Section Group",
                     text: "Are you sure you want to delete?",
                     type: "question",
@@ -397,9 +397,11 @@ export default {
 
                     if (result) {
 
-                        await self.$http.delete(helpers.add_endpoint_json(api_endpoints.schema_group,(self.sectionGroup.id+'/delete_group')))
+                        let request = await fetch_util.fetchUrl(
+                            helpers.add_endpoint_json(api_endpoints.schema_group,(self.sectionGroup.id+'/delete_group')), {method:"DELETE"}
+                        )
     
-                        .then((response) => {
+                        request.then((response) => {
 
                             self.$refs.schema_group_table.vmDataTable.ajax.reload();
 
@@ -416,16 +418,17 @@ export default {
         },
         initSelects: async function() {
 
-            await this.$http.get(helpers.add_endpoint_join(api_endpoints.schema_group,'1/get_group_selects')).then(res=>{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.schema_group,'1/get_group_selects'))
+            request.then(res=>{
 
-                    this.schemaPurposes = res.body.all_purpose
-                    this.schemaSections = res.body.all_section
+                    this.schemaPurposes = res.all_purpose
+                    this.schemaSections = res.all_section
 
-            },err=>{
+            }).catch((error) => {
 
-                swal(
+                swal.fire(
                     'Get Application Selects Error',
-                    helpers.apiVueResourceError(err),
+                    helpers.apiVueResourceError(error),
                     'error'
                 )
             });

@@ -4,7 +4,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="amendForm">
-                        <alert :show.sync="showError" type="danger"><strong>{{errorString}}</strong></alert>
+                        <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                         <div class="col-sm-12">
                             <div class="row">
                                 <label class="control-label">Request Amendment for the application</label>
@@ -52,7 +52,7 @@
 import Vue from 'vue'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import {helpers, api_endpoints} from "@/utils/hooks.js"
+import {helpers, api_endpoints, fetch_util} from "@/utils/hooks.js"
 import { mapGetters } from 'vuex'
 export default {
     name:'amendment-request',
@@ -138,10 +138,10 @@ export default {
         },
         fetchAmendmentChoices: function(){
             let vm = this;
-            vm.$http.get('/api/amendment_request_reason_choices.json').then((response) => {
-                vm.reason_choices = response.body;
-                
-            },(error) => {
+            let request = fetch_util.fetchUrl('/api/amendment_request_reason_choices.json')
+            request.then((response) => {
+                vm.reason_choices = response;                
+            }).catch((error) => {
                 console.log(error);
             } );
         },
@@ -149,11 +149,12 @@ export default {
             let vm = this;
             vm.errors = false;
             let amendment = JSON.parse(JSON.stringify(vm.amendment));
-            vm.$http.post('/api/amendment.json',JSON.stringify(amendment),{
+            let request = fetch_util.fetchUrl('/api/amendment.json',{method:'POST', body:JSON.stringify(amendment)},{
                         emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                         //vm.$parent.loading.splice('processing contact',1);
-                        swal({
+                        swal.fire({
                              title: 'Sent',
                              text: 'An email has been sent to applicant with the request to amend this Application',
                              type: 'question',
@@ -166,22 +167,11 @@ export default {
                             vm.close();
                             this.$router.push({name:"internal-dash",});
                         })
-
-                        //vm.$emit('refreshFromResponse',response);
-                        // Vue.http.get(`/api/application/${vm.application_id}/internal_application.json`).then((res)=>
-                        // {
-                        //     vm.$emit('refreshFromResponse',res);
-                            
-                        // },(error)=>{
-                        //     console.log(error);
-                        // });
-
                     },(error)=>{
                         console.log(error);
                         vm.errors = true;
                         vm.errorString = helpers.apiVueResourceError(error);
                         vm.amendingApplication = true;
-                        
                     });
                 
         },
@@ -189,9 +179,7 @@ export default {
             let vm = this;
             vm.validation_form = $(vm.form).validate({
                 rules: {
-                    reason: "required"
-                    
-                     
+                    reason: "required"                   
                 },
                 messages: {              
                     reason: "field is required",

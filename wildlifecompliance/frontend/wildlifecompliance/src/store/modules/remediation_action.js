@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
     api_endpoints,
-    helpers
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 
@@ -16,11 +16,11 @@ export const remediationActionStore = {
     mutations: {
         updateRemediationAction(state, remediation_action) {
             console.log('updateRemediationAction');
-            Vue.set(state, 'remediation_action', {
+            state.remediation_action = {
                 ...remediation_action
-            });
+            };
             if (state.remediation_action.due_date) {
-                state.remediation_action.due_date = moment(state.remediation_action.due_date, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.remediation_action.due_date = moment(state.remediation_action.due_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
 
             let remediationActionDocumentUrl = helpers.add_endpoint_join(
@@ -28,27 +28,27 @@ export const remediationActionStore = {
                 state.remediation_action.id + "/process_default_document/"
                 )
             console.log(remediationActionDocumentUrl);
-            Vue.set(state.remediation_action, 'remediationActionDocumentUrl', remediationActionDocumentUrl); 
+            state.remediation_action.remediationActionDocumentUrl = remediationActionDocumentUrl; 
 
             let commsLogsDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.remediation_action,
                 state.remediation_action.id + "/process_comms_log_document/"
                 )
-            Vue.set(state.remediation_action, 'commsLogsDocumentUrl', commsLogsDocumentUrl); 
+            state.remediation_action.commsLogsDocumentUrl = commsLogsDocumentUrl; 
         },
         updateCanUserAction(state, can_user_action) {
-            Vue.set(state.remediation_action, 'can_user_action', can_user_action);
+            state.remediation_action.can_user_action = can_user_action;
         },
     },
     actions: {
         async loadRemediationAction({ dispatch, }, { remediation_action_id }) {
-            const returnedRemediationAction = await Vue.http.get(
+            const returnedRemediationAction = await fetch_util.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.remediation_action, 
                         remediation_action_id)
                     );
 
-            await dispatch("setRemediationAction", returnedRemediationAction.body);
+            await dispatch("setRemediationAction", returnedRemediationAction);
         },
         async saveRemediationAction({ dispatch, state }) {
             // Construct url endpoint
@@ -58,7 +58,7 @@ export const remediationActionStore = {
             let payload = {};
             Object.assign(payload, state.remediation_action);
 
-            let savedRemediationAction = await Vue.http.put(putUrl, payload);
+            let savedRemediationAction = await fetch_util.fetchUrl(putUrl, {method:"PUT",body:JSON.stringify(payload)});
         },
         async submitRemediationAction({ dispatch, state }) {
             // Construct url endpoint
@@ -68,8 +68,8 @@ export const remediationActionStore = {
             let payload = {};
             Object.assign(payload, state.remediation_action);
 
-            let ret = await Vue.http.post(submitUrl, payload);
-            return ret.body;
+            let ret = await fetch_util.fetchUrl(submitUrl, {method:'POST', body:JSON.stringify(payload)});
+            return ret;
         },
         setRemediationAction({ commit, }, remediation_action) {
             commit("updateRemediationAction", remediation_action);

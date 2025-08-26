@@ -37,8 +37,7 @@
 import Vue from "vue";
 import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
-import { required, minLength, between } from 'vuelidate/lib/validators'
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import datatable from '@vue-utils/datatable.vue'
 
 export default {
@@ -131,11 +130,6 @@ export default {
         runningSheetHistoryEntryInstance: {
             required: true,
         },
-    },
-    filters: {
-      formatDate: function(data) {
-          return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-      }
     },
     methods: {
         tokenToHtml: function(description) {
@@ -254,29 +248,17 @@ export default {
             api_endpoints.legal_case,
             this.legal_case.id + "/running_sheet_history/"
             )
-        let returnedRunningSheetHist = await Vue.http.post(
+        let returnedRunningSheetHist = await fetch_util.fetchUrl(
             fetchUrl, 
-            { "running_sheet_entry_number": this.runningSheetHistoryEntryInstance }
+            {method:'POST', body:JSON.stringify({ "running_sheet_entry_number": this.runningSheetHistoryEntryInstance })}
         );
         if (returnedRunningSheetHist && returnedRunningSheetHist.body) {
             for (let v of returnedRunningSheetHist.body.versions) {
                 let entryVersion = _.cloneDeep(v.entry_fields);
-                //entryVersion.description = this.tokenToUrl(entryVersion.description)
                 entryVersion.description = this.tokenToHtml(entryVersion.description)
                 this.runningSheetHist.push(entryVersion);
             }
         }
-        /*
-        for (let r of this.legal_case.running_sheet_entries) {
-          if (r.number === this.runningSheetHistoryEntryInstance && r.versions && r.versions.length > 0) {
-              for (let rr of r.versions) {
-                  let entryVersion = _.cloneDeep(rr.entry_fields);
-                  entryVersion.description = this.tokenToUrl(entryVersion.description)
-                  this.runningSheetHist.push(entryVersion);
-              }
-          }
-        }
-        */
         this.$nextTick(() => {
             this.constructRunningSheetTable();
         });

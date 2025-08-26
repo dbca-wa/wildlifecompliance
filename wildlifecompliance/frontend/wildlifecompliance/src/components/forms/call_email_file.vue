@@ -43,7 +43,7 @@
 <script>
 import {
   api_endpoints,
-  helpers
+  helpers, fetch_util
 }
 from '@/utils/hooks';
 import CommentBlock from './comment_block.vue';
@@ -141,13 +141,6 @@ export default {
             vm.show_spinner = false;
         },
 
-        /*
-        upload_file: function(e) {
-            let vm = this;
-            $("[id=save_and_continue_btn][value='Save Without Confirmation']").trigger( "click" );
-        },
-		*/
-
         get_documents: function() {
             let vm = this;
 
@@ -155,13 +148,11 @@ export default {
             formData.append('action', 'list');
             formData.append('input_name', vm.name);
             formData.append('csrfmiddlewaretoken', vm.csrf_token);
-            vm.$http.post(vm.application_document_action, formData)
-                .then(res=>{
-                    vm.documents = res.body;
-                    //console.log(vm.documents);
-                    vm.show_spinner = false;
-                });
-
+            let request = fetch_util.fetchUrl(vm.application_document_action, {method:'POST', body:JSON.stringify(formData)})
+            request.then(res=>{
+                vm.documents = res;
+                vm.show_spinner = false;
+            });
         },
 
         delete_document: function(file) {
@@ -173,10 +164,9 @@ export default {
             formData.append('document_id', file.id);
             formData.append('csrfmiddlewaretoken', vm.csrf_token);
 
-            vm.$http.post(vm.application_document_action, formData)
-                .then(res=>{
+            let request = fetch_util.fetchUrl(vm.application_document_action, {method:'POST', body:JSON.stringify(formData)})
+                request.then(res=>{
                     vm.documents = vm.get_documents()
-                    //vm.documents = res.body;
                     vm.show_spinner = false;
                 });
 
@@ -208,9 +198,9 @@ export default {
             formData.append('_file', vm.uploadFile(e));
             formData.append('csrfmiddlewaretoken', vm.csrf_token);
 
-            vm.$http.post(vm.application_document_action, formData)
-                .then(res=>{
-                    vm.documents = res.body;
+            let request = fetch_util.fetchUrl(vm.application_document_action, {method:'POST', body:JSON.stringify(formData)})
+                request.then(res=>{
+                    vm.documents = res;
                 },err=>{
                 });
 

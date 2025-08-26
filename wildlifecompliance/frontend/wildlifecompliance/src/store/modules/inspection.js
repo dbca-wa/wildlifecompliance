@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
     api_endpoints,
-    helpers
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 import moment from 'moment';
@@ -38,13 +38,13 @@ export const inspectionStore = {
     },
     mutations: {
         updateInspection(state, inspection) {
-            Vue.set(state, 'inspection', {
+            state.inspection = {
                 ...inspection
-            });
+            };
             console.log('updateInspection');
             if (!inspection.location) {
                 /* When location is null, set default object */
-                Vue.set(state.inspection, 'location', 
+                state.inspection.location =
                     {
                         "type": "Feature",
                         properties: {
@@ -59,11 +59,10 @@ export const inspectionStore = {
                             "type": "Point",
                             "coordinates": [],
                         },
-                    }
-                ); 
+                    }; 
             }
             if (state.inspection.planned_for_date) {
-                state.inspection.planned_for_date = moment(state.inspection.planned_for_date, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.inspection.planned_for_date = moment(state.inspection.planned_for_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             // format artifact time from 24 to 12 hour
             if (state.inspection.planned_for_time) {
@@ -76,44 +75,44 @@ export const inspectionStore = {
                 api_endpoints.inspection,
                 state.inspection.id + "/process_inspection_report_document/"
                 )
-            Vue.set(state.inspection, 'inspectionReportDocumentUrl', inspectionReportDocumentUrl); 
+            state.inspection.inspectionReportDocumentUrl = inspectionReportDocumentUrl; 
             let rendererDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.inspection,
                 state.inspection.id + "/process_renderer_document/"
                 )
-            Vue.set(state.inspection, 'rendererDocumentUrl', rendererDocumentUrl); 
+            state.inspection.rendererDocumentUrl = rendererDocumentUrl; 
             let commsLogsDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.inspection,
                 state.inspection.id + "/process_comms_log_document/"
                 )
-            Vue.set(state.inspection, 'commsLogsDocumentUrl', commsLogsDocumentUrl); 
+            state.inspection.commsLogsDocumentUrl = commsLogsDocumentUrl; 
             let createInspectionProcessCommsLogsDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.inspection,
                 state.inspection.id + "/create_inspection_process_comms_log_document/"
                 )
-            Vue.set(state.inspection, 'createInspectionProcessCommsLogsDocumentUrl', createInspectionProcessCommsLogsDocumentUrl); 
+            state.inspection.createInspectionProcessCommsLogsDocumentUrl = createInspectionProcessCommsLogsDocumentUrl; 
         },
         updatePlannedForTime(state, time) {
-            Vue.set(state.inspection, 'planned_for_time', time);
+            state.inspection.planned_for_time = time;
         },
         updatePartyInspected(state, data) {
             if (data.data_type === 'individual') {
-                Vue.set(state.inspection, 'party_inspected', data.data_type);
-                Vue.set(state.inspection, 'individual_inspected_id', data.id);
+                state.inspection.party_inspected = data.data_type;
+                state.inspection.individual_inspected_id = data.id;
                 if (state.inspection.organisation_inspected_id) {
                     state.inspection.organisation_inspected_id = null;
                 }
             }
             if (data.data_type === 'organisation') {
-                Vue.set(state.inspection, 'party_inspected', data.data_type);
-                Vue.set(state.inspection, 'organisation_inspected_id', data.id);
+                state.inspection.party_inspected = data.data_type;
+                state.inspection.organisation_inspected_id = data.id;
                 if (state.inspection.individual_inspected_id) {
                     state.inspection.individual_inspected_id = null;
                 }
             }
         },
         updateRelatedItems(state, related_items) {
-            Vue.set(state.inspection, 'related_items', related_items);
+            state.inspection.related_items = related_items;
         },
         updateLocationPoint(state, point) {
             state.inspection.location.geometry.coordinates = point;
@@ -135,17 +134,16 @@ export const inspectionStore = {
     actions: {
         async loadInspection({ dispatch, commit }, { inspection_id }) {
             try {
-                const returnedInspection = await Vue.http.get(
+                const returnedInspection = await fetch_util.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.inspection, 
                         inspection_id)
                     );
 
                 /* Set Inspection object */
-                //await dispatch("setInspection", returnedInspection.body);
-                await dispatch("setInspection", returnedInspection.body);
+                await dispatch("setInspection", returnedInspection);
 
-                for (let form_data_record of returnedInspection.body.data) {
+                for (let form_data_record of returnedInspection.data) {
                     await dispatch("setFormValue", {
                         key: form_data_record.field_name,
                         value: {
@@ -162,24 +160,6 @@ export const inspectionStore = {
                 console.log(err);
             }
         },
-        // async modifyInspectionTeam({ dispatch, state}, { user_id, action }) {
-        //     console.log("modifyInspectionTeam");
-        //     try {
-        //         const returnedInspection = await Vue.http.post(
-        //             helpers.add_endpoint_join(
-        //                 api_endpoints.inspection,
-        //                 state.inspection.id + '/modify_inspection_team/',
-        //             ),
-        //             { user_id, action }
-        //             );
-
-        //         /* Set Inspection object */
-        //         await dispatch("setInspection", returnedInspection.body);
-
-        //     } catch (err) {
-        //         console.log(err);
-        //     }
-        // },
         
         async saveInspection({ dispatch, state, rootGetters }, { create, internal }) {
             let inspectionId = null;
@@ -190,7 +170,7 @@ export const inspectionStore = {
                 Object.assign(payload, state.inspection);
                 console.log(payload);
                 if (payload.planned_for_date) {
-                    payload.planned_for_date = moment(payload.planned_for_date, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.planned_for_date = moment(payload.planned_for_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 } else if (payload.planned_for_date === '') {
                     payload.planned_for_date = null;
                 }
@@ -209,7 +189,7 @@ export const inspectionStore = {
                 let fetchUrl = null;
                 if (create) {
                     fetchUrl = api_endpoints.inspection;
-                    savedInspection = await Vue.http.post(fetchUrl, payload);
+                    savedInspection = await fetch_util.fetchUrl(fetchUrl,{method:'POST', body:JSON.stringify(payload)});
                 } else {
                     // update Inspection
                     fetchUrl = helpers.add_endpoint_join(
@@ -217,10 +197,10 @@ export const inspectionStore = {
                         //state.inspection.id + "/inspection_save/"
                         state.inspection.id + '/'
                         )
-                    savedInspection = await Vue.http.put(fetchUrl, payload);
+                    savedInspection = await fetch_util.fetchUrl(fetchUrl,{method:'PUT', body:JSON.stringify(payload)});
                 }
-                await dispatch("setInspection", savedInspection.body);
-                inspectionId = savedInspection.body.id;
+                await dispatch("setInspection", savedInspection);
+                inspectionId = savedInspection;
 
             } catch (err) {
                 error = true;
@@ -229,7 +209,7 @@ export const inspectionStore = {
                     // return "There was an error saving the record";
                     return err;
                 } else {
-                    await swal("Error", "There was an error saving the record", "error");
+                    await swal.fire("Error", "There was an error saving the record", "error");
                 }
                 //return window.location.href = "/internal/inspection/";
                 //console.log(savedInspection);
@@ -240,7 +220,7 @@ export const inspectionStore = {
                 }
                 // update inspection
                 else if (!create && !error) {
-                    await swal("Saved", "The record has been saved", "success");
+                    await swal.fire("Saved", "The record has been saved", "success");
                 }
                 return savedInspection;
             }

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
     api_endpoints,
-    helpers
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 
@@ -26,11 +26,11 @@ export const sanctionOutcomeStore = {
             }
         },
         updateSanctionOutcome(state, sanction_outcome) {
-            Vue.set(state, 'sanction_outcome', {
+            state.sanction_outcome = {
                 ...sanction_outcome
-            });
+            };
             if (state.sanction_outcome.date_of_issue) {
-                state.sanction_outcome.date_of_issue = moment(state.sanction_outcome.date_of_issue, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.sanction_outcome.date_of_issue = moment(state.sanction_outcome.date_of_issue, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             if (state.sanction_outcome.time_of_issue) {
                 state.sanction_outcome.time_of_issue = moment(state.sanction_outcome.time_of_issue, 'HH:mm:ss').format('LT');
@@ -39,57 +39,55 @@ export const sanctionOutcomeStore = {
                 api_endpoints.sanction_outcome,
                 state.sanction_outcome.id + "/process_default_document/"
                 )
-            Vue.set(state.sanction_outcome, 'sanctionOutcomeDocumentUrl', sanctionOutcomeDocumentUrl); 
+            state.sanction_outcome.sanctionOutcomeDocumentUrl = sanctionOutcomeDocumentUrl; 
 
             let commsLogsDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.sanction_outcome,
                 state.sanction_outcome.id + "/process_comms_log_document/"
                 )
-            Vue.set(state.sanction_outcome, 'commsLogsDocumentUrl', commsLogsDocumentUrl); 
+            state.sanction_outcome.commsLogsDocumentUrl = commsLogsDocumentUrl; 
         },
         updateAssignedToId(state, assigned_to_id) {
-            Vue.set(state.sanction_outcome, 'assigned_to_id', assigned_to_id);
+            state.sanction_outcome.assigned_to_id = assigned_to_id;
         },
         updateCanUserAction(state, can_user_action) {
-            Vue.set(state.sanction_outcome, 'can_user_action', can_user_action);
+            state.sanction_outcome.can_user_action = can_user_action;
         },
         updateRelatedItems(state, related_items) {
-            Vue.set(state.sanction_outcome, 'related_items', related_items);
+            state.sanction_outcome.related_items = related_items;
         },
         updateRegistrationHolder(state, data) {
             if (data.data_type === 'individual') {
-                Vue.set(state.sanction_outcome, 'registration_holder_id', data.id);
+                state.sanction_outcome.registration_holder_id = data.id;
             }
         },
         updateDriver(state, data) {
             if (data.data_type === 'individual') {
-                Vue.set(state.sanction_outcome, 'driver_id', data.id);
+                state.sanction_outcome.driver_id = data.id;
             }
         },
     },
     actions: {
         async loadRemediationAction({ dispatch, }, { remediation_action_id }){
-            const returned = await Vue.http.get(
+            const returned = await fetch_util.fetchUrl(
                 helpers.add_endpoint_json(
                     api_endpoints.remediation_action, 
                     remediation_action_id)
                 );
-            console.log('returned.body');
-            console.log(returned.body);
+            console.log(returned);
 
-            await dispatch("setRemediationAction", returned.body);
+            await dispatch("setRemediationAction", returned);
         },
         async loadSanctionOutcome({ dispatch, }, { sanction_outcome_id }) {
             try {
-                const returnedSanctionOutcome = await Vue.http.get(
+                const returnedSanctionOutcome = await fetch_util.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.sanction_outcome, 
                         sanction_outcome_id)
                     );
-                console.log('loadSanctionOutcome');
-                console.log(returnedSanctionOutcome.body);
+                console.log(returnedSanctionOutcome);
 
-                await dispatch("setSanctionOutcome", returnedSanctionOutcome.body);
+                await dispatch("setSanctionOutcome", returnedSanctionOutcome);
             } catch (err) {
                 console.log(err);
             }
@@ -121,10 +119,10 @@ export const sanctionOutcomeStore = {
 
             console.log('payload');
             console.log(payload);
-            let savedSanctionOutcome = await Vue.http.put(putUrl, payload);
+            let savedSanctionOutcome = await fetch_util.fetchUrl(putUrl, {method:"PUT",body:JSON.stringify(payload)});
 
             // Update sanction outcome in the vuex store
-            await dispatch("setSanctionOutcome", savedSanctionOutcome.body);
+            await dispatch("setSanctionOutcome", savedSanctionOutcome);
 
             // Return the saved data just in case needed
             return savedSanctionOutcome;

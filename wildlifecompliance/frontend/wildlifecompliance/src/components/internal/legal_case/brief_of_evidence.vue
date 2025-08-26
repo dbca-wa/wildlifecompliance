@@ -191,7 +191,7 @@
                 <FormSection id="physical-artifacts-tree" :formCollapse="false" label="List of Exhibits, Sensitive Unused and Non-Sensitive Unused Materials" treeHeight="yes">
                     <div class="col-sm-12 form-group"><div class="row">
                         <label class="col-sm-10">Select the objects to be included on the list of exhibits</label>
-                        <div class v-if="physicalArtifactsUsedVisibility" class="col-sm-10">
+                        <div v-if="physicalArtifactsUsedVisibility" class="col-sm-10">
                             <div class="row" v-for="artifact in physicalArtifactsUsed">
                                 <!--input class="col-sm-1" type="checkbox" :value="artifact.id" v-model="physicalArtifactsUsedTicked"-->
                                 <input :disabled="readonlyForm" class="col-sm-1" type="checkbox" v-model="artifact.ticked">
@@ -281,13 +281,12 @@ import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'eonasdan-bootstrap-datetimepicker';
+
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+
 import _ from 'lodash';
-import TreeSelect from '@riophae/vue-treeselect'
-import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+import TreeSelect from 'vue3-treeselect'
+//import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import filefield from '@/components/common/compliance_file.vue';
 
 
@@ -309,16 +308,6 @@ export default {
             default: true,
         },
   },
-    /*
-  watch: {
-      readonlyForm: {
-          handler: function (newVal, oldVal){
-              this.showHideTreeControls();
-          },
-          deep: true
-      },
-  },
-  */
   computed: {
     ...mapGetters('legalCaseStore', {
       legal_case: "legal_case",
@@ -473,11 +462,6 @@ export default {
         return options;
     },
 
-  },
-  filters: {
-    formatDate: function(data) {
-      return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-    }
   },
   methods: {
     ...mapActions('legalCaseStore', {

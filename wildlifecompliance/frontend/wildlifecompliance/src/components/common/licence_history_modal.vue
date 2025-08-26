@@ -93,9 +93,6 @@ export default {
             },
         }
     },
-    watch:{
-
-    },
     computed: {
         is_external: function(){
             return this.level == 'external';

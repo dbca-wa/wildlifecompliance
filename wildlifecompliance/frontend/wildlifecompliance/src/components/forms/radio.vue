@@ -22,7 +22,10 @@ export default {
     props:["value","label", "id", "name","isRequired","handleChange","conditions","savedValue","readonly"],
     computed:{
         isChecked:function () {
-            return this.value == this.savedValue.value;
+            if (this.value == this.savedValue.value) {
+                return true
+            }
+            return null
         },
         options:function () {
             return JSON.stringify(this.conditions);

@@ -10,14 +10,14 @@
         </div>
         <div class="row" style="padding-bottom: 50px;">
         <h3>{{ headerLabel }}: {{ application.lodgement_number }}</h3>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                        Submission 
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div class="row">
                             <div class="col-sm-12">
                                 <strong>Submitted by</strong><br/>
@@ -25,27 +25,29 @@
                             </div>
                             <div class="col-sm-12 top-buffer-s">
                                 <strong>Lodged on</strong><br/>
-                                {{ application.lodgement_date | formatDate}}
+                                {{ formatDate(application.lodgement_date) }}
                             </div>
                             <div class="col-sm-12 top-buffer-s">
                                 <table class="table small-table">
+                                    <thead>
                                     <tr>
                                         <th>Lodgement</th>
                                         <th>Date</th>
                                         <th>Action</th>
                                     </tr>
+                                    </thead>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                         Workflow 
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div class="row">
                             <div class="col-sm-12">
                                 <strong>Status</strong><br/>
@@ -62,29 +64,29 @@
                              <div class="col-sm-12 top-buffer-s" v-show="showAssignToOfficer" >
                                 <strong>Assigned Officer</strong><br/>
                                 <div class="form-group">
-                                    <template>
+                                    <div>
                                         <select ref="assigned_officer" class="form-control" v-model="selectedActivity.assigned_officer">
                                             <option v-for="member in selectedActivity.licensing_officers" :value="member.id" v-bind:key="member.id">{{member.first_name}} {{member.last_name}}</option>
                                         </select>
                                         <a @click.prevent="assignToMe()" class="actionBtn pull-right">Assign to me</a>
-                                    </template>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-12 top-buffer-s" v-show="showAssignToApprover && !application_workflow_state" >
                                 <strong>Assigned Approver</strong><br/>
                                 <div class="form-group">
-                                    <template>
+                                    <div>
                                         <div>
                                         <select ref="assigned_approver" class="form-control" v-model="selectedActivity.assigned_approver" >
                                             <option v-for="member in selectedActivity.issuing_officers" :value="member.id" v-bind:key="member.id">{{member.first_name}} {{member.last_name}}</option>
                                         </select>
                                         <a @click.prevent="makeMeApprover()" class="actionBtn pull-right">Assign to me</a>
                                         </div>
-                                    </template>                                    
+                                    </div>                                    
                                 </div>
                             </div>
 
-                            <template v-if="isFinalised">
+                            <div v-if="isFinalised">
                                 <div>
                                     <div class="col-sm-12">
                                         <div class="separator"></div>
@@ -97,13 +99,13 @@
                                         <a class="actionBtn" v-if="(!showingApplication || !this.unfinishedActivities.length) && !showingConditions" @click.prevent="toggleConditions({show: true})">Show Conditions</a>
                                     </div>
                                 </div>
-                            </template>
-                            <template v-if="isFinalised">
+                            </div>
+                            <div v-if="isFinalised">
                                 <div class="col-sm-12">
                                     <div class="separator"></div>
                                 </div>
-                            </template>
-                            <template v-if="(canIssueDecline && approvingApplication && !application_workflow_state) || notOfficerWorkflow">
+                            </div>
+                            <div v-if="(canIssueDecline && approvingApplication && !application_workflow_state) || notOfficerWorkflow">
                                 <div>
                                     <div class="col-sm-12">
                                         <div class="separator"></div>
@@ -121,14 +123,14 @@
                                         <a class="actionBtn" v-if="!showingApplication && !showingConditions" @click.prevent="actionConditionLink()">Show Conditions</a>
                                     </div>
                                 </div>
-                            </template>
-                            <template v-if="(canIssueDecline && approvingApplication && !application_workflow_state) || notOfficerWorkflow">
+                            </div>
+                            <div v-if="(canIssueDecline && approvingApplication && !application_workflow_state) || notOfficerWorkflow">
                                 <div class="col-sm-12">
                                     <div class="separator"></div>
                                 </div>
-                            </template>
+                            </div>
                               <div class="col-sm-12 top-buffer-s" >
-                                <template v-if="showingApplication">
+                                <div v-if="showingApplication">
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <strong>Action</strong><br/>
@@ -153,8 +155,8 @@
                                             <button v-else class="btn btn-primary top-buffer-s col-xs-12" @click.prevent="actionConditionButton()">Assessments &amp; Conditions</button><br/>
                                         </div>
                                     </div>
-                                </template>
-                                <template v-else>
+                                </div>
+                                <div v-else>
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <strong>Action</strong><br/>
@@ -181,46 +183,41 @@
                                             <button class="btn btn-primary top-buffer-s col-xs-12" @click.prevent="proposedDecline()">Propose Decline</button>
                                         </div>
                                     </div>  
-                                </template>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-1"></div>
         <div class="col-md-8">
             <div class="row">
-                <template v-if="canIssueDecline && isofficerfinalisation">
+                <div v-if="canIssueDecline && isofficerfinalisation">
                     <IssueLicence :application="application" :licence_activity_tab="selected_activity_tab_id" :applicantType="applicantType" @action-tab="actionTabListener" />
-                </template>
+                </div>
 
                 <ApplicationAssessments @action-tab="actionTabListener" v-if="isSendingToAssessor || showingConditions" />
 
-                <template v-if="applicationDetailsVisible && showingApplication">
+                <div v-if="applicationDetailsVisible && showingApplication">
                     <div>
                     <ul class="nav nav-pills mb-3" id="tabs-main" data-tabs="tabs">
-                        <li class="nav-item"><a ref="applicantTab" class="nav-link" data-toggle="pill" v-on:click="selectApplicantTab()" :href="'#'+applicantTab">Applicant</a></li>
+                        <li class="nav-item"><a ref="applicantTab" class="nav-link" data-bs-toggle="pill" v-on:click="selectApplicantTab()" :href="'#'+applicantTab">Applicant</a></li>
                         <!-- <li class="nav-item"><a ref="applicationTab" class="nav-link" data-toggle="pill" :href="'#'+applicationTab">Application</a></li> -->
                         <li class="nav-item" v-for="(activity, index) in allCurrentActivities">
-                            <a :class="{'nav-link amendment-highlight': application.has_amendment}"
-                                data-toggle="pill" v-on:click="selectTab(activity)" :href="'#'+activityTab">{{activity.label}}</a>
+                            <a :class="{'nav-link amendment-highlight': application.has_amendment}" class="nav-link"
+                                data-bs-toggle="pill" v-on:click="selectTab(activity)" :href="'#'+activityTab">{{activity.label}}</a>
                         </li>
                     </ul>
                     <div class="tab-content">
-                    <div :id="applicantTab" class="tab-pane fade in active">
+                    <div :id="applicantTab" class="tab-pane fade">
 
                     <div class="col-md-12" v-if="showingApplicant">
                         <div class="row">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Applicant
-                                        <a class="panelClicker" :href="'#'+detailsBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="detailsBody">
-                                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                        </a>
-                                    </h3> 
-                                </div>
-                                <div v-if="applicantType == 'org'" class="panel-body panel-collapse collapse in" :id="detailsBody">
+                            <FormSection
+                                :form-collapse="false"
+                                label="Applicant"
+                            >
+                                <div v-if="applicantType == 'org'" class="panel panel-default">
                                       <form class="form-horizontal">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Name</label>
@@ -236,7 +233,7 @@
                                           </div>
                                       </form>
                                 </div>
-                                <div v-if="applicantType == 'proxy'" class="panel-body panel-collapse collapse in" :id="detailsBody">
+                                <div v-if="applicantType == 'proxy'" class="panel panel-default">
                                       <form class="form-horizontal">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Given Name(s)</label>
@@ -258,7 +255,7 @@
                                           </div>
                                       </form>
                                 </div>
-                                <div v-if="applicantType == 'submitter'" class="panel-body panel-collapse collapse in" :id="detailsBody">
+                                <div v-if="applicantType == 'submitter'" class="panel panel-default">
                                       <form class="form-horizontal">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Given Name(s)</label>
@@ -280,63 +277,16 @@
                                           </div>
                                       </form>
                                 </div>
-                            </div>
+                            </FormSection>
                         </div>
                     </div>
-                    <!--<div class="col-md-12">
-                        <div class="row">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Identification
-                                        <a class="panelClicker" :href="'#'+identificationBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="identificationBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                </div>
-                                <div v-if="applicantType == 'org' && application.org_applicant.organisation.identification" class="panel-body panel-collapse collapse" :id="identificationBody">
-                                      <form class="form-horizontal">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Identification</label>
-                                            <div class="col-sm-8">
-                                                <img width="100%" name="applicantIdentification" v-bind:src="application.org_applicant.organisation.identification" />
-                                            </div>
-                                          </div>
-                                      </form>
-                                </div>
-                                <div v-if="applicantType == 'proxy' && application.proxy_applicant.identification2" class="panel-body panel-collapse collapse" :id="identificationBody">
-                                      <form class="form-horizontal">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Identification</label>
-                                            <div class="col-sm-8">
-                                                <img width="100%" name="applicantIdentification" v-bind:src="application.proxy_applicant.identification2" />
-                                            </div>
-                                          </div>
-                                      </form>
-                                </div>
-                                <div v-if="applicantType == 'submitter' && application.submitter.identification2" class="panel-body panel-collapse collapse" :id="identificationBody">
-                                      <form class="form-horizontal">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Identification</label>
-                                            <div class="col-sm-8">
-                                                <span class="btn btn-link btn-file pull-left"><SecureBaseLink link_name="Uploaded Photo ID" :link_data="{'customer_id': application.submitter.id}" /></span>
-                                            </div>
-                                          </div>
-                                      </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>-->
                     <div class="col-md-12">
                         <div class="row">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Address Details
-                                        <a class="panelClicker" :href="'#'+addressBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="addressBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3> 
-                                </div>
-                                <div v-if="applicantType == 'org' && application.org_applicant.address" class="panel-body panel-collapse collapse" :id="addressBody">
+                            <FormSection
+                                :form-collapse="false"
+                                label="Address Details"
+                            >
+                                <div v-if="applicantType == 'org' && application.org_applicant.address" class="panel panel-default">
                                       <form class="form-horizontal">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Street</label>
@@ -368,7 +318,7 @@
                                           </div>
                                        </form>
                                 </div>
-                                <div v-if="applicantType == 'proxy' && application.proxy_applicant.residential_address" class="panel-body panel-collapse collapse" :id="addressBody">
+                                <div v-if="applicantType == 'proxy' && application.proxy_applicant.residential_address" class="panel panel-default">
                                       <form class="form-horizontal">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Street</label>
@@ -400,7 +350,7 @@
                                           </div>
                                        </form>
                                 </div>
-                                <div v-if="applicantType == 'submitter' && application.submitter.residential_address" class="panel-body panel-collapse collapse" :id="addressBody">
+                                <div v-if="applicantType == 'submitter' && application.submitter.residential_address" class="panel panel-default">
                                       <form class="form-horizontal">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Street</label>
@@ -432,24 +382,20 @@
                                           </div>
                                        </form>
                                 </div>
-                            </div>
+                            </FormSection>
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="row">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Contact Details
-                                        <a class="panelClicker" :href="'#'+contactsBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="contactsBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                </div>
-                                <div v-if="applicantType == 'org'" class="panel-body panel-collapse collapse" :id="contactsBody">
+                            <FormSection
+                                :form-collapse="false"
+                                label="Contact Details"
+                            >
+                                <div v-if="applicantType == 'org'" class="panel panel-default">
                                     <table ref="contacts_datatable" :id="contacts_table_id" class="hover table table-striped table-bordered dt-responsive" cellspacing="0" width="100%">
                                     </table>
                                 </div>
-                                <div v-if="applicantType == 'proxy'" class="panel-body panel-collapse collapse" :id="contactsBody">
+                                <div v-if="applicantType == 'proxy'" class="panel panel-default">
                                   <form class="form-horizontal">
                                       <div class="form-group">
                                         <label for="" class="col-sm-3 control-label">Phone</label>
@@ -471,7 +417,7 @@
                                       </div>
                                   </form>
                                 </div>
-                                <div v-if="applicantType == 'submitter'" class="panel-body panel-collapse collapse" :id="contactsBody">
+                                <div v-if="applicantType == 'submitter'" class="panel panel-default">
                                   <form class="form-horizontal">
                                       <div class="form-group">
                                         <label for="" class="col-sm-3 control-label">Phone</label>
@@ -493,22 +439,16 @@
                                       </div>
                                   </form>
                                 </div>
-
-                            </div>
+                            </FormSection>
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class ="row">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Check List
-                                    <a class="panelClicker" :href="'#'+checksBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="checksBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                    </a>
-                                </h3>
-
-                            </div>
-                            <div class="panel-body panel-collapse collapse" :id="checksBody">
+                        <FormSection
+                            :form-collapse="false"
+                            label="Check List"
+                        >
+                            <div class="panel panel-default">
                                 <div class="row">
                                     <div class="col-sm-4">ID Check</div>
                                     <div class="col-sm-4">
@@ -543,12 +483,8 @@
                                     </div>
                                 </div>
                             </div>
-
-
-                        </div>
+                        </FormSection>
                     </div>
-
-
                     </div>
                 </div>
 
@@ -578,8 +514,8 @@
                                                 <div class="container">
                                                     <p class="pull-right" style="margin-top:5px;">
                                                         <span style="margin-right: 5px; font-size: 18px; display: block;" v-if="updatedFee" >
-                                                            <strong>Updated application fee: {{application.application_fee | toCurrency}}</strong>
-                                                            <strong>licence fee: {{application.licence_fee | toCurrency}}</strong>
+                                                            <strong>Updated application fee: {{toCurrency(application.application_fee)}}</strong>
+                                                            <strong>licence fee: {{toCurrency(application.licence_fee)}}</strong>
                                                         </span>
                                                         <button v-if="showSpinner && showRequestSpinner" type="button" disabled class="btn btn-primary" >Save Changes</button> 
                                                         <button v-else-if="showSpinner && !showRequestSpinner" type="button" class="btn btn-primary" ><i class="fa fa-spinner fa-spin"/>Saving</button>                                                    
@@ -596,7 +532,7 @@
                 </div>
             </div>
         </div>
-    </template>
+    </div>
 
     <!-- Final Decision display -->
     <div v-show="showFinalDecision">
@@ -612,26 +548,22 @@
         <div class="row">
             <div class="col-md-12">          
                 <div class="row">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Decision
-                                <a class="panelClicker" :href="'#'+decisionBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="decisionBody">
-                                    <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                </a>
-                            </h3>
-                        </div>
-                        <div class="panel-body panel-collapse collapse" :id="decisionBody">
+                    <FormSection
+                        :form-collapse="false"
+                        label="Decision"
+                    >
+                        <div class="panel panel-default">
                             <div v-for="activity in application.activities.filter(activity => ['issue_refund','issued'].includes(activity.decision_action))">
                                 <div class="col-sm-12">
                                     <strong>&nbsp;</strong><br/>
                                     <strong>Licence Activity: {{ activity.activity_name_str }}</strong><br/>
                                     <strong>Decision: {{ activity.processing_status.id === 'declined' ? activity.processing_status.name : activity.decision_action }}</strong><br/>
-                                    <strong>Start date: {{ activity.processing_status.id === 'declined' ? '' : activity.start_date | formatDateNoTime }}</strong><br/>
-                                    <strong>Expiry date: {{ activity.processing_status.id === 'declined' ? '' : activity.expiry_date | formatDateNoTime }}</strong>                                    
+                                    <strong>Start date: {{ activity.processing_status.id === 'declined' ? '' : formatDateNoTime(activity.start_date) }}</strong><br/>
+                                    <strong>Expiry date: {{ activity.processing_status.id === 'declined' ? '' : formatDateNoTime(activity.expiry_date) }}</strong>                                    
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </FormSection>
                 </div>
             </div>
         </div>
@@ -639,8 +571,8 @@
     </div>
     <!-- End of Final Decision Display -->
 
-    </div>
-    </div>   
+            </div>
+        </div>   
     </div>
     <ProposedDecline ref="proposed_decline" @refreshFromResponse="refreshFromResponse"></ProposedDecline>
     <AmendmentRequest ref="amendment_request" @refreshFromResponse="refreshFromResponse"></AmendmentRequest>
@@ -650,13 +582,14 @@
     <div v-else>
         <br/><br/><br/><br/><br/><br/><br/><br/>
         <div class="col-md-12">
-            <center><i class="fa fa-4x fa-spinner fa-spin"/></center>
+            <div style="text-align:center;"><i class="fa fa-4x fa-spinner fa-spin"/></div>
         </div>
     </div>
 
 
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Application from '../../form.vue';
 import { mapActions, mapGetters } from 'vuex'
 import ProposedDecline from './application_proposed_decline.vue';
@@ -670,23 +603,24 @@ import AmendmentRequestDetails from '@/components/forms/amendment_request_detail
 import SecureBaseLink from '@common-components/securebase_link.vue';
 import {
     api_endpoints,
-    helpers
+    helpers, fetch_util
 }
 from '@/utils/hooks';
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'InternalApplication',
     data: function() {
         let vm = this;
         return {
-            applicantTab: 'applicantTab'+vm._uid,
-            applicationTab: 'applicationTab'+vm._uid,
-            activityTab: 'activityTab'+vm._uid+'_'+0,
-            detailsBody: 'detailsBody'+vm._uid,
-            identificationBody: 'identificationBody'+vm._uid,
-            addressBody: 'addressBody'+vm._uid,
-            contactsBody: 'contactsBody'+vm._uid,
-            checksBody: 'checksBody'+vm._uid,
-            decisionBody: 'decisionBody'+vm._uid,
+            applicantTab: 'applicantTab'+uuid(),
+            applicationTab: 'applicationTab'+uuid(),
+            activityTab: 'activityTab'+uuid()+'_'+0,
+            detailsBody: 'detailsBody'+uuid(),
+            identificationBody: 'identificationBody'+uuid(),
+            addressBody: 'addressBody'+uuid(),
+            contactsBody: 'contactsBody'+uuid(),
+            checksBody: 'checksBody'+uuid(),
+            decisionBody: 'decisionBody'+uuid(),
             isSendingToAssessor: false,
             notOfficerWorkflow: false,
             assessorGroup:{},
@@ -701,8 +635,8 @@ export default {
             showingConditions:false,
             isofficerfinalisation:false,
             approvingApplication:false,
-            contacts_table_id: vm._uid+'contacts-table',
-            application_assessor_datatable:vm._uid+'assessment-table',
+            contacts_table_id: uuid()+'contacts-table',
+            application_assessor_datatable:uuid()+'assessment-table',
             spinner: false,
             request_spinner: false,
             condition_spinner: false,
@@ -757,6 +691,7 @@ export default {
         }
     },
     components: {
+        FormSection,
         Application,
         datatable,
         ProposedDecline,
@@ -767,16 +702,6 @@ export default {
         CommsLogs,
         AmendmentRequestDetails,
         SecureBaseLink,
-    },
-    filters: {
-        formatDate: function(data){
-            return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
-        },
-        formatDateNoTime: function(data){
-            return data ? moment(data).format('DD/MM/YYYY'): '';
-        },       
-    },
-    watch: {
     },
     computed: {
         ...mapGetters([
@@ -1121,6 +1046,9 @@ export default {
         },
     },
     methods: {
+        formatDateNoTime: function(data){
+            return data ? moment(data).format('YYYY-MM-DD'): '';
+        },    
         ...mapActions({
             load: 'loadApplication',
             revert: 'revertApplication',
@@ -1259,7 +1187,7 @@ export default {
         },
         acceptIdRequest: async function() {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Accept ID Check",
                 text: "Are you sure you want to accept this ID Check?",
                 type: "question",
@@ -1267,9 +1195,13 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_id_check')))
-                    .then((response) => {
-                        vm.setIdCheckStatus(response.body.id_check_status);
+                    let request = fetch_util.fetchUrl(
+                        helpers.add_endpoint_json(
+                            api_endpoints.applications,(vm.application.id+'/accept_id_check')),
+                            {method:'POST'}
+                        )
+                    request.then((response) => {
+                        vm.setIdCheckStatus(response.id_check_status);
                     }, (error) => {
                         console.log(error);
                     });
@@ -1279,7 +1211,7 @@ export default {
         },
         resetIdRequest: async function() {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Reset ID Check",
                 text: "Are you sure you want to reset this ID Check?",
                 type: "question",
@@ -1287,9 +1219,12 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_id_check')))
-                    .then((response) => {
-                        vm.setIdCheckStatus(response.body.id_check_status);
+                    let request = fetch_util.fetchUrl(
+                        helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_id_check'))
+                        ,{method:'POST'}
+                    )
+                    request.then((response) => {
+                        vm.setIdCheckStatus(response.id_check_status);
                     }, (error) => {
                         console.log(error);
                     });
@@ -1299,7 +1234,7 @@ export default {
         },
         updateIdRequest: async function() {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Request Update ID Check",
                 text: "Are you sure you want to request this ID Check update?",
                 type: "question",
@@ -1307,9 +1242,9 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/request_id_check')))
-                    .then((response) => {
-                        vm.setIdCheckStatus(response.body.id_check_status);
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/request_id_check')),{method:'POST'})
+                    request.then((response) => {
+                        vm.setIdCheckStatus(response.id_check_status);
                     }, (error) => {
                         console.log(error);
                     });
@@ -1319,7 +1254,7 @@ export default {
         },
         acceptCharacterRequest: async function() {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Accept Character Check",
                 text: "Are you sure you want to accept this Character Check?",
                 type: "question",
@@ -1327,9 +1262,9 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_character_check')))
-                    .then((response) => {
-                        vm.setCharacterCheckStatus(response.body.character_check_status);
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_character_check')),{method:'POST'})
+                    request.then((response) => {
+                        vm.setCharacterCheckStatus(response.character_check_status);
                     }, (error) => {
                         console.log(error);
                     });
@@ -1339,7 +1274,7 @@ export default {
         },
         resetCharacterRequest: async function() {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Reset Character Check",
                 text: "Are you sure you want to reset this Character Check?",
                 type: "question",
@@ -1347,9 +1282,9 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_character_check')))
-                    .then((response) => {
-                        vm.setCharacterCheckStatus(response.body.character_check_status);
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_character_check')),{method:'POST'})
+                    request.then((response) => {
+                        vm.setCharacterCheckStatus(response.character_check_status);
                     }, (error) => {
                         console.log(error);
                     });
@@ -1359,7 +1294,7 @@ export default {
         },
         acceptReturnRequest: async function() {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Accept Return Check",
                 text: "Are you sure you want to accept this Return Check?",
                 type: "question",
@@ -1367,9 +1302,9 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_return_check')))
-                    .then((response) => {
-                        vm.setReturnCheckStatus(response.body.return_check_status);
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_return_check')),{method:'POST'})
+                    request.then((response) => {
+                        vm.setReturnCheckStatus(response.return_check_status);
                     }, (error) => {
                         console.log(error);
                     });
@@ -1379,7 +1314,7 @@ export default {
         },
         resetReturnRequest: async function() {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Reset Return Check",
                 text: "Are you sure you want to reset this Return Check?",
                 type: "question",
@@ -1387,9 +1322,9 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_return_check')))
-                    .then((response) => {
-                        vm.setReturnCheckStatus(response.body.return_check_status);
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_return_check')),{method:'POST'})
+                    request.then((response) => {
+                        vm.setReturnCheckStatus(response.return_check_status);
                     }, (error) => {
                         console.log(error);
                     });
@@ -1405,9 +1340,8 @@ export default {
             this.highlight_missing_fields();
 
             await this.saveFormData({ url: this.form_data_application_url }).then(response => {
-                // this.spinner = false;
                 this.resetUpdateFeeStatus();
-                showNotification && swal(
+                showNotification && swal.fire(
                     'Saved',
                     'Your application has been saved',
                     'success'
@@ -1426,7 +1360,7 @@ export default {
                     }, 1);
                     return false;
                 }
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -1525,7 +1459,7 @@ export default {
                     this.condition_spinner = false;
                     this.spinner = false;
                     console.log(error)
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -1561,7 +1495,7 @@ export default {
                     this.condition_spinner = false;
                     this.spinner = false;
                     console.log(error)
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -1584,16 +1518,17 @@ export default {
             const data = {
                 "activity_id" : this.selectedActivity.licence_activity,
             }
-            await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_to_me')),JSON.stringify(data),{
+            let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_to_me')), {method:'POST', body:JSON.stringify(data)},{
                 emulateJSON:true
 
-            }).then((response) => {
+            })
+request.then((response) => {
                 // this.refreshFromResponse(response);
                 // vm.updateAssignedOfficerSelect();
             }, (error) => {
                 vm.revert();
                 vm.updateAssignedOfficerSelect();
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -1606,8 +1541,8 @@ export default {
             $(vm.$refs.assigned_approver).trigger('change');
         },
         refreshFromResponse:function(response){
-            this.setOriginalApplication(response.body);
-            this.setApplication(response.body);
+            this.setOriginalApplication(response);
+            this.setApplication(response);
             this.$nextTick(() => {
                 this.initialiseAssignedOfficerSelect(true);
                 this.updateAssignedOfficerSelect();
@@ -1623,15 +1558,16 @@ export default {
                 "activity_id" : this.selectedActivity.licence_activity,
             };
             if (!unassign){
-                await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_officer')),JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_officer')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-                }).then((response) => {
+                })
+request.then((response) => {
                     // this.refreshFromResponse(response);
                     // this.updateAssignedOfficerSelect();
                 }, (error) => {
                     this.revert();
                     this.updateAssignedOfficerSelect();
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -1639,15 +1575,16 @@ export default {
                 });
             }
             else{
-                await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/unassign_officer')),JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/unassign_officer')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-                }).then((response) => {
+                })
+request.then((response) => {
                     // this.refreshFromResponse(response);
                     // this.updateAssignedOfficerSelect();
                 }, (error) => {
                     this.revert();
                     this.updateAssignedOfficerSelect();
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -1666,15 +1603,16 @@ export default {
             }
 
             if (!unassign){
-                await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_activity_approver')),JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_activity_approver')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-                }).then((response) => {
+                })
+request.then((response) => {
                     // this.refreshFromResponse(response);
                     // this.updateAssignedApproverSelect();
                 }, (error) => {
                     this.revert();
                     this.updateAssignedApproverSelect();
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -1682,15 +1620,16 @@ export default {
                 });
             }
             else{
-                await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/unassign_activity_approver')),JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/unassign_activity_approver')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-                }).then((response) => {
+                })
+request.then((response) => {
                     // this.refreshFromResponse(response);
                     // this.updateAssignedOfficerSelect();
                 }, (error) => {
                     this.revert();
                     this.updateAssignedOfficerSelect();
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -1706,16 +1645,17 @@ export default {
             const data = {
                 "activity_id" : this.selectedActivity.licence_activity,
             }
-            await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/make_me_activity_approver')),JSON.stringify(data),{
+            let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/make_me_activity_approver')), {method:'POST', body:JSON.stringify(data)},{
                 emulateJSON:true
 
-            }).then((response) => {
+            })
+request.then((response) => {
                 // this.refreshFromResponse(response);
                 // this.updateAssignedApproverSelect();
             }, (error) => {
                 this.revert();
                 this.updateAssignedApproverSelect();
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -1728,13 +1668,14 @@ export default {
                 'activity_id' : activity_id,
                 'status': status
             }
-            await vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/update_activity_status')),JSON.stringify(data),{
+            let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/update_activity_status')), {method:'POST', body:JSON.stringify(data)},{
                 emulateJSON:true,
-            }).then((response) => {
+            })
+request.then((response) => {
                 this.refreshFromResponse(response);
             }, (error) => {
                 this.revert();
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -1892,7 +1833,7 @@ export default {
                 },(error)=>{
 
                     console.log(error)
-                    swal(
+                    swal.fire(
                         'Application Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -1937,7 +1878,7 @@ export default {
             }
         },
         actionOfficerReturnButton: async function(){
-            swal({
+            swal.fire({
                 title: 'Return to Officer - Conditions',
                 html:`
                     Please provide the reason for returning this licensed activity back to officer for review.
@@ -1958,7 +1899,7 @@ export default {
                         "activity_id" : this.selectedActivity.licence_activity,
                         "text": text
                     }
-                    await this.$http.post(helpers.add_endpoint_json(
+                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(
                             api_endpoints.applications, (this.application.id+'/return_to_officer')
                         ), JSON.stringify(data)).then((response) => {
 
@@ -1966,7 +1907,7 @@ export default {
 
                     }, (error) => {
                         this.revert();
-                        swal(
+                        swal.fire(
                             'Application Error',
                             helpers.apiVueResourceError(error),
                             'error'
@@ -2134,7 +2075,6 @@ export default {
             vm.initialiseOrgContactTable();
             vm.initialiseSelects();
             vm.form = document.forms.new_application;
-            // vm.eventListeners();
         });
     },
     mounted: function() {

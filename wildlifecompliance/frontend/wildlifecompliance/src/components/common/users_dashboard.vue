@@ -1,15 +1,13 @@
 <template id="user_dashboard">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">People <small v-if="is_external">View people details</small>
-                        <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#peopleInfo" expanded="true" :aria-controls="pBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pBody">
+            <FormSection
+                :form-collapse="false"
+                label="People"
+                index="people"
+                :subtitle=subtitle
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -23,10 +21,10 @@
                         <div class="col-md-3">
                             <label for="">Date of Birth</label>
                             <div class="input-group date" ref="filterDateOfBirthPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateOfBirth">
-                                <span class="input-group-addon">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateOfBirth">
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>
                     </div>
@@ -36,17 +34,19 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import { mapActions, mapGetters } from 'vuex'
 import {
     api_endpoints,
     helpers
 }from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'UserDashTable',
     props: {
@@ -66,15 +66,15 @@ export default {
     data() {
         let vm = this;
         return {
-            pBody: 'pBody' + vm._uid,
-            datatable_id: 'user-datatable-'+vm._uid,
+            pBody: 'pBody' + uuid(),
+            datatable_id: 'user-datatable-'+uuid(),
             // Filters for Users
             filterCharacterFlagged: 'All',
             character_flagged_options: ['True','False'],
             filterDateOfBirth: '',
-            dateFormat: 'DD/MM/YYYY',
+            dateFormat: 'YYYY-MM-DD',
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -98,7 +98,7 @@ export default {
                     // adding extra GET params for Custom filtering
                     "data": function (d) {
                         d.character_flagged = vm.filterCharacterFlagged;
-                        d.dob = vm.filterDateOfBirth != '' && vm.filterDateOfBirth != null ? moment(vm.filterDateOfBirth, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                        d.dob = vm.filterDateOfBirth != '' && vm.filterDateOfBirth != null ? moment(vm.filterDateOfBirth, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
                     }
                 },
                 columns: [
@@ -156,7 +156,8 @@ export default {
         }
     },
     components:{
-        datatable
+        datatable,
+        FormSection
     },
     watch:{
         filterDateOfBirth: function(){
@@ -170,7 +171,12 @@ export default {
         is_external: function(){
             return this.level == 'external';
         },
-        
+        subtitle: function() {
+            if (this.is_external) {
+                return "View people details";
+            }
+            return "";
+        }
     },
     methods: {
         ...mapActions([
@@ -188,16 +194,6 @@ export default {
         },
         addEventListeners: function(){
             let vm = this;
-            // Initialise Date of Birth Filter
-            $(vm.$refs.filterDateOfBirthPicker).datetimepicker(vm.datepickerOptions);
-            $(vm.$refs.filterDateOfBirthPicker).on('dp.change', function(e){
-                if ($(vm.$refs.filterDateOfBirthPicker).data('DateTimePicker').date()) {
-                    vm.filterDateOfBirth =  e.date.format('DD/MM/YYYY');
-                }
-                else if ($(vm.$refs.filterDateOfBirthPicker).data('date') === "") {
-                    vm.filterDateOfBirth = "";
-                }
-             });
             // Apply on behalf of listener
             vm.$refs.user_datatable.vmDataTable.on('click', 'a[apply-on-behalf-of]', function(e) {
                 e.preventDefault();
@@ -214,5 +210,4 @@ export default {
     }
 }
 </script>
-<style scoped>
-</style>
+

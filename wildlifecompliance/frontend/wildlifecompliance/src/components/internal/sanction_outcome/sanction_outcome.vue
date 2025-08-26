@@ -1,19 +1,15 @@
 <template lang="html">
     <div class="container">
         <div class="row">
-            <div class="col-md-3">
-                <h3>Sanction Outcome: {{ displayLodgementNumber }}</h3>
-            </div>
-        </div>
-        <div>
-            <div class="col-md-3">
+            <h3>Sanction Outcome: {{ displayLodgementNumber }}</h3>
+            <div class="col-md-4">
                 <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
-                <div class="row">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
+                <div class="">
+                    <div class="card mb-3">
+                        <div class="card-header">
                             Workflow
                         </div>
-                        <div class="panel-body panel-collapse">
+                        <div class="card-body border-bottom">
                             <div class="row">
                                 <div class="col-sm-12">
                                     <strong>Status</strong><br/>
@@ -32,12 +28,12 @@
                             </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
+                <div class="">
+                    <div class="card mb-3">
+                        <div class="card-header">
                             Action
                         </div>
-                        <div class="panel-body panel-collapse">
+                        <div class="card-body border-bottom">
 
                             <!-- Infringement Notice Coordinator -->
                             <div v-if="visibilityExtendDueDateButton" class="row action-button">
@@ -139,17 +135,29 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-9" id="main-column">
+            <div class="col-md-8">
                 <div class="row">
                     <div class="container-fluid">
-                        <ul class="nav nav-pills aho2">
-                            <li class="nav-item active"><a data-toggle="tab" :href="'#'+soTab">{{ typeDisplay }}</a></li>
-                            <li class="nav-item" v-show="displayRemediationActions"><a data-toggle="tab" :href="'#'+raTab">Remediation Actions</a></li>
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+deTab">Details</a></li>
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+reTab">Related Items</a></li>
+                        <ul id="pills-tab" class="nav nav-pills mb-3" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+soTab">{{ typeDisplay }}</a></li>
+                            <li class="nav-item" v-show="displayRemediationActions">
+                                <a class="nav-link"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+raTab">Remediation Actions</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+deTab">Details</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+reTab">Related Items</a></li>
                         </ul>
-                        <div class="tab-content">
-                            <div :id="soTab" class="tab-pane fade in active">
+                        <div id="pills-tabContent" class="tab-content">
+                            <div :id="soTab" class="tab-pane fade in active show" role="tabpanel">
                                 <FormSection :formCollapse="false" :label="typeDisplay" Index="1">
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
@@ -258,7 +266,7 @@
                                 </FormSection>
                             </div>
 
-                            <div :id="raTab" class="tab-pane fade in">
+                            <div :id="raTab" class="tab-pane fade in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Remediation Actions" Index="2">
                                     <div class="col-sm-12 form-group">
                                         <div class="row col-sm-12">
@@ -273,7 +281,7 @@
                                 </FormSection>
                             </div>
 
-                            <div :id="deTab" class="tab-pane fade in">
+                            <div :id="deTab" class="tab-pane fade in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Details" Index="3">
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
@@ -296,9 +304,9 @@
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="dateOfIssuePicker">
                                                 <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="sanction_outcome.date_of_issue" :disabled="!sanction_outcome.issued_on_paper || readonlyForm"/>
-                                                <span class="input-group-addon">
+                                                <!--<span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>
+                                                </span>-->
                                             </div>
                                         </div>
                                     </div></div>
@@ -316,9 +324,9 @@
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="timeOfIssuePicker">
                                                 <input type="text" class="form-control" placeholder="HH:MM" v-model="sanction_outcome.time_of_issue" :disabled="!sanction_outcome.issued_on_paper || readonlyForm" />
-                                                <span class="input-group-addon">
+                                                <!--<span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>
+                                                </span>-->
                                             </div>
                                         </div>
                                     </div></div>
@@ -374,7 +382,7 @@
                                                 <label>Payment due date:</label>
                                             </div>
                                             <div class="col-sm-3">
-                                                <span>{{ formatDate(item.due_date_applied) }}</span>
+                                                <span>{{ formatSODate(item.due_date_applied) }}</span>
                                             </div>
                                             <div class="col-sm-2">
                                                 <label>Reason:</label>
@@ -387,7 +395,7 @@
                                 </FormSection>
                             </div>
 
-                            <div :id="reTab" class="tab-pane fade in">
+                            <div :id="reTab" class="tab-pane fade in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Related Items" Index="6">
                                     <div class="col-sm-12 form-group"><div class="row">
                                         <div class="col-sm-12">
@@ -462,6 +470,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import datatable from '@vue-utils/datatable.vue'
@@ -477,7 +486,7 @@ import RecordFerCaseNumber from '@/components/internal/sanction_outcome/record_f
 import SendParkingInfringement from '@/components/internal/sanction_outcome/send_parking_infringement.vue';
 import AcceptRemediationAction from '@/components/internal/sanction_outcome/accept_remediation_action.vue';
 import RequestAmendmentRemediationAction from '@/components/internal/sanction_outcome/request_amendment_remediation_action.vue';
-import 'bootstrap/dist/css/bootstrap.css';
+
 import hash from 'object-hash';
 import RelatedItems from "@common-components/related_items.vue";
 import RegistrationHolder from "@common-components/search_person_or_organisation.vue";
@@ -512,10 +521,10 @@ export default {
             workflow_type :'',
             workflowBindId :'',
             remediation_action_id: 0,
-            soTab: 'soTab' + this._uid,
-            raTab: 'raTab' + this._uid,
-            deTab: 'deTab' + this._uid,
-            reTab: 'reTab' + this._uid,
+            soTab: 'soTab' + uuid(),
+            raTab: 'raTab' + uuid(),
+            deTab: 'deTab' + uuid(),
+            reTab: 'reTab' + uuid(),
             objectHash : null,
             extendPaymentDueDateInitialized: false,
             recordFerCaseNumberInitialized: false,
@@ -802,7 +811,7 @@ export default {
         relatedItemsBindId: function() {
             let timeNow = Date.now()
             if (this.sanction_outcome && this.sanction_outcome.id) {
-                return 'sanction_outcome_' + this.sanction_outcome.id + '_' + this._uid;
+                return 'sanction_outcome_' + this.sanction_outcome.id + '_' + uuid();
             } else {
                 return timeNow.toString();
             }
@@ -1068,8 +1077,7 @@ export default {
             await this.loadRemediationAction({ remediation_action_id: remediation_action_id });
             this.constructRemediationActionsTable();
         },
-        formatDate: function(d){
-            console.log('formatDate');
+        formatSODate: function(d){
             if (d === 'overdue'){
                 return 'Overdue';
             }
@@ -1141,7 +1149,7 @@ export default {
                 console.log('save()');
                 let returned_so = await this.saveSanctionOutcome();
 
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
 
                 this.constructAllegedCommittedOffencesTable();
                 this.updateObjectHash()
@@ -1152,7 +1160,7 @@ export default {
         saveExit: async function() {
             try {
                 await this.saveSanctionOutcome();
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
 
                 // remove redundant eventListeners
                 window.removeEventListener('beforeunload', this.leaving);
@@ -1186,39 +1194,13 @@ export default {
                     }
                 }
             }
-            await swal("Error", errorText, "error");
+            await swal.fire("Error", errorText, "error");
         },
         destroyed: function() {
             window.removeEventListener('beforeunload', this.leaving);
             window.removeEventListener('onblur', this.leaving);
         },
-        setUpDateTimePicker: function() {
-            let vm = this;
-            let el_issue_date = $(vm.$refs.dateOfIssuePicker);
-            let el_issue_time = $(vm.$refs.timeOfIssuePicker);
-
-            // Issue "Date" field
-            el_issue_date.datetimepicker({ format: "DD/MM/YYYY", maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_issue_date.on("dp.change", function(e) {
-              if (el_issue_date.data("DateTimePicker").date()) {
-                vm.sanction_outcome.date_of_issue = e.date.format("DD/MM/YYYY");
-              } else if (el_issue_date.data("date") === "") {
-                vm.sanction_outcome.date_of_issue = null;
-              }
-            });
-
-            // Issue "Time" field
-            el_issue_time.datetimepicker({ format: "LT", showClear: true });
-            el_issue_time.on("dp.change", function(e) {
-              if (el_issue_time.data("DateTimePicker").date()) {
-                vm.sanction_outcome.time_of_issue = e.date.format("LT");
-              } else if (el_issue_time.data("date") === "") {
-                vm.sanction_outcome.time_of_issue = null;
-              }
-            });
-        },
         addEventListeners: function() {
-            this.setUpDateTimePicker();
             $("#alleged-committed-offence-table").on("click", ".remove_alleged_committed_offence", this.removeAllegedOffenceClicked);
             $("#alleged-committed-offence-table").on("click", ".restore_alleged_committed_offence", this.restoreAllegedOffenceClicked);
             $("#alleged-committed-offence-table").on("click", ".include_alleged_committed_offence", this.includeAllegedOffenceClicked);

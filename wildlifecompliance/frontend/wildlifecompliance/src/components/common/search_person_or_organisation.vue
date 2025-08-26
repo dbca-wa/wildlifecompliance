@@ -59,7 +59,7 @@
 <script>
 import Awesomplete from "awesomplete";
 import $ from "jquery";
-import "bootstrap/dist/css/bootstrap.css";
+
 import "awesomplete/awesomplete.css";
 import updateCreatePerson from '@common-components/update_create_person.vue'
 import updateCreateOrganisation from '@common-components/update_create_organisation.vue'
@@ -117,8 +117,6 @@ export default {
                     this.creatingPerson = false;
                 } else if (this.entity.id && this.entity.data_type === 'organisation') {
                     this.displayUpdateCreatePerson = false;
-                    // TODO: swap following two lines once create org implemented
-                    //this.displayUpdateCreateOrganisation = true;
                     this.displayUpdateCreateOrganisation = false;
                     this.creatingOrganisation = false;
                 }
@@ -141,6 +139,7 @@ export default {
             if (this.domIdHelper) {
                 domId += this.domIdHelper;
             }
+            console.log(domId)
             return domId;
         },
         labelTitle: function() {
@@ -337,122 +336,127 @@ export default {
                 this.setInput(value);
             } else if (obj.errorMessage) {
                 let errorMessage = obj.errorMessage
-                await swal("Error", errorMessage, "error");
+                await swal.fire("Error", errorMessage, "error");
             }
         },
         initAwesomplete: function() {
             let vm = this;
 
             let element_search = document.getElementById(vm.elemId);
-            vm.awesomplete_obj = new Awesomplete(element_search, {
-                maxItems: vm.maxItems,
-                sort: false,
-                filter: () => {
-                    return true;
-                }, 
-                item: function(text, input) {
-                    let ret = Awesomplete.ITEM(text, ""); // Not sure how this works but this doesn't add <mark></mark>
-                    return ret;
-                },
-                data: function(item, input) {
-                    if (vm.searchType == "individual") {
-                        let f_name = item.first_name ? item.first_name : "";
-                        let l_name = item.last_name ? item.last_name : "";
-            
-                        let full_name = [f_name, l_name].filter(Boolean).join(" ");
-                        //console.log(full_name)
-                        //let individual_full_name = f_name + ' ' + l_name;
-                        let email = item.email ? "E:" + item.email : "";
-                        let p_number = item.phone_number ? "P:" + item.phone_number : "";
-                        let m_number = item.mobile_number ? "M:" + item.mobile_number : "";
-                        let dob = item.dob ? "DOB:" + item.dob : "DOB: ---";
-            
-                        let full_name_marked = "<strong>" + vm.markMatchedText(full_name, input) + "</strong>";
-                        let email_marked = vm.markMatchedText(email, input);
-                        let p_number_marked = vm.markMatchedText(p_number, input);
-                        let m_number_marked = vm.markMatchedText(m_number, input);
-                        let dob_marked = vm.markMatchedText(dob, input);
-            
-                        let myLabel = [
-                            full_name_marked,
-                            email_marked,
-                            p_number_marked,
-                            m_number_marked,
-                            dob_marked
-                        ].filter(Boolean).join("<br />");
-                        myLabel = "<div data-item-id=" + item.id + ' data-full-name="' + full_name + '" data-type="individual">' + myLabel + "</div>";
-            
-                        return {
-                            label: myLabel, // Displayed in the list below the search box
-                            value: [full_name, dob].filter(Boolean).join(", "), // Inserted into the search box once selected
-                            id: item.id
-                        };
-                    } else {
-                        let name = item.name ? item.name : "";
-                        let abn = item.abn ? "ABN:" + item.abn : "";
-            
-                        let name_marked = "<strong>" + vm.markMatchedText(name, input) + "</strong>";
-                        let abn_marked = vm.markMatchedText(abn, input);
-            
-                        let myLabel = [name_marked, abn_marked].filter(Boolean).join("<br />");
-                        myLabel = "<div data-item-id=" + item.id + ' data-type="organisation">' + myLabel + "</div>";
-            
-                        return {
-                            label: myLabel,
-                            value: [name, abn].filter(Boolean).join(", "),
-                            id: item.id
-                        };
+            console.log(vm.elemId)
+            console.log(element_search)
+            if (element_search != null) {
+                vm.awesomplete_obj = new Awesomplete(element_search, {
+                    maxItems: vm.maxItems,
+                    sort: false,
+                    filter: () => {
+                        return true;
+                    }, 
+                    item: function(text, input) {
+                        let ret = Awesomplete.ITEM(text, ""); // Not sure how this works but this doesn't add <mark></mark>
+                        return ret;
+                    },
+                    data: function(item, input) {
+                        if (vm.searchType == "individual") {
+                            let f_name = item.first_name ? item.first_name : "";
+                            let l_name = item.last_name ? item.last_name : "";
+                
+                            let full_name = [f_name, l_name].filter(Boolean).join(" ");
+                            //console.log(full_name)
+                            //let individual_full_name = f_name + ' ' + l_name;
+                            let email = item.email ? "E:" + item.email : "";
+                            let p_number = item.phone_number ? "P:" + item.phone_number : "";
+                            let m_number = item.mobile_number ? "M:" + item.mobile_number : "";
+                            let dob = item.dob ? "DOB:" + item.dob : "DOB: ---";
+                
+                            let full_name_marked = "<strong>" + vm.markMatchedText(full_name, input) + "</strong>";
+                            let email_marked = vm.markMatchedText(email, input);
+                            let p_number_marked = vm.markMatchedText(p_number, input);
+                            let m_number_marked = vm.markMatchedText(m_number, input);
+                            let dob_marked = vm.markMatchedText(dob, input);
+                
+                            let myLabel = [
+                                full_name_marked,
+                                email_marked,
+                                p_number_marked,
+                                m_number_marked,
+                                dob_marked
+                            ].filter(Boolean).join("<br />");
+                            myLabel = "<div data-item-id=" + item.id + ' data-full-name="' + full_name + '" data-type="individual">' + myLabel + "</div>";
+                
+                            return {
+                                label: myLabel, // Displayed in the list below the search box
+                                value: [full_name, dob].filter(Boolean).join(", "), // Inserted into the search box once selected
+                                id: item.id
+                            };
+                        } else {
+                            let name = item.name ? item.name : "";
+                            let abn = item.abn ? "ABN:" + item.abn : "";
+                
+                            let name_marked = "<strong>" + vm.markMatchedText(name, input) + "</strong>";
+                            let abn_marked = vm.markMatchedText(abn, input);
+                
+                            let myLabel = [name_marked, abn_marked].filter(Boolean).join("<br />");
+                            myLabel = "<div data-item-id=" + item.id + ' data-type="organisation">' + myLabel + "</div>";
+                
+                            return {
+                                label: myLabel,
+                                value: [name, abn].filter(Boolean).join(", "),
+                                id: item.id
+                            };
+                        }
                     }
-                }
-            });
-            $(element_search)
-            .on("keyup", function(ev) {
-                var keyCode = ev.keyCode || ev.which;
-                if ((48 <= keyCode && keyCode <= 90) || (96 <= keyCode && keyCode <= 105) || keyCode == 8 || keyCode == 46) {
-                    vm.search_person_or_organisation(ev.target.value);
-                    return false;
-                }
-            })
-            .on("awesomplete-selectcomplete", function(ev) {
-                ev.preventDefault();
-                ev.stopPropagation();
-                return false;
-            })
-            .on("awesomplete-select", function(ev) {
-                let origin = $(ev.originalEvent.origin);
-                console.log('In awesomplete-select')
-                console.log(origin)
-                let originTagName = origin[0].tagName;
-                console.log('originTagName: ' + originTagName);
-                switch(originTagName){
-                    case "STRONG":
-                        origin = origin.parent();
-                        break;
-                    case "MARK":
-                        origin = origin.parent().parent();
-                        break;
-                    case "LI":
-                        origin = origin.children().first();
-                        break;
-                }
-                let data_item_id = origin[0].getAttribute("data-item-id");
-                let data_type = origin[0].getAttribute("data-type");
-                let data_full_name = origin[0].getAttribute("data-full-name");
-
-                // Emit an event so that the parent vue component can subscribe to the event: 'person-selected' 
-                // and receive the data user selected.
-                // 
-                // id is an Emailuser.id when data_type is 'individual' or 
-                // an Organisation.id when data_type is 'organisation'
-                vm.$nextTick(() => {
-                    let data_item_id_int = parseInt(data_item_id);
-                    vm.entity = {
-                        'id': data_item_id_int, 
-                        'data_type': data_type,
-                        'full_name': data_full_name
-                    };
                 });
-            });
+
+                $(element_search)
+                .on("keyup", function(ev) {
+                    var keyCode = ev.keyCode || ev.which;
+                    if ((48 <= keyCode && keyCode <= 90) || (96 <= keyCode && keyCode <= 105) || keyCode == 8 || keyCode == 46) {
+                        vm.search_person_or_organisation(ev.target.value);
+                        return false;
+                    }
+                })
+                .on("awesomplete-selectcomplete", function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    return false;
+                })
+                .on("awesomplete-select", function(ev) {
+                    let origin = $(ev.originalEvent.origin);
+                    console.log('In awesomplete-select')
+                    console.log(origin)
+                    let originTagName = origin[0].tagName;
+                    console.log('originTagName: ' + originTagName);
+                    switch(originTagName){
+                        case "STRONG":
+                            origin = origin.parent();
+                            break;
+                        case "MARK":
+                            origin = origin.parent().parent();
+                            break;
+                        case "LI":
+                            origin = origin.children().first();
+                            break;
+                    }
+                    let data_item_id = origin[0].getAttribute("data-item-id");
+                    let data_type = origin[0].getAttribute("data-type");
+                    let data_full_name = origin[0].getAttribute("data-full-name");
+
+                    // Emit an event so that the parent vue component can subscribe to the event: 'person-selected' 
+                    // and receive the data user selected.
+                    // 
+                    // id is an Emailuser.id when data_type is 'individual' or 
+                    // an Organisation.id when data_type is 'organisation'
+                    vm.$nextTick(() => {
+                        let data_item_id_int = parseInt(data_item_id);
+                        vm.entity = {
+                            'id': data_item_id_int, 
+                            'data_type': data_type,
+                            'full_name': data_full_name
+                        };
+                    });
+                });
+            }
         },
         search_person_or_organisation(searchTerm){
             var vm = this;
@@ -512,23 +516,6 @@ export default {
             Object.assign(this.entity, this.entityEdit);
         }
         this.object_hash = hash(this.entity);
-        /*
-        if (this.departmentalStaff) {
-            let returned_departmental_staff = await cache_helper.getSetCacheList(
-              'DepartmentalStaff',
-              //'https://itassets.dbca.wa.gov.au/api/users/fast/?minimal=true'
-              api_endpoints.get_department_users
-              );
-            Object.assign(this.departmentalStaffList, returned_departmental_staff);
-            // blank entry allows user to clear selection
-            this.departmentalStaffList.splice(0, 0,
-              {
-                pk: "",
-                //artifact_type: "",
-                //description: "",
-              });
-        }
-    */
     },
 }
 </script>

@@ -272,12 +272,10 @@ class SearchReferenceView(views.APIView):
         #TODO not clear is this should be internal only or not, but at least should be authed
         try:
             if request.user.is_authenticated:
-                #qs = []
                 reference_number = request.data.get('reference_number')
+                result = {}
                 if reference_number:
                     result = search_reference(reference_number)
-                #serializer = SearchReferenceSerializer(qs)
-                #return Response(serializer.data)
                 return Response(result)
             else:
                 return Response(status=status.HTTP_401_UNAUTHORIZED,)

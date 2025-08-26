@@ -2,14 +2,14 @@
 <div class="container" id="internalOrgAccess">
     <div class="row">
         <h3>Organisation Access Request {{ access.id }}</h3>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <CommsLogs :comms_url="comms_url" :logs_url="logs_url" comms_add_url="test"/>
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                        Submission 
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div class="row">
                             <div class="col-sm-12">
                                 <strong>Submitted by</strong><br/>
@@ -17,15 +17,17 @@
                             </div>
                             <div class="col-sm-12 top-buffer-s">
                                 <strong>Lodged on</strong><br/>
-                                {{ access.lodgement_date | formatDate}}
+                                {{ formatDate(access.lodgement_date) }}
                             </div>
                             <div class="col-sm-12 top-buffer-s">
                                 <table class="table small-table">
+                                    <thead>
                                     <tr>
                                         <th>Lodgment</th>
                                         <th>Date</th>
                                         <th>Action</th>
                                     </tr>
+                                    </thead>
                                 </table>
                             </div>
                         </div>
@@ -33,11 +35,11 @@
                 </div>
             </div>
             <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+                <div class="card mb-3">
+                    <div class="card-header">
                         Workflow 
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div class="row">
                             <div class="col-sm-12">
                                 <strong>Status</strong><br/>
@@ -46,12 +48,12 @@
                              <div class="col-sm-12 top-buffer-s">
                                 <strong>Assigned Officer</strong><br/>
                                 <div class="form-group">
-                                    <template>
+                                    <div>
                                         <select ref="assigned_officer" :disabled="!officerCanProcess" class="form-control" v-model="access.assigned_officer">
                                             <option v-for="member in organisation_access_group_members" :value="member.id" v-bind:key="member.id">{{member.name}}</option>
                                         </select>
                                         <a v-if="officerCanProcess" @click.prevent="assignToMe()" class="actionBtn pull-right">Assign to me</a>
-                                    </template>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-12 top-buffer-s" v-if="officerCanProcess">
@@ -67,7 +69,6 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-1"></div>
         <div class="col-md-8">
             <div class="row">
                 <div class="panel panel-default">
@@ -130,7 +131,7 @@ import datatable from '@vue-utils/datatable.vue'
 import CommsLogs from '@common-components/comms_logs.vue'
 import {
   api_endpoints,
-  helpers
+  helpers, fetch_util
 }
 from '@/utils/hooks'
 export default {
@@ -294,21 +295,16 @@ export default {
         requestType : null,
     }
   },
-  watch: {},
-  filters: {
-    formatDate: function(data){
-        return moment(data).format('DD/MM/YYYY HH:mm:ss');
-    }
-  },
   beforeRouteEnter: function(to, from, next){
-    Vue.http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,to.params.access_id)).then((response) => {
+    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,to.params.access_id))
+    request.then((response) => {
         next(vm => {
-            vm.access = response.body
+            vm.access = response
             vm.requestType = vm.access.role == 'employee' ? '(Administrator)' : '(Consultant)'
         })
-    },(error) => {
+    }).catch((error) => {
         console.log(error);
-    })
+    });
   },
   components: {
     datatable,
@@ -332,13 +328,13 @@ export default {
     commaToNewline(s){
         return s.replace(/[,;]/g, '\n');
     },
-    fetchAccessGroupMembers: function(){
+    fetch_utilAccessGroupMembers: function(){
         let vm = this;
         vm.loading.push('Loading Access Group Members');
-        vm.$http.get(api_endpoints.organisation_access_group_members).then((response) => {
-            vm.organisation_access_group_members = response.body
+        let request = fetch_util.fetchUrl(api_endpoints.organisation_access_group_members).then((response) => {
+            vm.organisation_access_group_members = response
             vm.loading.splice('Loading Access Group Members',1);
-        },(error) => {
+        }).catch((error) => {
             console.log(error);
             vm.loading.splice('Loading Access Group Members',1);
         })
@@ -346,13 +342,13 @@ export default {
     },
     assignToMe: function(){
         let vm = this;
-        vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/assign_to_me')))
-        .then((response) => {
-            vm.access = response.body;
+        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/assign_to_me')))
+        request.then((response) => {
+            vm.access = response;
             vm.updateAssignedOfficerSelect();
-        }, (error) => {
+        }).catch((error) => {
             vm.updateAssignedOfficerSelect();
-            swal(
+            swal.fire(
                 'Application Error',
                 helpers.apiVueResourceError(error),
                 'error'
@@ -366,14 +362,15 @@ export default {
         unassign = vm.access.assigned_officer != null && vm.access.assigned_officer != 'undefined' ? false: true;
         data = {'officer_id': vm.access.assigned_officer};
         if (!unassign){
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/assign_officer')),JSON.stringify(data),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/assign_officer')), {method:'POST', body:JSON.stringify(data)},{
                 emulateJSON:true
-            }).then((response) => {
-                vm.access = response.body;
+            })
+            request.then((response) => {
+                vm.access = response;
                 vm.updateAssignedOfficerSelect();
-            }, (error) => {
+            }).catch((error) => {
                 vm.updateAssignedOfficerSelect();
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -381,13 +378,13 @@ export default {
             });
         }
         else{
-            vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/unassign_officer')))
-            .then((response) => {
-                vm.access = response.body;
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/unassign_officer')))
+            request.then((response) => {
+                vm.access = response;
                 vm.updateAssignedOfficerSelect();
-            }, (error) => {
+            }).catch((error) => {
                 vm.updateAssignedOfficerSelect();
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -402,7 +399,7 @@ export default {
     },
     acceptRequest: function() {
         let vm = this;
-        swal({
+        swal.fire({
             title: "Accept Organisation Request",
             text: "Are you sure you want to accept this organisation request?",
             type: "question",
@@ -410,16 +407,16 @@ export default {
             confirmButtonText: 'Accept'
         }).then((result) => {
             if (result) {
-                vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/accept')))
-                .then((response) => {
-                    swal({
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/accept')))
+                request.then((response) => {
+                    swal.fire({
                         title: "Accept Organisation Request",
                         text: "The organisation access request has been accepted.",
                         type: "success"}
                     );
-                    vm.access = response.body;
-                }, (error) => {
-                    swal({
+                    vm.access = response;
+                }).catch((error) => {
+                    swal.fire({
                         title: "Accept Organisation Request",
                         text: "There was an error accepting the organisation access request.",
                         type: "error"}
@@ -427,14 +424,14 @@ export default {
                     console.log(error);
                 });
             }
-        },(error) => {
-
+        }).catch((error) => {
+            console.log(error)
         });
 
     },
     amendmentRequest: function() {
         let vm = this;
-        swal({
+        swal.fire({
             title: "Amendment Request",
             text: "Request a new letter from the user.",
             type: "question",
@@ -444,16 +441,16 @@ export default {
             confirmButtonText: 'Send Request'
         }).then((result) => {
             if (result) {
-                vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result)))
-                .then((response) => {
-                    swal({
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result)))
+                request.then((response) => {
+                    swal.fire({
                         title: "Amendment Request",
                         text: "A new letter has been requested.",
                         type: "success"}
                     );
-                    vm.access = response.body;
-                }, (error) => {
-                    swal({
+                    vm.access = response;
+                }).catch((error) => {
+                    swal.fire({
                         title: "Amendment Request",
                         text: "There was an error sending the amendment request request.",
                         type: "error"}
@@ -461,14 +458,14 @@ export default {
                     console.log(error);
                 });
             }
-        },(error) => {
-
+        }).catch((error) => {
+            console.log(error)
         });
 
     },
     declineRequest: function() {
         let vm = this;
-        swal({
+        swal.fire({
             title: "Decline Organisation Request",
             text: "Are you sure you want to decline this organisation request?",
             type: "question",
@@ -476,16 +473,16 @@ export default {
             confirmButtonText: 'Accept'
         }).then((result) => {
             if (result) {
-                vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/decline')))
-                .then((response) => {
-                    swal({
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/decline')))
+                request.then((response) => {
+                    swal.fire({
                         title: "Decline Organisation Request",
                         text: "The organisation access request has been declined.",
                         type: "success"}
                     );
-                    vm.access = response.body;
-                }, (error) => {
-                    swal({
+                    vm.access = response;
+                }).catch((error) => {
+                    swal.fire({
                         title: "Decline Organisation Request",
                         text: "There was an error declining the organisation access request.",
                         type: "error"}

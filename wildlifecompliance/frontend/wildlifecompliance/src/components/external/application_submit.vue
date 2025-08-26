@@ -7,14 +7,16 @@
                         <strong>Your application has been successfully submitted.</strong>
                         <br/>
                         <table>
+                            <thead>
                             <tr>
                                 <td><strong>Application:&nbsp;</strong></td>
                                 <td><strong>{{application.lodgement_number}}</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Date:</strong></td>
-                                <td><strong> {{application.lodgement_date|formatDate}}</strong></td>
+                                <td><strong> {{formatDate(application.lodgement_date)}}</strong></td>
                             </tr>
+                            </thead>
                         </table>
                         <a href="/" style="margin-top:15px;" class="btn btn-primary">Back to dashboard</a>
                     </div>
@@ -47,11 +49,6 @@ export default {
   computed: {
   },
   methods: {
-  },
-  filters:{
-        formatDate: function(data){
-            return data ? moment(data).format('DD/MM/YYYY'): '';
-        }
   },
   mounted: function() {
     let vm = this;

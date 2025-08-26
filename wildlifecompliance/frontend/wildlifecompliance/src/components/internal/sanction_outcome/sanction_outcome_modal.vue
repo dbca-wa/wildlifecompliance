@@ -181,10 +181,10 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="dueDatePicker">
-                                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" :value="current_remediation_action.due_date" />
-                                        <span class="input-group-addon">
+                                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" :value="current_remediation_action.due_date" />
+                                        <!--<span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                        </span>-->
                                     </div>
                                 </div>
                             </div></div>
@@ -224,10 +224,10 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="dateOfIssuePicker">
-                                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="sanction_outcome.date_of_issue" :disabled="!sanction_outcome.issued_on_paper"/>
-                                        <span class="input-group-addon">
+                                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="sanction_outcome.date_of_issue" :disabled="!sanction_outcome.issued_on_paper"/>
+                                        <!--<span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                        </span>-->
                                     </div>
                                 </div>
                             </div></div>
@@ -238,10 +238,10 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="timeOfIssuePicker">
-                                        <input type="text" class="form-control" placeholder="HH:MM" v-model="sanction_outcome.time_of_issue" :disabled="!sanction_outcome.issued_on_paper" />
-                                        <span class="input-group-addon">
+                                        <input type="time" class="form-control" placeholder="HH:MM" v-model="sanction_outcome.time_of_issue" :disabled="!sanction_outcome.issued_on_paper" />
+                                        <!--<span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                        </span>-->
                                     </div>
                                 </div>
                             </div></div>
@@ -269,16 +269,17 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import modal from "@vue-utils/bootstrap-modal.vue";
 import datatable from "@vue-utils/datatable.vue";
 import filefield from "@/components/common/compliance_file.vue";
 import { mapGetters, mapActions } from "vuex";
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "../utils";
 import $ from "jquery";
 import "jquery-ui/ui/widgets/draggable.js";
-import "bootstrap/dist/css/bootstrap.css";
+
 import "awesomplete/awesomplete.css";
 
 export default {
@@ -288,9 +289,9 @@ export default {
 
     return {
         temporary_document_collection_id: null,
-        nTab: "nTab" + vm._uid,
-        aTab: "aTab" + vm._uid,
-        dTab: "dTab" + vm._uid,
+        nTab: "nTab" + uuid(),
+        aTab: "aTab" + uuid(),
+        dTab: "dTab" + uuid(),
         isModalOpen: false,
         processingDetails: false,
 
@@ -684,7 +685,6 @@ export default {
                 }
             }
             this.errorResponse = errorText;
-            //await swal("Error", errorText, "error");
         },
         ...mapActions({
             loadAllocatedGroup: 'loadAllocatedGroup',  // defined in store/modules/user.js
@@ -774,48 +774,6 @@ export default {
         },
         addEventListeners: function() {
             let vm = this;
-            let el_issue_date = $(vm.$refs.dateOfIssuePicker);
-            let el_issue_time = $(vm.$refs.timeOfIssuePicker);
-            let el_due_date = $(vm.$refs.dueDatePicker);
-
-            // Issue "Date" field
-            el_issue_date.datetimepicker({
-              format: "DD/MM/YYYY",
-              maxDate: "now",
-              showClear: true
-            });
-            el_issue_date.on("dp.change", function(e) {
-              if (el_issue_date.data("DateTimePicker").date()) {
-                vm.sanction_outcome.date_of_issue = e.date.format("DD/MM/YYYY");
-              } else if (el_issue_date.data("date") === "") {
-                vm.sanction_outcome.date_of_issue = null;
-              }
-            });
-
-            // Issue "Time" field
-            el_issue_time.datetimepicker({ format: "LT", showClear: true });
-            el_issue_time.on("dp.change", function(e) {
-              if (el_issue_time.data("DateTimePicker").date()) {
-                vm.sanction_outcome.time_of_issue = e.date.format("LT");
-              } else if (el_issue_time.data("date") === "") {
-                vm.sanction_outcome.time_of_issue = null;
-              }
-            });
-
-            // Due "Date" field
-            el_due_date.datetimepicker({
-              minDate: moment().millisecond(0).second(0).minute(0).hour(0),
-              format: "DD/MM/YYYY",
-              showClear: true
-            });
-            el_due_date.on("dp.change", function(e) {
-              if (el_due_date.data("DateTimePicker").date()) {
-                vm.current_remediation_action.due_date = e.date.format("DD/MM/YYYY");
-              } else if (el_due_date.data("date") === "") {
-                vm.current_remediation_action.due_date = null;
-              }
-            });
-
             $("#tbl_remediation_actions").on("click", ".remove_button", vm.removeClicked);
             $("#tbl_alleged_offence").on("click", ".alleged_offence_include", vm.aco_include_clicked);
         },
@@ -930,7 +888,7 @@ export default {
             payload.inspection_id = this.$parent.inspection ? this.$parent.inspection.id : null;
             payload.workflow_type = 'send_to_manager'  // Because this modal is used only when creating new sanction outcome to send to manager
 
-            const savedObj = await Vue.http.post(postUrl, payload);
+            const savedObj = await fetch_util.fetchUrl(postUrl, {method:'POST', body:JSON.stringify(payload)});
             return savedObj;
         },
         currentOffenderChanged: function() {
@@ -982,28 +940,28 @@ export default {
             // This modal is used not onfly from an offence but also from the several entities, such as call_email, inspection, etc.
             let returned = null;
             if (this.$parent.call_email && this.$parent.call_email.id) {
-                returned = await Vue.http.get("/api/offence/filter_by_call_email.json", {
+                returned = await fetch_util.fetchUrl("/api/offence/filter_by_call_email.json", {
                     params: { call_email_id: this.$parent.call_email.id }
                 });
-                this.options_for_offences = returned.body;
+                this.options_for_offences = returned;
             } else if (this.$parent.inspection && this.$parent.inspection.id) {
-                returned = await Vue.http.get("/api/offence/filter_by_inspection.json", {
+                returned = await fetch_util.fetchUrl("/api/offence/filter_by_inspection.json", {
                     params: { inspection_id: this.$parent.inspection.id }
                 });
-                this.options_for_offences = returned.body;
+                this.options_for_offences = returned;
             } else if (this.$parent.offence && this.$parent.offence.id) {
                 this.options_for_offences = [this.$parent.offence];
             } else if (this.$parent.legal_case && this.$parent.legal_case.id) {
-                returned = await Vue.http.get("/api/offence/filter_by_legal_case.json", {
+                returned = await fetch_util.fetchUrl("/api/offence/filter_by_legal_case.json", {
                     params: { legal_case_id: this.$parent.legal_case.id }
                 });
-                this.options_for_offences = returned.body;
+                this.options_for_offences = returned;
             }
         },
         createDocumentActionUrl: async function() {
             // create sanction outcome and get id
-            let returned_sanction_outcome = await Vue.http.post(api_endpoints.sanction_outcome);
-            this.sanction_outcome.id = returned_sanction_outcome.body.id;
+            let returned_sanction_outcome = await fetch_util.fetchUrl(api_endpoints.sanction_outcome);
+            this.sanction_outcome.id = returned_sanction_outcome.id;
 
             return helpers.add_endpoint_join(
                 api_endpoints.sanction_outcome,

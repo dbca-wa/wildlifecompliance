@@ -1,38 +1,36 @@
 <template id="organisation_dashboard">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Organisations
-                        <a :href="'#'+oBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="oBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="oBody">
+            <FormSection
+                :form-collapse="false"
+                label="Organisations"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-lg-12">
                             <datatable ref="organisation_datatable" :id="datatable_id" :dtOptions="organisation_options" :dtHeaders="organisation_headers"/>
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import {
     api_endpoints,
     helpers
 }from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'OrganisationDashTable',
     data() {
         let vm = this;
         return {
-            oBody: 'oBody' + vm._uid,
-            datatable_id: 'organisation-datatable-'+vm._uid,
+            oBody: 'oBody' + uuid(),
+            datatable_id: 'organisation-datatable-'+uuid(),
             organisation_headers: ["Name", "ABN", "Address", "Action"],
             organisation_options:{
                 serverSide: true,
@@ -41,7 +39,7 @@ export default {
                 order: [
                     [0, 'asc']
                 ],
-                tableID: 'organisation-datatable-'+vm._uid,
+                tableID: 'organisation-datatable-'+uuid(),
                 language: {
                     processing: "<i class='fa fa-4x fa-spinner fa-spin'></i>"
                 },
@@ -87,14 +85,9 @@ export default {
             }
         }
     },
-    components:{
+    components: {
+        FormSection,
         datatable
-    },
-    watch:{
-    },
-    computed: {
-    },
-    methods:{
     },
     mounted: function(){
         let vm = this;
@@ -107,5 +100,4 @@ export default {
     }
 }
 </script>
-<style scoped>
-</style>
+

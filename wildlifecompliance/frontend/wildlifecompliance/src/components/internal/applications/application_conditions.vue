@@ -1,46 +1,22 @@
-<template id="application_conditions">
-
-                <div :class="isLicensingOfficer ? 'col-md-12 conditions-table' : 'col-md-12'" > 
-                    <div class="row">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Proposed Conditions
-                                    <a class="panelClicker" :href="'#'+panelBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="panelBody">
-                                        <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                    </a>
-                                </h3>
-                            </div>
-                            <div class="panel-body panel-collapse collapse in" :id="panelBody">
-                                <form class="form-horizontal" action="index.html" method="post">
-                                    <div class="col-sm-12">
-                                        <button v-if="canAddConditions" @click.prevent="addCondition()" style="margin-bottom:10px;" class="btn btn-primary pull-right">Add Condition</button>
-                                    </div>
-                                    <datatable ref="conditions_datatable" :id="'conditions-datatable-'+_uid" :dtOptions="condition_options" :dtHeaders="condition_headers"/>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <ConditionDetail ref="condition_detail" :application_id="application.id" :conditions="conditions" :licence_activity_tab="selected_activity_tab_id"
-                    :condition="viewedCondition" :purposes="purposes"/>
-                </div>       
-
-            
+<template id="application_conditions">     
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import {
     api_endpoints,
-    helpers
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 import '@/scss/dashboards/application.scss';
 import datatable from '@vue-utils/datatable.vue';
 import ConditionDetail from './application_add_condition.vue';
 import { mapActions, mapGetters } from 'vuex'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'InternalApplicationConditions',
     props: {
         activity: {
-            type: Object | null,
+            type: Object,
             required: true
         }
     },
@@ -49,11 +25,11 @@ export default {
         return {
             form: null,
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 allowInputToggle:true
             },
-            panelBody: "application-conditions-"+vm._uid,
+            panelBody: "application-conditions-"+uuid(),
             viewedCondition: {},
             conditions: [],
             purposes: [],
@@ -88,7 +64,7 @@ export default {
                     {
                         data: "due_date",
                         mRender:function (data,type,full) {
-                            return data != '' && data != null ? moment(data).format('DD/MM/YYYY'): '';
+                            return data != '' && data != null ? moment(data).format('YYYY-MM-DD'): '';
                         },
                         orderable: false
                     },
@@ -172,9 +148,8 @@ export default {
             }
         }
     },
-    watch:{
-    },
-    components:{
+    components: {
+        FormSection,
         datatable,
         ConditionDetail
     },
@@ -263,7 +238,7 @@ export default {
             var showDueDate = false
             if(preloadedCondition) {
                 this.viewedCondition = preloadedCondition;
-                this.viewedCondition.due_date = preloadedCondition.due_date != null ? moment(preloadedCondition.due_date).format('DD/MM/YYYY'): '';
+                this.viewedCondition.due_date = preloadedCondition.due_date != null ? moment(preloadedCondition.due_date).format('YYYY-MM-DD'): '';
                 showDueDate=this.viewedCondition.require_return
             }
             else {
@@ -282,7 +257,7 @@ export default {
         },
         removeCondition(_id){
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Remove Condition",
                 text: "Are you sure you want to remove this condition?",
                 type: "warning",
@@ -291,8 +266,8 @@ export default {
                 confirmButtonColor:'#d9534f'
             }).then((result) => {
                 if (result) {
-                    vm.$http.delete(helpers.add_endpoint_json(api_endpoints.application_conditions,_id+'/delete'))
-                    .then((response) => {
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.application_conditions,_id+'/delete'), {method:"DELETE"})
+                    request.then((response) => {
                         vm.$refs.conditions_datatable.vmDataTable.ajax.reload();
                     }, (error) => {
                         console.log(error);
@@ -303,9 +278,10 @@ export default {
         },
         async fetchConditions(){
             let vm = this;
-            await vm.$http.get(api_endpoints.application_standard_conditions).then((response) => {
-                vm.conditions = response.body
-            },(error) => {
+            let request = fetch_util.fetchUrl(api_endpoints.application_standard_conditions)
+            request.then((response) => {
+                vm.conditions = response
+            }).catch((error) => {
                 console.log(error);
             })
         },
@@ -318,15 +294,16 @@ export default {
         },
         async editCondition(_id){
             let vm = this;
-            await vm.$http.get(helpers.add_endpoint_json(api_endpoints.application_conditions,_id)).then((response) => {
-                response.body.standard ? $(this.$refs.condition_detail.$refs.standard_req).val(response.body.standard_condition).trigger('change'): '';
-                this.addCondition(response.body);
-            },(error) => {
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.application_conditions,_id))
+            request.then((response) => {
+                response.standard ? $(this.$refs.condition_detail.$refs.standard_req).val(response.standard_condition).trigger('change'): '';
+                this.addCondition(response);
+            }).catch((error) => {
                 console.log(error);
             })
         },
         updatedConditions(){
-            if (this.$refs.conditions_datatable.vmDataTable){
+            if (this.$refs.conditions_datatable !== undefined && this.$refs.conditions_datatable.vmDataTable){
                 this.$refs.conditions_datatable.vmDataTable.ajax.reload();            
             }
             // this.$refs.conditions_datatable.vmDataTable.ajax.reload();
@@ -359,10 +336,10 @@ export default {
         },
         async sendDirection(req,direction){
             let movement = direction == 'down'? 'move_down': 'move_up';
-            await this.$http.get(helpers.add_endpoint_json(api_endpoints.application_conditions,req+'/'+movement)).then((response) => {
-            },(error) => {
-                console.log(error);
-                
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.application_conditions,req+'/'+movement))
+            request.then((response) => {
+            }).catch((error) => {
+                console.log(error); 
             })
         },
         async moveUp(e) {
@@ -449,5 +426,3 @@ export default {
     }
 }
 </script>
-<style scoped>
-</style>

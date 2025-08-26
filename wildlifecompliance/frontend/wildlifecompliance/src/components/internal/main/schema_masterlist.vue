@@ -3,16 +3,11 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Schema Masterlist Questions
-                        <a :href="'#'+pMasterListBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pMasterListBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pMasterListBody">
-
+            <FormSection
+                :form-collapse="false"
+                label="Schema Masterlist Questions"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-12">
                             <button class="btn btn-primary pull-right" @click.prevent="addTableEntry()" name="add-masterlist">New Question</button>
@@ -33,7 +28,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 
@@ -104,6 +99,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
@@ -112,12 +108,14 @@ import SchemaHeader from './schema_add_header.vue'
 import SchemaExpander from './schema_add_expander.vue'
 import {
   api_endpoints,
-  helpers
+  helpers, fetch_util
 }
 from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name:'schemaMasterlistModal',
     components: {
+        FormSection,
         modal,
         alert,
         datatable,
@@ -131,11 +129,11 @@ export default {
         let vm = this;
         vm.schema_masterlist_url = helpers.add_endpoint_join(api_endpoints.schema_masterlist_paginated, 'schema_masterlist_datatable_list/?format=datatables');
         return {
-            schema_masterlist_id: 'schema-materlist-datatable-'+vm._uid,
-            pMasterListBody: 'pMasterListBody' + vm._uid,
-            pOptionBody: 'pOptionBody' + vm._uid,
-            pHeaderBody: 'pHeaderBody' + vm._uid,
-            pExpanderBody: 'pOptionBody' + vm._uid,
+            schema_masterlist_id: 'schema-materlist-datatable-'+uuid(),
+            pMasterListBody: 'pMasterListBody' + uuid(),
+            pOptionBody: 'pOptionBody' + uuid(),
+            pHeaderBody: 'pHeaderBody' + uuid(),
+            pExpanderBody: 'pOptionBody' + uuid(),
             filterOptions: '',
             isModalOpen:false,
             missing_fields: [],
@@ -258,10 +256,6 @@ export default {
         }
 
     },
-    watch:{
-    },
-    computed: {
-    },
     methods: {
         delay(callback, ms) {
             var timer = 0;
@@ -350,13 +344,14 @@ export default {
 
             if (data.id === '') {
 
-                await self.$http.post(api_endpoints.schema_masterlist, JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(api_endpoints.schema_masterlist, {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-                }).then((response) => {
+                })
+                request.then((response) => {
                     self.$refs.schema_masterlist_table.vmDataTable.ajax.reload();
                     self.close();
                 }, (error) => {
-                    swal(
+                    swal.fire(
                         'Save Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -365,13 +360,14 @@ export default {
 
             } else {
 
-                await self.$http.post(helpers.add_endpoint_json(api_endpoints.schema_masterlist,data.id+'/save_masterlist'),JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_masterlist,data.id+'/save_masterlist'), {method:'POST', body:JSON.stringify(data)},{
                         emulateJSON:true,
-                }).then((response)=>{
+                })
+                request.then((response)=>{
                     self.$refs.schema_masterlist_table.vmDataTable.ajax.reload();
                     self.close();
                 },(error)=>{
-                    swal(
+                    swal.fire(
                         'Save Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -419,7 +415,7 @@ export default {
                 self.$refs.schema_masterlist_table.row_of_data = self.$refs.schema_masterlist_table.vmDataTable.row('#'+$(this).attr('data-rowid'));
                 self.masterlist.id = self.$refs.schema_masterlist_table.row_of_data.data().id;
 
-                swal({
+                swal.fire({
                     title: "Delete Masterlist",
                     text: "Are you sure you want to delete?",
                     type: "question",
@@ -429,11 +425,13 @@ export default {
                 }).then(async (result) => {
 
                     if (result) {
-                        await self.$http.delete(helpers.add_endpoint_json(api_endpoints.schema_masterlist,(self.masterlist.id+'/delete_masterlist')))
-                        .then((response) => {
+                        let request = await fetch_util.fetchUrl(
+                            helpers.add_endpoint_json(api_endpoints.schema_masterlist,(self.masterlist.id+'/delete_masterlist')), {method:"DELETE"}
+                        )
+                        request.then((response) => {
                             self.$refs.schema_masterlist_table.vmDataTable.ajax.reload();
                         }, (error) => {
-                            swal(
+                            swal.fire(
                                 'Delete Error',
                                 helpers.apiVueResourceError(error),
                                 'error'
@@ -487,14 +485,15 @@ export default {
         },
         initSelects: async function() {
 
-            await this.$http.get(helpers.add_endpoint_join(api_endpoints.schema_masterlist,'1/get_masterlist_selects')).then(res=>{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.schema_masterlist,'1/get_masterlist_selects'))
+            request.then(res=>{
 
-                    this.answerTypes = res.body.all_answer_types
+                    this.answerTypes = res.all_answer_types
 
-            },err=>{
-                swal(
+            }).catch((error) => {
+                swal.fire(
                     'Get Application Selects Error',
-                    helpers.apiVueResourceError(err),
+                    helpers.apiVueResourceError(error),
                     'error'
                 )
             });

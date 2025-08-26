@@ -3,7 +3,7 @@
         <modal @ok="ok()" @cancel="cancel()" title="Add Contact" large>
             <form class="form-horizontal" name="addContactForm">
                 <div class="row">
-                    <alert :show.sync="showError" type="danger"><strong>{{errorString}}</strong></alert>
+                    <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                     <div class="col-lg-12">
                         <div class="row">
                             <div class="form-group">
@@ -64,7 +64,7 @@
 //import $ from 'jquery'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import {helpers,api_endpoints} from "@/utils/hooks.js"
+import {helpers,api_endpoints,fetch_util} from "@/utils/hooks.js"
 export default {
     name:'Add-Organisation-Contact',
     components:{
@@ -111,35 +111,37 @@ export default {
         },
         fetchContact: function(id){
             let vm = this;
-            vm.$http.get(api_endpoints.contact(id)).then((response) => {
-                vm.contact = response.body; vm.isModalOpen = true;
-            },(error) => {
+            let request = fetch_util.fetchUrl(api_endpoints.contact(id))
+            request.then((response) => {
+                vm.contact = response; vm.isModalOpen = true;
+            }).catch((error) => {
                 console.log(error);
-            } );
+            });
         },
         sendData:function(){
             let vm = this;
             vm.errors = false;
-            //vm.$parent.loading.push('processing contact');
             if (vm.contact.id){
                 let contact = vm.contact;
-                vm.$http.put(api_endpoints.organisation_contacts(contact.id),JSON.stringify(contact),{
+                let request = fetch_util.fetchUrl(api_endpoints.organisation_contacts(contact.id),
+                    {method:"PUT",body:JSON.stringify(contact)},{
                         emulateJSON:true,
-                    }).then((response)=>{
-                        //vm.$parent.loading.splice('processing contact',1);
+                    })
+                request.then((response)=>{
                         vm.close();
                     },(error)=>{
                         console.log(error);
                         vm.errors = true;
                         vm.errorString = helpers.apiVueResourceError(error);
-                        //vm.$parent.loading.splice('processing contact',1);
                     });
             } else {
                 let contact = JSON.parse(JSON.stringify(vm.contact));
                 contact.organisation = vm.org_id;
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,vm.org_id+'/add_nonuser_contact'),JSON.stringify(contact),{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,vm.org_id+'/add_nonuser_contact'),
+                    {method:'POST', body:contact},{
                         emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                         //vm.$parent.loading.splice('processing contact',1);
                         vm.close();
                         vm.$parent.addedContact();

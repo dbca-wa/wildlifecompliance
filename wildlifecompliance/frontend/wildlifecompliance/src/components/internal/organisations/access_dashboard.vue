@@ -93,7 +93,7 @@ export default {
                         data:"lodgement_date",
                         searchable: false,
                         mRender:function(data,type,full){
-                            return moment(data).format('DD/MM/YYYY')
+                            return moment(data).format('YYYY-MM-DD')
                         }
                     },
                     {

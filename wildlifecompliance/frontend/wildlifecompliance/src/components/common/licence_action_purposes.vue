@@ -4,7 +4,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="actionPurposeForm">
-                        <alert :show.sync="showError" type="danger"><strong>{{errorString}}</strong></alert>
+                        <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <div class="row">
@@ -37,7 +37,7 @@
 //import $ from 'jquery'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import {helpers,api_endpoints} from "@/utils/hooks.js"
+import {helpers,api_endpoints,fetch_util} from "@/utils/hooks.js"
 import { mapGetters } from 'vuex'
 export default {
     name:'LicenceActionPurposes',
@@ -175,10 +175,17 @@ export default {
                 if (vm.action_licence.purpose_ids_list.length > 0){
                     data.purpose_ids_list = vm.action_licence.purpose_ids_list
                     data.selected_activity_id = vm.selectedActivityId;
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/cancel_purposes'),JSON.stringify(data),{
+                    let request = fetch_util.fetchUrl(
+                        helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/cancel_purposes'),
+                        {
+                            method:'POST', body:JSON.stringify(data)
+                        },{
                             emulateJSON:true,
-                        }).then((response)=>{
-                            swal(
+                        }
+                    )
+                    
+                    request.then((response)=>{
+                            swal.fire(
                                     'Cancel Purposes',
                                     'The selected licenced purposes have been Cancelled.',
                                     'success'
@@ -193,7 +200,7 @@ export default {
                         });
                 } else {
                     vm.actioningPurposes = false;
-                    swal(
+                    swal.fire(
                          'Cancel Purpose',
                          'Please select at least once licenced purpose to Cancel.',
                          'error'
@@ -203,10 +210,13 @@ export default {
                 if (vm.action_licence.purpose_ids_list.length > 0){
                     data.purpose_ids_list = vm.action_licence.purpose_ids_list
                     data.selected_activity_id = vm.selectedActivityId;
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/suspend_purposes'),JSON.stringify(data),{
+                    let request = fetch_util.fetchUrl(
+                        helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/suspend_purposes'),
+                        {method:'POST', body:JSON.stringify(data)},{
                             emulateJSON:true,
-                        }).then((response)=>{
-                            swal(
+                        })
+                    request.then((response)=>{
+                            swal.fire(
                                     'Suspend Purposes',
                                     'The selected licenced purposes have been Suspended.',
                                     'success'
@@ -221,7 +231,7 @@ export default {
                         });
                 } else {
                     vm.actioningPurposes = false;
-                    swal(
+                    swal.fire(
                          'Suspend Purpose',
                          'Please select at least once licenced purpose to Suspend.',
                          'error'
@@ -231,10 +241,11 @@ export default {
                 if (vm.action_licence.purpose_ids_list.length > 0){
                     data.purpose_ids_list = vm.action_licence.purpose_ids_list
                     data.selected_activity_id = vm.selectedActivityId;
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/surrender_purposes'),JSON.stringify(data),{
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/surrender_purposes'),{method:'POST', body:JSON.stringify(data)},{
                             emulateJSON:true,
-                        }).then((response)=>{
-                            swal(
+                        })
+                    request.then((response)=>{
+                            swal.fire(
                                     'Surrender Purposes',
                                     'The selected licenced purposes have been Surrendered.',
                                     'success'
@@ -249,7 +260,7 @@ export default {
                         });
                 } else {
                     vm.actioningPurposes = false;
-                    swal(
+                    swal.fire(
                          'Surrender Purpose',
                          'Please select at least once licenced purpose to Surrender.',
                          'error'
@@ -259,10 +270,11 @@ export default {
                 if (vm.action_licence.purpose_ids_list.length > 0){
                     data.purpose_ids_list = vm.action_licence.purpose_ids_list
                     data.selected_activity_id = vm.selectedActivityId;
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/reactivate_renew_purposes'),JSON.stringify(data),{
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/reactivate_renew_purposes'), {method:'POST', body:JSON.stringify(data)},{
                             emulateJSON:true,
-                        }).then((response)=>{
-                            swal(
+                        })
+                    request.then((response)=>{
+                            swal.fire(
                                     'Reactivate Renew Purposes',
                                     'Renew for the selected licenced purposes has been Reactivated.',
                                     'success'
@@ -277,7 +289,7 @@ export default {
                         });
                 } else {
                     vm.actioningPurposes = false;
-                    swal(
+                    swal.fire(
                          'Reactivate Renew Purpose',
                          'Please select at least once licenced purpose to Reactivate Renew.',
                          'error'
@@ -287,9 +299,10 @@ export default {
                 if (vm.action_licence.purpose_ids_list.length > 0){
                     data.purpose_ids_list = vm.action_licence.purpose_ids_list
                     data.selected_activity_id = vm.selectedActivityId;
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/reissue_purposes'),JSON.stringify(data),{
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/reissue_purposes'), {method:'POST', body:JSON.stringify(data)},{
                             emulateJSON:true,
-                        }).then((response)=>{
+                        })
+                    request.then((response)=>{
                             vm.actioningPurposes = false;
                             let p1 = this.licence_activity_purposes.filter(pur => {
                                 return pur.purpose.id===this.action_licence.purpose_ids_list[0];
@@ -303,7 +316,7 @@ export default {
                         });
                 } else {
                     vm.actioningPurposes = false;
-                    swal(
+                    swal.fire(
                          'Reissue Purpose',
                          'Please select at least once licenced purpose to Reissue.',
                          'error'
@@ -313,10 +326,11 @@ export default {
                 if (vm.action_licence.purpose_ids_list.length > 0){
                     data.purpose_ids_list = vm.action_licence.purpose_ids_list
                     data.selected_activity_id = vm.selectedActivityId;
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/reinstate_purposes'),JSON.stringify(data),{
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.licences,vm.licence_id+'/reinstate_purposes'), {method:'POST', body:JSON.stringify(data)},{
                             emulateJSON:true,
-                        }).then((response)=>{
-                            swal(
+                        })
+                    request.then((response)=>{
+                            swal.fire(
                                     'Reinstate Purposes',
                                     'The selected licenced purposes have been Reinstated.',
                                     'success'
@@ -331,7 +345,7 @@ export default {
                         });
                 } else {
                     vm.actioningPurposes = false;
-                    swal(
+                    swal.fire(
                          'Reinstate Purpose',
                          'Please select at least once licenced purpose to Reinstate.',
                          'error'

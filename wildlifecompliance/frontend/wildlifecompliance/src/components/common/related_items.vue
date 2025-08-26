@@ -16,14 +16,13 @@
 <script>
 import Vue from "vue";
 import datatable from '@vue-utils/datatable.vue'
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'eonasdan-bootstrap-datetimepicker';
+
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+
 import WeakLinks from '@/components/common/weak_links.vue';
 
 export default {
@@ -180,7 +179,7 @@ export default {
             'comment': this.$refs.weak_links_lookup.comment,
         }
         // post payload to url, then
-        let relatedItems = await Vue.http.post(url, payload);
+        let relatedItems = await fetch.fetchUrl(url, {method:'POST', body:JSON.stringify(payload)});
         if (relatedItems.ok) {
             await this.parent_update_related_items(relatedItems.body);
             return relatedItems
@@ -199,7 +198,7 @@ export default {
             'second_object_id': secondObjectId,
         }
         // post payload to url, then
-        let relatedItems = await Vue.http.post(url, payload);
+        let relatedItems = await fetch.fetchUrl(url, {method:'POST', body:JSON.stringify(payload)});
         if (relatedItems.ok) {
             await this.parent_update_related_items(relatedItems.body);
         }

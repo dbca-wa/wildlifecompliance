@@ -1,14 +1,10 @@
 <template>
-<div class="panel panel-default">
+  <FormSection
+      :form-collapse="false"
+      label="Return"
+  >
+    <div class="panel panel-default">
     <AmendmentRequestDetails v-show="is_external"/>
-    <div class="panel-heading">
-        <h3 class="panel-title">Return
-            <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
-                <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-            </a>
-        </h3>
-    </div>
-    <div class="panel-body panel-collapse in" :id="pdBody">
         <div class="col-md-12" v-if="returns.has_species">
             <div class="form-group">
                 <label for="">Species Available:</label>
@@ -61,30 +57,32 @@
         </div>
     </div>
     <input type='hidden' name="table_name" :value="returns.table[0].name" />
-</div>
+  </FormSection>
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import CommsLogs from '@common-components/comms_logs.vue'
 import AmendmentRequestDetails from './return_amendment.vue';
 import {
   api_endpoints,
-  helpers
+  helpers, fetch_util
 }
 from '@/utils/hooks'
 var select2 = require('select2');
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
 
+
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
   name: 'externalReturn',
   props:["table", "data", "grid"],
   data() {
     let vm = this;
     return {
-        pdBody: 'pdBody' + vm._uid,
+        pdBody: 'pdBody' + uuid(),
         form: null,
         spreadsheet: null,
         returnBtn: 'Submit',
@@ -96,6 +94,7 @@ export default {
     }
   },
   components: {
+    FormSection,
     AmendmentRequestDetails,
   },
   computed: {
@@ -146,17 +145,18 @@ export default {
       this.refresh_grid = false
       let _data = new FormData(this.form);
       _data.append('spreadsheet', this.spreadsheet)
-      await this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/upload_details'),_data,{
+      let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/upload_details'),{method:'POST', body:JSON.stringify(_data)},{
                     emulateJSON:true,
-        }).then((response)=>{
+        })
+      request.then((response)=>{
             if (this.replaceReturn === 'no') {
               let idx1 = this.returns.table[0]['data'].length
-              for (let idx2=0; idx2 < response.body[0]['data'].length; idx2++) {
-                this.returns.table[0]['data'][idx1++] = response.body[0]['data'][idx2]
+              for (let idx2=0; idx2 < response[0]['data'].length; idx2++) {
+                this.returns.table[0]['data'][idx1++] = response[0]['data'][idx2]
               }
             }
             if (this.replaceReturn === 'yes') {
-              this.returns.table[0]['data'] = response.body[0]['data']
+              this.returns.table[0]['data'] = response[0]['data']
               this.replaceReturn = 'no'
             }
             this.species_cache[this.returns.species] = this.returns.table[0]['data']
@@ -164,7 +164,7 @@ export default {
             this.spreadsheetReturn = 'yes'
             this.refresh_grid = true
         },exception=>{
-		        swal('Error Uploading', exception.body.error, 'error');
+		        swal.fire('Error Uploading', exception.body.error, 'error');
         });
     },
     getSpecies: async function(_id){
@@ -184,18 +184,12 @@ export default {
         // load species json from ajax
         this.refresh_grid = false
         this.returns.species = specie_id
-        await this.$http.get(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/species_data_details/?species_id='+specie_id+'&'))
-          .then((response)=>{
-            this.returns.table[0]['data'] = response.body[0]['data']     
-            // cache currently displayed species json
-            // this.species_cache[specie_id] = this.returns.table[0]['data']
-
-          },exception=>{
-
-            swal('Error with Species data', exception.body.error, 'error');
-          });
-
-
+        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/species_data_details/?species_id='+specie_id+'&'))
+        request.then((response)=>{
+          this.returns.table[0]['data'] = response[0]['data']     
+        }).catch((error) => {
+          swal.fire('Error with Species data', helpers.apiVueResourceError(error), 'error');
+        });
       };  // end 
       this.replaceReturn = 'no'
       this.nilReturn = 'no'

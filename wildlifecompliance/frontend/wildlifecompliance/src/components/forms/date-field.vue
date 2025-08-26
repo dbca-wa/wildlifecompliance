@@ -7,8 +7,6 @@
                 <HelpText :help_text="help_text" />
             </template>
 
-           
-
             <CommentBlock 
                 :label="label"
                 :name="name"
@@ -16,13 +14,13 @@
                 />
 
             <div v-if="isTableField" class='date date-class'>
-                <input type="text" :readonly="readonly" :name="name" class="form-control" placeholder="DD/MM/YYYY" v-model="value" :required="isRequired" :title="value"/>
+                <input type="date" :readonly="readonly" :name="name" class="form-control" placeholder="DD/MM/YYYY" v-model="value" :required="isRequired" :title="value"/>
             </div>
             <div v-else class='input-group date'>
-                <input type="text" :readonly="readonly" :name="name" class="form-control" placeholder="DD/MM/YYYY" v-model="value" :required="isRequired" :title="value"/>
-                <span class="input-group-addon">
+                <input type="date" :readonly="readonly" :name="name" class="form-control" placeholder="DD/MM/YYYY" v-model="value" :required="isRequired" :title="value"/>
+                <!--<span class="input-group-addon">
                     <span class="glyphicon glyphicon-calendar"></span>
-                </span>
+                </span>-->
             </div>
         </div>
     </div>
@@ -60,23 +58,6 @@ export default {
             }
         },
     },
-    methods:{
-    },
-    mounted: function() {
-        $(`[name=${this.name}]`).datetimepicker({
-            format: 'DD/MM/YYYY'
-        }).off('dp.change').on('dp.change', (e) => {
-            if ($(`[name='${this.name}']`).data('DateTimePicker') && $(`[name='${this.name}']`).data('DateTimePicker').date()) {
-                this.value = $(e.target).data('DateTimePicker').date().format('DD/MM/YYYY');
-            }
-            else if ($(`[name='${this.name}']`).data('date') === "") {
-                this.value = "";
-            }
-            else {
-                this.value = "";
-            }
-        });
-    }
 }
 </script>
 

@@ -41,13 +41,14 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import { mapActions, mapGetters } from 'vuex';
 import HelpText from './help_text.vue';
 import HelpTextUrl from './help_text_url.vue';
 
 var select2 = require('select2');
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+
 
 export default {
     props: {
@@ -96,7 +97,7 @@ export default {
         let vm =this;
         return{
             selected: (this.isMultiple) ? [] : "",
-            selectid: "select"+vm._uid,
+            selectid: "select"+uuid(),
             multipleSelected: [],
         }
     },

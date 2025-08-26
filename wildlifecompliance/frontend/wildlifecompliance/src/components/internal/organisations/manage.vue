@@ -7,10 +7,8 @@
                 <h3>{{ org.name }} - {{org.abn}}</h3>
             </div>
         </div>        
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <CommsLogs :comms_url="comms_url" :logs_url="logs_url" comms_add_url="test"/>
-            </div>
-            <div class="col-md-1">
             </div>
             <div class="col-md-8">
                 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
@@ -34,15 +32,11 @@
                     <div class="tab-pane fade" id="pills-details" role="tabpanel" aria-labelledby="pills-details-tab">
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Organisation Details
-                                        <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
-                                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse in" :id="pdBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Organisation Details"
+                                >
+                                    <div class="panel panel-default">
                                       <form class="form-horizontal" name="personal_form" method="post">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Name</label>
@@ -64,54 +58,16 @@
                                           </div>
                                        </form>
                                   </div>
-                                </div>
+                                </FormSection>
                             </div>
                         </div>
-                        <!-- div class="row">
-                            <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Identification<small> Upload organisation ID</small>
-                                        <a class="panelClicker" :href="'#'+idBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="idBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse" :id="idBody">
-                                      <form class="form-horizontal" name="id_form" method="post">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Identification</label>
-                                            <div class="col-sm-6">
-                                                <img v-if="org.organisation.identification" width="100%" name="identification" v-bind:src="org.organisation.identification" />
-                                            </div>
-                                          </div>
-                                          <div class="form-group">
-                                            <div class="col-sm-12">
-                                                -- output order in reverse due to pull-right at runtime --
-                                                <button v-if="!uploadingID" class="pull-right btn btn-primary" @click.prevent="uploadID()">Upload</button>
-                                                <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Uploading</button>
-                                                <span class="pull-right" style="margin-left:10px;margin-top:10px;margin-right:10px">{{uploadedIDFileName}}</span>
-                                                <span class="btn btn-primary btn-file pull-right">
-                                                    Select ID to Upload<input type="file" ref="uploadedID" @change="readFileID()"/>
-                                                </span>
-                                            </div>
-                                          </div>
-                                       </form>
-                                  </div>
-                                </div>
-                            </div>
-                        </div -->
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Address Details
-                                        <a class="panelClicker" :href="'#'+adBody" data-toggle="collapse" expanded="false"  data-parent="#userInfo" :aria-controls="adBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div v-if="loading.length == 0" class="panel-body collapse" :id="adBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Address Details"
+                                >
+                                    <div class="panel panel-default">
                                       <form class="form-horizontal" action="index.html" method="post">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Street</label>
@@ -150,42 +106,35 @@
                                             </div>
                                           </div>
                                        </form>
-                                  </div>
-                                </div>
+                                    </div>
+                                </FormSection>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Contact Details
-                                        <a class="panelClicker" :href="'#'+cdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="cdBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse" :id="cdBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Contact Details"
+                                >
+                                    <div class="panel panel-default">
                                         <form class="form-horizontal" action="index.html" method="post">
                                             <div class="col-sm-12">
                                                 <button @click.prevent="addContact()" style="margin-bottom:10px;" class="btn btn-primary pull-right">Add Contact</button>
                                             </div>
                                             <datatable ref="contacts_datatable" id="organisation_contacts_datatable" :dtOptions="contacts_options" :dtHeaders="contacts_headers"/>
                                         </form>
-                                  </div>
-                                </div>
+                                    </div>
+                                </FormSection>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Linked Persons<small> - Manage the user accounts linked to the organisation</small>
-                                        <a class="panelClicker" :href="'#'+oBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="oBody">
-                                            <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse" :id="oBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Linked Persons"
+                                    subtitle="Manage the user accounts linked to the organisation"
+                                >
+                                    <div class="panel panel-default">
                                     <div class ="row">
                                         <form class="form-horizontal" action="index.html" method="post">
                                             <div class="col-sm-6">
@@ -230,8 +179,8 @@
                                     <div>
                                         <datatable ref="contacts_datatable_user" id="organisation_contacts_datatable_ref" :dtOptions="contacts_options_ref" :dtHeaders="contacts_headers_ref" />
                                     </div>
-                                  </div>
-                                </div>
+                                    </div>
+                                </FormSection>
                             </div>
                         </div>
                     </div> 
@@ -266,9 +215,10 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 //import $ from 'jquery'
 import Vue from 'vue'
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
 import AddContact from '@common-components/add_contact.vue'
 import ApplicationDashTable from '@common-components/applications_dashboard.vue'
@@ -279,21 +229,22 @@ import IntelligenceInformation from '@common-components/intelligence_information
 import CommsLogs from '@common-components/comms_logs.vue'
 import utils from '../utils'
 import api from '../api'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'Organisation',
     data () {
         let vm = this;
         return {
-            adBody: 'adBody'+vm._uid,
-            aBody: 'aBody'+vm._uid,
-            pdBody: 'pdBody'+vm._uid,
-            pBody: 'pBody'+vm._uid,
-            cdBody: 'cdBody'+vm._uid,
-            cBody: 'cBody'+vm._uid,
-            oBody: 'oBody'+vm._uid,
-            dTab: 'dTab'+vm._uid,
-            oTab: 'oTab'+vm._uid,
-            idBody: 'idBody'+vm._uid,
+            adBody: 'adBody'+uuid(),
+            aBody: 'aBody'+uuid(),
+            pdBody: 'pdBody'+uuid(),
+            pBody: 'pBody'+uuid(),
+            cdBody: 'cdBody'+uuid(),
+            cBody: 'cBody'+uuid(),
+            oBody: 'oBody'+uuid(),
+            dTab: 'dTab'+uuid(),
+            oTab: 'oTab'+uuid(),
+            idBody: 'idBody'+uuid(),
             org: {
                 address: {}
             },
@@ -391,6 +342,7 @@ export default {
         }
     },
     components: {
+        FormSection,
         datatable,
         ApplicationDashTable,
         LicenceDashTable,
@@ -439,12 +391,10 @@ export default {
         });
     },
     methods: {
-        set_tabs:function(){
+        /*set_tabs:function(){
             let vm = this;
-
-            /* set Applicant tab Active */
             $('#pills-tab a[href="#pills-details"]').tab('show');
-        },
+        },*/
 
         addContact: function(){
             this.$refs.add_contact.isModalOpen = true;
@@ -457,7 +407,7 @@ export default {
                 let name = $(e.target).data('name');
                 let email = $(e.target).data('email');
                 let id = $(e.target).data('id');
-                swal({
+                swal.fire({
                     title: "Delete Contact",
                     text: "Are you sure you want to remove "+ name + "("+ email + ") as a contact  ?",
                     type: "error",
@@ -480,13 +430,14 @@ export default {
         updateDetails: function() {
             let vm = this;
             vm.updatingDetails = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,(vm.org.id+'/update_details')),JSON.stringify(vm.org),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,(vm.org.id+'/update_details')), {method:'POST', body:JSON.stringify(vm.org)},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 vm.updatingDetails = false;
-                vm.org = response.body;
+                vm.org = response;
                 if (vm.org.address == null){ vm.org.address = {}; }
-                swal(
+                swal.fire(
                     'Saved',
                     'Organisation details have been saved',
                     'success'
@@ -498,7 +449,7 @@ export default {
         },
         addedContact: function() {
             let vm = this;
-            swal(
+            swal.fire(
                 'Added',
                 'The contact has been successfully added.',
                 'success'
@@ -508,10 +459,13 @@ export default {
         deleteContact: function(id){
             let vm = this;
             
-            vm.$http.delete(helpers.add_endpoint_json(api_endpoints.organisation_contacts,id),{
-                emulateJSON:true
-            }).then((response) => {
-                swal(
+            let request = fetch_util.fetchUrl(
+                helpers.add_endpoint_json(api_endpoints.organisation_contacts,id), {method:"DELETE"},
+                {
+                    emulateJSON:true
+                })
+            request.then((response) => {
+                swal.fire(
                     'Contact Deleted', 
                     'The contact was successfully deleted',
                     'success'
@@ -519,7 +473,7 @@ export default {
                 vm.$refs.contacts_datatable.vmDataTable.ajax.reload();
             }, (error) => {
                 console.log(error);
-                swal(
+                swal.fire(
                     'Contact Deleted', 
                     'The contact could not be deleted because of the following error '+error,
                     'error'
@@ -529,12 +483,13 @@ export default {
         updateAddress: function() {
             let vm = this;
             vm.updatingAddress = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,(vm.org.id+'/update_address')),JSON.stringify(vm.org.address),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,(vm.org.id+'/update_address')), {method:'POST', body:JSON.stringify(vm.org.address)},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 vm.updatingAddress = false;
-                vm.org = response.body;
-                swal(
+                vm.org = response;
+                swal.fire(
                     'Saved',
                     'Address details have been saved',
                     'success'
@@ -566,18 +521,19 @@ export default {
             data.append('identification', vm.uploadedID);
             if (vm.uploadedID == null){
                 vm.uploadingID = false;
-                swal({
+                swal.fire({
                         title: 'Upload ID',
                         html: 'Please select a file to upload.',
                         type: 'error'
                 });
             } else {
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,(vm.org.id+'/upload_id')),data,{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,(vm.org.id+'/upload_id')),{method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-                }).then((response) => {
+                })
+                request.then((response) => {
                     vm.uploadingID = false;
                     vm.uploadedID = null;
-                    swal({
+                    swal.fire({
                         title: 'Upload ID',
                         html: 'The organisation ID has been successfully uploaded.',
                         type: 'success',
@@ -591,7 +547,7 @@ export default {
                     for (var key in error.body) {
                         error_msg += key + ': ' + error.body[key] + '<br/>';
                     }
-                    swal({
+                    swal.fire({
                         title: 'Upload ID',
                         html: 'There was an error uploading the organisation ID.<br/>' + error_msg,
                         type: 'error'
@@ -602,7 +558,7 @@ export default {
     },
     mounted: function(){
         let vm =this;
-        this.set_tabs();
+        //this.set_tabs();
         this.personal_form = document.forms.personal_form;
         this.eventListeners();
     },

@@ -1,15 +1,13 @@
 <template id="returns_dashboard">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Returns <small v-if="is_external">View submitted returns and submit new ones</small>
-                        <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pBody">
+            <FormSection
+                :form-collapse="false"
+                label="Returns"
+                index="returns"
+                :subtitle=subtitle
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -25,19 +23,19 @@
                         <div class="col-md-3">
                             <label for="">Due Date From</label>
                             <div class="input-group date" ref="dueDateFromPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDueDateFrom">
-                                <span class="input-group-addon">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDueDateFrom">
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>
                         <div class="col-md-3">
                             <label for="">Due Date To</label>
                             <div class="input-group date" ref="dueDateToPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDueDateTo">
-                                <span class="input-group-addon">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDueDateTo">
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>
                     </div><br/>
@@ -47,16 +45,18 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import {
     api_endpoints,
     helpers
 }from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'ReturnTableDash',
     props: {
@@ -76,14 +76,14 @@ export default {
     data() {
         let vm = this;
         return {
-            pBody: 'pBody' + vm._uid,
-            datatable_id: 'return-datatable-'+vm._uid,
+            pBody: 'pBody' + uuid(),
+            datatable_id: 'return-datatable-'+uuid(),
             filterReturnStatus: 'All',
             filterDueDateFrom: '',
             filterDueDateTo: '',
-            dateFormat: 'DD/MM/YYYY',
+            dateFormat: 'YYYY-MM-DD',
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -102,8 +102,8 @@ export default {
                     "dataSrc": 'data',
                     "data": function (d) {
                         d.status = vm.filterReturnStatus;
-                        d.date_from = vm.filterDueDateFrom != '' && vm.filterDueDateFrom != null ? moment(vm.filterDueDateFrom, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
-                        d.date_to = vm.filterDueDateTo != '' && vm.filterDueDateTo != null ? moment(vm.filterDueDateTo, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                        d.date_from = vm.filterDueDateFrom != '' && vm.filterDueDateFrom != null ? moment(vm.filterDueDateFrom, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
+                        d.date_to = vm.filterDueDateTo != '' && vm.filterDueDateTo != null ? moment(vm.filterDueDateTo, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
                     }
                 },
                 columns: [
@@ -177,7 +177,8 @@ export default {
         }
     },
     components:{
-        datatable
+        datatable,
+        FormSection
     },
     watch:{
         filterReturnStatus: function(value){
@@ -186,12 +187,9 @@ export default {
             table.column(2).search(value).draw();
         },
         filterDueDateFrom: function(value){
-            //this.dateSearch()
-            //this.filterReturnStatus = 'All'
             this.visibleDatatable.vmDataTable.draw();
         },
         filterDueDateTo: function(value){
-            //this.dateSearch()
             this.visibleDatatable.vmDataTable.draw();
         },
     },
@@ -202,32 +200,14 @@ export default {
         visibleDatatable: function() {
             return this.$refs.return_datatable;
         },
+        subtitle: function() {
+            if (this.is_external) {
+                return "View submitted returns and submit new ones";
+            }
+            return "";
+        }
     },
     methods:{
-        addEventListeners: function(){
-            let vm = this;
-            // Initialise Application Date Filters
-             $(vm.$refs.dueDateToPicker).datetimepicker(vm.datepickerOptions);
-             $(vm.$refs.dueDateToPicker).on('dp.change', function(e){
-                 if ($(vm.$refs.dueDateToPicker).data('DateTimePicker').date()) {
-                     vm.filterDueDateTo =  e.date.format('DD/MM/YYYY');
-                 }
-                 else if ($(vm.$refs.dueDateToPicker).data('date') === "") {
-                     vm.filterDueDateTo = "";
-                 }
-              });
-             $(vm.$refs.dueDateFromPicker).datetimepicker(vm.datepickerOptions);
-             $(vm.$refs.dueDateFromPicker).on('dp.change',function (e) {
-                 if ($(vm.$refs.dueDateFromPicker).data('DateTimePicker').date()) {
-                     vm.filterDueDateFrom = e.date.format('DD/MM/YYYY');
-                     $(vm.$refs.dueDateToPicker).data("DateTimePicker").minDate(e.date);
-                 }
-                 else if ($(vm.$refs.dueDateFromPicker).data('date') === "") {
-                     vm.filterDueDateFrom = "";
-                 }
-             });
-             // End of Due Date Filters
-        },
         delay(callback, ms) {
             var timer = 0;
             return function () {
@@ -281,11 +261,8 @@ export default {
     mounted: function(){
         let vm = this;
         this.$nextTick(() => {
-            vm.addEventListeners();
             vm.initialiseSearch();
         });
     }
 }
 </script>
-<style scoped>
-</style>

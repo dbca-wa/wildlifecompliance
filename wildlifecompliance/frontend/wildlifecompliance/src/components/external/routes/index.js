@@ -21,7 +21,7 @@ export default
     },
     children: [
         {
-            path: '/',
+            path: '/external',
             component: ExternalDashboard,
             name: 'external-applications-dash'
         },

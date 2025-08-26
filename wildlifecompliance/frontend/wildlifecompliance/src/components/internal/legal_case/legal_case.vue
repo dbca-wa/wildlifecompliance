@@ -372,24 +372,24 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import Assignment from "../assignment.vue";
 import CommsLogs from "@common-components/comms_logs.vue";
 import datatable from '@vue-utils/datatable.vue'
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'eonasdan-bootstrap-datetimepicker';
+
 import Offence from '../offence/offence_modal';
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal';
 import Inspection from '../inspection/create_inspection_modal';
 import filefield from '@/components/common/compliance_file.vue';
 import RelatedItems from "@common-components/related_items.vue";
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+
 import hash from 'object-hash';
 import Magic from './magic';
 //import SearchPersonOrganisationModal from '@/components/common/search_person_or_organisation_modal';
@@ -398,8 +398,8 @@ import _ from 'lodash';
 import RunningSheetHistory from './running_sheet_history'
 import LegalCaseWorkflow from './legal_case_workflow'
 //import TreeSelect from "@/components/compliance_forms/treeview.vue";
-import TreeSelect from '@riophae/vue-treeselect'
-import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+import TreeSelect from 'vue3-treeselect'
+//import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import BriefOfEvidence from './brief_of_evidence';
 import ProsecutionBrief from './prosecution_brief';
 import CourtProceedings from './court_proceedings';
@@ -429,13 +429,13 @@ export default {
             //runningSheetArtifactList: [],
             //runningSheetPersonList: [],
             objectHash: null,
-            runTab: 'runTab'+this._uid,
-            rTab: 'rTab'+this._uid,
-            //gTab: 'gTab'+this._uid,
-            cTab: 'cTab'+this._uid,
-            cpTab: 'cpTab'+this._uid,
-            bTab: 'bTab'+this._uid,
-            pTab: 'pTab'+this._uid,
+            runTab: 'runTab'+uuid(),
+            rTab: 'rTab'+uuid(),
+            //gTab: 'gTab'+uuid(),
+            cTab: 'cTab'+uuid(),
+            cpTab: 'cpTab'+uuid(),
+            bTab: 'bTab'+uuid(),
+            pTab: 'pTab'+uuid(),
             current_schema: [],
             //workflowBindId: '',
             workflow_type: '',
@@ -891,11 +891,6 @@ export default {
         return keyCombination;
     },
   },
-  filters: {
-    formatDate: function(data) {
-      return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-    }
-  },
   methods: {
     ...mapActions('legalCaseStore', {
       loadLegalCase: 'loadLegalCase',
@@ -1106,7 +1101,7 @@ export default {
             api_endpoints.legal_case,
             this.legal_case.id + '/create_running_sheet_entry/'
             )
-        let updatedRunningSheet = await Vue.http.post(fetchUrl, payload);
+        let updatedRunningSheet = await fetch_util.fetchUrl(fetchUrl, {method:'POST', body:JSON.stringify(payload)});
         console.log(updatedRunningSheet)
         if (updatedRunningSheet.ok) {
             await this.setAddRunningSheetEntry(updatedRunningSheet.body);
@@ -1159,32 +1154,6 @@ export default {
     },
     addWorkflow: function(workflow_type) {
         console.log(workflow_type)
-        /*
-        if (['brief_of_evidence', 'prosecution_brief'].includes(workflow_type)) {
-            // Save legal_case first
-            await this.save({
-                "create": false,
-                "internal": true
-            })
-            // workflow_action api method
-            //let post_url = '/api/legal_case/' + this.legal_case.id + '/workflow_action/'
-            let postUrl = helpers.add_endpoint_join(
-                api_endpoints.legal_case,
-                this.legal_case.id + '/workflow_action/'
-            );
-            let payload = new FormData();
-            workflow_type ? payload.append('workflow_type', workflow_type) : null;
-            let res = await Vue.http.post(postUrl, payload);
-
-        } else {
-            // open workflow modal
-            this.workflow_type = workflow_type;
-            this.updateWorkflowBindId();
-            this.$nextTick(() => {
-                this.$refs.legal_case_workflow.isModalOpen = true;
-            });
-        }
-        */
         // open workflow modal
         this.workflow_type = workflow_type;
         this.setLegalCaseWorkflowBindId();
@@ -1554,15 +1523,15 @@ export default {
                 running_sheet_id = r.id
             }
         }
-        let returnedEntry = await Vue.http.post(
+        let returnedEntry = await fetch_util.fetchUrl(
             helpers.add_endpoint_join(
                 api_endpoints.legal_case,
                 this.legal_case.id + '/delete_reinstate_running_sheet_entry/',
             ),
-            {
+            {method:'POST', body:JSON.stringify({
                 "running_sheet_id": running_sheet_id,
                 "deleted": true,
-            }
+            })}
             );
         if (returnedEntry.ok) {
             // required for running_sheet_history
@@ -1592,15 +1561,15 @@ export default {
                 running_sheet_id = r.id
             }
         }
-        let returnedEntry = await Vue.http.post(
+        let returnedEntry = await fetch_util.fetchUrl(
             helpers.add_endpoint_join(
                 api_endpoints.legal_case,
                 this.legal_case.id + '/delete_reinstate_running_sheet_entry/',
             ),
-            {
+            {method:'POST', body:JSON.stringify({
                 "running_sheet_id": running_sheet_id,
                 "deleted": false,
-            }
+            })}
             );
         if (returnedEntry.ok) {
             // required for running_sheet_history

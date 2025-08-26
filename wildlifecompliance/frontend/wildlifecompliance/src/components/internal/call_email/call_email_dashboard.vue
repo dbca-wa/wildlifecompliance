@@ -1,8 +1,6 @@
 <template>
     <div class="container" id="internalCallEmailDash">
         <FormSection :label="`Call/Emails`" :Index="`0`">
-                  
-              
         <div class="row">
             <div class="col-md-3">
                 <div class="form-group">
@@ -30,10 +28,7 @@
                 <div class="form-group">
                     <label for="">Lodged From</label>
                     <div class="input-group date" ref="lodgementDateFromPicker">
-                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedFrom">
-                        <span class="input-group-addon">
-                            <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
+                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedFrom">
                     </div>
                 </div>
             </div>
@@ -41,10 +36,7 @@
                 <div class="form-group">
                     <label for="">Lodged To</label>
                     <div class="input-group date" ref="lodgementDateToPicker">
-                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedTo">
-                        <span class="input-group-addon">
-                            <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
+                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedTo">
                     </div>
                 </div>
             </div>
@@ -76,9 +68,8 @@
     import $ from 'jquery'
     import datatable from '@vue-utils/datatable.vue'
     import MapLocations from "./map_locations.vue";
-    import Vue from 'vue'
-    import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
-    import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
+    import { cache_helper, fetch_util } from "@/utils/hooks";
+    import { mapGetters, mapActions } from "vuex";
     import FormSection from "@/components/forms/section_toggle.vue";
     export default {
         name: 'CallEmailDashTable',
@@ -89,18 +80,16 @@
                     is_volunteer: false,
                 },
                 classification_types: [],
-                // classificationChoices: [],
                 report_types: [],
                 // Filters
                 filterStatus: 'All',
                 filterClassification: 'All',
-                // statusChoices: [],
                 status_choices: [],
                 filterLodgedFrom: '',
                 filterLodgedTo: '',
-                dateFormat: 'DD/MM/YYYY',
+                dateFormat: 'YYYY-MM-DD',
                 datepickerOptions: {
-                    format: 'DD/MM/YYYY',
+                    format: 'YYYY-MM-DD',
                     showClear: true,
                     useCurrent: false,
                     keepInvalid: true,
@@ -126,15 +115,13 @@
                     responsive: true,
                     processing: true,
                     ajax: {
-                        //"url": helpers.add_endpoint_json(api_endpoints.call_email, 'datatable_list'),
-                        //"url": helpers.add_endpoint_json(api_endpoints.call_email_paginated, 'get_paginated_datatable'),
                         "url": "/api/call_email_paginated/get_paginated_datatable/?format=datatables",
                         "dataSrc": 'data',
                         "data": function(d) {
                             d.status_description = vm.filterStatus;
                             d.classification_description = vm.filterClassification;
-                            d.date_from = vm.filterLodgedFrom != '' && vm.filterLodgedFrom != null ? moment(vm.filterLodgedFrom, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
-                            d.date_to = vm.filterLodgedTo != '' && vm.filterLodgedTo != null ? moment(vm.filterLodgedTo, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                            d.date_from = vm.filterLodgedFrom != '' && vm.filterLodgedFrom != null ? moment(vm.filterLodgedFrom, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
+                            d.date_to = vm.filterLodgedTo != '' && vm.filterLodgedTo != null ? moment(vm.filterLodgedTo, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
                         }
                     },
                     dom: 'lBfrtip',
@@ -209,11 +196,11 @@
             }
         },
         created: async function() {
-            const returnedComplianceUserData = await Vue.http.get('/api/my_compliance_user_details/')
-            Object.assign(this.complianceUser, returnedComplianceUserData.body);
+            const returnedComplianceUserData = await fetch_util.fetchUrl('/api/my_compliance_user_details/')
+            Object.assign(this.complianceUser, returnedComplianceUserData);
             //let returned_classification_types = await cache_helper.getSetCacheList('CallEmail_ClassificationTypes', '/api/classification/classification_choices/');
-            let returned_classification_types = await Vue.http.get('/api/classification/classification_choices/');
-            Object.assign(this.classification_types, returned_classification_types.body);
+            let returned_classification_types = await fetch_util.fetchUrl('/api/classification/classification_choices/');
+            Object.assign(this.classification_types, returned_classification_types);
             this.classification_types.splice(0, 0, {id: 'all', display: 'All'});
 
             let returned_status_choices = await cache_helper.getSetCacheList('CallEmail_StatusChoices', '/api/call_email/status_choices');
@@ -260,33 +247,13 @@
                 let newCallId = null
                 let savedCallEmail = await this.saveCallEmail({ route: false, crud: 'create'});
                 if (savedCallEmail) {
-                    newCallId = savedCallEmail.body.id;
+                    newCallId = savedCallEmail.id;
                 }
 
                 await this.$router.push({
                     name: 'view-call-email', 
                     params: {call_email_id: newCallId}
                     });
-            },
-            addEventListeners: function () {
-                let vm = this;
-                // Initialise Application Date Filters
-                $(vm.$refs.lodgementDateToPicker).datetimepicker(vm.datepickerOptions);
-                $(vm.$refs.lodgementDateToPicker).on('dp.change', function (e) {
-                    if ($(vm.$refs.lodgementDateToPicker).data('DateTimePicker').date()) {
-                        vm.filterLodgedTo = e.date.format('DD/MM/YYYY');
-                    } else if ($(vm.$refs.lodgementDateToPicker).data('date') === "") {
-                        vm.filterLodgedTo = "";
-                    }
-                });
-                $(vm.$refs.lodgementDateFromPicker).datetimepicker(vm.datepickerOptions);
-                $(vm.$refs.lodgementDateFromPicker).on('dp.change', function (e) {
-                    if ($(vm.$refs.lodgementDateFromPicker).data('DateTimePicker').date()) {
-                        vm.filterLodgedFrom = e.date.format('DD/MM/YYYY');
-                    } else if ($(vm.$refs.lodgementDateFromPicker).data('date') === "") {
-                        vm.filterLodgedFrom = "";
-                    }
-                });
             },
             initialiseSearch: function () {
                 this.dateSearch();
@@ -333,7 +300,6 @@
             });
             this.$nextTick(async () => {
                 await vm.initialiseSearch();
-                await vm.addEventListeners();
             });
         }
     }

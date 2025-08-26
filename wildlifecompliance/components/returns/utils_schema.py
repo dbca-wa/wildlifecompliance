@@ -231,7 +231,7 @@ class SchemaField:
         error = None
         # override the integer validation. The default message is a bit cryptic if there's an error casting a string
         # like '1.2' into an int.
-        if isinstance(self.type, types.integer):
+        if isinstance(self.type, int):
             if not is_blank_value(value):
                 not_integer = False
                 try:

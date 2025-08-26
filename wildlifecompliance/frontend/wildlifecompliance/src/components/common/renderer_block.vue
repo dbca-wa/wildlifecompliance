@@ -42,17 +42,6 @@
             :help_text="help_text"
             :help_text_url="help_text_url"/>
 
-        <RichTextField v-if="component.type === 'richtext'"
-            :readonly="is_readonly"
-            :name="component_name"
-            :field_data="value"
-            :id="element_id()"
-            :label="component.label"
-            :help_text="help_text"
-            :isRequired="component.isRequired"
-            :can_view_richtext_src="can_view_richtext_src"
-            :help_text_url="help_text_url"/>
-
         <TextField v-if="component.type === 'text'"
             type="text"
             :name="component_name"
@@ -174,8 +163,6 @@
 
         <div class="form-group" v-if="component.type === 'radiobuttons'">
             <label :id="element_id()" class="inline" style="white-space: pre-line;">{{component.label}} <HelpTextUrl :help_text_url="help_text_url"/></label>
-                
-                 <!-- <HelpText :help_text="help_text"/> -->
                 
                 <CommentBlock 
                     :label="component.label"
@@ -403,9 +390,6 @@ const RendererBlock = {
         'isComponentVisible',
         'isComponentEditableForOfficer',
     ]),
-    can_view_richtext_src: function() {
-        return this.application.can_view_richtext_src ? this.application.can_view_richtext_src : false;
-    },
     is_readonly: function() {
         return this.component.readonly ? this.component.readonly : this.application.readonly ? !this.isComponentEditableForOfficer : this.application.readonly;
     },

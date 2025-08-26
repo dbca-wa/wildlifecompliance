@@ -4,13 +4,13 @@
             <h3>Application {{application.id}}: {{application.licence_type_short_name}}</h3>
         </div>
         <div v-if="withSectionsSelector" class="col-md-3 sections-dropdown">
-            <affix class="sections-menu" relative-element-selector="#tabs">
+            <div class="sections-menu" relative-element-selector="#tabs">
                 <div class="panel panel-default fixed">
                 <div class="panel-heading">
                     <div class="dropdown">
                         <ul class="list-unstyled">
                             <li class="open">
-                                <h5>Sections</span></h5>
+                                <h5>Sections</h5>
                                 <ul class="dropdown-menu dropdown-panel">
                                     <li v-for="(tab, tab_idx) in renderer_tabs" class='dropdown-submenu'>
                                         <a tabindex='-1' class='section-menu' v-on:click="sectionClick(tab)">
@@ -24,7 +24,6 @@
                                         <div class='dropdown-menu-right section-list' id='section-submenu' >
                                             <div v-for="(section, section_idx) in getSections(tab.id)"
                                                 v-on:click="selectTab(tab)"
-                                                v-scroll-to="`#${section.name}`"
                                                 class="menu-row">
                                                     <div>
                                                         <i class="fa fa-circle"></i>
@@ -41,7 +40,7 @@
                 <div class="panel-body" style="padding:0">
                 </div>
                 </div>
-            </affix>
+            </div>
         </div>
     </div>
 </template>

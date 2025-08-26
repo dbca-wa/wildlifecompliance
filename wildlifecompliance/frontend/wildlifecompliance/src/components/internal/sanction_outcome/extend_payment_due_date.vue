@@ -8,10 +8,10 @@
                         <label class="col-sm-3">New due date</label>
                         <div class="col-sm-3">
                             <div class="input-group date" ref="newDueDatePicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="new_due_date" />
-                                <span class="input-group-addon">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="new_due_date" />
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>
                         current due date: {{ comingDueDateDisplay }} <br />
@@ -61,11 +61,11 @@
 import Vue from "vue";
 import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import filefield from '@/components/common/compliance_file.vue';
 import "jquery-ui/ui/widgets/draggable.js";
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+
 
 export default {
     name: "ExtendPaymentDueDate",
@@ -117,7 +117,7 @@ export default {
             console.log('*** in extendMinDateDisplay ***');
             if (this.comingDueDate){
                 let due_date_plus_1 = moment(this.comingDueDate).add(1, 'days');
-                return due_date_plus_1.format('DD/MM/YYYY');
+                return due_date_plus_1.format('YYYY-MM-DD');
             } else {
                 return '';
             }
@@ -125,7 +125,7 @@ export default {
         extendMaxDateDisplay: function() {
             if (this.extendMaxDate){
                 let extend_max_date = moment(this.extendMaxDate);
-                return extend_max_date.format('DD/MM/YYYY');
+                return extend_max_date.format('YYYY-MM-DD');
             } else {
                 return '';
             }
@@ -136,7 +136,7 @@ export default {
         comingDueDateDisplay: function() {
             if(this.comingDueDate){
                 let due_date = moment(this.comingDueDate)
-                return due_date.format('DD/MM/YYYY');
+                return due_date.format('YYYY-MM-DD');
             } else {
                 return '';
             }
@@ -178,16 +178,14 @@ export default {
         },
         addEventListeners: function () {
             console.log('in addEventListeners');
-
+            //TODO apply min and max date validation
             let vm = this;
-            let el_fr_date = $(vm.$refs.newDueDatePicker);
+            
             let options = { format: "DD/MM/YYYY" };
 
             if (vm.due_date_max){
                 options['maxDate'] = vm.extendMaxDate;
             }
-
-            console.log(vm.comingDueDate);
 
             if (vm.comingDueDate){
                 // Copy comingDuDate object
@@ -198,16 +196,6 @@ export default {
                 // Enter a default value to the input box
                 vm.new_due_date = coming_due_date.getDate() + '/' + (coming_due_date.getMonth() + 1) + '/' + coming_due_date.getFullYear();
             }
-
-            el_fr_date.datetimepicker(options);
-
-            el_fr_date.on("dp.change", function(e) {
-                if (el_fr_date.data("DateTimePicker").date()) {
-                    vm.new_due_date = e.date.format("DD/MM/YYYY");
-                } else if (el_fr_date.data("date") === "") {
-                    vm.new_due_date = null;
-                }
-            });
         },
         ok: async function () {
             try {
@@ -270,7 +258,7 @@ export default {
             this.$refs.comms_log_file.commsLogId ? payload.append('comms_log_id', this.$refs.comms_log_file.commsLogId) : null;
             this.new_due_date ? payload.append('new_due_date', this.new_due_date) : null;
 
-            let res = await Vue.http.post(post_url, payload);
+            let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
             return res
         },
         uploadFile(target,file_obj){

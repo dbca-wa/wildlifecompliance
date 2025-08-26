@@ -20,19 +20,13 @@
             <div>
                 <label class="">Lodged From</label>
                 <div class="input-group date" ref="lodgementDateFromPicker">
-                    <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedFrom" />
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+                    <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedFrom" />
                 </div>
             </div>
             <div>
                 <label class="">Lodged To</label>
                 <div class="input-group date" ref="lodgementDateToPicker">
-                    <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedTo" />
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+                    <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterLodgedTo" />
                 </div>
             </div>
         </div>
@@ -60,14 +54,14 @@ import L from 'leaflet';
 import 'leaflet.markercluster';  /* This should be imported after leaflet */
 import 'leaflet.locatecontrol';
 import Awesomplete from 'awesomplete';
-import { api_endpoints, helpers, cache_helper } from '@/utils/hooks'
+import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css'
-import 'bootstrap/dist/css/bootstrap.css';
+
 import 'awesomplete/awesomplete.css';
 
 L.TileLayer.WMTS = L.TileLayer.extend({
@@ -211,9 +205,6 @@ export default {
         vm.initMap();
         vm.loadLocations();
         vm.initAwesomplete();
-        vm.$nextTick(() => {
-            vm.addEventListeners();
-        });
     },
     watch: {
         filterStatus: function () {
@@ -254,33 +245,6 @@ export default {
     methods: {
         ...mapActions('callemailStore', {
         }),
-        addEventListeners: function () {
-            let vm = this;
-            let el_fr = $(vm.$refs.lodgementDateFromPicker);
-            let el_to = $(vm.$refs.lodgementDateToPicker);
-
-            // Date "From" field
-            el_fr.datetimepicker({ format: 'DD/MM/YYYY', maxDate: 'now', showClear: true });
-            el_fr.on('dp.change', function (e) {
-                if (el_fr.data('DateTimePicker').date()) {
-                    vm.filterLodgedFrom = e.date.format('DD/MM/YYYY');
-                    el_to.data('DateTimePicker').minDate(e.date);
-                } else if (el_fr.data('date') === "") {
-                    vm.filterLodgedFrom = "";
-                }
-            });
-
-            // Date "To" field
-            el_to.datetimepicker({ format: 'DD/MM/YYYY', maxDate: 'now', showClear: true });
-            el_to.on('dp.change', function (e) {
-                if (el_to.data('DateTimePicker').date()) {
-                    vm.filterLodgedTo = e.date.format('DD/MM/YYYY');
-                    el_fr.data('DateTimePicker').maxDate(e.date);
-                } else if (el_to.data('date') === "") {
-                    vm.filterLodgedTo = "";
-                }
-            });
-        },
         initAwesomplete: function(){
             var self = this;
             var element_search = document.getElementById('search-input');
@@ -391,8 +355,9 @@ export default {
         addOtherLayers(){
             var overlayMaps = {};
 
-            this.$http.get('/api/map_layers/').then(response => {
-                let layers = response.body.results;
+            let request = fetch_util.fetchUrl('/api/map_layers/')
+request.then(response => {
+                let layers = response.results;
                 for (var i = 0; i < layers.length; i++){
                     let l = L.tileLayer.wmts(
                         'https://kmi.dpaw.wa.gov.au/geoserver/gwc/service/wmts',
@@ -472,8 +437,9 @@ export default {
                         /* dynamically construct content of the popup */
                         myMarker.on('click', (ev)=>{
                             let popup = ev.target.getPopup();
-                            self.$http.get('/api/call_email/' + call_email.id).then(response => {
-                                let call_email = response.body;
+                            let request = fetch_util.fetchUrl('/api/call_email/' + call_email.id)
+request.then(response => {
+                                let call_email = response;
                                 popup.setContent(self.construct_content(call_email, coords));
                             });
                         })

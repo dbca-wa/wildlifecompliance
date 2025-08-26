@@ -1,6 +1,6 @@
 <template lang="html">
     <div class="row">
-        <template v-if="isApplicationLoaded && initialiseAssessmentOptions()">
+        <div v-if="isApplicationLoaded && initialiseAssessmentOptions()">
 
             <modal
                 transition="modal fade"
@@ -9,15 +9,11 @@
                 title="Assessment Record" large>
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Assessment Details
-                                    <a class="panelClicker" :href="'#'+panelBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="panelBody">
-                                        <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                    </a>
-                                </h3>
-                            </div>
-                            <div class="panel-body panel-collapse collapse in" :id="panelBody">
+                        <FormSection
+                            :form-collapse="false"
+                            label="Assessment Details"
+                        >
+                            <div class="panel panel-default">
                                 <form class="form-horizontal" name="assessment_form" method="put">
                                     <div class="col-sm-12">
                                         <div class="form-group">
@@ -41,7 +37,7 @@
                                     
                                 </form>
                             </div>
-                        </div>
+                        </FormSection>
                     </div>
                 </div>
             </modal>
@@ -58,22 +54,17 @@
             <div class="tab-content">
                 <div v-if="selectedActivity" :id="`${selectedActivity.id}`">
                     <div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">{{isLicensingOfficer ? 'Send to Assessor' : 'Assessments'}}
-                                    <a class="panelClicker" :href="`#${selectedActivity.id}`+assessorsBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="assessorsBody">
-                                        <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                    </a>
-                                </h3>
-                            </div>
-                            <div class="panel-body panel-collapse collapse in" :id="`${selectedActivity.id}`+assessorsBody">
+                        <FormSection
+                            :form-collapse="false"
+                            :label=title
+                        >
+                            <div class="panel panel-default">
                                 <div v-if="canSendToAssessor" class="row">
                                     <div class="col-sm-10" style="margin-bottom: 10px">
                                             <label class="control-label pull-left"  for="Name">Assessor Group</label>
                                             <select class="form-control" v-model="selectedAssessor">
                                                 <option 
-                                                    v-for="(assessor, idx) in assessorGroup"
-                                                    v-if="isAssessorRelevant(assessor)"
+                                                    v-for="(assessor, idx) in relevantAssessorGroup"
                                                     :id="assessor.id"
                                                     :value="assessor"
                                                     :selected="!selectedAssessor"
@@ -87,13 +78,13 @@
                                 <div class="row" v-if="optionsLoadedForActivity(selectedActivity)" v-bind:key="`assessor_datatable_${selectedActivity.id}`">
                                     <datatable ref="assessorDatatable"
                                         :data-index="selectedActivity.id"
-                                        :id="`${selectedActivity.id}_${_uid}assessor_datatable`"
+                                        :id="`${selectedActivity.id}_${uid}assessor_datatable`"
                                         :dtOptions="assessors_options[selectedActivity.id]"
                                         :dtHeaders="assessors_headers"
                                         :onMount="eventListeners"/>
                                 </div>
                             </div>
-                        </div>
+                        </FormSection>
                         <div :id="`${selectedActivity.id}`" class="tab-pane fade in">
                             <Conditions
                                 :key="`assessor_condition_${selected_activity_tab_id}`"
@@ -103,11 +94,12 @@
                     </div>
                 </div>
             </div>
-        </template>
+        </div>
         <SendToAssessor ref="send_to_assessor" @refreshFromResponse="refreshFromResponse"></SendToAssessor>
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Application from '../../form.vue';
 import modal from '@vue-utils/bootstrap-modal.vue'
 import datatable from '@vue-utils/datatable.vue';
@@ -117,9 +109,10 @@ import SendToAssessor from './application_send_assessor.vue';
 
 import {
     api_endpoints,
-    helpers
+    helpers, fetch_util
 }
 from '@/utils/hooks';
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'ApplicationAssessments',
     data: function() {
@@ -131,20 +124,22 @@ export default {
             },
             datepickerInitialised: false,
             isModalOpen: false,
-            assessorsBody: `assessorsBody${vm._uid}`,
+            assessorsBody: `assessorsBody${uuid()}`,
             assessorGroup: [],
-            panelBody: `assessment-details-${vm._uid}`,
+            panelBody: `assessment-details-${uuid()}`,
             "selectedAssessor": {},
-            application_assessor_datatable: `${vm._uid}assessment-table`,
+            application_assessor_datatable: `${uuid()}assessment-table`,
             assessors_headers: ["Assessor Group","Date Sent","Status","Final Comments","Action"],
             assessors_options: {},
             DATE_TIME_FORMAT: 'DD/MM/YYYY HH:mm:ss',
             viewingAssessmentId: null,
             savingAssessment: false,
             showSendToAssessorButton: true,
+            uid: uuid(),
         }
     },
     components: {
+        FormSection,
         datatable,
         modal,
         Application,
@@ -156,13 +151,6 @@ export default {
             type: Boolean,
             default: false,
         },
-    },
-    filters: {
-        formatDate: function(data){
-            return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
-        }
-    },
-    watch: {
     },
     computed: {
         ...mapGetters([
@@ -186,6 +174,20 @@ export default {
             'allCurrentActivities',
             'allCurrentActivitiesWithAssessor',
         ]),
+        title: function() {
+            if (this.isLicensingOfficer) {
+                return "Send to Assessor"
+            } else {
+                return "Assessments"
+            }
+        },
+        relevantAssessorGroup: function() {
+            let relevantAssessors = [];
+            this.assessorGroup.forEach(assessor => {
+                relevantAssessors.push(this.isAssessorRelevant(assessor));
+            });
+            return relevantAssessors;
+        },
         applicationDetailsVisible: function() {
             this.$nextTick(() => {
                 this.eventListeners();
@@ -293,9 +295,9 @@ export default {
         openAssessmentModal: function(assessment_id) {
             this.isModalOpen = true;
             this.viewingAssessmentId = assessment_id;
-            this.$http.get(`${api_endpoints.assessment}${this.viewingAssessmentId}`).then((response) => {
-                    this.assessment = response.body;
-            },(error) => {
+            let request = fetch_util.fetchUrl(`${api_endpoints.assessment}${this.viewingAssessmentId}`).then((response) => {
+                    this.assessment = response;
+            }).catch((error) => {
                 console.log(error);
             })
         },
@@ -303,9 +305,12 @@ export default {
             return new Promise((resolve, reject) => {
                 let formData = new FormData(this.form);
                 formData.append('final_comment', this.assessment.final_comment);
-                this.$http.put(helpers.add_endpoint_json(api_endpoints.assessment,this.assessment.id+'/update_assessment'),formData,{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessment,this.assessment.id+'/update_assessment'),
+                {method:"PUT",body:formData},
+                {
                     emulateJSON:true
-                }).then(res=>{
+                })
+                request.then(res=>{
                     resolve(res);
                 },err=>{
                     reject(err);
@@ -315,7 +320,7 @@ export default {
         saveAssessment: function(e) {
             this.savingAssessment = true;
             this.saveAssessmentData().then(() => {
-                swal(
+                swal.fire(
                     'Save Assessment',
                     'Your assessment has been saved.',
                     'success'
@@ -323,7 +328,7 @@ export default {
                     this.savingAssessment = false;
                 });
             }, error => {
-                swal(
+                swal.fire(
                     'Error',
                     'There was an error saving your assessment',
                     'error'
@@ -355,6 +360,7 @@ export default {
             if(this.selected_activity_tab_id && !force) {
 
                 let tabs = $('#tabs-main li')
+                let tab;
                 for (let i=0; i < tabs.length; i++){
 
                     if (tabs[i].innerText===this.selected_activity_tab_name){
@@ -436,7 +442,7 @@ export default {
             this.$refs.send_to_assessor.assessment.licence_activity=this.selected_activity_tab_id;
             this.$refs.send_to_assessor.assessment.text='';
             if (this.selectedAssessor.id == null || this.selectedAssessor.display_name == null){
-              swal(
+              swal.fire(
                 'Error',
                 'Please select an Assessor Group to send the request to.',
                 'error'
@@ -472,34 +478,34 @@ export default {
                 data.selected_assessment_tab=this.selected_activity_tab_id;
                 data.application_id=this.application.id;
                 
-                this.$http.post(helpers.add_endpoint_json(api_endpoints.applications,(this.application.id+'/complete_assessment')),
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications, {method:'POST', body:JSON.stringify(this.application.id+'/complete_assessment')}),
                 {
                     "selected_assessment_tab": this.selected_activity_tab_id,
                     "application_id": this.application_id,
                     "assessment_id": this.viewingAssessmentId,
                 })
-                .then((response) => {
+                request.then((response) => {
                     // FIXME: $parent causing local flags to loose settings
                     // and therefore not closing. Should be ok as assessor
                     // does not update applications.
                     // this.$parent.refreshFromResponse(response);
                     this.refreshAssessorDatatables();
                     this.close();
-                    swal(
+                    swal.fire(
                         'Complete Assessment',
                         'The assessment has been successfully completed',
                         'success'
                     )
                 }, (error) => {
                     this.revert();
-                    swal(
+                    swal.fire(
                         'Error',
                         helpers.apiVueResourceError(error),
                         'error'
                     )
                 });
             }, error => {
-                swal(
+                swal.fire(
                     'Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -513,10 +519,11 @@ export default {
         },
         fetchAssessorGroup: function(){
             let data = {'application_id' : this.application.id };
-            this.$http.post(helpers.add_endpoint_json(api_endpoints.assessor_group,'user_list'),JSON.stringify(data),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessor_group,'user_list'), {method:'POST', body:JSON.stringify(data)},{
                 emulateJSON:true,
-            }).then((response) => {
-                this.assessorGroup = response.body;
+            })
+            request.then((response) => {
+                this.assessorGroup = response;
             },(error) => {
                 console.log(error);
             });
@@ -604,8 +611,9 @@ export default {
                 e.preventDefault();
 
                 let assessment_id = $(e.target).data('assessmentid');
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.assessment,(assessment_id+'/remind_assessment'))).then((response)=>{
-                    swal(
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessment, {method:'POST', body:JSON.stringify(assessment_id+'/remind_assessment')}))
+                request.then((response)=>{
+                    swal.fire(
                             'Sent',
                             'An email has been sent to assessor with the request to assess this Application',
                             'success'
@@ -625,14 +633,15 @@ export default {
                 e.preventDefault();
 
                 let assessment_id = $(e.target).data('assessmentid');
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.assessment,(assessment_id+'/resend_assessment'))).then((response)=>{
-                    swal(
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessment,{method:'POST', body:JSON.stringify(assessment_id+'/resend_assessment')}))
+                request.then((response)=>{
+                    swal.fire(
                             'Sent',
                             'An email has been sent to assessor with the request to re-assess this Application',
                             'success'
                     )
                     vm.refreshAssessorDatatables();
-                    vm.$http.get(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/internal_application')).then((res) => {
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/internal_application')).then((res) => {
                         vm.refreshFromResponse(res);
                     });
 
@@ -650,15 +659,15 @@ export default {
                 e.preventDefault();
 
                 let assessment_id = $(e.target).data('assessmentid');
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.assessment,(assessment_id+'/recall_assessment'))).then((response)=>{
-                    //vm.$parent.loading.splice('processing contact',1);
-                    swal(
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessment,(assessment_id+'/recall_assessment')))
+                request.then((response)=>{
+                    swal.fire(
                             'Success',
                             'An assessment for this Application has been recalled',
                             'success'
                     )
                     vm.refreshAssessorDatatables();
-                    vm.$http.get(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/internal_application')).then((res) => {
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/internal_application')).then((res) => {
                         vm.refreshFromResponse(res);
                     });
                 },(error)=>{

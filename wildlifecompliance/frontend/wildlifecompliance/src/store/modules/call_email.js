@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
     api_endpoints,
-    helpers
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 import moment from 'moment';
@@ -127,11 +127,11 @@ export const callemailStore = {
                     country: 'AU'
                 };
             }
-            Vue.set(state, 'call_email', {
+            state.call_email = {
                 ...call_email
-            });
+            };
             if (state.call_email.occurrence_date_from) {
-                state.call_email.occurrence_date_from = moment(state.call_email.occurrence_date_from, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.call_email.occurrence_date_from = moment(state.call_email.occurrence_date_from, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             if (state.call_email.occurrence_time_start) {
                 state.call_email.occurrence_time_start = moment(state.call_email.occurrence_time_start, 'HH:mm').format('hh:mm A');
@@ -139,7 +139,7 @@ export const callemailStore = {
                 state.call_email.occurrence_time_start = null;
             }
             if (state.call_email.occurrence_date_to) {
-                state.call_email.occurrence_date_to = moment(state.call_email.occurrence_date_to, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.call_email.occurrence_date_to = moment(state.call_email.occurrence_date_to, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             if (state.call_email.occurrence_time_end) {
                 state.call_email.occurrence_time_end = moment(state.call_email.occurrence_time_end, 'HH:mm').format('hh:mm A');
@@ -147,7 +147,7 @@ export const callemailStore = {
                 state.call_email.occurrence_time_end = null;
             }
             if (state.call_email.date_of_call) {
-                state.call_email.date_of_call = moment(state.call_email.date_of_call, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.call_email.date_of_call = moment(state.call_email.date_of_call, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             if (state.call_email.time_of_call) {
                 state.call_email.time_of_call = moment(state.call_email.time_of_call, 'HH:mm').format('hh:mm A');
@@ -161,16 +161,16 @@ export const callemailStore = {
                 api_endpoints.call_email,
                 state.call_email.id + "/process_renderer_document/"
                 )
-            Vue.set(state.call_email, 'rendererDocumentUrl', rendererDocumentUrl); 
+            state.call_email.rendererDocumentUrl = rendererDocumentUrl; 
             let commsLogsDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.call_email,
                 state.call_email.id + "/process_comms_log_document/"
                 )
-            Vue.set(state.call_email, 'commsLogsDocumentUrl', commsLogsDocumentUrl); 
+            state.call_email.commsLogsDocumentUrl = commsLogsDocumentUrl; 
         },
         updateSchema(state, schema) {
             //state.call_email.schema = schema;
-            Vue.set(state.call_email, 'schema', schema);
+            state.call_email.schema = schema;
         },        
         updateClassificationTypes(state, classification_entry) {
             if (classification_entry) {
@@ -195,17 +195,17 @@ export const callemailStore = {
         },
         updateClassification(state, classification) {
             if (classification) {
-                Vue.set(state.call_email, 'classification', classification);
+                state.call_email.classification = classification;
             }
         },
         updateReportType(state, report_type) {
             if (report_type) {
-                Vue.set(state.call_email, 'report_type', report_type);
+                state.call_email.report_type = report_type;
             }
         },
         updateEmailUser(state, email_user){
             if (email_user){
-                Vue.set(state.call_email, 'email_user', email_user);
+                state.call_email.email_user = email_user;
             }
         },
         updateEmailUserEmpty(state){
@@ -221,13 +221,13 @@ export const callemailStore = {
                     country: 'AU'
                 }
             };
-            Vue.set(state.call_email, 'email_user', email_user_empty);
+            state.call_email.email_user = email_user_empty;
         },
         updateResidentialAddress(state, address){
-            Vue.set(state.call_email.email_user, 'residential_address', address);
+            state.call_email.email_user.residential_address = address;
         },
         updateLocation(state, location) {
-            Vue.set(state.call_email, 'location', location);
+            state.call_email.location = location;
         },
         updateLocationPoint(state, point) {
             state.call_email.location.geometry.coordinates = point;
@@ -246,8 +246,8 @@ export const callemailStore = {
             state.call_email.location.properties.details = "";
         },
         updateAllocatedGroupList(state, members) {
-            Vue.set(state.call_email, 'allocated_group', {});
-            Vue.set(state.call_email, 'allocated_group', members);
+            state.call_email.allocated_group = {};
+            state.call_email.allocated_group = members;
         },
         updateAllocatedGroupId(state, id) {
             state.call_email.allocated_group_id = id;
@@ -256,39 +256,39 @@ export const callemailStore = {
             state.call_email.region_id = id;
         },
         updateOccurrenceTimeStart(state, time) {
-            Vue.set(state.call_email, 'occurrence_time_start', time);
+            state.call_email.occurrence_time_start = time;
         },
         updateOccurrenceTimeEnd(state, time) {
-            Vue.set(state.call_email, 'occurrence_time_end', time);
+            state.call_email.occurrence_time_end = time;
         },
         updateTimeOfCall(state, time) {
-            Vue.set(state.call_email, 'time_of_call', time);
+            state.call_email.time_of_call = time;
         },
         updateDateOfCall(state, date) {
-            Vue.set(state.call_email, 'date_of_call', date);
+            state.call_email.date_of_call = date;
         },
         updateRelatedItems(state, related_items) {
-            Vue.set(state.call_email, 'related_items', related_items);
+            state.call_email.related_items = related_items;
         },
         updateCaller(state, data) {
             if (data.data_type === 'individual') {
-                Vue.set(state.call_email, 'email_user_id', data.id);
+                state.call_email.email_user_id = data.id;
             }
         },
     },
     actions: {
         async loadCallEmail({ dispatch, commit }, { call_email_id }) {
             try {
-                const returnedCallEmail = await Vue.http.get(
+                const returnedCallEmail = await fetch_util.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.call_email, 
                         call_email_id)
                     );
 
                 /* Set CallEmail object */
-                await dispatch("setCallEmail", returnedCallEmail.body);
+                await dispatch("setCallEmail", returnedCallEmail);
 
-                for (let form_data_record of returnedCallEmail.body.data) {
+                for (let form_data_record of returnedCallEmail.data) {
                     await dispatch("setFormValue", {
                         key: form_data_record.field_name,
                         value: {
@@ -308,19 +308,18 @@ export const callemailStore = {
         async saveCallEmailPerson({dispatch, state}){
             try{
                 let fetchUrl = helpers.add_endpoint_join(api_endpoints.call_email, state.call_email.id + "/call_email_save_person/");
-                const savedEmailUser = await Vue.http.post(fetchUrl, state.call_email);
-                await dispatch("setEmailUser", savedEmailUser.body);
-                await swal("Saved", "The record has been saved", "success");
+                const savedEmailUser = await fetch_util.fetchUrl(fetchUrl, {method:'POST', body:JSON.stringify(state.call_email)});
+                await dispatch("setEmailUser", savedEmailUser);
+                await swal.fire("Saved", "The record has been saved", "success");
             } catch (err) {
                 //console.log(err);
                 if (err.body.non_field_errors){
-                    await swal("Error", err.body.non_field_errors[0], "error");
+                    await swal.fire("Error", err.body.non_field_errors[0], "error");
                 } else {
-                    await swal("Error", "There was an error saving the record", "error");
+                    await swal.fire("Error", "There was an error saving the record", "error");
                 }
             }
         },
-        //async saveCallEmail({ dispatch, state, rootGetters}, { crud, internal, close }) {
         async saveCallEmail({ dispatch, state, rootGetters}, { crud, internal }) {
             let callId = null;
             let savedCallEmail = null;
@@ -329,7 +328,7 @@ export const callemailStore = {
                 let payload = new Object();
                 Object.assign(payload, state.call_email);
                 if (payload.occurrence_date_from) {
-                    payload.occurrence_date_from = moment(payload.occurrence_date_from, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.occurrence_date_from = moment(payload.occurrence_date_from, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 } else if (payload.occurrence_date_from === '') {
                     payload.occurrence_date_from = null;
                 }
@@ -339,7 +338,7 @@ export const callemailStore = {
                     payload.occurrence_time_start = null;
                 }
                 if (payload.occurrence_date_to) {
-                    payload.occurrence_date_to = moment(payload.occurrence_date_to, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.occurrence_date_to = moment(payload.occurrence_date_to, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 } else if (payload.occurrence_date_to === '') {
                     payload.occurrence_date_to = null;
                 }
@@ -349,7 +348,7 @@ export const callemailStore = {
                     payload.occurrence_time_end = null;
                 }
                 if (payload.date_of_call) {
-                    payload.date_of_call = moment(payload.date_of_call, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.date_of_call = moment(payload.date_of_call, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 } else if (payload.date_of_call === '') {
                     payload.date_of_call = null;
                 }
@@ -374,19 +373,19 @@ export const callemailStore = {
 
                 if (crud === 'create') {
                     const createUrl = api_endpoints.call_email;
-                    savedCallEmail = await Vue.http.post(createUrl, {});
+                    savedCallEmail = await fetch_util.fetchUrl(createUrl, {method:'POST'});
                 } else if (crud === 'duplicate') {
                     const createUrl = api_endpoints.call_email;
-                    savedCallEmail = await Vue.http.post(createUrl, payload);
+                    savedCallEmail = await fetch_util.fetchUrl(createUrl, {method:'POST', body:JSON.stringify(payload)});
                 } else if (crud === 'save') {
                         //---Save the draft call/email
                         const draftUrl = helpers.add_endpoint_join(
                         api_endpoints.call_email,
                         state.call_email.id + "/draft/")
                     try {
-                        savedCallEmail = await Vue.http.post(draftUrl, payload)
+                        savedCallEmail = await fetch_util.fetchUrl(draftUrl, {method:'POST', body:JSON.stringify(payload)})
                     }catch(err) {
-                        await swal({
+                        await swal.fire({
                             title: 'Error',
                             html: helpers.formatError(err),
                             type: "error",
@@ -398,9 +397,9 @@ export const callemailStore = {
                         api_endpoints.call_email, 
                         state.call_email.id + "/"
                         )
-                        savedCallEmail = await Vue.http.put(fetchUrl, payload)
+                        savedCallEmail = await fetch_util.fetchUrl(fetchUrl, {method:"PUT",body:JSON.stringify(payload)});
                     }catch(err) {
-                        await swal({
+                        await swal.fire({
                             title: 'Mandatory Field',
                             html: helpers.formatError(err),
                             type: "error",
@@ -408,26 +407,22 @@ export const callemailStore = {
                     }
                 }
 
-                await dispatch("setCallEmail", savedCallEmail.body);
-                callId = savedCallEmail.body.id;
+                await dispatch("setCallEmail", savedCallEmail);
+                callId = savedCallEmail.id;
 
             } catch (err) {
-                //console.log(err);
                 if (internal) {
-                    // return "There was an error saving the record";
                     return err;
                 } else {
-                    await swal("Error", "There was an error saving the record", "error");
+                    await swal.fire("Error", "There was an error saving the record", "error");
                 }
-                //return window.location.href = "/internal/call_email/";
             }
             if (crud === 'duplicate') {
-                console.log("hello???")
                 return window.location.href = "/internal/call_email/" + callId;
             }
             else if (crud !== 'create') {
                 if (!internal) {
-                    await swal("Saved", "The record has been saved", "success");
+                    await swal.fire("Saved", "The record has been saved", "success");
                 } else {
                     return savedCallEmail;
                 }

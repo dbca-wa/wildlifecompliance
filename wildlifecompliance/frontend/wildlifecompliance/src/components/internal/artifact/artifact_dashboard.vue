@@ -24,19 +24,19 @@
             <div class="col-md-3">
                 <label class="">Date from:</label>
                 <div class="input-group date" ref="issueDateFromPicker">
-                    <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFromPicker" />
-                    <span class="input-group-addon">
+                    <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFromPicker" />
+                    <!--<span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+                    </span>-->
                 </div>
             </div>
             <div class="col-md-3">
                 <label class="">Date to:</label>
                 <div class="input-group date" ref="issueDateToPicker">
-                    <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateToPicker" />
-                    <span class="input-group-addon">
+                    <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateToPicker" />
+                    <!--<span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+                    </span>-->
                 </div>
             </div>
             <div class="col-md-3 pull-right">
@@ -127,7 +127,7 @@ export default {
                         searchable: false,
                         orderable: true,
                         mRender: function (data, type, full) {
-                            return data != '' && data != null ? moment(data).format('DD/MM/YYYY') : '';
+                            return data != '' && data != null ? moment(data).format('YYYY-MM-DD') : '';
                         }
                     },
                     {
@@ -172,12 +172,6 @@ export default {
             return false;
         },
     },
-    mounted(){
-        let vm = this;
-        vm.$nextTick(() => {
-            vm.addEventListeners();
-        });
-    },
     watch: {
         filterType: function () {
             this.$refs.artifact_table.vmDataTable.draw();
@@ -208,42 +202,6 @@ export default {
         setCreateArtifactBindId: function() {
             let timeNow = Date.now()
             this.createArtifactBindId = 'artifact' + timeNow.toString();
-        },
-        addEventListeners: function () {
-            console.log('addEventLinsterners');
-
-            let vm = this;
-            this.attachFromDatePicker();
-            this.attachToDatePicker();
-        },
-        attachFromDatePicker: function(){
-            let vm = this;
-            let el_fr = $(vm.$refs.issueDateFromPicker);
-            let el_to = $(vm.$refs.issueDateToPicker);
-
-            el_fr.datetimepicker({ format: 'DD/MM/YYYY', maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_fr.on('dp.change', function (e) {
-                if (el_fr.data('DateTimePicker').date()) {
-                    vm.filterDateFromPicker = e.date.format('DD/MM/YYYY');
-                    el_to.data('DateTimePicker').minDate(e.date);
-                } else if (el_fr.data('date') === "") {
-                    vm.filterDateFromPicker = "";
-                }
-            });
-        },
-        attachToDatePicker: function(){
-            let vm = this;
-            let el_fr = $(vm.$refs.issueDateFromPicker);
-            let el_to = $(vm.$refs.issueDateToPicker);
-            el_to.datetimepicker({ format: 'DD/MM/YYYY', maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_to.on('dp.change', function (e) {
-                if (el_to.data('DateTimePicker').date()) {
-                    vm.filterDateToPicker = e.date.format('DD/MM/YYYY');
-                    el_fr.data('DateTimePicker').maxDate(e.date);
-                } else if (el_to.data('date') === "") {
-                    vm.filterDateToPicker = "";
-                }
-            });
         },
         constructOptionsType: async function() {
             let returned = await cache_helper.getSetCacheList('ArtifactTypes', '/api/artifact/types.json');

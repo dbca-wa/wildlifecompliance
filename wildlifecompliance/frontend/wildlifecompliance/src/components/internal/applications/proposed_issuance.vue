@@ -4,7 +4,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="licenceForm">
-                        <alert :show.sync="showError" type="danger"><strong>{{errorString}}</strong></alert>
+                        <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <div class="row">
@@ -13,16 +13,12 @@
 
                                         <div v-show="selected_activity_tab_id === a.licence_activity">
                                             <div v-for="(p, p_idx) in a.proposed_purposes" v-bind:key="`p_${p_idx}`">
-                                
-                                                <div class="panel panel-primary">
-                                                    <div class="panel-heading">
-                                                        <h4 class="panel-title">{{p.purpose.short_name}}
-                                                            <a class="panelClicker" :href="`#${p_idx}${index}`+purposeBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="purposeBody">
-                                                                <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-                                                            </a>
-                                                        </h4>
-                                                    </div>
-                                                    <div class="panel-body panel-collapse collapse" :id="`${p_idx}${index}`+purposeBody">
+                                                <FormSection
+                                                    :form-collapse="false"
+                                                    :label=p.purpose.short_name
+                                                    :index=p_idx
+                                                >
+                                                    <div class="panel panel-primary">
                                                         <div class="row">
                                                             <div class="col-sm-12">
                                                                 <div class="col-sm-3">
@@ -31,18 +27,18 @@
                                                                 </div>
                                                                 <div class="col-sm-3">
                                                                     <div class="input-group date" v-if="getPickedPurpose(p.purpose.id).isProposed" :ref="`start_date_${p.id}`" style="width: 100%;">
-                                                                        <input :readonly="!canEditLicenceDates && p.proposed_start_date" type="text" class="form-control" :name="`start_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_start_date">
-                                                                        <span class="input-group-addon">
+                                                                        <input :readonly="!canEditLicenceDates && p.proposed_start_date" type="date" class="form-control" :name="`start_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_start_date">
+                                                                        <!--<span class="input-group-addon">
                                                                             <span class="glyphicon glyphicon-calendar"></span>
-                                                                        </span>
+                                                                        </span>-->
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-sm-3">                                                        
                                                                     <div class="input-group date" v-if="getPickedPurpose(p.purpose.id).isProposed" :ref="`end_date_${p.id}`" style="width: 100%;">
-                                                                        <input :readonly="!canEditLicenceDates && p.proposed_end_date" type="text" class="form-control" :name="`end_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_end_date">
-                                                                        <span class="input-group-addon">
+                                                                        <input :readonly="!canEditLicenceDates && p.proposed_end_date" type="date" class="form-control" :name="`end_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_end_date">
+                                                                        <!--<span class="input-group-addon">
                                                                             <span class="glyphicon glyphicon-calendar"></span>
-                                                                        </span>
+                                                                        </span>-->
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -81,7 +77,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </FormSection>
 
                                             </div>
                                         </div>
@@ -175,14 +171,16 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 //import $ from 'jquery'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import {helpers,api_endpoints} from "@/utils/hooks.js"
+import {helpers,api_endpoints,fetch_util} from "@/utils/hooks.js"
 import { mapGetters } from 'vuex'
 import filefield from '@/components/common/compliance_file.vue'
 import summernote from '@/components/purpose_details_summernote'
 
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name:'Proposed-Licence',
     components:{
@@ -190,6 +188,7 @@ export default {
         alert,
         filefield,
         summernote,
+        FormSection,
     },
     props:{
         can_view_richtext_src: Boolean,
@@ -215,7 +214,7 @@ export default {
 	}
 
         return {
-            purposeBody: `purposeBody${vm._uid}`,
+            purposeBody: `purposeBody${uuid()}`,
             isModalOpen:false,
             form:null,
             propose_issue:{
@@ -234,7 +233,7 @@ export default {
             successString: '',
             success:false,
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -307,9 +306,9 @@ export default {
         },
         fetchContact: function(id){
             let vm = this;
-            vm.$http.get(api_endpoints.contact(id)).then((response) => {
-                vm.contact = response.body; vm.isModalOpen = true;
-            },(error) => {
+            let request = fetch_util.fetchUrl(api_endpoints.contact(id)).then((response) => {
+                vm.contact = response; vm.isModalOpen = true;
+            }).catch((error) => {
                 console.log(error);
             } );
         },
@@ -353,9 +352,10 @@ export default {
             vm.propose_issue.activities = vm.applicationSelectedActivitiesForPurposes.filter( a => {return vm.checkedActivities.includes(a.id)});
             let propose_issue = JSON.parse(JSON.stringify(vm.propose_issue));
             vm.issuingLicence = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,vm.application_id+'/proposed_licence'),JSON.stringify(vm.propose_issue),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application_id+'/proposed_licence'), {method:'POST', body:JSON.stringify(vm.propose_issue)},{
                     emulateJSON:true,
-                }).then((response)=>{
+                })
+            request.then((response)=>{
 
                     vm.$router.push({name:"internal-dash",});     
 
@@ -398,41 +398,7 @@ export default {
                 }
             });
        },
-    //    initialiseAttributes: function() {
-    //        //this.preloadProposedPurpose()
-
-    //    },
-       eventListeners:function () {
-            let vm = this;
-            // Initialise Date Picker
-            for (let i=0; i<vm.applicationSelectedActivitiesForPurposes.length; i++){
-                let act = vm.applicationSelectedActivitiesForPurposes[i]
-                for (let p=0; p<act.proposed_purposes.length; p++){
-                    let purpose = act.proposed_purposes[p]
-                    let start_date = 'start_date_' + purpose.id
-                    $(`[name='${start_date}']`).datetimepicker(vm.datepickerOptions);
-                    $(`[name='${start_date}']`).on('dp.change', function(e){
-                        if ($(`[name='${start_date}']`).data('DateTimePicker') && $(`[name='${start_date}']`).data('DateTimePicker').date()) {
-                            purpose.proposed_start_date =  e.date.format('DD/MM/YYYY');
-                        }
-                        else if ($(`[name='${start_date}']`).data('date') === "") {
-                            purpose.proposed_start_date = "";
-                        }
-                    });
-                    let end_date = 'end_date_' + purpose.id
-                    $(`[name='${end_date}']`).datetimepicker(vm.datepickerOptions);
-                    $(`[name='${end_date}']`).on('dp.change', function(e){
-                        if ($(`[name='${end_date}']`).data('DateTimePicker') && $(`[name='${end_date}']`).data('DateTimePicker').date()) {
-                            purpose.proposed_end_date =  e.date.format('DD/MM/YYYY');
-                        }
-                        else if ($(`[name='${end_date}']`).data('date') === "") {
-                            purpose.proposed_end_date = "";
-                        }
-                    });
-                }
-            }
-         },
-         preloadProposedPurpose: function() {
+        preloadProposedPurpose: function() {
             for (let i=0; i<this.applicationSelectedActivitiesForPurposes.length; i++){
                 let act = this.applicationSelectedActivitiesForPurposes[i]
                 for (let p=0; p<act.proposed_purposes.length; p++){
@@ -462,26 +428,17 @@ export default {
                     if (purpose.proposed_start_date == null || purpose.proposed_start_date.charAt(2)==='/'){
                         continue
                     }
-                    let date1 = moment(purpose.proposed_start_date, 'YYYY-MM-DD').format('DD/MM/YYYY')
-                    let date2 = moment(purpose.proposed_end_date, 'YYYY-MM-DD').format('DD/MM/YYYY')
+                    let date1 = moment(purpose.proposed_start_date, 'YYYY-MM-DD').format('YYYY-MM-DD')
+                    let date2 = moment(purpose.proposed_end_date, 'YYYY-MM-DD').format('YYYY-MM-DD')
                     purpose.proposed_start_date = date1
                     purpose.proposed_end_date = date2
                 }
             }
         },
    },
-   updated:function () {
-        this.$nextTick(()=>{
-            this.eventListeners();
-        });
-   },
    mounted:function () {
         this.form = document.forms.licenceForm;
         this.addFormValidations();
-        this.$nextTick(()=>{
-            this.eventListeners();
-        });
-        // this.initialiseAttributes();
    }
 }
 </script>

@@ -1,29 +1,27 @@
 <template>
-    <div class="panel panel-default">
-        <div class="panel-heading" v-show="false">
-            <h3 class="panel-title">Return
-                <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
-                    <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                </a>
-            </h3>
-        </div>
-        <div class="panel-body panel-collapse in" :id="pdBody">
+    <FormSection
+        :form-collapse="false"
+        label="Return"
+    >
+        <div class="panel panel-default">
             <div v-if="isReturnsLoaded" class="col-sm-offset-3 col-sm-6 borderDecoration">
                 <strong>Your Return has been submitted successfully.</strong>
                 <br/>
                 <table>
+                    <thead>
                     <tr>
                         <td><strong>Reference number:&nbsp;</strong></td>
                         <td><strong>{{returns.lodgement_number}}</strong></td>
                     </tr>
                     <tr>
                         <td><strong>Lodgement date:</strong></td>
-                        <td><strong> {{returns.lodgement_date|formatDate}}</strong></td>
+                        <td><strong> {{ formatDate(returns.lodgement_date) }}</strong></td>
                     </tr>
                     <tr>
                         <td><strong>Invoice:</strong></td>
                         <td><a :href="returns.invoice_url" target="_blank"><i style="color:red" class="fa fa-file-pdf-o"></i></a></td>
                     </tr>
+                    </thead>
                 </table>
                 <a href="/" style="margin-top:15px;" class="btn btn-primary">Back to dashboard</a>
             </div>
@@ -33,10 +31,11 @@
             </div>
         </div>
         <input type='hidden' name="table_name" :value="returns.table[0].name" />
-    </div>
+    </FormSection>
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import CommsLogs from '@common-components/comms_logs.vue'
@@ -45,13 +44,17 @@ import {
   helpers
 }
 from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
   name: 'ReturnConfirmation',
   data() {
     let vm = this;
     return {
-      pdBody: 'pdBody' + vm._uid,
+      pdBody: 'pdBody' + uuid(),
     }
+  },
+  components: {
+    FormSection,
   },
   computed: {
     ...mapGetters([
@@ -66,11 +69,6 @@ export default {
     ...mapActions([
         'setReturns',
     ]),
-  },
-  filters:{
-        formatDate: function(data){
-            return data ? moment(data).format('DD/MM/YYYY'): '';
-        }
   },
 }
 </script>

@@ -8,34 +8,30 @@
             <div class="col-md-9">
                 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="pills-details-tab" data-toggle="pill" href="#pills-details" role="tab" aria-controls="pills-details" aria-selected="true">
+                        <a class="nav-link active" id="pills-details-tab" data-bs-toggle="pill" href="#pills-details" role="tab" aria-controls="pills-details" aria-selected="true">
                             Details
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="pills-licensing-tab" data-toggle="pill" href="#pills-licensing" role="tab" aria-controls="pills-licensing" aria-selected="false">
+                        <a class="nav-link" id="pills-licensing-tab" data-bs-toggle="pill" href="#pills-licensing" role="tab" aria-controls="pills-licensing" aria-selected="false">
                             Licensing
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="pills-compliance-tab" data-toggle="pill" href="#pills-compliance" role="tab" aria-controls="pills-compliance" aria-selected="false">
+                        <a class="nav-link" id="pills-compliance-tab" data-bs-toggle="pill" href="#pills-compliance" role="tab" aria-controls="pills-compliance" aria-selected="false">
                             Compliance
                         </a>
                     </li>
                 </ul>
-                <div class="tab-content" id="pills-tabContent">
-                  <div class="tab-pane fade" id="pills-details" role="tabpanel" aria-labelledby="pills-details-tab">
+                <div id="pills-tabContent" class="tab-content">
+                  <div class="tab-pane fade in active show" id="pills-details" role="tabpanel" aria-labelledby="pills-details-tab">
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Personal Details
-                                        <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
-                                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse in" :id="pdBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Personal Details"
+                                >
+                                    <div class="panel panel-default">
                                       <form class="form-horizontal" name="personal_form" method="post">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Account Given Name(s)</label>
@@ -53,7 +49,7 @@
                                             <label for="" class="col-sm-3 control-label" >Account Date of Birth</label>
                                             <div class="col-sm-6">
                                                 <div class="input-group date" ref="dob" style="width: 100%;">
-                                                    <input disabled type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="user.dob">
+                                                    <input disabled type="date" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="user.dob">
                                                 </div>
                                             </div>
                                           </div>
@@ -84,52 +80,17 @@
                                             </div>
                                           </div>
                                        </form>
-                                  </div>
-                                </div>
+                                    </div>
+                                </FormSection>
                             </div>
                         </div>
-                        <!--<div class="row">
-                            <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Identification
-                                        <a class="panelClicker" :href="'#'+idBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="idBody">
-                                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse in" :id="idBody">
-                                      <form class="form-horizontal" name="id_form" method="post">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Identification</label>
-                                            <div class="col-sm-9">
-                                                <span class="col-sm-3 btn btn-link btn-file pull-left" v-if="uploadedID"><SecureBaseLink link_name="Uploaded Photo ID" :link_data="{'customer_id': user.id}" /></span>
-                                                <span class="col-sm-3 btn btn-link btn-file pull-left" v-else-if="!uploadedID">Attach Photo ID<input type="file" ref="uploadedID" @change="readFileID()"/></span>
-                                                <span class="col-sm-3 btn btn-link btn-file pull-left" v-else >&nbsp;Uploading...</span>
-                                                <span v-if="uploadedID" class="btn btn-link btn-file pull-left">
-                                                    <a @click="removeID()" class="fa fa-trash-o" title="Remove file" style="cursor: pointer; color:red;" />
-                                                </span>
-                                            </div> 
-                                          </div>
-                                          <div class="form-group">
-                                            <div class="col-sm-12"></div>
-                                          </div>
-                                       </form>
-                                  </div>
-                                </div>
-                            </div>
-                        </div>-->
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Address Details
-                                        <a class="panelClicker" :href="'#'+adBody" data-toggle="collapse" expanded="false"  data-parent="#userInfo" :aria-controls="adBody">
-                                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div v-if="loading.length == 0" class="panel-body collapse in" :id="adBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Address Details"
+                                >
+                                    <div class="panel panel-default">
                                       <form class="form-horizontal" action="index.html" method="post">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Street</label>
@@ -169,20 +130,16 @@
                                           </div>
                                        </form>
                                   </div>
-                                </div>
+                                </FormSection>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Contact Details <small></small>
-                                        <a class="panelClicker" :href="'#'+cdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="cdBody">
-                                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse in" :id="cdBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Contact Details"
+                                >
+                                    <div class="panel panel-default">
                                       <form class="form-horizontal" action="index.html" method="post">
                                           <div class="form-group">
                                             <label for="" class="col-sm-3 control-label">Phone</label>
@@ -210,20 +167,16 @@
                                           </div>
                                        </form>
                                   </div>
-                                </div>
+                                </FormSection>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                    <h3 class="panel-title">Organisations <small></small>
-                                        <a class="panelClicker" :href="'#'+odBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="odBody">
-                                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                        </a>
-                                    </h3>
-                                  </div>
-                                  <div class="panel-body collapse in" :id="odBody">
+                                <FormSection
+                                    :form-collapse="false"
+                                    label="Organisations"
+                                >
+                                    <div class="panel panel-default">
                                       <div v-for="org in user.wildlifecompliance_organisations" v-bind:key="org.id">
                                           <div class="form-group">
                                             <label for="" class="col-sm-2 control-label" >Organisation</label>
@@ -251,7 +204,7 @@
                                           </div>
                                       </div>
                                   </div>
-                                </div>
+                                </FormSection>
                             </div>
                         </div>
                     </div> 
@@ -292,7 +245,8 @@
 </template>
 
 <script>
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { v4 as uuid } from 'uuid';
+import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
 import ApplicationDashTable from '@common-components/applications_dashboard.vue'
 import LicenceDashTable from '@common-components/licences_dashboard.vue'
@@ -303,18 +257,19 @@ import CommsLogs from '@common-components/comms_logs.vue'
 import IntelligenceInformation from '@common-components/intelligence_information.vue'
 import SecureBaseLink from '@common-components/securebase_link.vue';
 import utils from '../utils'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'User',
     data () {
         let vm = this;
         return {
-            adBody: 'adBody'+vm._uid,
-            pdBody: 'pdBody'+vm._uid,
-            cdBody: 'cdBody'+vm._uid,
-            odBody: 'odBody'+vm._uid,
-            idBody: 'idBody'+vm._uid,
-            dTab: 'dTab'+vm._uid,
-            oTab: 'oTab'+vm._uid,
+            adBody: 'adBody'+uuid(),
+            pdBody: 'pdBody'+uuid(),
+            cdBody: 'cdBody'+uuid(),
+            odBody: 'odBody'+uuid(),
+            idBody: 'idBody'+uuid(),
+            dTab: 'dTab'+uuid(),
+            oTab: 'oTab'+uuid(),
             user: {
                 residential_address: {},
                 wildlifecompliance_organisations: []
@@ -337,7 +292,7 @@ export default {
             returns_url: api_endpoints.returns_paginated+'user_datatable_list?format=datatables&user_id='+vm.$route.params.user_id,
             orgRequest_pending: [],
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -346,6 +301,7 @@ export default {
         }
     },
     components: {
+        FormSection,
         datatable,
         ApplicationDashTable,
         LicenceDashTable,
@@ -393,12 +349,10 @@ export default {
         });
     },
     methods: {
-        set_tabs:function(){
+        /*set_tabs:function(){
             let vm = this;
-
-            /* set Applicant tab Active */
             $('#pills-tab a[href="#pills-details"]').tab('show');
-        },
+        },*/
 
         eventListeners: function(){
             let vm = this;
@@ -412,13 +366,14 @@ export default {
         updateContact: function() {
             let vm = this;
             vm.updatingContact = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/update_contact')),JSON.stringify(vm.user),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/update_contact')), {method:'POST', body:JSON.stringify(vm.user)},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 vm.updatingContact = false;
-                vm.user = response.body;
+                vm.user = response;
                 if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
-                swal({
+                swal.fire({
                     title: 'Update Contact Details',
                     html: 'User contact details has been successfully updated.',
                     type: 'success',
@@ -429,7 +384,7 @@ export default {
                 for (var key in error.body) {
                     error_msg += key + ': ' + error.body[key] + '<br/>';
                 }
-                swal({
+                swal.fire({
                     title: 'Update Contact Details',
                     html: 'There was an error updating the user contact details.<br/>' + error_msg,
                     type: 'error'
@@ -439,13 +394,14 @@ export default {
         updateAddress: function() {
             let vm = this;
             vm.updatingAddress = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/update_address')),JSON.stringify(vm.user.residential_address),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/update_address')), {method:'POST', body:JSON.stringify(vm.user.residential_address)},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 vm.updatingAddress = false;
-                vm.user = response.body;
+                vm.user = response;
                 if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
-                swal({
+                swal.fire({
                     title: 'Update Address Details',
                     html: 'User address details has been successfully updated.',
                     type: 'success',
@@ -456,7 +412,7 @@ export default {
                 for (var key in error.body) {
                     error_msg += key + ': ' + error.body[key] + '<br/>';
                 }
-                swal({
+                swal.fire({
                     title: 'Update Address Details',
                     html: 'There was an error updating the user address details.<br/>' + error_msg,
                     type: 'error'
@@ -466,7 +422,7 @@ export default {
         unlinkUser: function(org){
             let vm = this;
             let org_name = org.name;
-            swal({
+            swal.fire({
                 title: "Unlink From Organisation",
                 text: "Are you sure you want to unlink this user from "+org.name+" ?",
                 type: "question",
@@ -474,31 +430,34 @@ export default {
                 confirmButtonText: 'Accept'
             }).then((result) => {
                 if (result) {
-                    vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'),JSON.stringify(vm.user),{
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'), {method:'POST', body:JSON.stringify(vm.user)},{
                         emulateJSON:true
-                    }).then((response) => {
-                        vm.$http.get(helpers.add_endpoint_json(api_endpoints.users,vm.user.id)).then((response) => {
-                            vm.user = response.body
+                    })
+                    request.then((response) => {
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,vm.user.id)).then((response) => {
+                            vm.user = response
                             if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
                             if (vm.user.wildlifecompliance_organisations && vm.user.wildlifecompliance_organisations.length > 0){
                               vm.managesOrg = 'Yes'
                             }
-                            swal(
+                            swal.fire(
                                 'Unlink',
                                 'The user has been successfully unlinked from '+org_name+'.',
                                 'success'
                             )
-                        },(error) => {
+                        }).catch((error) => {
+                            console.log(error)
                         })
-                    }, (error) => {
-                        swal(
+                    }).catch((error) => {
+                        swal.fire(
                             'Unlink',
                             'There was an error unlinking the user from '+org_name+'.',
                             'error'
                         )
                     });
                 }
-            },(error) => {
+            }).catch((error) => {
+                console.log(error)
             });
         },
         readFileID: async function() {
@@ -527,21 +486,20 @@ export default {
             data.append('identification2', vm.uploadedID);
             if (vm.uploadedID == null){
                 vm.uploadingID = false;
-                swal({
+                swal.fire({
                         title: 'Upload ID',
                         html: 'Please select a file to upload.',
                         type: 'error'
                 });
             } else {
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/upload_id')),data,{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/upload_id')),{method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-                }).then((response) => {
+                })
+                request.then((response) => {
                     vm.uploadingID = false;
                     vm.uploadedID = null;
-                    //vm.uploadedID = response.body.identification;
-                    //vm.user.identification = response.body.identification;
-                    vm.uploadedID = response.body.identification2;
-                    vm.user.identification2 = response.body.identification2;
+                    vm.uploadedID = response.identification2;
+                    vm.user.identification2 = response.identification2;
                 }, (error) => {
                     console.log(error);
                     vm.uploadingID = false;
@@ -550,7 +508,7 @@ export default {
                     for (var key in error.body) {
                         error_msg += key + ': ' + error.body[key] + '<br/>';
                     }
-                    swal({
+                    swal.fire({
                         title: 'Upload ID',
                         html: 'There was an error uploading your ID.<br/>' + error_msg,
                         type: 'error'
@@ -558,25 +516,11 @@ export default {
                 });
             }
         },
-        eventListeners:function () {
-            const self = this
-            let _dob = 'dob';
-            $(`[name='${_dob}']`).datetimepicker(self.datepickerOptions);
-            $(`[name='${_dob}']`).on('dp.change', function(e){
-                if ($(`[name='${_dob}']`).data('DateTimePicker').date()) {
-                    self.user.dob =  e.date.format('DD/MM/YYYY');
-                }
-                else if ($(`[name='${_dob}']`).data('date') === "") {
-                    self.user.dob = "";
-                }
-            });
-        },
     },
     mounted: function(){
         let vm = this;
-        vm.set_tabs();
+        //vm.set_tabs();
         this.personal_form = document.forms.personal_form;
-        this.eventListeners();
     },
 }
 </script>

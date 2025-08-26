@@ -1,3 +1,46 @@
+{% load users %}
+{% load static %}
+{% load tagutils %}
+{% is_officer as is_officer_login %}
+{% is_wildlifecompliance_officer as is_wildlifecompliance_officer %}
+{% is_compliance_internal_user as is_compliance_internal_login %}
+{% prefer_compliance_management as prefer_compliance_management %}
+{% is_compliance_management_user as is_compliance_management_user %}
+{% COMPLIANCE_LINKS_ENABLED as compliance_links_enabled %}
+
+{% is_internal as is_internal_login %}
+
+{% if request.user.is_authenticated %}
+    {% if is_compliance_management_user and not is_compliance_internal_login %}
+        <li><a class="nav-link" href="/internal/call_email">Call/Emails</a></li>     
+        <li><a class="nav-link" href="/infringement">Infringement Notice</a></li>                       
+    {% elif is_wildlifecompliance_officer and not prefer_compliance_management %}
+        <li><a class="nav-link" href="/internal/">Applications</a></li>
+        <li><a class="nav-link" href="/internal/licences">Licences</a></li>
+        <li><a class="nav-link" href="/internal/returns">Returns</a></li>
+        <li><a class="nav-link" href="/internal/organisations/access">Organisation Access Requests</a></li>
+    {% elif is_compliance_internal_login and prefer_compliance_management %}
+        <li><a class="nav-link" href="/internal/call_email">Call/Emails</a></li>
+        {% if compliance_links_enabled %}
+            <li><a class="nav-link" href="/internal/inspection">Inspections</a></li>
+            <li><a class="nav-link" href="/internal/offence">Offences</a></li>
+            <li><a class="nav-link" href="/internal/object">Objects</a></li>
+            <li><a class="nav-link" href="/internal/sanction_outcome">Sanction Outcomes</a></li>
+            <li><a class="nav-link" href="/internal/legal_case">Cases</a></li>
+        {% endif %} 
+    {% else %}
+        <!-- External user -->
+        <li><a class="nav-link" href="/infringement">Infringement Notice</a></li>
+    {% endif %}
+
+    {% if is_officer_login %}
+        <li><a class="nav-link" href="/internal/search">Search</a></li>
+    {% endif %}
+{% else %}
+    <li><a class="nav-link" href="{% url 'wc_contact' %}">Contact Us</a></li>
+    <li><a class="nav-link" href="{% url 'wc_further_info' %}">Further Information</a></li>
+    <li><a class="nav-link" href="{% url 'wc_infringement' %}">Infringement Notice</a></li>
+{% endif %}
 
 <script>
     var payment_processing = 
@@ -41,3 +84,40 @@
         },"500");
     }
 </script>
+
+<style>
+    .navbar-brand > img {
+        display: inline;
+    }
+
+    h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        line-height: 1.2;
+    }
+
+    .navbar {
+        margin-bottom: 0px;
+    }
+
+    .nav-item {
+        background-color: hsla(0, 0%, 0%, 0) !important;
+    }
+
+    .input-sm {
+        padding: 0 !important;
+    }
+
+    .form-control {
+        font-size: 14px;
+    }
+
+    .form-select {
+        font-size: 14px;
+    }
+
+    .gov_top_spacer {
+        margin-bottom: 5px;
+    }
+</style>

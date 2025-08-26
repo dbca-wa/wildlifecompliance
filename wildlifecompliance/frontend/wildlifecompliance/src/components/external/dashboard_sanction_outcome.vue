@@ -24,12 +24,5 @@ export default {
     components:{
         SanctionOutcomeDashTable,
     },
-    watch: {},
-    computed: {
-    },
-    methods: {
-    },
-    mounted: function () {
-    }
 }
 </script>

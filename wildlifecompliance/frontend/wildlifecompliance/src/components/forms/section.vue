@@ -1,27 +1,27 @@
 <template lang="html">
-    <div class="panel panel-default" >
-      <div class="panel-heading">
-        <h3 class="panel-title">{{label}}
-            <a :href="'#'+section_id" class="panelClicker" data-toggle="collapse" expanded="true" :aria-controls="section_id">
-                <span class="glyphicon glyphicon-chevron-down pull-right "></span>
-            </a>
-        </h3>
-      </div>
-      <div class="panel-body collapse in" :id="section_id">
+    <FormSectionToggle
+        :form-collapse="false"
+        :label=label
+    >
+        <div class="panel panel-default" >
           <slot></slot>
-      </div>
-    </div>
+        </div>
+    </FormSectionToggle>
 </template>
 
 <script>
+import FormSectionToggle from "@/components/forms/section_toggle.vue";
 export default {
-    name:"FormSection",
-    props:["label","Index"],
+    name: "Section",
+    props:['label','Index'],
     data:function () {
         return {
             title:"Section title",
             eventInitialised: false
         }
+    },
+    components: {
+        FormSectionToggle,
     },
     computed:{
         section_id:function () {

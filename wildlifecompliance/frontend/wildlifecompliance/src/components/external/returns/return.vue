@@ -17,7 +17,7 @@
                     <div class="navbar-inner">
                         <div class="container">
                             <p class="pull-right" style="margin-top:5px;">
-                                <strong style="font-size: 18px;" v-if="isPayable">Return submission fee: {{returns_estimate_fee | toCurrency}}</strong><br>
+                                <strong style="font-size: 18px;" v-if="isPayable">Return submission fee: {{toCurrency(returns_estimate_fee)}}</strong><br>
 
                                   <button v-if="spinner_exit" style="width:150px;" disabled class="btn btn-primary btn-md"><i class="fa fa-spin fa-spinner"></i>&nbsp;Saving</button>
                                   <button v-else-if="!spinner_exit && disable_exit" style="width:150px;" disabled class="btn btn-primary btn-md" name="save_exit">Save and Exit</button>
@@ -46,6 +46,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from 'vue'
 import Returns from '../../returns_form.vue'
 import ReturnSheet from './enter_return_sheet.vue'
@@ -56,14 +57,14 @@ import { mapActions, mapGetters } from 'vuex'
 import CommsLogs from '@common-components/comms_logs.vue'
 import {
   api_endpoints,
-  helpers
+  helpers, fetch_util
 }
 from '@/utils/hooks'
 export default {
   name: 'externalReturn',
   data() {
     return {
-      pdBody: 'pdBody' + self._uid,
+      pdBody: 'pdBody' + uuid(),
       estimated_fee: 0,
       spinner_exit: false,
       spinner_submit: false,
@@ -172,11 +173,12 @@ export default {
         });
         data.append('transfer', speciesJSON)
       }
-      await self.$http.post(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/save'),data,{
+      let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/save'),{method:'POST', body:JSON.stringify(data)},{
                       emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                       let species_id = self.returns.sheet_species;
-                      self.setReturns(response.body);
+                      self.setReturns(response);
                       self.returns.sheet_species = species_id;
                       self.returns.species = species_id;
                       self.is_saving = false
@@ -187,7 +189,7 @@ export default {
                       self.spinner_continue = false;
                       if (andContinue) { 
 
-                        swal( 'Save', 
+                        swal.fire( 'Save', 
                               'Return Details Saved', 
                               'success'
                         )
@@ -205,7 +207,7 @@ export default {
                       self.spinner_exit = false;
                       self.spinner_continue = false;
                       console.log(error);
-                      swal('Error',
+                      swal.fire('Error',
                            'There was an error saving your return details.<br/>' + error.body,
                            'error'
                       )
@@ -220,9 +222,10 @@ export default {
       self.spinner_submit = true;
       var data = await self.get_table_data()
 
-      await self.$http.post(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/save_and_submit'),data,{
+      let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/save_and_submit'),{method:'POST', body:JSON.stringify(data)},{
                       emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                       // self.is_submitting = false;
                       self.disable_submit = false;
                       self.disable_exit = false;
@@ -237,7 +240,7 @@ export default {
                       self.disable_continue = false;
                       self.spinner_submit = false;
                       console.log(error);
-                      swal('Error',
+                      swal.fire('Error',
                            'There was an error saving and submitting your return details.<br/>' + error.body,
                            'error'
                       )
@@ -252,30 +255,31 @@ export default {
       self.spinner_exit = true;
       self.spinner_submit = true;
       self.form=document.forms.external_returns_form;
-      self.$http.post(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/submit'),{
-                      emulateJSON:true,
-                    }).then((response)=>{
-                       let species_id = self.returns.sheet_species;
-                       self.setReturns(response.body);
-                       self.returns.sheet_species = species_id;
-                       self.disable_continue = false;
-                       self.disable_exit = false;
-                       self.disable_submit = false;
-                       self.spinner_exit = false;
-                       self.spinner_submit = false;
-                       this.$router.push({name:"external-applications-dash"});
-                    },(error)=>{
-                       self.disable_continue = false;
-                       self.disable_exit = false;
-                       self.disable_submit = false;
-                       self.spinner_exit = false;
-                       self.spinner_submit = false;
-                       console.log(error);
-                       swal('Error',
-                            'There was an error submitting your return details.<br/>' + error.body,
-                            'error'
-                       )
-                    });
+      let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/submit'),{
+            emulateJSON:true,
+          })
+      request.then((response)=>{
+              let species_id = self.returns.sheet_species;
+              self.setReturns(response);
+              self.returns.sheet_species = species_id;
+              self.disable_continue = false;
+              self.disable_exit = false;
+              self.disable_submit = false;
+              self.spinner_exit = false;
+              self.spinner_submit = false;
+              this.$router.push({name:"external-applications-dash"});
+          },(error)=>{
+              self.disable_continue = false;
+              self.disable_exit = false;
+              self.disable_submit = false;
+              self.spinner_exit = false;
+              self.spinner_submit = false;
+              console.log(error);
+              swal.fire('Error',
+                  'There was an error submitting your return details.<br/>' + error.body,
+                  'error'
+              )
+          });
 
     },
     submit_and_checkout: async function(e) {
@@ -286,18 +290,19 @@ export default {
       self.spinner_exit = true;
       self.spinner_submit = true;
       self.form=document.forms.external_returns_form;
-      await self.$http.post(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/submit_and_checkout'),{
+      let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/submit_and_checkout'),{
                       emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                        self.disable_continue = false;
                        self.disable_exit = false;
                        self.disable_submit = false;
                        self.spinner_exit = false;
                        self.spinner_submit = false;
 
-                       window.location.href = res.body;
+                       window.location.href = res;
                        //let species_id = self.returns.sheet_species;
-                       //self.setReturns(response.body);
+                       //self.setReturns(response);
                        //self.returns.sheet_species = species_id;
                     },(error)=>{
                        self.disable_continue = false;
@@ -306,7 +311,7 @@ export default {
                        self.spinner_exit = false;
                        self.spinner_submit = false;
                        console.log(error);
-                       swal('Error',
+                       swal.fire('Error',
                             'There was an error submitting your return details.<br/>' + error.body,
                             'error'
                        )

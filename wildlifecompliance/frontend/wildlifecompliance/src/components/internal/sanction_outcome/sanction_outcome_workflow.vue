@@ -47,11 +47,11 @@
 import Vue from "vue";
 import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import filefield from '@/components/common/compliance_file.vue';
 import "jquery-ui/ui/widgets/draggable.js";
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+
 
 export default {
     name: "SanctionOutcomeWorkflow",
@@ -205,7 +205,7 @@ export default {
             this.$refs.comms_log_file.commsLogId ? payload.append('comms_log_id', this.$refs.comms_log_file.commsLogId) : null;
             this.workflow_type ? payload.append('workflow_type', this.workflow_type) : null;
 
-            let res = await Vue.http.post(post_url, payload);
+            let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
             return res
         },
         uploadFile(target,file_obj){

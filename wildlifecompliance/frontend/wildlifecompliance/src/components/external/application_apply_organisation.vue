@@ -2,15 +2,12 @@
     <div class="container" >
         <div class="row">
             <div class="col-sm-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Apply on behalf of
-                            <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                                <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                            </a>
-                        </h3>
-                    </div>
-                    <div class="panel-body collapse in" :id="pBody">
+                <FormSection
+                :form-collapse="false"
+                label="Apply on behalf of"
+                index="apply"
+                >
+                    <div class="panel panel-default">
                         <form class="form-horizontal" name="personal_form" method="post">
                             <div class="col-sm-12">
                                     <!-- <p><strong>Note: If you are applying for a Taking licence, it cannot be applied for on behalf of an organisation.</strong></p> -->
@@ -34,20 +31,22 @@
                             </div>
                         </form>
                     </div>
-                </div>
+                </FormSection>
             </div>
         </div>
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from 'vue'
 import {
   api_endpoints,
-  helpers
+  helpers, fetch_util
 }
 from '@/utils/hooks'
 import { mapActions, mapGetters } from 'vuex'
 import utils from './utils'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
   data: function() {
     let vm = this;
@@ -62,10 +61,11 @@ export default {
         },
         "loading": [],
         form: null,
-        pBody: 'pBody' + vm._uid,
+        pBody: 'pBody' + uuid(),
     }
   },
   components: {
+    FormSection
   },
   computed: {
     isLoading: function() {
@@ -95,11 +95,12 @@ export default {
     
     fetchOrgContact:function (){
             let vm =this;
-            vm.$http.get(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_pending_requests')).then((response)=>{
-                vm.orgRequest_pending = response.body;
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,'get_pending_requests'))
+            request.then((response)=>{
+                vm.orgRequest_pending = response;
                 vm.loading.splice('fetching pending organisation requests',1);
-            },(response)=>{
-                vm.loading.splice('fetching pending organisation requests',1);
+            }).catch((error) => {
+                console.log(error)
             });
         },
   },

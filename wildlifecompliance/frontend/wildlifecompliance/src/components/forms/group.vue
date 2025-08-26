@@ -50,7 +50,7 @@ export default {
     },
     mounted:function () {
         var vm =this;
-        $('[data-toggle="tooltip"]').tooltip();
+        //$('[data-toggle="tooltip"]').tooltip();
     }
 }
 </script>

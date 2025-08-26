@@ -4,7 +4,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="conditionForm">
-                        <alert :show.sync="showError" type="danger"><strong>{{errorString}}</strong></alert>
+                        <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <label class="radio-inline control-label"><input type="radio" name="conditionType" :value="true" v-model="condition.standard">Standard Condition</label>
@@ -50,10 +50,10 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <div class="input-group date" ref="due_date" style="width: 70%;">
-                                            <input type="text" class="form-control" name="due_date" placeholder="DD/MM/YYYY" v-model="condition.due_date">
-                                            <span class="input-group-addon">
+                                            <input type="date" class="form-control" name="due_date" placeholder="DD/MM/YYYY" v-model="condition.due_date">
+                                            <!--<span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>
+                                            </span>-->
                                         </div>
                                     </div>
                                 </div>
@@ -134,11 +134,11 @@
 //import $ from 'jquery'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import {helpers,api_endpoints} from "@/utils/hooks.js"
+import {helpers,api_endpoints,fetch_util} from "@/utils/hooks.js"
 
 var select2 = require('select2');
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+
 
 export default {
     name:'Condition-Detail',
@@ -183,7 +183,7 @@ export default {
             successString: '',
             success:false,
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -212,7 +212,7 @@ export default {
     },
     watch: {
         due_date: function(){
-            this.validDate = moment(this.condition.due_date,'DD/MM/YYYY').isValid();
+            this.validDate = moment(this.condition.due_date,'YYYY-MM-DD').isValid();
         },
     },
     methods:{
@@ -235,25 +235,22 @@ export default {
             $(this.$refs.standard_req).val(null).trigger('change');
             this.errors = false;
             $('.has-error').removeClass('has-error');
-            const datePicker = $(this.$refs.due_date).data('DateTimePicker');
-            if(datePicker) {
-                datePicker.clear();
-            }
             this.showDueDate = false;
             this.validation_form.resetForm();
         },
         fetchContact: function(id){
             let vm = this;
-            vm.$http.get(api_endpoints.contact(id)).then((response) => {
-                vm.contact = response.body; vm.isModalOpen = true;
-            },(error) => {
+            let request = fetch_util.fetchUrl(api_endpoints.contact(id))
+            request.then((response) => {
+                vm.contact = response; vm.isModalOpen = true;
+            }).catch((error) => {
                 console.log(error);
             } );
         },
         fetchReturnTypes() {
-            this.$http.get(api_endpoints.return_types).then((response) => {
-                this.return_types = response.body;
-            },(error) => {
+            let request = fetch_util.fetchUrl(api_endpoints.return_types).then((response) => {
+                this.return_types = response;
+            }).catch((error) => {
                 console.log(error);
             })
         },
@@ -278,9 +275,10 @@ export default {
             }
             if (vm.condition.id){
                 vm.updatingCondition = true;
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.application_conditions,condition.id+'/update_condition'),JSON.stringify(condition),{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.application_conditions,condition.id+'/update_condition'), {method:'POST', body:JSON.stringify(condition)},{
                         emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                         vm.updatingCondition = false;
                         vm.$parent.updatedConditions();
                         vm.close();
@@ -291,9 +289,10 @@ export default {
                     });
             } else {
                 vm.addingCondition = true;
-                vm.$http.post(api_endpoints.application_conditions,JSON.stringify(condition),{
+                let request = fetch_util.fetchUrl(api_endpoints.application_conditions,{method:'POST', body:JSON.stringify(condition)},{
                         emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                         vm.addingCondition = false;
                         vm.close();
                         vm.$parent.updatedConditions();
@@ -409,18 +408,6 @@ export default {
        vm.setConditionSelector();
        if (vm.condition.free_condition || vm.condition.due_date){
             vm.showDueDate=true;
-       }
-       // Initialise Date Picker
-       if (!vm.condition.standard || vm.showDueDate) {
-            $(vm.$refs.due_date).datetimepicker(vm.datepickerOptions);
-            $(vm.$refs.due_date).on('dp.change', function(e){
-                if ($(vm.$refs.due_date).data('DateTimePicker').date()) {
-                    vm.condition.due_date =  e.date.format('DD/MM/YYYY');
-                }
-                else if ($(vm.$refs.due_date).data('date') === "") {
-                    vm.condition.due_date = "";
-                }
-            });       
        }
    },
    mounted:function () {

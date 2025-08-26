@@ -1,19 +1,15 @@
 <template lang="html">
     <div class="container">
         <div class="row">
-            <div class="col-md-3">
-                <h3>Offence: {{ displayLodgementNumber }}</h3>
-            </div>
-        </div>
-        <div>
-            <div class="col-md-3">
+            <h3>Offence: {{ displayLodgementNumber }}</h3>
+            <div class="col-md-4">
                 <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
-                <div class="row">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
+                <div class="">
+                    <div class="card mb-3">
+                        <div class="card-header">
                             Workflow
                         </div>
-                        <div class="panel-body panel-collapse">
+                        <div class="card-body border-bottom">
                             <div class="row">
                                 <div class="col-sm-12">
                                     <strong>Status</strong><br/>
@@ -31,12 +27,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
+                <div class="">
+                    <div class="card mb-3">
+                        <div class="card-header">
                             Action
                         </div>
-                        <div class="panel-body panel-collapse">
+                        <div class="card-body border-bottom">
                             <div v-if="visibilitySanctionOutcomeButton" class="row action-button">
                                 <div class="col-sm-12">
                                     <a @click="openSanctionOutcome()" class="btn btn-primary btn-block">
@@ -56,19 +52,48 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-9" id="main-column">
+            <div class="col-md-8"> 
                 <div class="row">
                     <div class="container-fluid">
-                        <ul class="nav nav-pills aho2">
-                            <li class="nav-item active"><a data-toggle="tab" :href="'#'+offenceTab">Offence</a></li>
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+detailsTab">Details</a></li>
-                            <!-- li class="nav-item"><a data-toggle="tab" :href="'#'+documentTab">Document</a></li-->
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+offenderTab">Offender(s)</a></li>
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+locationTab" @click="mapOffenceClicked">Location</a></li>
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+relatedItemsTab">Related Items</a></li>
+                        <ul id="pills-tab" class="nav nav-pills mb-3" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+offenceTab">
+                                    Offence
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+detailsTab">
+                                    Details
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+offenderTab">
+                                    Offender(s)
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+locationTab" @click="mapOffenceClicked">
+                                    Location
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                data-bs-toggle="pill"
+                                role="tab" :href="'#'+relatedItemsTab">
+                                    Related Items
+                                </a>
+                            </li>
                         </ul>
-                        <div class="tab-content">
-                            <div :id="offenceTab" class="tab-pane fade in active">
+                        <div id="pills-tabContent" class="tab-content">
+                            <div :id="offenceTab" class="tab-pane fade in active show" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Offence" Index="0">
 
                                     <div class="col-sm-12 form-group"><div class="row">
@@ -94,19 +119,13 @@
                                         <label class="col-sm-3">{{ occurrenceDateLabel }}</label>
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="occurrenceDateFromPicker">
-                                                <input :readonly="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" :value="date_from" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>
+                                                <input :readonly="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" :value="date_from" />
                                             </div>
                                         </div>
                                         <div v-show="offence.occurrence_from_to">
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="occurrenceDateToPicker">
-                                                    <input :readonly="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" :value="date_to" />
-                                                    <span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>
+                                                    <input :readonly="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" :value="date_to" />
                                                 </div>
                                             </div>
                                         </div>
@@ -116,19 +135,13 @@
                                         <label class="col-sm-3">{{ occurrenceTimeLabel }}</label>
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="occurrenceTimeFromPicker">
-                                                <input :readonly="readonlyForm" type="text" class="form-control" placeholder="HH:MM" :value="time_from" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>
+                                                <input :readonly="readonlyForm" type="time" class="form-control" placeholder="HH:MM" :value="time_from" />
                                             </div>
                                         </div>
                                         <div v-show="offence.occurrence_from_to">
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="occurrenceTimeToPicker">
-                                                    <input :readonly="readonlyForm" type="text" class="form-control" placeholder="HH:MM" :value="time_to" />
-                                                    <span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>
+                                                    <input :readonly="readonlyForm" type="time" class="form-control" placeholder="HH:MM" :value="time_to" />
                                                 </div>
                                             </div>
                                         </div>
@@ -153,12 +166,12 @@
                                     </div></div>
                                 </FormSection>
                             </div>
-                            <div :id="detailsTab" class="tab-pane face in">
+                            <div :id="detailsTab" class="tab-pane fade in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Details" Index="1">
                                     <textarea :readonly="readonlyForm" class="form-control" placeholder="add details" v-model="offence.details" />
                                 </FormSection>
                             </div>
-                            <div :id="documentTab" class="tab-pane face in">
+                            <div :id="documentTab" class="tab-pane fade in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Document" Index="1.5">
                                     <div class="form-group">
                                         <div class="row">
@@ -180,7 +193,7 @@
                                     </div>
                                 </FormSection>
                             </div>
-                            <div :id="offenderTab" class="tab-pane face in">
+                            <div :id="offenderTab" class="tab-pane fdce in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Offender(s)" Index="2">
                                     <!--div class="col-sm-12 form-group"><div class="row">
                                         <input :disabled="readonlyForm" class="col-sm-1" id="offender_individual" type="radio" v-model="offender_search_type" value="individual">
@@ -215,7 +228,7 @@
 
                                 </FormSection>
                             </div>
-                            <div :id="locationTab" class="tab-pane face in">
+                            <div :id="locationTab" class="tab-pane fade in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Location" Index="3">
                                     <MapLocation
                                         v-if="offence.location"
@@ -257,7 +270,7 @@
                                     </div>
                                 </FormSection>
                             </div>
-                            <div :id="relatedItemsTab" class="tab-pane face in">
+                            <div :id="relatedItemsTab" class="tab-pane fade in" role="tabpanel">
                                 <FormSection :formCollapse="false" label="Related Items" Index="4">
                                     <div class="col-sm-12 form-group"><div class="row">
                                         <div class="col-sm-12">
@@ -304,12 +317,13 @@
 
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import Assignment from "../assignment.vue";
 import datatable from '@vue-utils/datatable.vue'
 import utils from "../utils";
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import CommsLogs from "@common-components/comms_logs.vue";
 import FileField from '@/components/common/compliance_file.vue';
@@ -318,7 +332,7 @@ import SearchOffender from './search_offenders.vue'
 //import CreateNewPerson from "@common-components/create_new_person.vue";
 import MapLocation from "../../common/map_location";
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal';
-import 'bootstrap/dist/css/bootstrap.css';
+
 import "awesomplete/awesomplete.css";
 import RelatedItems from "@common-components/related_items.vue";
 import moment from 'moment';
@@ -354,12 +368,12 @@ export default {
             selectedOffender: null,
             offenderModalOpened: false,
             offender_modal_key: 0,
-            offenceTab: 'offenceTab' + vm._uid,
-            detailsTab: 'detailsTab' + vm._uid,
-            documentTab: 'documentTab' + vm._uid,
-            offenderTab: 'offenderTab' + vm._uid,
-            locationTab: 'locationTab' + vm._uid,
-            relatedItemsTab: 'relatedItemsTab' + vm._uid,
+            offenceTab: 'offenceTab' + uuid(),
+            detailsTab: 'detailsTab' + uuid(),
+            documentTab: 'documentTab' + uuid(),
+            offenderTab: 'offenderTab' + uuid(),
+            locationTab: 'locationTab' + uuid(),
+            relatedItemsTab: 'relatedItemsTab' + uuid(),
             displayCreateNewPerson: false,
             idLocationFieldsAddress: vm.guid + "LocationFieldsAddress",
             idLocationFieldsDetails: vm.guid + "LocationFieldsDetails",
@@ -726,7 +740,7 @@ export default {
         relatedItemsBindId: function() {
             let timeNow = Date.now()
             if (this.offence && this.offence.id) {
-                return 'offence_' + this.offence.id + '_' + this._uid;
+                return 'offence_' + this.offence.id + '_' + uuid();
             } else {
                 return timeNow.toString();
             }
@@ -802,7 +816,7 @@ export default {
         save: async function(){
             try {
                 await this.saveOffence({'fr_date': this.date_from, 'fr_time': this.time_from, 'to_date': this.date_to, 'to_time': this.time_to});
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
 
                 this.constructOffendersTable();
                 this.constructAllegedOffencesTable();
@@ -826,7 +840,7 @@ export default {
             try {
                 //await this.saveOffence();
                 await this.saveOffence({'fr_date': this.date_from, 'fr_time': this.time_from, 'to_date': this.date_to, 'to_time': this.time_to});
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
 
                 // remove redundant eventListeners
                 window.removeEventListener('beforeunload', this.leaving);
@@ -864,7 +878,7 @@ export default {
             } else {
                 errorText += err.message;
             }
-            await swal("Error", errorText, "error");
+            await swal.fire("Error", errorText, "error");
         },
         updateAssignedToId: async function (body) {
             //this.setAssignedToId(body.assigned_to_id);
@@ -1219,7 +1233,7 @@ export default {
                     this.uuid++;
                 }
             } else if (missing) {
-                await swal("Error", "Name, Address, and Date of Birth Required", "error");
+                await swal.fire("Error", "Name, Address, and Date of Birth Required", "error");
             }
             
         },
@@ -1399,14 +1413,12 @@ export default {
         },
         searchOrganisation: function(id) {
           return new Promise((resolve, reject) => {
-            Vue.http.get("/api/search_organisation/" + id).then(
-              response => {
-                resolve(response.body);
-              },
-              error => {
+            let request = fetch_util.fetchUrl("/api/search_organisation/" + id)
+            request.then((response) => {
+                resolve(response);
+            }).catch((error) => {
                 reject(error);
-              }
-            );
+            });
           });
         },
         setCurrentOffender: function(data_type, id, source) {
@@ -1464,69 +1476,6 @@ export default {
         },
         addEventListeners: function() {
             let vm = this;
-            let el_fr_date = $(vm.$refs.occurrenceDateFromPicker);
-            let el_fr_time = $(vm.$refs.occurrenceTimeFromPicker);
-            let el_to_date = $(vm.$refs.occurrenceDateToPicker);
-            let el_to_time = $(vm.$refs.occurrenceTimeToPicker);
-
-            // "From" Date field
-            el_fr_date.datetimepicker({
-                format: "DD/MM/YYYY",
-                maxDate: moment().millisecond(0).second(0).minute(0).hour(0),
-                showClear: true,
-                date: vm.offence.occurrence_datetime_from,
-            });
-            el_fr_date.on("dp.change", function(e) {
-                if (el_fr_date.data("DateTimePicker").date()) {
-                    vm.date_from = e.date.format('DD/MM/YYYY');
-                    el_to_date.data("DateTimePicker").minDate(e.date);
-                } else if (el_fr_date.data("date") === "") {
-                    vm.date_from = null;
-                }
-            });
-            // "From" Time field
-            el_fr_time.datetimepicker({
-                format: "LT",
-                showClear: true,
-                date: vm.offence.occurrence_datetime_from,
-            });
-            el_fr_time.on("dp.change", function(e) {
-                if (el_fr_time.data("DateTimePicker").date()) {
-                    vm.time_from = e.date.format('LT');
-                } else if (el_fr_time.data("date") === "") {
-                    vm.time_from = null;
-                }
-            });
-
-            // "To" Date field
-            el_to_date.datetimepicker({
-                format: "DD/MM/YYYY",
-                maxDate: moment().millisecond(0).second(0).minute(0).hour(0),
-                minDate: vm.offence.occurrence_datetime_from,
-                showClear: true,
-                date: vm.offence.occurrence_datetime_to,
-            });
-            el_to_date.on("dp.change", function(e) {
-                if (el_to_date.data("DateTimePicker").date()) {
-                    vm.date_to = e.date.format('DD/MM/YYYY');
-                    //el_fr_date.data("DateTimePicker").maxDate(e.date);
-                } else if (el_to_date.data("date") === "") {
-                    vm.date_to = null;
-                }
-            });
-            // "To" Time field
-            el_to_time.datetimepicker({
-                format: "LT",
-                showClear: true,
-                date: vm.offence.occurrence_datetime_to,
-            });
-            el_to_time.on("dp.change", function(e) {
-                if (el_to_time.data("DateTimePicker").date()) {
-                    vm.time_to = e.date.format('LT');
-                } else if (el_to_time.data("date") === "") {
-                    vm.time_to = null;
-                }
-            });
 
             $("#alleged-offence-table").on("click", ".remove_button", vm.removeAllegedOffenceClicked);
             $("#alleged-offence-table").on("click", ".restore_button", vm.restoreAllegedOffenceClicked);

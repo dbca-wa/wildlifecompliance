@@ -1,29 +1,29 @@
 <template lang="html">
     <div class="container">
       <div class="row">
-        <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-10">
           <h3>Call/Email: {{ call_email.number }}</h3>
-        </div>
-        <div class="col-md-3 pull-right">
+          </div>
+          <div class="col-md-2">
           <input  v-if="call_email.user_is_volunteer" type="button" @click.prevent="duplicate" class="pull-right btn btn-primary" value="Create Duplicate Call/Email"/>  
+          </div>
         </div>
-      </div>
-          <div class="col-md-3">
+      
+          <div class="col-md-4">
             <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                         Workflow 
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div class="row">
                             <div class="col-sm-12">
                                 <strong>Status</strong><br/>
                                 {{ statusDisplay }}<br/>
                             </div>
                         </div>
-
-                        <!--div v-if="call_email.allocated_group && !(statusId === 'closed')" class="form-group"-->
                         <div v-if="assignToVisible" class="form-group">
                           <div class="row">
                             <div class="col-sm-12 top-buffer-s">
@@ -49,12 +49,12 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                         Action 
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div v-if="statusId ==='draft' && canUserAction" class="row action-button">
                           <div class="col-sm-12">
                                 <a ref="forwardToWildlifeProtectionBranch" @click="addWorkflow('forward_to_wildlife_protection_branch')" class="btn btn-primary btn-block">
@@ -139,16 +139,36 @@
 
           </div>
 
-          <div class="col-md-9" id="main-column">  
-            <div class="row">
-
-                <div class="container-fluid">
-                    <ul class="nav nav-pills aho2">
-                        <li class="nav-item active"><a data-toggle="tab" :href="'#'+cTab">Call/Email</a></li>
-                        <li class="nav-item"><a data-toggle="tab" :href="'#'+rTab">Related Items</a></li>
+          <div class="col-md-8"> 
+              <div class="row">
+                    <ul id="pills-tab" class="nav nav-pills mb-3" role="tablist">
+                        <li class="nav-item">
+                          <a 
+                            class="nav-link active"
+                            data-bs-toggle="pill"
+                            :href="'#'+cTab"
+                            role="tab"
+                          >
+                            Call/Email
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a 
+                            class="nav-link"
+                            data-bs-toggle="pill"
+                            :href="'#'+rTab"
+                            role="tab"
+                          >
+                            Related Items
+                          </a>
+                        </li>
                     </ul>
-                    <div class="tab-content">
-                        <div :id="cTab" class="tab-pane fade in active">
+                    <div id="pills-tabContent" class="tab-content">
+                        <div 
+                          :id="cTab" 
+                          class="tab-pane fade in active show"
+                          role="tabpanel"
+                        >
 
                           <FormSection :formCollapse="false" label="Caller" Index="0">
                             
@@ -204,19 +224,19 @@
                                 <label class="col-sm-3">Date of call</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="dateOfCallPicker">
-                                        <input :disabled="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="call_email.date_of_call"/>
-                                        <span class="input-group-addon">
+                                        <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="call_email.date_of_call"/>
+                                        <!--<span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                        </span>-->
                                     </div>
                                 </div>
                                 <label class="col-sm-3">Time of call</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" id="timeOfCallPicker">
-                                      <input :disabled="readonlyForm" type="text" class="form-control" placeholder="HH:MM" v-model="call_email.time_of_call"/>
-                                      <span class="input-group-addon">
+                                      <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="call_email.time_of_call"/>
+                                      <!--<span class="input-group-addon">
                                           <span class="glyphicon glyphicon-calendar"></span>
-                                      </span>
+                                      </span>-->
                                     </div>
                                 </div>
                             </div></div>
@@ -247,19 +267,19 @@
                                 <label class="col-sm-3">{{ occurrenceDateLabel }}</label>
                                 <div class="col-sm-4">
                                     <div class="input-group date" ref="occurrenceDateFromPicker">
-                                        <input :disabled="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="call_email.occurrence_date_from" />
-                                        <span class="input-group-addon">
+                                        <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="call_email.occurrence_date_from" />
+                                        <!--<span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                        </span>-->
                                     </div>
                                 </div>
                                 <div v-show="call_email.occurrence_from_to">
                                     <div class="col-sm-4">
                                         <div class="input-group date" ref="occurrenceDateToPicker">
-                                            <input :disabled="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="call_email.occurrence_date_to" />
-                                            <span class="input-group-addon">
+                                            <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="call_email.occurrence_date_to" />
+                                            <!--<span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>
+                                            </span>-->
                                         </div>
                                     </div>
                                 </div>
@@ -269,20 +289,20 @@
                               <label class="col-sm-3">{{ occurrenceTimeLabel }}</label>
                               <div class="col-sm-3">
                                   <div class="input-group date" id="occurrenceTimeStartPicker">
-                                    <input :disabled="readonlyForm" type="text" class="form-control" placeholder="HH:MM" v-model="call_email.occurrence_time_start"/>
-                                    <span class="input-group-addon">
+                                    <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="call_email.occurrence_time_start"/>
+                                    <!--<span class="input-group-addon">
                                         <span class="glyphicon glyphicon-calendar"></span>
-                                    </span>
+                                    </span>-->
                                   </div>
                               </div>
                               <div v-show="call_email.occurrence_from_to">
                                   <label class="col-sm-3">Occurrence time to</label>
                                   <div class="col-sm-3">
                                       <div class="input-group date" id="occurrenceTimeEndPicker">
-                                        <input :disabled="readonlyForm" type="text" class="form-control" placeholder="HH:MM" v-model="call_email.occurrence_time_end"/>
-                                        <span class="input-group-addon">
+                                        <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="call_email.occurrence_time_end"/>
+                                        <!--<span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                        </span>-->
                                       </div>
                                   </div>
                               </div>
@@ -454,12 +474,14 @@
                                 </div>
                             </div> -->
                             
-                            <div v-if="rendererVisibility"  v-for="(item, index) in current_schema">
+                            <div v-if="rendererVisibility">  
+                              <div v-for="(item, index) in current_schema">
                               <compliance-renderer-block
                                  :component="item"
                                  :readonlyForm="readonlyForm"
                                  v-bind:key="`compliance_renderer_block_${index}`"
                                 />
+                                </div>
                             </div>
                           </FormSection>
             
@@ -479,7 +501,11 @@
                           </FormSection>
 
                         </div>  
-                        <div :id="rTab" class="tab-pane fade in">
+                        <div 
+                          :id="rTab" 
+                          class="tab-pane fade in"
+                          role="tabpanel"
+                          >
                             <FormSection :formCollapse="false" label="Related Items">
                                 <div class="col-sm-12 form-group"><div class="row">
                                     <div class="col-sm-12" v-if="relatedItemsVisibility">
@@ -489,11 +515,9 @@
                             </FormSection>
                         </div>
                     </div>
-                </div>       
-
-
-            </div>          
+              </div>                
           </div>
+        </div>
 
         <div v-if="call_email.can_user_action" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
                         <div class="navbar-inner">
@@ -533,13 +557,14 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 
 import CommsLogs from "@common-components/comms_logs.vue";
 import MapLocation from "./map_location.vue";
 import datatable from '@vue-utils/datatable.vue'
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 //import SearchPerson from "./search_person.vue";
 import SearchPersonOrganisation from "@common-components/search_person_or_organisation.vue";
 import utils from "@/components/external/utils";
@@ -548,10 +573,9 @@ import moment from 'moment';
 import CallWorkflow from './call_email_workflow';
 import Offence from '../offence/offence_modal';
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'eonasdan-bootstrap-datetimepicker';
+
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+
 import Inspection from '../inspection/create_inspection_modal';
 import RelatedItems from "@common-components/related_items.vue";
 import hash from 'object-hash';
@@ -563,9 +587,9 @@ export default {
     return {
       objectHash: null,
       uuid: 0,
-      cTab: 'cTab'+this._uid,
-      rTab: 'rTab'+this._uid,
-      sanctionOutcomeKey: 'sanctionOutcome' + this._uid,
+      cTab: 'cTab'+uuid(),
+      rTab: 'rTab'+uuid(),
+      sanctionOutcomeKey: 'sanctionOutcome' + uuid(),
       dtHeadersRelatedItems: [
           'Number',
           'Type',
@@ -620,10 +644,10 @@ export default {
       reportAdviceUrl: '',
       sectionLabel: "Details",
       sectionIndex: 1,
-      pBody: "pBody" + this._uid,
+      pBody: "pBody" + uuid(),
       loading: [],
       renderer_form: null,
-      callemailTab: "callemailTab" + this._uid,
+      callemailTab: "callemailTab" + uuid(),
       comms_url: helpers.add_endpoint_json(
         api_endpoints.call_email,
         this.$route.params.call_email_id + "/comms_log"
@@ -694,7 +718,6 @@ export default {
     }),
     ...mapGetters({
       renderer_form_data: 'renderer_form_data',
-      //current_user: 'current_user',
     }),
     locationExists: function() {
         if (this.call_email && 
@@ -787,7 +810,7 @@ export default {
     relatedItemsBindId: function() {
         let timeNow = Date.now()
         if (this.call_email && this.call_email.id) {
-            return 'call_email_' + this.call_email.id + '_' + this._uid;
+            return 'call_email_' + this.call_email.id + '_' + uuid();
         } else {
             return timeNow.toString();
         }
@@ -825,11 +848,6 @@ export default {
         }
         return entangled_other_checked;
     },
-  },
-  filters: {
-    formatDate: function(data) {
-      return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-    }
   },
   methods: {
     ...mapActions('callemailStore', {
@@ -902,7 +920,7 @@ export default {
     },
     async addWorkflow(workflow_type) {
       if (!this.locationExists) {
-            await swal({
+            await swal.fire({
                 title: 'Mandatory Field',
                 html: "Location must be specified",
                 type: "error",
@@ -1074,15 +1092,9 @@ export default {
                             api_endpoints.report_types,
                             this.call_email.report_type_id + '/get_schema',
                             );
-              let returnedData = await Vue.http.get(url);
-              let returnedSchema = returnedData.body.schema;
-              let returnedAdviceUrl = returnedData.body.adviceurl;
-              /*
-              let returned_schema = await cache_helper.getSetCache(
-                'CallEmail_ReportTypeSchema', 
-                this.call_email.id.toString(), 
-                url);
-              */
+              let returnedData = await fetch_util.fetchUrl(url);
+              let returnedSchema = returnedData.schema;
+              let returnedAdviceUrl = returnedData.adviceurl;
               if (returnedSchema) {
                 this.current_schema = returnedSchema;
               }
@@ -1107,86 +1119,14 @@ export default {
         } else {
             payload = { 'assigned_to_id': this.call_email.assigned_to_id };
         }
-        let res = await Vue.http.post(
+        let res = await fetch_util.fetchUrl(
             url,
             payload
         );
-        await this.setCallEmail(res.body); 
+        await this.setCallEmail(res); 
     },
     addEventListeners: function() {
       let vm = this;
-      let el_fr_date = $(vm.$refs.occurrenceDateFromPicker);
-      let el_fr_time = $(vm.$refs.occurrenceTimeFromPicker);
-      let el_to_date = $(vm.$refs.occurrenceDateToPicker);
-      let el_to_time = $(vm.$refs.occurrenceTimeToPicker);
-      let el_date_of_call = $(vm.$refs.dateOfCallPicker);
-      let el_time_of_call = $(vm.$refs.timeOfCallPicker);
-
-      // "From" field
-      el_fr_date.datetimepicker({
-        format: "DD/MM/YYYY",
-        maxDate: "now",
-        showClear: true
-      });
-      el_fr_date.on("dp.change", function(e) {
-        if (el_fr_date.data("DateTimePicker").date()) {
-          vm.call_email.occurrence_date_from = e.date.format("DD/MM/YYYY");
-        } else if (el_fr_date.data("date") === "") {
-          vm.call_email.occurrence_date_from = "";
-        }
-      });
-      el_fr_time.datetimepicker({ format: "LT", showClear: true });
-      el_fr_time.on("dp.change", function(e) {
-        if (el_fr_time.data("DateTimePicker").date()) {
-          vm.call_email.occurrence_time_from = e.date.format("LT");
-        } else if (el_fr_time.data("date") === "") {
-          vm.call_email.occurrence_time_from = "";
-        }
-      });
-
-      // "To" field
-      el_to_date.datetimepicker({
-        format: "DD/MM/YYYY",
-        maxDate: "now",
-        showClear: true
-      });
-      el_to_date.on("dp.change", function(e) {
-        if (el_to_date.data("DateTimePicker").date()) {
-          vm.call_email.occurrence_date_to = e.date.format("DD/MM/YYYY");
-        } else if (el_to_date.data("date") === "") {
-          vm.call_email.occurrence_date_to = "";
-        }
-      });
-      el_to_time.datetimepicker({ format: "LT", showClear: true });
-      el_to_time.on("dp.change", function(e) {
-        if (el_to_time.data("DateTimePicker").date()) {
-          vm.call_email.occurrence_time_to = e.date.format("LT");
-        } else if (el_to_time.data("date") === "") {
-          vm.call_email.occurrence_time_to = "";
-        }
-      });
-      // Date/Time of call
-      el_date_of_call.datetimepicker({
-        format: "DD/MM/YYYY",
-        maxDate: "now",
-        //useCurrent: true,
-        //showClear: true
-      });
-      el_date_of_call.on("dp.change", function(e) {
-        if (el_date_of_call.data("DateTimePicker").date()) {
-          vm.call_email.date_of_call = e.date.format("DD/MM/YYYY");
-        } else if (el_date_of_call.data("date") === "") {
-          vm.call_email.date_of_call = "";
-        }
-      });
-      el_time_of_call.datetimepicker({ format: "LT", showClear: true });
-      el_time_of_call.on("dp.change", function(e) {
-        if (el_time_of_call.data("DateTimePicker").date()) {
-          vm.call_email.time_of_call = e.date.format("LT");
-        } else if (el_time_of_call.data("date") === "") {
-          vm.call_email.time_of_call = "";
-        }
-      });
       window.addEventListener('beforeunload', this.leaving);
       window.addEventListener('onblur', this.leaving);
     },
@@ -1207,36 +1147,26 @@ export default {
     if (this.$route.params.call_email_id) {
       await this.loadCallEmail({ call_email_id: this.$route.params.call_email_id });
     }
-    // await this.loadComplianceAllocatedGroup(this.call_email.allocated_group_id);
-    // load drop-down select lists
     
     /// large LOV(List Of Values) object
-    const lovResponse = await Vue.http.get('/api/lov_collection/lov_collection_choices/');
-    this.lovCollection = lovResponse.body;
+    const lovResponse = await fetch_util.fetchUrl('/api/lov_collection/lov_collection_choices/');
+    this.lovCollection = lovResponse;
 
     // classification_types
-    //let returned_classification_types = await Vue.http.get('/api/classification/classification_choices/');
     Object.assign(this.classification_types, this.lovCollection.classification_types);
     // call_types
-    //let returned_call_types = await Vue.http.get('/api/call_type/call_type_choices/');
     Object.assign(this.call_types, this.lovCollection.call_type_choices);
     //Wildcare Species Types
-    //let returned_wildcare_species_types = await Vue.http.get('/api/wildcare_species_type/wildcare_species_type_choices/');
     Object.assign(this.wildcare_species_types, this.lovCollection.wildcare_species_types);
     //Wildcare Species Sub Types
-    //let returned_wildcare_species_sub_types = await Vue.http.get('/api/wildcare_species_sub_type/wildcare_species_sub_type_choices/');
     Object.assign(this.wildcare_species_sub_types, this.lovCollection.wildcare_species_sub_types);
     // Entangled choices
-    //let returned_entangled_choices = await Vue.http.get('/api/call_email/entangled_choices/');
     Object.assign(this.entangled_choices, this.lovCollection.entangled_choices);
     // Gender choices
-    //let returned_gender_choices = await Vue.http.get('/api/call_email/gender_choices/');
     Object.assign(this.gender_choices, this.lovCollection.gender_choices);
     // Pinky/Joey choices
-    //let returned_baby_kangaroo_choices = await Vue.http.get('/api/call_email/baby_kangaroo_choices/');
     Object.assign(this.baby_kangaroo_choices, this.lovCollection.baby_kangaroo_choices);
     // Age choices
-    //let returned_age_choices = await Vue.http.get('/api/call_email/age_choices/');
     Object.assign(this.age_choices, this.lovCollection.age_choices);
     //report_types
     let returned_report_types = await cache_helper.getSetCacheList('CallEmail_ReportTypes', helpers.add_endpoint_json(
@@ -1263,7 +1193,6 @@ export default {
     for (let referrer_id of this.call_email.selected_referrers) {
         this.referrersSelected.push(referrer_id)
     }
-    //Object.assign(this.referrersSelected, this.call_email.selected_referrers)
 
     // load current CallEmail renderer schema
     if (this.call_email && this.call_email.report_type_id) {
@@ -1273,16 +1202,9 @@ export default {
         this.loadReportAdviceUrl(this.call_email.report_type.advice_url);
     }
 
-    // regionDistricts
-    // let returned_region_districts = await cache_helper.getSetCacheList(
-    //   'RegionDistricts', 
-    //   api_endpoints.region_district
-    //   );
-    // Object.assign(this.regionDistricts, returned_region_districts);
-    
     // Apply current timestamp to date and time of call
     if (!this.call_email.date_of_call && this.call_email.can_user_edit_form) {
-        this.setDateOfCall(moment().format('DD/MM/YYYY'));
+        this.setDateOfCall(moment().format('YYYY-MM-DD'));
     }
     if (!this.call_email.time_of_call && this.call_email.can_user_edit_form) {
         this.setTimeOfCall(moment().format('LT'));
@@ -1302,30 +1224,9 @@ export default {
               $( chev ).toggleClass( "glyphicon-chevron-down glyphicon-chevron-up" );
           }, 100 );
       });
-      // Time field controls
-      $('#occurrenceTimeStartPicker').datetimepicker({
-              format: 'LT'
-          });
-      $('#occurrenceTimeEndPicker').datetimepicker({
-              format: 'LT'
-          });
-      $('#occurrenceTimeStartPicker').on('dp.change', function(e) {
-          vm.setOccurrenceTimeStart(e.date.format('LT'));
-      });
-      $('#occurrenceTimeEndPicker').on('dp.change', function(e) {
-          vm.setOccurrenceTimeEnd(e.date.format('LT'));
-      }); 
-      $('#timeOfCallPicker').datetimepicker({
-              format: 'LT'
-          });
-      $('#timeOfCallPicker').on('dp.change', function(e) {
-          vm.setTimeOfCall(e.date.format('LT'));
-      }); 
       vm.$nextTick(() => {
           vm.addEventListeners();
-          //this.calculateHash();
       });
-
   }
 };
 </script>

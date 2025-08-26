@@ -1,20 +1,18 @@
 <template lang="html">
     <div class="container">
       <div class="row">
-        <div class="col-md-3">
-          <h3>Inspection: {{ inspection.number }}</h3>
-        </div>
 
-      </div>
-          <div class="col-md-3">
+          <h3>Inspection: {{ inspection.number }}</h3>
+
+          <div class="col-md-4">
             <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
 
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                         Workflow
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div class="row">
                             <div class="col-sm-12">
                                 <strong>Status</strong><br/>
@@ -32,21 +30,12 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                         Action
                     </div>
-                    <div class="panel-body panel-collapse">
-
-                        <!--div v-if="statusId ==='open' && this.call_email.can_user_action" class="row action-button">
-                          <div class="col-sm-12">
-                                <a ref="save" @click="save()" class="btn btn-primary btn-block">
-                                  Save
-                                </a>
-                          </div>
-                        </div-->
-
+                    <div class="card-body border-bottom">
                         <div class="row action-button">
                           <div v-if="sendToManagerVisibility" class="col-sm-12">
                                 <a ref="close" @click="addWorkflow('send_to_manager')" class="btn btn-primary btn-block">
@@ -103,19 +92,56 @@
 
           </div>
 
-          <div class="col-md-9" id="main-column">
+          <div class="col-md-8"> 
             <div class="row">
 
                 <div class="container-fluid">
-                    <ul class="nav nav-pills aho2">
-                        <li class="nav-item active"><a data-toggle="tab" :href="'#'+iTab">Inspection</a></li>
-                        <li class="nav-item"><a data-toggle="tab" :href="'#'+lTab" @click="mapTabClicked">Location</a></li>
-                        <li class="nav-item"><a data-toggle="tab" :href="'#'+cTab">Checklist</a></li>
-                        <li class="nav-item"><a data-toggle="tab" :href="'#'+oTab">Outcomes</a></li>
-                        <li class="nav-item"><a data-toggle="tab" :href="'#'+rTab">Related Items</a></li>
+                    <ul id="pills-tab" class="nav nav-pills mb-3" role="tablist">
+                        <li class="nav-item">
+                          <a class="nav-link active"
+                            data-bs-toggle="pill"
+                            role="tab"
+                            :href="'#'+iTab">
+                            Inspection
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link"
+                            data-bs-toggle="pill"
+                            role="tab"
+                            :href="'#'+lTab" 
+                            @click="mapTabClicked">
+                            Location
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link"
+                            data-bs-toggle="pill"
+                            role="tab" :href="'#'+cTab">
+                            Checklist
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link"
+                            data-bs-toggle="pill"
+                            role="tab" :href="'#'+oTab">
+                            Outcomes
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link"
+                            data-bs-toggle="pill"
+                            role="tab" :href="'#'+rTab">
+                            Related Items
+                          </a>
+                        </li>
                     </ul>
-                    <div class="tab-content">
-                        <div :id="iTab" class="tab-pane fade in active">
+                    <div id="pills-tabContent" class="tab-content">
+                        <div 
+                          :id="iTab" 
+                          class="tab-pane fade in active show"
+                          role="tabpanel"
+                        >
 
                           <FormSection :formCollapse="false" label="Inspection Details" Index="0">
 
@@ -158,20 +184,20 @@
                                 <label class="col-sm-3">Planned for (Date)</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="plannedForDatePicker">
-                                        <input :disabled="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="inspection.planned_for_date" />
-                                        <span class="input-group-addon">
+                                        <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="inspection.planned_for_date" />
+                                        <!--<span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                        </span>-->
                                     </div>
                                 </div>
 
                                 <label class="col-sm-3">Planned for (Time)</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" id="plannedForTimePicker">
-                                      <input :disabled="readonlyForm" type="text" class="form-control" placeholder="HH:MM" v-model="inspection.planned_for_time"/>
-                                      <span class="input-group-addon">
+                                      <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="inspection.planned_for_time"/>
+                                      <!--<span class="input-group-addon">
                                           <span class="glyphicon glyphicon-calendar"></span>
-                                      </span>
+                                      </span>-->
                                     </div>
                                 </div>
                             </div></div>
@@ -247,7 +273,10 @@
 
                         </div>
 
-                        <div :id="lTab" class="tab-pane fade in">
+                        <div :id="lTab" 
+                          class="tab-pane fade in"
+                          role="tabpanel"
+                        >
                             <FormSection :formCollapse="false" label="Location">
                                     <MapLocation 
                                         v-if="inspection.location" 
@@ -290,20 +319,28 @@
                             </FormSection>
                         </div>
 
-                        <div :id="cTab" class="tab-pane fade in">
+                        <div :id="cTab" 
+                          class="tab-pane fade in"
+                          role="tabpanel"
+                        >
                             <FormSection :formCollapse="false" label="Checklist">
-                                <div class="col-sm-12 form-group"><div class="row">
-                                        <div v-if="rendererVisibility" v-for="(item, index) in current_schema">
+                                <div class="col-sm-12 form-group">
+                                  <div v-if="rendererVisibility" class="row">
+                                      <div v-for="(item, index) in current_schema">
                                       <compliance-renderer-block
                                          :component="item"
                                          :readonlyForm="readonlyForm"
                                          v-bind:key="`compliance_renderer_block${index}`"
                                         />
                                     </div>
-                                </div></div>
+                                </div>
+                              </div>
                             </FormSection>
                         </div>
-                        <div :id="oTab" class="tab-pane fade in">
+                        <div :id="oTab" 
+                          class="tab-pane fade in"
+                          role="tabpanel"
+                        >
                             <FormSection :formCollapse="false" label="Inspection report">
                                 <div class="form-group">
                                     <div class="row">
@@ -323,7 +360,10 @@
                                 </div>
                             </FormSection>
                         </div>
-                        <div :id="rTab" class="tab-pane fade in">
+                        <div :id="rTab" 
+                          class="tab-pane fade in"
+                          role="tabpanel"
+                        >
                             <FormSection :formCollapse="false" label="Related Items">
                                 <div class="col-sm-12 form-group"><div class="row">
                                     <div class="col-sm-12" v-if="relatedItemsVisibility">
@@ -338,7 +378,7 @@
 
             </div>
           </div>
-
+        </div>
         <div v-if="inspection.can_user_action" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
             <div class="navbar-inner">
                 <div class="container">
@@ -368,6 +408,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import SearchPersonOrganisation from "@/components/common/search_person_or_organisation.vue";
@@ -376,12 +417,11 @@ import SearchPersonOrganisation from "@/components/common/search_person_or_organ
 import Assignment from "../assignment.vue";
 import CommsLogs from "@common-components/comms_logs.vue";
 import datatable from '@vue-utils/datatable.vue'
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'eonasdan-bootstrap-datetimepicker';
+
 import Offence from '../offence/offence_modal';
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal';
 import filefield from '@/components/common/compliance_file.vue';
@@ -389,7 +429,7 @@ import InspectionWorkflow from './inspection_workflow.vue';
 import RelatedItems from "@common-components/related_items.vue";
 import MapLocation from "../../common/map_location";
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+
 import hash from 'object-hash';
 
 
@@ -400,11 +440,11 @@ export default {
         mapboxAccessToken: null,
       uuid: 0,
       objectHash: null,
-      iTab: 'iTab'+this._uid,
-      rTab: 'rTab'+this._uid,
-      oTab: 'oTab'+this._uid,
-      cTab: 'cTab'+this._uid,
-      lTab: 'lTab'+this._uid,
+      iTab: 'iTab'+uuid(),
+      rTab: 'rTab'+uuid(),
+      oTab: 'oTab'+uuid(),
+      cTab: 'cTab'+uuid(),
+      lTab: 'lTab'+uuid(),
       current_schema: [],
       //createInspectionBindId: '',
       workflowBindId: '',
@@ -450,7 +490,7 @@ export default {
 
       sectionLabel: "Details",
       sectionIndex: 1,
-      pBody: "pBody" + this._uid,
+      pBody: "pBody" + uuid(),
       loading: [],
       inspectionTypes: [],
       teamMemberSelected: null,
@@ -594,7 +634,7 @@ export default {
     relatedItemsBindId: function() {
         let timeNow = Date.now()
         if (this.inspection && this.inspection.id) {
-            return 'inspection_' + this.inspection.id + '_' + this._uid;
+            return 'inspection_' + this.inspection.id + '_' + uuid();
         } else {
             return timeNow.toString();
         }
@@ -635,11 +675,6 @@ export default {
     inspectionTeam: function() {
         return this.inspection.inspection_team;
     },
-  },
-  filters: {
-    formatDate: function(data) {
-      return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-    }
   },
   watch: {
       inspectionTeam: {
@@ -817,8 +852,8 @@ export default {
             'action': action
         }
 
-        let inspectionTeamResponse = await Vue.http.post(inspectionTeamUrl, payload);
-        await this.setInspection(inspectionTeamResponse.body);
+        let inspectionTeamResponse = await fetch_util.fetchUrl(inspectionTeamUrl, {method:'POST', body:JSON.stringify(payload)});
+        await this.setInspection(inspectionTeamResponse);
         this.$nextTick(() => {
             this.constructInspectionTeamTable()
         });
@@ -953,30 +988,6 @@ export default {
     },
     addEventListeners: function() {
       let vm = this;
-      let el_fr_date = $(vm.$refs.plannedForDatePicker);
-      let el_fr_time = $(vm.$refs.plannedForTimePicker);
-
-      // "From" field
-      el_fr_date.datetimepicker({
-        format: "DD/MM/YYYY",
-        minDate: "now",
-        showClear: true
-      });
-      el_fr_date.on("dp.change", function(e) {
-        if (el_fr_date.data("DateTimePicker").date()) {
-          vm.inspection.planned_for_date = e.date.format("DD/MM/YYYY");
-        } else if (el_fr_date.data("date") === "") {
-          vm.inspection.planned_for_date = "";
-        }
-      });
-      el_fr_time.datetimepicker({ format: "LT", showClear: true });
-      el_fr_time.on("dp.change", function(e) {
-        if (el_fr_time.data("DateTimePicker").date()) {
-          vm.inspection.planned_for_time = e.date.format("LT");
-        } else if (el_fr_time.data("date") === "") {
-          vm.inspection.planned_for_time = "";
-        }
-      });
       $('#inspection-team-table').on(
           'click',
           '.remove_button',
@@ -1077,14 +1088,6 @@ export default {
 
   mounted: function() {
       let vm = this;
-
-      // Time field controls
-      $('#plannedForTimePicker').datetimepicker({
-              format: 'LT'
-          });
-      $('#plannedForTimePicker').on('dp.change', function(e) {
-          vm.setPlannedForTime(e.date.format('LT'));
-      });
 
       // Initialise select2 for officer list
       $(vm.$refs.inspectionteam).select2({

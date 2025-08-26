@@ -3,15 +3,11 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Schema Section Question
-                        <a :href="'#'+pQuestionBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pQuestionBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pQuestionBody">
+            <FormSection
+                :form-collapse="false"
+                label="Schema Section Question"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -63,7 +59,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 
@@ -222,23 +218,26 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import SchemaOption from './schema_add_option.vue'
 import {
   api_endpoints,
-  helpers
+  helpers, fetch_util
 }
 from '@/utils/hooks'
 
 var select2 = require('select2');
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
 
+
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name:'schema-question',
     components: {
+        FormSection,
         modal,
         alert,
         datatable,
@@ -251,9 +250,9 @@ export default {
         vm.schema_question_url = helpers.add_endpoint_join(api_endpoints.schema_question_paginated, 'schema_question_datatable_list/?format=datatables');
 
         return {
-            schema_question_id: 'schema-question-datatable-'+vm._uid,
-            pOptionsBody: 'pOptionsBody' + vm._uid,
-            pQuestionBody: 'pQuestionBody' + vm._uid,
+            schema_question_id: 'schema-question-datatable-'+uuid(),
+            pOptionsBody: 'pOptionsBody' + uuid(),
+            pQuestionBody: 'pQuestionBody' + uuid(),
             isModalOpen: false,
             isNewEntry: false,
             missing_fields: [],
@@ -424,30 +423,28 @@ export default {
             if (this.filterQuestionPurpose==='All') {
                 return true
             }
-            this.$http.get(helpers.add_endpoint_json(api_endpoints.schema_question,'1/get_question_sections'),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_question,'1/get_question_sections'),{
                 params: { licence_purpose_id: this.filterQuestionPurpose },
             }).then((res)=>{
-                this.schemaGroups = res.body.question_groups; 
-                this.schemaSections = res.body.question_sections;
-            },err=>{
-
+                this.schemaGroups = res.question_groups; 
+                this.schemaSections = res.question_sections;
+            }).catch((error) => {
+                console.log(error);
             });
         },
         filterQuestionSection: function(){
             if (this.filterQuestionSection==='All') {
                 return true
             }
-            this.$http.get(helpers.add_endpoint_json(api_endpoints.schema_question,'1/get_question_parents'),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_question,'1/get_question_parents'),{
                 params: { section_id: this.filterQuestionSection },
             }).then((res)=>{
                 this.sectionQuestion.section = this.filterQuestionSection;
-                this.parentList = res.body.question_parents;
-            },err=>{
-
+                this.parentList = res.question_parents;
+            }).catch((error) => {
+                console.log(error)
             });
         },
-    },
-    computed: {    
     },
     methods: {
         delay(callback, ms) {
@@ -464,13 +461,6 @@ export default {
             if (!this.isModalOpen || g_id == '' || g_id == null) {
                 return true
             }
-            // this.$http.get(helpers.add_endpoint_json(api_endpoints.schema_question,'1/get_question_order'),{
-            //     params: { group_id: g_id },
-            // }).then((res)=>{
-            //     this.sectionQuestion.order = res.body.question_order;
-            // },err=>{
-
-            // });
             return true;
         },
         filterQuestionParent: function(q_id){
@@ -547,17 +537,18 @@ export default {
 
             if (data.id === '') {
 
-                await self.$http.post(api_endpoints.schema_question, JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(api_endpoints.schema_question, {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
 
-                }).then((response) => {
+                })
+                request.then((response) => {
 
                     self.$refs.schema_question_table.vmDataTable.ajax.reload();
                     self.close();
 
                 }, (error) => {
 
-                    swal(
+                    swal.fire(
                         'Save Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -566,10 +557,11 @@ export default {
 
             } else {
 
-                await self.$http.post(helpers.add_endpoint_json(api_endpoints.schema_question,data.id+'/save_question'),JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_question,data.id+'/save_question'), {method:'POST', body:JSON.stringify(data)},{
                         emulateJSON:true,
 
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
 
                         self.$refs.schema_question_table.vmDataTable.ajax.reload();
                         self.close();
@@ -650,7 +642,7 @@ export default {
                 self.$refs.schema_question_table.row_of_data = self.$refs.schema_question_table.vmDataTable.row('#'+$(this).attr('data-rowid'));
                 self.sectionQuestion.id = self.$refs.schema_question_table.row_of_data.data().id;
 
-                swal({
+                swal.fire({
                     title: "Delete Section Question",
                     text: "Are you sure you want to delete?",
                     type: "question",
@@ -661,9 +653,12 @@ export default {
 
                     if (result) {
 
-                        await self.$http.delete(helpers.add_endpoint_json(api_endpoints.schema_question,(self.sectionQuestion.id+'/delete_question')))
+                        let request = await fetch_util.fetchUrl(
+                            helpers.add_endpoint_json(api_endpoints.schema_question,(self.sectionQuestion.id+'/delete_question')), 
+                            {method:"DELETE"}
+                        )
     
-                        .then((response) => {
+                        request.then((response) => {
 
                             self.$refs.schema_question_table.vmDataTable.ajax.reload();
 
@@ -760,17 +755,18 @@ export default {
         },
         initSelects: async function() {
 
-            await this.$http.get(helpers.add_endpoint_join(api_endpoints.schema_question,'1/get_question_selects')).then(res=>{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.schema_question,'1/get_question_selects'))
+            request.then(res=>{
 
-                    this.masterlist = res.body.all_masterlist;
-                    this.schemaPurposes = res.body.all_purpose;
-                    this.schemaSections = res.body.all_section;
-                    this.schemaGroups = res.body.all_group
+                    this.masterlist = res.all_masterlist;
+                    this.schemaPurposes = res.all_purpose;
+                    this.schemaSections = res.all_section;
+                    this.schemaGroups = res.all_group
 
-            },err=>{
-                swal(
+            }).catch((error) => {
+                swal.fire(
                     'Get Application Selects Error',
-                    helpers.apiVueResourceError(err),
+                    helpers.apiVueResourceError(error),
                     'error'
                 )
             });

@@ -68,7 +68,7 @@
 import Vue from "vue";
 import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import filefield from '@/components/common/compliance_file.vue';
 
 export default {
@@ -132,11 +132,6 @@ export default {
       },
       */
     },
-    filters: {
-      formatDate: function(data) {
-          return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-      }
-    },
     methods: {
       ...mapActions('legalCaseStore', {
           saveLegalCase: 'saveLegalCase',
@@ -181,8 +176,7 @@ export default {
           }
           // save workflow modal
           try {
-              let res = await Vue.http.post(post_url, payload);
-              console.log(res);
+              let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
               if (res.ok) {
                   return res
               }

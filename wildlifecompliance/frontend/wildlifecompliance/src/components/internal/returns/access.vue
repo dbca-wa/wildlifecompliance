@@ -3,10 +3,10 @@
 <div id="access-menu">
     <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
 
-    <div class="row">
-        <div class="panel panel-default">
-            <div class="panel-heading">Submission</div>
-            <div class="panel-body panel-collapse">
+    <div class="">
+        <div class="card mb-3">
+            <div class="card-header">Submission</div>
+            <div class="card-body border-bottom">
                 <div class="row">
                     <div class="col-sm-12">
                         <strong>Submitted by</strong><br/>
@@ -15,15 +15,17 @@
                     <div class="col-sm-12"><br/></div>
                     <div class="col-sm-12 top-buffer-s">
                         <strong>Lodged on</strong><br/>
-                        {{ returns.lodgement_date | formatDate}}
+                        {{ formatDate(returns.lodgement_date) }}
                     </div>
                     <div class="col-sm-12 top-buffer-s">
                         <table class="table small-table">
-                            <tr>
-                                <th>Lodgement</th>
-                                <th>Date</th>
-                                <th>Action</th>
-                            </tr>
+                            <thead>
+                                <tr>
+                                    <th>Lodgement</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
                         </table>
                     </div>
                 </div>
@@ -31,10 +33,10 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="panel panel-default">
-            <div class="panel-heading">Workflow</div>
-            <div class="panel-body panel-collapse">
+    <div class="">
+        <div class="card mb-3">
+            <div class="card-header">Workflow</div>
+            <div class="card-body border-bottom">
                 <div class="row">
                     <div class="col-sm-12">
                         <strong>Status</strong><br/>
@@ -44,12 +46,12 @@
                     <div v-show="showAssignToList" class="col-sm-12 top-buffer-s">
                         <strong>Assigned Officer</strong><br/>
                         <div class="form-group">
-                            <template>
+                            <div>
                                 <select ref="assigned_to" class="form-control" v-model="returns.assigned_to">
                                     <option v-for="member in returns.activity_curators" :value="member.id" v-bind:key="member.id">{{member.first_name}} {{member.last_name}}</option>
                                 </select>
                                 <a @click.prevent="assignToMe()" class="actionBtn pull-right">Assign to me</a>
-                            </template>
+                            </div>
                         </div>
                     </div>
                     <div v-show="!showAssignToList" class="col-sm-12 top-buffer-s">
@@ -85,7 +87,8 @@ import AmendmentRequest from './amendment_request.vue';
 import '@/scss/forms/form.scss';
 import {
     api_endpoints,
-    helpers
+    helpers,
+    fetch_util
 }
 from '@/utils/hooks'
 export default {
@@ -95,9 +98,7 @@ export default {
         AmendmentRequest,
     },
     filters: {
-        formatDate: function(data){
-            return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
-        }
+        
     },
     data() {
         let vm = this;
@@ -197,7 +198,7 @@ export default {
             });
         },
         refreshFromResponse:function(response){
-            this.setReturns(response.body);
+            this.setReturns(response);
             this.$nextTick(() => {
                 this.initAssignedOfficerSelect(true);
                 this.updateAssignedOfficerSelect();
@@ -212,10 +213,11 @@ export default {
             const data = {
                 // none.
             }
-            this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,(this.returns.id+'/assign_to_me')),JSON.stringify(data),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,(this.returns.id+'/assign_to_me')), {method:'POST', body:JSON.stringify(data)},{
                 emulateJSON:true
 
-            }).then((response) => {
+            })
+            request.then((response) => {
                 this.refreshFromResponse(response);
                 this.updateAssignedOfficerSelect();
 
@@ -223,7 +225,7 @@ export default {
                 // this.revert();
                 // this.updateAssignedOfficerSelect();
                 console.log(error)
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(error),
                     'error'
@@ -239,10 +241,11 @@ export default {
                 'officer_id': this.returns.assigned_to,
             };
             if (!unassign){
-                this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,(this.returns.id+'/assign_officer')),JSON.stringify(data),{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,(this.returns.id+'/assign_officer')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
 
-                }).then((response) => {
+                })
+                request.then((response) => {
                     this.refreshFromResponse(response);
                     this.updateAssignedOfficerSelect();
 
@@ -250,7 +253,7 @@ export default {
                     // this.revert();
                     // this.updateAssignedOfficerSelect();
                     console.log(error)
-                    swal(
+                    swal.fire(
                         'Returns Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -258,10 +261,11 @@ export default {
                 });
             }
             else{
-                this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,(this.returns.id+'/unassign_officer')),JSON.stringify(data),{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,(this.returns.id+'/unassign_officer')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
 
-                }).then((response) => {
+                })
+                request.then((response) => {
                     this.refreshFromResponse(response);
                     this.updateAssignedOfficerSelect();
     
@@ -269,7 +273,7 @@ export default {
                     console.log(error)
                     // this.revert();
                     // this.updateAssignedOfficerSelect();
-                    swal(
+                    swal.fire(
                         'Returns Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -282,16 +286,17 @@ export default {
             this.form=document.forms.internal_returns_form;
             var data = new FormData(this.form);
 
-            this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/officer_comments'),data,{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/officer_comments'),{method:'POST', body:JSON.stringify(data)},{
                         emulateJSON:true,
 
-            }).then((response)=>{
+            })
+            request.then((response)=>{
 
                 return true // continue.
             
             },(error)=>{
                 console.log(error);
-                swal('Error',
+                swal.fire('Error',
                     'There was an error saving your return details.<br/>' + error.body,
                     'error'
                 )
@@ -306,17 +311,18 @@ export default {
             await this.save_wo();
             this.form=document.forms.internal_returns_form;
 
-            this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/accept'),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/accept'),{
                             emulateJSON:true,
 
-            }).then((response)=>{
+            })
+            request.then((response)=>{
 
                 // Return to dashboard.
                 this.$router.push({name:"internal-dash"});
 
             },(error)=>{
                 console.log(error);
-                swal('Error',
+                swal.fire('Error',
                         'There was an error accepting the return.<br/>' + error.body,
                         'error'
                 )

@@ -1,18 +1,12 @@
 <template>
 <div class="container" id="internalSearch">
-    <!--UserDashTable level="internal" :url="users_url" />
-    <OrganisationDashTable /-->
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Person and Organisation Search
-                        <a :href="'#'+rBody" data-toggle="collapse"  data-parent="#personOrgSearch" expanded="true" :aria-controls="rBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="kBody">
+            <FormSection
+                :form-collapse="false"
+                label="Person and Organisation SearchReturn"
+            >
+                <div class="panel panel-default">
                     <div class="form-group">
                         <div class="row">   
                             <div class="form-check form-check-inline col-md-3">
@@ -49,20 +43,16 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
     <div v-if="showSearchKeywords" class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Keywords
-                        <a :href="'#'+kBody" data-toggle="collapse"  data-parent="#keywordInfo" expanded="true" :aria-controls="kBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="kBody">
+            <FormSection
+                :form-collapse="false"
+                label="Keywords"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                       <div>
                         <div class="form-group">
@@ -81,10 +71,8 @@
                               <label class="form-check-label" for="searchReturn">Return with requirements</label>
                           </div>
                           <label for="" class="control-label col-lg-12">Keyword</label>
-                            <div class="col-md-8">
+                            <div class="col-md-9">
                               <input type="search"  class="form-control input-sm" name="details" placeholder="" v-model="keyWord"></input>
-                            </div>
-                            <div class="col-md-1">
                             </div>
                             <div class="col-md-3">
                               <input type="button" @click.prevent="addKeyword" class="btn btn-primary" value="Add"/>
@@ -117,20 +105,16 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Reference Number
-                        <a :href="'#'+rBody" data-toggle="collapse"  data-parent="#referenceNumberInfo" expanded="true" :aria-controls="rBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="rBody">
+            <FormSection
+                :form-collapse="false"
+                label="Reference Number"
+            >
+                <div class="panel panel-default">
                     <div class="row col-lg-12">
                         <span>Search on the following items via Reference Number:</span>
                         <ul>
@@ -163,15 +147,16 @@
                           <div v-else>
                             <input type="button" @click.prevent="search_reference" class="btn btn-primary" style="margin-bottom: 5px" value="Search"/>
                         </div>
-                        <alert :show.sync="showError" type="danger"><strong>{{errorString}}</strong></alert>
+                        <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import $ from 'jquery'
 import datatable from '@/utils/vue/datatable.vue'
 import alert from '@/utils/vue/alert.vue'
@@ -180,10 +165,12 @@ import OrganisationDashTable from '@internal-components/organisations/organisati
 import '@/scss/dashboards/search.scss';
 import {
   api_endpoints,
-  helpers
+  helpers,
+  fetch_util
 }
 from '@/utils/hooks'
 import utils from './utils'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'SearchDashboard',
     data() {
@@ -193,10 +180,10 @@ export default {
             preferredSystem: null,
             showSpinner: false,
             users_url: helpers.add_endpoint_join(api_endpoints.users_paginated,'datatable_list/?format=datatables'),
-            rBody: 'rBody' + vm._uid,
-            oBody: 'oBody' + vm._uid,
-            cBody: 'cBody' + vm._uid,
-            kBody: 'kBody' + vm._uid,
+            rBody: 'rBody' + uuid(),
+            oBody: 'oBody' + uuid(),
+            cBody: 'cBody' + uuid(),
+            kBody: 'kBody' + uuid(),
             loading: [],
             search_option: "starts_with",
             searchKeywords: [],
@@ -212,7 +199,7 @@ export default {
             results: [],
             errors: false,
             errorString: '',
-            datatable_id: 'keyword-search-datatable-'+vm._uid,
+            datatable_id: 'keyword-search-datatable-'+uuid(),
             keyword_search_headers:["Number","Type","Applicant","Text Found","Action"],
             keyword_search_options:{
                 language: {
@@ -257,30 +244,24 @@ export default {
         }
     },
     watch: {
-        searchKeywords: function() {
-            if (this.searchKeywords.length > 0){
-                this.hasSearchKeywords = true;
-            } else {
-                this.hasSearchKeywords = false;
-            };
+        searchKeywords: {
+            handler: function (){
+                if (this.searchKeywords.length > 0){
+                    this.hasSearchKeywords = true;
+                } else {
+                    this.hasSearchKeywords = false;
+                };
+            },
+            deep: true,
         }
     },
     components: {
+        FormSection,
         alert,
         datatable,
         UserDashTable,
         OrganisationDashTable
     },
-    //beforeRouteEnter:function(to,from,next){
-        //let initialisers = [
-        //    utils.fetchOrganisations(),
-        //]
-        //Promise.all(initialisers).then(data => {
-        //    next(vm => {
-        //        vm.organisations = data[0].results;
-        //    });
-        //});
-    //},
     computed: {
         isLoading: function () {
             return this.loading.length == 0;
@@ -373,18 +354,17 @@ export default {
             vm.showSpinner = true;
             vm.errors = false;
             vm.errorString = '';
+
             try {
-              const res = await vm.$http.post('/api/search_reference.json',{"reference_number": vm.referenceWord,});
-              console.log(res)
-              if (res.body.url_string) {
-                  window.location.href = res.body.url_string;
-              } else if (res.body.error) {
-                  console.log(res.body.error)
+              const res = await fetch_util.fetchUrl('/api/search_reference.json',{method:'POST', body:JSON.stringify({'reference_number': vm.referenceWord})});
+              if (res.url_string) {
+                  window.location.href = res.url_string;
+              } else if (res.error) {
+                  console.log(res.error)
                   vm.errors = true;
-                  vm.errorString = res.body.error;
+                  vm.errorString = res.error;
               }
             } catch(error) {
-              //console.log(error);
               vm.errors = true;
               vm.errorString = helpers.apiVueResourceError(error);
             }
@@ -421,14 +401,20 @@ export default {
           if(this.searchKeywords.length > 0)
           {
             vm.searching=true;
-            vm.$http.post('/api/search_keywords.json',{
-              searchKeywords: vm.searchKeywords,
-              searchApplication: vm.searchApplication,
-              searchLicence: vm.searchLicence,
-              searchReturn: vm.searchReturn,
-              is_internal: true,
-            }).then(res => {
-              vm.results = res.body;
+
+            let request = fetch_util.fetchUrl('/api/search_keywords.json',{
+              method:'POST',
+              body: JSON.stringify({
+                'searchKeywords': vm.searchKeywords,
+                'searchApplication': vm.searchApplication,
+                'searchLicence': vm.searchLicence,
+                'searchReturn': vm.searchReturn,
+                'is_internal': true,
+            })
+            })
+
+            request.then(res => {
+              vm.results = res;
               vm.$refs.keyword_search_datatable.vmDataTable.clear()
               vm.$refs.keyword_search_datatable.vmDataTable.rows.add(vm.results);
               vm.$refs.keyword_search_datatable.vmDataTable.draw();

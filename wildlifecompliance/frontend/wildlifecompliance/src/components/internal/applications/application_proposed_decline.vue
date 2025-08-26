@@ -4,7 +4,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="declineForm">
-                        <alert :show.sync="showError" type="danger"><strong>{{errorString}}</strong></alert>
+                        <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <!-- <div class="row">
@@ -51,7 +51,7 @@
 //import $ from 'jquery'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import {helpers,api_endpoints} from "@/utils/hooks.js"
+import {helpers,api_endpoints,fetch_util} from "@/utils/hooks.js"
 import { mapGetters } from 'vuex'
 export default {
     name:'ProposedDecline',
@@ -138,28 +138,21 @@ export default {
             let propose_decline = JSON.parse(JSON.stringify(vm.propose_decline));
             vm.decliningApplication = true;
             if (propose_decline.activity.length > 0){
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,this.application_id+'/proposed_decline'),JSON.stringify(propose_decline),{
-                        emulateJSON:true,
-                    }).then((response)=>{
-                        //swal(
-                        //        'Propose Decline',
-                        //        'The selected licenced activities have been proposed for Decline.',
-                        //        'success'
-                        //)
-                        //vm.decliningApplication = false;
-                        //vm.close();
-                        //vm.$emit('refreshFromResponse',response);
-                        vm.$router.push({
-                            name:"internal-dash",
-                        });     
-                    },(error)=>{
-                        vm.errors = true;
-                        vm.decliningApplication = false;
-                        vm.errorString = helpers.apiVueResourceError(error);
-                    });
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,this.application_id+'/proposed_decline'),{method:'POST', body:JSON.stringify(propose_decline)},{
+                    emulateJSON:true,
+                })
+                request.then((response)=>{
+                    vm.$router.push({
+                        name:"internal-dash",
+                    });     
+                },(error)=>{
+                    vm.errors = true;
+                    vm.decliningApplication = false;
+                    vm.errorString = helpers.apiVueResourceError(error);
+                });
             } else {
                 vm.decliningApplication = false;
-                swal(
+                swal.fire(
                      'Propose Decline',
                      'Please select at least once licenced activity to Propose Decline.',
                      'error'

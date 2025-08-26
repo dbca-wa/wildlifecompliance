@@ -18,15 +18,11 @@
                 <div :id="dTab" class="tab-pane fade in active">
                     <div class="row">
                         <div class="col-sm-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                <h3 class="panel-title">Personal Details
-                                    <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
-                                        <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                    </a>
-                                </h3>
-                                </div>
-                                <div class="panel-body collapse in" :id="pdBody">
+                            <FormSection
+                                :form-collapse="false"
+                                label="Personal Details"
+                            >
+                                <div class="panel panel-default">
                                     <div v-if="objectAlert" class="alert alert-danger">
                                         <p>test alert</p>
                                     </div>
@@ -57,20 +53,16 @@
                                         </div>
                                     </form>
                                 </div>
-                            </div>
+                            </FormSection>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                <h3 class="panel-title">Address Details
-                                    <a class="panelClicker" :href="'#'+adBody" data-toggle="collapse" expanded="false"  data-parent="#userInfo" :aria-controls="adBody">
-                                        <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                    </a>
-                                </h3>
-                                </div>
-                                <div v-if="loading.length == 0" class="panel-body collapse in" :id="adBody">
+                            <FormSection
+                                :form-collapse="false"
+                                label="Address Details"
+                            >
+                                <div v-if="loading.length == 0" class="panel panel-default">
                                     <form class="form-horizontal" action="index.html" method="post">
                                         <div class="form-group">
                                         <label for="" class="col-sm-3 control-label">Street</label>
@@ -120,20 +112,16 @@
                                         </div>  -->
                                     </form>
                                 </div>
-                            </div>
+                            </FormSection>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                <h3 class="panel-title">Contact Details <small></small>
-                                    <a class="panelClicker" :href="'#'+cdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="false" :aria-controls="cdBody">
-                                        <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                                    </a>
-                                </h3>
-                                </div>
-                                <div class="panel-body collapse in" :id="cdBody">
+                            <FormSection
+                                :form-collapse="false"
+                                label="Contact Details"
+                            >
+                                <div class="panel panel-default">
                                     <form class="form-horizontal" action="index.html" method="post">
                                         <div class="form-group">
                                         <label for="" class="col-sm-3 control-label">Phone</label>
@@ -166,7 +154,7 @@
                                         </div> -->
                                     </form>
                                 </div>
-                            </div>
+                            </FormSection>
                         </div>
                     </div>
                     <div class="row" v-if="isEditable">
@@ -193,18 +181,20 @@
 </template>
         
 <script>
+import { v4 as uuid } from 'uuid';
 import Awesomplete from 'awesomplete';
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import datatable from '@vue-utils/datatable.vue'
 import ApplicationDashTable from '@common-components/applications_dashboard.vue'
 import LicenceDashTable from '@common-components/licences_dashboard.vue'
 import ReturnDashTable from '@common-components/returns_dashboard.vue'
 import PersonSearch from "@common-components/search_person_or_organisation.vue";
-import 'bootstrap/dist/css/bootstrap.css';
+
 import 'awesomplete/awesomplete.css';
 import utils from '../utils'
 
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: "search-person",
     data: function(){
@@ -215,13 +205,13 @@ export default {
         return {
             awe: null,
             suggest_list: [],
-            adBody: 'adBody'+vm._uid,
-            pdBody: 'pdBody'+vm._uid,
-            cdBody: 'cdBody'+vm._uid,
-            odBody: 'odBody'+vm._uid,
-            idBody: 'idBody'+vm._uid,
-            dTab: 'dTab'+vm._uid,
-            oTab: 'oTab'+vm._uid,
+            adBody: 'adBody'+uuid(),
+            pdBody: 'pdBody'+uuid(),
+            cdBody: 'cdBody'+uuid(),
+            odBody: 'odBody'+uuid(),
+            idBody: 'idBody'+uuid(),
+            dTab: 'dTab'+uuid(),
+            oTab: 'oTab'+uuid(),
             user: {
                 residential_address: {},
                 wildlifecompliance_organisations: []
@@ -240,6 +230,7 @@ export default {
         }
     },
     components: {
+        FormSection,
         datatable,
         ApplicationDashTable,
         LicenceDashTable,
@@ -320,13 +311,14 @@ export default {
         updateContact: function() {
             let vm = this;
             vm.updatingContact = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.call_email.email_user.id+'/update_contact')),JSON.stringify(vm.call_email.email_user),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,(vm.call_email.email_user.id+'/update_contact')), {method:'POST', body:JSON.stringify(vm.call_email.email_user)},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 vm.updatingContact = false;
-                // vm.user = response.body;
+                // vm.user = response;
                 if (vm.call_email.email_user.residential_address == null){ vm.call_email.email_user.residential_address = {}; }
-                swal({
+                swal.fire({
                     title: 'Update Contact Details',
                     html: 'User contact details has been successfully updated.',
                     type: 'success',
@@ -337,7 +329,7 @@ export default {
                 for (var key in error.body) {
                     error_msg += key + ': ' + error.body[key] + '<br/>';
                 }
-                swal({
+                swal.fire({
                     title: 'Update Contact Details',
                     html: 'There was an error updating the user contact details.<br/>' + error_msg,
                     type: 'error'
@@ -347,13 +339,14 @@ export default {
         updateAddress: function() {
             let vm = this;
             vm.updatingAddress = true;
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.users,(vm.call_email.email_user.id+'/update_address')),JSON.stringify(vm.call_email.email_user.residential_address),{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,(vm.call_email.email_user.id+'/update_address')), {method:'POST', body:JSON.stringify(vm.call_email.email_user.residential_address)},{
                 emulateJSON:true
-            }).then((response) => {
+            })
+            request.then((response) => {
                 vm.updatingAddress = false;
-                vm.call_email.email_user = response.body;
+                vm.call_email.email_user = response;
                 if (vm.call_email.email_user.residential_address == null){ vm.call_email.email_user.residential_address = {}; }
-                swal({
+                swal.fire({
                     title: 'Update Address Details',
                     html: 'User address details has been successfully updated.',
                     type: 'success',
@@ -364,7 +357,7 @@ export default {
                 for (var key in error.body) {
                     error_msg += key + ': ' + error.body[key] + '<br/>';
                 }
-                swal({
+                swal.fire({
                     title: 'Update Address Details',
                     html: 'There was an error updating the user address details.<br/>' + error_msg,
                     type: 'error'

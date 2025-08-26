@@ -4,6 +4,8 @@ import {
     UPDATE_RETURNS_ESTIMATE,
 } from '@/store/mutation-types';
 
+import { fetch_util } from '@/utils/hooks';
+
 export const returnsStore = {
     state: {
         returns: {
@@ -20,19 +22,19 @@ export const returnsStore = {
     },
     mutations: {
         [UPDATE_RETURNS] (state, returns) {
-            Vue.set(state, 'returns', {...returns});
+            state.returns = {...returns};
         },
         [UPDATE_RETURNS_ESTIMATE] (state, estimate) {
-            Vue.set(state, 'returns_estimate_fee', estimate);
+            state.returns_estimate_fee = estimate;
         },
     },
     actions: {
         loadReturns({ dispatch, commit }, { url }) {
             return new Promise((resolve, reject) => {
-                Vue.http.get(url).then(res => {
-
-                    if (res.body.format !== 'sheet') {    // Return Sheets utilise Non-rendered data.
-                        var obj = res.body.table[0]['data'][0]
+                let request = fetch_util.fetchUrl(url)
+                request.then(res => {
+                    if (res.format !== 'sheet') {    // Return Sheets utilise Non-rendered data.
+                        var obj = res.table[0]['data'][0]
                         for(let form_data_record of Object.keys(obj)) {
                             let deficiency_key = form_data_record + '-deficiency-field'    
                             dispatch('setFormValue', {
@@ -46,11 +48,10 @@ export const returnsStore = {
                         }
                     }
 
-                    dispatch('setReturns', res.body);
+                    dispatch('setReturns', res);
                     resolve();
-                },
-                err => {
-                    console.log(err);
+                }).catch((error) => {
+                    console.log(error);
                     reject();
                 });
             })

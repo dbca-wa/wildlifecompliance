@@ -20,19 +20,19 @@
             <div>
                 <label class="">Planned Date From</label>
                 <div class="input-group date" ref="lodgementDateFromPicker">
-                    <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFrom" />
-                    <span class="input-group-addon">
+                    <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFrom" />
+                    <!--<span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+                    </span>-->
                 </div>
             </div>
             <div>
                 <label class="">Planned Date To</label>
                 <div class="input-group date" ref="lodgementDateToPicker">
-                    <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateTo" />
-                    <span class="input-group-addon">
+                    <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateTo" />
+                    <!--<span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+                    </span>-->
                 </div>
             </div>
         </div>
@@ -60,14 +60,14 @@ import L from 'leaflet';
 import 'leaflet.markercluster';  /* This should be imported after leaflet */
 import 'leaflet.locatecontrol';
 import Awesomplete from 'awesomplete';
-import { api_endpoints, helpers, cache_helper } from '@/utils/hooks'
+import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css'
-import 'bootstrap/dist/css/bootstrap.css';
+
 import 'awesomplete/awesomplete.css';
 
 L.TileLayer.WMTS = L.TileLayer.extend({
@@ -211,9 +211,6 @@ export default {
         vm.initMap();
         vm.loadLocations();
         vm.initAwesomplete();
-        vm.$nextTick(() => {
-            vm.addEventListeners();
-        });
     },
     watch: {
         filterStatus: function () {
@@ -252,33 +249,6 @@ export default {
     computed: {
     },
     methods: {
-        addEventListeners: function () {
-            let vm = this;
-            let el_fr = $(vm.$refs.lodgementDateFromPicker);
-            let el_to = $(vm.$refs.lodgementDateToPicker);
-
-            // Date "From" field
-            el_fr.datetimepicker({ format: 'DD/MM/YYYY', minDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_fr.on('dp.change', function (e) {
-                if (el_fr.data('DateTimePicker').date()) {
-                    vm.filterDateFrom = e.date.format('DD/MM/YYYY');
-                    //el_to.data('DateTimePicker').minDate(e.date);
-                } else if (el_fr.data('date') === "") {
-                    vm.filterDateFrom = "";
-                }
-            });
-
-            // Date "To" field
-            el_to.datetimepicker({ format: 'DD/MM/YYYY', minDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_to.on('dp.change', function (e) {
-                if (el_to.data('DateTimePicker').date()) {
-                    vm.filterDateTo = e.date.format('DD/MM/YYYY');
-                    el_fr.data('DateTimePicker').maxDate(e.date);
-                } else if (el_to.data('date') === "") {
-                    vm.filterDateTo = "";
-                }
-            });
-        },
         initAwesomplete: function(){
             var self = this;
             var element_search = document.getElementById('search-input');
@@ -388,8 +358,9 @@ export default {
         addOtherLayers(){
             var overlayMaps = {};
 
-            this.$http.get('/api/map_layers/').then(response => {
-                let layers = response.body.results;
+            let request = fetch_util.fetchUrl('/api/map_layers/')
+request.then(response => {
+                let layers = response.results;
                 for (var i = 0; i < layers.length; i++){
                     let l = L.tileLayer.wmts(
                         'https://kmi.dpaw.wa.gov.au/geoserver/gwc/service/wmts',
@@ -475,8 +446,9 @@ export default {
                         /* dynamically construct content of the popup */
                         myMarker.on('click', (ev)=>{
                             let popup = ev.target.getPopup();
-                            self.$http.get('/api/inspection/' + inspection.id).then(response => {
-                                let inspection = response.body;
+                            let request = fetch_util.fetchUrl('/api/inspection/' + inspection.id)
+request.then(response => {
+                                let inspection = response;
                                 popup.setContent(self.construct_content(inspection, coords));
                             });
                         })

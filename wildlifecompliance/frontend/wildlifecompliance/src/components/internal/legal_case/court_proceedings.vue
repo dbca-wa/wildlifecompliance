@@ -158,13 +158,12 @@
 <script>
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
 import datatable from '@vue-utils/datatable.vue'
-import 'bootstrap/dist/css/bootstrap.css';
-import 'eonasdan-bootstrap-datetimepicker';
+
 import _ from 'lodash';
 import JournalHistory from './journal_history'
 import filefield from '@/components/common/compliance_file.vue';
@@ -315,11 +314,6 @@ export default {
             return this.legal_case.court_proceedings ? true : false;
         },
     },
-    filters: {
-        formatDate: function(data) {
-            return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-        }
-    },
     methods: {
         ...mapActions('legalCaseStore', {
             setCourtProceedingsJournalEntry: 'setCourtProceedingsJournalEntry',
@@ -461,15 +455,15 @@ export default {
                     journal_entry_id = r.id
                 }
             }
-            let returnedEntry = await Vue.http.post(
+            let returnedEntry = await fetch_util.fetchUrl(
                 helpers.add_endpoint_join(
                     api_endpoints.legal_case,
                     this.legal_case.id + '/delete_reinstate_journal_entry/',
                 ),
-                {
+                {method:'POST', body:JSON.stringify({
                     "journal_entry_id": journal_entry_id,
                     "deleted": true,
-                }
+                })}
             );
             if (returnedEntry.ok) {
                 // required for running_sheet_history
@@ -508,15 +502,15 @@ export default {
                     journal_entry_id = r.id
                 }
             }
-            let returnedEntry = await Vue.http.post(
+            let returnedEntry = await fetch_util.fetchUrl(
                 helpers.add_endpoint_join(
                     api_endpoints.legal_case,
                     this.legal_case.id + '/delete_reinstate_journal_entry/',
                 ),
-                {
+                {method:'POST', body:JSON.stringify({
                     "journal_entry_id": journal_entry_id,
                     "deleted": false,
-                }
+                })}
                 );
             if (returnedEntry.ok) {
                 // required for running_sheet_history
@@ -592,7 +586,7 @@ export default {
                 api_endpoints.legal_case,
                 this.legal_case.id + '/create_journal_entry/'
                 )
-            let updatedCourtProceedings = await Vue.http.post(fetchUrl, payload);
+            let updatedCourtProceedings = await fetch_util.fetchUrl(fetchUrl, {method:'POST', body:JSON.stringify(payload)});
             console.log(updatedCourtProceedings)
             if (updatedCourtProceedings.ok) {
                 await this.setAddCourtProceedingsEntry(updatedCourtProceedings.body);

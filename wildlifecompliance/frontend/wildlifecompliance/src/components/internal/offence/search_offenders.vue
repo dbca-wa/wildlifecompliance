@@ -37,7 +37,7 @@
 <script>
 import Awesomplete from "awesomplete";
 import $ from "jquery";
-import "bootstrap/dist/css/bootstrap.css";
+
 import "awesomplete/awesomplete.css";
 import hash from 'object-hash';
 import SearchPersonOrganisation from "@common-components/search_person_or_organisation.vue";
@@ -184,89 +184,92 @@ export default {
             let vm = this;
 
             let element_search = document.getElementById(vm.elemId);
-            vm.awesomplete_obj = new Awesomplete(element_search, {
-                maxItems: vm.maxItems,
-                sort: false,
-                filter: () => {
-                    return true;
-                }, 
-                item: function(text, input) {
-                    let ret = Awesomplete.ITEM(text, ""); // Not sure how this works but this doesn't add <mark></mark>
-                    return ret;
-                },
-                data: function(item, input) {
-                    let f_name = item.first_name ? item.first_name : "";
-                    let l_name = item.last_name ? item.last_name : "";
-        
-                    let full_name = [f_name, l_name].filter(Boolean).join(" ");
-                    let email = item.email ? "E:" + item.email : "";
-                    let p_number = item.phone_number ? "P:" + item.phone_number : "";
-                    let m_number = item.mobile_number ? "M:" + item.mobile_number : "";
-                    let dob = item.dob ? "DOB:" + item.dob : "DOB: ---";
-        
-                    let full_name_marked = "<strong>" + vm.markMatchedText(full_name, input) + "</strong>";
-                    let email_marked = vm.markMatchedText(email, input);
-                    let p_number_marked = vm.markMatchedText(p_number, input);
-                    let m_number_marked = vm.markMatchedText(m_number, input);
-                    let dob_marked = vm.markMatchedText(dob, input);
-        
-                    let myLabel = [
-                        full_name_marked,
-                        email_marked,
-                        p_number_marked,
-                        m_number_marked,
-                        dob_marked
-                    ].filter(Boolean).join("<br />");
-                    myLabel = "<div data-item-id=" + item.id + ' data-full-name="' + full_name + '" data-type="individual">' + myLabel + "</div>";
-        
-                    return {
-                        label: myLabel, // Displayed in the list below the search box
-                        value: [full_name, dob].filter(Boolean).join(", "), // Inserted into the search box once selected
-                        id: item.id
-                    };
-                }
-            });
-            $(element_search)
-            .on("keyup", function(ev) {
-                var keyCode = ev.keyCode || ev.which;
-                if ((48 <= keyCode && keyCode <= 90) || (96 <= keyCode && keyCode <= 105) || keyCode == 8 || keyCode == 46) {
-                    vm.search_offender(ev.target.value);
-                    return false;
-                }
-            })
-            .on("awesomplete-selectcomplete", function(ev) {
-                ev.preventDefault();
-                ev.stopPropagation();
-                return false;
-            })
-            .on("awesomplete-select", function(ev) {
-                let origin = $(ev.originalEvent.origin);
-                let originTagName = origin[0].tagName;
-                switch(originTagName){
-                    case "STRONG":
-                        origin = origin.parent();
-                        break;
-                    case "MARK":
-                        origin = origin.parent().parent();
-                        break;
-                    case "LI":
-                        origin = origin.children().first();
-                        break;
-                }
-                let data_item_id = origin[0].getAttribute("data-item-id");
-                let data_type = origin[0].getAttribute("data-type");
-                let data_full_name = origin[0].getAttribute("data-full-name");
-
-                vm.$nextTick(() => {
-                    let data_item_id_int = parseInt(data_item_id);
-                    vm.entity = {
-                        'id': data_item_id_int, 
-                        'data_type': data_type,
-                        'full_name': data_full_name,
-                        'source': 'offenders',
-                    };
+            if (element_search != null) {
+                vm.awesomplete_obj = new Awesomplete(element_search, {
+                    maxItems: vm.maxItems,
+                    sort: false,
+                    filter: () => {
+                        return true;
+                    }, 
+                    item: function(text, input) {
+                        let ret = Awesomplete.ITEM(text, ""); // Not sure how this works but this doesn't add <mark></mark>
+                        return ret;
+                    },
+                    data: function(item, input) {
+                        let f_name = item.first_name ? item.first_name : "";
+                        let l_name = item.last_name ? item.last_name : "";
+            
+                        let full_name = [f_name, l_name].filter(Boolean).join(" ");
+                        let email = item.email ? "E:" + item.email : "";
+                        let p_number = item.phone_number ? "P:" + item.phone_number : "";
+                        let m_number = item.mobile_number ? "M:" + item.mobile_number : "";
+                        let dob = item.dob ? "DOB:" + item.dob : "DOB: ---";
+            
+                        let full_name_marked = "<strong>" + vm.markMatchedText(full_name, input) + "</strong>";
+                        let email_marked = vm.markMatchedText(email, input);
+                        let p_number_marked = vm.markMatchedText(p_number, input);
+                        let m_number_marked = vm.markMatchedText(m_number, input);
+                        let dob_marked = vm.markMatchedText(dob, input);
+            
+                        let myLabel = [
+                            full_name_marked,
+                            email_marked,
+                            p_number_marked,
+                            m_number_marked,
+                            dob_marked
+                        ].filter(Boolean).join("<br />");
+                        myLabel = "<div data-item-id=" + item.id + ' data-full-name="' + full_name + '" data-type="individual">' + myLabel + "</div>";
+            
+                        return {
+                            label: myLabel, // Displayed in the list below the search box
+                            value: [full_name, dob].filter(Boolean).join(", "), // Inserted into the search box once selected
+                            id: item.id
+                        };
+                    }
                 });
-            });
+                
+                $(element_search)
+                .on("keyup", function(ev) {
+                    var keyCode = ev.keyCode || ev.which;
+                    if ((48 <= keyCode && keyCode <= 90) || (96 <= keyCode && keyCode <= 105) || keyCode == 8 || keyCode == 46) {
+                        vm.search_offender(ev.target.value);
+                        return false;
+                    }
+                })
+                .on("awesomplete-selectcomplete", function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    return false;
+                })
+                .on("awesomplete-select", function(ev) {
+                    let origin = $(ev.originalEvent.origin);
+                    let originTagName = origin[0].tagName;
+                    switch(originTagName){
+                        case "STRONG":
+                            origin = origin.parent();
+                            break;
+                        case "MARK":
+                            origin = origin.parent().parent();
+                            break;
+                        case "LI":
+                            origin = origin.children().first();
+                            break;
+                    }
+                    let data_item_id = origin[0].getAttribute("data-item-id");
+                    let data_type = origin[0].getAttribute("data-type");
+                    let data_full_name = origin[0].getAttribute("data-full-name");
+
+                    vm.$nextTick(() => {
+                        let data_item_id_int = parseInt(data_item_id);
+                        vm.entity = {
+                            'id': data_item_id_int, 
+                            'data_type': data_type,
+                            'full_name': data_full_name,
+                            'source': 'offenders',
+                        };
+                    });
+                });
+            }
         },
         search_offender(searchTerm){
             var vm = this;

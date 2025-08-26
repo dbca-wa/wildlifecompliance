@@ -1,15 +1,13 @@
 <template id="returns_dashboard">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Sanction Outcomes <small v-if="is_external">View any sanction outcome issued to you, pay any infringement notice and follow up on any remediation action</small>
-                        <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pBody">
+            <FormSection
+                :form-collapse="false"
+                label="Sanction Outcomes"
+                index="sanction_outcomes"
+                :subtitle=subtitle
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -47,19 +45,19 @@
                         <div class="col-md-3">
                             <label for="">Issue date from</label>
                             <div class="input-group date" ref="issueDateFromPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFrom">
-                                <span class="input-group-addon">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFrom">
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>
                         <div class="col-md-3">
                             <label for="">Issue date to</label>
                             <div class="input-group date" ref="issueDateToPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateTo">
-                                <span class="input-group-addon">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateTo">
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>
                     </div>
@@ -70,15 +68,16 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
-import { api_endpoints, helpers, cache_helper } from '@/utils/hooks'
-
+import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'SanctionOutcomeTableDash',
     props: {
@@ -102,8 +101,8 @@ export default {
             sanction_outcome_statuses: [],
             sanction_outcome_payment_statuses: [],
 
-            pBody: 'pBody' + vm._uid,
-            datatable_id: 'return-datatable-'+vm._uid,
+            pBody: 'pBody' + uuid(),
+            datatable_id: 'return-datatable-'+uuid(),
 
             filterType: 'all',
             filterStatus: 'all',
@@ -111,9 +110,9 @@ export default {
             filterDateFrom: '',
             filterDateTo: '',
 
-            dateFormat: 'DD/MM/YYYY',
+            dateFormat: 'YYYY-MM-DD',
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -171,7 +170,7 @@ export default {
                         searchable: true,
                         orderable: true,
                         mRender: function (data, type, full) {
-                            return data != '' && data != null ? moment(data).format('DD/MM/YYYY') : '';
+                            return data != '' && data != null ? moment(data).format('YYYY-MM-DD') : '';
                         }
                     },
                     {
@@ -219,7 +218,7 @@ export default {
                                     let ra = full.remediation_actions[i];
                                     body += '<tr>' +
                                         //td + ra.description + td_close +
-                                        td + moment(ra.due_date).format('DD/MM/YYYY') + td_close +
+                                        td + moment(ra.due_date).format('YYYY-MM-DD') + td_close +
                                         td + ra.status.name + td_close +
                                         td + ra.user_action + td_close
                                     '</tr>'
@@ -242,7 +241,8 @@ export default {
         }
     },
     components:{
-        datatable
+        datatable,
+        FormSection
     },
     watch:{
         filterType: function () {
@@ -270,6 +270,12 @@ export default {
         is_external: function(){
             return this.level == 'external';
         },
+        subtitle: function() {
+            if (this.is_external) {
+                return "View any sanction outcome issued to you, pay any infringement notice and follow up on any remediation action";
+            }
+            return "";
+        }
     },
     created: async function(){
         this.constructOptionsType();
@@ -278,9 +284,6 @@ export default {
     },
     methods:{
         addEventListeners: function () {
-            this.attachFromDatePicker();
-            this.attachToDatePicker();
-
             let vm = this;
             // External Pay Fee listener
             vm.$refs.sanction_outcome_table.vmDataTable.on('click', 'a[data-pay-infringement-penalty]', function(e) {
@@ -290,44 +293,16 @@ export default {
             });
         },
         payInfringementPenalty: function(sanction_outcome_id){
-            this.$http.post('/infringement_penalty/' + sanction_outcome_id + '/').then(res=>{
-                    window.location.href = res.body;
+            let request = fetch_util.fetchUrl('/infringement_penalty/' + sanction_outcome_id + '/',{method:'POST'})
+            request.then(res=>{
+                    window.location.href = res;
                 },err=>{
-                    swal(
+                    swal.fire(
                         'Submit Error',
                         helpers.apiVueResourceError(err),
                         'error'
                     )
                 });
-        },
-        attachFromDatePicker: function(){
-            let vm = this;
-            let el_fr = $(vm.$refs.issueDateFromPicker);
-            let el_to = $(vm.$refs.issueDateToPicker);
-
-            el_fr.datetimepicker({ format: 'DD/MM/YYYY', maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_fr.on('dp.change', function (e) {
-                if (el_fr.data('DateTimePicker').date()) {
-                    vm.filterDateFrom = e.date.format('DD/MM/YYYY');
-                    el_to.data('DateTimePicker').minDate(e.date);
-                } else if (el_fr.data('date') === "") {
-                    vm.filterDateFrom = "";
-                }
-            });
-        },
-        attachToDatePicker: function(){
-            let vm = this;
-            let el_fr = $(vm.$refs.issueDateFromPicker);
-            let el_to = $(vm.$refs.issueDateToPicker);
-            el_to.datetimepicker({ format: 'DD/MM/YYYY', maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_to.on('dp.change', function (e) {
-                if (el_to.data('DateTimePicker').date()) {
-                    vm.filterDateTo = e.date.format('DD/MM/YYYY');
-                    el_fr.data('DateTimePicker').maxDate(e.date);
-                } else if (el_to.data('date') === "") {
-                    vm.filterDateTo = "";
-                }
-            });
         },
         constructOptionsType: async function() {
             let returned = await cache_helper.getSetCacheList('SanctionOutcomeTypes', '/api/sanction_outcome/types.json');
@@ -354,6 +329,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-</style>

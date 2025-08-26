@@ -30,7 +30,7 @@ import FormSection from "@/components/forms/section_toggle.vue";
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import filefield from '@/components/common/compliance_file.vue';
-import 'bootstrap/dist/css/bootstrap.css';
+
 
 export default {
     name: 'RemediationActionSubmitSuccess',
@@ -83,7 +83,7 @@ export default {
                     }
                 }
             }
-            await swal("Error", errorText, "error");
+            await swal.fire("Error", errorText, "error");
         },
     }
 }

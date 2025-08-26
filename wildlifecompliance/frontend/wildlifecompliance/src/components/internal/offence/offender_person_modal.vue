@@ -37,14 +37,14 @@
                                 <div class="input-group date" ref="dobDatePicker">
                                     <input 
                                     name="dob"
-                                    type="text" 
+                                    type="date" 
                                     class="form-control" 
                                     placeholder="DD/MM/YYYY" 
                                     v-model="offender_person.dob" 
                                     />
-                                    <span class="input-group-addon">
+                                    <!--<span class="input-group-addon">
                                         <span class="glyphicon glyphicon-calendar"></span>
-                                    </span>
+                                    </span>-->
                                 </div>
                             </div>
                         </div>
@@ -154,12 +154,11 @@
 </template>
 
 <script>
-import { api_endpoints, helpers } from "@/utils/hooks";
+import { api_endpoints, helpers, fetch_util } from "@/utils/hooks";
 import utils from '@/components/internal/utils'
 import modal from "@vue-utils/bootstrap-modal.vue";
-import "bootstrap/dist/css/bootstrap.css";
+
 import Vue from "vue";
-import 'eonasdan-bootstrap-datetimepicker';
 
 export default {
   name: "Offender",
@@ -215,11 +214,11 @@ export default {
         data.address_state = vm.offender_person.address_state;
         data.address_country = vm.offender_person.address_country;
         data.address_postcode = vm.offender_person.address_postcode;
-        let res = Vue.http.post(
+        let res = fetch_util.fetchUrl(
             helpers.add_endpoint_join(
                 api_endpoints.offenders,
                 this.offender_id + "/update_offender_person/"),
-                data
+                {method:'POST', body:JSON.stringify(data)}
             );
         return res
     },
@@ -269,7 +268,6 @@ export default {
             errorText += err.message;
         }
         this.errorResponse = errorText;
-        //await swal("Error", errorText, "error");
     },
     cancel: function() {
         this.processingDetails = false;
@@ -278,22 +276,6 @@ export default {
     close: function() {
         this.processingDetails = false;
         this.isModalOpen = false;
-    },
-    addEventListeners: function() {
-          let el_dob_date = $(this.$refs.dobDatePicker);
-
-          el_dob_date.datetimepicker({
-            format: "DD/MM/YYYY",
-            maxDate: "now",
-            showClear: true
-          });
-          el_dob_date.on("dp.change", (e) => {
-            if (el_dob_date.data("DateTimePicker").date()) {
-              this.offender_person.dob = e.date.format("DD/MM/YYYY");
-            } else if (el_dob_date.data("date") === "") {
-              this.offender_person.dob = "";
-            }
-          });
     },
     loadCountries: function(){
         let vm = this;
@@ -319,7 +301,6 @@ export default {
       let vm = this;
       vm.$nextTick(()=>{
           vm.loadCountries();
-          vm.addEventListeners();
       })
   }  
 };

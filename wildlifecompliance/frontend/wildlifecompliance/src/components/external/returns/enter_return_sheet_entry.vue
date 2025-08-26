@@ -20,7 +20,7 @@
                 </div>
                 <div class="row">
                 <form class="form-horizontal" name="sheetEntryForm">
-                    <alert :show.sync="showError" type="danger"><strong>{{errorString}}</strong></alert>
+                    <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                         <div class="col-sm-12">
                         <div class="row">
                             <div class="col-md-3">
@@ -31,7 +31,7 @@
                             </div>
                             <div class="col-md-6" v-if="isAddEntry && !isStockEntry">
                                 <select class="form-control" v-model="entryActivity">
-                                    <option v-for="(activity, activityId) in filteredActivityList" v-if="activity['auto']=='false'" :value="activityId">{{activity['label']}}</option>
+                                    <option v-for="(activity, activityId) in filteredAutoActivityList"" :value="activityId">{{activity['label']}}</option>
                                 </select>
                             </div>
                             <div class="col-md-3" v-if="isChangeEntry && !isStockEntry">
@@ -44,10 +44,10 @@
                             </div>
                             <div class="col-md-6">
                               <div class="input-group date" ref="activityDateToPicker" name="activityDateToPicker" required="true">
-                                  <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="entryActivityDate" id="entryActivityDate">
-                                  <span class="input-group-addon">
+                                  <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="entryActivityDate" id="entryActivityDate">
+                                  <!--<span class="input-group-addon">
                                       <span class="glyphicon glyphicon-calendar"></span>
-                                  </span>
+                                  </span>-->
                               </div>
                             </div>
                         </div>
@@ -128,7 +128,8 @@ import alert from '@vue-utils/alert.vue'
 import { mapActions, mapGetters } from 'vuex'
 import {
     api_endpoints,
-    helpers
+    helpers,
+    fetch_util
 } from "@/utils/hooks.js"
 import '@/scss/forms/return_sheet.scss';
 export default {
@@ -171,7 +172,7 @@ export default {
         activityList: {'0': {'label': null, 'licence': false, 'pay': false}},
         initialQty: 0,
         datepickerOptions:{
-            format: 'DD/MM/YYYY',
+            format: 'YYYY-MM-DD',
             showClear:true,
             useCurrent:false,
             keepInvalid:true,
@@ -210,12 +211,21 @@ export default {
       isStockEntry: function() {
         return this.entryActivity==='stock'?true:false;
       },
-      filteredActivityList: function() {
+      filteredActivityList: function() { //TODO fix this (possible source of incorrect return counts?)
         let filteredList = Object.assign({}, this.activityList)
         if (filteredList['stock'] && !this.isStockEntry) {
           delete filteredList['stock']
         }
   
+        return filteredList
+      },
+      filteredAutoActivityList: function() {
+        let filteredList = []
+        this.filteredActivityList.forEach(activity => {
+          if (activity['auto'] == false) {
+            filteredList.add(activity);
+          }
+        });
         return filteredList
       }
     },
@@ -406,19 +416,20 @@ export default {
         };
       },
       payTransfer: async function(_data) {
-        this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/sheet_pay_transfer'),_data,{
-                      emulateJSON:true,
-                    }).then((response)=>{
-                            window.location.href = res.body;
-                      //let species_id = this.returns.sheet_species;
-                      //this.setReturns(response.body);
-                      //this.returns.sheet_species = species_id;
-                    },(error)=>{
-                      console.log(error);
-                      swal('Error',
-                            'There was an error with transferring.<br/>' + error.body,
-                            'error'
-                      )
+        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/sheet_pay_transfer'),{method:'POST', body:JSON.stringify(_data)},{
+              emulateJSON:true,
+            })
+        request.then((response)=>{
+                    window.location.href = res;
+              //let species_id = this.returns.sheet_species;
+              //this.setReturns(response);
+              //this.returns.sheet_species = species_id;
+            },(error)=>{
+              console.log(error);
+              swal.fire('Error',
+                    'There was an error with transferring.<br/>' + error.body,
+                    'error'
+              )
         });
 
         return true
@@ -432,43 +443,44 @@ export default {
         row_data['species_id'] = self.returns.sheet_species;
         row_data['transfer'] = 'Notified';
         data.append('transfer', JSON.stringify(row_data))
-        self.$http.post(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/sheet_check_transfer'),data,{
-                      emulateJSON:true,
-                    }).then((response)=>{
+        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/sheet_check_transfer'),{method:'POST', body:JSON.stringify(data)},{
+              emulateJSON:true,
+            })
+        request.then((response)=>{
 
-                        if (self.isAddEntry) {
+                if (self.isAddEntry) {
 
-                            self.row_of_data.row.add(row_data).node().id = row_data.rowId;
-                            self.row_of_data.draw();
-                            self.species_cache[self.returns.sheet_species] = self.return_table.data();
+                    self.row_of_data.row.add(row_data).node().id = row_data.rowId;
+                    self.row_of_data.draw();
+                    self.species_cache[self.returns.sheet_species] = self.return_table.data();
 
-                        } else {  // Changing records only
+                } else {  // Changing records only
 
-                            self.row_of_data.data().activity = self.entryActivity;
-                            self.row_of_data.data().qty = self.entryQty;
-                            self.row_of_data.data().total = self.entryTotal;
-                            self.row_of_data.data().licence = self.entryLicence;
-                            self.row_of_data.data().comment = self.entryComment;
-                            self.row_of_data.data().transfer = self.entryTransfer;
-                            self.row_of_data.data().supplier = self.entrySupplier;
-                            self.row_of_data.invalidate().draw()
-                            self.species_cache[self.returns.sheet_species] = self.return_table.data();
-                        }
+                    self.row_of_data.data().activity = self.entryActivity;
+                    self.row_of_data.data().qty = self.entryQty;
+                    self.row_of_data.data().total = self.entryTotal;
+                    self.row_of_data.data().licence = self.entryLicence;
+                    self.row_of_data.data().comment = self.entryComment;
+                    self.row_of_data.data().transfer = self.entryTransfer;
+                    self.row_of_data.data().supplier = self.entrySupplier;
+                    self.row_of_data.invalidate().draw()
+                    self.species_cache[self.returns.sheet_species] = self.return_table.data();
+                }
 
-                        let transfer = {}  //{speciesID: {this.entryDateTime: row_data},}
-                        if (self.returns.sheet_species in self.species_transfer){
-                            transfer = self.species_transfer[self.returns.sheet_species]
-                        }
-                        transfer[self.entryDateTime] = row_data;
-                        self.species_transfer[self.returns.sheet_species] = transfer
-                        //self.close()
-                        is_valid = true;
+                let transfer = {}  //{speciesID: {this.entryDateTime: row_data},}
+                if (self.returns.sheet_species in self.species_transfer){
+                    transfer = self.species_transfer[self.returns.sheet_species]
+                }
+                transfer[self.entryDateTime] = row_data;
+                self.species_transfer[self.returns.sheet_species] = transfer
+                //self.close()
+                is_valid = true;
 
-                    },(error)=>{
-                        console.log(error)
-                        self.errors = true;
-                        //self.errorString = helpers.apiVueResourceError('Licence is not Valid.');
-                        self.errorString = 'Error with Validation'
+            },(error)=>{
+                console.log(error)
+                self.errors = true;
+                //self.errorString = helpers.apiVueResourceError('Licence is not Valid.');
+                self.errorString = 'Error with Validation'
         });
         return is_valid;
       },
@@ -570,20 +582,11 @@ export default {
 
         return is_correct;
       }, 
-      //Initialise Date Picker
-      initDatePicker: function() {
-        const vm = this;
-        $(vm.$refs.activityDateToPicker).datetimepicker(vm.datepickerOptions);
-        $('#entryActivityDate').blur(function(e){
-            vm.entryActivityDate =  $(this).val();
-          });
-      }
     },
     mounted: function() {
       let vm = this;
       vm.form = document.forms.sheetEntryForm;
       vm.addFormValidations();
-      vm.initDatePicker();
     }
 }
 </script>

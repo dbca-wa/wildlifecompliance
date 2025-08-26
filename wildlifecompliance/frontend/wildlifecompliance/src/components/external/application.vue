@@ -51,8 +51,8 @@
                             <div class="container">
                                 <p class="pull-right" style="margin-top:5px;">
                                     <span v-if="showCardPayButton || showCashPayButton" style="margin-right: 5px; font-size: 18px; display: block;">
-                                        <strong>Estimated application fee: {{adjusted_application_fee | toCurrency}}</strong>
-                                        <strong>Estimated licence fee: {{application.licence_fee | toCurrency}}</strong>
+                                        <strong>Estimated application fee: {{toCurrency(adjusted_application_fee)}}</strong>
+                                        <strong>Estimated licence fee: {{toCurrency(application.licence_fee)}}</strong>
                                     </span>
                                     <input v-if="!isProcessing && canDiscardActivity" type="button" @click.prevent="discardActivity" class="btn btn-danger" value="Discard Activity"/>
                                     <input v-if="!isProcessing" type="button" @click.prevent="saveExit" class="btn btn-primary" value="Save and Exit"/>
@@ -84,13 +84,15 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Application from '../form.vue'
 import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import AmendmentRequestDetails from '@/components/forms/amendment_request_details.vue';
 import {
   api_endpoints,
-  helpers
+  helpers,
+  fetch_util
 }
 from '@/utils/hooks';
 export default {
@@ -104,7 +106,7 @@ export default {
       missing_fields: [],
       adjusted_application_fee: 0,
       payment_method: null,
-      activityTab: 'activityTab'+vm._uid+'_'+0,
+      activityTab: 'activityTab'+uuid()+'_'+0,
     }
   },
   components: {
@@ -195,7 +197,7 @@ export default {
     discardActivity: function(e) {
       let swal_title = 'Discard Selected Activity';
       let swal_html = `Are you sure you want to discard activity: ${this.selected_activity_tab_name}?`;
-      swal({
+      swal.fire({
           title: swal_title,
           html: swal_html,
           type: "question",
@@ -203,15 +205,16 @@ export default {
           confirmButtonText: 'Discard',
           confirmButtonColor: '#d9534f',
       }).then((result) => {
-        this.$http.delete(this.activity_discard_url, {params: {'activity_id': this.selected_activity_tab_id}}).then(res=>{
-            swal(
+          let request = fetch_util.fetchUrl(this.activity_discard_url, {method:"DELETE", params: {'activity_id': this.selected_activity_tab_id}})
+          request.then(res=>{
+            swal.fire(
               'Activity Discarded',
               `${this.selected_activity_tab_name} has been discarded from this application.`,
               'success'
             );
 
             // No activities left? Redirect out of the application screen.
-            if(res.body.processing_status === 'discarded') {
+            if(res.processing_status === 'discarded') {
               this.$router.push({
                   name:"external-applications-dash",
               });
@@ -230,7 +233,7 @@ export default {
               });
             }
         },err=>{
-          swal(
+          swal.fire(
             'Error',
             helpers.apiVueResourceError(err),
             'error'
@@ -255,7 +258,7 @@ export default {
     saveExit: async function(e) {
       let is_saved = await this.save_form();
       if (is_saved) {
-          swal(
+          swal.fire(
             'Saved',
             'Your application has been saved',
             'success'
@@ -275,7 +278,8 @@ export default {
       this.missing_fields.length = 0;
       this.highlight_missing_fields();
 
-      await this.saveFormData({ url: this.application_form_data_url, draft: true , submit: is_submitting}).then(res=>{
+      let request = await this.saveFormData({ url: this.application_form_data_url, draft: true , submit: is_submitting});
+      request.then(res=>{
         this.isProcessing = false;
         is_saved = true;
 
@@ -291,7 +295,7 @@ export default {
             }, 1);
         }
 
-        swal(
+        swal.fire(
             'Error',
             'There was an error saving your application',
             'error'
@@ -304,7 +308,7 @@ export default {
     save: async function(e) {
       let is_saved = await this.save_form();
       if (is_saved) {
-          swal(
+          swal.fire(
             'Saved',
             'Your application has been saved',
             'success'
@@ -331,7 +335,7 @@ export default {
         let vm = this;
         let swal_title = 'Submit Application'
         let swal_html = 'Are you sure you want to submit this application?'
-        swal({
+        swal.fire({
             title: swal_title,
             html: swal_html,
             type: "question",
@@ -344,9 +348,9 @@ export default {
                 let is_saved = await this.save_form(is_submitting);
                 if (is_saved) {
                   this.isProcessing = true;
-                  vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/submit'),{}).then(res=>{
-
-                      this.setApplication(res.body);
+                  let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/submit'),{})
+                  request.then(res=>{
+                      this.setApplication(res);
                       this.isProcessing = false;
                       vm.$router.push({
                           name: 'submit_application',
@@ -354,7 +358,7 @@ export default {
                       });
 
                   },err=>{
-                      swal(
+                      swal.fire(
                           'Submit Error',
                           helpers.apiVueResourceError(err),
                           'error'
@@ -372,7 +376,7 @@ export default {
             }
 
         },(error) => {
-            swal(
+            swal.fire(
                 'Error',
                 'There was an error submitting your application',
                 'error'
@@ -386,7 +390,7 @@ export default {
         let vm = this;
         let swal_title = 'Checkout and Submit Application'
         let swal_html = 'Are you sure you want to pay and submit this application?<br><br>'
-        swal({
+        swal.fire({
             title: swal_title,
             html: swal_html,
             type: "question",
@@ -402,11 +406,11 @@ export default {
                 vm.isProcessing = true;
                 if (this.adjusted_application_fee > 0 || this.application.licence_fee > 0) { //refund not required.
 
-                    vm.$http.post(helpers.add_endpoint_join(api_endpoints.applications,vm.application.id+'/application_fee_checkout/'), {})
-                    .then(res=>{
-                        window.location.href = res.body;
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,vm.application.id+'/application_fee_checkout/'), {method:'POST'})
+                    request.then(res=>{
+                        window.location.href = res;
                     },err=>{
-                        swal(
+                        swal.fire(
                             'Submit Error',
                             helpers.apiVueResourceError(err),
                             'error'
@@ -431,7 +435,7 @@ export default {
                 vm.isProcessing = false;
             }
         },(error) => {
-            swal(
+            swal.fire(
                 'Error',
                 'There was an error submitting your application',
                 'error'
@@ -445,7 +449,7 @@ export default {
         let vm = this;
         let swal_title = 'Submit Application and Record Payment'
         let swal_html = 'Are you sure you want to submit this application?'
-        swal({
+        swal.fire({
             title: swal_title,
             html: swal_html,
             type: "question",
@@ -458,10 +462,11 @@ export default {
               
               if (is_saved) {
                 this.isProcessing = true;
-                vm.$http.post(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/application_fee_reception'),{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/application_fee_reception'),{
                   emulateJSON:true
-                }).then(res=>{
-                  this.setApplication(res.body);
+                })
+                request.then(res=>{
+                  this.setApplication(res);
                   this.isProcessing = false;
                   vm.$router.push({
                       name: 'submit_application',
@@ -469,7 +474,7 @@ export default {
                   });
 
                 },err=>{
-                      swal(
+                      swal.fire(
                           'Submit Error',
                           helpers.apiVueResourceError(err),
                           'error'
@@ -486,7 +491,7 @@ export default {
 
             }
         },(error) => {
-            swal(
+            swal.fire(
                 'Error',
                 'There was an error submitting your application',
                 'error'

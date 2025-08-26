@@ -13,15 +13,15 @@
           <CommentBlock :label="label" :name="name" :field_data="getDeficiencyField" />
 
           <div class="grid-container">
-              <div>
-                  <label v-if="headers" v-for="header in headers" >
+              <div v-if="headers">
+                  <label v-for="header in headers" >
                       <input class="form-control" v-model="header.label" disabled="disabled" />
                       <div class="grid-item" v-for ="(field, row_no) in field_data" >
-                          <div id="header.name" v-for="(title,key) in field" v-if="key == header.name"
+                          <div id="header.name" v-for="(title,key) in field"
                               :name="`${name}::${header.name}`" :key="`f_${key}`" >
 
                               <div v-if="header.type === 'date'" >
-                                  <input type="text"
+                                  <input type="date"
                                          :id="header.name + '::' + row_no"
                                          :disabled="header.readonly"
                                          :name="name + '::' + header.name"
@@ -124,35 +124,7 @@ const GridBlock = {
       self.show_add_row = !readonly
       return self.field_data[row][name].value;
     },
-    setDatePicker: function() {
-      const self = this;
-      for (let row=0; row<self.field_data.length; row++) {
-        Object.keys(self.field_data[row]).forEach(function(key) {
-          if (key.indexOf('date')>-1) {
-            let val = key + '::' + row;
-            let dateVal = self.field_data[row][key].value != null ? self.field_data[row][key].value : '';
-            let parts = dateVal.split('/');
-            var newDate = new Date(parts[2], parts[1] - 1, parts[0]); // format new Date(YYYY,MM,DD)
-            $(`[id='${val}']`).datetimepicker({
-              format: 'DD/MM/YYYY',
-              defaultDate: dateVal != '' ? newDate : null
-            }).off('dp.change').on('dp.change', (e) => {
-              self.value = $(e.target).data('DateTimePicker').date($(e.target)[0].value).format('DD/MM/YYYY');
-              let row_no = e.target.id.split('::')[1]
-              let name = e.target.name.split('::')[1]
-              self.setDateValue(e.target.value, row_no, name, e.target.disabled)
-            });
-          }
-        });
-      }
-    } // end of function to set the DatePicker widget for each Grid Item date.
   },
-  updated:function () {
-      this.setDatePicker();
-  },
-  mounted:function () {
-      this.setDatePicker();
-  }
 }
 
 export default GridBlock;

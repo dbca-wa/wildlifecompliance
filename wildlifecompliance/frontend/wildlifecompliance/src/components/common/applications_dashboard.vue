@@ -1,15 +1,13 @@
 <template id="application_dashboard">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Applications <small v-if="is_external">View existing applications and lodge new ones</small>
-                        <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pBody">
+            <FormSection
+                :form-collapse="false"
+                label="Applications"
+                index="applications"
+                :subtitle=subtitle
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -46,19 +44,19 @@
                         <div class="col-md-3">
                             <label for="">Lodged From</label>
                             <div class="input-group date" ref="applicationDateFromPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedFrom">
-                                <span class="input-group-addon">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedFrom">
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>
                         <div class="col-md-3">
                             <label for="">Lodged To</label>
                             <div class="input-group date" ref="applicationDateToPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedTo">
-                                <span class="input-group-addon">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedTo">
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>
                     </div>
@@ -70,20 +68,22 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
-require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+
 import { mapActions, mapGetters } from 'vuex'
 import {
     api_endpoints,
-    helpers
+    helpers,
+    fetch_util
 }from '@/utils/hooks'
 import '@/scss/dashboards/application.scss';
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'ApplicationTableDash',
     props: {
@@ -317,8 +317,8 @@ export default {
             }
         ]
         return {
-            pBody: 'pBody' + vm._uid,
-            datatable_id: 'application-datatable-'+vm._uid,
+            pBody: 'pBody' + uuid(),
+            datatable_id: 'application-datatable-'+uuid(),
             // Filters for Applications
             filterApplicationLicenceType: 'All',
             filterApplicationStatus: 'All',
@@ -326,9 +326,9 @@ export default {
             filterApplicationLodgedTo: '',
             filterApplicationSubmitter: 'All',
             filterApplicationActivity: 'All',
-            dateFormat: 'DD/MM/YYYY',
+            dateFormat: 'YYYY-MM-DD',
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -378,8 +378,8 @@ export default {
                         d.category_name = vm.filterApplicationLicenceType;
                         d.customer_status = vm.filterApplicationStatus.id;
                         d.submitter = vm.filterApplicationSubmitter;
-                        d.date_from = vm.filterApplicationLodgedFrom != '' && vm.filterApplicationLodgedFrom != null ? moment(vm.filterApplicationLodgedFrom, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
-                        d.date_to = vm.filterApplicationLodgedTo != '' && vm.filterApplicationLodgedTo != null ? moment(vm.filterApplicationLodgedTo, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                        d.date_from = vm.filterApplicationLodgedFrom != '' && vm.filterApplicationLodgedFrom != null ? moment(vm.filterApplicationLodgedFrom, 'YYYY-MM-DD').format('YYYY-MM-DD'): ''; //TODO use of moment here may be unnecessary, consider removing throughout project
+                        d.date_to = vm.filterApplicationLodgedTo != '' && vm.filterApplicationLodgedTo != null ? moment(vm.filterApplicationLodgedTo, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
                         d.activity_purpose = vm.filterApplicationActivity;
                     }
                 },
@@ -452,8 +452,8 @@ export default {
                         d.category_name = vm.filterApplicationLicenceType;
                         d.processing_status = vm.filterApplicationStatus.id;
                         d.submitter = vm.filterApplicationSubmitter;
-                        d.date_from = vm.filterApplicationLodgedFrom != '' && vm.filterApplicationLodgedFrom != null ? moment(vm.filterApplicationLodgedFrom, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
-                        d.date_to = vm.filterApplicationLodgedTo != '' && vm.filterApplicationLodgedTo != null ? moment(vm.filterApplicationLodgedTo, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                        d.date_from = vm.filterApplicationLodgedFrom != '' && vm.filterApplicationLodgedFrom != null ? moment(vm.filterApplicationLodgedFrom, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
+                        d.date_to = vm.filterApplicationLodgedTo != '' && vm.filterApplicationLodgedTo != null ? moment(vm.filterApplicationLodgedTo, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
                         d.activity_purpose = vm.filterApplicationActivity;
                     }
                 },
@@ -508,7 +508,8 @@ export default {
         }
     },
     components:{
-        datatable
+        datatable,
+        FormSection
     },
     watch:{
         filterApplicationStatus: function() {
@@ -545,6 +546,12 @@ export default {
         is_external: function(){
             return this.level == 'external';
         },
+        subtitle: function() {
+            if (this.is_external) {
+                return "View existing applications and lodge new ones";
+            }
+            return "";
+        }
     },
     methods:{
         ...mapActions([
@@ -555,7 +562,7 @@ export default {
         },
         discardApplication:function (application_id) {
             let vm = this;
-            swal({
+            swal.fire({
                 title: "Discard Application",
                 text: "Are you sure you want to discard this application?",
                 type: "warning",
@@ -564,16 +571,16 @@ export default {
                 confirmButtonColor:'#d9534f'
             }).then((result) => {
                 if (result) {
-                    vm.$http.delete(api_endpoints.discard_application(application_id))
-                    .then((response) => {
-                        swal(
+                    let request = fetch_util.fetchUrl(api_endpoints.discard_application(application_id), {method:"DELETE"})
+                    request.then((response) => {
+                        swal.fire(
                             'Discarded',
                             'Your application has been discarded',
                             'success'
                         )
                         vm.visibleDatatable.vmDataTable.ajax.reload();
                     }, (error) => {
-                        swal(
+                        swal.fire(
                             'Discard Error',
                             helpers.apiVueResourceError(error),
                             'error'
@@ -594,13 +601,16 @@ export default {
             };
         },
         payLicenceFee: function(application_id, activity_id) {
-            this.$http.post(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/licence_fee_checkout/'), {
-                application_id,
-                activity_id
-            }).then(res=>{
-                    window.location.href = res.body;
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/licence_fee_checkout/'), 
+                {method:'POST', body:{
+                    application_id,
+                    activity_id
+                }}
+            )
+            request.then(res=>{
+                    window.location.href = res;
                 },err=>{
-                    swal(
+                    swal.fire(
                         'Submit Error',
                         helpers.apiVueResourceError(err),
                         'error'
@@ -608,10 +618,15 @@ export default {
                 });
         },
         payApplicationFee: function(application_id) {
-            this.$http.post(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/application_fee_checkout/'), application_id).then(res=>{
-                    window.location.href = res.body;
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/application_fee_checkout/'), 
+                {method:'POST', body:{
+                    application_id
+                }}
+            )
+            request.then(res=>{
+                    window.location.href = res;
                 },err=>{
-                    swal(
+                    swal.fire(
                         'Submit Error',
                         helpers.apiVueResourceError(err),
                         'error'
@@ -619,43 +634,24 @@ export default {
                 });
         },
         getActivities: async function(application_id) {
-            await this.$http.post(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/get_activities/'), {
-                application_id
-            }).then(res=>{
-
-                    this.activities = res.body;
-
-                },err=>{
-                    swal(
-                        'Get Activity Error',
-                        helpers.apiVueResourceError(err),
-                        'error'
-                    )
-                });
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/get_activities/'), 
+                {method:'POST', body:JSON.stringify({
+                    application_id
+                })}
+            )
+            request.then(res=>{
+                this.activities = res;
+            },err=>{
+                swal.fire(
+                    'Get Activity Error',
+                    helpers.apiVueResourceError(err),
+                    'error'
+                )
+            });
         },
         addEventListeners: function(){
             let vm = this;
             // Initialise Application Date Filters
-            $(vm.$refs.applicationDateToPicker).datetimepicker(vm.datepickerOptions);
-            $(vm.$refs.applicationDateToPicker).on('dp.change', function(e){
-                if ($(vm.$refs.applicationDateToPicker).data('DateTimePicker').date()) {
-                    vm.filterApplicationLodgedTo =  e.date.format('DD/MM/YYYY');
-                }
-                else if ($(vm.$refs.applicationDateToPicker).data('date') === "") {
-                    vm.filterApplicationLodgedTo = "";
-                }
-             });
-            $(vm.$refs.applicationDateFromPicker).datetimepicker(vm.datepickerOptions);
-            $(vm.$refs.applicationDateFromPicker).on('dp.change',function (e) {
-                if ($(vm.$refs.applicationDateFromPicker).data('DateTimePicker').date()) {
-                    vm.filterApplicationLodgedFrom = e.date.format('DD/MM/YYYY');
-                    $(vm.$refs.applicationDateToPicker).data("DateTimePicker").minDate(e.date);
-                }
-                else if ($(vm.$refs.applicationDateFromPicker).data('date') === "") {
-                    vm.filterApplicationLodgedFrom = "";
-                    $(vm.$refs.applicationDateToPicker).data("DateTimePicker").minDate(false);
-                }
-            });
             // External Discard listener
             vm.visibleDatatable.vmDataTable.on('click', 'a[data-discard-application]', function(e) {
                 e.preventDefault();
@@ -818,19 +814,19 @@ export default {
         },
         initialiseSelects: async function() {
 
-            await this.$http.get(helpers.add_endpoint_join(api_endpoints.applications,'1/get_application_selects')).then(res=>{
-
-                    this.application_status = res.body.all_status
-                    this.application_licence_types = res.body.all_category
-                    this.application_activities = res.body.all_activity
-                },err=>{
-
-                    swal(
-                        'Get Application Selects Error',
-                        helpers.apiVueResourceError(err),
-                        'error'
-                    )
-                });
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,'1/get_application_selects'))
+            request.then(res=>{
+                this.application_status = res.all_status
+                this.application_licence_types = res.all_category
+                this.application_activities = res.all_activity
+            }).catch((error) => {
+                console.log(error)
+                swal.fire(
+                    'Get Application Selects Error',
+                    helpers.apiVueResourceError(error),
+                    'error'
+                )
+            });
         },
     },
     mounted: function(){
@@ -850,5 +846,3 @@ export default {
     }
 }
 </script>
-<style scoped>
-</style>

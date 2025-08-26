@@ -3,16 +3,11 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Schema Purpose Section
-                        <a :href="'#'+pPurposeBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pPurposeBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pPurposeBody">
-
+            <FormSection
+                :form-collapse="false"
+                label="Schema Purpose Section"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -42,7 +37,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 
@@ -103,22 +98,23 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import {
   api_endpoints,
-  helpers
+  helpers, fetch_util
 }
 from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name:'schema-purpose',
     components: {
+        FormSection,
         modal,
         alert,
         datatable,
-    },
-    props:{
     },
     watch:{
         filterTablePurpose: function() {
@@ -129,8 +125,8 @@ export default {
         let vm = this;
         vm.schema_purpose_url = helpers.add_endpoint_join(api_endpoints.schema_purpose_paginated, 'schema_purpose_datatable_list/?format=datatables');
         return {
-            schema_purpose_id: 'schema-purpose-datatable-'+vm._uid,
-            pPurposeBody: 'pPurposeBody' + vm._uid,
+            schema_purpose_id: 'schema-purpose-datatable-'+uuid(),
+            pPurposeBody: 'pPurposeBody' + uuid(),
             isModalOpen:false,
             missing_fields: [],
             filterTablePurpose: 'All',
@@ -244,16 +240,16 @@ export default {
 
             if (data.id === '') {
 
-                await self.$http.post(api_endpoints.schema_purpose, JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(api_endpoints.schema_purpose, {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
-
-                }).then((response) => {
+                })
+                request.then((response) => {
 
                     self.$refs.schema_purpose_table.vmDataTable.ajax.reload();
                     self.close();
 
                 }, (error) => {
-                    swal(
+                    swal.fire(
                         'Save Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -262,16 +258,17 @@ export default {
 
             } else {
 
-                await self.$http.post(helpers.add_endpoint_json(api_endpoints.schema_purpose,data.id+'/save_purpose'),JSON.stringify(data),{
+                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_purpose,data.id+'/save_purpose'), {method:'POST', body:JSON.stringify(data)},{
                         emulateJSON:true,
 
-                }).then((response)=>{
+                })
+                request.then((response)=>{
 
                     self.$refs.schema_purpose_table.vmDataTable.ajax.reload();
                     self.close();
 
                 },(error)=>{
-                    swal(
+                    swal.fire(
                         'Save Error',
                         helpers.apiVueResourceError(error),
                         'error'
@@ -312,7 +309,7 @@ export default {
                 self.$refs.schema_purpose_table.row_of_data = self.$refs.schema_purpose_table.vmDataTable.row('#'+$(this).attr('data-rowid'));
                 self.sectionPurpose.id = self.$refs.schema_purpose_table.row_of_data.data().id;
 
-                swal({
+                swal.fire({
                     title: "Delete Purpose Section",
                     text: "Are you sure you want to delete?",
                     type: "question",
@@ -323,9 +320,11 @@ export default {
 
                     if (result) {
 
-                        await self.$http.delete(helpers.add_endpoint_json(api_endpoints.schema_purpose,(self.sectionPurpose.id+'/delete_purpose')))
+                        let request = await fetch_util.fetchUrl(
+                            helpers.add_endpoint_json(api_endpoints.schema_purpose,(self.sectionPurpose.id+'/delete_purpose')), {method:"DELETE"}
+                        )
     
-                        .then((response) => {
+                        request.then((response) => {
 
                             self.$refs.schema_purpose_table.vmDataTable.ajax.reload();
 
@@ -342,15 +341,16 @@ export default {
         },
         initSelects: async function() {
 
-            await this.$http.get(helpers.add_endpoint_join(api_endpoints.schema_purpose,'1/get_purpose_selects')).then(res=>{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.schema_purpose,'1/get_purpose_selects'))
+            request.then(res=>{
 
-                    this.schemaPurposes = res.body.all_purpose
+                    this.schemaPurposes = res.all_purpose
 
-            },err=>{
+            }).catch((error) => {
 
-                swal(
+                swal.fire(
                     'Get Application Selects Error',
-                    helpers.apiVueResourceError(err),
+                    helpers.apiVueResourceError(error),
                     'error'
                 )
             });

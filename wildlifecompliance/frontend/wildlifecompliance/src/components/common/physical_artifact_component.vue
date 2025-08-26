@@ -144,19 +144,19 @@
                                                     <label class="col-sm-3">Date</label>
                                                     <div class="col-sm-3">
                                                         <div class="input-group date" ref="artifactDatePicker">
-                                                            <input :disabled="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="physical_artifact.artifact_date" />
-                                                            <span class="input-group-addon">
+                                                            <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="physical_artifact.artifact_date" />
+                                                            <!--<span class="input-group-addon">
                                                                 <span class="glyphicon glyphicon-calendar"></span>
-                                                            </span>
+                                                            </span>-->
                                                         </div>
                                                     </div>
                                                     <label class="col-sm-3">Time</label>
                                                     <div class="col-sm-3">
                                                         <div class="input-group date" ref="artifactTimePicker">
-                                                          <input :disabled="readonlyForm" type="text" class="form-control" placeholder="HH:MM" v-model="physical_artifact.artifact_time"/>
-                                                          <span class="input-group-addon">
+                                                          <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="physical_artifact.artifact_time"/>
+                                                          <!--<span class="input-group-addon">
                                                               <span class="glyphicon glyphicon-calendar"></span>
-                                                          </span>
+                                                          </span>-->
                                                         </div>
                                                     </div>
                                                 </div>
@@ -211,13 +211,15 @@
                                 <div :id="detailsTab" :class="detailsTabClass" v-bind:key="artifactType">
                                     <FormSection :formCollapse="false" label="Details">
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <div v-if="detailsSchemaVisibility" v-for="(item, index) in detailsSchema">
-                                              <compliance-renderer-block
-                                                 :component="item"
-                                                 :readonlyForm="readonlyForm"
-                                                 v-bind:key="`compliance_renderer_block${index}`"
-                                                @update-temp-doc-coll-id="addToTemporaryDocumentCollectionList"
-                                                />
+                                            <div v-if="detailsSchemaVisibility">
+                                                <div v-for="(item, index) in detailsSchema">
+                                                <compliance-renderer-block
+                                                    :component="item"
+                                                    :readonlyForm="readonlyForm"
+                                                    v-bind:key="`compliance_renderer_block${index}`"
+                                                    @update-temp-doc-coll-id="addToTemporaryDocumentCollectionList"
+                                                    />
+                                                </div>
                                             </div>
                                         </div></div>
                                     </FormSection>
@@ -225,12 +227,14 @@
                                 <div :id="storageTab" :class="storageTabClass">
                                     <FormSection :formCollapse="false" label="Storage" v-bind:key="artifactType">
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <div v-if="storageSchemaVisibility" v-for="(item, index) in storageSchema">
-                                              <compliance-renderer-block
-                                                 :component="item"
-                                                 :readonlyForm="readonlyForm"
-                                                 v-bind:key="`compliance_renderer_block${index}`"
-                                                />
+                                            <div v-if="storageSchemaVisibility"> 
+                                                <div v-for="(item, index) in storageSchema">
+                                                <compliance-renderer-block
+                                                    :component="item"
+                                                    :readonlyForm="readonlyForm"
+                                                    v-bind:key="`compliance_renderer_block${index}`"
+                                                    />
+                                                </div>
                                             </div>
                                         </div></div>
                                     </FormSection>
@@ -254,10 +258,10 @@
                                             <label class="col-sm-3">Date</label>
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="disposalDatePicker">
-                                                    <input :disabled="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="physical_artifact.disposal_date" />
-                                                    <span class="input-group-addon">
+                                                    <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="physical_artifact.disposal_date" />
+                                                    <!--<span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>
+                                                    </span>-->
                                                 </div>
                                             </div>
                                         </div></div>
@@ -300,18 +304,17 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 //import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import filefield from '@/components/common/compliance_file.vue';
-//import { required, minLength, between } from 'vuelidate/lib/validators'
-import 'bootstrap/dist/css/bootstrap.css';
-import 'eonasdan-bootstrap-datetimepicker';
+
 import moment from 'moment';
 import SearchPersonOrganisation from './search_person_or_organisation'
 //require("select2/dist/css/select2.min.css");
-//require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
+//
 import FormSection from "@/components/forms/section_toggle.vue";
 import RelatedItems from "@common-components/related_items.vue";
 import datatable from '@vue-utils/datatable.vue'
@@ -321,13 +324,13 @@ export default {
     data: function() {
         return {
             uuid: 0,
-            relatedItemsTab: 'relatedItemsTab'+this._uid,
-            newTab: 'newTab'+this._uid,
-            existingTab: 'existingTab'+this._uid,
-            objectTab: 'objectTab'+this._uid,
-            detailsTab: 'detailsTab'+this._uid,
-            storageTab: 'storageTab'+this._uid,
-            disposalTab: 'disposalTab'+this._uid,
+            relatedItemsTab: 'relatedItemsTab'+uuid(),
+            newTab: 'newTab'+uuid(),
+            existingTab: 'existingTab'+uuid(),
+            objectTab: 'objectTab'+uuid(),
+            detailsTab: 'detailsTab'+uuid(),
+            storageTab: 'storageTab'+uuid(),
+            disposalTab: 'disposalTab'+uuid(),
             tabSelected: 'objectTab',
             isModalOpen: false,
             processingDetails: false,
@@ -456,12 +459,6 @@ export default {
                     this.setStatementId(null);
                 }
                 this.setStatementVisibility();
-                /*
-                if (this.statementVisibilityArray.includes(this.artifactType)) {
-                    console.log("statementVisibility true")
-                    this.statementVisibility = true;
-                }
-                */
             },
             //deep: true,
         },
@@ -769,11 +766,6 @@ export default {
             return visibility;
         },
     },
-    filters: {
-      formatDate: function(data) {
-          return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-      }
-    },
     methods: {
         ...mapActions('physicalArtifactStore', {
             savePhysicalArtifact: 'savePhysicalArtifact',
@@ -846,7 +838,7 @@ export default {
                 "legal_case_id": this.legalCaseId
             }
             //console.log(payload);
-            await Vue.http.put(fetchUrl, payload);
+            await fetch_util.fetchUrl(fetchUrl, {method:"PUT",body:JSON.stringify(payload)});
             let physicalArtifactType = e.target.dataset.artifactType.replace(/~/g, ' ');
             let physicalArtifactIdentifier = e.target.dataset.identifier.replace(/~/g, ' ').replace('null', '');
             this.$nextTick(() => {
@@ -862,32 +854,6 @@ export default {
         },
         addEventListeners: function() {
             let vm = this;
-            let el_fr_date = $(vm.$refs.artifactDatePicker);
-            let el_fr_time = $(vm.$refs.artifactTimePicker);
-
-            // "From" field
-            el_fr_date.datetimepicker({
-            format: "DD/MM/YYYY",
-            maxDate: "now",
-            showClear: true
-            });
-            el_fr_date.on("dp.change", function(e) {
-                //console.log(e)
-                if (el_fr_date.data("DateTimePicker").date()) {
-                  vm.physical_artifact.artifact_date = e.date.format("DD/MM/YYYY");
-                } else if (el_fr_date.data("date") === "") {
-                  vm.physical_artifact.artifact_date = "";
-                }
-            });
-            el_fr_time.datetimepicker({ format: "LT", showClear: true });
-            el_fr_time.on("dp.change", function(e) {
-                //console.log(e)
-                if (el_fr_time.data("DateTimePicker").date()) {
-                  vm.physical_artifact.artifact_time = e.date.format("LT");
-                } else if (el_fr_time.data("date") === "") {
-                  vm.physical_artifact.artifact_time = "";
-                }
-            });
             // department_users
             $(vm.$refs.physical_artifact_officers).select2({
                     minimumInputLength: 2,
@@ -955,23 +921,6 @@ export default {
                 (e) => {
                     this.emitPhysicalArtifact(e);
                 });
-
-            //Disposal Date
-            let disposal_date_control = $(vm.$refs.disposalDatePicker);
-            // "From" field
-            disposal_date_control.datetimepicker({
-            format: "DD/MM/YYYY",
-            maxDate: "now",
-            showClear: true
-            });
-            disposal_date_control.on("dp.change", function(e) {
-                //console.log(e)
-                if (disposal_date_control.data("DateTimePicker").date()) {
-                  vm.physical_artifact.disposal_date = e.date.format("DD/MM/YYYY");
-                } else if (disposal_date_control.data("date") === "") {
-                  vm.physical_artifact.disposal_date = "";
-                }
-            });
         },
         compare: function(a, b) {
             const nameA = a.name.toLowerCase();
@@ -1014,15 +963,9 @@ export default {
           this.addEventListeners();
       });
     },
-    beforeDestroy: async function() {
-        //console.log("beforeDestroy")
+    beforeUnmount: async function() {
         await this.setPhysicalArtifact({});
     },
-    /*
-    destroyed: function() {
-        console.log("destroyed")
-    },
-    */
     created: async function() {
         console.log("created")
         if (this.$route.params.physical_artifact_id) {

@@ -1,23 +1,39 @@
 <template lang="html">
     <div class="container">
         <div class="row">
-            <div class="col-md-5">
-                <h3>Remediation Action: {{ remediation_action.remediation_action_id }}</h3>
-            </div>
-        </div>
-        <div>
-            <div class="col-md-3">
+            <h3>Remediation Action: {{ remediation_action.remediation_action_id }}</h3>
+            <div class="col-md-4">
             </div>
 
-            <div class="col-md-9" id="main-column">
+            <div class="col-md-8"> 
                 <div class="row">
                     <div class="container-fluid">
-                        <ul class="nav nav-pills aho2">
-                            <li class="nav-item active"><a data-toggle="tab" :href="'#'+reTab">Remediation Action</a></li>
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+coTab">Confirmation</a></li>
+                        <ul id="pills-tab" class="nav nav-pills mb-3" role="tablist">
+                            <li class="nav-item">
+                                <a 
+                                    class="nav-link active"
+                                    data-bs-toggle="pill"
+                                    role="tab"
+                                    :href="'#'+reTab">
+                                    Remediation Action
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a 
+                                    class="nav-link"
+                                    data-bs-toggle="pill"
+                                    role="tab"
+                                    :href="'#'+coTab">
+                                    Confirmation
+                                </a>
+                            </li>
                         </ul>
-                        <div class="tab-content">
-                            <div :id="reTab" class="tab-pane fade in active">
+                        <div id="pills-tabContent" class="tab-content">
+                            <div 
+                                :id="reTab" 
+                                class="tab-pane fade in active show"
+                                role="tabpanel"
+                            >
                                 <FormSection :formCollapse="false" label="Remediation Action" Index="1">
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-4">
@@ -60,7 +76,11 @@
                                 </FormSection>
                             </div>
 
-                            <div :id="coTab" class="tab-pane fade in">
+                            <div 
+                                :id="coTab" 
+                                class="tab-pane fade in"
+                                role="tabpanel"
+                            >
                                 <FormSection :formCollapse="false" label="Confirmation" Index="2">
 
                                 </FormSection>
@@ -87,6 +107,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 //import datatable from '@vue-utils/datatable.vue'
@@ -95,15 +116,15 @@ import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 //import CommsLogs from "@common-components/comms_logs.vue";
 import filefield from '@/components/common/compliance_file.vue';
-import 'bootstrap/dist/css/bootstrap.css';
+
 
 export default {
     name: 'RemediationAction',
     data() {
 
         return {
-            reTab: 'reTab' + this._uid,
-            coTab: 'coTab' + this._uid,
+            reTab: 'reTab' + uuid(),
+            coTab: 'coTab' + uuid(),
         }
     },
     components: {
@@ -147,7 +168,7 @@ export default {
         saveExit: async function() {
             try {
                 await this.saveRemediationAction();
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
                 this.$router.push({ name: 'external-sanction-outcome-dash' });
             } catch (err) {
                 this.processError(err);
@@ -156,7 +177,7 @@ export default {
         save: async function() {
             try {
                 await this.saveRemediationAction();
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
             } catch (err) {
                 this.processError(err);
             }
@@ -189,7 +210,7 @@ export default {
                     }
                 }
             }
-            await swal("Error", errorText, "error");
+            await swal.fire("Error", errorText, "error");
         },
     }
 }

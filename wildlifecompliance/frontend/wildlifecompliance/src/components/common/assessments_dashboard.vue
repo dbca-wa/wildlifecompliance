@@ -1,15 +1,12 @@
 <template id="assessment_dashboard">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Applications referred to me
-                        <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                            <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-body collapse in" :id="pBody">
+            <FormSection
+                :form-collapse="false"
+                label="Applications referred to me"
+                index="assessments"
+            >
+                <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -43,19 +40,19 @@
                         <div class="col-md-3">
                             <label for="">Lodged From</label>
                             <div class="input-group date" ref="applicationDateFromPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedFrom">
-                                <span class="input-group-addon">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedFrom">
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>
                         <div class="col-md-3">
                             <label for="">Lodged To</label>
                             <div class="input-group date" ref="applicationDateToPicker">
-                                <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedTo">
-                                <span class="input-group-addon">
+                                <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedTo">
+                                <!--<span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span>-->
                             </div>
                         </div>                   
                     </div>
@@ -66,32 +63,34 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </FormSection>
         </div>
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import {
     api_endpoints,
     helpers
 }from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'AssessmentTableDash',
     data() {
         let vm = this;
         return {
-            pBody: 'pBody' + vm._uid,
-            datatable_id: 'assessment-datatable-'+vm._uid,
+            pBody: 'pBody' + uuid(),
+            datatable_id: 'assessment-datatable-'+uuid(),
             // Filters for Applications
             filterApplicationLicenceType: 'All',
             filterApplicationStatus: 'All',
             filterApplicationLodgedFrom: '',
             filterApplicationLodgedTo: '',
             filterApplicationSubmitter: 'All',
-            dateFormat: 'DD/MM/YYYY',
+            dateFormat: 'YYYY-MM-DD',
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -109,7 +108,7 @@ export default {
                 order: [
                     [0, 'desc']
                 ],
-                tableID: 'assessment-datatable-'+vm._uid,
+                tableID: 'assessment-datatable-'+uuid(),
                 language: {
                     processing: "<i class='fa fa-4x fa-spinner fa-spin'></i>"
                 },
@@ -122,8 +121,8 @@ export default {
                         d.category_name = vm.filterApplicationLicenceType;
                         d.status = vm.filterApplicationStatus.id;
                         d.submitter = vm.filterApplicationSubmitter;
-                        d.date_from = vm.filterApplicationLodgedFrom != '' && vm.filterApplicationLodgedFrom != null ? moment(vm.filterApplicationLodgedFrom, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
-                        d.date_to = vm.filterApplicationLodgedTo != '' && vm.filterApplicationLodgedTo != null ? moment(vm.filterApplicationLodgedTo, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                        d.date_from = vm.filterApplicationLodgedFrom != '' && vm.filterApplicationLodgedFrom != null ? moment(vm.filterApplicationLodgedFrom, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
+                        d.date_to = vm.filterApplicationLodgedTo != '' && vm.filterApplicationLodgedTo != null ? moment(vm.filterApplicationLodgedTo, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
                     }
                 },
                 columns: [
@@ -238,7 +237,8 @@ export default {
         }
     },
     components:{
-        datatable
+        datatable,
+        FormSection
     },
     watch:{
         filterApplicationActivity: function() {
@@ -268,30 +268,6 @@ export default {
     computed: {
     },
     methods:{
-        addEventListeners: function(){
-            let vm = this;
-            // Initialise Application Date Filters
-            $(vm.$refs.applicationDateToPicker).datetimepicker(vm.datepickerOptions);
-            $(vm.$refs.applicationDateToPicker).on('dp.change', function(e){
-                if ($(vm.$refs.applicationDateToPicker).data('DateTimePicker').date()) {
-                    vm.filterApplicationLodgedTo =  e.date.format('DD/MM/YYYY');
-                }
-                else if ($(vm.$refs.applicationDateToPicker).data('date') === "") {
-                    vm.filterapplicationodgedTo = "";
-                }
-             });
-            $(vm.$refs.applicationDateFromPicker).datetimepicker(vm.datepickerOptions);
-            $(vm.$refs.applicationDateFromPicker).on('dp.change',function (e) {
-                if ($(vm.$refs.applicationDateFromPicker).data('DateTimePicker').date()) {
-                    vm.filterApplicationLodgedFrom = e.date.format('DD/MM/YYYY');
-                    $(vm.$refs.applicationDateToPicker).data("DateTimePicker").minDate(e.date);
-                }
-                else if ($(vm.$refs.applicationDateFromPicker).data('date') === "") {
-                    vm.filterApplicationLodgedFrom = "";
-                    $(vm.$refs.applicationDateToPicker).data("DateTimePicker").minDate(false);
-                }
-            });
-        },
         initialiseSearch:function(){
             this.submitterSearch();
             this.dateSearch();
@@ -363,11 +339,8 @@ export default {
             }, 100 );
         });
         this.$nextTick(() => {
-            vm.addEventListeners();
             vm.initialiseSearch();
         });
     }
 }
 </script>
-<style scoped>
-</style>

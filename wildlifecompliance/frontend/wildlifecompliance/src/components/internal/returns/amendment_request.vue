@@ -4,7 +4,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="amendForm">
-                        <alert :show.sync="showError" type="danger"><strong>{{errorString}}</strong></alert>
+                        <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                         <div class="col-sm-12">
                             <div class="row">
                                 <label class="control-label">Request Amendment for the Return</label>
@@ -40,7 +40,7 @@
 import Vue from 'vue'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import {helpers, api_endpoints} from "@/utils/hooks.js"
+import {helpers, api_endpoints, fetch_util} from "@/utils/hooks.js"
 import { mapActions, mapGetters } from 'vuex'
 export default {
     name:'amendment-request',
@@ -127,10 +127,10 @@ export default {
         },
         fetchAmendmentChoices: function(){
             let vm = this;
-            vm.$http.get('/api/return_amendment_request_reason_choices.json').then((response) => {
-                vm.reason_choices = response.body;
+            let request = fetch_util.fetchUrl('/api/return_amendment_request_reason_choices.json').then((response) => {
+                vm.reason_choices = response;
 
-            },(error) => {
+            }).catch((error) => {
                 console.log(error);
             } );
         },
@@ -140,13 +140,14 @@ export default {
             self.amendment.a_return = this.returns
             let amendment = JSON.parse(JSON.stringify(self.amendment));
 
-            self.$http.post('/api/returns_amendment.json',JSON.stringify(amendment),{
+            let request = fetch_util.fetchUrl('/api/returns_amendment.json',{method:'POST', body:JSON.stringify(amendment)},{
                         emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                         let species_id = this.returns.sheet_species;
-                        this.setReturns(response.body);
+                        this.setReturns(response);
                         this.returns.sheet_species = species_id;
-                        swal(
+                        swal.fire(
                              'Sent',
                              'An email has been sent to the Licensee with the request to amend this Return.',
                              'success'

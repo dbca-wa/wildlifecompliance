@@ -23,19 +23,19 @@
                 <div class="col-md-3">
                     <label class="">Date from:</label>
                     <div class="input-group date" ref="issueDateFromPicker">
-                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFromPicker" />
-                        <span class="input-group-addon">
+                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateFromPicker" />
+                        <!--<span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
+                        </span>-->
                     </div>
                 </div>
                 <div class="col-md-3">
                     <label class="">Date to:</label>
                     <div class="input-group date" ref="issueDateToPicker">
-                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateToPicker" />
-                        <span class="input-group-addon">
+                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterDateToPicker" />
+                        <!--<span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
+                        </span>-->
                     </div>
                 </div>
                 <div class="col-md-3 pull-right">
@@ -67,7 +67,7 @@ import $ from 'jquery'
 import datatable from '@vue-utils/datatable.vue'
 //import FormSection from "@/components/compliance_forms/section.vue";
 import FormSection from "@/components/forms/section_toggle.vue";
-import { api_endpoints, helpers, cache_helper } from '@/utils/hooks'
+import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
 import OffenceModal from "./offence_modal.vue";
 import MapLocations from "./offence_locations.vue";
 
@@ -125,7 +125,7 @@ export default {
                         searchable: true,
                         orderable: true,
                         mRender: function (data, type, full) {
-                            return data != '' && data != null ? moment(data).format('DD/MM/YYYY') : '';
+                            return data != '' && data != null ? moment(data).format('YYYY-MM-DD') : '';
                         }
                     },
                     {
@@ -224,12 +224,6 @@ export default {
             this.$refs.offence_table.vmDataTable.draw();
         },
     },
-    mounted(){
-        let vm = this;
-        vm.$nextTick(() => {
-            vm.addEventListeners();
-        });
-    },
     created: async function() {
         this.constructOptionsType();
         this.constructOptionsStatus();
@@ -238,60 +232,14 @@ export default {
     methods: {
         getUserCanCreate: async function() {
             let url = helpers.add_endpoint_join(api_endpoints.offence, 'can_user_create/');
-            let res = await Vue.http.get(url);
-            this.canUserCreateNewOffence = res.body;
+            let res = await fetch_util.fetchUrl(url);
+            this.canUserCreateNewOffence = res;
         },
         createOffence: function() {
-//            this.setCreateOffenceBindId()
-//            this.offenceInitialised = true;
-//            this.$nextTick(() => {
-//                this.$refs.add_offence.isModalOpen = true;
-//            });
-
             this.uuid += 1;
             this.offenceInitialised = true;
             this.$nextTick(() => {
                 this.$refs.add_offence.isModalOpen = true;
-            });
-        },
-      //  setCreateOffenceBindId: function() {
-      //      let timeNow = Date.now()
-      //      this.createOffenceBindId = 'inspection' + timeNow.toString();
-
-      //      console.log('setCreateOffenceBindId');
-      //      console.log(this.createOffenceBindId);
-      //  },
-        addEventListeners: function () {
-            this.attachFromDatePicker();
-            this.attachToDatePicker();
-        },
-        attachFromDatePicker: function(){
-            let vm = this;
-            let el_fr = $(vm.$refs.issueDateFromPicker);
-            let el_to = $(vm.$refs.issueDateToPicker);
-
-            el_fr.datetimepicker({ format: 'DD/MM/YYYY', maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_fr.on('dp.change', function (e) {
-                if (el_fr.data('DateTimePicker').date()) {
-                    vm.filterDateFromPicker = e.date.format('DD/MM/YYYY');
-                    el_to.data('DateTimePicker').minDate(e.date);
-                } else if (el_fr.data('date') === "") {
-                    vm.filterDateFromPicker = "";
-                }
-            });
-        },
-        attachToDatePicker: function(){
-            let vm = this;
-            let el_fr = $(vm.$refs.issueDateFromPicker);
-            let el_to = $(vm.$refs.issueDateToPicker);
-            el_to.datetimepicker({ format: 'DD/MM/YYYY', maxDate: moment().millisecond(0).second(0).minute(0).hour(0), showClear: true });
-            el_to.on('dp.change', function (e) {
-                if (el_to.data('DateTimePicker').date()) {
-                    vm.filterDateToPicker = e.date.format('DD/MM/YYYY');
-                    el_fr.data('DateTimePicker').maxDate(e.date);
-                } else if (el_to.data('date') === "") {
-                    vm.filterDateToPicker = "";
-                }
             });
         },
         constructOptionsType: async function() {

@@ -1,50 +1,6 @@
 <template>
     <div id="legalCasePersonOrgDash">
-        <FormSection :label="`Case`" :Index="`0`">
-
-        <!--div class="row">
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label for="">Status</label>
-                    <select class="form-control" v-model="filterStatus">
-                        <option v-for="option in statusChoices" :value="option.display" v-bind:key="option.id">
-                            {{ option.display }}
-                        </option>
-                    </select>
-                </div>
-            </div>
-
-        </div>
-        <div class="row">
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label for="">Planned From</label>
-                    <div class="input-group date" ref="caseCreatedDateFromPicker">
-                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterCaseCreatedFrom">
-                        <span class="input-group-addon">
-                            <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label for="">Planned To</label>
-                    <div class="input-group date" ref="caseCreatedDateToPicker">
-                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterCaseCreatedTo">
-                        <span class="input-group-addon">
-                            <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 pull-right">
-                <button @click.prevent="createLegalCase"
-                    class="btn btn-primary pull-right">New Case</button>
-            </div>    
-        </div-->
-            
-
+        <FormSection :label="`Case`" :Index="`0`">            
         <div class="row">
             <div class="col-lg-12">
                 <datatable ref="legal_case_table" id="legal-case-table" :dtOptions="dtOptions" :dtHeaders="dtHeaders" />
@@ -78,11 +34,11 @@
                 statusChoices: [],
                 //inspectionTypes: [],
                 
-                dateFormat: 'DD/MM/YYYY',
+                dateFormat: 'YYYY-MM-DD',
                 legalCaseInitialised: false,
                 createLegalCaseBindId: '',
                 // datepickerOptions: {
-                //     format: 'DD/MM/YYYY',
+                //     format: 'YYYY-MM-DD',
                 //     showClear: true,
                 //     useCurrent: false,
                 //     keepInvalid: true,
@@ -115,8 +71,8 @@
                             d.entity_type = vm.entity_type;
                             /*
                             d.status_description = vm.filterStatus;
-                            d.date_from = vm.filterPlannedFrom != '' && vm.filterPlannedFrom != null ? moment(vm.filterPlannedFrom, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
-                            d.date_to = vm.filterPlannedTo != '' && vm.filterPlannedTo != null ? moment(vm.filterPlannedTo, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                            d.date_from = vm.filterPlannedFrom != '' && vm.filterPlannedFrom != null ? moment(vm.filterPlannedFrom, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
+                            d.date_to = vm.filterPlannedTo != '' && vm.filterPlannedTo != null ? moment(vm.filterPlannedTo, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
                             */
                         }
                     },
@@ -246,26 +202,6 @@
                     params: { legal_case_id: newLegalCaseId}
                     });
             },
-            addEventListeners: function () {
-                let vm = this;
-                // Initialise Planned Date Filters
-                $(vm.$refs.caseCreatedDateToPicker).datetimepicker(vm.datepickerOptions);
-                $(vm.$refs.caseCreatedDateToPicker).on('dp.change', function (e) {
-                    if ($(vm.$refs.caseCreatedDateToPicker).data('DateTimePicker').date()) {
-                        vm.filterCaseCreatedTo = e.date.format('DD/MM/YYYY');
-                    } else if ($(vm.$refs.plannedDateToPicker).data('date') === "") {
-                        vm.filterCaseCreatedTo = "";
-                    }
-                });
-                $(vm.$refs.caseCreatedDateFromPicker).datetimepicker(vm.datepickerOptions);
-                $(vm.$refs.caseCreatedDateFromPicker).on('dp.change', function (e) {
-                    if ($(vm.$refs.caseCreatedDateFromPicker).data('DateTimePicker').date()) {
-                        vm.filterCaseCreatedFrom = e.date.format('DD/MM/YYYY');
-                    } else if ($(vm.$refs.caseCreatedDateFromPicker).data('date') === "") {
-                        vm.filterCaseCreatedFrom = "";
-                    }
-                });
-            },
             initialiseSearch: function () {
                 this.dateSearch();
             },
@@ -312,7 +248,6 @@
             });
             this.$nextTick(async () => {
                 await vm.initialiseSearch();
-                await vm.addEventListeners();
             });
         }
     }

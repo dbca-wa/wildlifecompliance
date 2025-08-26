@@ -6,8 +6,6 @@
                 <HelpText :help_text="help_text" />
             </template>
 
-            
-
             <CommentBlock 
                 :label="label"
                 :name="name"
@@ -28,12 +26,13 @@
                 </div>
                 <span v-if="show_spinner"><i class='fa fa-2x fa-spinner fa-spin'></i></span>
             </div>
-            <div v-if="!readonly" v-for="n in repeat">
-                <div v-if="isRepeatable || (!isRepeatable && num_documents()==0)">
-                    <input :name="name" type="file" class="form-control" :data-que="n" :accept="fileTypes" @change="handleChange" :required="isRequired"/>
+            <div v-if="!readonly">
+                <div v-for="n in repeat">
+                    <div v-if="isRepeatable || (!isRepeatable && num_documents()==0)">
+                        <input :name="name" type="file" class="form-control" :data-que="n" :accept="fileTypes" @change="handleChange" :required="isRequired"/>
+                    </div>
                 </div>
             </div>
-
         </div>
     </div>
 </template>
@@ -41,7 +40,8 @@
 <script>
 import {
   api_endpoints,
-  helpers
+  helpers,
+  fetch_util
 }
 from '@/utils/hooks';
 import CommentBlock from './comment_block.vue';
@@ -167,12 +167,11 @@ export default {
             formData.append('action', 'list');
             formData.append('input_name', vm.name);
             formData.append('csrfmiddlewaretoken', vm.csrf_token);
-            vm.$http.post(vm.application_document_action, formData)
-                .then(res=>{
-                    vm.documents = res.body;
-                    //console.log(vm.documents);
-                    vm.show_spinner = false;
-                });
+            let request = fetch_util.fetchUrl(vm.application_document_action, {method:'POST', body:formData})
+            request.then(res=>{
+                vm.documents = res;
+                vm.show_spinner = false;
+            });
 
         },
 
@@ -185,13 +184,11 @@ export default {
             formData.append('document_id', file.id);
             formData.append('csrfmiddlewaretoken', vm.csrf_token);
 
-            vm.$http.post(vm.application_document_action, formData)
-                .then(res=>{
-                    vm.documents = vm.get_documents()
-                    //vm.documents = res.body;
-                    vm.show_spinner = false;
-                });
-
+            let request = fetch_util.fetchUrl(vm.application_document_action, {method:'POST', body:formData})
+            request.then(res=>{
+                vm.documents = vm.get_documents()
+                vm.show_spinner = false;
+            });
         },
         
         uploadFile(e){
@@ -220,11 +217,10 @@ export default {
             formData.append('_file', vm.uploadFile(e));
             formData.append('csrfmiddlewaretoken', vm.csrf_token);
 
-            vm.$http.post(vm.application_document_action, formData)
-                .then(res=>{
-                    vm.documents = res.body;
-                },err=>{
-                });
+            let request = fetch_util.fetchUrl(vm.application_document_action, {method:'POST', body:formData})
+            request.then(res=>{
+                vm.documents = res;
+            });
 
         },
 

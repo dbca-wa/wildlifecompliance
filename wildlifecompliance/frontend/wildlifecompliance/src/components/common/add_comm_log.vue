@@ -4,7 +4,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="commsForm">
-                        <alert :show.sync="showError" type="danger"><strong>{{errorString}}</strong></alert>
+                        <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <div class="row">
@@ -73,7 +73,7 @@
                                             <div :class="'row top-buffer file-row-'+i">
                                                 <div class="col-sm-4">
                                                     <span v-if="f.file == null" class="btn btn-info btn-file pull-left">
-                                                        Atttach File <input type="file" :name="'file-upload-'+i" :class="'file-upload-'+i" @change="uploadFile('file-upload-'+i,f)"/>
+                                                        Attach File <input type="file" :name="'file-upload-'+i" :class="'file-upload-'+i" @change="uploadFile('file-upload-'+i,f)"/>
                                                     </span>
                                                     <span v-else class="btn btn-info btn-file pull-left">
                                                         Update File <input type="file" :name="'file-upload-'+i" :class="'file-upload-'+i" @change="uploadFile('file-upload-'+i,f)"/>
@@ -105,10 +105,9 @@
 </template>
 
 <script>
-//import $ from 'jquery'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import {helpers,api_endpoints} from "@/utils/hooks.js"
+import {helpers,fetch_util} from "@/utils/hooks.js"
 export default {
     name:'Add-Comms',
     components:{
@@ -135,7 +134,7 @@ export default {
             successString: '',
             success:false,
             datepickerOptions:{
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
@@ -217,17 +216,15 @@ export default {
             vm.errors = false;
             let comms = new FormData(vm.form); 
             vm.addingComms = true;
-            vm.$http.post(vm.url,comms,{
-                }).then((response)=>{
+            let request = fetch_util.fetchUrl(vm.url,{method:'POST', body:JSON.stringify(comms)},{})
+            request.then((response)=>{
                     vm.addingComms = false;
                     vm.close();
-                    //vm.$emit('refreshFromResponse',response);
                 },(error)=>{
                     vm.errors = true;
                     vm.addingComms = false;
                     vm.errorString = helpers.apiVueResourceError(error);
                 });
-            
         },
         addFormValidations: function() {
             let vm = this;

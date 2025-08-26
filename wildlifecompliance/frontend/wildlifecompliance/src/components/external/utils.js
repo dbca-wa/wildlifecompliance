@@ -1,104 +1,104 @@
 import Vue from 'vue'
 import api from './api'
-import {api_endpoints, helpers} from '@/utils/hooks' 
+import {api_endpoints, helpers, fetch_util} from '@/utils/hooks' 
 
 export default {
     fetchCurrentUser: function (){
         return new Promise ((resolve,reject) => {
-            Vue.http.get(api.my_user_details).then((response) => {
-                resolve(response.body);
-            },
-            (error) => {
+            let request = fetch_util.fetchUrl(api.my_user_details)
+            request.then((response) => {
+                resolve(response);
+            }).catch((error) => {
                 reject(error);
             });
         });
     },
     fetchApplication: function(id){
         return new Promise ((resolve,reject) => {
-            Vue.http.get(helpers.add_endpoint_json(api.applications,id)).then((response) => {
-                resolve(response.body);
-            },
-            (error) => {
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.applications,id))
+            request.then((response) => {
+                resolve(response);
+            }).catch((error) => {
                 reject(error);
             });
         });
     },
     fetchCountries: function (){
         return new Promise ((resolve,reject) => {
-            Vue.http.get(api.countries).then((response) => {
-                resolve(response.body);
-            },
-            (error) => {
+            let request = fetch_util.fetchUrl(api.countries)
+            request.then((response) => {
+                resolve(response);
+            }).catch((error) => {
                 reject(error);
             });
         });
     },
     fetchOrganisations: function(id){
         return new Promise ((resolve,reject) => {
-            Vue.http.get(api.organisations).then((response) => {
-                resolve(response.body);
-            },
-            (error) => {
+            let request = fetch_util.fetchUrl(api.organisations)
+            request.then((response) => {
+                resolve(response);
+            }).catch((error) => {
                 reject(error);
             });
         });
     },
     fetchOrganisationPermissions: function(id){
         return new Promise ((resolve,reject) => {
-            Vue.http.get(helpers.add_endpoint_json(api.my_organisations,id)).then((response) => {
-                resolve(response.body);
-            },
-            (error) => {
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.my_organisations,id))
+            request.then((response) => {
+                resolve(response);
+            }).catch((error) => {
                 reject(error);
             });
         });
     },
     fetchLicenceClasses: function(){
         return new Promise ((resolve,reject) => {
-            Vue.http.get(api.licences_class).then((response) => {
-                resolve(response.body);
-            },
-            (error) => {
+            let request = fetch_util.fetchUrl(api.licences_class)
+            request.then((response) => {
+                resolve(response);
+            }).catch((error) => {
                 reject(error);
             });
         });
     },
     fetchLicenceAvailablePurposes: function(params){
         return new Promise ((resolve,reject) => {
-            Vue.http.get(api.licence_available_purposes, {"params": params}).then((response) => {
-                resolve(response.body);
-            },
-            (error) => {
+            let request = fetch_util.fetchUrl(api.licence_available_purposes, {"params": params})
+            request.then((response) => {
+                resolve(response);
+            }).catch((error) => {
                 reject(error);
             });
         });
     },
     fetchOrganisationId: function(org_id) {
         return new Promise ((resolve,reject) => {
-            Vue.http.get(api_endpoints.get_organisation_id(org_id)).then((response) => {
-                resolve(response.body);
-            },
-            (error) => {
+            let request = fetch_util.fetchUrl(api_endpoints.get_organisation_id(org_id))
+            request.then((response) => {
+                resolve(response);
+            }).catch((error) => {
                 reject(error);
             });
         });
     },
     fetchOrganisation: function(id){
         return new Promise ((resolve,reject) => {
-            Vue.http.get(helpers.add_endpoint_json(api.organisations,id)).then((response) => {
-                resolve(response.body);
-            },
-            (error) => {
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api.organisations,id))
+            request.then((response) => {
+                resolve(response);
+            }).catch((error) => {
                 reject(error);
             });
         });
     },
     fetchCurrentActiveLicenceApplication: function(params){
         return new Promise ((resolve,reject) => {
-            Vue.http.get(`${api.applications}active_licence_application`, {"params": params}).then((response) => {
-                resolve(response.body);
-            },
-            (error) => {
+            let request = fetch_util.fetchUrl(`${api.applications}active_licence_application`, {"params": params})
+            request.then((response) => {
+                resolve(response);
+            }).catch((error) => {
                 reject(error);
             });
         });

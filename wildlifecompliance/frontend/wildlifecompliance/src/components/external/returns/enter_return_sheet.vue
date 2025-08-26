@@ -1,13 +1,9 @@
 <template>
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">{{ sheetTitle }}
-            <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
-                <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-            </a>
-        </h3>
-    </div>
-    <div class="panel-body panel-collapse in" :id="pdBody">
+<FormSection
+    :form-collapse="false"
+    :label=sheetTitle
+>
+  <div class="panel panel-default">
         <div class="col-sm-12">
             <div class="row">
                 <div class="col-md-6">
@@ -56,10 +52,11 @@
         </div>
     </div>
     <SheetEntry ref="sheet_entry"></SheetEntry>
-</div>
+</FormSection>
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import utils from '@/components/external/utils'
 import $ from 'jquery'
@@ -74,6 +71,7 @@ import {
 }
 from '@/utils/hooks'
 import '@/scss/forms/return_sheet.scss';
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
   name: 'externalReturnSheet',
   props: {
@@ -85,7 +83,7 @@ export default {
   data() {
     var vm = this; // keep and use created ViewModel context with table.
     return {
-        pdBody: 'pdBody' + vm._uid,
+        pdBody: 'pdBody' + uuid(),
         datatable_id: 'return-datatable',
         form: null,
         filterActivityType: 'All',
@@ -200,18 +198,12 @@ export default {
         }
     }
   },
-  components:{
+  components: {
+    FormSection,
     SheetEntry,
     datatable,
     Returns,
   },
-  // watch:{
-  //   filterActivityType: function(value){
-  //     let table = this.$refs.return_datatable.vmDataTable
-  //     value = value != 'All' ? value : ''
-  //     table.column(2).search(value).draw();
-  //   },
-  // },
   computed: {
      ...mapGetters([
         'isReturnsLoaded',
@@ -239,7 +231,7 @@ export default {
     },
     addSheetRow: function () {
       if (document.getElementById("species_selector").value === '' || null) {
-        swal(
+        swal.fire(
           'Select Specie',
           'Please select a specie before adding a new entry.',
           'error'

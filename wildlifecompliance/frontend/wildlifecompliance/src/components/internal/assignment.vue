@@ -25,7 +25,7 @@
 </template>
 <script>
 import Vue from "vue";
-import { api_endpoints, helpers } from "@/utils/hooks";
+import { api_endpoints, helpers, fetch_util } from "@/utils/hooks";
 export default {
     name: 'Assignment',
     props: {
@@ -53,7 +53,7 @@ export default {
     data: function() {
         let vm = this;
         return {
-            allowed_groups: [],//this.getAllocatedGroup(this.allowed_group_ids),
+            allowed_groups: [],
             assign_to_id: null,
         }         
     },
@@ -72,33 +72,37 @@ export default {
             } else {
                 payload = { 'assigned_to_id': this.assign_to_id };
             }
-            let res = await Vue.http.post(
+            let res = await fetch_util.fetchUrl(
                 url,
-                payload
+                {method:'POST', body:JSON.stringify(payload)}
             );
-            this.$emit('update-assigned-to-id', res.body);
+            this.$emit('update-assigned-to-id', res);
         },
         getAllocatedGroup: async function(id_list) {
             if (this.allowed_groups == null) {
-            Vue.set(this, 'allowed_groups', []);
+                this.allowed_groups = [];
             }
-            let allocatedGroupResponse = await Vue.http.post(
-            api_endpoints.allocated_group_members,
-            {
-                'id_list': id_list,
-            });
+            let allocatedGroupResponse = await fetch_util.fetchUrl(
+                api_endpoints.allocated_group_members,
+                {
+                    method:'POST',body:JSON.stringify({'id_list': id_list}),
+                }
+            );
             if (allocatedGroupResponse.ok) {
-                Vue.set(this, 'allowed_groups', allocatedGroupResponse.body);
+                this.allowed_groups = allocatedGroupresponse;
             } 
         },        
     },
     watch: 
     {
-        allowed_group_ids(after,before) {
-            if (before === undefined && after !== undefined) {
-                this.getAllocatedGroup(this.allowed_group_ids);
-                this.assign_to_id = this.assigned_to_id; 
-            }
+        allowed_group_ids: {
+            handler: function (after,before) {
+                if (before === undefined && after !== undefined) {
+                    this.getAllocatedGroup(this.allowed_group_ids);
+                    this.assign_to_id = this.assigned_to_id; 
+                }
+            },
+            deep: true,
         }
     },
     mounted: function() {

@@ -10,7 +10,7 @@
 
 export default {
     props: {
-        formatted_text: {
+        formatted_text_prop: {
             type: String,
             default: ""
         },
@@ -36,6 +36,11 @@ export default {
             summernote_display: null,
         }
     },
+    computed: {
+        formatted_text: function() {
+            return this.formatted_text_prop;
+        }
+    },
     watch: {
         formatted_text: {
             handler(val){
@@ -51,21 +56,20 @@ export default {
     },
     methods: {
         setText: function (text) {
-            this.$summernoterElement.summernote('code', text);
+            this.$summernoteElement.summernote('code', text);
         },
         updateFormatedText: function (_, contents) {
             if (this.pushed > 0) {
                     this.pushed--;
                 } else {
                     this.changed++;
-                    //this.formatted_text = contents;
                     this.$emit('update-formatted-text', {"formatted_text":contents, "purpose_index":this.purpose_index, "activity_index":this.activity_index, "species_index":this.species_index})
                 }
         }
     },
     mounted: function() {
         let config = {};
-        this.$summernoterElement = $(this.$el).find('.summernote-div').first();
+        this.$summernoteElement = $(this.$el).find('.summernote-div').first();
         config.minHeight = null;
         config.maxHeight = null;
         config.toolbar =  [
@@ -75,11 +79,11 @@ export default {
                 ['table', ['table']],
             ]; 
         // init the editor
-        this.$summernoterElement.summernote(config);
+        this.$summernoteElement.summernote(config);
         // set formatted_text
-        this.$summernoterElement.summernote('code', this.formatted_text);
+        this.$summernoteElement.summernote('code', this.formatted_text);
         // set callback to pass event back to parent 
-        this.$summernoterElement.on('summernote.change', this.updateFormatedText);
+        this.$summernoteElement.on('summernote.change', this.updateFormatedText);
     }
 }
 </script>

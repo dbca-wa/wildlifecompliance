@@ -11,6 +11,13 @@ module.exports = defineConfig({
     publicPath: '/static/wildlifecompliance_vue/',
     filenameHashing: false,
     chainWebpack: (config) => {
+        config.resolve.alias.set("vue", "@vue/compat");
+        config.module
+            .rule("vue")
+            .use("vue-loader")
+            .tap((options) => {
+            return { ...options, compilerOptions: { compatConfig: { MODE: 2 } } };
+        });
         config.resolve.alias.set(
             '@',
             path.resolve(__dirname, 'src')
@@ -58,6 +65,9 @@ module.exports = defineConfig({
             new MomentLocalesPlugin(),
             new webpack.ProvidePlugin({
                 Buffer: ['buffer', 'Buffer'],
+            }),
+            new webpack.DefinePlugin({
+                __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
             }),
         ],
         devServer: {

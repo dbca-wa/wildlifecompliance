@@ -42,7 +42,7 @@ import "leaflet.locatecontrol";
 import Awesomplete from "awesomplete";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { guid } from "@/utils/helpers";
-import "bootstrap/dist/css/bootstrap.css";
+
 import "awesomplete/awesomplete.css";
 import "leaflet/dist/leaflet.css";
 import "leaflet-measure/dist/leaflet-measure.css";
@@ -103,15 +103,7 @@ export default {
         idSearchInput: vm.guid + "SearchInput",
         idBasemapSat: vm.guid + "BasemapSat",
         idBasemapOsm: vm.guid + "BasemapOsm"
-    };
-  },
-    computed: {
-     //   marker_lat: function() {
-     //       return this.marker_latitude;
-     //   },
-     //   marker_lng: function() {
-     //       return this.marker_longitude;
-     //   },
+      };
     },
     watch: {
         marker_latitude: function(){

@@ -2,20 +2,13 @@
 <form method="POST" name="internal_returns_form" enctype="multipart/form-data">
 <div class="container" id="internalReturn">
     <Returns v-if="isReturnsLoaded">
-        <div class="col-md-3" />
-        <div class="col-md-9">
-
-        <template>
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Condition Details
-                    <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
-                        <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                    </a>
-                </h3>
-            </div>
-            <div class="panel-body panel-collapse in" :id="pdBody">
-                <div class="col-sm-12">
+        <div class="col-md-8">
+        <FormSection
+            :form-collapse="false"
+            label="Condition Details"
+        >                
+            <div class="panel panel-default">
+                <div class="col-sm-8">
                     <form class="form-horizontal" name="return_form">
                         <div class="form-group">
                             <label for="" class="col-sm-3 control-label">Licence Activity</label>
@@ -41,8 +34,8 @@
                     </form>
                 </div>
             </div>
-        </div>
-        </template>
+        </FormSection>
+
         <ReturnSheet v-if="returns.format==='sheet'"></ReturnSheet>
         <ReturnQuestion v-if="returns.format==='question'"></ReturnQuestion>
         <ReturnData v-if="returns.format==='data'"></ReturnData>
@@ -87,6 +80,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import Returns from '../../returns_form.vue'
@@ -96,20 +90,17 @@ import ReturnData from '../../external/returns/enter_return.vue'
 import CommsLogs from '@common-components/comms_logs.vue'
 import {
   api_endpoints,
-  helpers
+  helpers,
+  fetch_util
 }
 from '@/utils/hooks'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
   name: 'internal-returns',
-  filters: {
-    formatDate: function(data){
-            return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
-    }
-  },
   data() {
     let vm = this;
     return {
-        pdBody: 'pdBody' + vm._uid,
+        pdBody: 'pdBody' + uuid(),
         panelClickersInitialised: false,
         loading: [],
         spinner: false,
@@ -129,6 +120,7 @@ export default {
     }
   },
   components: {
+    FormSection,
     Returns,
     CommsLogs,
     ReturnQuestion,
@@ -165,23 +157,24 @@ export default {
         this.form=document.forms.internal_returns_form;
         var data = new FormData(this.form);
 
-        this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/officer_comments'),data,{
+        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/officer_comments'),{method:'POST', body:JSON.stringify(data)},{
                       emulateJSON:true,
 
-        }).then((response)=>{
+        })
+        request.then((response)=>{
             this.spinner = false;
             let species_id = this.returns.sheet_species;
-            this.setReturns(response.body);
+            this.setReturns(response);
             this.returns.sheet_species = species_id;
 
-            swal( 'Save', 
+            swal.fire( 'Save', 
                 'Return Details Saved', 
                 'success' )
         
         },(error)=>{
             this.spinner = false
             console.log(error);
-            swal('Error',
+            swal.fire('Error',
                 'There was an error saving your return details.<br/>' + error.body,
                 'error'
             )
@@ -213,11 +206,12 @@ export default {
         });
         data.append('transfer', speciesJSON)
       }
-      await this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/save'),data,{
+        let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/save'),{method:'POST', body:data},{
             emulateJSON:true,
-        }).then((response)=>{
+        })
+        request.then((response)=>{
             let species_id = this.returns.sheet_species;
-            this.setReturns(response.body);
+            this.setReturns(response);
             this.returns.sheet_species = species_id;
             this.returns.species = species_id;
             this.is_saving = false
@@ -226,9 +220,9 @@ export default {
             this.disable_continue = false;
             this.spinner_exit = false;
             this.spinner_continue = false;
-            if (andContinue) { 
+        if (andContinue) { 
 
-            swal( 'Save', 
+            swal.fire( 'Save', 
                     'Return Details Saved', 
                     'success'
             )
@@ -246,7 +240,7 @@ export default {
             this.spinner_exit = false;
             this.spinner_continue = false;
             console.log(error);
-            swal('Error',
+            swal.fire('Error',
                 'There was an error saving your return details.<br/>' + error.body,
                 'error'
             )

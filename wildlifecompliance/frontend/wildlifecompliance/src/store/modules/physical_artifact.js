@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
     api_endpoints,
-    helpers
+    helpers, fetch_util
 }
 from '@/utils/hooks';
 import moment from 'moment';
@@ -18,13 +18,13 @@ export const physicalArtifactStore = {
     },
     mutations: {
         updatePhysicalArtifact(state, physical_artifact) {
-            Vue.set(state, 'physical_artifact', {
+            state.physical_artifact = {
                 ...physical_artifact
-            });
+            };
             console.log('updatePhysicalArtifact');
             // format artifact_date for vue
             if (state.physical_artifact.artifact_date) {
-                state.physical_artifact.artifact_date = moment(state.physical_artifact.artifact_date, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.physical_artifact.artifact_date = moment(state.physical_artifact.artifact_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             // format artifact time from 24 to 12 hour
             if (state.physical_artifact.artifact_time) {
@@ -34,51 +34,39 @@ export const physicalArtifactStore = {
             }
             // format disposal_date for vue
             if (state.physical_artifact.disposal_date) {
-                state.physical_artifact.disposal_date = moment(state.physical_artifact.disposal_date, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                state.physical_artifact.disposal_date = moment(state.physical_artifact.disposal_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
             }
             // default doc implemented in Artifact model/viewset
             let defaultDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.artifact,
                 state.physical_artifact.id + "/process_default_document/"
                 )
-            Vue.set(state.physical_artifact, 'defaultDocumentUrl', defaultDocumentUrl); 
+            state.physical_artifact.defaultDocumentUrl = defaultDocumentUrl; 
             // comms log doc implemented in Artifact model/viewset
             let commsLogsDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.artifact,
                 state.physical_artifact.id + "/process_comms_log_document/"
                 )
-            Vue.set(state.physical_artifact, 'commsLogsDocumentUrl', commsLogsDocumentUrl);
+            state.physical_artifact.commsLogsDocumentUrl = commsLogsDocumentUrl;
             // renderer
             let rendererDocumentUrl = helpers.add_endpoint_join(
                 api_endpoints.physical_artifact,
                 state.physical_artifact.id + "/process_renderer_document/"
                 )
-            Vue.set(state.physical_artifact, 'rendererDocumentUrl', rendererDocumentUrl);
-            /*
-            let createLegalCaseProcessCommsLogsPhysicalUrl = helpers.add_endpoint_join(
-                api_endpoints.legal_case,
-                state.legal_case.id + "/create_legal_case_process_comms_log_physical/"
-                )
-            Vue.set(state.legal_case, 'createLegalCaseProcessCommsLogsPhysicalUrl', createLegalCaseProcessCommsLogsPhysicalUrl);
-            */
+            state.physical_artifact.rendererDocumentUrl = rendererDocumentUrl;
         },
         updateRelatedItems(state, related_items) {
-            Vue.set(state.physical_artifact, 'related_items', related_items);
+            state.physical_artifact.related_items = related_items;
         },
         updateOfficerId(state, id) {
-            Vue.set(state.physical_artifact, 'officer_id', id);
+            state.physical_artifact.officer_id = id;
         },
         updateCustodianId(state, id) {
-            Vue.set(state.physical_artifact, 'custodian_id', id);
+            state.physical_artifact.custodian_id = id;
         },
-        /*
-        updateTemporaryDocumentCollectionId(state, temp_doc_id) {
-            Vue.set(state.physical_artifact, 'temporary_document_collection_id', temp_doc_id);
-        },
-        */
         updateTemporaryDocumentCollectionList(state, {temp_doc_id, input_name}) {
             if (!state.physical_artifact.temporary_document_collection_list) {
-                Vue.set(state.physical_artifact, 'temporary_document_collection_list', []);
+                state.physical_artifact.temporary_document_collection_list = [];
             }
             state.physical_artifact.temporary_document_collection_list.push(
                 {   "temp_doc_id": temp_doc_id,
@@ -88,33 +76,28 @@ export const physicalArtifactStore = {
         },
         updateStatementId(state, statement_id) {
             console.log(statement_id)
-            Vue.set(state.physical_artifact, 'statement_id', statement_id);
+            state.physical_artifact.statement_id = statement_id;
         },
         updateUsedWithinCase(state, used_within_case) {
-            Vue.set(state.physical_artifact, 'used_within_case', used_within_case);
+            state.physical_artifact.used_within_case = used_within_case;
         },
         updateSensitiveNonDisclosable(state, sensitive_non_disclosable) {
-            Vue.set(state.physical_artifact, 'sensitive_non_disclosable', sensitive_non_disclosable);
+            state.physical_artifact.sensitive_non_disclosable = sensitive_non_disclosable;
         },
-        /*
-        updatePhysicalArtifactLegalId(state, legal_case_id) {
-            Vue.set(state.physical_artifact, 'legal_case_id', legal_case_id);
-        },
-        */
     },
     actions: {
         async loadPhysicalArtifact({ dispatch, commit }, { physical_artifact_id }) {
             try {
-                const returnedPhysicalArtifact = await Vue.http.get(
+                const returnedPhysicalArtifact = await fetch_util.fetchUrl(
                     helpers.add_endpoint_json(
                         api_endpoints.physical_artifact,
                         physical_artifact_id)
                     );
 
                 console.log(returnedPhysicalArtifact)
-                commit("updatePhysicalArtifact", returnedPhysicalArtifact.body);
+                commit("updatePhysicalArtifact", returnedPhysicalArtifact);
 
-                for (let form_data_record of returnedPhysicalArtifact.body.data) {
+                for (let form_data_record of returnedPhysicalArtifact.data) {
                     await dispatch("setFormValue", {
                         key: form_data_record.field_name,
                         value: {
@@ -140,7 +123,7 @@ export const physicalArtifactStore = {
                 console.log(payload);
                 // format artifact date for backend save
                 if (payload.artifact_date) {
-                    payload.artifact_date = moment(payload.artifact_date, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.artifact_date = moment(payload.artifact_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 } else if (payload.artifact_date === '') {
                     payload.artifact_date = null;
                 }
@@ -152,7 +135,7 @@ export const physicalArtifactStore = {
                 }
                 // format disposal date for backend save
                 if (payload.disposal_date) {
-                    payload.disposal_date = moment(payload.disposal_date, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    payload.disposal_date = moment(payload.disposal_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 } else if (payload.disposal_date === '') {
                     payload.disposal_date = null;
                 }
@@ -172,17 +155,17 @@ export const physicalArtifactStore = {
                 let fetchUrl = null;
                 if (create) {
                     fetchUrl = api_endpoints.physical_artifact;
-                    savedPhysicalArtifact = await Vue.http.post(fetchUrl, payload);
+                    savedPhysicalArtifact = await fetch_util.fetchUrl(fetchUrl, {method:'POST', body:JSON.stringify(payload)});
                 } else {
                     fetchUrl = helpers.add_endpoint_join(
                         api_endpoints.physical_artifact,
                         state.physical_artifact.id + '/'
                         )
                     console.log(payload);
-                    savedPhysicalArtifact = await Vue.http.put(fetchUrl, payload);
+                    savedPhysicalArtifact = await fetch_util.fetchUrl(fetchUrl, {method:"PUT",body:JSON.stringify(payload)});
                 }
-                await dispatch("setPhysicalArtifact", savedPhysicalArtifact.body);
-                physicalArtifactId = savedPhysicalArtifact.body.id;
+                await dispatch("setPhysicalArtifact", savedPhysicalArtifact);
+                physicalArtifactId = savedPhysicalArtifact.id;
 
             } catch (err) {
                 console.log(err);
@@ -190,7 +173,7 @@ export const physicalArtifactStore = {
                     // return "There was an error saving the record";
                     return err;
                 } else {
-                    await swal("Error", "There was an error saving the record", "error");
+                    await swal.fire("Error", "There was an error saving the record", "error");
                 }
             }
             // internal arg used when file upload triggers record creation
@@ -199,7 +182,7 @@ export const physicalArtifactStore = {
             }
             // update legal_case
             else if (!create) {
-                await swal("Saved", "The record has been saved", "success");
+                await swal.fire("Saved", "The record has been saved", "success");
             }
         },
         setPhysicalArtifact({ commit, }, physical_artifact) {

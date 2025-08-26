@@ -9,6 +9,8 @@ import {
     REMOVE_FORM_FIELD,
 } from '@/store/mutation-types';
 
+import { fetch_util } from '@/utils/hooks';
+
 export const rendererStore = {
     state: {
         tabs: [],
@@ -89,23 +91,23 @@ export const rendererStore = {
     },
     mutations: {
         [UPDATE_RENDERER_TABS] (state, tabs) {
-            Vue.set(state, 'tabs', tabs);
+            state.tabs = tabs;
         },
         [UPDATE_RENDERER_SECTIONS] (state, sections) {
-            Vue.set(state, 'sections', {...sections});
+            state.sections = {...sections};
         },
         [UPDATE_VISIBLE_COMPONENT] (state, { key, value }) {
-            Vue.set(state.visible_components, key, value);
+            state.visible_components[key] = value;
         },
         [TOGGLE_FINALISED_TABS] (state, visible) {
-            Vue.set(state.visibility, 'exclude_decisions', visible ? [] : ['issued', 'declined']);
+            state.visibility.exclude_decisions = visible ? [] : ['issued', 'declined'];
         },
         [UPDATE_FORM_DATA] (state, form_data) {
             if(form_data == null) {
-                Vue.set(state, 'form_data', {});
+                state.form_data = {};
             }
             else {
-                Vue.set(state, 'form_data', {...form_data});
+                state.form_data = {...form_data};
             }
         },
         [UPDATE_FORM_FIELD] (state, { key, value }) {
@@ -113,7 +115,7 @@ export const rendererStore = {
             for(let idx in value) {
                 currentValue[idx] = value[idx];
             }
-            Vue.set(state.form_data, key, currentValue);
+            state.form_data[key] = currentValue;
         },
         [REMOVE_FORM_FIELD] (state, key) {
             Vue.delete(state.form_data, key);
@@ -150,7 +152,8 @@ export const rendererStore = {
         saveFormData({ dispatch, commit, getters, rootGetters }, { url, draft, submit }) {
             return new Promise((resolve, reject) => {
                 const post_data = Object.assign({'__draft': draft, '__update_fee': rootGetters.application.update_fee, '__submit': submit}, getters.renderer_form_data);
-                Vue.http.post(url, post_data).then(res => {
+                let request = fetch_util.fetchUrl(url, {method:'POST', body:JSON.stringify(post_data)})
+                request.then(res => {
                     resolve(res);
                 },
                 err => {
@@ -162,7 +165,8 @@ export const rendererStore = {
         finalDecisionData({ dispatch, commit, getters }, { url, draft }) {
             return new Promise((resolve, reject) => {
                 const post_data = Object.assign({'__draft': draft}, getters.renderer_form_data);
-                Vue.http.post(url, post_data).then(res => {
+                let request = fetch_util.fetchUrl(url, {method:'POST', body:JSON.stringify(post_data)})
+                request.then(res => {
                     resolve(res);
                 },
                 err => {
@@ -174,13 +178,14 @@ export const rendererStore = {
         assessmentData({ dispatch, commit, getters, rootGetters }, { url, draft }) {
             return new Promise((resolve, reject) => {
                 const post_data = Object.assign({'__draft': draft, '__update_fee': rootGetters.application.update_fee, '__assess': rootGetters.application.assess, '__licence_activity': rootGetters.selected_activity_tab_id}, getters.renderer_form_data);
-                Vue.http.post(url, post_data).then(res => {
+                let request = fetch_util.fetchUrl(url, {method:'POST', body:JSON.stringify(post_data)})
+                request.then(res => {
                     resolve(res);
-                    dispatch('setApplication', res.body);
+                    dispatch('setApplication', res);
                     dispatch('setApplication', {
                         ...rootGetters.application,
-                        application_fee: res.body.adjusted_paid_amount.application_fee,
-                        licence_fee: res.body.adjusted_paid_amount.licence_fee,
+                        application_fee: res.adjusted_paid_amount.application_fee,
+                        licence_fee: res.adjusted_paid_amount.licence_fee,
                         update_fee: false,
                         assess: false,
                     });

@@ -62,20 +62,20 @@
                                 <label class="col-sm-3">{{ occurrenceDateLabel }}</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="occurrenceDateFromPicker">
-                                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="offence.occurrence_date_from" />
-                                        <span class="input-group-addon">
+                                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="offence.occurrence_date_from" />
+                                        <!--<span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                        </span>-->
                                     </div>
                                 </div>
                                 <label v-show="offence.occurrence_from_to" class="col-sm-1">to</label>
                                 <div v-show="offence.occurrence_from_to">
                                     <div class="col-sm-3">
                                         <div class="input-group date" ref="occurrenceDateToPicker">
-                                            <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="offence.occurrence_date_to" />
-                                            <span class="input-group-addon">
+                                            <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="offence.occurrence_date_to" />
+                                            <!--<span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>
+                                            </span>-->
                                         </div>
                                     </div>
                                 </div>
@@ -85,20 +85,20 @@
                                 <label class="col-sm-3">{{ occurrenceTimeLabel }}</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="occurrenceTimeFromPicker">
-                                        <input type="text" class="form-control" placeholder="HH:MM" v-model="offence.occurrence_time_from" />
-                                        <span class="input-group-addon">
+                                        <input type="time" class="form-control" placeholder="HH:MM" v-model="offence.occurrence_time_from" />
+                                        <!--<span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                        </span>-->
                                     </div>
                                 </div>
                                 <label v-show="offence.occurrence_from_to" class="col-sm-1">to</label>
                                 <div v-show="offence.occurrence_from_to">
                                     <div class="col-sm-3">
                                         <div class="input-group date" ref="occurrenceTimeToPicker">
-                                            <input type="text" class="form-control" placeholder="HH:MM" v-model="offence.occurrence_time_to" />
-                                            <span class="input-group-addon">
+                                            <input type="time" class="form-control" placeholder="HH:MM" v-model="offence.occurrence_time_to" />
+                                            <!--<span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>
+                                            </span>-->
                                         </div>
                                     </div>
                                 </div>
@@ -227,18 +227,19 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import Awesomplete from "awesomplete";
 import modal from "@vue-utils/bootstrap-modal.vue";
 import datatable from "@vue-utils/datatable.vue";
 import { mapGetters, mapActions } from "vuex";
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import MapLocationOffence from "./map_location_offence1";
 import SearchPersonOrganisation from "@common-components/search_person_or_organisation.vue";
 //import CreateNewPerson from "@common-components/create_new_person.vue";
 import utils from "../utils";
 import $ from "jquery";
-import "bootstrap/dist/css/bootstrap.css";
+
 import "awesomplete/awesomplete.css";
 import { v4 as uuidv4 } from 'uuid';
 import "jquery-ui/ui/widgets/draggable.js";
@@ -275,11 +276,11 @@ export default {
       },
       current_offender: null,
       offender_search_type: "individual",
-      oTab: "oTab" + vm._uid,
-      dTab: "dTab" + vm._uid,
-      pTab: "pTab" + vm._uid,
-      lTab: "lTab" + vm._uid,
-      documentTab: 'documentTab' + vm._uid,
+      oTab: "oTab" + uuid(),
+      dTab: "dTab" + uuid(),
+      pTab: "pTab" + uuid(),
+      lTab: "lTab" + uuid(),
+      documentTab: 'documentTab' + uuid(),
       errorResponse: '',
 
       temporary_document_collection_id: null,
@@ -493,11 +494,6 @@ export default {
     parentEntity: function() {
         return {'id': 1, 'data_type': 'individual'}
     },
-  },
-  filters: {
-    formatDate: function(data) {
-      return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-    }
   },
   methods: {
     ...mapActions("offenceStore", {
@@ -834,7 +830,6 @@ export default {
             errorText += err.message;
         }
         this.errorResponse = errorText;
-        //await swal("Error", errorText, "error");
     },
     cancel: function() {
         // for call_email offenceBindId
@@ -889,50 +884,6 @@ export default {
     },
     addEventListeners: function() {
       let vm = this;
-      let el_fr_date = $(vm.$refs.occurrenceDateFromPicker);
-      let el_fr_time = $(vm.$refs.occurrenceTimeFromPicker);
-      let el_to_date = $(vm.$refs.occurrenceDateToPicker);
-      let el_to_time = $(vm.$refs.occurrenceTimeToPicker);
-
-      // "Date From" field
-      el_fr_date.datetimepicker({ format: "DD/MM/YYYY", maxDate: "now", showClear: true });
-      el_fr_date.on("dp.change", function(e) {
-        if (el_fr_date.data("DateTimePicker").date()) {
-          vm.offence.occurrence_date_from = e.date.format("DD/MM/YYYY");
-            el_to_date.data('DateTimePicker').minDate(e.date);
-        } else if (el_fr_date.data("date") === "") {
-          vm.offence.occurrence_date_from = null;
-        }
-      });
-      // "Time From" field
-      el_fr_time.datetimepicker({ format: "LT", showClear: true });
-      el_fr_time.on("dp.change", function(e) {
-        if (el_fr_time.data("DateTimePicker").date()) {
-          vm.offence.occurrence_time_from = e.date.format("LT");
-        } else if (el_fr_time.data("date") === "") {
-          vm.offence.occurrence_time_from = null;
-        }
-      });
-
-      // "Date To" field
-      el_to_date.datetimepicker({ format: "DD/MM/YYYY", maxDate: "now", showClear: true });
-      el_to_date.on("dp.change", function(e) {
-        if (el_to_date.data("DateTimePicker").date()) {
-          vm.offence.occurrence_date_to = e.date.format("DD/MM/YYYY");
-            el_fr_date.data('DateTimePicker').maxDate(e.date);
-        } else if (el_to_date.data("date") === "") {
-          vm.offence.occurrence_date_to = null;
-        }
-      });
-      // "Time To" field
-      el_to_time.datetimepicker({ format: "LT", showClear: true });
-      el_to_time.on("dp.change", function(e) {
-        if (el_to_time.data("DateTimePicker").date()) {
-          vm.offence.occurrence_time_to = e.date.format("LT");
-        } else if (el_to_time.data("date") === "") {
-          vm.offence.occurrence_time_to = null;
-        }
-      });
 
       $("#alleged-offence-table").on(
         "click",
@@ -1077,14 +1028,12 @@ export default {
     },
     searchOrganisation: function(id) {
       return new Promise((resolve, reject) => {
-        Vue.http.get("/api/search_organisation/" + id).then(
-          response => {
-            resolve(response.body);
-          },
-          error => {
+        let request = fetch_util.fetchUrl("/api/search_organisation/" + id)
+        request.then((response) => {
+            resolve(response);
+        }).catch((error) => {
             reject(error);
-          }
-        );
+        });
       });
     },
     setCurrentOffenceSelected: function(offence) {

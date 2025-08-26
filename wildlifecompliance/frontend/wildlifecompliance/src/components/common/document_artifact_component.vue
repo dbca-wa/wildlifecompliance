@@ -184,19 +184,19 @@
                                             <label class="col-sm-3">Date</label>
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="artifactDatePicker">
-                                                    <input :disabled="readonlyForm" type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="document_artifact.artifact_date" />
-                                                    <span class="input-group-addon">
+                                                    <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="document_artifact.artifact_date" />
+                                                    <!--<span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>
+                                                    </span>-->
                                                 </div>
                                             </div>
                                             <label class="col-sm-3">Time</label>
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="artifactTimePicker">
-                                                  <input :disabled="readonlyForm" type="text" class="form-control" placeholder="HH:MM" v-model="document_artifact.artifact_time"/>
-                                                  <span class="input-group-addon">
-                                                      <span class="glyphicon glyphicon-calendar"></span>
-                                                  </span>
+                                                  <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="document_artifact.artifact_time"/>
+                                                  <!--<span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                    </span>-->
                                                 </div>
                                             </div>
                                         </div>
@@ -236,14 +236,13 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 //import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import filefield from '@/components/common/compliance_file.vue';
-//import { required, minLength, between } from 'vuelidate/lib/validators'
-import 'bootstrap/dist/css/bootstrap.css';
-import 'eonasdan-bootstrap-datetimepicker';
+
 import moment from 'moment';
 import SearchPersonOrganisation from './search_person_or_organisation'
 import FormSection from "@/components/forms/section_toggle.vue";
@@ -255,13 +254,13 @@ export default {
     data: function() {
         return {
             uuid: 0,
-            newTab: 'newTab'+this._uid,
-            existingTab: 'existingTab'+this._uid,
-            objectTab: 'objectTab'+this._uid,
-            detailsTab: 'detailsTab'+this._uid,
-            storageTab: 'storageTab'+this._uid,
-            disposalTab: 'disposalTab'+this._uid,
-            rTab: 'rTab'+this._uid,
+            newTab: 'newTab'+uuid(),
+            existingTab: 'existingTab'+uuid(),
+            objectTab: 'objectTab'+uuid(),
+            detailsTab: 'detailsTab'+uuid(),
+            storageTab: 'storageTab'+uuid(),
+            disposalTab: 'disposalTab'+uuid(),
+            rTab: 'rTab'+uuid(),
             isModalOpen: false,
             processingDetails: false,
             documentActionUrl: '',
@@ -339,7 +338,7 @@ export default {
                         searchable: false,
                         orderable: true,
                         mRender: function (data, type, full) {
-                            return data != '' && data != null ? moment(data).format('DD/MM/YYYY') : '';
+                            return data != '' && data != null ? moment(data).format('YYYY-MM-DD') : '';
                         }
                     },
                     {
@@ -416,36 +415,9 @@ export default {
         artifactType: {
             handler: function (){
                 this.setStatementVisibility();
-                //this.setPersonProvidingStatementLabel();
-                //this.setInterviewerLabel();
-                /*
-                if (
-                    // legal case exists and Document Type is not a statementArtifactType
-                    (this.legalCaseExists && this.artifactType && !this.statementArtifactTypes.includes(this.artifactType)) ||
-                    // OR document_artifact already has a linked statement
-                    (this.document_artifact && this.document_artifact.statement)
-                    )
-                {
-                    console.log("statementVisibility true")
-                    this.statementVisibility = true;
-                } else {
-                    console.log("statementVisibility false")
-                    this.statementVisibility = false;
-                }
-                */
             },
             deep: true,
         },
-        /*
-        legalCaseId: {
-            handler: async function() {
-                if (this.legal_case && this.legal_case.id) {
-                    await this.setDocumentArtifactLegalId(this.legal_case.id)
-                }
-            },
-        },
-        */
-
     },
     computed: {
         ...mapGetters('documentArtifactStore', {
@@ -669,11 +641,6 @@ export default {
             return related_items_visibility;
         },
     },
-    filters: {
-      formatDate: function(data) {
-          return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-      }
-    },
     methods: {
         ...mapActions('documentArtifactStore', {
             saveDocumentArtifact: 'saveDocumentArtifact',
@@ -784,7 +751,7 @@ export default {
                 "legal_case_id": this.legalCaseId
             }
             console.log(payload);
-            await Vue.http.put(fetchUrl, payload);
+            await fetch_util.fetchUrl(fetchUrl, {method:"PUT",body:JSON.stringify(payload)});
             let documentArtifactType = e.target.dataset.artifactType.replace(/~/g, ' ');
             let documentArtifactIdentifier = e.target.dataset.identifier.replace(/~/g, ' ').replace('null', '');
             this.$nextTick(() => {
@@ -810,57 +777,6 @@ export default {
 
         addEventListeners: function() {
             let vm = this;
-            let el_fr_date = $(vm.$refs.artifactDatePicker);
-            let el_fr_time = $(vm.$refs.artifactTimePicker);
-
-            // "From" field
-            el_fr_date.datetimepicker({
-            format: "DD/MM/YYYY",
-            maxDate: "now",
-            showClear: true
-            });
-            el_fr_date.on("dp.change", function(e) {
-                console.log(e)
-                if (el_fr_date.data("DateTimePicker").date()) {
-                  vm.document_artifact.artifact_date = e.date.format("DD/MM/YYYY");
-                } else if (el_fr_date.data("date") === "") {
-                  vm.document_artifact.artifact_date = "";
-                }
-            });
-            el_fr_time.datetimepicker({ format: "LT", showClear: true });
-            el_fr_time.on("dp.change", function(e) {
-                console.log(e)
-                if (el_fr_time.data("DateTimePicker").date()) {
-                  vm.document_artifact.artifact_time = e.date.format("LT");
-                } else if (el_fr_time.data("date") === "") {
-                  vm.document_artifact.artifact_time = "";
-                }
-            });
-            /*
-            // department_users
-            $(vm.$refs.document_artifact_department_users).select2({
-                    "theme": "bootstrap",
-                    allowClear: true,
-                    placeholder:""
-                }).
-                on("select2:select",function (e) {
-                    console.log(e)
-                    let selected = $(e.currentTarget);
-                    let selectedData = selected.val();
-                    console.log(selectedData)
-                    vm.setOfficerInterviewerWrapper(selectedData);
-                    //vm.setInterviewerEmail(selectedData);
-                    //vm.setSelectedCustodian(selectedData);
-                    //let custodianData = e.params.data
-                    //console.log(custodianData)
-                    //Object.assign(vm.selectedCustodian, custodianData);
-                }).
-                on("select2:unselect",function (e) {
-                    var selected = $(e.currentTarget);
-                    vm.setInterviewerEmail('');
-                    //vm.selectedCustodian = {}
-                });
-                */
             // department_users
             $(vm.$refs.document_artifact_interviewer).select2({
                     minimumInputLength: 2,
@@ -926,30 +842,13 @@ export default {
             }
             return comparison;
         },
-
-      //createDocumentActionUrl: async function(done) {
-      //  if (!this.inspection.id) {
-      //      // create inspection and update vuex
-      //      let returned_inspection = await this.saveInspection({ create: true, internal: true })
-      //      await this.loadInspection({inspection_id: returned_inspection.body.id});
-      //  }
-      //  // populate filefield document_action_url
-      //  this.$refs.comms_log_file.document_action_url = this.inspection.createInspectionProcessCommsLogsDocumentUrl;
-      //  return done(true);
-      //},
-
     },
     mounted: function() {
       this.$nextTick(async () => {
           this.addEventListeners();
-          /*
-          if (this.legal_case && this.legal_case.id) {
-              this.setDocumentArtifactLegalId(this.legal_case.id)
-          */
       });
     },
-    beforeDestroy: async function() {
-        console.log("beforeDestroy")
+    beforeUnmount: async function() {
         await this.setDocumentArtifact({});
     },
     created: async function() {
@@ -988,17 +887,6 @@ export default {
             );
             $(vm.$refs.document_artifact_interviewer).append(option).trigger('change');
         }
-
-        /*
-        // retrieve department_users from backend cache
-        let returned_department_users = await this.$http.get(api_endpoints.department_users)
-        Object.assign(this.departmentStaffList, returned_department_users.body)
-        this.departmentStaffList.splice(0, 0,
-          {
-            pk: "",
-            name: "",
-          });
-          */
     },
 };
 </script>

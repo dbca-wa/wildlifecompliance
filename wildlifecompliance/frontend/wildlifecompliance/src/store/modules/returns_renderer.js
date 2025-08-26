@@ -28,22 +28,22 @@ export const returnsRendererStore = {
     },
     mutations: {
         [UPDATE_RETURNS_TABS] (state, tabs) {
-            Vue.set(state, 'tabs', tabs);
+            state.tabs = tabs;
         },
         [UPDATE_SELECTED_TAB_ID] (state, tab_id) {
             state.selected_returns_tab_id = tab_id;
         },
         [UPDATE_RETURNS_SPECIES] (state, species) {
-            Vue.set(state, 'species', species);
+            state.species = species;
         },
         [UPDATE_RETURNS_EXTERNAL] (state, external) {
-            Vue.set(state, 'external_user', external);
+            state.external_user = external;
         },
         [UPDATE_RETURNS_SELECTED_SPECIES] (state, selected_species) {
-            Vue.set(state, 'selected_species', selected_species);
+            state.selected_species = selected_species;
         },
         [UPDATE_RETURNS_TRANSFER_SPECIES] (state, transfer_species) {
-            Vue.set(state, 'transfer_species', transfer_species);
+            state.transfer_species = transfer_species;
         },
     },
     actions: {

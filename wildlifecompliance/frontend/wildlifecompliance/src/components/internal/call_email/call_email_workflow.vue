@@ -112,11 +112,11 @@
 import Vue from "vue";
 import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import filefield from '@/components/common/compliance_file.vue';
 require("select2/dist/css/select2.min.css");
-require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
-import { required, minLength, between } from 'vuelidate/lib/validators'
+
+import { required } from '@vuelidate/validators'
 
 export default {
     name: "CallEmailWorking",
@@ -243,11 +243,6 @@ export default {
             }
         }
     },
-    filters: {
-      formatDate: function(data) {
-          return data ? moment(data).format("DD/MM/YYYY HH:mm:ss") : "";
-      }
-    },
     methods: {
       ...mapActions('callemailStore', {
           saveCallEmail: 'saveCallEmail',
@@ -261,7 +256,7 @@ export default {
       },
       updateAllocatedGroup: async function() {
           this.errorResponse = "";
-          Vue.set(this, 'allocatedGroup', []);
+          this.allocatedGroup = [];
           if (this.groupPermission && this.regionId) {
               try {
                   let allocatedGroupResponse = await this.loadAllocatedGroup({
@@ -269,8 +264,8 @@ export default {
                       region_id: this.regionId,
                       district_id: this.districtId ? this.districtId : null,
                   });
-                  Vue.set(this, 'allocatedGroup', allocatedGroupResponse.body);
-                  this.allocated_group_id = allocatedGroupResponse.body.group_id;
+                  this.allocatedGroup = allocatedGroupresponse;
+                  this.allocated_group_id = allocatedGroupresponse.group_id;
               } catch(error) {
                   // Display http error response on modal
                   this.errorResponse = error.body[0];
@@ -323,13 +318,13 @@ export default {
           this.case_priority_id ? payload.append('case_priority_id', this.case_priority_id) : null;
           this.regionId ? payload.append('region_id', this.regionId) : null;
           try {
-              const res = await Vue.http.post(post_url, payload);
+              const res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
               if (res.ok) {
                   this.$router.push({ name: 'internal-call-email-dash' });
               }
           } catch(err) {
               this.errorResponse = 'Error:' + err.statusText;
-              await swal({
+              await swal.fire({
                   title: 'Mandatory Field',
                   html: helpers.formatError(err),
                   type: "error",

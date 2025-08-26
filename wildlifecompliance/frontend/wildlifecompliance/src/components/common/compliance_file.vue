@@ -26,9 +26,11 @@
             </div>
             <div v-if="show_spinner"><i class='fa fa-2x fa-spinner fa-spin'></i></div>
         </div>
-        <div v-if="!readonly" v-for="n in repeat">
-            <div v-if="isRepeatable || (!isRepeatable && num_documents()==0)">
-                <input :name="name" type="file" :data-que="n" :accept="fileTypes" @change="handleChangeWrapper"/>
+        <div v-if="!readonly">
+            <div v-for="n in repeat">
+                <div v-if="isRepeatable || (!isRepeatable && num_documents()==0)">
+                    <input :name="name" type="file" :data-que="n" :accept="fileTypes" @change="handleChangeWrapper"/>
+                </div>
             </div>
         </div>
     </div>
@@ -37,7 +39,8 @@
 <script>
 import {
   api_endpoints,
-  helpers
+  helpers,
+  fetch_util
 }
 from '@/utils/hooks';
 //import CommentBlock from './comment_block.vue';
@@ -113,7 +116,6 @@ export default {
             deep: true
         },
     },
-
     methods:{
         handleChange: function (e) {
             let vm = this;
@@ -168,11 +170,9 @@ export default {
                 }
                 formData.append('input_name', this.name);
                 formData.append('csrfmiddlewaretoken', this.csrf_token);
-                let res = await Vue.http.post(this.document_action_url, formData)
-                //let res = await Vue.http.post(this.documentActionUrl, formData)
-                this.documents = res.body.filedata;
-                this.commsLogId = res.body.comms_instance_id;
-                //console.log(vm.documents);
+                let res = await fetch_util.fetchUrl(this.document_action_url, {method:'POST', body:JSON.stringify(formData)})
+                this.documents = res.filedata;
+                this.commsLogId = res.comms_instance_id;
             }
             this.show_spinner = false;
 
@@ -190,12 +190,12 @@ export default {
             formData.append('document_id', file.id);
             formData.append('csrfmiddlewaretoken', this.csrf_token);
             if (this.document_action_url) {
-                let res = await Vue.http.post(this.document_action_url, formData)
-                this.documents = res.body.filedata;
+                let res = await fetch_util.fetchUrl(this.document_action_url, {method:'POST', body:JSON.stringify(formData)})
+                this.documents = res.filedata;
                 //this.documents = await this.get_documents()
-                this.commsLogId = res.body.comms_instance_id;
+                this.commsLogId = res.comms_instance_id;
             }
-            //vm.documents = res.body;
+            //vm.documents = res;
             this.show_spinner = false;
 
         },
@@ -210,7 +210,7 @@ export default {
             }
             formData.append('csrfmiddlewaretoken', this.csrf_token);
             if (this.document_action_url) {
-                let res = await Vue.http.post(this.document_action_url, formData)
+                let res = await fetch_util.fetchUrl(this.document_action_url, {method:'POST', body:JSON.stringify(formData)})
             }
             this.show_spinner = false;
         },
@@ -232,8 +232,8 @@ export default {
         handleChangeWrapper: async function(e) {
             if (this.documentActionUrl === 'temporary_document' && !this.temporary_document_collection_id) {
                 // If temporary_document, create TemporaryDocumentCollection object and allow document_action_url to update
-                let res = await Vue.http.post(this.document_action_url)
-                this.temporary_document_collection_id = res.body.id
+                let res = await fetch_util.fetchUrl(this.document_action_url)
+                this.temporary_document_collection_id = res.id
                 await this.$emit('update-temp-doc-coll-id',
                     {
                         "temp_doc_id": this.temporary_document_collection_id,
@@ -266,10 +266,10 @@ export default {
                 formData.append('filename', e.target.files[0].name);
                 formData.append('_file', this.uploadFile(e));
                 formData.append('csrfmiddlewaretoken', this.csrf_token);
-                let res = await Vue.http.post(this.document_action_url, formData)
+                let res = await fetch_util.fetchUrl(this.document_action_url, {method:'POST', body:JSON.stringify(formData)})
                 
-                this.documents = res.body.filedata;
-                this.commsLogId = res.body.comms_instance_id;
+                this.documents = res.filedata;
+                this.commsLogId = res.comms_instance_id;
                 this.show_spinner = false;
             } else {
                 console.log("no documentActionUrl");

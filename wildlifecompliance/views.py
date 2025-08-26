@@ -169,7 +169,11 @@ class ManagementCommandsView(LoginRequiredMixin, UserPassesTestMixin, TemplateVi
         from wildlifecompliance.components.applications.services import (
             ApplicationService)
 
-        data = {}
+        data = {
+            "prefer_compliance_management": prefer_compliance_management(request),
+            "is_internal_login": is_internal(request),
+            "is_compliance_internal_login": is_compliance_internal_user(request),
+        }
         command_script = request.POST.get('script', None)
         if command_script:
             logger.info(
@@ -178,8 +182,16 @@ class ManagementCommandsView(LoginRequiredMixin, UserPassesTestMixin, TemplateVi
                 ))
 
             call_command(command_script)
-            data.update({command_script: 'true'})
+            data[command_script] = 'true'
 
+        return render(request, self.template_name, data)
+    
+    def get(self,request):
+        data = {
+            "prefer_compliance_management": prefer_compliance_management(request),
+            "is_internal_login": is_internal(request),
+            "is_compliance_internal_login": is_compliance_internal_user(request),
+        }
         return render(request, self.template_name, data)
 
 class SecureBaseView(View):
@@ -192,91 +204,7 @@ class SecureBaseView(View):
         securebase_view = SecurePipe(request)
 
         return securebase_view.get_http_response()
-
-
-#TODO check if this is used/needed
-#def getLedgerIdentificationFile(request, emailuser_id):
-#    allow_access = False
-#    # Add permission rules
-#    #allow_access = True
-#    ####
-#    try:
-#        user= EmailUser.objects.get(id=emailuser_id)
-#        if request.user == user or request.user.is_staff is True or request.user.is_superuser is True:
-#            allow_access=True
-#        user_id=user.identification2
-#        id_path=user_id.upload.path
-#
-#        extension = ""
-#
-#        if id_path[-5:-4] == '.':
-#            extension = id_path[-4:]
-#        if id_path[-4:-3] == '.':
-#            extension = id_path[-3:]
-#
-#        #if request.user.is_superuser:
-#        if allow_access == True:
-#            file_name_path =  id_path 
-#            full_file_path= id_path
-#            if os.path.isfile(full_file_path) is True:
-#                    #extension = file_name_path[-3:] 
-#                    the_file = open(full_file_path, 'rb')
-#                    the_data = the_file.read()
-#                    the_file.close()
-#                    if extension == 'msg':
-#                        return HttpResponse(the_data, content_type="application/vnd.ms-outlook")
-#                    if extension == 'eml':
-#                        return HttpResponse(the_data, content_type="application/vnd.ms-outlook")
-#
-#                    return HttpResponse(the_data, content_type=mimetypes.types_map['.'+str(extension)])
-#        else:
-#            messages.error(request, 'Unable to find the document')
-#            return redirect('home')
-#    except:
-#        messages.error(request, 'Unable to find the document')
-#        return redirect('home')
-
-#def getLedgerSeniorCardFile(request, emailuser_id):
-#    allow_access = False
-#    # Add permission rules
-#    #allow_access = True
-#    ####
-#    try:
-#        user= EmailUser.objects.get(id=emailuser_id)
-#        if request.user == user or request.user.is_staff is True or request.user.is_superuser is True:
-#            allow_access=True
-#        user_senior_card=user.senior_card2
-#        senior_card_path=user_senior_card.upload.path
-#
-#        extension = ""
-#
-#        if senior_card_path[-5:-4] == '.':
-#            extension = senior_card_path[-4:]
-#        if senior_card_path[-4:-3] == '.':
-#            extension = senior_card_path[-3:]
-#
-#
-#
-#        if allow_access == True:
-#            file_name_path =  senior_card_path 
-#            full_file_path= senior_card_path
-#            if os.path.isfile(full_file_path) is True:
-#                    #extension = file_name_path[-3:] 
-#                    the_file = open(full_file_path, 'rb')
-#                    the_data = the_file.read()
-#                    the_file.close()
-#                    if extension == 'msg':
-#                        return HttpResponse(the_data, content_type="application/vnd.ms-outlook")
-#                    if extension == 'eml':
-#                        return HttpResponse(the_data, content_type="application/vnd.ms-outlook")
-#
-#                    return HttpResponse(the_data, content_type=mimetypes.types_map['.'+str(extension)])
-#        else:
-#                messages.error(request, 'Unable to find the document')
-#                return redirect('home')
-#    except:
-#        messages.error(request, 'Unable to find the document')
-#        return redirect('home')
+    
 
 def is_authorised_to_access_application_document(request,document_id):
     if is_internal(request):

@@ -30,10 +30,10 @@
                 <div class="form-group">
                     <label for="">Planned From</label>
                     <div class="input-group date" ref="plannedDateFromPicker">
-                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterPlannedFrom">
-                        <span class="input-group-addon">
+                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterPlannedFrom">
+                        <!--<span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
+                        </span>-->
                     </div>
                 </div>
             </div>
@@ -41,10 +41,10 @@
                 <div class="form-group">
                     <label for="">Planned To</label>
                     <div class="input-group date" ref="plannedDateToPicker">
-                        <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="filterPlannedTo">
-                        <span class="input-group-addon">
+                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterPlannedTo">
+                        <!--<span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
+                        </span>-->
                     </div>
                 </div>
             </div>
@@ -76,7 +76,7 @@
     import $ from 'jquery'
     import datatable from '@vue-utils/datatable.vue'
     import Vue from 'vue'
-    import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+    import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
     import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
     import FormSection from "@/components/forms/section_toggle.vue";
     import InspectionModal from "./create_inspection_modal.vue";
@@ -101,14 +101,14 @@
                 statusChoices: [],
                 inspectionTypes: [],
                 
-                dateFormat: 'DD/MM/YYYY',
+                dateFormat: 'YYYY-MM-DD',
                 inspectionInitialised: false,
                 
                 canUserCreateNewInspection: false,
 
                 createInspectionBindId: '',
                 // datepickerOptions: {
-                //     format: 'DD/MM/YYYY',
+                //     format: 'YYYY-MM-DD',
                 //     showClear: true,
                 //     useCurrent: false,
                 //     keepInvalid: true,
@@ -141,8 +141,8 @@
                         'data': function(d) {
                             d.status_description = vm.filterStatus;
                             d.inspection_description = vm.filterInspectionType;
-                            d.date_from = vm.filterPlannedFrom != '' && vm.filterPlannedFrom != null ? moment(vm.filterPlannedFrom, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
-                            d.date_to = vm.filterPlannedTo != '' && vm.filterPlannedTo != null ? moment(vm.filterPlannedTo, 'DD/MM/YYYY').format('YYYY-MM-DD'): '';
+                            d.date_from = vm.filterPlannedFrom != '' && vm.filterPlannedFrom != null ? moment(vm.filterPlannedFrom, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
+                            d.date_to = vm.filterPlannedTo != '' && vm.filterPlannedTo != null ? moment(vm.filterPlannedTo, 'YYYY-MM-DD').format('YYYY-MM-DD'): '';
                         }
                     },
                     dom: 'lBfrtip',
@@ -305,8 +305,8 @@
             },
             getUserCanCreate: async function() {
                 let url = helpers.add_endpoint_join(api_endpoints.inspection, 'can_user_create/');
-                let res = await Vue.http.get(url);
-                this.canUserCreateNewInspection = res.body;
+                let res = await fetch_util.fetchUrl(url);
+                this.canUserCreateNewInspection = res;
             },
             createInspectionUrl: async function () {
                 const newInspectionId = await this.saveInspection({ create: true });
@@ -315,31 +315,6 @@
                     name: 'view-inspection', 
                     params: { inspection_id: newInspectionId}
                     });
-            },
-            addEventListeners: function () {
-                let vm = this;
-                // Initialise Planned Date Filters
-                $(vm.$refs.plannedDateToPicker).datetimepicker(vm.datepickerOptions);
-                $(vm.$refs.plannedDateFromPicker).datetimepicker(vm.datepickerOptions);
-                // Add Date Filter events
-                $(vm.$refs.plannedDateToPicker).on('dp.change', function (e) {
-                    if ($(vm.$refs.plannedDateToPicker).data('DateTimePicker').date()) {
-                        // if From Date set, disable dates earlier than the from date
-                        $(vm.$refs.plannedDateFromPicker).data("DateTimePicker").maxDate(e.date)
-                        vm.filterPlannedTo = e.date.format('DD/MM/YYYY');
-                    } else if ($(vm.$refs.plannedDateToPicker).data('date') === "") {
-                        vm.filterPlannedTo = "";
-                    }
-                });
-                $(vm.$refs.plannedDateFromPicker).on('dp.change', function (e) {
-                    if ($(vm.$refs.plannedDateFromPicker).data('DateTimePicker').date()) {
-                        // if To Date set, disable dates later than the To date
-                        $(vm.$refs.plannedDateToPicker).data("DateTimePicker").minDate(e.date)
-                        vm.filterPlannedFrom = e.date.format('DD/MM/YYYY');
-                    } else if ($(vm.$refs.plannedDateFromPicker).data('date') === "") {
-                        vm.filterPlannedFrom = "";
-                    }
-                });
             },
             initialiseSearch: function () {
                 this.dateSearch();
@@ -386,7 +361,6 @@
             });
             this.$nextTick(async () => {
                 await vm.initialiseSearch();
-                await vm.addEventListeners();
             });
             
             

@@ -4,7 +4,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="assessorForm">
-                        <alert :show.sync="showError" type="danger"><strong>{{errorString}}</strong></alert>
+                        <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                         <div class="col-sm-12">
                             <div class="row">
                                 <div class="col-sm-offset-2 col-sm-8">
@@ -37,7 +37,7 @@ import alert from '@vue-utils/alert.vue'
 //import api_endpoints from '../api'
 import {
     api_endpoints,
-    helpers
+    helpers, fetch_util
 } from "@/utils/hooks.js"
 export default {
     name:'Send-to-Assessor',
@@ -89,11 +89,12 @@ export default {
             let vm = this;
             vm.errors = false;
             let assessment = JSON.parse(JSON.stringify(vm.assessment));
-            vm.$http.post('/api/assessment.json',JSON.stringify(assessment),{
+            let request = fetch_util.fetchUrl('/api/assessment.json', {method:'POST', body:JSON.stringify(assessment)},{
                         emulateJSON:true,
-                    }).then((response)=>{
+                    })
+                request.then((response)=>{
                         //vm.$parent.loading.splice('processing contact',1);
-                        swal(
+                        swal.fire(
                              'Send to Assessor',
                              'This application has been sent to the selected group for assessment.',
                              'success'
@@ -103,7 +104,7 @@ export default {
                         for (var i=0;i<vm.$parent.$refs.assessorDatatable.length;i++){
                             vm.$parent.$refs.assessorDatatable[i].vmDataTable.ajax.reload();
                         }
-                        vm.$http.get(helpers.add_endpoint_json(api_endpoints.applications,assessment.application+'/internal_application')).then((res) => {
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,assessment.application+'/internal_application')).then((res) => {
                             vm.$emit('refreshFromResponse',res);
                         });
                         vm.close();

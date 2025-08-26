@@ -2,19 +2,12 @@
     <div class="container" >
         <div class="row">
             <div class="col-sm-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">{{applicationTitle}} for
-                            <span v-if="selected_apply_org_id">{{ selected_apply_org_id_details.name }} ({{ selected_apply_org_id_details.abn }})</span>
-                            <span v-if="selected_apply_proxy_id">{{ selected_apply_proxy_id_details.first_name }} {{ selected_apply_proxy_id_details.last_name }} ({{ selected_apply_proxy_id_details.email }})</span>
-                            <span v-if="!selected_apply_org_id && !selected_apply_proxy_id">yourself</span>
-                            <a :href="'#'+pBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pBody">
-                                <span class="glyphicon glyphicon-chevron-up pull-right "></span>
-                            </a>
-                        </h3>
-                    </div>
-
-                    <div class="panel-body collapse in" :id="pBody">
+                <FormSection
+                    :form-collapse="false"
+                    :label="title"
+                    index="apply"
+                >
+                    <div class="panel panel-default">
                         <form v-if="categoryCount" class="form-horizontal" name="personal_form" method="post">
                           
                             <div class="col-sm-12" v-show='current_user.is_reception' >
@@ -46,9 +39,9 @@
                                             <div class="row">
 
 
-                                                <div  v-if="category.checked" class="col-sm-9">
+                                                <div v-if="category.checked && selected_apply_org_id != ''" class="col-sm-9">
 
-                                                    <div v-if="!(selected_apply_org_id != '' && type.not_for_organisation == true)" v-for="(type,index1) in category.activity" class="checkbox margin-left-20">
+                                                    <div v-for="(type,index1) in categoryActivity" class="checkbox margin-left-20">
                                                         <input type="checkbox" ref="selected_activity_type" name ="activity" :value="type.id" :id = "type.id" v-model="category.activity[index1].selected" @change="handleActivityCheckboxChange(index,index1)"> {{type.short_name}}
 
                                                         <div v-if="type.selected">
@@ -61,7 +54,7 @@
                                                                         v-model="type.purpose[index2].selected"
                                                                         @change="handlePurposeCheckboxChange(index,$event)">
                                                                             {{purpose.name}}
-                                                                            <span> ({{parseFloat(purpose.base_application_fee) | toCurrency}} + {{parseFloat(purpose.base_licence_fee) | toCurrency}})</span>
+                                                                            <span> ({{toCurrency(parseFloat(purpose.base_application_fee))}} + {{toCurrency(parseFloat(purpose.base_licence_fee))}})</span>
                                                                 </div>
 
                                                                 <div v-else class ="col-sm-12">
@@ -87,8 +80,8 @@
                                 <button v-if="showSpinner" type="button" class="btn btn-primary pull-right" style="margin-left: 10px;" disabled><i class="fa fa-spinner fa-spin" />Continue</button>
                                 <button v-else @click.prevent="submit()" type="button" class="btn btn-primary pull-right" style="margin-left: 10px;">Continue</button>
                                 <div class="pull-right" style="font-size: 18px;">
-                                    <strong>Estimated application fee: {{application_fee | toCurrency}}</strong><br>
-                                    <strong>Estimated licence fee: {{licence_fee | toCurrency}}</strong><br>
+                                    <strong>Estimated application fee: {{toCurrency(application_fee)}}</strong><br>
+                                    <strong>Estimated licence fee: {{toCurrency(licence_fee)}}</strong><br>
                                 </div>
                             </div>
                         </form>
@@ -96,7 +89,7 @@
                             <div class="col-sm-12">
                                 <div class="row">
                                     <br/><br/><br/><br/>
-                                    <center><i class="fa fa-4x fa-spinner fa-spin"/></center>
+                                    <div style="text-align:center;"><i class="fa fa-4x fa-spinner fa-spin"/></div>
                                     <br/><br/><br/><br/>
                                 </div>
                             </div>
@@ -111,21 +104,24 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </FormSection>
             </div>
         </div>
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from 'vue'
 import {
   api_endpoints,
-  helpers
+  helpers,
+  fetch_util
 }
 from '@/utils/hooks'
 import { mapActions, mapGetters } from 'vuex'
 import utils from './utils'
 import internal_utils from '@/components/internal/utils'
+import FormSection from "@/components/forms/section_toggle.vue";
 export default {
   data: function() {
     let vm = this;
@@ -159,7 +155,7 @@ export default {
         },
         "loading": [],
         form: null,
-        pBody: 'pBody' + vm._uid,
+        pBody: 'pBody' + uuid(),
         application_fee: 0,
         licence_fee: 0,
         selected_apply_org_id_details : {},
@@ -169,8 +165,18 @@ export default {
     }
   },
   components: {
+    FormSection
   },
   computed: {
+        categoryActivity: function() {
+            let activityList = [];
+            this.category.activity.forEach(activity => {
+                if (!(activity.type.not_for_organisation == true)) {
+                    activityList.add(activity);
+                }
+            });
+            return activityList;
+        },
         ...mapGetters([
             'selected_apply_org_id',
             'selected_apply_proxy_id',
@@ -179,6 +185,15 @@ export default {
             'reception_method_id',
             'current_user',
         ]),
+        title: function() {
+            if (this.selected_apply_org_id && this.selected_apply_org_id_details != undefined) {
+                return this.applicationTitle + " for " + this.selected_apply_org_id_details.name + " " + this.selected_apply_org_id_details.abn
+            } else if (this.selected_apply_proxy_id && this.selected_apply_proxy_id_details != undefined) {
+                return this.applicationTitle + " for " + this.selected_apply_proxy_id_details.first_name + " " + this.selected_apply_proxy_id_details.last_name + " " + selected_apply_proxy_id_details.email
+            } else {
+                return this.applicationTitle + " for yourself"
+            }
+        },
         applicationTitle: function() {
             switch(this.selected_apply_licence_select) {
                 case 'new_activity':
@@ -235,7 +250,7 @@ export default {
     submit: function() {
         let vm = this;
         vm.spinner = true;
-        swal({
+        swal.fire({
             title: "Create Application",
             text: "Are you sure you want to create an application?",
             type: "question",
@@ -295,12 +310,16 @@ export default {
             activity => activity.purpose.filter(
                 purpose => purpose.selected || (purpose.id == event.target.id && event.target.checked)
             ))).map(purpose => purpose.id);
-        this.$http.post('/api/application/estimate_price/', {
-                'purpose_ids': purpose_ids,
-                'licence_type': this.selected_apply_licence_select,
-            }).then(res => {
-                this.application_fee = res.body.fees.application;
-                this.licence_fee = res.body.fees.licence;
+        let request = fetch_util.fetchUrl('/api/application/estimate_price/', 
+            {
+                method:'POST', body:{
+                    'purpose_ids': purpose_ids,
+                    'licence_type': this.selected_apply_licence_select,
+                }
+            })
+        request.then(res => {
+                this.application_fee = res.fees.application;
+                this.licence_fee = res.fees.licence;
 
         }, err => {
             console.log(err);
@@ -362,7 +381,7 @@ export default {
 
         // if no selections, display error do not continue
         if(count_total_purposes == 0){
-            swal({
+            swal.fire({
                 title: "Create Application",
                 text: "Please ensure at least one licence purpose is selected",
                 type: "error",
@@ -377,10 +396,11 @@ export default {
             data.customer_method_id = vm.customer_pay_method;
             data.selected_activity = vm.select_activity;
             data.selected_purpose = vm.select_purpose;
-            vm.$http.post('/api/application.json',JSON.stringify(data),{emulateJSON:true}).then(res => {
+            let request = fetch_util.fetchUrl('/api/application.json',{method:'POST', body:JSON.stringify(data)},{emulateJSON:true})
+            request.then(res => {
                 vm.setApplicationWorkflowState({bool: false});
                 vm.setReceptionMethodId({pay_method: this.customer_pay_method});
-                vm.application = res.body;
+                vm.application = res;
                 vm.spinner = false;
                 vm.$router.push({
                     name:"draft_application",
@@ -389,7 +409,7 @@ export default {
             }, err => {
                 console.log(err);
                 vm.spinner = false;
-                swal(
+                swal.fire(
                     'Application Error',
                     helpers.apiVueResourceError(err),
                     'error'
@@ -411,10 +431,11 @@ export default {
         data.customer_method_id = vm.customer_pay_method;
         data.selected_activity = vm.select_activity;
         data.selected_purpose = vm.select_purpose;
-        vm.$http.post('/api/application.json',JSON.stringify(data),{emulateJSON:true}).then(res => {
+        let request = fetch_util.fetchUrl('/api/application.json',{method:'POST', body:JSON.stringify(data)},{emulateJSON:true})
+        request.then(res => {
             vm.setApplicationWorkflowState({bool: false});
             vm.setReceptionMethodId({pay_method: this.customer_pay_method});
-            vm.application = res.body;
+            vm.application = res;
             vm.spinner = false;
             vm.$router.push({
                 name:"draft_application",
@@ -423,7 +444,7 @@ export default {
         }, err => {
             console.log(err);
             vm.spinner = false;
-            swal(
+            swal.fire(
                 'Application Error',
                 helpers.apiVueResourceError(err),
                 'error'
