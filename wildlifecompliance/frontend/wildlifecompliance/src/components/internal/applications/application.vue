@@ -589,6 +589,7 @@
 
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Application from '../../form.vue';
 import { mapActions, mapGetters } from 'vuex'
 import ProposedDecline from './application_proposed_decline.vue';
@@ -611,15 +612,15 @@ export default {
     data: function() {
         let vm = this;
         return {
-            applicantTab: 'applicantTab'+vm._uid,
-            applicationTab: 'applicationTab'+vm._uid,
-            activityTab: 'activityTab'+vm._uid+'_'+0,
-            detailsBody: 'detailsBody'+vm._uid,
-            identificationBody: 'identificationBody'+vm._uid,
-            addressBody: 'addressBody'+vm._uid,
-            contactsBody: 'contactsBody'+vm._uid,
-            checksBody: 'checksBody'+vm._uid,
-            decisionBody: 'decisionBody'+vm._uid,
+            applicantTab: 'applicantTab'+uuid(),
+            applicationTab: 'applicationTab'+uuid(),
+            activityTab: 'activityTab'+uuid()+'_'+0,
+            detailsBody: 'detailsBody'+uuid(),
+            identificationBody: 'identificationBody'+uuid(),
+            addressBody: 'addressBody'+uuid(),
+            contactsBody: 'contactsBody'+uuid(),
+            checksBody: 'checksBody'+uuid(),
+            decisionBody: 'decisionBody'+uuid(),
             isSendingToAssessor: false,
             notOfficerWorkflow: false,
             assessorGroup:{},
@@ -634,8 +635,8 @@ export default {
             showingConditions:false,
             isofficerfinalisation:false,
             approvingApplication:false,
-            contacts_table_id: vm._uid+'contacts-table',
-            application_assessor_datatable:vm._uid+'assessment-table',
+            contacts_table_id: uuid()+'contacts-table',
+            application_assessor_datatable:uuid()+'assessment-table',
             spinner: false,
             request_spinner: false,
             condition_spinner: false,

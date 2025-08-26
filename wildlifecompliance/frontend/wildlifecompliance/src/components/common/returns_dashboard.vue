@@ -50,6 +50,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import {
     api_endpoints,
@@ -75,8 +76,8 @@ export default {
     data() {
         let vm = this;
         return {
-            pBody: 'pBody' + vm._uid,
-            datatable_id: 'return-datatable-'+vm._uid,
+            pBody: 'pBody' + uuid(),
+            datatable_id: 'return-datatable-'+uuid(),
             filterReturnStatus: 'All',
             filterDueDateFrom: '',
             filterDueDateTo: '',

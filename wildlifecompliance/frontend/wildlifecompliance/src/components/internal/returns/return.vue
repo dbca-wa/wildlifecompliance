@@ -2,16 +2,13 @@
 <form method="POST" name="internal_returns_form" enctype="multipart/form-data">
 <div class="container" id="internalReturn">
     <Returns v-if="isReturnsLoaded">
-        <div class="col-md-3" />
-        <div class="col-md-9">
-
-        <template>
+        <div class="col-md-8">
         <FormSection
             :form-collapse="false"
             label="Condition Details"
         >                
             <div class="panel panel-default">
-                <div class="col-sm-12">
+                <div class="col-sm-8">
                     <form class="form-horizontal" name="return_form">
                         <div class="form-group">
                             <label for="" class="col-sm-3 control-label">Licence Activity</label>
@@ -38,7 +35,7 @@
                 </div>
             </div>
         </FormSection>
-        </template>
+
         <ReturnSheet v-if="returns.format==='sheet'"></ReturnSheet>
         <ReturnQuestion v-if="returns.format==='question'"></ReturnQuestion>
         <ReturnData v-if="returns.format==='data'"></ReturnData>
@@ -83,6 +80,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import Returns from '../../returns_form.vue'
@@ -102,7 +100,7 @@ export default {
   data() {
     let vm = this;
     return {
-        pdBody: 'pdBody' + vm._uid,
+        pdBody: 'pdBody' + uuid(),
         panelClickersInitialised: false,
         loading: [],
         spinner: false,

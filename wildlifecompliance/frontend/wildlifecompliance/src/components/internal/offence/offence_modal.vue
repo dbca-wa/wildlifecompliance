@@ -227,6 +227,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import Awesomplete from "awesomplete";
 import modal from "@vue-utils/bootstrap-modal.vue";
@@ -275,11 +276,11 @@ export default {
       },
       current_offender: null,
       offender_search_type: "individual",
-      oTab: "oTab" + vm._uid,
-      dTab: "dTab" + vm._uid,
-      pTab: "pTab" + vm._uid,
-      lTab: "lTab" + vm._uid,
-      documentTab: 'documentTab' + vm._uid,
+      oTab: "oTab" + uuid(),
+      dTab: "dTab" + uuid(),
+      pTab: "pTab" + uuid(),
+      lTab: "lTab" + uuid(),
+      documentTab: 'documentTab' + uuid(),
       errorResponse: '',
 
       temporary_document_collection_id: null,

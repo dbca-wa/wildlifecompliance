@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name:"schema-add-expander",
@@ -43,7 +44,7 @@ export default {
     data:function () {
         let vm = this;
         return {
-            pExpanderBody: 'pExpanderBody' + vm._uid,
+            pExpanderBody: 'pExpanderBody' + uuid(),
             addedExpander: {
                 label: '',
                 value: '',

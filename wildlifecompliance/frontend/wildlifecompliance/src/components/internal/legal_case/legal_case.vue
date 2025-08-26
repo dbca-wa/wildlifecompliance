@@ -372,6 +372,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import Assignment from "../assignment.vue";
@@ -428,13 +429,13 @@ export default {
             //runningSheetArtifactList: [],
             //runningSheetPersonList: [],
             objectHash: null,
-            runTab: 'runTab'+this._uid,
-            rTab: 'rTab'+this._uid,
-            //gTab: 'gTab'+this._uid,
-            cTab: 'cTab'+this._uid,
-            cpTab: 'cpTab'+this._uid,
-            bTab: 'bTab'+this._uid,
-            pTab: 'pTab'+this._uid,
+            runTab: 'runTab'+uuid(),
+            rTab: 'rTab'+uuid(),
+            //gTab: 'gTab'+uuid(),
+            cTab: 'cTab'+uuid(),
+            cpTab: 'cpTab'+uuid(),
+            bTab: 'bTab'+uuid(),
+            pTab: 'pTab'+uuid(),
             current_schema: [],
             //workflowBindId: '',
             workflow_type: '',

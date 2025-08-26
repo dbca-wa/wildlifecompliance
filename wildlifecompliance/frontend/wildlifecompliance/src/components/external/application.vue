@@ -84,6 +84,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Application from '../form.vue'
 import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
@@ -105,7 +106,7 @@ export default {
       missing_fields: [],
       adjusted_application_fee: 0,
       payment_method: null,
-      activityTab: 'activityTab'+vm._uid+'_'+0,
+      activityTab: 'activityTab'+uuid()+'_'+0,
     }
   },
   components: {

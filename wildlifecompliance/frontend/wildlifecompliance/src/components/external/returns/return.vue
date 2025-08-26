@@ -46,6 +46,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from 'vue'
 import Returns from '../../returns_form.vue'
 import ReturnSheet from './enter_return_sheet.vue'
@@ -63,7 +64,7 @@ export default {
   name: 'externalReturn',
   data() {
     return {
-      pdBody: 'pdBody' + self._uid,
+      pdBody: 'pdBody' + uuid(),
       estimated_fee: 0,
       spinner_exit: false,
       spinner_submit: false,

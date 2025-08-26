@@ -156,6 +156,7 @@
 </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import $ from 'jquery'
 import datatable from '@/utils/vue/datatable.vue'
 import alert from '@/utils/vue/alert.vue'
@@ -179,10 +180,10 @@ export default {
             preferredSystem: null,
             showSpinner: false,
             users_url: helpers.add_endpoint_join(api_endpoints.users_paginated,'datatable_list/?format=datatables'),
-            rBody: 'rBody' + vm._uid,
-            oBody: 'oBody' + vm._uid,
-            cBody: 'cBody' + vm._uid,
-            kBody: 'kBody' + vm._uid,
+            rBody: 'rBody' + uuid(),
+            oBody: 'oBody' + uuid(),
+            cBody: 'cBody' + uuid(),
+            kBody: 'kBody' + uuid(),
             loading: [],
             search_option: "starts_with",
             searchKeywords: [],
@@ -198,7 +199,7 @@ export default {
             results: [],
             errors: false,
             errorString: '',
-            datatable_id: 'keyword-search-datatable-'+vm._uid,
+            datatable_id: 'keyword-search-datatable-'+uuid(),
             keyword_search_headers:["Number","Type","Applicant","Text Found","Action"],
             keyword_search_options:{
                 language: {

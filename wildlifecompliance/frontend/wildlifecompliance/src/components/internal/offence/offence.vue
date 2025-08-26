@@ -317,6 +317,7 @@
 
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import Assignment from "../assignment.vue";
@@ -367,12 +368,12 @@ export default {
             selectedOffender: null,
             offenderModalOpened: false,
             offender_modal_key: 0,
-            offenceTab: 'offenceTab' + vm._uid,
-            detailsTab: 'detailsTab' + vm._uid,
-            documentTab: 'documentTab' + vm._uid,
-            offenderTab: 'offenderTab' + vm._uid,
-            locationTab: 'locationTab' + vm._uid,
-            relatedItemsTab: 'relatedItemsTab' + vm._uid,
+            offenceTab: 'offenceTab' + uuid(),
+            detailsTab: 'detailsTab' + uuid(),
+            documentTab: 'documentTab' + uuid(),
+            offenderTab: 'offenderTab' + uuid(),
+            locationTab: 'locationTab' + uuid(),
+            relatedItemsTab: 'relatedItemsTab' + uuid(),
             displayCreateNewPerson: false,
             idLocationFieldsAddress: vm.guid + "LocationFieldsAddress",
             idLocationFieldsDetails: vm.guid + "LocationFieldsDetails",
@@ -739,7 +740,7 @@ export default {
         relatedItemsBindId: function() {
             let timeNow = Date.now()
             if (this.offence && this.offence.id) {
-                return 'offence_' + this.offence.id + '_' + this._uid;
+                return 'offence_' + this.offence.id + '_' + uuid();
             } else {
                 return timeNow.toString();
             }

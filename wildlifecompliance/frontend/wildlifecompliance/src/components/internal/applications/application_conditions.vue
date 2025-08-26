@@ -1,25 +1,7 @@
-<template id="application_conditions">
-    <!--<div :class="isLicensingOfficer ? 'col-md-12 conditions-table' : 'col-md-12'" > 
-        <div class="row">
-            <FormSection
-                :form-collapse="false"
-                label="Proposed Conditions"
-            >
-                <div class="panel panel-default">
-                    <form class="form-horizontal" action="index.html" method="post">
-                        <div class="col-sm-12">
-                            <button v-if="canAddConditions" @click.prevent="addCondition()" style="margin-bottom:10px;" class="btn btn-primary pull-right">Add Condition</button>
-                        </div>
-                        <datatable ref="conditions_datatable" :id="'conditions-datatable-'+_uid" :dtOptions="condition_options" :dtHeaders="condition_headers"/>
-                    </form>
-                </div>
-            </FormSection>
-        </div>
-        <ConditionDetail ref="condition_detail" :application_id="application.id" :conditions="conditions" :licence_activity_tab="selected_activity_tab_id"
-        :condition="viewedCondition" :purposes="purposes"/>
-    </div>-->       
+<template id="application_conditions">     
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import {
     api_endpoints,
     helpers, fetch_util
@@ -47,7 +29,7 @@ export default {
                 showClear:true,
                 allowInputToggle:true
             },
-            panelBody: "application-conditions-"+vm._uid,
+            panelBody: "application-conditions-"+uuid(),
             viewedCondition: {},
             conditions: [],
             purposes: [],

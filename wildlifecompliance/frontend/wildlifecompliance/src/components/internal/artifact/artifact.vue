@@ -63,6 +63,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import CommsLogs from "@common-components/comms_logs.vue";
@@ -91,8 +92,8 @@ export default {
             rowNumberSelected: '',
             tabSelected: '',
             objectHash: null,
-            oTab: 'runTab'+this._uid,
-            rTab: 'rTab'+this._uid,
+            oTab: 'runTab'+uuid(),
+            rTab: 'rTab'+uuid(),
             /*
             current_schema: [],
             workflowBindId: '',
@@ -207,7 +208,7 @@ export default {
         let timeNow = Date.now()
         let bindId = null;
         if (this.artifactComponent && this.artifactComponent.id) {
-            bindId = 'artifact_' + this.artifactComponent.id + '_' + this._uid;
+            bindId = 'artifact_' + this.artifactComponent.id + '_' + uuid();
         } else {
             bindId = timeNow.toString();
         }

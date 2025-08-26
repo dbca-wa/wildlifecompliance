@@ -107,6 +107,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 //import datatable from '@vue-utils/datatable.vue'
@@ -122,8 +123,8 @@ export default {
     data() {
 
         return {
-            reTab: 'reTab' + this._uid,
-            coTab: 'coTab' + this._uid,
+            reTab: 'reTab' + uuid(),
+            coTab: 'coTab' + uuid(),
         }
     },
     components: {

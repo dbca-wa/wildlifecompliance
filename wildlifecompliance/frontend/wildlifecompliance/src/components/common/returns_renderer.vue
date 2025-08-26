@@ -1,14 +1,14 @@
 <template lang="html">
     <div>
         <h3>{{ displayable_number }}</h3>
-        <div class="col-md-3">
+        <div class="col-md-4">
 
             <MenuAccess ref="menu_access" v-show="!is_external"></MenuAccess>          
 
         </div>
 
         <!-- Tabs Layout -->
-        <div class="col-md-9" >
+        <div class="col-md-8" >
             <div id="tabs" v-show="displayable_tabs">
                 <ul class="nav nav-pills mb-3" id="tab-section" data-tabs="tabs" >
                     <li class="nav-item active"><a id="0" class="nav-link" data-toggle="pill" v-on:click="selectReturnsTab(0)">{{tabs[0]}}</a></li>
@@ -71,7 +71,7 @@ export default {
   props:{
     form_width: {
         type: String,
-        default: 'col-md-9'
+        default: 'col-md-8'
     },
   },
   computed: {

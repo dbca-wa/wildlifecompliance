@@ -73,6 +73,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 
 import { mapActions, mapGetters } from 'vuex'
@@ -316,8 +317,8 @@ export default {
             }
         ]
         return {
-            pBody: 'pBody' + vm._uid,
-            datatable_id: 'application-datatable-'+vm._uid,
+            pBody: 'pBody' + uuid(),
+            datatable_id: 'application-datatable-'+uuid(),
             // Filters for Applications
             filterApplicationLicenceType: 'All',
             filterApplicationStatus: 'All',
@@ -845,5 +846,3 @@ export default {
     }
 }
 </script>
-<style scoped>
-</style>

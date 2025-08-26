@@ -96,6 +96,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import modal from '@vue-utils/bootstrap-modal.vue';
 import SearchPersonOrganisation from './search_person_or_organisation'
@@ -113,9 +114,9 @@ export default {
         urlProtocol: 'https',
         uuid: 0,
         entity: {},
-        pTab: 'pTab' + this._uid,
-        aTab: 'aTab' + this._uid,
-        uTab: 'uTab' + this._uid,
+        pTab: 'pTab' + uuid(),
+        aTab: 'aTab' + uuid(),
+        uTab: 'uTab' + uuid(),
         componentType: '',
         documentArtifactErrorMessage: '',
         //image: "/static/wildlifecompliance_vue/img/shibaken.jpg"

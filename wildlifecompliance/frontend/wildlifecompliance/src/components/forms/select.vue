@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 var select2 = require('select2');
 require("select2/dist/css/select2.min.css");
 
@@ -77,7 +78,7 @@ export default {
         let vm =this;
         return{
             selected: (this.isMultiple) ? [] : "",
-            selectid: "select"+vm._uid,
+            selectid: "select"+uuid(),
             multipleSelected: [],
         }
     },

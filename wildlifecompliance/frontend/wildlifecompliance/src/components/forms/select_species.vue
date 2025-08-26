@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import { mapActions, mapGetters } from 'vuex';
 import HelpText from './help_text.vue';
 import HelpTextUrl from './help_text_url.vue';
@@ -96,7 +97,7 @@ export default {
         let vm =this;
         return{
             selected: (this.isMultiple) ? [] : "",
-            selectid: "select"+vm._uid,
+            selectid: "select"+uuid(),
             multipleSelected: [],
         }
     },

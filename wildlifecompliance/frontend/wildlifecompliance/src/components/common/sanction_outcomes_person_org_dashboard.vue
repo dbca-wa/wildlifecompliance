@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import { api_endpoints, helpers, cache_helper } from '@/utils/hooks'
 import FormSection from "@/components/forms/section_toggle.vue";
@@ -59,8 +60,8 @@ export default {
             sanction_outcome_payment_statuses: [],
             */
 
-            pBody: 'pBody' + vm._uid,
-            datatable_id: 'return-datatable-'+vm._uid,
+            pBody: 'pBody' + uuid(),
+            datatable_id: 'return-datatable-'+uuid(),
             /*
             filterType: 'all',
             filterStatus: 'all',

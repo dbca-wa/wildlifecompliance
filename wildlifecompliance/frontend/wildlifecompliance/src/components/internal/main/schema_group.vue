@@ -120,6 +120,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
@@ -160,8 +161,8 @@ export default {
         let vm = this;
         vm.schema_group_url = helpers.add_endpoint_join(api_endpoints.schema_group_paginated, 'schema_group_datatable_list/?format=datatables');
         return {
-            schema_group_id: 'schema-group-datatable-'+vm._uid,
-            pGroupBody: 'pGroupBody' + vm._uid,
+            schema_group_id: 'schema-group-datatable-'+uuid(),
+            pGroupBody: 'pGroupBody' + uuid(),
             isModalOpen:false,
             missing_fields: [],
             filterTablePurpose: 'All',

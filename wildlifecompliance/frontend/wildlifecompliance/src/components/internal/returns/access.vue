@@ -3,10 +3,10 @@
 <div id="access-menu">
     <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
 
-    <div class="row">
-        <div class="panel panel-default">
-            <div class="panel-heading">Submission</div>
-            <div class="panel-body panel-collapse">
+    <div class="">
+        <div class="card mb-3">
+            <div class="card-header">Submission</div>
+            <div class="card-body border-bottom">
                 <div class="row">
                     <div class="col-sm-12">
                         <strong>Submitted by</strong><br/>
@@ -33,10 +33,10 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="panel panel-default">
-            <div class="panel-heading">Workflow</div>
-            <div class="panel-body panel-collapse">
+    <div class="">
+        <div class="card mb-3">
+            <div class="card-header">Workflow</div>
+            <div class="card-body border-bottom">
                 <div class="row">
                     <div class="col-sm-12">
                         <strong>Status</strong><br/>

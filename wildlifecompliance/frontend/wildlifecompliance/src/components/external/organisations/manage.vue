@@ -83,6 +83,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
 import utils from '../utils'
@@ -94,8 +95,8 @@ export default {
     data () {
         let vm = this;
         return {
-            cBody: 'cBody'+vm._uid,
-            oBody: 'oBody'+vm._uid,
+            cBody: 'cBody'+uuid(),
+            oBody: 'oBody'+uuid(),
             org_id: null,
             org: null,
             myorgperms: null,

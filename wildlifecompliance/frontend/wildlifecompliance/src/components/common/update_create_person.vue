@@ -147,6 +147,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from 'vue';
 import $ from "jquery";
 import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
@@ -160,11 +161,11 @@ export default {
 
         return {
             mainElement: null,
-            elementId: 'create_new_person_' + vm._uid,
+            elementId: 'create_new_person_' + uuid(),
 
-            pdBody: 'pdBody'+vm._uid,
-            cdBody: 'cdBody'+vm._uid,
-            adBody: 'adBody'+vm._uid,
+            pdBody: 'pdBody'+uuid(),
+            cdBody: 'cdBody'+uuid(),
+            adBody: 'adBody'+uuid(),
             errorGivenName: false,
             errorLastName: false,
             errorDob: false,

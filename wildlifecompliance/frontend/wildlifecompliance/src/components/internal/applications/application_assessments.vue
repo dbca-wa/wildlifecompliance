@@ -78,7 +78,7 @@
                                 <div class="row" v-if="optionsLoadedForActivity(selectedActivity)" v-bind:key="`assessor_datatable_${selectedActivity.id}`">
                                     <datatable ref="assessorDatatable"
                                         :data-index="selectedActivity.id"
-                                        :id="`${selectedActivity.id}_${_uid}assessor_datatable`"
+                                        :id="`${selectedActivity.id}_${uid}assessor_datatable`"
                                         :dtOptions="assessors_options[selectedActivity.id]"
                                         :dtHeaders="assessors_headers"
                                         :onMount="eventListeners"/>
@@ -99,6 +99,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Application from '../../form.vue';
 import modal from '@vue-utils/bootstrap-modal.vue'
 import datatable from '@vue-utils/datatable.vue';
@@ -123,17 +124,18 @@ export default {
             },
             datepickerInitialised: false,
             isModalOpen: false,
-            assessorsBody: `assessorsBody${vm._uid}`,
+            assessorsBody: `assessorsBody${uuid()}`,
             assessorGroup: [],
-            panelBody: `assessment-details-${vm._uid}`,
+            panelBody: `assessment-details-${uuid()}`,
             "selectedAssessor": {},
-            application_assessor_datatable: `${vm._uid}assessment-table`,
+            application_assessor_datatable: `${uuid()}assessment-table`,
             assessors_headers: ["Assessor Group","Date Sent","Status","Final Comments","Action"],
             assessors_options: {},
             DATE_TIME_FORMAT: 'DD/MM/YYYY HH:mm:ss',
             viewingAssessmentId: null,
             savingAssessment: false,
             showSendToAssessorButton: true,
+            uid: uuid(),
         }
     },
     components: {

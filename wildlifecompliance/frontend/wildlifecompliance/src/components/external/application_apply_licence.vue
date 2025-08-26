@@ -110,6 +110,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from 'vue'
 import {
   api_endpoints,
@@ -154,7 +155,7 @@ export default {
         },
         "loading": [],
         form: null,
-        pBody: 'pBody' + vm._uid,
+        pBody: 'pBody' + uuid(),
         application_fee: 0,
         licence_fee: 0,
         selected_apply_org_id_details : {},

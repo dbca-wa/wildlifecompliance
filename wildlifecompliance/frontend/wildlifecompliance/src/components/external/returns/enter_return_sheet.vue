@@ -56,6 +56,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import utils from '@/components/external/utils'
 import $ from 'jquery'
@@ -82,7 +83,7 @@ export default {
   data() {
     var vm = this; // keep and use created ViewModel context with table.
     return {
-        pdBody: 'pdBody' + vm._uid,
+        pdBody: 'pdBody' + uuid(),
         datatable_id: 'return-datatable',
         form: null,
         filterActivityType: 'All',

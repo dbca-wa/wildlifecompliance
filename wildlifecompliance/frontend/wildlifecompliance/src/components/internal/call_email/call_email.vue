@@ -557,6 +557,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 
@@ -586,9 +587,9 @@ export default {
     return {
       objectHash: null,
       uuid: 0,
-      cTab: 'cTab'+this._uid,
-      rTab: 'rTab'+this._uid,
-      sanctionOutcomeKey: 'sanctionOutcome' + this._uid,
+      cTab: 'cTab'+uuid(),
+      rTab: 'rTab'+uuid(),
+      sanctionOutcomeKey: 'sanctionOutcome' + uuid(),
       dtHeadersRelatedItems: [
           'Number',
           'Type',
@@ -643,10 +644,10 @@ export default {
       reportAdviceUrl: '',
       sectionLabel: "Details",
       sectionIndex: 1,
-      pBody: "pBody" + this._uid,
+      pBody: "pBody" + uuid(),
       loading: [],
       renderer_form: null,
-      callemailTab: "callemailTab" + this._uid,
+      callemailTab: "callemailTab" + uuid(),
       comms_url: helpers.add_endpoint_json(
         api_endpoints.call_email,
         this.$route.params.call_email_id + "/comms_log"
@@ -809,7 +810,7 @@ export default {
     relatedItemsBindId: function() {
         let timeNow = Date.now()
         if (this.call_email && this.call_email.id) {
-            return 'call_email_' + this.call_email.id + '_' + this._uid;
+            return 'call_email_' + this.call_email.id + '_' + uuid();
         } else {
             return timeNow.toString();
         }

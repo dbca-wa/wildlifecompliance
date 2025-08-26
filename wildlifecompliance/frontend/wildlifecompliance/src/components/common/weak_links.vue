@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Awesomplete from "awesomplete";
 import $ from "jquery";
 
@@ -39,7 +40,7 @@ export default {
     data: function(){
         this.awesomplete_obj = null;
         return {
-            elemId: 'create_weak_link_' + this._uid,
+            elemId: 'create_weak_link_' + uuid(),
             selectedEntity: null,
             second_object_id: null,
             second_content_type: null,

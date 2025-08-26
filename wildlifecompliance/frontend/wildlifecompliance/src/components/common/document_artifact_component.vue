@@ -236,6 +236,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 //import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
@@ -253,13 +254,13 @@ export default {
     data: function() {
         return {
             uuid: 0,
-            newTab: 'newTab'+this._uid,
-            existingTab: 'existingTab'+this._uid,
-            objectTab: 'objectTab'+this._uid,
-            detailsTab: 'detailsTab'+this._uid,
-            storageTab: 'storageTab'+this._uid,
-            disposalTab: 'disposalTab'+this._uid,
-            rTab: 'rTab'+this._uid,
+            newTab: 'newTab'+uuid(),
+            existingTab: 'existingTab'+uuid(),
+            objectTab: 'objectTab'+uuid(),
+            detailsTab: 'detailsTab'+uuid(),
+            storageTab: 'storageTab'+uuid(),
+            disposalTab: 'disposalTab'+uuid(),
+            rTab: 'rTab'+uuid(),
             isModalOpen: false,
             processingDetails: false,
             documentActionUrl: '',

@@ -190,6 +190,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from 'vue'
 import $ from 'jquery'
 import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
@@ -204,7 +205,7 @@ export default {
     data () {
         let vm = this;
         return {
-            oBody: 'oBody'+vm._uid,
+            oBody: 'oBody'+uuid(),
             current_user: {
                 wildlifecompliance_organisations:[],
             },

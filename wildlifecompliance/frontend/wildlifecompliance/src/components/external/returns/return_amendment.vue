@@ -21,6 +21,7 @@
 
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import { splitText } from "@/utils/helpers.js";
@@ -31,7 +32,7 @@ export default {
   data: function() {
     let vm = this;
     return {
-        returnsAmendBody: 'returnsAmendBody'+vm._uid,
+        returnsAmendBody: 'returnsAmendBody'+uuid(),
     }
   },
   components: {

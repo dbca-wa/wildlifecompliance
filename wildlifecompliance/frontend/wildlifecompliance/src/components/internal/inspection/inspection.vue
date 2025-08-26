@@ -408,6 +408,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import SearchPersonOrganisation from "@/components/common/search_person_or_organisation.vue";
@@ -439,11 +440,11 @@ export default {
         mapboxAccessToken: null,
       uuid: 0,
       objectHash: null,
-      iTab: 'iTab'+this._uid,
-      rTab: 'rTab'+this._uid,
-      oTab: 'oTab'+this._uid,
-      cTab: 'cTab'+this._uid,
-      lTab: 'lTab'+this._uid,
+      iTab: 'iTab'+uuid(),
+      rTab: 'rTab'+uuid(),
+      oTab: 'oTab'+uuid(),
+      cTab: 'cTab'+uuid(),
+      lTab: 'lTab'+uuid(),
       current_schema: [],
       //createInspectionBindId: '',
       workflowBindId: '',
@@ -489,7 +490,7 @@ export default {
 
       sectionLabel: "Details",
       sectionIndex: 1,
-      pBody: "pBody" + this._uid,
+      pBody: "pBody" + uuid(),
       loading: [],
       inspectionTypes: [],
       teamMemberSelected: null,
@@ -633,7 +634,7 @@ export default {
     relatedItemsBindId: function() {
         let timeNow = Date.now()
         if (this.inspection && this.inspection.id) {
-            return 'inspection_' + this.inspection.id + '_' + this._uid;
+            return 'inspection_' + this.inspection.id + '_' + uuid();
         } else {
             return timeNow.toString();
         }
@@ -852,7 +853,7 @@ export default {
         }
 
         let inspectionTeamResponse = await fetch_util.fetchUrl(inspectionTeamUrl, {method:'POST', body:JSON.stringify(payload)});
-        await this.setInspection(inspectionTeamresponse);
+        await this.setInspection(inspectionTeamResponse);
         this.$nextTick(() => {
             this.constructInspectionTeamTable()
         });

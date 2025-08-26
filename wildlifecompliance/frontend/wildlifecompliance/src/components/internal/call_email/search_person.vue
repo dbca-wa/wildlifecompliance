@@ -181,6 +181,7 @@
 </template>
         
 <script>
+import { v4 as uuid } from 'uuid';
 import Awesomplete from 'awesomplete';
 import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
@@ -204,13 +205,13 @@ export default {
         return {
             awe: null,
             suggest_list: [],
-            adBody: 'adBody'+vm._uid,
-            pdBody: 'pdBody'+vm._uid,
-            cdBody: 'cdBody'+vm._uid,
-            odBody: 'odBody'+vm._uid,
-            idBody: 'idBody'+vm._uid,
-            dTab: 'dTab'+vm._uid,
-            oTab: 'oTab'+vm._uid,
+            adBody: 'adBody'+uuid(),
+            pdBody: 'pdBody'+uuid(),
+            cdBody: 'cdBody'+uuid(),
+            odBody: 'odBody'+uuid(),
+            idBody: 'idBody'+uuid(),
+            dTab: 'dTab'+uuid(),
+            oTab: 'oTab'+uuid(),
             user: {
                 residential_address: {},
                 wildlifecompliance_organisations: []

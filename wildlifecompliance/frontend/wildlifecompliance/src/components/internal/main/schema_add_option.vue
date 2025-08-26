@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name:"schema-add-option",
@@ -46,7 +47,7 @@ export default {
     data:function () {
         let vm = this;
         return {
-            pOptionBody: 'pOptionBody' + vm._uid,
+            pOptionBody: 'pOptionBody' + uuid(),
             addedOption: {
                 id: '',
                 label: '',

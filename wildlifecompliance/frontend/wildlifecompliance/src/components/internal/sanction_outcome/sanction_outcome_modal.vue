@@ -269,6 +269,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import modal from "@vue-utils/bootstrap-modal.vue";
 import datatable from "@vue-utils/datatable.vue";
@@ -288,9 +289,9 @@ export default {
 
     return {
         temporary_document_collection_id: null,
-        nTab: "nTab" + vm._uid,
-        aTab: "aTab" + vm._uid,
-        dTab: "dTab" + vm._uid,
+        nTab: "nTab" + uuid(),
+        aTab: "aTab" + uuid(),
+        dTab: "dTab" + uuid(),
         isModalOpen: false,
         processingDetails: false,
 

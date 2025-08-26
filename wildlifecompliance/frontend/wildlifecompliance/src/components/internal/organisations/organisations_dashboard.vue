@@ -17,6 +17,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import {
     api_endpoints,
@@ -28,8 +29,8 @@ export default {
     data() {
         let vm = this;
         return {
-            oBody: 'oBody' + vm._uid,
-            datatable_id: 'organisation-datatable-'+vm._uid,
+            oBody: 'oBody' + uuid(),
+            datatable_id: 'organisation-datatable-'+uuid(),
             organisation_headers: ["Name", "ABN", "Address", "Action"],
             organisation_options:{
                 serverSide: true,
@@ -38,7 +39,7 @@ export default {
                 order: [
                     [0, 'asc']
                 ],
-                tableID: 'organisation-datatable-'+vm._uid,
+                tableID: 'organisation-datatable-'+uuid(),
                 language: {
                     processing: "<i class='fa fa-4x fa-spinner fa-spin'></i>"
                 },

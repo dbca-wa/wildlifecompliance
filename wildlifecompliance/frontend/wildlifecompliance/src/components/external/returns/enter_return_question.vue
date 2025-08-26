@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import CommsLogs from '@common-components/comms_logs.vue'
@@ -37,7 +38,7 @@ export default {
   data() {
     let vm = this;
     return {
-      pdBody: 'pdBody' + vm._uid,
+      pdBody: 'pdBody' + uuid(),
     }
   },
   computed: {

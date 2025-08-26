@@ -470,6 +470,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import datatable from '@vue-utils/datatable.vue'
@@ -520,10 +521,10 @@ export default {
             workflow_type :'',
             workflowBindId :'',
             remediation_action_id: 0,
-            soTab: 'soTab' + this._uid,
-            raTab: 'raTab' + this._uid,
-            deTab: 'deTab' + this._uid,
-            reTab: 'reTab' + this._uid,
+            soTab: 'soTab' + uuid(),
+            raTab: 'raTab' + uuid(),
+            deTab: 'deTab' + uuid(),
+            reTab: 'reTab' + uuid(),
             objectHash : null,
             extendPaymentDueDateInitialized: false,
             recordFerCaseNumberInitialized: false,
@@ -810,7 +811,7 @@ export default {
         relatedItemsBindId: function() {
             let timeNow = Date.now()
             if (this.sanction_outcome && this.sanction_outcome.id) {
-                return 'sanction_outcome_' + this.sanction_outcome.id + '_' + this._uid;
+                return 'sanction_outcome_' + this.sanction_outcome.id + '_' + uuid();
             } else {
                 return timeNow.toString();
             }

@@ -269,6 +269,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import Application from '../../form.vue';
 import modal from '@vue-utils/bootstrap-modal.vue'
 import { mapActions, mapGetters } from 'vuex'
@@ -286,13 +287,13 @@ export default {
     data: function() {
         let vm = this;
         return {
-            applicantTab: 'applicantTab'+vm._uid,
-            applicationTab: 'applicationTab'+vm._uid,
-            activityTab: 'activityTab'+vm._uid+'_'+0,
-            detailsBody: 'detailsBody'+vm._uid,
-            identificationBody: 'identificationBody'+vm._uid,
-            addressBody: 'addressBody'+vm._uid,
-            checksBody: 'checksBody'+vm._uid,
+            applicantTab: 'applicantTab'+uuid(),
+            applicationTab: 'applicationTab'+uuid(),
+            activityTab: 'activityTab'+uuid()+'_'+0,
+            detailsBody: 'detailsBody'+uuid(),
+            identificationBody: 'identificationBody'+uuid(),
+            addressBody: 'addressBody'+uuid(),
+            checksBody: 'checksBody'+uuid(),
             isSendingToAssessor: false,
             assessorGroup:{},
             "selectedAssessor":{},
@@ -302,7 +303,7 @@ export default {
             showingApplication:false,
             isOfficerConditions:false,
             isofficerfinalisation:false,
-            application_assessor_datatable:vm._uid+'assessment-table',
+            application_assessor_datatable:uuid()+'assessment-table',
             assessors_headers:["Assessor Group","Date Sent","Status","Action"],
             assessors_options:{},
             DATE_TIME_FORMAT: 'DD/MM/YYYY HH:mm:ss',

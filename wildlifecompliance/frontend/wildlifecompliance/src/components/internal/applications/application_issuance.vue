@@ -232,6 +232,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import {
     api_endpoints,
     helpers, fetch_util
@@ -279,10 +280,10 @@ export default {
 	}
 
         return {
-            panelBody: "application-issuance-"+vm._uid,
-            issuePanelBody: "app-issuance-check-"+vm._uid,
-            emailPanelBody: "app-issuance-email-"+vm._uid,
-            purposeBody: `purposeBody${vm._uid}`,
+            panelBody: "application-issuance-"+uuid(),
+            issuePanelBody: "app-issuance-check-"+uuid(),
+            emailPanelBody: "app-issuance-email-"+uuid(),
+            purposeBody: `purposeBody${uuid()}`,
             proposed_licence:{},
             licence:{
                 activity: [],

@@ -245,6 +245,7 @@
 </template>
 
 <script>
+import { v4 as uuid } from 'uuid';
 import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
 import ApplicationDashTable from '@common-components/applications_dashboard.vue'
@@ -262,13 +263,13 @@ export default {
     data () {
         let vm = this;
         return {
-            adBody: 'adBody'+vm._uid,
-            pdBody: 'pdBody'+vm._uid,
-            cdBody: 'cdBody'+vm._uid,
-            odBody: 'odBody'+vm._uid,
-            idBody: 'idBody'+vm._uid,
-            dTab: 'dTab'+vm._uid,
-            oTab: 'oTab'+vm._uid,
+            adBody: 'adBody'+uuid(),
+            pdBody: 'pdBody'+uuid(),
+            cdBody: 'cdBody'+uuid(),
+            odBody: 'odBody'+uuid(),
+            idBody: 'idBody'+uuid(),
+            dTab: 'dTab'+uuid(),
+            oTab: 'oTab'+uuid(),
             user: {
                 residential_address: {},
                 wildlifecompliance_organisations: []

@@ -72,6 +72,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import modal from '@vue-utils/bootstrap-modal.vue'
 import datatable from '@/utils/vue/datatable.vue'
 import LicenceActionPurposes from './licence_action_purposes.vue'
@@ -104,8 +105,8 @@ export default {
     data() {
         let vm = this;
         return {
-            pBody: 'pBody' + vm._uid,
-            datatable_id: 'licence-datatable-'+vm._uid,
+            pBody: 'pBody' + uuid(),
+            datatable_id: 'licence-datatable-'+uuid(),
             filterLicenceType: 'All',
             filterLicenceIssuedFrom: '',
             filterLicenceIssuedTo: '',

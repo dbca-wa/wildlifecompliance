@@ -68,6 +68,7 @@
     </div>
 </template>
 <script>
+import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
 import {
     api_endpoints,
@@ -79,8 +80,8 @@ export default {
     data() {
         let vm = this;
         return {
-            pBody: 'pBody' + vm._uid,
-            datatable_id: 'assessment-datatable-'+vm._uid,
+            pBody: 'pBody' + uuid(),
+            datatable_id: 'assessment-datatable-'+uuid(),
             // Filters for Applications
             filterApplicationLicenceType: 'All',
             filterApplicationStatus: 'All',
@@ -107,7 +108,7 @@ export default {
                 order: [
                     [0, 'desc']
                 ],
-                tableID: 'assessment-datatable-'+vm._uid,
+                tableID: 'assessment-datatable-'+uuid(),
                 language: {
                     processing: "<i class='fa fa-4x fa-spinner fa-spin'></i>"
                 },
