@@ -1195,7 +1195,11 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_id_check')))
+                    let request = fetch_util.fetchUrl(
+                        helpers.add_endpoint_json(
+                            api_endpoints.applications,(vm.application.id+'/accept_id_check')),
+                            {method:'POST'}
+                        )
                     request.then((response) => {
                         vm.setIdCheckStatus(response.id_check_status);
                     }, (error) => {
@@ -1215,7 +1219,10 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_id_check')))
+                    let request = fetch_util.fetchUrl(
+                        helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_id_check'))
+                        ,{method:'POST'}
+                    )
                     request.then((response) => {
                         vm.setIdCheckStatus(response.id_check_status);
                     }, (error) => {
@@ -1235,7 +1242,7 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/request_id_check')))
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/request_id_check')),{method:'POST'})
                     request.then((response) => {
                         vm.setIdCheckStatus(response.id_check_status);
                     }, (error) => {
@@ -1255,7 +1262,7 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_character_check')))
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_character_check')),{method:'POST'})
                     request.then((response) => {
                         vm.setCharacterCheckStatus(response.character_check_status);
                     }, (error) => {
@@ -1275,7 +1282,7 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_character_check')))
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_character_check')),{method:'POST'})
                     request.then((response) => {
                         vm.setCharacterCheckStatus(response.character_check_status);
                     }, (error) => {
@@ -1295,7 +1302,7 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_return_check')))
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_return_check')),{method:'POST'})
                     request.then((response) => {
                         vm.setReturnCheckStatus(response.return_check_status);
                     }, (error) => {
@@ -1315,7 +1322,7 @@ export default {
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
                 if (result) {
-                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_return_check')))
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_return_check')),{method:'POST'})
                     request.then((response) => {
                         vm.setReturnCheckStatus(response.return_check_status);
                     }, (error) => {

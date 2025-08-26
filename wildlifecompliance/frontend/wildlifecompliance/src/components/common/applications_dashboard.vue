@@ -635,9 +635,9 @@ export default {
         },
         getActivities: async function(application_id) {
             let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/get_activities/'), 
-                {method:'POST', body:{
+                {method:'POST', body:JSON.stringify({
                     application_id
-                }}
+                })}
             )
             request.then(res=>{
                 this.activities = res;
