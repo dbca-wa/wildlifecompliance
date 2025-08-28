@@ -561,23 +561,23 @@ import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 
-import CommsLogs from "@common-components/comms_logs.vue";
+import CommsLogs from "@/components/common/comms_logs.vue";
 import MapLocation from "./map_location.vue";
-import datatable from '@vue-utils/datatable.vue'
-import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
+import datatable from '@/utils/vue/datatable.vue'
+import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks.js";
 //import SearchPerson from "./search_person.vue";
-import SearchPersonOrganisation from "@common-components/search_person_or_organisation.vue";
+import SearchPersonOrganisation from "@/components/common/search_person_or_organisation.vue";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
-import CallWorkflow from './call_email_workflow';
-import Offence from '../offence/offence_modal';
-import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal';
+import CallWorkflow from './call_email_workflow.vue';
+import Offence from '../offence/offence_modal.vue';
+import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal.vue';
 
-require("select2/dist/css/select2.min.css");
+import "select2/dist/css/select2.min.css";
 
-import Inspection from '../inspection/create_inspection_modal';
-import RelatedItems from "@common-components/related_items.vue";
+import Inspection from '../inspection/create_inspection_modal.vue';
+import RelatedItems from "@/components/common/related_items.vue";
 import hash from 'object-hash';
 import CreateLegalCaseModal from "../legal_case/create_legal_case_modal.vue";
 

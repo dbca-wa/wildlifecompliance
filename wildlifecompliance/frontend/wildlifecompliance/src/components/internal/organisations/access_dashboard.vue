@@ -25,7 +25,7 @@
 </template>
 <script>
 import $ from 'jquery'
-import datatable from '@vue-utils/datatable.vue'
+import datatable from '@/utils/vue/datatable.vue'
 import {
   api_endpoints,
   helpers

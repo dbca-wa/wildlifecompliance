@@ -230,13 +230,13 @@
 import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import Awesomplete from "awesomplete";
-import modal from "@vue-utils/bootstrap-modal.vue";
-import datatable from "@vue-utils/datatable.vue";
+import modal from "@/utils/vue/bootstrap-modal.vue";
+import datatable from "@/utils/vue/datatable.vue";
 import { mapGetters, mapActions } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
-import MapLocationOffence from "./map_location_offence1";
-import SearchPersonOrganisation from "@common-components/search_person_or_organisation.vue";
-//import CreateNewPerson from "@common-components/create_new_person.vue";
+import MapLocationOffence from "./map_location_offence1.vue";
+import SearchPersonOrganisation from "@/components/common/search_person_or_organisation.vue";
+//import CreateNewPerson from "@/components/common/create_new_person.vue";
 import utils from "../utils";
 import $ from "jquery";
 

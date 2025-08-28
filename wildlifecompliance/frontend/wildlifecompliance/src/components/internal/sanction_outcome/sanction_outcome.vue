@@ -473,14 +473,14 @@
 import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
-import datatable from '@vue-utils/datatable.vue'
+import datatable from '@/utils/vue/datatable.vue'
 import utils from "@/components/external/utils";
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import Assignment from "../assignment.vue";
-import CommsLogs from "@common-components/comms_logs.vue";
+import CommsLogs from "@/components/common/comms_logs.vue";
 import filefield from '@/components/common/compliance_file.vue';
-import SanctionOutcomeWorkflow from '@/components/internal/sanction_outcome/sanction_outcome_workflow';
+import SanctionOutcomeWorkflow from '@/components/internal/sanction_outcome/sanction_outcome_workflow.vue';
 import ExtendPaymentDueDate from '@/components/internal/sanction_outcome/extend_payment_due_date.vue';
 import RecordFerCaseNumber from '@/components/internal/sanction_outcome/record_fer_case_number.vue';
 import SendParkingInfringement from '@/components/internal/sanction_outcome/send_parking_infringement.vue';
@@ -488,9 +488,9 @@ import AcceptRemediationAction from '@/components/internal/sanction_outcome/acce
 import RequestAmendmentRemediationAction from '@/components/internal/sanction_outcome/request_amendment_remediation_action.vue';
 
 import hash from 'object-hash';
-import RelatedItems from "@common-components/related_items.vue";
-import RegistrationHolder from "@common-components/search_person_or_organisation.vue";
-import Driver from "@common-components/search_person_or_organisation.vue";
+import RelatedItems from "@/components/common/related_items.vue";
+import RegistrationHolder from "@/components/common/search_person_or_organisation.vue";
+import Driver from "@/components/common/search_person_or_organisation.vue";
 
 export default {
     name: 'ViewSanctionOutcome',

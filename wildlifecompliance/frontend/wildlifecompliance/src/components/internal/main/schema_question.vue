@@ -220,8 +220,8 @@
 <script>
 import { v4 as uuid } from 'uuid';
 import datatable from '@/utils/vue/datatable.vue'
-import modal from '@vue-utils/bootstrap-modal.vue'
-import alert from '@vue-utils/alert.vue'
+import modal from '@/utils/vue/bootstrap-modal.vue'
+import alert from '@/utils/vue/alert.vue'
 import SchemaOption from './schema_add_option.vue'
 import {
   api_endpoints,

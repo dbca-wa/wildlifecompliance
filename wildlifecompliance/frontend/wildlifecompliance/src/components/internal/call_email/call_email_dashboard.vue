@@ -66,7 +66,7 @@
 </template>
 <script>
     import $ from 'jquery'
-    import datatable from '@vue-utils/datatable.vue'
+    import datatable from '@/utils/vue/datatable.vue'
     import MapLocations from "./map_locations.vue";
     import { cache_helper, fetch_util } from "@/utils/hooks";
     import { mapGetters, mapActions } from "vuex";

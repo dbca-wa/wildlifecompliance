@@ -595,12 +595,12 @@ import { mapActions, mapGetters } from 'vuex'
 import ProposedDecline from './application_proposed_decline.vue';
 import AmendmentRequest from './amendment_request.vue';
 import ApplicationAssessments from './application_assessments.vue';
-import datatable from '@vue-utils/datatable.vue';
+import datatable from '@/utils/vue/datatable.vue';
 import ProposedLicence from './proposed_issuance.vue';
 import IssueLicence from './application_issuance.vue';
-import CommsLogs from '@common-components/comms_logs.vue';
+import CommsLogs from '@/components/common/comms_logs.vue';
 import AmendmentRequestDetails from '@/components/forms/amendment_request_details.vue';
-import SecureBaseLink from '@common-components/securebase_link.vue';
+import SecureBaseLink from '@/components/common/securebase_link.vue';
 import {
     api_endpoints,
     helpers, fetch_util

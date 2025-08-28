@@ -173,12 +173,12 @@
 <script>
 import { v4 as uuid } from 'uuid';
 //import $ from 'jquery'
-import modal from '@vue-utils/bootstrap-modal.vue'
-import alert from '@vue-utils/alert.vue'
+import modal from '@/utils/vue/bootstrap-modal.vue'
+import alert from '@/utils/vue/alert.vue'
 import {helpers,api_endpoints,fetch_util} from "@/utils/hooks.js"
 import { mapGetters } from 'vuex'
 import filefield from '@/components/common/compliance_file.vue'
-import summernote from '@/components/purpose_details_summernote'
+import summernote from '@/components/purpose_details_summernote.vue'
 
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {

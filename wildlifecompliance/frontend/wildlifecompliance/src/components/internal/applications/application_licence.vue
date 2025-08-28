@@ -27,7 +27,7 @@ import {
     helpers
 }
 from '@/utils/hooks'
-import datatable from '@vue-utils/datatable.vue'
+import datatable from '@/utils/vue/datatable.vue'
 import { mapGetters } from 'vuex'
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {

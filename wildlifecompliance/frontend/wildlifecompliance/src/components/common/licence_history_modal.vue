@@ -25,9 +25,9 @@
 </template>
 <script>
 import Vue from "vue";
-import modal from "@vue-utils/bootstrap-modal.vue";
-import datatable from "@vue-utils/datatable.vue";
-import alert from '@vue-utils/alert.vue';
+import modal from "@/utils/vue/bootstrap-modal.vue";
+import datatable from "@/utils/vue/datatable.vue";
+import alert from '@/utils/vue/alert.vue';
 import {
     api_endpoints,
     helpers

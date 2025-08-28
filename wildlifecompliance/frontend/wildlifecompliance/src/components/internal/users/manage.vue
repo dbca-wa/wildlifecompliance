@@ -247,15 +247,15 @@
 <script>
 import { v4 as uuid } from 'uuid';
 import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
-import datatable from '@vue-utils/datatable.vue'
-import ApplicationDashTable from '@common-components/applications_dashboard.vue'
-import LicenceDashTable from '@common-components/licences_dashboard.vue'
-import ReturnDashTable from '@common-components/returns_dashboard.vue'
-import SanctionOutcomePersonOrgDashTable from '@common-components/sanction_outcomes_person_org_dashboard.vue'
-import LegalCasePersonOrgDashTable from '@common-components/legal_case_person_org_dashboard.vue'
-import CommsLogs from '@common-components/comms_logs.vue'
-import IntelligenceInformation from '@common-components/intelligence_information.vue'
-import SecureBaseLink from '@common-components/securebase_link.vue';
+import datatable from '@/utils/vue/datatable.vue'
+import ApplicationDashTable from '@/components/common/applications_dashboard.vue'
+import LicenceDashTable from '@/components/common/licences_dashboard.vue'
+import ReturnDashTable from '@/components/common/returns_dashboard.vue'
+import SanctionOutcomePersonOrgDashTable from '@/components/common/sanction_outcomes_person_org_dashboard.vue'
+import LegalCasePersonOrgDashTable from '@/components/common/legal_case_person_org_dashboard.vue'
+import CommsLogs from '@/components/common/comms_logs.vue'
+import IntelligenceInformation from '@/components/common/intelligence_information.vue'
+import SecureBaseLink from '@/components/common/securebase_link.vue';
 import utils from '../utils'
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {

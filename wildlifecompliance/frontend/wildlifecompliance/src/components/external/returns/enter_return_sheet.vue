@@ -63,7 +63,7 @@ import $ from 'jquery'
 import Vue from 'vue'
 import Returns from '../../returns_form.vue'
 import { mapActions, mapGetters } from 'vuex'
-import CommsLogs from '@common-components/comms_logs.vue'
+import CommsLogs from '@/components/common/comms_logs.vue'
 import SheetEntry from './enter_return_sheet_entry.vue'
 import {
   api_endpoints,

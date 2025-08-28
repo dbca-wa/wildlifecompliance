@@ -6,7 +6,7 @@
 <script>
 
 import datatable from '@/utils/vue/datatable.vue'
-import SanctionOutcomeDashTable from '@common-components/sanction_outcomes_dashboard.vue'
+import SanctionOutcomeDashTable from '@/components/common/sanction_outcomes_dashboard.vue'
 import {
   api_endpoints,
   helpers

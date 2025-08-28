@@ -98,10 +98,10 @@
 <script>
 import { v4 as uuid } from 'uuid';
 import Vue from "vue";
-import modal from '@vue-utils/bootstrap-modal.vue';
-import SearchPersonOrganisation from './search_person_or_organisation'
-import DocumentArtifact from './document_artifact_component'
-import PhysicalArtifact from './physical_artifact_component'
+import modal from '@/utils/vue/bootstrap-modal.vue';
+import SearchPersonOrganisation from './search_person_or_organisation.vue'
+import DocumentArtifact from './document_artifact_component.vue'
+import PhysicalArtifact from './physical_artifact_component.vue'
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 
 export default {

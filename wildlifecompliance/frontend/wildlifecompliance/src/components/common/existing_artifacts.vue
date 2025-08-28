@@ -9,7 +9,7 @@
 </template>
 <script>
 import Vue from "vue";
-import datatable from '@vue-utils/datatable.vue'
+import datatable from '@/utils/vue/datatable.vue'
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";

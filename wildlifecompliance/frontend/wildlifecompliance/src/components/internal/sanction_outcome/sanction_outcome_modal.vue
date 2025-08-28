@@ -271,8 +271,8 @@
 <script>
 import { v4 as uuid } from 'uuid';
 import Vue from "vue";
-import modal from "@vue-utils/bootstrap-modal.vue";
-import datatable from "@vue-utils/datatable.vue";
+import modal from "@/utils/vue/bootstrap-modal.vue";
+import datatable from "@/utils/vue/datatable.vue";
 import filefield from "@/components/common/compliance_file.vue";
 import { mapGetters, mapActions } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";

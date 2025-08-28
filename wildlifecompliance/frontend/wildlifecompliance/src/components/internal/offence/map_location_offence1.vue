@@ -72,8 +72,7 @@ import "leaflet-measure"; /* This should be imported after leaflet */
 import "leaflet.locatecontrol";
 import Awesomplete from "awesomplete";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import { guid } from "@/utils/helpers";
-import { api_endpoints, helpers, cache_helper } from '@/utils/hooks'
+import { api_endpoints, helpers, cache_helper } from '@/utils/hooks.js'
 
 import "awesomplete/awesomplete.css";
 import "leaflet/dist/leaflet.css";
@@ -110,7 +109,7 @@ export default {
    //   iconUrl: require("../../../assets/marker-yellow-locked.svg"),
    //   ...baseDic
    // });
-    vm.guid = guid();
+    vm.guid = helpers.guid();
 
     return {
         mapboxAccessToken: null,

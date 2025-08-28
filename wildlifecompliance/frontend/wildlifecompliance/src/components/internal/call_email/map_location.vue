@@ -78,7 +78,7 @@ import 'leaflet-measure';  /* This should be imported after leaflet */
 import 'leaflet.locatecontrol';
 import Awesomplete from 'awesomplete';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import { guid, } from "@/utils/helpers";
+import helpers from "@/utils/helpers";
 
 import 'awesomplete/awesomplete.css';
 import 'leaflet/dist/leaflet.css';
@@ -98,7 +98,7 @@ export default {
         vm.icon_enquiery = L.icon({iconUrl: require('../../../assets/marker-green-locked.svg'), ...baseDic });
         vm.icon_complaint = L.icon({iconUrl: require('../../../assets/marker-red-locked.svg'), ...baseDic});
         vm.icon_incident = L.icon({iconUrl: require('../../../assets/marker-yellow-locked.svg'), ...baseDic});
-        vm.guid = guid();
+        vm.guid = helpers.guid();
 
         return {
             defaultCenter: defaultCentre,

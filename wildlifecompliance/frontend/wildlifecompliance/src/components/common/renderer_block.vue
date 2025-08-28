@@ -314,7 +314,7 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import { helpers, api_endpoints } from "@/utils/hooks.js"
-import { strToBool } from "@/utils/helpers.js";
+// import { strToBool } from "@/utils/helpers.js";
 import FormSection from '@/components/forms/section.vue'
 import Group from '@/components/forms/group.vue'
 import Group2 from '@/components/forms/group2.vue'
@@ -455,7 +455,7 @@ const RendererBlock = {
         'setFormValue',
         'refreshApplicationFees',
     ]),
-    strToBool: strToBool,
+    strToBool: helpers.strToBool,
     element_id: function(depth=0) {
         return `id_${this.component_name}${(depth) ? `_${depth}` : ''}${this.instance !== null ? `__instance${this.instance}`: ''}`;
     },

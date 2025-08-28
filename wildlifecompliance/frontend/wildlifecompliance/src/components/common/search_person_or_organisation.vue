@@ -61,10 +61,10 @@ import Awesomplete from "awesomplete";
 import $ from "jquery";
 
 import "awesomplete/awesomplete.css";
-import updateCreatePerson from '@common-components/update_create_person.vue'
-import updateCreateOrganisation from '@common-components/update_create_organisation.vue'
+import updateCreatePerson from '@/components/common/update_create_person.vue'
+import updateCreateOrganisation from '@/components/common/update_create_organisation.vue'
 import hash from 'object-hash';
-import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
+import { api_endpoints, helpers, cache_helper } from "@/utils/hooks.js";
 
 export default {
     name: "search-person-organisation",

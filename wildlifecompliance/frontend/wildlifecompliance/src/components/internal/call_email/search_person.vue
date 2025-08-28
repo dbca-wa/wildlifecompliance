@@ -185,11 +185,11 @@ import { v4 as uuid } from 'uuid';
 import Awesomplete from 'awesomplete';
 import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import datatable from '@vue-utils/datatable.vue'
-import ApplicationDashTable from '@common-components/applications_dashboard.vue'
-import LicenceDashTable from '@common-components/licences_dashboard.vue'
-import ReturnDashTable from '@common-components/returns_dashboard.vue'
-import PersonSearch from "@common-components/search_person_or_organisation.vue";
+import datatable from '@/utils/vue/datatable.vue'
+import ApplicationDashTable from '@/components/common/applications_dashboard.vue'
+import LicenceDashTable from '@/components/common/licences_dashboard.vue'
+import ReturnDashTable from '@/components/common/returns_dashboard.vue'
+import PersonSearch from "@/components/common/search_person_or_organisation.vue";
 
 import 'awesomplete/awesomplete.css';
 import utils from '../utils'

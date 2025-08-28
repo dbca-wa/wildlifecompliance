@@ -4,7 +4,7 @@
 </div>
 </template>
 <script>
-import LicenceDashTable from '@common-components/licences_dashboard.vue'
+import LicenceDashTable from '@/components/common/licences_dashboard.vue'
 import {
   api_endpoints,
   helpers

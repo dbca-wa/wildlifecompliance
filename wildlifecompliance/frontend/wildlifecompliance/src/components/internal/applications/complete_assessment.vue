@@ -271,12 +271,12 @@
 <script>
 import { v4 as uuid } from 'uuid';
 import Application from '../../form.vue';
-import modal from '@vue-utils/bootstrap-modal.vue'
+import modal from '@/utils/vue/bootstrap-modal.vue'
 import { mapActions, mapGetters } from 'vuex'
 import ApplicationAssessments from './application_assessments.vue';
-import datatable from '@vue-utils/datatable.vue';
-import CommsLogs from '@common-components/comms_logs.vue';
-import InspectionRequest from '../inspection/create_inspection_modal'
+import datatable from '@/utils/vue/datatable.vue';
+import CommsLogs from '@/components/common/comms_logs.vue';
+import InspectionRequest from '../inspection/create_inspection_modal.vue'
 import {
     api_endpoints,
     helpers, fetch_util
