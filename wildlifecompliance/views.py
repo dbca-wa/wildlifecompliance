@@ -62,9 +62,9 @@ class InternalView(UserPassesTestMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(InternalView, self).get_context_data(**kwargs)
-        context['dev'] = settings.DEV_STATIC
-        context['dev_url'] = settings.DEV_STATIC_URL
-        context['app_build_url'] = settings.DEV_APP_BUILD_URL
+        # context['dev'] = settings.DEV_STATIC
+        # context['dev_url'] = settings.DEV_STATIC_URL
+        # context['app_build_url'] = settings.DEV_APP_BUILD_URL
         #context['build_tag'] = settings.BUILD_TAG
         return context
 
@@ -74,9 +74,9 @@ class ExternalView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ExternalView, self).get_context_data(**kwargs)
-        context['dev'] = settings.DEV_STATIC
-        context['dev_url'] = settings.DEV_STATIC_URL
-        context['app_build_url'] = settings.DEV_APP_BUILD_URL
+        # context['dev'] = settings.DEV_STATIC
+        # context['dev_url'] = settings.DEV_STATIC_URL
+        # context['app_build_url'] = settings.DEV_APP_BUILD_URL
         #context['build_tag'] = settings.BUILD_TAG
         return context
 
@@ -136,9 +136,9 @@ def first_time(request):
         context['redirect_url'] = request.GET['next']
     else:
         context['redirect_url'] = '/'
-    context['dev'] = settings.DEV_STATIC
-    context['dev_url'] = settings.DEV_STATIC_URL
-    context['app_build_url'] = settings.DEV_APP_BUILD_URL
+    # context['dev'] = settings.DEV_STATIC
+    # context['dev_url'] = settings.DEV_STATIC_URL
+    # context['app_build_url'] = settings.DEV_APP_BUILD_URL
     #context['build_tag'] = settings.BUILD_TAG
     return render(request, 'wildlifecompliance/dash/index.html', context)
 
