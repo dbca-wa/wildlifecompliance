@@ -1,11 +1,15 @@
 import os
 import confy
+import logging
 from confy import env
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 confy.read_environment_file(BASE_DIR+"/.env")
 os.environ.setdefault("BASE_DIR", BASE_DIR)
 from django.core.exceptions import ImproperlyConfigured
 from ledger_api_client.settings_base import *
+
+
+logger = logging.getLogger(__name__)
 
 os.environ['LEDGER_PRODUCT_CUSTOM_FIELDS'] = "('ledger_description','quantity','price_incl_tax','price_excl_tax','oracle_code')"
 os.environ['LEDGER_REFUND_TRANSACTION_CALLBACK_MODULE'] = 'wildlifecompliance:wildlifecompliance.components.applications.api.application_refund_callback'
@@ -103,6 +107,7 @@ INSTALLED_APPS += [
     'appmonitor_client',
     'ledger_api_client',
     'webtemplate_dbca',
+    'django_vite',
 ]
 
 CKEDITOR_BASEPATH = '/static/ckeditor/ckeditor/'
@@ -323,15 +328,11 @@ if not STOP_SQL_LOG:
     }
 
 
-STATICFILES_DIRS.append(
-    os.path.join(
-        os.path.join(
-            BASE_DIR,
-            'wildlifecompliance',
-            'static')))
-DEV_STATIC = env('DEV_STATIC', False)
-DEV_STATIC_URL = env('DEV_STATIC_URL')
-DEV_APP_BUILD_URL = env('DEV_APP_BUILD_URL')  # URL of the Dev app.js served by webpack & express
+STATICFILES_DIRS.append(os.path.join(BASE_DIR, 'wildlifecompliance', 'static'))
+STATICFILES_DIRS.append(os.path.join(BASE_DIR, 'wildlifecompliance', 'static', 'wildlifecompliance_vue'))
+# DEV_STATIC = env('DEV_STATIC', False)
+# DEV_STATIC_URL = env('DEV_STATIC_URL')
+# DEV_APP_BUILD_URL = env('DEV_APP_BUILD_URL')  # URL of the Dev app.js served by webpack & express
 #BUILD_TAG = env('BUILD_TAG', '0.0.0')  # URL of the Dev app.js served by webpack & express
 
 RAND_HASH = ''
@@ -342,9 +343,9 @@ if not len(RAND_HASH):
 if len(RAND_HASH) == 0:
     print ("ERROR: No rand hash provided")
 
-if DEV_STATIC and not DEV_STATIC_URL:
-    raise ImproperlyConfigured(
-        'If running in DEV_STATIC, DEV_STATIC_URL has to be set')
+# if DEV_STATIC and not DEV_STATIC_URL:
+    # raise ImproperlyConfigured(
+        # 'If running in DEV_STATIC, DEV_STATIC_URL has to be set')
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
 # Department details
@@ -469,3 +470,25 @@ REPORTING_EMAIL = env('REPORTING_EMAIL', '').lower()
 # (_save method of FileSystemStorage class)
 # As it causes a permission exception when using azure network drives
 FILE_UPLOAD_PERMISSIONS = None
+
+RUNNING_DEVSERVER = len(sys.argv) > 1 and sys.argv[1] == "runserver"
+EMAIL_INSTANCE = decouple.config("EMAIL_INSTANCE", default="DEV")
+
+# Make sure this returns True when in local development
+# so you can use the vite dev server with hot module reloading
+DJANGO_VITE_DEV_MODE = RUNNING_DEVSERVER and EMAIL_INSTANCE == "DEV" and DEBUG is True  # DJANGO_VITE_DEV_MODE is preserved word.
+
+logger.debug(f'DJANGO_VITE_DEV_MODE: {DJANGO_VITE_DEV_MODE}')
+
+DJANGO_VITE = {
+    "default": {
+        "dev_mode": DJANGO_VITE_DEV_MODE,  # Indicates whether to serve assets via the ViteJS development server or from compiled production assets.
+        "dev_server_host": "localhost", # Default host for vite (can change if needed)
+        "dev_server_port": 8080, # Default port for vite (can change if needed)
+        "static_url_prefix": "/static/wildlifecompliance_vue" if DJANGO_VITE_DEV_MODE else "wildlifecompliance_vue/",  # The directory prefix for static files built by ViteJS.
+    },
+}
+VUE3_ENTRY_SCRIPT = decouple.config(  # This is not a reserved keyword.
+    "VUE3_ENTRY_SCRIPT",
+    default="src/main.js",  # This path will be auto prefixed with the static_url_prefix from DJANGO_VITE above
+)  # Path of the vue3 entry point script served by vite
