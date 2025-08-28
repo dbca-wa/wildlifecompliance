@@ -78,7 +78,7 @@
 
 <script>
 import $ from 'jquery'
-import datatable from '@/utils/vue/datatable.vue'
+import datatable from '@vue-utils/datatable.vue'
 //import FormSection from "@/components/compliance_forms/section.vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'

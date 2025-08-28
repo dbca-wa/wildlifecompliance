@@ -35,8 +35,8 @@
 
 <script>
 //import $ from 'jquery'
-import modal from '@/utils/vue/bootstrap-modal.vue'
-import alert from '@/utils/vue/alert.vue'
+import modal from '@vue-utils/bootstrap-modal.vue'
+import alert from '@vue-utils/alert.vue'
 import {helpers,api_endpoints,fetch_util} from "@/utils/hooks.js"
 import { mapGetters } from 'vuex'
 export default {

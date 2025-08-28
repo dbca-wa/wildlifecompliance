@@ -85,7 +85,7 @@
 import { v4 as uuid } from 'uuid';
 import Vue from 'vue'
 import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
-import datatable from '@/utils/vue/datatable.vue'
+import datatable from '@vue-utils/datatable.vue'
 import AddContact from '@common-components/add_contact.vue'
 import utils from '../internal/utils'
 import api from '../internal/api'

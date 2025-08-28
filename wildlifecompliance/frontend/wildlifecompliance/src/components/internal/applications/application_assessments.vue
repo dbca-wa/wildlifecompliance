@@ -101,8 +101,8 @@
 <script>
 import { v4 as uuid } from 'uuid';
 import Application from '../../form.vue';
-import modal from '@/utils/vue/bootstrap-modal.vue'
-import datatable from '@/utils/vue/datatable.vue';
+import modal from '@vue-utils/bootstrap-modal.vue'
+import datatable from '@vue-utils/datatable.vue';
 import { mapActions, mapGetters } from 'vuex'
 import Conditions from './application_conditions.vue';
 import SendToAssessor from './application_send_assessor.vue';

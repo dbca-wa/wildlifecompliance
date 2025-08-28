@@ -73,8 +73,8 @@
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
-import modal from '@/utils/vue/bootstrap-modal.vue'
-import datatable from '@/utils/vue/datatable.vue'
+import modal from '@vue-utils/bootstrap-modal.vue'
+import datatable from '@vue-utils/datatable.vue'
 import LicenceActionPurposes from './licence_action_purposes.vue'
 import InspectionRequest from '../internal/inspection/create_inspection_modal.vue'
 import LicenceHistory from './licence_history_modal.vue';

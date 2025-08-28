@@ -9,7 +9,7 @@
 </template>
 <script>
 import Vue from "vue";
-import modal from '@/utils/vue/bootstrap-modal.vue';
+import modal from '@vue-utils/bootstrap-modal.vue';
 
 export default {
     name: "Magic",

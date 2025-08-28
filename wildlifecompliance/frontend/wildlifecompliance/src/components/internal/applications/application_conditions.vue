@@ -8,7 +8,7 @@ import {
 }
 from '@/utils/hooks';
 import '@/scss/dashboards/application.scss';
-import datatable from '@/utils/vue/datatable.vue';
+import datatable from '@vue-utils/datatable.vue';
 import ConditionDetail from './application_add_condition.vue';
 import { mapActions, mapGetters } from 'vuex'
 import FormSection from "@/components/forms/section_toggle.vue";

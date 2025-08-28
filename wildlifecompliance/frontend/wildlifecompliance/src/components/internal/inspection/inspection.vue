@@ -416,7 +416,7 @@ import SearchPersonOrganisation from "@/components/common/search_person_or_organ
 //import CreateNewOrganisation from "@/components/common/create_new_organisation.vue";
 import Assignment from "../assignment.vue";
 import CommsLogs from "@/components/common/comms_logs.vue";
-import datatable from '@/utils/vue/datatable.vue'
+import datatable from '@vue-utils/datatable.vue'
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";

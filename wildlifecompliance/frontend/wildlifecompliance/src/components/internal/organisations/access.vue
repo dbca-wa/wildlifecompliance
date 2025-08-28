@@ -127,7 +127,7 @@
 </template>
 <script>
 import Vue from 'vue'
-import datatable from '@/utils/vue/datatable.vue'
+import datatable from '@vue-utils/datatable.vue'
 import CommsLogs from '@common-components/comms_logs.vue'
 import {
   api_endpoints,

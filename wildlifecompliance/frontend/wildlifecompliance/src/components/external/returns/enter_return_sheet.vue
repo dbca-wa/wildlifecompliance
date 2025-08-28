@@ -57,7 +57,7 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
-import datatable from '@/utils/vue/datatable.vue'
+import datatable from '@vue-utils/datatable.vue'
 import utils from '@/components/external/utils'
 import $ from 'jquery'
 import Vue from 'vue'

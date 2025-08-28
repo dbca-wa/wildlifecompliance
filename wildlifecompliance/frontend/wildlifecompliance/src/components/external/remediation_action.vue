@@ -110,7 +110,7 @@
 import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
-//import datatable from '@/utils/vue/datatable.vue'
+//import datatable from '@vue-utils/datatable.vue'
 //import utils from "@/components/external/utils";
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";

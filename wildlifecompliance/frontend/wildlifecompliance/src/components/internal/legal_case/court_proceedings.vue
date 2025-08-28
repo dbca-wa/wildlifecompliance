@@ -162,7 +162,7 @@ import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks"
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
-import datatable from '@/utils/vue/datatable.vue'
+import datatable from '@vue-utils/datatable.vue'
 
 import _ from 'lodash';
 import JournalHistory from '@/components/internal/legal_case/journal_history.vue'

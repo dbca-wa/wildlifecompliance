@@ -563,7 +563,7 @@ import FormSection from "@/components/forms/section_toggle.vue";
 
 import CommsLogs from "@/components/common/comms_logs.vue";
 import MapLocation from "./map_location.vue";
-import datatable from '@/utils/vue/datatable.vue'
+import datatable from '@vue-utils/datatable.vue'
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks.js";
 //import SearchPerson from "./search_person.vue";
 import SearchPersonOrganisation from "@/components/common/search_person_or_organisation.vue";

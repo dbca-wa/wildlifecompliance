@@ -185,7 +185,7 @@ import { v4 as uuid } from 'uuid';
 import Awesomplete from 'awesomplete';
 import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import datatable from '@/utils/vue/datatable.vue'
+import datatable from '@vue-utils/datatable.vue'
 import ApplicationDashTable from '@common-components/applications_dashboard.vue'
 import LicenceDashTable from '@common-components/licences_dashboard.vue'
 import ReturnDashTable from '@common-components/returns_dashboard.vue'

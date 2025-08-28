@@ -42,7 +42,8 @@ export default defineConfig(({ mode }) => {
                 // vue: 'vue/dist/vue.esm-bundler.js',
                 'vue': '@vue/compat',
                 '@': path.resolve(__dirname, './src'),
-                '@common-components': path.resolve(__dirname, './src/components/common/')
+                '@common-components': path.resolve(__dirname, './src/components/common/'),
+                '@vue-utils': path.resolve(__dirname, './src/utils/vue/')
             },
         },
         define: {
