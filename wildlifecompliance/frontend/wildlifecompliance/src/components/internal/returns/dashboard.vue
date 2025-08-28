@@ -4,7 +4,7 @@
 </div>
 </template>
 <script>
-import ReturnDashTable from '@/components/common/returns_dashboard.vue'
+import ReturnDashTable from '@common-components/returns_dashboard.vue'
 import {
   api_endpoints,
   helpers

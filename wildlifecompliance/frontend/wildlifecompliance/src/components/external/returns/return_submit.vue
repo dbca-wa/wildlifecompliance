@@ -38,7 +38,7 @@
 import { v4 as uuid } from 'uuid';
 import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
-import CommsLogs from '@/components/common/comms_logs.vue'
+import CommsLogs from '@common-components/comms_logs.vue'
 import {
   api_endpoints,
   helpers

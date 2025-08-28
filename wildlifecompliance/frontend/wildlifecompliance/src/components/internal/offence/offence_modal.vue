@@ -243,7 +243,7 @@ import $ from "jquery";
 import "awesomplete/awesomplete.css";
 import { v4 as uuidv4 } from 'uuid';
 import "jquery-ui/ui/widgets/draggable.js";
-import FileField from '@/components/common/compliance_file.vue';
+import FileField from '@common-components/compliance_file.vue';
 import { data } from "jquery";
 import SearchOffender from './search_offenders.vue'
 

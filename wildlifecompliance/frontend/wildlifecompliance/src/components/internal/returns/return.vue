@@ -87,7 +87,7 @@ import Returns from '../../returns_form.vue'
 import ReturnQuestion from '../../external/returns/enter_return_question.vue'
 import ReturnSheet from '../../external/returns/enter_return_sheet.vue'
 import ReturnData from '../../external/returns/enter_return.vue'
-import CommsLogs from '@/components/common/comms_logs.vue'
+import CommsLogs from '@common-components/comms_logs.vue'
 import {
   api_endpoints,
   helpers,

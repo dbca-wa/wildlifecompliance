@@ -115,7 +115,7 @@ import FormSection from "@/components/forms/section_toggle.vue";
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 //import CommsLogs from "@/components/common/comms_logs.vue";
-import filefield from '@/components/common/compliance_file.vue';
+import filefield from '@common-components/compliance_file.vue';
 
 
 export default {

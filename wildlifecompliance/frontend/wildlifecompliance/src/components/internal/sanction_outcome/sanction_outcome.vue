@@ -479,7 +479,7 @@ import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import Assignment from "../assignment.vue";
 import CommsLogs from "@/components/common/comms_logs.vue";
-import filefield from '@/components/common/compliance_file.vue';
+import filefield from '@common-components/compliance_file.vue';
 import SanctionOutcomeWorkflow from '@/components/internal/sanction_outcome/sanction_outcome_workflow.vue';
 import ExtendPaymentDueDate from '@/components/internal/sanction_outcome/extend_payment_due_date.vue';
 import RecordFerCaseNumber from '@/components/internal/sanction_outcome/record_fer_case_number.vue';

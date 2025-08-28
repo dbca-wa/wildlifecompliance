@@ -77,8 +77,8 @@ require("select2/dist/css/select2.min.css");
 
 import hash from 'object-hash';
 import _ from 'lodash';
-import DocumentArtifact from '@/components/common/document_artifact_component.vue'
-import PhysicalArtifact from '@/components/common/physical_artifact_component.vue'
+import DocumentArtifact from '@common-components/document_artifact_component.vue'
+import PhysicalArtifact from '@common-components/physical_artifact_component.vue'
 
 
 export default {

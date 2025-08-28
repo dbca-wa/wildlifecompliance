@@ -275,7 +275,7 @@ import modal from '@/utils/vue/bootstrap-modal.vue'
 import { mapActions, mapGetters } from 'vuex'
 import ApplicationAssessments from './application_assessments.vue';
 import datatable from '@/utils/vue/datatable.vue';
-import CommsLogs from '@/components/common/comms_logs.vue';
+import CommsLogs from '@common-components/comms_logs.vue';
 import InspectionRequest from '../inspection/create_inspection_modal.vue'
 import {
     api_endpoints,

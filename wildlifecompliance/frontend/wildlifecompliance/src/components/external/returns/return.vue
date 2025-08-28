@@ -54,7 +54,7 @@ import ReturnQuestion from './enter_return_question.vue'
 import ReturnData from './enter_return.vue'
 import ReturnSubmit from './return_submit.vue'
 import { mapActions, mapGetters } from 'vuex'
-import CommsLogs from '@/components/common/comms_logs.vue'
+import CommsLogs from '@common-components/comms_logs.vue'
 import {
   api_endpoints,
   helpers, fetch_util

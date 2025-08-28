@@ -27,7 +27,7 @@
 <script>
 import MenuAccess from '../internal/returns/access.vue';
 import { mapActions, mapGetters } from 'vuex';
-import CommsLogs from '@/components/common/comms_logs.vue'
+import CommsLogs from '@common-components/comms_logs.vue'
 import '@/scss/forms/form.scss';
 import {
   api_endpoints,

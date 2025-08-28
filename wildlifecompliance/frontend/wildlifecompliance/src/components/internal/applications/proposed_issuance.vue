@@ -177,7 +177,7 @@ import modal from '@/utils/vue/bootstrap-modal.vue'
 import alert from '@/utils/vue/alert.vue'
 import {helpers,api_endpoints,fetch_util} from "@/utils/hooks.js"
 import { mapGetters } from 'vuex'
-import filefield from '@/components/common/compliance_file.vue'
+import filefield from '@common-components/compliance_file.vue'
 import summernote from '@/components/purpose_details_summernote.vue'
 
 import FormSection from "@/components/forms/section_toggle.vue";

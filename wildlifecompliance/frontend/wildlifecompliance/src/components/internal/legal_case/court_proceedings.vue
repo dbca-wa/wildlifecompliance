@@ -166,8 +166,8 @@ import datatable from '@/utils/vue/datatable.vue'
 
 import _ from 'lodash';
 import JournalHistory from '@/components/internal/legal_case/journal_history.vue'
-import filefield from '@/components/common/compliance_file.vue';
-import CourtDate from '@/components/common/court_date.vue'
+import filefield from '@common-components/compliance_file.vue';
+import CourtDate from '@common-components/court_date.vue'
 
 export default {
     name: "ViewCourtProceedings",

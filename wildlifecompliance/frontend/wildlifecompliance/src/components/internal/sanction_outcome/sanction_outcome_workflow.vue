@@ -48,7 +48,7 @@ import Vue from "vue";
 import modal from '@/utils/vue/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
-import filefield from '@/components/common/compliance_file.vue';
+import filefield from '@common-components/compliance_file.vue';
 import "jquery-ui/ui/widgets/draggable.js";
 require("select2/dist/css/select2.min.css");
 

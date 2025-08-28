@@ -309,7 +309,7 @@ import Vue from "vue";
 //import modal from '@/utils/vue/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
-import filefield from '@/components/common/compliance_file.vue';
+import filefield from '@common-components/compliance_file.vue';
 
 import moment from 'moment';
 import SearchPersonOrganisation from './search_person_or_organisation.vue'

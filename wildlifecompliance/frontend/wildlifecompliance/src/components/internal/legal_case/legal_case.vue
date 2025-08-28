@@ -386,14 +386,14 @@ import moment from 'moment';
 import Offence from '../offence/offence_modal.vue';
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal.vue';
 import Inspection from '../inspection/create_inspection_modal.vue';
-import filefield from '@/components/common/compliance_file.vue';
+import filefield from '@common-components/compliance_file.vue';
 import RelatedItems from "@/components/common/related_items.vue";
 import "select2/dist/css/select2.min.css";
 
 import hash from 'object-hash';
 import Magic from './magic.vue';
-//import SearchPersonOrganisationModal from '@/components/common/search_person_or_organisation_modal';
-import PersonOrArtifactModal from '@/components/common/person_or_artifact_modal.vue';
+//import SearchPersonOrganisationModal from '@common-components/search_person_or_organisation_modal';
+import PersonOrArtifactModal from '@common-components/person_or_artifact_modal.vue';
 import _ from 'lodash';
 import RunningSheetHistory from './running_sheet_history.vue'
 import LegalCaseWorkflow from './legal_case_workflow.vue'

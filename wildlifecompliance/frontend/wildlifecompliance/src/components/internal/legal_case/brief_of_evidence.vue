@@ -287,7 +287,7 @@ require("select2/dist/css/select2.min.css");
 import _ from 'lodash';
 import TreeSelect from 'vue3-treeselect'
 //import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-import filefield from '@/components/common/compliance_file.vue';
+import filefield from '@common-components/compliance_file.vue';
 
 
 export default {

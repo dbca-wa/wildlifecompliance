@@ -88,7 +88,7 @@ import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import datatable from '@/utils/vue/datatable.vue'
 import utils from '../utils.js'
 import api from '../api.js'
-import AddContact from '@/components/common/add_contact.vue'
+import AddContact from '@common-components/add_contact.vue'
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name: 'Organisation',

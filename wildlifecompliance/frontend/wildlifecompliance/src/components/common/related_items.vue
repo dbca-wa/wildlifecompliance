@@ -23,7 +23,7 @@ import moment from 'moment';
 
 require("select2/dist/css/select2.min.css");
 
-import WeakLinks from '@/components/common/weak_links.vue';
+import WeakLinks from '@common-components/weak_links.vue';
 
 export default {
     name: "RelatedItems",

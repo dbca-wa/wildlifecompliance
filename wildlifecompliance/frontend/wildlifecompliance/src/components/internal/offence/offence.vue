@@ -326,7 +326,7 @@ import utils from "../utils";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import CommsLogs from "@/components/common/comms_logs.vue";
-import FileField from '@/components/common/compliance_file.vue';
+import FileField from '@common-components/compliance_file.vue';
 import OffenceWorkflow from './offence_workflow.vue';
 import SearchOffender from './search_offenders.vue'
 //import CreateNewPerson from "@/components/common/create_new_person.vue";

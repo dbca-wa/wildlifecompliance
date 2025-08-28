@@ -424,7 +424,7 @@ import moment from 'moment';
 
 import Offence from '../offence/offence_modal.vue';
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal.vue';
-import filefield from '@/components/common/compliance_file.vue';
+import filefield from '@common-components/compliance_file.vue';
 import InspectionWorkflow from './inspection_workflow.vue';
 import RelatedItems from "@/components/common/related_items.vue";
 import MapLocation from "../../common/map_location.vue";

@@ -4,7 +4,7 @@
 </div>
 </template>
 <script>
-import UserDashTable from '@/components/common/users_dashboard.vue'
+import UserDashTable from '@common-components/users_dashboard.vue'
 import {
   api_endpoints,
   helpers

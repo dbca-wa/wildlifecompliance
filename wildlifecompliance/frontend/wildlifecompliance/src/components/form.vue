@@ -18,7 +18,7 @@
     from '@/utils/hooks'
     
     import '@/scss/forms/form.scss';
-    import RendererForm from '@/components/common/renderer.vue';
+    import RendererForm from '@common-components/renderer.vue';
     export default {
         components: {
             RendererForm,

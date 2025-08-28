@@ -160,7 +160,7 @@ import { v4 as uuid } from 'uuid';
 import $ from 'jquery'
 import datatable from '@/utils/vue/datatable.vue'
 import alert from '@/utils/vue/alert.vue'
-import UserDashTable from '@/components/common/users_dashboard.vue'
+import UserDashTable from '@common-components/users_dashboard.vue'
 import OrganisationDashTable from '@/components/internal/organisations/organisations_dashboard.vue'
 import '@/scss/dashboards/search.scss';
 import {
