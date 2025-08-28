@@ -1,3 +1,6 @@
+import logging
+import traceback
+
 from django.urls import reverse
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.components.applications.models import ReturnRequest
@@ -24,6 +27,9 @@ from wildlifecompliance.components.main.utils import (
     get_first_name,
     get_last_name,
 )
+
+
+logger = logging.getLogger(__name__)
 
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
@@ -383,8 +389,17 @@ class ReturnSerializer(serializers.ModelSerializer):
             Return.RETURN_PROCESSING_STATUS_PAYMENT,
         ]
         can_user_edit = False
-        is_submitter = _return.application.submitter \
-            == self.context['request'].user
+
+        is_submitter = False
+        try:
+            is_submitter = _return.application.submitter == self.context['request'].user
+        except EmailUser.DoesNotExist:
+            logger.error(
+                f"Submitter not found for Return (ID: {_return.id}) and Application (ID: {_return.application.id}). "
+                f"The user associated with submitter_id={_return.application.submitter_id} may have been deleted."
+            )
+        except Exception as e:
+            logger.error(f'An unexpected error occurred while checking the submitter: {str(e)}')
 
         if _return.processing_status in with_customer and is_submitter:
             can_user_edit = True
