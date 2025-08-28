@@ -82,9 +82,9 @@ module.exports = defineConfig({
                 'Access-Control-Allow-Headers':
                     'Origin, X-Requested-With, Content-Type, Accept',
             },
-            client: {
-                webSocketURL: 'ws://0.0.0.0:' + port + '/ws',
-            },
+            // client: {
+            //     webSocketURL: 'ws://0.0.0.0:' + port + '/ws',
+            // },
         },
         module: {
             rules: [
