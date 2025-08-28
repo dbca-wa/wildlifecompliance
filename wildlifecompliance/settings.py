@@ -257,6 +257,13 @@ CRON_CLASSES = [
     'wildlifecompliance.cron.OracleIntegrationCronJob',
 ]
 
+# Add a new formatter
+LOGGING['formatters']['verbose2'] = {
+    "format": "%(levelname)s %(asctime)s %(name)s [Line:%(lineno)s][%(funcName)s] %(message)s"
+}
+LOGGING['handlers']['console']['formatter'] = 'verbose2'
+LOGGING['handlers']['console']['level'] = 'DEBUG'
+LOGGING['handlers']['file']['formatter'] = 'verbose2'
 # Additional logging for wildlifecompliance
 LOGGING['handlers']['application_checkout'] = {
     'level': 'INFO',
