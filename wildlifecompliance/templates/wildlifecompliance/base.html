@@ -23,6 +23,10 @@
 {% block header_top_menu %}
 {% endblock %}
 
+{% block extra_hidden_inputs %}
+    <link rel="icon" type="image/svg+xml" href="{% static 'wildlifecompliance/img/favicon.svg' %}">
+{% endblock %}
+
 {% block extra_css %}
 <link type="text/css" href="{% static 'wildlifecompliance/css/base.css' %}" rel="stylesheet">
 {% if not dev %}
