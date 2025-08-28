@@ -1,6 +1,6 @@
 var site_url = location.origin
 
-module.exports = {
+export default {
     person_org_lookup: '/api/person_org_lookup',
     allocated_group_members: '/api/allocated_group_members',
     staff_member_lookup: '/api/staff_member_lookup',

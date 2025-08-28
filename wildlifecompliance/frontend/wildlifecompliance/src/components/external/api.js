@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     applications: '/api/application/',
     my_user_details: '/api/my_user_details/',
     //countries: 'https://restcountries.eu/rest/v1/?fullText=true/',
