@@ -1,8 +1,9 @@
 {% extends "ledgerui/accounts_base_b5.html" %}
 {% load static %}
-
 {% load users %}
 {% load tagutils %}
+{% load django_vite %}
+
 {% get_instance_type as instance_type %}
 {% is_internal as is_internal_login %}
 {% is_officer as is_officer_login %}
@@ -51,3 +52,11 @@
         </div>
     </div>
 {% endblock menu_items_left_brand %}
+
+{% block extra_js %}
+    {% vite_hmr_client app='moorings_app' %} <!-- This tag will include this script only if DJANGO_VITE_DEV_MODE is true, otherwise this will do nothing. -->
+{% endblock %}
+
+{% block custom_js %}
+    {% vite_asset vue3_entry_script_moorings app='moorings_app' %}
+{% endblock %}
