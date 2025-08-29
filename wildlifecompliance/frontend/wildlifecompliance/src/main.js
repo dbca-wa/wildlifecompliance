@@ -5,8 +5,10 @@ import 'vite/modulepreload-polyfill';
 import Vue from 'vue';
 // window._ = _;
 import $ from 'jquery';
-import 'jquery-validation';
 window.$ = $;
+import 'jquery-validation';
+import select2 from 'select2';
+select2()
 import { createApp } from 'vue';
 import App from '@/App.vue';
 import router from '@/router';
