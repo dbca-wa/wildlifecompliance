@@ -86,6 +86,11 @@ import 'leaflet-measure/dist/leaflet-measure.css';
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css'
 import { api_endpoints } from "@/utils/hooks";
 import Vue from "vue";
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import markerGrayLocked from '../../../assets/marker-gray-locked.svg';
+import markerGreenLocked from '../../../assets/marker-green-locked.svg';
+import markerRedLocked from '../../../assets/marker-red-locked.svg';
+import markerYellowLocked from '../../../assets/marker-yellow-locked.svg';
 
 export default {
     name: "map-leaflet",
@@ -93,11 +98,11 @@ export default {
         const defaultCentre = [13775786.985667605, -2871569.067879858];
 
         let vm = this;
-        let baseDic = { shadowUrl: require('leaflet/dist/images/marker-shadow.png'), shadowSize: [41, 41], shadowAnchor: [12, 41], iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -20]};
-        vm.icon_default = L.icon({iconUrl: require('../../../assets/marker-gray-locked.svg'), ...baseDic });
-        vm.icon_enquiery = L.icon({iconUrl: require('../../../assets/marker-green-locked.svg'), ...baseDic });
-        vm.icon_complaint = L.icon({iconUrl: require('../../../assets/marker-red-locked.svg'), ...baseDic});
-        vm.icon_incident = L.icon({iconUrl: require('../../../assets/marker-yellow-locked.svg'), ...baseDic});
+        let baseDic = { shadowUrl: markerShadow, shadowSize: [41, 41], shadowAnchor: [12, 41], iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -20]};
+        vm.icon_default = L.icon({iconUrl: markerGrayLocked, ...baseDic });
+        vm.icon_enquiery = L.icon({iconUrl: markerGreenLocked, ...baseDic });
+        vm.icon_complaint = L.icon({iconUrl: markerRedLocked, ...baseDic});
+        vm.icon_incident = L.icon({iconUrl: markerYellowLocked, ...baseDic});
         vm.guid = helpers.guid();
 
         return {

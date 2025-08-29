@@ -79,6 +79,9 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-measure/dist/leaflet-measure.css";
 import "leaflet.locatecontrol/dist/L.Control.Locate.min.css";
 
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import markerGrayLocked from '../../../assets/marker-gray-locked.svg';
+
 export default {
   name: "map-leaflet",
   data: function() {
@@ -86,7 +89,7 @@ export default {
 
     let vm = this;
     let baseDic = {
-      shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+      shadowUrl: markerShadow,
       shadowSize: [41, 41],
       shadowAnchor: [12, 41],
       iconSize: [32, 32],
@@ -94,21 +97,9 @@ export default {
       popupAnchor: [0, -20]
     };
     vm.icon_default = Leaf.icon({
-      iconUrl: require("../../../assets/marker-gray-locked.svg"),
+      iconUrl: markerGrayLocked,
       ...baseDic
     });
-   // vm.icon_enquiery = Leaf.icon({
-   //   iconUrl: require("../../../assets/marker-green-locked.svg"),
-   //   ...baseDic
-   // });
-   // vm.icon_complaint = Leaf.icon({
-   //   iconUrl: require("../../../assets/marker-red-locked.svg"),
-   //   ...baseDic
-   // });
-   // vm.icon_incident = Leaf.icon({
-   //   iconUrl: require("../../../assets/marker-yellow-locked.svg"),
-   //   ...baseDic
-   // });
     vm.guid = helpers.guid();
 
     return {

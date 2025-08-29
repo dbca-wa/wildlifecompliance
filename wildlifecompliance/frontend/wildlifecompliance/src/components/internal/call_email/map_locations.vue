@@ -61,8 +61,11 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css'
-
 import 'awesomplete/awesomplete.css';
+
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
 L.TileLayer.WMTS = L.TileLayer.extend({
     defaultWmtsParams: {
@@ -151,9 +154,9 @@ L.tileLayer.wmts = function (url, options) {
 /* To make default marker work with webpack */
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+    iconRetinaUrl: markerIcon2x,
+    iconUrl: markerIcon,
+    shadowUrl: markerShadow,
 });
 /********************************************/
 
@@ -398,6 +401,11 @@ request.then(response => {
                 }
             });
         },
+        getIconUrl(filename) {
+            // The first argument is the relative path to the asset from this file.
+            // The second argument, `import.meta.url`, tells Vite the base path for the resolution.
+            return new URL(`../../../assets/${filename}`, import.meta.url).href;
+        },
         addMarkers(call_emails){
             let self = this;
             self.mcg.clearLayers();
@@ -421,8 +429,8 @@ request.then(response => {
 
                         /* create marker */
                         let myIcon = L.icon({
-                            iconUrl: require('../../../assets/' + filename),
-                            shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+                            iconUrl: vm.getIconUrl(filename),
+                            shadowUrl: markerShadow,
                             shadowSize: [41, 41],
                             shadowAnchor: [12, 41],
                             iconSize: [32, 32],
@@ -438,7 +446,7 @@ request.then(response => {
                         myMarker.on('click', (ev)=>{
                             let popup = ev.target.getPopup();
                             let request = fetch_util.fetchUrl('/api/call_email/' + call_email.id)
-request.then(response => {
+                            request.then(response => {
                                 let call_email = response;
                                 popup.setContent(self.construct_content(call_email, coords));
                             });

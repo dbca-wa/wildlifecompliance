@@ -225,6 +225,7 @@ import alert from '@vue-utils/alert.vue'
 import SchemaOption from './schema_add_option.vue'
 import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import FormSection from "@/components/forms/section_toggle.vue";
+
 export default {
     name:'schema-question',
     components: {
