@@ -25,20 +25,15 @@ import Offence from '../offence/offence.vue'
 import DashboardSwitcher from '../dashboard_switcher.vue'
 import Reports from '@/components/reports/reports.vue'
 import SchemaManager from '../main/schema_manager.vue'
+import RouterWrapper from '@/components/common/RouterWrapper.vue'
 
 export default
 {
     path: '/internal',
-    component:
-    {
-        render(c)
-        {
-            return c('router-view')
-        }
-    },
+    component: RouterWrapper,
     children: [
         {
-            path: '/internal',
+            path: '',
             component: DashboardSwitcher,
             name: 'internal-dash'
         },

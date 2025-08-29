@@ -9,19 +9,12 @@ import Organisation from '../organisations/manage.vue'
 import Returns from '../returns/return.vue'
 import RemediationAction from '../remediation_action.vue'
 import RemediationActionSubmitSuccess from '../remediation_action_submit_success.vue'
-import { h } from 'vue'
 import RouterWrapper from '@/components/common/RouterWrapper.vue'
 
 export default
 {
     path: '/external',
     component: RouterWrapper,
-    // {
-    //     render()
-    //     {
-    //         return h('router-view')
-    //     }
-    // },
     children: [
         {
             path: '',
@@ -54,12 +47,6 @@ export default
         {
             path: 'application',
             component: RouterWrapper,
-            // {
-            //     render()
-            //     {
-            //         return h('router-view')
-            //     }
-            // },
             children: [
                 {
                     path: '/',
