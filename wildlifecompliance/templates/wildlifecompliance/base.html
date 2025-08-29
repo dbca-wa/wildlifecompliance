@@ -30,17 +30,10 @@
 
 {% block extra_css %}
 <link type="text/css" href="{% static 'wildlifecompliance/css/base.css' %}" rel="stylesheet">
-{% if not dev %}
-<link rel="stylesheet" href="{% static 'wildlifecompliance_vue/css/app.css' %}?v={{GIT_COMMIT_HASH}}">
-<link rel="stylesheet" href="{% static 'wildlifecompliance_vue/css/chunk-vendors.css' %}?v={{GIT_COMMIT_HASH}}">
-{% endif %}
 {% endblock %}
 
 {% block custom_js %}
-    <script type="text/javascript"
-            src="{% static 'wildlifecompliance_vue/js/chunk-vendors.js' %}?v={{GIT_COMMIT_HASH}}"></script>
-    <script type="text/javascript"
-            src="{% static 'wildlifecompliance_vue/js/app.js' %}?v={{GIT_COMMIT_HASH}}"></script>
+    {% vite_asset vue3_entry_script app='default' %}
 {% endblock custom_js %}
 
 {% block menu_items_left_brand %}
@@ -54,9 +47,5 @@
 {% endblock menu_items_left_brand %}
 
 {% block extra_js %}
-    {% vite_hmr_client app='moorings_app' %} <!-- This tag will include this script only if DJANGO_VITE_DEV_MODE is true, otherwise this will do nothing. -->
-{% endblock %}
-
-{% block custom_js %}
-    {% vite_asset vue3_entry_script_moorings app='moorings_app' %}
+    {% vite_hmr_client app='default' %} <!-- This tag will include this script only if DJANGO_VITE_DEV_MODE is true, otherwise this will do nothing. -->
 {% endblock %}
