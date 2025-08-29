@@ -278,7 +278,7 @@ import { mapGetters, mapActions } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "../utils";
 import $ from "jquery";
-import "jquery-ui/ui/widgets/draggable.js";
+// import "jquery-ui/ui/widgets/draggable.js";
 
 import "awesomplete/awesomplete.css";
 
@@ -700,12 +700,12 @@ export default {
             this.constructAllegedOffencesTable();
             this.check_if_is_parking_offence();
         },
-        makeModalsDraggable: function(){
-            this.elem_modal = $('.modal > .modal-dialog');
-            for (let i=0; i<this.elem_modal.length; i++){
-                $(this.elem_modal[i]).draggable();
-            }
-        },
+        // makeModalsDraggable: function(){
+        //     this.elem_modal = $('.modal > .modal-dialog');
+        //     for (let i=0; i<this.elem_modal.length; i++){
+        //         $(this.elem_modal[i]).draggable();
+        //     }
+        // },
         close: function() {
             this.$parent.sanctionOutcomeInitialised = false;
             this.isModalOpen = false;
@@ -987,7 +987,7 @@ export default {
         this.$nextTick(() => {
             this.addEventListeners();
             this.elem_paper_id_notice = $('#paper_id_notice');
-            this.makeModalsDraggable();
+            // this.makeModalsDraggable();
         });
     }
 };

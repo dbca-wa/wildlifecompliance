@@ -242,7 +242,7 @@ import $ from "jquery";
 
 import "awesomplete/awesomplete.css";
 import { v4 as uuidv4 } from 'uuid';
-import "jquery-ui/ui/widgets/draggable.js";
+// import "jquery-ui/ui/widgets/draggable.js";
 import FileField from '@common-components/compliance_file.vue';
 import { data } from "jquery";
 import SearchOffender from './search_offenders.vue'
@@ -521,12 +521,12 @@ export default {
         setTemporaryDocumentCollectionId: function(val) {
             this.temporary_document_collection_id = val;
         },
-    makeModalsDraggable: function(){
-        this.elem_modal = $('.modal > .modal-dialog');
-        for (let i=0; i<this.elem_modal.length; i++){
-            //$(this.elem_modal[i]).draggable();
-        }
-    },
+    // makeModalsDraggable: function(){
+    //     this.elem_modal = $('.modal > .modal-dialog');
+    //     for (let i=0; i<this.elem_modal.length; i++){
+    //         //$(this.elem_modal[i]).draggable();
+    //     }
+    // },
     constructRegionsAndDistricts: async function() {
         let returned_regions = await cache_helper.getSetCacheList(
             "Regions",
@@ -1098,7 +1098,7 @@ export default {
     mounted: function() {
         this.$nextTick(() => {
             this.addEventListeners();
-            this.makeModalsDraggable();
+            // this.makeModalsDraggable();
         });
     }
 };

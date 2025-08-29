@@ -63,9 +63,6 @@ import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import filefield from '@common-components/compliance_file.vue';
-import "jquery-ui/ui/widgets/draggable.js";
-require("select2/dist/css/select2.min.css");
-
 
 export default {
     name: "ExtendPaymentDueDate",
@@ -163,19 +160,19 @@ export default {
     mounted: function () {
         this.$nextTick(() => {
             this.addEventListeners();
-            this.makeModalsDraggable();
+            // this.makeModalsDraggable();
         });
     },
     methods: {
         ...mapActions({
             loadAllocatedGroup: 'loadAllocatedGroup',  // defined in store/modules/user.js
         }),
-        makeModalsDraggable: function(){
-            this.elem_modal = $('.modal > .modal-dialog');
-            for (let i=0; i<this.elem_modal.length; i++){
-                $(this.elem_modal[i]).draggable();
-            }
-        },
+        // makeModalsDraggable: function(){
+        //     this.elem_modal = $('.modal > .modal-dialog');
+        //     for (let i=0; i<this.elem_modal.length; i++){
+        //         $(this.elem_modal[i]).draggable();
+        //     }
+        // },
         addEventListeners: function () {
             console.log('in addEventListeners');
             //TODO apply min and max date validation
