@@ -327,7 +327,6 @@ if not STOP_SQL_LOG:
         'level': 'DEBUG'
     }
 
-
 STATICFILES_DIRS.append(os.path.join(BASE_DIR, 'wildlifecompliance', 'static'))
 STATICFILES_DIRS.append(os.path.join(BASE_DIR, 'wildlifecompliance', 'static', 'wildlifecompliance_vue'))
 # DEV_STATIC = env('DEV_STATIC', False)
@@ -484,7 +483,7 @@ DJANGO_VITE = {
     "default": {
         "dev_mode": DJANGO_VITE_DEV_MODE,  # Indicates whether to serve assets via the ViteJS development server or from compiled production assets.
         "dev_server_host": "localhost", # Default host for vite (can change if needed)
-        "dev_server_port": 8080, # Default port for vite (can change if needed)
+        "dev_server_port": 9052, # Must match the dev server port (Ref: vite.config.js)
         "static_url_prefix": "/static/wildlifecompliance_vue" if DJANGO_VITE_DEV_MODE else "wildlifecompliance_vue/",  # The directory prefix for static files built by ViteJS.
     },
 }
