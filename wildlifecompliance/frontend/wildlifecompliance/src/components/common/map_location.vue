@@ -35,13 +35,10 @@
 </template>
 
 <script>
-import Vue from "vue";
 import Leaf from "leaflet";
 import "leaflet-measure"; /* This should be imported after leaflet */
 import "leaflet.locatecontrol";
 import Awesomplete from "awesomplete";
-import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-
 import "awesomplete/awesomplete.css";
 import "leaflet/dist/leaflet.css";
 import "leaflet-measure/dist/leaflet-measure.css";
