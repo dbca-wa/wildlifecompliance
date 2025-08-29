@@ -70,12 +70,6 @@ import CommsLogs from "@/components/common/comms_logs.vue";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import moment from 'moment';
-
-//import RelatedItems from "@/components/common/related_items.vue";
-require("select2/dist/css/select2.min.css");
-
-import hash from 'object-hash';
 import _ from 'lodash';
 import DocumentArtifact from '@common-components/document_artifact_component.vue'
 import PhysicalArtifact from '@common-components/physical_artifact_component.vue'

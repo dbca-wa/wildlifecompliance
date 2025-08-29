@@ -46,10 +46,6 @@ import { mapActions, mapGetters } from 'vuex';
 import HelpText from './help_text.vue';
 import HelpTextUrl from './help_text_url.vue';
 
-var select2 = require('select2');
-require("select2/dist/css/select2.min.css");
-
-
 export default {
     props: {
         "label": {

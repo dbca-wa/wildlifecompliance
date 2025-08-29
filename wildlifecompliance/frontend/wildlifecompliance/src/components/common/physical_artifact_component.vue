@@ -313,8 +313,6 @@ import filefield from '@common-components/compliance_file.vue';
 
 import moment from 'moment';
 import SearchPersonOrganisation from './search_person_or_organisation.vue'
-//require("select2/dist/css/select2.min.css");
-//
 import FormSection from "@/components/forms/section_toggle.vue";
 import RelatedItems from "@/components/common/related_items.vue";
 import datatable from '@vue-utils/datatable.vue'

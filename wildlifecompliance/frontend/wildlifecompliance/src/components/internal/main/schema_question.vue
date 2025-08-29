@@ -223,16 +223,7 @@ import datatable from '@vue-utils/datatable.vue'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import SchemaOption from './schema_add_option.vue'
-import {
-  api_endpoints,
-  helpers, fetch_util
-}
-from '@/utils/hooks'
-
-var select2 = require('select2');
-require("select2/dist/css/select2.min.css");
-
-
+import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name:'schema-question',

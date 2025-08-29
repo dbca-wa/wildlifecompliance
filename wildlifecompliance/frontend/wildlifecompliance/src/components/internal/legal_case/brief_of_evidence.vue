@@ -280,10 +280,6 @@ import FormSection from "@/components/forms/section_toggle.vue";
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import moment from 'moment';
-
-require("select2/dist/css/select2.min.css");
-
 import _ from 'lodash';
 import TreeSelect from 'vue3-treeselect'
 //import '@riophae/vue-treeselect/dist/vue-treeselect.css'

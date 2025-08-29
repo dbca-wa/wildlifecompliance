@@ -34,8 +34,6 @@ import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import filefield from '@common-components/compliance_file.vue';
-require("select2/dist/css/select2.min.css");
-
 
 export default {
     name: "OffenceWorkflow",

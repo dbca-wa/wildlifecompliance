@@ -57,10 +57,6 @@ import HelpText from './help_text.vue';
 import HelpTextUrl from './help_text_url.vue';
 import CommentBlock from './comment_block.vue';
 
-// var select2 = require('select2');
-// require("select2/dist/css/select2.min.css");
-// 
-
 export default {
     props: {
         "label": {
