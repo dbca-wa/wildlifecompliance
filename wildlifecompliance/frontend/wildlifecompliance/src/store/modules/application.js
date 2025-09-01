@@ -259,7 +259,7 @@ export const applicationStore = {
         },
         setLicenceTypeData({ dispatch, state, getters, rootGetters }, activity_data) {
             return new Promise((resolve, reject) => {
-                fetch_util.fetchUrl('/api/application/' + getters.application_id + '/update_licence_type_data/', {method:'POST', body:JSON.stringify({
+                let request = fetch_util.fetchUrl('/api/application/' + getters.application_id + '/update_licence_type_data/', {method:'POST', body:JSON.stringify({
                         'application_id': getters.application_id,
                         'licence_activity_id': activity_data.licence_activity_id,
                         'licence_activity_workflow': activity_data.workflow,
