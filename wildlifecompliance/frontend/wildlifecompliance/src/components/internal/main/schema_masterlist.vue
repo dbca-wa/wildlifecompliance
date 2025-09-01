@@ -344,7 +344,7 @@ export default {
 
             if (data.id === '') {
 
-                let request = await fetch_util.fetchUrl(api_endpoints.schema_masterlist, {method:'POST', body:JSON.stringify(data)},{
+                let request = fetch_util.fetchUrl(api_endpoints.schema_masterlist, {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
                 })
                 request.then((response) => {
@@ -360,7 +360,7 @@ export default {
 
             } else {
 
-                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_masterlist,data.id+'/save_masterlist'), {method:'POST', body:JSON.stringify(data)},{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_masterlist,data.id+'/save_masterlist'), {method:'POST', body:JSON.stringify(data)},{
                         emulateJSON:true,
                 })
                 request.then((response)=>{
@@ -425,7 +425,7 @@ export default {
                 }).then(async (result) => {
 
                     if (result) {
-                        let request = await fetch_util.fetchUrl(
+                        let request = fetch_util.fetchUrl(
                             helpers.add_endpoint_json(api_endpoints.schema_masterlist,(self.masterlist.id+'/delete_masterlist')), {method:"DELETE"}
                         )
                         request.then((response) => {

@@ -145,7 +145,7 @@ export default {
       this.refresh_grid = false
       let _data = new FormData(this.form);
       _data.append('spreadsheet', this.spreadsheet)
-      let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/upload_details'),{method:'POST', body:JSON.stringify(_data)},{
+      let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/upload_details'),{method:'POST', body:JSON.stringify(_data)},{
                     emulateJSON:true,
         })
       request.then((response)=>{

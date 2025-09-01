@@ -307,7 +307,7 @@ export default {
 
             if (data.id === '') {
 
-                let request = await fetch_util.fetchUrl(api_endpoints.schema_group, {method:'POST', body:JSON.stringify(data)},{
+                let request = fetch_util.fetchUrl(api_endpoints.schema_group, {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
 
                 })
@@ -326,7 +326,7 @@ export default {
 
             } else {
 
-                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_group,data.id+'/save_group'), {method:'POST', body:JSON.stringify(data)},{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_group,data.id+'/save_group'), {method:'POST', body:JSON.stringify(data)},{
                         emulateJSON:true,
 
                 })
@@ -397,7 +397,7 @@ export default {
 
                     if (result) {
 
-                        let request = await fetch_util.fetchUrl(
+                        let request = fetch_util.fetchUrl(
                             helpers.add_endpoint_json(api_endpoints.schema_group,(self.sectionGroup.id+'/delete_group')), {method:"DELETE"}
                         )
     

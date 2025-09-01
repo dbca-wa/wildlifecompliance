@@ -537,7 +537,7 @@ export default {
 
             if (data.id === '') {
 
-                let request = await fetch_util.fetchUrl(api_endpoints.schema_question, {method:'POST', body:JSON.stringify(data)},{
+                let request = fetch_util.fetchUrl(api_endpoints.schema_question, {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
 
                 })
@@ -557,7 +557,7 @@ export default {
 
             } else {
 
-                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_question,data.id+'/save_question'), {method:'POST', body:JSON.stringify(data)},{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_question,data.id+'/save_question'), {method:'POST', body:JSON.stringify(data)},{
                         emulateJSON:true,
 
                     })
@@ -653,7 +653,7 @@ export default {
 
                     if (result) {
 
-                        let request = await fetch_util.fetchUrl(
+                        let request = fetch_util.fetchUrl(
                             helpers.add_endpoint_json(api_endpoints.schema_question,(self.sectionQuestion.id+'/delete_question')), 
                             {method:"DELETE"}
                         )
