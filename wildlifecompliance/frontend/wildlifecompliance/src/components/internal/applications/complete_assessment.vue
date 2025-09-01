@@ -2,7 +2,6 @@
     <div v-if="isApplicationLoaded" class="container" id="internalApplicationAssessment">
 
         <modal transition="modal fade"
-            :showOk="true"
             okClass="btn btn-primary"
             :closeWhenOk="true"
             okText="Mark Complete"
