@@ -328,10 +328,11 @@ export default {
     commaToNewline(s){
         return s.replace(/[,;]/g, '\n');
     },
-    fetch_utilAccessGroupMembers: function(){
+    fetchAccessGroupMembers: function(){
         let vm = this;
         vm.loading.push('Loading Access Group Members');
-        let request = fetch_util.fetchUrl(api_endpoints.organisation_access_group_members).then((response) => {
+        let request = fetch_util.fetchUrl(api_endpoints.organisation_access_group_members)
+        request.then((response) => {
             vm.organisation_access_group_members = response
             vm.loading.splice('Loading Access Group Members',1);
         }).catch((error) => {
