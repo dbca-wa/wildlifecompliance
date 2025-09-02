@@ -297,6 +297,12 @@ LOGGING['loggers']['securebase_manager'] = {
     'handlers': ['securebase_manager'],
     'level': 'INFO'
 }
+LOGGING['loggers']['']['level'] = 'DEBUG'
+LOGGING['loggers']['wildlifecompliance'] = {
+    "handlers": [ "console", "file" ],
+    "level": "DEBUG",
+    "propagate": False  # Prevent double logging by stopping propagation
+}
 if not STOP_SQL_LOG:
     LOGGING['handlers']['file_sql'] = {
         'level': 'DEBUG',
