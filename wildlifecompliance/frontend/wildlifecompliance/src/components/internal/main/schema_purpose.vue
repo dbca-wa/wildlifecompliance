@@ -240,7 +240,7 @@ export default {
 
             if (data.id === '') {
 
-                let request = await fetch_util.fetchUrl(api_endpoints.schema_purpose, {method:'POST', body:JSON.stringify(data)},{
+                let request = fetch_util.fetchUrl(api_endpoints.schema_purpose, {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
                 })
                 request.then((response) => {
@@ -258,7 +258,7 @@ export default {
 
             } else {
 
-                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_purpose,data.id+'/save_purpose'), {method:'POST', body:JSON.stringify(data)},{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.schema_purpose,data.id+'/save_purpose'), {method:'POST', body:JSON.stringify(data)},{
                         emulateJSON:true,
 
                 })
@@ -320,7 +320,7 @@ export default {
 
                     if (result) {
 
-                        let request = await fetch_util.fetchUrl(
+                        let request = fetch_util.fetchUrl(
                             helpers.add_endpoint_json(api_endpoints.schema_purpose,(self.sectionPurpose.id+'/delete_purpose')), {method:"DELETE"}
                         )
     
