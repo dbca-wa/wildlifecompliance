@@ -519,7 +519,6 @@ class WildlifeLicence(SanitiseMixin):
         Licence. Same logic as the UserAvailableWildlifeLicencePurposesViewSet
         list function (used in API call)
         """
-        logger.debug('WildlifeLicence.purposes_available_to_add() - start')
         available_purpose_records = LicencePurpose.objects.all()
         licence_category_id = self.licence_category.id
         current_activities = self.current_activities
@@ -540,7 +539,6 @@ class WildlifeLicence(SanitiseMixin):
             licence_category_id=licence_category_id
         )
 
-        logger.debug('WildlifeLicence.purposes_available_to_add() - end')
         return available_purpose_records
 
     # @property
@@ -688,7 +686,6 @@ class WildlifeLicence(SanitiseMixin):
         Returns True if the licence is the most recent one of it's category,
         filtered by matching org_applicant, proxy_applicant and submitter.
         '''
-        logger.debug('WildlifeLicence.is_latest_in_category() - start')
         try:
             current_application = self.current_application
             if not current_application:
@@ -725,7 +722,6 @@ class WildlifeLicence(SanitiseMixin):
             licence_category_id=self.licence_category.id
         ).latest('id') == self
 
-        logger.debug('WildlifeLicence.is_latest_in_category() - end')
         return is_latest
 
     @property
@@ -734,7 +730,6 @@ class WildlifeLicence(SanitiseMixin):
         An attribute indicating a licence inspection is created and opened for
         this License.
         """
-        logger.debug('WildlifeLicence.has_inspection_open() - start')
         inspection_exists = False
 
         inspections = LicenceInspection.objects.filter(
@@ -743,7 +738,6 @@ class WildlifeLicence(SanitiseMixin):
         is_active = [i.is_active for i in inspections if i.is_active]
         inspection_exists = is_active[0] if is_active else False
 
-        logger.debug('WildlifeLicence.has_inspection_open() - end')
         return inspection_exists
 
     @property
