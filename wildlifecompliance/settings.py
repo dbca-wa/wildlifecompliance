@@ -297,20 +297,6 @@ LOGGING['loggers']['securebase_manager'] = {
     'handlers': ['securebase_manager'],
     'level': 'INFO'
 }
-# # Additional logging for compliancemanagement
-# LOGGING['handlers']['compliancemanagement'] = {
-#     'level': 'INFO',
-#     'class': 'logging.handlers.RotatingFileHandler',
-#     'filename': os.path.join(
-#         BASE_DIR,
-#         'logs',
-#         'wildlifecompliance_compliancemanagement.log'),
-#     'formatter': 'verbose',
-#     'maxBytes': 5242880}
-# LOGGING['loggers']['compliancemanagement'] = {
-#     'handlers': ['compliancemanagement'],
-#     'level': 'INFO'
-# }
 if not STOP_SQL_LOG:
     LOGGING['handlers']['console'] = {
         'level': 'DEBUG',
