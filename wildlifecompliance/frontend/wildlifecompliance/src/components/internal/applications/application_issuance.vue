@@ -619,7 +619,7 @@ export default {
                 this.setApplicationWorkflowState({bool: true});
                 await this.finalDecisionData({ url: `/api/application/${this.application.id}/final_decision_data.json` }).then( async response => {
 
-                    let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/final_decision'), {method:'POST', body:JSON.stringify(licence)},{
+                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/final_decision'), {method:'POST', body:JSON.stringify(licence)},{
                                 emulateJSON:true,
 
                             })

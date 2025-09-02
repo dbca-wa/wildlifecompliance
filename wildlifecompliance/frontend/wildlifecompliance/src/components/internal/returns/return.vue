@@ -206,7 +206,7 @@ export default {
         });
         data.append('transfer', speciesJSON)
       }
-        let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/save'),{method:'POST', body:data},{
+        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/save'),{method:'POST', body:data},{
             emulateJSON:true,
         })
         request.then((response)=>{
