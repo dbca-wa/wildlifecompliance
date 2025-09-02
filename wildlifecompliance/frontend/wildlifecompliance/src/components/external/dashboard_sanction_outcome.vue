@@ -5,7 +5,7 @@
 </template>
 <script>
 
-import datatable from '@/utils/vue/datatable.vue'
+import datatable from '@vue-utils/datatable.vue'
 import SanctionOutcomeDashTable from '@common-components/sanction_outcomes_dashboard.vue'
 import {
   api_endpoints,

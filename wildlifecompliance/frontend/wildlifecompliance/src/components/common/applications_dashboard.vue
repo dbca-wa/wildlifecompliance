@@ -74,7 +74,7 @@
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
-import datatable from '@/utils/vue/datatable.vue'
+import datatable from '@vue-utils/datatable.vue'
 
 import { mapActions, mapGetters } from 'vuex'
 import {
@@ -406,10 +406,18 @@ export default {
                     var submittersColumn = vm.visibleDatatable.vmDataTable.columns(vm.getColumnIndex('submitter'));
                     submittersColumn.data().unique().sort().each( function ( d, j ) {
                         var submitters = [];
-                        $.each(d,(index,s) => {
-                            if (!submitters.find(submitter => submitter.email == s.email) || submitters.length == 0){
+                        $.each(d, (index, s) => {
+                            // The .find() callback now includes a safety check.
+                            const isDuplicate = submitters.find(submitter => {
+                                // First, check if 'submitter' is a valid object before accessing '.email'.
+                                // This prevents the "Cannot read properties of null" error.
+                                return submitter && submitter.email === s.email;
+                            });
+
+                            // If no duplicate is found (isDuplicate is undefined), then push.
+                            if (!isDuplicate) {
                                 submitters.push({
-                                    'email':s.email,
+                                    'email': s.email,
                                     'search_term': `${s.first_name} ${s.last_name} (${s.email})`
                                 });
                             }
@@ -481,9 +489,23 @@ export default {
                     submittersColumn.data().unique().sort().each( function ( d, j ) {
                         var submitters = [];
                         $.each(d,(index, submitter) => {
-                            if (!submitters.find(item => item.email == submitter.email || submitters.length == 0)){
+                            // First, ensure the 'submitter' from the outer loop is a valid object before proceeding.
+                            // This prevents errors if the source array 'd' itself contains null values.
+                            if (!submitter || !submitter.email) {
+                                // Skip this iteration if 'submitter' is null or doesn't have an email.
+                                return; // 'return' in a $.each callback is like 'continue' in a for loop.
+                            }
+
+                            // The .find() callback now includes a safety check for 'item'.
+                            const isDuplicate = submitters.find(item => {
+                                // Check if 'item' is a valid object before accessing '.email'.
+                                return item && item.email === submitter.email;
+                            });
+
+                            // If no duplicate is found, then push the new object.
+                            if (!isDuplicate) {
                                 submitters.push({
-                                    'email':submitter.email,
+                                    'email': submitter.email,
                                     'search_term': `${submitter.first_name} ${submitter.last_name} (${submitter.email})`
                                 });
                             }

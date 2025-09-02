@@ -165,9 +165,9 @@ import moment from 'moment';
 import datatable from '@vue-utils/datatable.vue'
 
 import _ from 'lodash';
-import JournalHistory from './journal_history'
-import filefield from '@/components/common/compliance_file.vue';
-import CourtDate from '@/components/common/court_date'
+import JournalHistory from '@/components/internal/legal_case/journal_history.vue'
+import filefield from '@common-components/compliance_file.vue';
+import CourtDate from '@common-components/court_date.vue'
 
 export default {
     name: "ViewCourtProceedings",

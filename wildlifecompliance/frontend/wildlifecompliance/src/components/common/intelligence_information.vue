@@ -35,7 +35,7 @@
     import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
     import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
     import FormSection from "@/components/forms/section_toggle.vue";
-    import filefield from '@/components/common/compliance_file.vue';
+    import filefield from '@common-components/compliance_file.vue';
     //import CreateLegalCaseModal from "./create_legal_case_modal.vue";
     
     export default {

@@ -123,7 +123,7 @@ import Vue from "vue";
 import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
-import filefield from '@/components/common/compliance_file.vue';
+import filefield from '@common-components/compliance_file.vue';
 import { required } from '@vuelidate/validators'
 
 export default {

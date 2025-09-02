@@ -136,10 +136,6 @@ import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import {helpers,api_endpoints,fetch_util} from "@/utils/hooks.js"
 
-var select2 = require('select2');
-require("select2/dist/css/select2.min.css");
-
-
 export default {
     name:'Condition-Detail',
     components:{

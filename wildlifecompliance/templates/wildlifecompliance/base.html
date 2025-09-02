@@ -1,8 +1,9 @@
 {% extends "ledgerui/accounts_base_b5.html" %}
 {% load static %}
-
 {% load users %}
 {% load tagutils %}
+{% load django_vite %}
+
 {% get_instance_type as instance_type %}
 {% is_internal as is_internal_login %}
 {% is_officer as is_officer_login %}
@@ -23,19 +24,16 @@
 {% block header_top_menu %}
 {% endblock %}
 
+{% block extra_hidden_inputs %}
+    <link rel="icon" type="image/svg+xml" href="{% static 'wildlifecompliance/img/favicon.svg' %}">
+{% endblock %}
+
 {% block extra_css %}
 <link type="text/css" href="{% static 'wildlifecompliance/css/base.css' %}" rel="stylesheet">
-{% if not dev %}
-<link rel="stylesheet" href="{% static 'wildlifecompliance_vue/css/app.css' %}?v={{GIT_COMMIT_HASH}}">
-<link rel="stylesheet" href="{% static 'wildlifecompliance_vue/css/chunk-vendors.css' %}?v={{GIT_COMMIT_HASH}}">
-{% endif %}
 {% endblock %}
 
 {% block custom_js %}
-    <script type="text/javascript"
-            src="{% static 'wildlifecompliance_vue/js/chunk-vendors.js' %}?v={{GIT_COMMIT_HASH}}"></script>
-    <script type="text/javascript"
-            src="{% static 'wildlifecompliance_vue/js/app.js' %}?v={{GIT_COMMIT_HASH}}"></script>
+    {% vite_asset vue3_entry_script app='default' %}
 {% endblock custom_js %}
 
 {% block menu_items_left_brand %}
@@ -47,3 +45,7 @@
         </div>
     </div>
 {% endblock menu_items_left_brand %}
+
+{% block extra_js %}
+    {% vite_hmr_client app='default' %} <!-- This tag will include this script only if DJANGO_VITE_DEV_MODE is true, otherwise this will do nothing. -->
+{% endblock %}

@@ -412,23 +412,23 @@ import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import SearchPersonOrganisation from "@/components/common/search_person_or_organisation.vue";
-//import CreateNewPerson from "@common-components/create_new_person.vue";
-//import CreateNewOrganisation from "@common-components/create_new_organisation.vue";
+//import CreateNewPerson from "@/components/common/create_new_person.vue";
+//import CreateNewOrganisation from "@/components/common/create_new_organisation.vue";
 import Assignment from "../assignment.vue";
-import CommsLogs from "@common-components/comms_logs.vue";
+import CommsLogs from "@/components/common/comms_logs.vue";
 import datatable from '@vue-utils/datatable.vue'
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
 
-import Offence from '../offence/offence_modal';
-import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal';
-import filefield from '@/components/common/compliance_file.vue';
+import Offence from '../offence/offence_modal.vue';
+import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal.vue';
+import filefield from '@common-components/compliance_file.vue';
 import InspectionWorkflow from './inspection_workflow.vue';
-import RelatedItems from "@common-components/related_items.vue";
-import MapLocation from "../../common/map_location";
-require("select2/dist/css/select2.min.css");
+import RelatedItems from "@/components/common/related_items.vue";
+import MapLocation from "../../common/map_location.vue";
+import "select2/dist/css/select2.min.css";
 
 import hash from 'object-hash';
 

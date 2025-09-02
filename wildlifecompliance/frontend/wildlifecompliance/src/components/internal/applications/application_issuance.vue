@@ -239,8 +239,8 @@ import {
 }
 from '@/utils/hooks'
 import { mapGetters, mapActions } from 'vuex'
-import filefield from '@/components/common/compliance_file.vue'
-import summernote from '@/components/purpose_details_summernote'
+import filefield from '@common-components/compliance_file.vue'
+import summernote from '@/components/purpose_details_summernote.vue'
 
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {

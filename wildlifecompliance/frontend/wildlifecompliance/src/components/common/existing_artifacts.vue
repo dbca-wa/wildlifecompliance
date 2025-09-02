@@ -15,9 +15,6 @@ import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
 
-require("select2/dist/css/select2.min.css");
-
-
 export default {
     name: "ExistingArtifacts",
     props: {

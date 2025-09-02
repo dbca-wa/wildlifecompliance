@@ -16,7 +16,7 @@
 from '@/utils/hooks'
     
     import '@/scss/forms/form.scss';
-    import ReturnsRendererForm from '@/components/common/returns_renderer.vue';
+    import ReturnsRendererForm from '@common-components/returns_renderer.vue';
     export default {
         components: {
             ReturnsRendererForm,

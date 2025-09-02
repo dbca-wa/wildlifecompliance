@@ -19,11 +19,7 @@ import datatable from '@vue-utils/datatable.vue'
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import moment from 'moment';
-
-require("select2/dist/css/select2.min.css");
-
-import WeakLinks from '@/components/common/weak_links.vue';
+import WeakLinks from '@common-components/weak_links.vue';
 
 export default {
     name: "RelatedItems",

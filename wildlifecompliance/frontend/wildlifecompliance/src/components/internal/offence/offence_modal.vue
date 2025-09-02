@@ -230,20 +230,20 @@
 import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import Awesomplete from "awesomplete";
-import modal from "@vue-utils/bootstrap-modal.vue";
-import datatable from "@vue-utils/datatable.vue";
+import modal from "@/utils/vue/bootstrap-modal.vue";
+import datatable from "@/utils/vue/datatable.vue";
 import { mapGetters, mapActions } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
-import MapLocationOffence from "./map_location_offence1";
-import SearchPersonOrganisation from "@common-components/search_person_or_organisation.vue";
-//import CreateNewPerson from "@common-components/create_new_person.vue";
+import MapLocationOffence from "./map_location_offence1.vue";
+import SearchPersonOrganisation from "@/components/common/search_person_or_organisation.vue";
+//import CreateNewPerson from "@/components/common/create_new_person.vue";
 import utils from "../utils";
 import $ from "jquery";
 
 import "awesomplete/awesomplete.css";
 import { v4 as uuidv4 } from 'uuid';
-import "jquery-ui/ui/widgets/draggable.js";
-import FileField from '@/components/common/compliance_file.vue';
+// import "jquery-ui/ui/widgets/draggable.js";
+import FileField from '@common-components/compliance_file.vue';
 import { data } from "jquery";
 import SearchOffender from './search_offenders.vue'
 
@@ -521,12 +521,12 @@ export default {
         setTemporaryDocumentCollectionId: function(val) {
             this.temporary_document_collection_id = val;
         },
-    makeModalsDraggable: function(){
-        this.elem_modal = $('.modal > .modal-dialog');
-        for (let i=0; i<this.elem_modal.length; i++){
-            //$(this.elem_modal[i]).draggable();
-        }
-    },
+    // makeModalsDraggable: function(){
+    //     this.elem_modal = $('.modal > .modal-dialog');
+    //     for (let i=0; i<this.elem_modal.length; i++){
+    //         //$(this.elem_modal[i]).draggable();
+    //     }
+    // },
     constructRegionsAndDistricts: async function() {
         let returned_regions = await cache_helper.getSetCacheList(
             "Regions",
@@ -1098,7 +1098,7 @@ export default {
     mounted: function() {
         this.$nextTick(() => {
             this.addEventListeners();
-            this.makeModalsDraggable();
+            // this.makeModalsDraggable();
         });
     }
 };

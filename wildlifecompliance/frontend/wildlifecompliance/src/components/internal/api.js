@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     organisations: '/api/organisations/',
     my_organisations: '/api/my_organisations/',
     users: '/api/users/',

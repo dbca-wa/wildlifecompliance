@@ -24,7 +24,7 @@
 <script>
 import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
-import { splitText } from "@/utils/helpers.js";
+import helpers from "@/utils/helpers.js";
 
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {
@@ -57,7 +57,7 @@ export default {
     }
   },
   methods: {
-    splitText: splitText
+    splitText: helpers.splitText
   },
 }
 </script>
