@@ -14,9 +14,6 @@
     <div id="app"></div>
 </div>
 
-<script type="text/javascript" src="{% static 'wildlifecompliance_vue/js/chunk-vendors.js' %}?v={{GIT_COMMIT_HASH}}"></script>
-<script type="text/javascript" src="{% static 'wildlifecompliance_vue/js/app.js' %}?v={{GIT_COMMIT_HASH}}"></script>
-
 <style>
     .navbar-brand > img {
         display: inline;
@@ -50,4 +47,11 @@
     }
 </style>
 
+{% endblock %}	
+
+{% block custom_js %}
+<script type="text/javascript" src="{% static 'wildlifecompliance_vue/js/chunk-vendors.js' %}?v={{GIT_COMMIT_HASH}}"></script>
+<script type="text/javascript" src="{% static 'wildlifecompliance_vue/js/app.js' %}?v={{GIT_COMMIT_HASH}}"></script>
+<script src="/static/common/node_modules/bootstrap-datepicker/js/bootstrap-datepicker.js?ver=0ceaa31aab1cdaf6702036a4a1cd6fc07867ccfb
+"></script>
 {% endblock %}	

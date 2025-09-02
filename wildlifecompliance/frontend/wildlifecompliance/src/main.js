@@ -3,8 +3,9 @@
 import Vue from 'vue';
 window._ = _;
 import $ from 'jquery';
+import 'jquery-ui';
 import 'jquery-validation';
-window.$ = $;
+//window.$ = $;
 import { createApp } from 'vue';
 import App from './App';
 import router from './router';
