@@ -4,7 +4,6 @@
 
             <modal
                 transition="modal fade"
-                :showOk="false"
                 @cancel="close()"
                 title="Assessment Record" large>
                 <div class="container-fluid">
@@ -182,9 +181,12 @@ export default {
             }
         },
         relevantAssessorGroup: function() {
+            console.log(this.assessorGroup)
             let relevantAssessors = [];
             this.assessorGroup.forEach(assessor => {
-                relevantAssessors.push(this.isAssessorRelevant(assessor));
+                if (this.isAssessorRelevant(assessor)) {
+                    relevantAssessors.push(assessor);
+                }
             });
             return relevantAssessors;
         },
@@ -609,9 +611,10 @@ export default {
             this.$refs.assessorDatatable.vmDataTable.on('click','.assessment_remind',(e) => {
                 e.stopImmediatePropagation();
                 e.preventDefault();
+                console.log(e)
 
                 let assessment_id = $(e.target).data('assessmentid');
-                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessment, {method:'POST', body:JSON.stringify(assessment_id+'/remind_assessment')}))
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessment,assessment_id+'/remind_assessment'), {method:'POST'})
                 request.then((response)=>{
                     swal.fire(
                             'Sent',
@@ -633,7 +636,7 @@ export default {
                 e.preventDefault();
 
                 let assessment_id = $(e.target).data('assessmentid');
-                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessment,{method:'POST', body:JSON.stringify(assessment_id+'/resend_assessment')}))
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessment,assessment_id+'/resend_assessment'),{method:'POST'})
                 request.then((response)=>{
                     swal.fire(
                             'Sent',
@@ -658,8 +661,9 @@ export default {
                 e.stopImmediatePropagation();
                 e.preventDefault();
 
+                console.log(e)
                 let assessment_id = $(e.target).data('assessmentid');
-                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessment,(assessment_id+'/recall_assessment')))
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.assessment,assessment_id+'/recall_assessment'), {method:'POST'})
                 request.then((response)=>{
                     swal.fire(
                             'Success',

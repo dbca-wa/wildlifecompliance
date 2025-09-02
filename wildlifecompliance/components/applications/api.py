@@ -366,10 +366,10 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
                 ).values_list('id', flat=True))
 
                 search_text_ass_ids = Assessment.objects.values('id').filter(
-                    Q(application__applicant__icontains=search_text) |
+                    Q(application__proxy_applicant_id__in=email_user_ids) |
                     Q(licence_activity__short_name__icontains=search_text) |
                     Q(application__proxy_applicant_id__in=email_user_ids) |
-                    Q(submitter_id__in=email_user_ids) 
+                    Q(application__submitter_id__in=email_user_ids) 
                 )
                 # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
                 # (otherwise they will filter on top of each other)

@@ -173,7 +173,7 @@ export default {
         });
         data.append('transfer', speciesJSON)
       }
-      let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/save'),{method:'POST', body:JSON.stringify(data)},{
+      let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/save'),{method:'POST', body:JSON.stringify(data)},{
                       emulateJSON:true,
                     })
                 request.then((response)=>{
@@ -222,7 +222,7 @@ export default {
       self.spinner_submit = true;
       var data = await self.get_table_data()
 
-      let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/save_and_submit'),{method:'POST', body:JSON.stringify(data)},{
+      let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/save_and_submit'),{method:'POST', body:JSON.stringify(data)},{
                       emulateJSON:true,
                     })
                 request.then((response)=>{
@@ -290,7 +290,7 @@ export default {
       self.spinner_exit = true;
       self.spinner_submit = true;
       self.form=document.forms.external_returns_form;
-      let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/submit_and_checkout'),{
+      let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/submit_and_checkout'),{
                       emulateJSON:true,
                     })
                 request.then((response)=>{

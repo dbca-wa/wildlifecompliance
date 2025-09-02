@@ -1518,11 +1518,11 @@ export default {
             const data = {
                 "activity_id" : this.selectedActivity.licence_activity,
             }
-            let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_to_me')), {method:'POST', body:JSON.stringify(data)},{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_to_me')), {method:'POST', body:JSON.stringify(data)},{
                 emulateJSON:true
 
             })
-request.then((response) => {
+            request.then((response) => {
                 // this.refreshFromResponse(response);
                 // vm.updateAssignedOfficerSelect();
             }, (error) => {
@@ -1558,10 +1558,10 @@ request.then((response) => {
                 "activity_id" : this.selectedActivity.licence_activity,
             };
             if (!unassign){
-                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_officer')), {method:'POST', body:JSON.stringify(data)},{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_officer')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
                 })
-request.then((response) => {
+                request.then((response) => {
                     // this.refreshFromResponse(response);
                     // this.updateAssignedOfficerSelect();
                 }, (error) => {
@@ -1575,10 +1575,10 @@ request.then((response) => {
                 });
             }
             else{
-                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/unassign_officer')), {method:'POST', body:JSON.stringify(data)},{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/unassign_officer')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
                 })
-request.then((response) => {
+                request.then((response) => {
                     // this.refreshFromResponse(response);
                     // this.updateAssignedOfficerSelect();
                 }, (error) => {
@@ -1603,10 +1603,10 @@ request.then((response) => {
             }
 
             if (!unassign){
-                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_activity_approver')), {method:'POST', body:JSON.stringify(data)},{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/assign_activity_approver')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
                 })
-request.then((response) => {
+                request.then((response) => {
                     // this.refreshFromResponse(response);
                     // this.updateAssignedApproverSelect();
                 }, (error) => {
@@ -1620,10 +1620,10 @@ request.then((response) => {
                 });
             }
             else{
-                let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/unassign_activity_approver')), {method:'POST', body:JSON.stringify(data)},{
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/unassign_activity_approver')), {method:'POST', body:JSON.stringify(data)},{
                     emulateJSON:true
                 })
-request.then((response) => {
+                request.then((response) => {
                     // this.refreshFromResponse(response);
                     // this.updateAssignedOfficerSelect();
                 }, (error) => {
@@ -1645,11 +1645,11 @@ request.then((response) => {
             const data = {
                 "activity_id" : this.selectedActivity.licence_activity,
             }
-            let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/make_me_activity_approver')), {method:'POST', body:JSON.stringify(data)},{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/make_me_activity_approver')), {method:'POST', body:JSON.stringify(data)},{
                 emulateJSON:true
 
             })
-request.then((response) => {
+            request.then((response) => {
                 // this.refreshFromResponse(response);
                 // this.updateAssignedApproverSelect();
             }, (error) => {
@@ -1668,10 +1668,10 @@ request.then((response) => {
                 'activity_id' : activity_id,
                 'status': status
             }
-            let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/update_activity_status')), {method:'POST', body:JSON.stringify(data)},{
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/update_activity_status')), {method:'POST', body:JSON.stringify(data)},{
                 emulateJSON:true,
             })
-request.then((response) => {
+            request.then((response) => {
                 this.refreshFromResponse(response);
             }, (error) => {
                 this.revert();
