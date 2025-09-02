@@ -62,18 +62,13 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
-import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
-import CommsLogs from '@common-components/comms_logs.vue'
 import AmendmentRequestDetails from './return_amendment.vue';
 import {
   api_endpoints,
   helpers, fetch_util
 }
 from '@/utils/hooks'
-var select2 = require('select2');
-require("select2/dist/css/select2.min.css");
-
 
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {

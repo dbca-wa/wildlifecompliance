@@ -40,7 +40,7 @@ import $ from "jquery";
 
 import "awesomplete/awesomplete.css";
 import hash from 'object-hash';
-import SearchPersonOrganisation from "@common-components/search_person_or_organisation.vue";
+import SearchPersonOrganisation from "@/components/common/search_person_or_organisation.vue";
 
 export default {
     name: "search-offender",

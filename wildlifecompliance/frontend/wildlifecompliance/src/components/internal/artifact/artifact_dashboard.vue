@@ -67,7 +67,7 @@ import datatable from '@vue-utils/datatable.vue'
 //import FormSection from "@/components/compliance_forms/section.vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import { api_endpoints, helpers, cache_helper } from '@/utils/hooks'
-import CreateArtifact from "@common-components/person_or_artifact_modal.vue";
+import CreateArtifact from "@/components/common/person_or_artifact_modal.vue";
 
 export default {
     name: 'ArtifactTableDash',

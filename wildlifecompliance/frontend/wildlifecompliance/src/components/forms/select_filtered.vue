@@ -52,14 +52,10 @@ search and calls the server api with a filtered_list_url.
 
 <script>
 import { v4 as uuid } from 'uuid';
-import { mapActions, mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
 import HelpText from './help_text.vue';
 import HelpTextUrl from './help_text_url.vue';
 import CommentBlock from './comment_block.vue';
-
-// var select2 = require('select2');
-// require("select2/dist/css/select2.min.css");
-// 
 
 export default {
     props: {

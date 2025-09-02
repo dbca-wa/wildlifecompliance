@@ -325,16 +325,16 @@ import datatable from '@vue-utils/datatable.vue'
 import utils from "../utils";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import CommsLogs from "@common-components/comms_logs.vue";
-import FileField from '@/components/common/compliance_file.vue';
-import OffenceWorkflow from './offence_workflow';
+import CommsLogs from "@/components/common/comms_logs.vue";
+import FileField from '@common-components/compliance_file.vue';
+import OffenceWorkflow from './offence_workflow.vue';
 import SearchOffender from './search_offenders.vue'
-//import CreateNewPerson from "@common-components/create_new_person.vue";
-import MapLocation from "../../common/map_location";
-import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal';
+//import CreateNewPerson from "@/components/common/create_new_person.vue";
+import MapLocation from "../../common/map_location.vue";
+import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal.vue';
 
 import "awesomplete/awesomplete.css";
-import RelatedItems from "@common-components/related_items.vue";
+import RelatedItems from "@/components/common/related_items.vue";
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
 import hash from 'object-hash';

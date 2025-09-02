@@ -67,8 +67,17 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css'
-
 import 'awesomplete/awesomplete.css';
+
+import markerIcon2X from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import markerGrayLocked from '../../../assets/marker-gray-locked.svg';
+import markerGreenLocked from '../../../assets/marker-green-locked.svg';
+import markerBlueLocked from '../../../assets/marker-blue-locked.svg';
+import markerYellowLocked from '../../../assets/marker-yellow-locked.svg';
+import markerRedLocked from '../../../assets/marker-red-locked.svg';
+import markerOrangeLocked from '../../../assets/marker-orange-locked.svg';
 
 L.TileLayer.WMTS = L.TileLayer.extend({
     defaultWmtsParams: {
@@ -157,9 +166,9 @@ L.tileLayer.wmts = function (url, options) {
 /* To make default marker work with webpack */
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-    iconUrl: require('leaflet/dist/images/marker-icon.png'),
-    shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+    iconRetinaUrl: markerIcon2X,
+    iconUrl: markerIcon,
+    shadowUrl: markerShadow,
 });
 /********************************************/
 
@@ -413,25 +422,25 @@ request.then(response => {
                         let coords = (inspections[i].lat, inspections[i].lon);
 
                         /* Select a marker file, according to the classification */
-                        let filename = 'marker-gray-locked.svg';
+                        let filename = markerGrayLocked;
                         if (inspection.status){
                             if (inspection.status == 'open'){
-                                filename = 'marker-green-locked.svg';
+                                filename = markerGreenLocked;
                             } else if (inspection.status == 'await_endorsement'){
-                                filename = 'marker-blue-locked.svg';
+                                filename = markerBlueLocked;
                             } else if (inspection.status == 'discarded'){
-                                filename = 'marker-yellow-locked.svg';
+                                filename = markerYellowLocked;
                             } else if (inspection.status == 'closed'){
-                                filename = 'marker-red-locked.svg';
+                                filename = markerRedLocked;
                             } else if (inspection.status == 'pending_closure'){
-                                filename = 'marker-orange-locked.svg';
+                                filename = markerOrangeLocked;
                             }
                         }
 
                         /* create marker */
                         let myIcon = L.icon({
-                            iconUrl: require('../../../assets/' + filename),
-                            shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+                            iconUrl: filename,
+                            shadowUrl: markerShadow,
                             shadowSize: [41, 41],
                             shadowAnchor: [12, 41],
                             iconSize: [32, 32],

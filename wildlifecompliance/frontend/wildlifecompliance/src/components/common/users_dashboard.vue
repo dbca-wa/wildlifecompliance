@@ -40,7 +40,7 @@
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
-import datatable from '@/utils/vue/datatable.vue'
+import datatable from '@vue-utils/datatable.vue'
 import { mapActions, mapGetters } from 'vuex'
 import {
     api_endpoints,

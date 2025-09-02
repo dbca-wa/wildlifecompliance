@@ -1,0 +1,17 @@
+<svg width="256" height="256" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img">
+    <title>wildlifecompliance favicon (large checkmark)</title>
+
+    <!-- Circular background -->
+    <circle cx="32" cy="32" r="30" fill="#2E7D32" />
+    
+    <!-- Leaf shape -->
+    <path d="M32,12 C18,27 22,50 32,52 C42,50 46,27 32,12 Z" fill="#87be8aff" />
+    
+    <!-- checkmark symbol -->
+    <polyline points="19,34 30,45 48,27" 
+              fill="none" 
+              stroke="#FFFFFF" 
+              stroke-width="5.5" 
+              stroke-linecap="round" 
+              stroke-linejoin="round" />
+</svg>

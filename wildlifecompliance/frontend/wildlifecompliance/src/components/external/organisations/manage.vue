@@ -86,8 +86,8 @@
 import { v4 as uuid } from 'uuid';
 import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
-import utils from '../utils'
-import api from '../api'
+import utils from '../utils.js'
+import api from '../api.js'
 import AddContact from '@common-components/add_contact.vue'
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {

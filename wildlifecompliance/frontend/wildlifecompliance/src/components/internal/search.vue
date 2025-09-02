@@ -158,10 +158,10 @@
 <script>
 import { v4 as uuid } from 'uuid';
 import $ from 'jquery'
-import datatable from '@/utils/vue/datatable.vue'
-import alert from '@/utils/vue/alert.vue'
+import datatable from '@vue-utils/datatable.vue'
+import alert from '@vue-utils/alert.vue'
 import UserDashTable from '@common-components/users_dashboard.vue'
-import OrganisationDashTable from '@internal-components/organisations/organisations_dashboard.vue'
+import OrganisationDashTable from '@/components/internal/organisations/organisations_dashboard.vue'
 import '@/scss/dashboards/search.scss';
 import {
   api_endpoints,

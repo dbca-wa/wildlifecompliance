@@ -1,17 +1,17 @@
+import 'vite/modulepreload-polyfill';
+
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
-window._ = _;
+// window._ = _;
 import $ from 'jquery';
 import 'jquery-ui';
 import 'jquery-validation';
-//window.$ = $;
 import { createApp } from 'vue';
-import App from './App';
-import router from './router';
+import App from '@/App.vue';
+import router from '@/router';
 import helpers from '@/utils/helpers';
-import api_endpoints from './api';
-import store from './store';
+import store from '@/store';
 import RendererBlock from '@/components/common/renderer_block.vue';
 import ComplianceRendererBlock from '@/components/common/compliance_renderer_block.vue';
 import { useVuelidate } from '@vuelidate/core'
@@ -39,8 +39,8 @@ import '@/../node_modules/@fortawesome/fontawesome-free/css/all.min.css';
 import 'summernote/dist/summernote-lite.min.css';
 import 'summernote/dist/summernote-lite.min.js';
 
-require('@/../node_modules/@fortawesome/fontawesome-free/css/all.min.css');
-require('@/../node_modules/datatables.net-bs5/css/dataTables.bootstrap5.min.css');
+import '@/../node_modules/@fortawesome/fontawesome-free/css/all.min.css';
+import '@/../node_modules/datatables.net-bs5/css/dataTables.bootstrap5.min.css';
 
 extendMoment(moment);
 

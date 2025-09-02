@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     fetchUrl: async function (url, options) {
         return new Promise((resolve, reject) => {
             let f = options === undefined ? fetch(url) : fetch(url, options);

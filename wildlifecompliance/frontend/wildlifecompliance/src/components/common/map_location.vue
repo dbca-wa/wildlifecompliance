@@ -35,19 +35,18 @@
 </template>
 
 <script>
-import Vue from "vue";
 import Leaf from "leaflet";
 import "leaflet-measure"; /* This should be imported after leaflet */
 import "leaflet.locatecontrol";
 import Awesomplete from "awesomplete";
-import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import { guid } from "@/utils/helpers";
-
 import "awesomplete/awesomplete.css";
 import "leaflet/dist/leaflet.css";
 import "leaflet-measure/dist/leaflet-measure.css";
 import "leaflet.locatecontrol/dist/L.Control.Locate.min.css";
-import { api_endpoints, helpers, cache_helper } from '@/utils/hooks'
+import { api_endpoints, helpers, cache_helper } from '@/utils/hooks.js'
+
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import markerGrayLocked from "../../assets/marker-gray-locked.svg";
 
 export default {
   name: "map-leaflet",
@@ -70,7 +69,7 @@ export default {
 
     let vm = this;
     let baseDic = {
-      shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+      shadowUrl: markerShadow,
       shadowSize: [41, 41],
       shadowAnchor: [12, 41],
       iconSize: [32, 32],
@@ -78,10 +77,10 @@ export default {
       popupAnchor: [0, -20]
     };
     vm.icon_default = Leaf.icon({
-      iconUrl: require("../../assets/marker-gray-locked.svg"),
+      iconUrl: markerGrayLocked,
       ...baseDic
     });
-    vm.guid = guid();
+    vm.guid = helpers.guid();
 
     return {
        // marker_lng: vm.marker_longitude,

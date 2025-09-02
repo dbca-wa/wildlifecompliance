@@ -5748,7 +5748,6 @@ class ApplicationSelectedActivity(SanitiseMixin):
         :param purpose_list containing purpose ids to be filtered on.
         :return boolean.
         '''
-        logger.debug('AppSelectedActivity.has_licence_amendment - start()')
         has_amendment = False
         valid_status = [
             Application.CUSTOMER_STATUS_DRAFT,
@@ -5770,8 +5769,6 @@ class ApplicationSelectedActivity(SanitiseMixin):
                     if p.purpose_id in purpose_list:
                         has_amendment = True
                         break
-
-        logger.debug('AppSelectedActivity.has_licence_amendment - end()')
 
         return has_amendment
 

@@ -121,7 +121,7 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
-import datatable from '@/utils/vue/datatable.vue'
+import datatable from '@vue-utils/datatable.vue'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import {

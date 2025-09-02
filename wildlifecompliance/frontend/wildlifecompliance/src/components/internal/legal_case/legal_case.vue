@@ -376,34 +376,34 @@ import { v4 as uuid } from 'uuid';
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import Assignment from "../assignment.vue";
-import CommsLogs from "@common-components/comms_logs.vue";
+import CommsLogs from "@/components/common/comms_logs.vue";
 import datatable from '@vue-utils/datatable.vue'
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
 
-import Offence from '../offence/offence_modal';
-import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal';
-import Inspection from '../inspection/create_inspection_modal';
-import filefield from '@/components/common/compliance_file.vue';
-import RelatedItems from "@common-components/related_items.vue";
-require("select2/dist/css/select2.min.css");
+import Offence from '../offence/offence_modal.vue';
+import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal.vue';
+import Inspection from '../inspection/create_inspection_modal.vue';
+import filefield from '@common-components/compliance_file.vue';
+import RelatedItems from "@/components/common/related_items.vue";
+import "select2/dist/css/select2.min.css";
 
 import hash from 'object-hash';
-import Magic from './magic';
-//import SearchPersonOrganisationModal from '@/components/common/search_person_or_organisation_modal';
-import PersonOrArtifactModal from '@/components/common/person_or_artifact_modal';
+import Magic from './magic.vue';
+//import SearchPersonOrganisationModal from '@common-components/search_person_or_organisation_modal';
+import PersonOrArtifactModal from '@common-components/person_or_artifact_modal.vue';
 import _ from 'lodash';
-import RunningSheetHistory from './running_sheet_history'
-import LegalCaseWorkflow from './legal_case_workflow'
+import RunningSheetHistory from './running_sheet_history.vue'
+import LegalCaseWorkflow from './legal_case_workflow.vue'
 //import TreeSelect from "@/components/compliance_forms/treeview.vue";
 import TreeSelect from 'vue3-treeselect'
 //import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-import BriefOfEvidence from './brief_of_evidence';
-import ProsecutionBrief from './prosecution_brief';
-import CourtProceedings from './court_proceedings';
-import GenerateDocument from './generate_document';
+import BriefOfEvidence from './brief_of_evidence.vue';
+import ProsecutionBrief from './prosecution_brief.vue';
+import CourtProceedings from './court_proceedings.vue';
+import GenerateDocument from './generate_document.vue';
 
 
 export default {

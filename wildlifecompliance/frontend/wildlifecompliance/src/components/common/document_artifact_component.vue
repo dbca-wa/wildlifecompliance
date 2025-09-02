@@ -241,12 +241,12 @@ import Vue from "vue";
 //import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
-import filefield from '@/components/common/compliance_file.vue';
+import filefield from '@common-components/compliance_file.vue';
 
 import moment from 'moment';
-import SearchPersonOrganisation from './search_person_or_organisation'
+import SearchPersonOrganisation from './search_person_or_organisation.vue'
 import FormSection from "@/components/forms/section_toggle.vue";
-import RelatedItems from "@common-components/related_items.vue";
+import RelatedItems from "@/components/common/related_items.vue";
 import datatable from '@vue-utils/datatable.vue'
 
 export default {

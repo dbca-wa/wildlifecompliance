@@ -273,7 +273,7 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import { helpers, api_endpoints } from "@/utils/hooks.js"
-import { strToBool } from "@/utils/helpers.js";
+// import { strToBool } from "@/utils/helpers.js";
 import FormSection from '@/components/forms/section.vue'
 import Group from '@/components/forms/group.vue'
 import Radio from '@/components/forms/radio.vue'
@@ -282,7 +282,7 @@ import Conditions from '@/components/forms/compliance_conditions.vue'
 import Checkbox from '@/components/forms/checkbox.vue'
 import Declaration from '@/components/forms/declarations.vue'
 //import File from '@/components/forms/call_email_file.vue'
-import File from '@/components/common/compliance_file.vue'
+import File from '@common-components/compliance_file.vue'
 import SelectBlock from '@/components/forms/select.vue'
 import DateField from '@/components/forms/date-field.vue'
 import TextField from '@/components/forms/text.vue'
@@ -455,7 +455,7 @@ const ComplianceRendererBlock = {
         addToTemporaryDocumentCollectionList: 'addToTemporaryDocumentCollectionList',
     }),
 
-    strToBool: strToBool,
+    strToBool: helpers.strToBool,
     element_id: function(depth=0) {
         return `id_${this.component_name}${(depth) ? `_${depth}` : ''}${this.instance !== null ? `__instance${this.instance}`: ''}`;
     },
