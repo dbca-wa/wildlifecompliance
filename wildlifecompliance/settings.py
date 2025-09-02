@@ -298,19 +298,20 @@ LOGGING['loggers']['securebase_manager'] = {
     'level': 'INFO'
 }
 if not STOP_SQL_LOG:
-    LOGGING['handlers']['console'] = {
+    LOGGING['handlers']['file_sql'] = {
         'level': 'DEBUG',
         'class': 'logging.handlers.RotatingFileHandler',
         'filename': os.path.join(
             BASE_DIR,
             'logs',
             'sql.log'),
-        'formatter': 'verbose',
+        'formatter': 'verbose2',
         'maxBytes': 5242880   
     }
     LOGGING['loggers']['django.db.backends'] = {
-        'handlers': ['console'],
-        'level': 'DEBUG'
+        'handlers': ['file_sql'],
+        'level': 'DEBUG',
+        'propagate': False
     }
 
 STATICFILES_DIRS.append(os.path.join(BASE_DIR, 'wildlifecompliance', 'static'))
