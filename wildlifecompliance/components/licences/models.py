@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import json
+from rest_framework.fields import ObjectDoesNotExist
 import reversion
 import logging
 
@@ -688,12 +689,27 @@ class WildlifeLicence(SanitiseMixin):
         filtered by matching org_applicant, proxy_applicant and submitter.
         '''
         logger.debug('WildlifeLicence.is_latest_in_category() - start')
-        organisation_id = self.current_application.org_applicant
-        proxy_id = self.current_application.proxy_applicant
-        submitter = self.current_application.submitter
+        try:
+            current_application = self.current_application
+            if not current_application:
+                logger.warning(f"current_application is None for the WildlifeLicence: [{self}]")
+                return False
+        except ObjectDoesNotExist:
+            logger.warning(f"current_application relation does not exist for the WildlifeLicence: [{self}]")
+            return False
+
+        organisation_id = current_application.org_applicant
+        proxy_id = current_application.proxy_applicant
+
+        try:
+            submitter = current_application.submitter
+        except ObjectDoesNotExist:
+            logger.error(f"Data inconsistency detected: 'submitter' does not exist for the Application: [{current_application}] (linked to WildlifeLicence: [{self}]).  The query cannot be completed.",
+                exc_info=True  # This adds the full stack trace to the log for easy debugging.)
+            )
+            return False
 
         is_latest = WildlifeLicence.objects.filter(
-
             Q(current_application__org_applicant_id=organisation_id)
             if organisation_id else
             (

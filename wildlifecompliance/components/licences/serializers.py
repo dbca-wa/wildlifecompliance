@@ -58,7 +58,11 @@ class WildlifeLicenceSerializer(serializers.ModelSerializer):
         from wildlifecompliance.components.licences.services import (
             LicenceService,
         )
-        return LicenceService.get_activities_list_for(obj)
+        activities = LicenceService.get_activities_list_for(obj)
+        if activities is None:
+            activities = [{'error': 'Failed to load activities.'}]
+        
+        return activities
 
     def get_can_add_purpose(self, obj):
         '''

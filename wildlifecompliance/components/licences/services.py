@@ -215,16 +215,16 @@ class LicenceService(object):
         Get a list of activities for the licence, merged by application per
         licence_activity_id (1 per LicenceActivity).
         '''
+        logger.info('TEST')
         the_list = None
         try:
             actioner = LicenceActioner(licence)
             the_list = actioner.get_latest_activity_purposes_for_request()
 
         except Exception as e:
-            logger.error('ERR get_activities_list_for() ID {0}: {1}'.format(
-                licence.id, e
-            ))
-            raise Exception('Failed getting activities for licence.')
+            logger.error(f'ERR get_activities_list_for() ID {licence.id}: {e}')
+            # raise Exception('Failed getting activities for licence.')
+            return None
 
         return the_list
 
