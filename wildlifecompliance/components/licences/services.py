@@ -215,7 +215,6 @@ class LicenceService(object):
         Get a list of activities for the licence, merged by application per
         licence_activity_id (1 per LicenceActivity).
         '''
-        logger.info('TEST')
         the_list = None
         try:
             actioner = LicenceActioner(licence)
