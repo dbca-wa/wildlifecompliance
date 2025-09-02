@@ -9,6 +9,8 @@ import $ from 'jquery';
 import 'jquery-validation';
 import select2 from 'select2';
 select2()
+import _ from 'lodash'
+window._ = _
 import { createApp } from 'vue';
 import App from '@/App.vue';
 import router from '@/router';
