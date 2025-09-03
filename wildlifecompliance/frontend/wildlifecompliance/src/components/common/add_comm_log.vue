@@ -1,6 +1,6 @@
 <template lang="html">
     <div id="AddComms">
-        <modal transition="modal fade" @ok="ok()" @cancel="cancel()" title="Communication log - Add entry" large>
+        <bootstrapModal transition="modal fade" @ok="ok()" @cancel="cancel()" title="Communication log - Add entry" large>
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="commsForm">
@@ -100,18 +100,18 @@
                 <button type="button" v-else class="btn btn-default" @click="ok">Add</button>
                 <button type="button" class="btn btn-default" @click="cancel">Cancel</button>
             </div>
-        </modal>
+        </bootstrapModal>
     </div>
 </template>
 
 <script>
-import modal from '@vue-utils/bootstrap-modal.vue'
+import bootstrapModal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import {helpers,fetch_util} from "@/utils/hooks.js"
 export default {
     name:'Add-Comms',
     components:{
-        modal,
+        bootstrapModal,
         alert
     },
     props:{
