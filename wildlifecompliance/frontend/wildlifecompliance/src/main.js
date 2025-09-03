@@ -5,6 +5,8 @@ import 'vite/modulepreload-polyfill';
 import Vue from 'vue';
 // window._ = _;
 import $ from 'jquery';
+window.$ = $
+window.jQuery = $
 //import 'jquery-ui';
 import 'jquery-validation';
 import select2 from 'select2';
