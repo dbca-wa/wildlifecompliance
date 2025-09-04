@@ -116,6 +116,9 @@ import alert from '@vue-utils/alert.vue'
 import { helpers, fetch_util } from "@/utils/hooks.js"
 export default {
     name:'Add-Comms',
+    compatConfig: {
+        COMPONENT_V_MODEL: false
+    },
     components:{
         bootstrapModal,
         alert

@@ -55,7 +55,9 @@
 
 <script>
 export default {
-    name: 'BootstrapModal',
+    compatConfig: {
+        COMPONENT_V_MODEL: false
+    },
     props: {
         // v-model support for showing/hiding the modal
         modelValue: {

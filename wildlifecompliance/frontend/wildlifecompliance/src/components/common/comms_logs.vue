@@ -43,6 +43,9 @@ import AddCommLog from './add_comm_log.vue';
 import { v4 as uuid } from 'uuid';
 export default {
     name: 'CommsLogSection',
+    compatConfig: {
+        COMPONENT_V_MODEL: false
+    },
     components: {
         AddCommLog,
     },
