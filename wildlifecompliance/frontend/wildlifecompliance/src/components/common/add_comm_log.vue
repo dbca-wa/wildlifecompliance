@@ -1,6 +1,14 @@
 <template lang="html">
     <div id="AddComms">
-        <bootstrapModal transition="modal fade" @ok="ok()" @cancel="cancel()" title="Communication log - Add entry" large>
+        <bootstrapModal 
+            :modelValue="modelValue"
+            @update:modelValue="$emit('update:modelValue', $event)"
+            title="Communication log - Add entry" 
+            size="lg"
+            ok-text="Add"
+            @submit="ok()" 
+            @close="cancel()"
+        >
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="commsForm">
