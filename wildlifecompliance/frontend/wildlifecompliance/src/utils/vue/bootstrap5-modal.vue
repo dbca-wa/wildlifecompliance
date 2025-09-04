@@ -1,119 +1,198 @@
 <template>
-    <div class="modal fade" ref="modalRef" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog" :class="modalClass">
-            <div class="modal-content">
-                <!-- Header -->
-                <slot name="header">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <slot name="title">
-                                {{ title }}
+    <div v-if="modelValue">
+        <teleport to="body"><!-- Teleport to move the modal to the end of the body, which solves z-index issues.  -->
+            <div
+                class="modal fade"
+                :class="{ show: isActive }"
+                tabindex="-1"
+                role="dialog"
+                style="display: block"
+                @click.self="$emit('update:modelValue', false)"
+            >
+                <div class="modal-dialog" :class="modalClass" role="document">
+                    <div class="modal-content">
+                        <slot name="header">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <slot name="title">{{ title }}</slot>
+                                </h5>
+                                <button
+                                    type="button"
+                                    class="btn-close"
+                                    aria-label="Close"
+                                    @click="$emit('update:modelValue', false)"
+                                ></button>
+                            </div>
+                        </slot>
+                        <div class="modal-body">
+                            <slot></slot>
+                        </div>
+                        <div v-if="!noFooter" class="modal-footer">
+                            <slot name="footer">
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    @click="$emit('close')"
+                                >
+                                    {{ cancelText }}
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    @click="$emit('submit')"
+                                >
+                                    {{ okText }}
+                                </button>
                             </slot>
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
                     </div>
-                </slot>
-                <!-- Body -->
-                <div class="modal-body">
-                    <slot></slot>
-                </div>
-                <!-- Footer -->
-                <div class="modal-footer">
-                    <slot name="footer">
-                        <button v-if="cancelText" type="button" :class="cancelClass" data-bs-dismiss="modal">{{ cancelText }}</button>
-                        <button v-if="okText" type="button" :class="okClass" @click="ok" :disabled="okDisabled">{{ okText }}</button>
-                    </slot>
                 </div>
             </div>
-        </div>
+            <div class="modal-backdrop fade" :class="{ show: isActive }"></div>
+        </teleport>
     </div>
 </template>
 
 <script>
-import { Modal } from 'bootstrap';
-
 export default {
     name: 'BootstrapModal',
     props: {
-        modelValue: Boolean, // For v-model support
-        title: { type: String, default: 'Modal' },
-        small: Boolean,
-        large: Boolean,
-        extraLarge: Boolean,
-        scrollable: Boolean,
-        force: Boolean, // Prevents closing on backdrop click or escape key
-        okText: { type: String, default: 'OK' },
-        cancelText: { type: String, default: 'Cancel' },
-        okClass: { type: String, default: 'btn btn-primary' },
-        cancelClass: { type: String, default: 'btn btn-secondary' },
-        okDisabled: Boolean,
+        // v-model support for showing/hiding the modal
+        modelValue: {
+            type: Boolean,
+            default: false,
+        },
+        title: {
+            type: String,
+            default: 'Modal',
+        },
+        size: {
+            type: String,
+            default: '', // 'sm', 'lg', 'xl'
+        },
+        okText: {
+            type: String,
+            default: 'OK',
+        },
+        cancelText: {
+            type: String,
+            default: 'Cancel',
+        },
+        noFooter: {
+            type: Boolean,
+            default: false,
+        },
     },
-    emits: ['update:modelValue', 'ok', 'shown', 'hidden'],
+    // Declare the events for v-model and other actions
+    emits: ['update:modelValue', 'submit', 'close'],
     data() {
         return {
-            modalInstance: null,
+            isActive: false,
         };
     },
     computed: {
         modalClass() {
-            return {
-                'modal-xl': this.extraLarge,
-                'modal-lg': this.large,
-                'modal-sm': this.small,
-                'modal-dialog-scrollable': this.scrollable,
-            };
-        }
-    },
-    mounted() {
-        if (!this.$refs.modalRef) return; // Safety check
-
-        this.modalInstance = new Modal(this.$refs.modalRef, {
-            backdrop: this.force ? 'static' : true,
-            keyboard: !this.force,
-        });
-
-        // Relay Bootstrap's native 'shown' event to the parent
-        this.$refs.modalRef.addEventListener('shown.bs.modal', () => {
-            this.$emit('shown');
-
-        });
-
-        // Relay Bootstrap's native 'hidden' event to the parent
-        this.$refs.modalRef.addEventListener('hidden.bs.modal', () => {
-            // When Bootstrap hides the modal, ensure the v-model state is synced
-            this.$emit('update:modelValue', false);
-            this.$emit('hidden');
-        });
-
-        // If the modal should be shown initially, show it.
-        if (this.modelValue) {
-            this.modalInstance.show();
-        }
-    },
-    beforeUnmount() {
-        if (this.modalInstance) {
-            // Dispose of the Bootstrap instance to prevent memory leaks
-            this.modalInstance.dispose();
-        }
+            if (this.size) {
+                return `modal-${this.size}`;
+            }
+            return '';
+        },
     },
     watch: {
+        // Watch for the v-model value to change
         modelValue(newValue) {
-            if (this.modalInstance) {
-                if (newValue) {
-                    this.modalInstance.show();
-                } else {
-                    this.modalInstance.hide();
-                }
+            if (newValue) {
+                // When showing, add class to body and activate modal
+                document.body.classList.add('modal-open');
+                // Use setTimeout to allow the fade-in animation to work
+                setTimeout(() => {
+                    this.isActive = true;
+                }, 10);
+            } else {
+                // When hiding, deactivate first, then remove body class after animation
+                this.isActive = false;
+                setTimeout(() => {
+                    document.body.classList.remove('modal-open');
+                }, 300); // 300ms is a typical bootstrap animation duration
             }
-        }
+        },
     },
-    methods: {
-        ok() {
-            // Emit the 'ok' event for the parent to handle.
-            // The parent is responsible for closing the modal via v-model if needed.
-            this.$emit('ok');
-
-        }
-    }
 };
 </script>
+
+<style scoped>
+.modal.show {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.modal {
+    display: block;
+}
+
+.modal .btn {
+    margin-bottom: 0px;
+}
+
+.modal-header {
+    border-top-left-radius: 0.3rem;
+    border-top-right-radius: 0.3rem;
+    background-color: #efefef;
+    color: #333333;
+}
+
+.btn-close {
+    color: #333333;
+    float: right;
+}
+
+.modal-footer {
+    border-bottom-left-radius: 0.3rem;
+    border-bottom-right-radius: 0.3rem;
+}
+
+.modal-body {
+    background-color: #fff;
+    color: #333333;
+}
+
+.modal-footer {
+    background-color: #efefef;
+    color: #333333;
+}
+
+.modal-transition {
+    transition: all 0.6s ease;
+}
+
+.modal-leave {
+    border-radius: 1px !important;
+}
+
+.modal-transition .modal-dialog,
+.modal-transition .modal-backdrop {
+    transition: all 0.5s ease;
+}
+
+.modal-enter .modal-dialog,
+.modal-leave .modal-dialog {
+    opacity: 0;
+    transform: translateY(-30%);
+}
+
+.modal-enter .modal-backdrop,
+.modal-leave .modal-backdrop {
+    opacity: 0;
+}
+
+.close {
+    font-size: 2.5rem;
+    opacity: 0.3;
+}
+
+.close:hover {
+    opacity: 0.7;
+}
+
+#okBtn {
+    margin-bottom: 0px;
+}
+</style>

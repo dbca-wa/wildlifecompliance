@@ -33,7 +33,8 @@
                 </div>
             </div>
         </div>
-        <AddCommLog ref="add_comm" :url="comms_add_url" />
+        <!-- <AddCommLog ref="add_comm" :url="comms_add_url" /> -->
+        <AddCommLog v-model="isAddCommLogModalOpen" :url="comms_add_url" />
     </div>
 </template>
 
@@ -70,6 +71,7 @@ export default {
     data() {
         let vm = this;
         return {
+            isAddCommLogModalOpen: false,
             uuid: uuid(),
             dateFormat: 'DD/MM/YYYY HH:mm:ss',
             actionsTable: null,
@@ -444,7 +446,9 @@ export default {
             }
         },
         addComm() {
-            this.$refs.add_comm.isModalOpen = true;
+            // this.$refs.add_comm.isModalOpen = true;
+            console.log('in addComm')
+            this.isAddCommLogModalOpen = true;
         },
     },
 };

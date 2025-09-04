@@ -95,19 +95,25 @@
                     </form>
                 </div>
             </div>
-            <div slot="footer">
+            <!-- <div slot="footer">
                 <button type="button" v-if="addingComms" disabled class="btn btn-default" @click="ok"><i class="fa fa-spinner fa-spin"></i> Adding</button>
                 <button type="button" v-else class="btn btn-default" @click="ok">Add</button>
                 <button type="button" class="btn btn-default" @click="cancel">Cancel</button>
-            </div>
+            </div> -->
+            <template #footer>
+                <button type="button" v-if="addingComms" disabled class="btn btn-secondary"><i class="fa fa-spinner fa-spin"></i> Adding</button>
+                <button type="button" v-else class="btn btn-primary" @click="ok">Add</button>
+                <button type="button" class="btn btn-secondary" @click="cancel">Cancel</button>
+            </template>
         </bootstrapModal>
     </div>
 </template>
 
 <script>
-import bootstrapModal from '@vue-utils/bootstrap-modal.vue'
+// import bootstrapModal from '@vue-utils/bootstrap-modal.vue'
+import bootstrapModal from '@vue-utils/bootstrap5-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import {helpers,fetch_util} from "@/utils/hooks.js"
+import { helpers, fetch_util } from "@/utils/hooks.js"
 export default {
     name:'Add-Comms',
     components:{
@@ -115,15 +121,20 @@ export default {
         alert
     },
     props:{
+        modelValue: {
+            type: Boolean,
+            required: true,
+        },
         url: {
             type: String,
             required: true
         }
     },
+    emits: ['update:modelValue'],
     data:function () {
         let vm = this;
         return {
-            isModalOpen:false,
+            // isModalOpen:false,
             form:null,
             comms: {},
             state: 'proposed_licence',
@@ -197,11 +208,15 @@ export default {
         },
         close:function () {
             let vm = this;
-            this.isModalOpen = false;
+            // this.isModalOpen = false;
+            this.$emit('update:modelValue', false); 
             this.comms = {};
             this.errors = false;
             $('.has-error').removeClass('has-error');
-            this.validation_form.resetForm();
+            // this.validation_form.resetForm();
+            if (this.validation_form) {
+                this.validation_form.resetForm();
+            }
             let file_length = vm.files.length;
             this.files = [];
             for (var i = 0; i < file_length;i++){
@@ -257,13 +272,23 @@ export default {
                     }
                 }
             });
-       },
-   },
-   mounted:function () {
-        let vm =this;
-        vm.form = document.forms.commsForm;
-        vm.addFormValidations();
-   }
+        },
+    },
+    mounted:function () {
+            // let vm =this;
+            // vm.form = document.forms.commsForm;
+            // vm.addFormValidations();
+    },
+    watch: {
+        modelValue(newValue) {
+            if (newValue === true) {
+                this.$nextTick(() => {
+                    this.form = document.forms.commsForm;
+                    this.addFormValidations();
+                });
+            }
+        }
+    },
 }
 </script>
 
