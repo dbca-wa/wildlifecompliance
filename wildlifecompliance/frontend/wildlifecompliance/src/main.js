@@ -11,6 +11,8 @@ window.jQuery = $
 import 'jquery-validation';
 import select2 from 'select2';
 select2()
+import swal from 'sweetalert2';
+window.swal = swal;
 import _ from 'lodash'
 window._ = _
 import { createApp } from 'vue';
