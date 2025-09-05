@@ -47,7 +47,7 @@ RUN apt-get install --no-install-recommends -y python3-gevent \
     software-properties-common imagemagick
 
 RUN apt-get install --no-install-recommends -y npm bzip2
-RUN add-apt-repository ppa:deadsnakes/ppa
+# RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt-get update
 RUN apt-get install --no-install-recommends -y python3.12 python3.12-dev
 RUN apt-get install --no-install-recommends -y graphviz libgraphviz-dev pkg-config
