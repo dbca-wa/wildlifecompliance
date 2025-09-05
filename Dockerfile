@@ -22,6 +22,10 @@ ARG build_tag=0.0.0
 #ENV BUILD_TAG=$build_tag
 RUN echo "*************************************************** Build TAG = $build_tag ***************************************************"
 
+# Replace with this mirror due to ubuntu.com mirror having issues preventing build docker build
+RUN sed 's/archive.ubuntu.com/mirror.pilotfiber.com/g' /etc/apt/sources.list > /etc/apt/sourcesau.list
+RUN mv /etc/apt/sourcesau.list /etc/apt/sources.list
+
 # Install Python libs from base environment.
 RUN apt-get clean
 RUN apt-get update
