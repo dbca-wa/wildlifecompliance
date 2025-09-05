@@ -3,7 +3,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-- django_upgrade_5
+- django_upgrade_5_node
 
 resources:
 - repo: self
