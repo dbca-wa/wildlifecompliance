@@ -60,8 +60,6 @@ from wildlifecompliance.components.main.utils import (
 )
 
 logger = logging.getLogger(__name__)
-# logger = logging
-
 
 class ReturnFilterBackend(DatatablesFilterBackend):
     """
@@ -99,16 +97,6 @@ class ReturnFilterBackend(DatatablesFilterBackend):
                 queryset = queryset.filter(due_date__lte=date_to)
 
         return queryset
-
-
-#class ReturnRenderer(DatatablesRenderer):
-#    def render(self, data, accepted_media_type=None, renderer_context=None):
-#        if 'view' in renderer_context and \
-#                hasattr(renderer_context['view'], '_datatables_total_count'):
-#            data['recordsTotal'] = \
-#                renderer_context['view']._datatables_total_count
-#        return super(ReturnRenderer, self).render(
-#            data, accepted_media_type, renderer_context)
 
 
 class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
@@ -277,9 +265,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
             logger.debug('ReturnViewSet.accept() - start')
             instance = self.get_object()
-            # instance.accept(request)
             ReturnService.accept_return_request(request, instance)
-            # serializer = self.get_serializer(instance)
             logger.debug('ReturnViewSet.accept() - end')
 
             return Response(
@@ -353,13 +339,6 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def sheet_check_transfer(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-
-            # if not instance.sheet.is_valid_transfer(request):
-            #     raise ValidationError({'err': 'Transfer not valid.'})
-
-            # if valid store updated table??
-            # ReturnService.store_request_details_for(instance, request)
-
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
         except serializers.ValidationError:
@@ -445,7 +424,6 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -503,7 +481,6 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             delete_session_return(request.session)
@@ -533,7 +510,6 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             delete_session_return(request.session)
@@ -562,8 +538,6 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def estimate_price(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            # return_id = request.data.get('return_id')
-
             return Response({'fees': ReturnService.calculate_fees(instance)})
 
         except serializers.ValidationError:
