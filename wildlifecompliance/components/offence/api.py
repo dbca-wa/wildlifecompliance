@@ -586,6 +586,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                                 offender_person = OffenderPersonSerializer(data=offender_person_data)
                                 offender_person.is_valid(raise_exception=True)
                                 offender_person.save()
+                                offender_person = offender_person.instance
 
                             else:
                                 try:

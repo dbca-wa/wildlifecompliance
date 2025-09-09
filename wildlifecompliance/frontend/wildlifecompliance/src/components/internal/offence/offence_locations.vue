@@ -181,7 +181,6 @@ export default {
         vm.ajax_for_location = null;
 
         return {
-            mapboxAccessToken: null,
             map: null,
             tileLayer: null, // Base layer (Open street map)
             tileLayerSat: null, // Base layer (satelllite)
@@ -204,9 +203,6 @@ export default {
         }
     },
     created: async function() {
-        let temp_token = await this.retrieveMapboxAccessToken();
-        this.mapboxAccessToken = temp_token.access_token;
-
         let returned_status_choices = await cache_helper.getSetCacheList('Offence_StatusChoices', '/api/offence/status_choices');
         Object.assign(this.status_choices, returned_status_choices);
         this.status_choices.splice(0, 0, {id: 'all', display: 'All'});
@@ -287,14 +283,17 @@ export default {
 
             var latlng = this.map.getCenter();
             $.ajax({
-                url: api_endpoints.geocoding_address_search + encodeURIComponent(place)+'.json?'+ $.param({
-                    access_token: self.mapboxAccessToken,
-                    country: 'au',
-                    limit: 10,
-                    proximity: ''+latlng.lng+','+latlng.lat,
-                    bbox: '112.920934,-35.191991,129.0019283,-11.9662455',
-                    types: 'region,postcode,district,place,locality,neighborhood,address,poi'
-                }),
+                url:
+                    api_endpoints.geocoding_address_search + "/?" + 
+                    $.param({
+                        search_term: place,
+                        country: "au",
+                        limit: 10,
+                        proximity: "" + latlng.lng + "," + latlng.lat,
+                        bbox: "112.920934,-35.191991,129.0019283,-11.9662455",
+                        types:
+                        "region,postcode,district,place,locality,neighborhood,address,poi"
+                    }),
                 dataType: 'json',
                 success: function(data, status, xhr) {
                     self.suggest_list = [];  // Clear the list first

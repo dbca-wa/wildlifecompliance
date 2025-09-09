@@ -71,10 +71,6 @@ var mapbox_access_token = '';
 
 Vue.mixin({
     methods: {
-        retrieveMapboxAccessToken: async function(){
-            let ret_val = await $.ajax('/api/geocoding_address_search_token');
-            return ret_val;
-        },
         toCurrency: function(value) {
             if (typeof value !== "number") {
                 return value;

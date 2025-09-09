@@ -122,7 +122,6 @@ export default {
             idSearchInput: vm.guid + 'SearchInput',
             idBasemapSat: vm.guid + 'BasemapSat',
             idBasemapOsm: vm.guid + 'BasemapOsm',
-            mapboxAccessToken: '',
         };
     },
     computed: {
@@ -186,10 +185,6 @@ export default {
                 this.showHideAddressDetailsFields(false, true);
             }
         });
-    },
-    created: async function() {
-        let temp_token = await this.retrieveMapboxAccessToken();
-        this.mapboxAccessToken = temp_token.access_token;
     },
     methods: {
         ...mapActions('callemailStore', {
@@ -257,10 +252,13 @@ export default {
         reverseGeocoding: async function(coordinates_4326){
             var self = this;
             $.ajax({
-                url: api_endpoints.geocoding_address_search + coordinates_4326[0] + ',' + coordinates_4326[1] + '.json?' + $.param({
+                url: api_endpoints.geocoding_address_search + "/?" + $.param({
+                        search_term: coordinates_4326[0] + ',' + coordinates_4326[1],
                         limit: 1,
                         types: 'address',
-                        access_token: self.mapboxAccessToken,
+                        country: '',
+                        proximity: '',
+                        bbox: '',
                     }),
                 dataType: 'json',
 
@@ -289,14 +287,13 @@ export default {
 
             var latlng = this.map.getCenter();
             $.ajax({
-                url: api_endpoints.geocoding_address_search + encodeURIComponent(place) + '.json?' + $.param({
+                url: api_endpoints.geocoding_address_search + "/?" + $.param({
+                        search_term: place,
                         country: 'au',
                         limit: 10,
                         proximity: ''+latlng.lng+','+latlng.lat,
-                        //proximity: ''+centre[0]+','+centre[1],
                         bbox: '112.920934,-35.191991,129.0019283,-11.9662455',
                         types: 'region,postcode,district,place,locality,neighborhood,address,poi',
-                        access_token: self.mapboxAccessToken,
                     }),
                 dataType: 'json',
                 success: function(data, status, xhr) {
