@@ -8,6 +8,9 @@ from django.utils import timezone
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
 from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 from ledger_api_client.ledger_models import Invoice
+from rest_framework import serializers
+
+from wildlifecompliance.helpers import is_internal
 from wildlifecompliance.components.applications.models import (
     ApplicationCondition,
     Application,
@@ -643,13 +646,46 @@ class Return(SanitiseMixin):
             return_table, created = ReturnTable.objects.get_or_create(
                 name=table_name, ret=self)
             return_table.save()
-            # delete any existing rows as they will all be recreated
-            return_table.returnrow_set.all().delete()
+
+            #get all rows from db
+            existing_rows = return_table.returnrow_set.all()
+
+            #get rows from request
             return_rows = [
                 ReturnRow(
                     return_table=return_table,
                     data=row) for row in table_rows]
 
+            #identify new rows from data
+            new_indexes = []
+            new_dict = {}
+            for i in return_rows:
+                if i.data and 'rowId' in i.data and 'date' in i.data:
+                    new_indexes.append("{}__{}".format(i.data['rowId'],i.data['date']))
+                    new_dict["{}__{}".format(i.data['rowId'],i.data['date'])] = i.data
+
+            #identify existing rows (via date and row id)
+            existing_indexes = []
+            existing_dict = {}
+            for i in existing_rows:
+                if i.data and 'rowId' in i.data and 'date' in i.data:
+                    existing_indexes.append("{}__{}".format(i.data['rowId'],i.data['date']))
+                    existing_dict["{}__{}".format(i.data['rowId'],i.data['date'])] = i.data
+
+            #raise error if an existing row is missing
+            for i in existing_indexes:
+                if not i in new_indexes:
+                    raise serializers.ValidationError("Return Table missing previously existing rows.")
+
+            #raise error if an existing row is set to change and the user is not internal
+            if not is_internal(request):
+                for i in new_indexes:
+                    if i in existing_dict:
+                        if new_dict[i] != existing_dict[i]:
+                            raise serializers.ValidationError("User not authorised to edit existing return rows.")
+
+            # delete any existing rows as they will all be recreated
+            existing_rows.delete()
             ReturnRow.objects.bulk_create(return_rows)
 
             # log transaction
