@@ -1023,20 +1023,19 @@ class LicenceActioner(LicenceActionable):
             selected_application.log_user_action(_action.format(
                     _activity.licence_activity.name), request)
 
+            #TODO fix or remove
             # Log entry for organisation
-            if selected_application.org_applicant:
-                selected_application.org_applicant.log_user_action(
-                    _action.format(_activity.licence_activity.name), request)
+            #if selected_application.org_applicant:
+            #    selected_application.org_applicant.log_user_action(
+            #        _action.format(_activity.licence_activity.name), request)
 
-            elif selected_application.proxy_applicant:
-                selected_application.proxy_applicant.log_user_action(
-                    _action.format(_activity.licence_activity.name), request)
+            #elif selected_application.proxy_applicant:
+            #    selected_application.proxy_applicant.log_user_action(
+            #        _action.format(_activity.licence_activity.name), request)
 
-            else:
-                pass
-                #TODO fix or replace
-                #selected_application.submitter.log_user_action(
-                #    _action.format(_activity.licence_activity.name), request)
+            #else:
+            #    selected_application.submitter.log_user_action(
+            #        _action.format(_activity.licence_activity.name), request)
 
         '''
         Action process.

@@ -2177,7 +2177,6 @@ class ReturnSheet(object):
             if not _data:
                 continue
 
-                # _data = request.data.get(species).encode('utf-8')
             try:
                 _data = ast.literal_eval(_data)  # ast should convert to tuple.
             except Exception as e:
