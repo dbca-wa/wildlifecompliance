@@ -344,7 +344,6 @@ export default {
         vm.awe = null;
 
         return {
-            mapboxAccessToken: null,
             uuid: 0,
             workflow_type :'',
             workflowBindId :'',
@@ -933,12 +932,15 @@ export default {
 
           $.ajax({
             url:
-              api_endpoints.geocoding_address_search + coordinates_4326.lng + "," + coordinates_4326.lat + ".json?" +
+              api_endpoints.geocoding_address_search + "/?" +
               $.param({
-                access_token: self.mapboxAccessToken,
-                limit: 1,
-                types: "address"
-              }),
+                    search_term: coordinates_4326.lng + "," + coordinates_4326.lat,
+                    limit: 1,
+                    types: 'address',
+                    country: '',
+                    proximity: '',
+                    bbox: '',
+                }),
             dataType: "json",
             success: function(data, status, xhr) {
               let address_found = false;
@@ -1543,9 +1545,6 @@ export default {
         },
     },
     created: async function() {
-        let temp_token = await this.retrieveMapboxAccessToken();
-        this.mapboxAccessToken = temp_token.access_token;
-
         if (this.$route.params.offence_id) {
             await this.constructOffenceDedicatedPage();
         }

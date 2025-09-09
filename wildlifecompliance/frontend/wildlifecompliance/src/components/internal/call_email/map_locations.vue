@@ -191,7 +191,6 @@ export default {
             classification_types: [],
             status_choices: [],
             cursor_location: null,
-            mapboxAccessToken: null,
         }
     },
     created: async function() {
@@ -202,9 +201,6 @@ export default {
         let returned_status_choices = await cache_helper.getSetCacheList('CallEmail_StatusChoices', '/api/call_email/status_choices');
         Object.assign(this.status_choices, returned_status_choices);
         this.status_choices.splice(0, 0, {id: 'all', display: 'All'});
-
-        let temp_token = await this.retrieveMapboxAccessToken();
-        this.mapboxAccessToken = temp_token.access_token;
     },
     mounted(){
         let vm = this;
@@ -313,15 +309,17 @@ export default {
 
             var latlng = this.map.getCenter();
             $.ajax({
-                url: api_endpoints.geocoding_address_search + encodeURIComponent(place)+'.json?'+ $.param({
-                    access_token: self.mapboxAccessToken,
-                    country: 'au',
-                    limit: 10,
-                    proximity: ''+latlng.lng+','+latlng.lat,
-                    //proximity: ''+centre[0]+','+centre[1],
-                    bbox: '112.920934,-35.191991,129.0019283,-11.9662455',
-                    types: 'region,postcode,district,place,locality,neighborhood,address,poi'
-                }),
+                url:
+                    api_endpoints.geocoding_address_search + "/?" + 
+                    $.param({
+                        search_term: place,
+                        country: "au",
+                        limit: 10,
+                        proximity: "" + latlng.lng + "," + latlng.lat,
+                        bbox: "112.920934,-35.191991,129.0019283,-11.9662455",
+                        types:
+                        "region,postcode,district,place,locality,neighborhood,address,poi"
+                    }),
                 dataType: 'json',
                 success: function(data, status, xhr) {
                     self.suggest_list = [];  // Clear the list first

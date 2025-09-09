@@ -71,17 +71,6 @@ Vue.filter('toCurrency', function(value) {
                 return formatter.format(value);
             });
 
-var mapbox_access_token = '';
-
-Vue.mixin({
-    methods: {
-        retrieveMapboxAccessToken: async function(){
-            let ret_val = await $.ajax('/api/geocoding_address_search_token');
-            return ret_val;
-        }
-    },
-})
-
 /* eslint-disable no-new */
 Vue.prototype.current_tab = '';
 window.vue = new Vue( {

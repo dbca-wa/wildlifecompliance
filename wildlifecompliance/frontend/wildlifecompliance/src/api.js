@@ -78,17 +78,8 @@ module.exports = {
     document_artifact: '/api/document_artifact/',
     department_users: '/api/department_users',
     disposal_methods: '/api/disposal_methods',
-    geocoding_address_search_token: '/api/geocoding_address_search_token/',
-    geocoding_address_search: `https://api.mapbox.com/geocoding/v5/mapbox.places/`,
+    geocoding_address_search: '/api/geocoding_address_search/',
     system_preference: '/api/system_preference/',
-    /*
-    geocoding_address_search: async function() {
-        //const token = await Vue.http.get('/api/geocoding_address_search_token');
-        const token = await $.ajax({url: '/api/geocoding_address_search_token/'});
-        console.log(token)
-        return `https://api.mapbox.com/geocoding/v5/mapbox.places?access_token=${token}`;
-    }
-    */
     schema_masterlist:"/api/schema_masterlist/",
     schema_masterlist_paginated:"/api/schema_masterlist_paginated/",
     schema_purpose:"/api/schema_purpose/",
