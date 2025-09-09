@@ -3184,6 +3184,9 @@ class Application(RevisionedMixin):
         from wildlifecompliance.components.returns.services import (
             ReturnService,
         )
+        from wildlifecompliance.components.returns.models import (
+            Return,
+        )
 
         logger.debug('Application.issue_activity() - start')
 
@@ -3201,9 +3204,6 @@ class Application(RevisionedMixin):
             raise Exception("Cannot issue activity: licence not found!")
 
         latest_application_in_function = self
-        # all_purpose_ids = self.licence_purposes.all(
-        #     # All licence purpose ids on this application.
-        # ).values_list('id', flat=True)
 
         # All active license purposes on this application.
         all_purpose = self.get_proposed_purposes()
@@ -3218,20 +3218,7 @@ class Application(RevisionedMixin):
                 replace_activity
             ]
 
-        # with transaction.atomic():
-        # try:
         for existing_activity in licence_latest_activities_for_licence_activity_id:
-
-            # compare each activity's purposes and find the difference 
-            # from the selected_purposes of the new application.
-
-            # selected_lic_id = selected_activity.licence_activity_id
-            # issued_purposes = all_purpose_ids.filter(
-            #     licence_activity_id=selected_lic_id
-            # )
-
-            # existing_purposes = \
-            #     existing_activity.purposes.values_list('id', flat=True)
 
             # All active license purposes on the current Activity.
             # NOTE: using latest version of licence purpose only.
@@ -3272,11 +3259,6 @@ class Application(RevisionedMixin):
                 Application.APPLICATION_TYPE_ACTIVITY,
             ]:
                 common_purpose_ids = None
-
-            # No relevant purposes were selected for action for this
-            # existing activity, do nothing
-            if not common_purpose_ids:
-                pass
 
             # If there are no remaining purposes in the
             # existing_activity(i.e. this issued activity replaces them
@@ -3357,7 +3339,9 @@ class Application(RevisionedMixin):
         selected_activity.processing_status = ACCEPTED
         selected_activity.activity_status = CURRENT
 
-        if not selected_activity.get_expiry_date() == None:
+        #prevent new return rows if this is a reissue - i.e. if the license/activity already has a corresponding returns table
+        return_exists = Return.objects.filter(licence=parent_licence, condition__licence_activity_id=selected_activity.licence_activity_id, application=self).exists()
+        if not selected_activity.get_expiry_date() == None and not return_exists:
             ReturnService.generate_return_request(
                 request, parent_licence, selected_activity
             )

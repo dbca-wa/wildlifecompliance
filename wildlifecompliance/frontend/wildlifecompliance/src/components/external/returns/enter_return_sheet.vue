@@ -133,7 +133,7 @@ export default {
               { data: "total" },
               { data: "transfer",
                 mRender: function(data, type, full) {
-                   if (full.activity && (vm.returns.can_current_user_edit || vm.returns.user_in_officers)
+                   if (full.activity && (vm.returns.user_in_officers)
                                 && !vm.isTrue(vm.returns.sheet_activity_list[full.activity]['auto'])
                                 && (full.transfer === 'Notified' || full.transfer === '')) {
                       var column = `<a class="edit-row" data-rowid=\"__ROWID__\">Edit</a><br/>`;
