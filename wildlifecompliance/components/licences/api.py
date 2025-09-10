@@ -235,7 +235,6 @@ class LicencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['GET', ])
     def internal_datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = DTInternalWildlifeLicenceSerializer
         queryset = self.get_queryset()
         # Filter by org
         org_id = request.GET.get('org_id', None)
@@ -257,14 +256,12 @@ class LicencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(current_application__submitter=user_id)
             )
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTInternalWildlifeLicenceSerializer(result_page, context={'request': request}, many=True)
         return self.paginator.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=['GET', ])
     def external_datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = DTExternalWildlifeLicenceSerializer
         # Filter for WildlifeLicence objects that have a current application linked with an
         # ApplicationSelectedActivity that has been ACCEPTED
         user_orgs = [
@@ -292,7 +289,6 @@ class LicencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         if submitter_id:
             queryset = queryset.filter(current_application__submitter_id=submitter_id)
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTExternalWildlifeLicenceSerializer(result_page, context={'request': request}, many=True)
         return self.paginator.get_paginated_response(serializer.data)

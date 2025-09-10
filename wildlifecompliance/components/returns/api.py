@@ -133,7 +133,6 @@ class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['GET', ])
     def user_datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = ReturnSerializer
         queryset = self.get_queryset()
         # Filter by org
         org_id = request.GET.get('org_id', None)
@@ -156,7 +155,6 @@ class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             )
             queryset = queryset.filter(application__in=applications)
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTInternalReturnSerializer(
             result_page, context={'request': request}, many=True)
@@ -164,7 +162,6 @@ class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['GET', ])
     def external_datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = ReturnSerializer
         queryset = self.get_queryset()
         # Filter by org
         org_id = request.GET.get('org_id', None)
@@ -186,7 +183,6 @@ class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(submitter=user_id)
             )
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTExternalReturnSerializer(
             result_page, context={'request': request}, many=True)
