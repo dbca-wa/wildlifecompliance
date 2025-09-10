@@ -189,10 +189,8 @@ class OrganisationPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @list_route(methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = DTOrganisationSerializer
         queryset = self.get_queryset()
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTOrganisationSerializer(result_page, context={'request': request}, many=True)
         return self.paginator.get_paginated_response(serializer.data)
@@ -819,10 +817,8 @@ class OrganisationRequestsPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @list_route(methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = OrganisationRequestDTSerializer
         queryset = self.get_queryset()
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = OrganisationRequestDTSerializer(result_page, context={'request': request}, many=True)
         return self.paginator.get_paginated_response(serializer.data)

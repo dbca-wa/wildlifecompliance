@@ -174,11 +174,8 @@ class SchemaMasterlistPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @list_route(methods=['GET', ])
     def schema_masterlist_datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = DTSchemaMasterlistSerializer
         queryset = self.get_queryset()
-
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTSchemaMasterlistSerializer(
             result_page, context={'request': request}, many=True
@@ -445,12 +442,8 @@ class SchemaPurposePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @list_route(methods=['GET', ])
     def schema_purpose_datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = DTSchemaPurposeSerializer
         queryset = self.get_queryset()
-
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
-        # self.paginator.page_size = 0
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTSchemaPurposeSerializer(
             result_page, context={'request': request}, many=True
@@ -710,12 +703,8 @@ class SchemaGroupPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @list_route(methods=['GET', ])
     def schema_group_datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = DTSchemaGroupSerializer
         queryset = self.get_queryset()
-
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
-        # self.paginator.page_size = 0
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTSchemaGroupSerializer(
             result_page, context={'request': request}, many=True
@@ -996,18 +985,13 @@ class SchemaQuestionPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @list_route(methods=['GET', ])
     def schema_question_datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = DTSchemaQuestionSerializer
         queryset = self.get_queryset()
-
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
-        # self.paginator.page_size = 0
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTSchemaQuestionSerializer(
             result_page, context={'request': request}, many=True
         )
         response = self.paginator.get_paginated_response(serializer.data)
-
         return response
 
 

@@ -231,7 +231,6 @@ class LegalCasePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = self.get_queryset()
 
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = LegalCaseDatatableSerializer(
             result_page, many=True, context={'request': request})
@@ -246,10 +245,7 @@ class LegalCasePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         person = None
         if entity_type == 'person':
             person = EmailUser.objects.get(id=entity_id)
-
-        #queryset = self.filter_queryset(queryset)
         queryset = person.legal_case_associated_persons.all()
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = LegalCaseDatatableSerializer(
             result_page, many=True, context={'request': request})
