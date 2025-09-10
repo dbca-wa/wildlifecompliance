@@ -1,16 +1,17 @@
 import 'vite/modulepreload-polyfill';
 
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
-// window._ = _;
 import $ from 'jquery';
-//import 'jquery-ui';
+window.$ = $
+window.jQuery = $
 import 'jquery-validation';
 import select2 from 'select2';
 select2()
+import swal from 'sweetalert2';
+window.swal = swal;
 import _ from 'lodash'
 window._ = _
+
 import { createApp } from 'vue';
 import App from '@/App.vue';
 import router from '@/router';
