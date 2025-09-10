@@ -102,7 +102,6 @@ class ReturnFilterBackend(DatatablesFilterBackend):
 class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (ReturnFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    #renderer_classes = (ReturnRenderer,)
     queryset = Return.objects.none()
     serializer_class = DTExternalReturnSerializer
     page_size = 10
@@ -123,8 +122,6 @@ class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             
             external_qs = Return.objects.filter(
                 Q(licence_id__in=user_licences)
-            ).exclude(
-                processing_status=Return.RETURN_PROCESSING_STATUS_DISCARDED
             ).distinct()
 
             return external_qs
@@ -133,7 +130,6 @@ class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['GET', ])
     def user_datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = ReturnSerializer
         queryset = self.get_queryset()
         # Filter by org
         org_id = request.GET.get('org_id', None)
@@ -156,7 +152,6 @@ class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             )
             queryset = queryset.filter(application__in=applications)
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTInternalReturnSerializer(
             result_page, context={'request': request}, many=True)
@@ -164,7 +159,6 @@ class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['GET', ])
     def external_datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = ReturnSerializer
         queryset = self.get_queryset()
         # Filter by org
         org_id = request.GET.get('org_id', None)
@@ -186,7 +180,6 @@ class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(submitter=user_id)
             )
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTExternalReturnSerializer(
             result_page, context={'request': request}, many=True)

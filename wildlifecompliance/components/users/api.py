@@ -173,7 +173,6 @@ class UserPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         self.serializer_class = DTUserSerializer
         queryset = self.get_queryset()
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTUserSerializer(result_page, context={'request': request}, many=True)
         return self.paginator.get_paginated_response(serializer.data)
