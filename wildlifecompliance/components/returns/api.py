@@ -102,7 +102,6 @@ class ReturnFilterBackend(DatatablesFilterBackend):
 class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (ReturnFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    #renderer_classes = (ReturnRenderer,)
     queryset = Return.objects.none()
     serializer_class = DTExternalReturnSerializer
     page_size = 10
@@ -123,8 +122,6 @@ class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             
             external_qs = Return.objects.filter(
                 Q(licence_id__in=user_licences)
-            ).exclude(
-                processing_status=Return.RETURN_PROCESSING_STATUS_DISCARDED
             ).distinct()
 
             return external_qs
