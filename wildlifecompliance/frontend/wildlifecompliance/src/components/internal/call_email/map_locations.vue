@@ -427,7 +427,7 @@ request.then(response => {
 
                         /* create marker */
                         let myIcon = L.icon({
-                            iconUrl: vm.getIconUrl(filename),
+                            iconUrl: this.getIconUrl(filename),
                             shadowUrl: markerShadow,
                             shadowSize: [41, 41],
                             shadowAnchor: [12, 41],
