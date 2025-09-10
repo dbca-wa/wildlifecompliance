@@ -168,7 +168,6 @@ class SanctionOutcomePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     def get_paginated_datatable(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = SanctionOutcomeDatatableSerializer(result_page, many=True, context={'request': request, 'internal': is_internal(request)})
         s_data = serializer.data
@@ -186,7 +185,6 @@ class SanctionOutcomePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             (Q(offender__isnull=True) & Q(driver=request.user))
         )
         queryset = self.filter_queryset(queryset).order_by('-id')
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = SanctionOutcomeDatatableSerializer(result_page, many=True, context={'request': request, 'internal': is_internal(request)})
         ret = self.paginator.get_paginated_response(serializer.data)
@@ -213,36 +211,11 @@ class SanctionOutcomePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             (Q(offender__isnull=True) & Q(driver=person))
         )
         queryset = self.filter_queryset(queryset).order_by('-id')
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = SanctionOutcomeDatatableSerializer(result_page, many=True, context={'request': request, 'internal': is_internal(request)})
         ret = self.paginator.get_paginated_response(serializer.data)
         return ret
 
-
-# class AmendmentRequestReasonViewSet(viewsets.ModelViewSet):
-#     queryset = AmendmentRequestReason.objects.all()
-#     serializer_class = AmendmentRequestReasonSerializer
-#
-#     @list_route(methods=['GET', ])
-#     def reasons(self, request, *args, **kwargs):
-#         try:
-#             qs = self.get_queryset()
-#             serializer = AmendmentRequestReasonSerializer(qs, many=True, context={'request': request})
-#             return Response(serializer.data)
-#
-#         except serializers.ValidationError:
-#             print(traceback.print_exc())
-#             raise
-#         except ValidationError as e:
-#             print(traceback.print_exc())
-#             if hasattr(e, 'error_dict'):
-#                 raise serializers.ValidationError(repr(e.error_dict))
-#             else:
-#                 raise serializers.ValidationError(repr(e[0].encode('utf-8')))
-#         except Exception as e:
-#             print(traceback.print_exc())
-#             raise serializers.ValidationError(str(e))
 
 #TODO the external side of this and sanction outcomes do not appear to be use - will need to be secured if this changes
 class RemediationActionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
