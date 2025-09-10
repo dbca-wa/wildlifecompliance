@@ -1180,8 +1180,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             if is_internal(request):
                 serializer = DTInternalApplicationSelectedActivitySerializer(
                     instance.activities, many=True)
-
-            if is_customer(request):
+            elif request.user.is_authenticated():
                 serializer = DTExternalApplicationSelectedActivitySerializer(
                     instance.activities, many=True)
 

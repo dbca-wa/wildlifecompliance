@@ -486,6 +486,7 @@ class DTExternalApplicationSelectedActivitySerializer(
     payment_status = serializers.SerializerMethodField()
     invoice_url = serializers.SerializerMethodField()
     # payment_url = serializers.SerializerMethodField()
+    activity_purpose_names_status = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = ApplicationSelectedActivity
@@ -503,6 +504,7 @@ class DTExternalApplicationSelectedActivitySerializer(
             'can_pay_licence_fee',
             'invoice_url',      # only load in expander
             # 'payment_url',    # only load in expander
+            'activity_purpose_names_status',
         )
         # the serverSide functionality of datatables is such that only columns
         # that have field 'data' defined are requested from the serializer. Use
@@ -554,6 +556,31 @@ class DTExternalApplicationSelectedActivitySerializer(
 
         return url
 
+    def get_activity_purpose_names_status(self, obj):
+        logger.debug('SelectedActivitySerializer.purpose_names() - start')
+        # purposes = [
+        #     p.purpose for p in obj.proposed_purposes.all()
+        # ]
+        purpose_names_qs=[]
+        purpose_status_qs=[]
+        for p in obj.proposed_purposes.all():
+            purpose_names_qs.append(p.purpose.name)
+            purpose_status_qs.append(p.get_processing_status_display())
+
+
+        if obj.proposed_action \
+                == ApplicationSelectedActivity.PROPOSED_ACTION_DEFAULT:
+            purpose_names_qs=[]
+            purpose_status_qs=[]
+            purposes = obj.purposes
+            for p in purposes.all():
+                purpose_names_qs.append(p.name)
+                purpose_status_qs.append('')
+
+        result={'name_string': ','.join(purpose_names_qs), 'status_string': ','.join(purpose_status_qs)}
+        #purpose_names = ','.join([p.name for p in purposes])
+        logger.debug('SelectedActivitySerializer.purpose_names() - end')
+        return result
 
 class DTInternalApplicationSelectedActivitySerializer(
             serializers.ModelSerializer):
