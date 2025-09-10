@@ -561,7 +561,6 @@ class ArtifactPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     def get_paginated_datatable(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = ArtifactPaginatedSerializer(result_page, many=True, context={'request': request})
         ret = self.paginator.get_paginated_response(serializer.data)

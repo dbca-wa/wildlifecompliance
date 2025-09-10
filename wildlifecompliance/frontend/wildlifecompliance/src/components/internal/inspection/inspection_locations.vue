@@ -181,7 +181,6 @@ export default {
         vm.ajax_for_location = null;
 
         return {
-            mapboxAccessToken: null,
             map: null,
             tileLayer: null, // Base layer (Open street map)
             tileLayerSat: null, // Base layer (satelllite)
@@ -211,9 +210,6 @@ export default {
         let returned_inspection_types = await cache_helper.getSetCacheList('InspectionTypes', api_endpoints.inspection_types);
         Object.assign(this.type_choices, returned_inspection_types);
         this.type_choices.splice(0, 0, {id: 'all', inspection_type: 'All'});
-
-        let temp_token = await this.retrieveMapboxAccessToken();
-        this.mapboxAccessToken = temp_token.access_token;
     },
     mounted(){
         let vm = this;
@@ -290,15 +286,17 @@ export default {
 
             var latlng = this.map.getCenter();
             $.ajax({
-                url: api_endpoints.geocoding_address_search + encodeURIComponent(place)+'.json?'+ $.param({
-                    access_token: self.mapboxAccessToken,
-                    country: 'au',
-                    limit: 10,
-                    proximity: ''+latlng.lng+','+latlng.lat,
-                    //proximity: ''+centre[0]+','+centre[1],
-                    bbox: '112.920934,-35.191991,129.0019283,-11.9662455',
-                    types: 'region,postcode,district,place,locality,neighborhood,address,poi'
-                }),
+                url:
+                    api_endpoints.geocoding_address_search + "/?" + 
+                    $.param({
+                        search_term: place,
+                        country: "au",
+                        limit: 10,
+                        proximity: "" + latlng.lng + "," + latlng.lat,
+                        bbox: "112.920934,-35.191991,129.0019283,-11.9662455",
+                        types:
+                        "region,postcode,district,place,locality,neighborhood,address,poi"
+                    }),
                 dataType: 'json',
                 success: function(data, status, xhr) {
                     self.suggest_list = [];  // Clear the list first

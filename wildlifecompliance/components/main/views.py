@@ -1,5 +1,7 @@
 import traceback
 import logging
+import requests
+import json
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from rest_framework import serializers, views, status
@@ -37,10 +39,28 @@ from wildlifecompliance.helpers import is_internal
 
 logger = logging.getLogger(__name__)
 
-class GeocodingAddressSearchTokenView(views.APIView):
-    def get(self, request, format=None):
-        return Response({"access_token": settings.GEOCODING_ADDRESS_SEARCH_TOKEN})
+class GeocodingAddressSearchView(views.APIView):
 
+    renderer_classes = [JSONRenderer]
+
+    def get(self, request, format=None):
+        search_term = request.GET.get('search_term') if 'search_term' in request.GET else None
+        country = request.GET.get('country') if 'country' in request.GET else 'au'
+        limit = request.GET.get('limit') if 'limit' in request.GET else '10'
+        bbox = request.GET.get('bbox') if 'bbox' in request.GET else '112.920934,-35.191991,129.0019283,-11.9662455'
+        types = request.GET.get('types') if 'types' in request.GET else 'region,postcode,district,place,locality,neighborhood,address,poi'
+        proximity = request.GET.get('proximity') if 'proximity' in request.GET else  '115.83984375000001,-31.952162238024975'
+
+        if search_term and request.user.is_authenticated:
+            access_token = settings.GEOCODING_ADDRESS_SEARCH_TOKEN
+            search_url = "https://api.mapbox.com/geocoding/v5/mapbox.places/{}.json/?access_token={}&country={}&limit={}&bbox={}&type={}&proximity={}".format(
+                search_term,access_token,country,limit,bbox,types,proximity
+            )
+
+            r = requests.get(search_url)
+            return Response(r.json())
+        else:
+            return Response()
 
 class SystemPreferenceView(views.APIView):
     def get(self, request, format=None):

@@ -83,9 +83,6 @@ export default {
     vm.guid = helpers.guid();
 
     return {
-       // marker_lng: vm.marker_longitude,
-       // marker_lat: vm.marker_latitude,
-            mapboxAccessToken: null,
         marker_lng: null,
         marker_lat: null,
         defaultCenter: defaultCentre,
@@ -121,10 +118,6 @@ export default {
                 this.refreshMarkerLocation();
             }
         }
-    },
-    created: async function() {
-        let temp_token = await this.retrieveMapboxAccessToken();
-        this.mapboxAccessToken = temp_token.access_token;
     },
   mounted: function() {
     let vm = this;
@@ -186,14 +179,12 @@ export default {
       var latlng = this.mainMap.getCenter();
       $.ajax({
         url:
-          api_endpoints.geocoding_address_search + 
-          encodeURIComponent(place) +
-          ".json?" +
+          api_endpoints.geocoding_address_search + "/?" + 
           $.param({
+            search_term: place,
             country: "au",
             limit: 10,
             proximity: "" + latlng.lng + "," + latlng.lat,
-                    access_token: self.mapboxAccessToken,
             bbox: "112.920934,-35.191991,129.0019283,-11.9662455",
             types:
               "region,postcode,district,place,locality,neighborhood,address,poi"

@@ -408,7 +408,6 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
         setattr(view, '_datatables_total_count', total_count)
         return queryset
 
-
 class ApplicationPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (ApplicationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
@@ -431,7 +430,6 @@ class ApplicationPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['GET', ])
     def internal_datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = DTInternalApplicationSerializer
 
         queryset = self.get_queryset()
         # Filter by org
@@ -457,7 +455,6 @@ class ApplicationPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(org_applicant_id__in=user_orgs)
             )
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTInternalApplicationSerializer(result_page, context={'request': request}, many=True)
         response = self.paginator.get_paginated_response(serializer.data)
@@ -490,7 +487,6 @@ class ApplicationPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
             processing_status=Application.PROCESSING_STATUS_DISCARDED
         ).distinct()
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTExternalApplicationSerializer(result_page, context={'request': request}, many=True)
         return self.paginator.get_paginated_response(serializer.data)
@@ -1178,8 +1174,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             if is_internal(request):
                 serializer = DTInternalApplicationSelectedActivitySerializer(
                     instance.activities, many=True)
-
-            if is_customer(request):
+            elif request.user.is_authenticated():
                 serializer = DTExternalApplicationSelectedActivitySerializer(
                     instance.activities, many=True)
 
@@ -2475,8 +2470,6 @@ class AssessmentPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = DTAssessmentSerializer
-
         # Get the assessor groups the current user is member of
         perm_user = PermissionUser(request.user)
         assessor_groups = perm_user.get_wildlifelicence_permission_group(
@@ -2490,7 +2483,6 @@ class AssessmentPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
                 actioned_by=self.request.user)
 
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTAssessmentSerializer(
             result_page, context={'request': request}, many=True)

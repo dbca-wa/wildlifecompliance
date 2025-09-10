@@ -103,7 +103,6 @@ export default {
     vm.guid = helpers.guid();
 
     return {
-        mapboxAccessToken: null,
       defaultCenter: defaultCentre,
       projection: null,
       mapOffence: null,
@@ -172,10 +171,6 @@ export default {
             }
     });
   },
-    created: async function(){
-        let temp_token = await this.retrieveMapboxAccessToken();
-        this.mapboxAccessToken = temp_token.access_token;
-    },
   methods: {
     ...mapActions("offenceStore", {
       // saveLocation: 'saveLocation',
@@ -250,17 +245,14 @@ export default {
             console.log(coordinates_4326);
 
       $.ajax({
-        url:
-            api_endpoints.geocoding_address_search + 
-          coordinates_4326[0] +
-          "," +
-          coordinates_4326[1] +
-          ".json?" +
-          $.param({
+        url: api_endpoints.geocoding_address_search + "/?" + $.param({
+            search_term: coordinates_4326[0] + ',' + coordinates_4326[1],
             limit: 1,
-            types: "address",
-                    access_token: self.mapboxAccessToken,
-          }),
+            types: 'address',
+            country: '',
+            proximity: '',
+            bbox: '',
+        }),
         dataType: "json",
         success: function(data, status, xhr) {
           let address_found = false;
@@ -288,15 +280,12 @@ export default {
       var latlng = this.mapOffence.getCenter();
       $.ajax({
         url:
-          api_endpoints.geocoding_address_search +
-          encodeURIComponent(place) +
-          ".json?" +
+          api_endpoints.geocoding_address_search + "/?" + 
           $.param({
+            search_term: place,
             country: "au",
-                    access_token: self.mapboxAccessToken,
             limit: 10,
             proximity: "" + latlng.lng + "," + latlng.lat,
-            //proximity: ''+centre[0]+','+centre[1],
             bbox: "112.920934,-35.191991,129.0019283,-11.9662455",
             types:
               "region,postcode,district,place,locality,neighborhood,address,poi"

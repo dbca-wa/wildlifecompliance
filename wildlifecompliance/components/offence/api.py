@@ -163,9 +163,7 @@ class OffencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['GET', ])
     def get_paginated_datatable(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = OffenceDatatableSerializer(result_page, many=True, context={'request': request})
         ret = self.paginator.get_paginated_response(serializer.data)
@@ -586,6 +584,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                                 offender_person = OffenderPersonSerializer(data=offender_person_data)
                                 offender_person.is_valid(raise_exception=True)
                                 offender_person.save()
+                                offender_person = offender_person.instance
 
                             else:
                                 try:
