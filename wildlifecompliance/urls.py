@@ -307,7 +307,7 @@ urlpatterns = [
     url(r'^private-media/', views.getPrivateFile, name='view_private_file'),
     url(r'infringement/', views.InfringementView.as_view(), name='wc_infringement'),
 
-] + ledger_patterns #+ media_serv_patterns
+] + ledger_patterns + media_serv_patterns
 
 if not are_migrations_running():
     DefaultDataManager()
