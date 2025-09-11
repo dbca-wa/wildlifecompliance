@@ -38,7 +38,7 @@
                         </span>-->
                     </div>
                 </div>
-                <div class="col-md-3 float-end">
+                <div class="col-md-6 float-end">
                      
                     <button v-if="visibilityCreateNewButton" @click.prevent="createOffence" class="btn btn-primary float-end">New Offence</button>
                 </div>    

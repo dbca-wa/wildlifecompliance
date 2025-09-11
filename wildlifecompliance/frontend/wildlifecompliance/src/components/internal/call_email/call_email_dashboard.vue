@@ -40,7 +40,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="newCallEmailVisibility" class="col-md-3 float-end">
+            <div v-if="newCallEmailVisibility" class="col-md-6 float-end">
                 <button @click.prevent="createCallEmailUrl"
                     class="btn btn-primary float-end">New Call/Email</button>
             </div>    

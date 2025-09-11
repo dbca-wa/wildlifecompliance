@@ -39,7 +39,7 @@
                     </span>-->
                 </div>
             </div>
-            <div class="col-md-3 float-end">
+            <div class="col-md-6 float-end">
                 <button @click.prevent="createArtifact" class="btn btn-primary float-end">New Object</button>
             </div>
         </div>
