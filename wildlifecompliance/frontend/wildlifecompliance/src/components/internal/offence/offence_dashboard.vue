@@ -161,7 +161,6 @@ export default {
                         searchable: false,
                         orderable: false,
                         mRender: function (data, type, row){
-                            console.log(row)
                             return row.documents
                         }
                     },
@@ -243,13 +242,11 @@ export default {
             });
         },
         constructOptionsType: async function() {
-            console.log('constructOptionsType');
             let returned= await cache_helper.getSetCacheList('SanctionOutcome_TypeChoices', '/api/sanction_outcome/types');
             Object.assign(this.offence_types, returned);
             this.offence_types.splice(0, 0, {id: 'all', display: 'All'});
         },
         constructOptionsStatus: async function() {
-            console.log('constructOptionsStatus');
             let returned = await cache_helper.getSetCacheList('OffenceStatuses', '/api/offence/statuses.json');
             Object.assign(this.offence_statuses, returned);
             this.offence_statuses.splice(0, 0, {id: 'all', display: 'All'});

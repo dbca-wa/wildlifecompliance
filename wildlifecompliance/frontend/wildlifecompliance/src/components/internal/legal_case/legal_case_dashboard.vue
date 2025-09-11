@@ -146,7 +146,7 @@
                             orderable: true
                         },
                         {
-                            data: 'created_date',
+                            data: 'case_created_date',
                             searchable: false,
                             orderable: true
                         },

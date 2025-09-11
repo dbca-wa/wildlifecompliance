@@ -169,8 +169,8 @@ export default {
                     },
                     {
                         data: 'offender',
-                        searchable: true,
-                        orderable: true,
+                        searchable: false,
+                        orderable: false,
                         mRender: function (data, type, row){
                             let name = '';
                             let num_chars = 30;
