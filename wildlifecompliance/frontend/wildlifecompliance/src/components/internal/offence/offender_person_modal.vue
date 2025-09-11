@@ -6,7 +6,7 @@
                     <div class="col-sm-12 form-group">
                       <div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left" for="first_name">First Name</label>
+                            <label class="control-label float-start" for="first_name">First Name</label>
                         </div>
                         <div class="col-sm-6">
                             <div v-if="offender_person">
@@ -18,7 +18,7 @@
                     <div class="col-sm-12 form-group">
                       <div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left" for="last_name">Last Name</label>
+                            <label class="control-label float-start" for="last_name">Last Name</label>
                         </div>
                         <div class="col-sm-6">
                             <div v-if="offender_person">
@@ -30,7 +30,7 @@
                     <div class="col-sm-12 form-group">
                       <div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left" for="dob">Date of Birth</label>
+                            <label class="control-label float-start" for="dob">Date of Birth</label>
                         </div>
                         <div class="col-sm-6">
                             <div v-if="offender_person">
@@ -53,7 +53,7 @@
                     <div class="col-sm-12 form-group">
                       <div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left" for="phone_number">Phone Number</label>
+                            <label class="control-label float-start" for="phone_number">Phone Number</label>
                         </div>
                         <div class="col-sm-6">
                             <div v-if="offender_person">
@@ -65,7 +65,7 @@
                     <div class="col-sm-12 form-group">
                       <div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left" for="mobile_number">Mobile Number</label>
+                            <label class="control-label float-start" for="mobile_number">Mobile Number</label>
                         </div>
                         <div class="col-sm-6">
                             <div v-if="offender_person">
@@ -77,7 +77,7 @@
                     <div class="col-sm-12 form-group">
                       <div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left" for="address_street">Street</label>
+                            <label class="control-label float-start" for="address_street">Street</label>
                         </div>
                         <div class="col-sm-6">
                             <div v-if="offender_person">
@@ -89,7 +89,7 @@
                     <div class="col-sm-12 form-group">
                       <div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left" for="address_locality">Locality</label>
+                            <label class="control-label float-start" for="address_locality">Locality</label>
                         </div>
                         <div class="col-sm-6">
                             <div v-if="offender_person">
@@ -101,7 +101,7 @@
                     <div class="col-sm-12 form-group">
                       <div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left" for="address_state">State</label>
+                            <label class="control-label float-start" for="address_state">State</label>
                         </div>
                         <div class="col-sm-3">
                             <div v-if="offender_person">
@@ -109,7 +109,7 @@
                             </div>
                         </div>
                         <div class="col-sm-3">
-                            <label class="control-label pull-left" for="address_postcode">Postcode</label>
+                            <label class="control-label float-start" for="address_postcode">Postcode</label>
                         </div>
                         <div class="col-sm-3">
                             <div v-if="offender_person">
@@ -121,7 +121,7 @@
                     <div class="col-sm-12 form-group">
                       <div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left" for="offence-identifier">Country</label>
+                            <label class="control-label float-start" for="offence-identifier">Country</label>
                         </div>
                         <div class="col-sm-6">
                             <div v-if="offender_person">

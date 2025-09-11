@@ -52,8 +52,8 @@
                                           </div>
                                           <div class="form-group">
                                             <div class="col-sm-12">
-                                                <button v-if="!updatingDetails" class="pull-right btn btn-primary" @click.prevent="updateDetails()">Update</button>
-                                                <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
+                                                <button v-if="!updatingDetails" class="float-end btn btn-primary" @click.prevent="updateDetails()">Update</button>
+                                                <button v-else disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
                                             </div>
                                           </div>
                                        </form>
@@ -101,8 +101,8 @@
                                           </div>
                                           <div class="form-group">
                                             <div class="col-sm-12">
-                                                <button v-if="!updatingAddress" class="pull-right btn btn-primary" @click.prevent="updateAddress()">Update</button>
-                                                <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
+                                                <button v-if="!updatingAddress" class="float-end btn btn-primary" @click.prevent="updateAddress()">Update</button>
+                                                <button v-else disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
                                             </div>
                                           </div>
                                        </form>
@@ -119,7 +119,7 @@
                                     <div class="panel panel-default">
                                         <form class="form-horizontal" action="index.html" method="post">
                                             <div class="col-sm-12">
-                                                <button @click.prevent="addContact()" style="margin-bottom:10px;" class="btn btn-primary pull-right">Add Contact</button>
+                                                <button @click.prevent="addContact()" style="margin-bottom:10px;" class="btn btn-primary float-end">Add Contact</button>
                                             </div>
                                             <datatable ref="contacts_datatable" id="organisation_contacts_datatable" :dtOptions="contacts_options" :dtHeaders="contacts_headers"/>
                                         </form>

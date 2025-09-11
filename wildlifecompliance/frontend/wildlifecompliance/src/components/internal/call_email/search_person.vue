@@ -6,7 +6,7 @@
                 <PersonSearch :readonly="!isEditable" ref="person_search" elementId="search_caller" classNames="col-sm-5 form-control" @person-selected="personSelected" />
             </div>
             <div class="col-sm-3">
-                <input :readonly="!isEditable" type="button" class="pull-right btn btn-primary" value="Create New Person" @click.prevent="createNewPerson()" />
+                <input :readonly="!isEditable" type="button" class="float-end btn btn-primary" value="Create New Person" @click.prevent="createNewPerson()" />
             </div>
         </div>
         <div class="col-md-12">
@@ -106,8 +106,8 @@
                                         </div>
                                         <!-- <div class="form-group">
                                         <div class="col-sm-12">
-                                            <button v-if="!updatingAddress" class="pull-right btn btn-primary" @click.prevent="updateAddress()">Update</button>
-                                            <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
+                                            <button v-if="!updatingAddress" class="float-end btn btn-primary" @click.prevent="updateAddress()">Update</button>
+                                            <button v-else disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
                                         </div>
                                         </div>  -->
                                     </form>
@@ -148,8 +148,8 @@
                                         </div>
                                         <!-- <div class="form-group">
                                         <div class="col-sm-12">
-                                            <button v-if="!updatingContact" class="pull-right btn btn-primary" @click.prevent="updateContact()">Update</button>
-                                            <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
+                                            <button v-if="!updatingContact" class="float-end btn btn-primary" @click.prevent="updateContact()">Update</button>
+                                            <button v-else disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
                                         </div>
                                         </div> -->
                                     </form>
@@ -159,8 +159,8 @@
                     </div>
                     <div class="row" v-if="isEditable">
                         <div class="col-sm-12">
-                            <button v-if="!updatingContact" class="pull-right btn btn-primary" @click.prevent="save">Update</button>
-                            <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
+                            <button v-if="!updatingContact" class="float-end btn btn-primary" @click.prevent="save">Update</button>
+                            <button v-else disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
                         </div>
                     </div>
                 </div>

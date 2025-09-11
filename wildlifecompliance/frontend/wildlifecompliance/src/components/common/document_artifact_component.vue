@@ -41,7 +41,7 @@
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-sm-3">
-                                                <label class="control-label pull-left" for="Name">Document</label>
+                                                <label class="control-label float-start" for="Name">Document</label>
                                             </div>
                                             <div v-if="!documentArtifactId" class="col-sm-9">
                                                 <filefield

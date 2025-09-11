@@ -139,7 +139,7 @@
             <input v-if="allowSaveUser"
             :disabled="!saveButtonEnabled"
             type="button" 
-            class="pull-right btn btn-primary" 
+            class="float-end btn btn-primary" 
             :value="saveButtonText" 
             @click.prevent="saveData" />
         </div>

@@ -98,7 +98,7 @@
 
                                     <div class="col-sm-12 form-group"><div class="row">
                                         <div class="col-sm-3">
-                                            <label class="control-label pull-left" for="offence-identifier">Identifier</label>
+                                            <label class="control-label float-start" for="offence-identifier">Identifier</label>
                                         </div>
                                         <div class="col-sm-6">
                                             <div v-if="offence">
@@ -176,7 +176,7 @@
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-sm-3">
-                                                <label class="control-label pull-left"  for="Name">Attachments</label>
+                                                <label class="control-label float-start"  for="Name">Attachments</label>
                                             </div>
                                             <div class="col-sm-9">
                                                 <!--
@@ -288,7 +288,7 @@
         <div v-if="visibilitySaveButton" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
             <div class="navbar-inner">
                 <div class="container">
-                    <p class="pull-right" style="margin-top:5px;">
+                    <p class="float-end" style="margin-top:5px;">
                         <input type="button" @click.prevent="saveExit" class="btn btn-primary" value="Save and Exit"/>
                         <input type="button" @click.prevent="save" class="btn btn-primary" value="Save and Continue"/>
                     </p>

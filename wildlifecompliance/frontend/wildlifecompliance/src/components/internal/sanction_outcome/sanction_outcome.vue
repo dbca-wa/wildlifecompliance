@@ -240,7 +240,7 @@
 
                                        <div class="col-sm-12 form-group"><div class="row">
                                            <div class="col-sm-3">
-                                               <label class="control-label pull-left">Paper ID</label>
+                                               <label class="control-label float-start">Paper ID</label>
                                            </div>
                                            <div class="col-sm-7">
                                                <input type="text" :readonly="readonlyForm" class="form-control" name="paper_id" placeholder="" v-model="sanction_outcome.paper_id" :disabled="!sanction_outcome.issued_on_paper" />
@@ -249,7 +249,7 @@
 
                                        <div class="col-sm-12 form-group"><div class="row">
                                            <div class="col-sm-3">
-                                               <label class="control-label pull-left">Paper notice</label>
+                                               <label class="control-label float-start">Paper notice</label>
                                            </div>
                                            <div id="paper_id_notice">
                                                <div v-if="sanction_outcome.issued_on_paper" class="col-sm-7">
@@ -270,7 +270,7 @@
                                 <FormSection :formCollapse="false" label="Remediation Actions" Index="2">
                                     <div class="col-sm-12 form-group">
                                         <div class="row col-sm-12">
-                                            <label class="control-label pull-left">Remediation Actions</label>
+                                            <label class="control-label float-start">Remediation Actions</label>
                                         </div>
                                         <div class="row">
                                             <div class="col-sm-12">
@@ -414,7 +414,7 @@
         <div v-if="visibilitySaveButton" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
             <div class="navbar-inner">
                 <div class="container">
-                    <p class="pull-right" style="margin-top:5px;">
+                    <p class="float-end" style="margin-top:5px;">
                         <input type="button" @click.prevent="saveExit" class="btn btn-primary" value="Save and Exit"/>
                         <input type="button" @click.prevent="save" class="btn btn-primary" value="Save and Continue"/>
                     </p>

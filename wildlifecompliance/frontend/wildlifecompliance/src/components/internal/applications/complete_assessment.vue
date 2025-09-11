@@ -31,7 +31,7 @@
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-sm-3">
-                                                <label class="control-label pull-left">Final Comments</label>
+                                                <label class="control-label float-start">Final Comments</label>
                                             </div>
                                             <div class="col-sm-9">
                                                 <textarea class="form-control" v-model="final_comment" :readonly="!canCompleteAssessment" style="width: 100%; max-width: 100%;" />
@@ -119,7 +119,7 @@
                                                 <option :value="null"></option>
                                                 <option v-for="member in activity_assessment.assessors" :value="member.id" v-bind:key="member.id">{{member.first_name}} {{member.last_name}}</option>
                                             </select>
-                                            <a @click.prevent="makeMeAssessor(activity_assessment)" class="actionBtn pull-right">Assign to me</a>
+                                            <a @click.prevent="makeMeAssessor(activity_assessment)" class="actionBtn float-end">Assign to me</a>
                                         </div>
                            
                                     </div>
@@ -243,7 +243,7 @@
                                                 <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
                                                     <div class="navbar-inner">
                                                         <div class="container">
-                                                            <p class="pull-right" style="margin-top:5px;">
+                                                            <p class="float-end" style="margin-top:5px;">
                                                                 <button v-if="!applicationIsDraft && canSaveApplication" class="btn btn-primary" @click.prevent="save()">Save Changes</button>
                                                             </p>
                                                         </div>

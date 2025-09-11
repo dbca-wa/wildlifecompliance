@@ -68,7 +68,7 @@
                                         <select ref="assigned_officer" class="form-control" v-model="selectedActivity.assigned_officer">
                                             <option v-for="member in selectedActivity.licensing_officers" :value="member.id" v-bind:key="member.id">{{member.first_name}} {{member.last_name}}</option>
                                         </select>
-                                        <a @click.prevent="assignToMe()" class="actionBtn pull-right">Assign to me</a>
+                                        <a @click.prevent="assignToMe()" class="actionBtn float-end">Assign to me</a>
                                     </div>
                                 </div>
                             </div>
@@ -80,7 +80,7 @@
                                         <select ref="assigned_approver" class="form-control" v-model="selectedActivity.assigned_approver" >
                                             <option v-for="member in selectedActivity.issuing_officers" :value="member.id" v-bind:key="member.id">{{member.first_name}} {{member.last_name}}</option>
                                         </select>
-                                        <a @click.prevent="makeMeApprover()" class="actionBtn pull-right">Assign to me</a>
+                                        <a @click.prevent="makeMeApprover()" class="actionBtn float-end">Assign to me</a>
                                         </div>
                                     </div>                                    
                                 </div>
@@ -512,7 +512,7 @@
                                         <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
                                             <div class="navbar-inner">
                                                 <div class="container">
-                                                    <p class="pull-right" style="margin-top:5px;">
+                                                    <p class="float-end" style="margin-top:5px;">
                                                         <span style="margin-right: 5px; font-size: 18px; display: block;" v-if="updatedFee" >
                                                             <strong>Updated application fee: {{toCurrency(application.application_fee)}}</strong>
                                                             <strong>licence fee: {{toCurrency(application.licence_fee)}}</strong>

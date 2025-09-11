@@ -16,7 +16,7 @@
                 <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
                     <div class="navbar-inner">
                         <div class="container">
-                            <p class="pull-right" style="margin-top:5px;">
+                            <p class="float-end" style="margin-top:5px;">
                                 <strong style="font-size: 18px;" v-if="isPayable">Return submission fee: {{toCurrency(returns_estimate_fee)}}</strong><br>
 
                                   <button v-if="spinner_exit" style="width:150px;" disabled class="btn btn-primary btn-md"><i class="fa fa-spin fa-spinner"></i>&nbsp;Saving</button>

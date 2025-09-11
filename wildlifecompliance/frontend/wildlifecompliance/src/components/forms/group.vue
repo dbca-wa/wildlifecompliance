@@ -12,12 +12,12 @@
                     <HelpTextUrl :help_text_url="help_text_url" /> 
                 </template>
                 
-                <a class="collapse-link-top pull-right" @click.prevent="expand"><span class="glyphicon glyphicon-chevron-down"></span></a>
+                <a class="collapse-link-top float-end" @click.prevent="expand"><span class="glyphicon glyphicon-chevron-down"></span></a>
                 <div class="children-anchor-point collapse in" style="padding-left: 0px"></div>
                 <span :class="{'hidden':isRemovable}" v-if="isPreviewMode">
                     <a :id="'remove_'+name" >Remove {{label}}</a>
                 </span>
-                <a class="collapse-link-bottom pull-right"  @click.prevent="minimize"><span class="glyphicon glyphicon-chevron-up"></span></a>
+                <a class="collapse-link-bottom float-end"  @click.prevent="minimize"><span class="glyphicon glyphicon-chevron-up"></span></a>
                 <div :class="{'row':true,'collapse':true, 'in':isExpanded}" style="margin-top:10px;" >
                     <div class="col-sm-12">
                         <slot></slot>

@@ -6,7 +6,7 @@
           <h3>Call/Email: {{ call_email.number }}</h3>
           </div>
           <div class="col-md-2">
-          <input  v-if="call_email.user_is_volunteer" type="button" @click.prevent="duplicate" class="pull-right btn btn-primary" value="Create Duplicate Call/Email"/>  
+          <input  v-if="call_email.user_is_volunteer" type="button" @click.prevent="duplicate" class="float-end btn btn-primary" value="Create Duplicate Call/Email"/>  
           </div>
         </div>
       
@@ -40,7 +40,7 @@
                             </div>
                           </div>
                           <div v-if="call_email.user_in_group">
-                              <a @click="updateAssignedToId('current_user')" class="btn pull-right">
+                              <a @click="updateAssignedToId('current_user')" class="btn float-end">
                                   Assign to me
                               </a>
                           </div>
@@ -522,7 +522,7 @@
         <div v-if="call_email.can_user_action" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
                         <div class="navbar-inner">
                             <div class="container">
-                                <p class="pull-right" style="margin-top:5px;">
+                                <p class="float-end" style="margin-top:5px;">
                                     
                                     <input type="button" @click.prevent="save('exit')" class="btn btn-primary" value="Save and Exit"/>
                                     <input type="button" @click.prevent="save('noexit')" class="btn btn-primary" value="Save and Continue" />

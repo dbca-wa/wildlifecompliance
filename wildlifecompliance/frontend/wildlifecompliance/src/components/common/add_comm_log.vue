@@ -17,7 +17,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left"  for="Name">To</label>
+                                        <label class="control-label float-start"  for="Name">To</label>
                                     </div>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" name="to" v-model="comms.to">
@@ -27,7 +27,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left"  for="Name">From</label>
+                                        <label class="control-label float-start"  for="Name">From</label>
                                     </div>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" name="fromm" v-model="comms.fromm">
@@ -37,7 +37,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left"  for="Name">Type</label>
+                                        <label class="control-label float-start"  for="Name">Type</label>
                                     </div>
                                     <div class="col-sm-4">
                                         <select class="form-control" name="type" v-model="comms.log_type">
@@ -54,7 +54,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left"  for="Name">Subject/Description</label>
+                                        <label class="control-label float-start"  for="Name">Subject/Description</label>
                                     </div>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control" name="subject" style="width:70%;" v-model="comms.subject">
@@ -64,7 +64,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left"  for="Name">Text</label>
+                                        <label class="control-label float-start"  for="Name">Text</label>
                                     </div>
                                     <div class="col-sm-9">
                                         <textarea name="text" class="form-control" style="width:70%;" v-model="comms.text"></textarea>
@@ -74,16 +74,16 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left"  for="Name">Attachments</label>
+                                        <label class="control-label float-start"  for="Name">Attachments</label>
                                     </div>
                                     <div class="col-sm-9">
                                         <template v-for="(f,i) in files">
                                             <div :class="'row top-buffer file-row-'+i">
                                                 <div class="col-sm-4">
-                                                    <span v-if="f.file == null" class="btn btn-info btn-file pull-left">
+                                                    <span v-if="f.file == null" class="btn btn-info btn-file float-start">
                                                         Attach File <input type="file" :name="'file-upload-'+i" :class="'file-upload-'+i" @change="uploadFile('file-upload-'+i,f)"/>
                                                     </span>
-                                                    <span v-else class="btn btn-info btn-file pull-left">
+                                                    <span v-else class="btn btn-info btn-file float-start">
                                                         Update File <input type="file" :name="'file-upload-'+i" :class="'file-upload-'+i" @change="uploadFile('file-upload-'+i,f)"/>
                                                     </span>
                                                 </div>

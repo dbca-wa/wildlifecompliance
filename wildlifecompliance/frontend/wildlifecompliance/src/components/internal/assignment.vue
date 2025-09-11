@@ -17,7 +17,7 @@
             </div>
         </div>
         <div v-if="user_in_group && !user_is_assignee">
-            <a @click="updateAssignedToId('current_user')" class="btn pull-right">
+            <a @click="updateAssignedToId('current_user')" class="btn float-end">
                 Assign to me
             </a>
         </div>

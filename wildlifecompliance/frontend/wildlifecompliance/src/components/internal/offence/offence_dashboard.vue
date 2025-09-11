@@ -38,9 +38,9 @@
                         </span>-->
                     </div>
                 </div>
-                <div class="col-md-3 pull-right">
+                <div class="col-md-3 float-end">
                      
-                    <button v-if="visibilityCreateNewButton" @click.prevent="createOffence" class="btn btn-primary pull-right">New Offence</button>
+                    <button v-if="visibilityCreateNewButton" @click.prevent="createOffence" class="btn btn-primary float-end">New Offence</button>
                 </div>    
             </div>
 

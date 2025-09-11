@@ -21,7 +21,7 @@
                     </div>
                         <div class="col-md-12">
                             <div class="col-md-3">
-                                <label v-if="hidx===0" class="control-label pull-left" >Add Headers</label>
+                                <label v-if="hidx===0" class="control-label float-start" >Add Headers</label>
                             </div>
                             <div class="col-md-2">
                                 <input type='text' class="form-control" v-model="h.label" />
@@ -38,7 +38,7 @@
                             </div>
                             <div class="col-md-3">
                                 <a v-if="hidx!==0" class="delete-icon fa fa-trash-o" style="cursor: pointer; color:red;" title="Delete row" @click.prevent="removeHeader(hidx)"></a>
-                                <button v-if="hidx===0" class="btn btn-link pull-right" :name="`add_header_link_1`" @click.prevent="addHeader()">[ Add Another ]</button>
+                                <button v-if="hidx===0" class="btn btn-link float-end" :name="`add_header_link_1`" @click.prevent="addHeader()">[ Add Another ]</button>
                             </div>
                         </div>
                 </div>

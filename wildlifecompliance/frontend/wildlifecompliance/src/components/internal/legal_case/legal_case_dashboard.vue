@@ -38,9 +38,9 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 pull-right">
+            <div class="col-md-3 float-end">
                 <button @click.prevent="createLegalCase"
-                    class="btn btn-primary pull-right">New Case</button>
+                    class="btn btn-primary float-end">New Case</button>
             </div>    
         </div>
             

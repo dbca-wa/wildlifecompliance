@@ -6,7 +6,7 @@
 
                     <div class="form-group"><div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left">FER Case Number</label>
+                            <label class="control-label float-start">FER Case Number</label>
                         </div>
                         <div class="col-sm-7">
                             <input type="text" class="form-control case_number_1" placeholder="" id="fer_case_number_1st" v-model="ferCaseNumber1st" maxlength="2" /> / 

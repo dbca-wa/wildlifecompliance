@@ -64,12 +64,12 @@
                 <div class="col-sm-12 form-group"><div class="row">
                     <div class="row action-button">
                         <div v-if="!readonlyForm">
-                              <a @click="createNewCourtProceedingsEntry()" class="btn btn-primary pull-right new-row-button" >
+                              <a @click="createNewCourtProceedingsEntry()" class="btn btn-primary float-end new-row-button" >
                                   New Row
                               </a>
                         </div>
                         <div v-else>
-                              <a class="btn btn-primary pull-right new-row-button" disabled>
+                              <a class="btn btn-primary float-end new-row-button" disabled>
                                   New Row
                               </a>
                         </div>

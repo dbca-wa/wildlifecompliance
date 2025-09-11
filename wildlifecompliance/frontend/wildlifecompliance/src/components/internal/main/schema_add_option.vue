@@ -10,7 +10,7 @@
                     <div class="col-md-12">&nbsp; </div>
                     <div class="col-md-12">
                         <div class="col-md-3">
-                            <label v-if="aidx===0" class="control-label pull-left" >Add Options</label>
+                            <label v-if="aidx===0" class="control-label float-start" >Add Options</label>
                         </div>
                         <div class="col-md-3" v-if="canAddMore">
                             <textarea class="form-control" v-model="a.label"></textarea>
@@ -20,11 +20,11 @@
                         </div>
                         <div class="col-md-6" v-if="canAddMore">
                             <a v-if="aidx!==0" class="delete-icon fa fa-trash-o" style="cursor: pointer; color:red;" title="Delete row" @click.prevent="removeOption(aidx)"></a>
-                            <button v-if="aidx===0" class="btn btn-link pull-right" :name="`select_option_link_1`" @click.prevent="addOption()">[ Add Another ]</button>
+                            <button v-if="aidx===0" class="btn btn-link float-end" :name="`select_option_link_1`" @click.prevent="addOption()">[ Add Another ]</button>
                         </div>
                         <div class="col-md-6" v-else>
                             <div v-for="(c, cid) in a.conditions" v-bind:key="`condition_${cid}`" >
-                                <input type="checkbox" :value="true" v-model="getCheckedConditions(a,c).isChecked" >&nbsp;&nbsp;<label>{{c.label}}</label></input><input type='text' v-if="getCheckedConditions(a,c).isDisplay" class="pull-right" v-model="c.value" />                           
+                                <input type="checkbox" :value="true" v-model="getCheckedConditions(a,c).isChecked" >&nbsp;&nbsp;<label>{{c.label}}</label></input><input type='text' v-if="getCheckedConditions(a,c).isDisplay" class="float-end" v-model="c.value" />                           
                             </div>
                         </div>
                     </div>

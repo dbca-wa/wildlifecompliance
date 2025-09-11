@@ -15,7 +15,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left"  for="Name">Purpose</label>
+                                        <label class="control-label float-start"  for="Name">Purpose</label>
                                     </div>
                                     <div class="col-sm-9" >
                                         <div style="width:70% !important">
@@ -29,7 +29,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left"  for="Name">Condition</label>
+                                        <label class="control-label float-start"  for="Name">Condition</label>
                                     </div>
                                     <div class="col-sm-9" v-if="condition.standard">
                                         <div style="width:70% !important">
@@ -46,7 +46,7 @@
                             <div class="form-group">
                                 <div class="row" v-if="!condition.standard || showDueDate">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left"  for="Name">Due Date</label>
+                                        <label class="control-label float-start"  for="Name">Due Date</label>
                                     </div>
                                     <div class="col-sm-9">
                                         <div class="input-group date" ref="due_date" style="width: 70%;">
@@ -61,7 +61,7 @@
                             <div class="form-group" v-if="!condition.standard && validDate">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left"  for="Name">Return Type</label>
+                                        <label class="control-label float-start"  for="Name">Return Type</label>
                                     </div>
                                     <div class="col-sm-9">
                                         <div style="width:70% !important">
@@ -76,7 +76,7 @@
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-sm-3">
-                                            <label class="control-label pull-left"  for="Name">Recurrence</label>
+                                            <label class="control-label float-start"  for="Name">Recurrence</label>
                                         </div>
                                         <div class="col-sm-9">
                                             <label class="checkbox-inline"><input type="checkbox" v-model="condition.recurrence"></label>
@@ -87,7 +87,7 @@
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-sm-3">
-                                                <label class="control-label pull-left"  for="Name">Recurrence pattern</label>
+                                                <label class="control-label float-start"  for="Name">Recurrence pattern</label>
                                             </div>
                                             <div class="col-sm-9">
                                                 <label class="radio-inline control-label"><input type="radio" name="recurrenceSchedule" value="weekly" v-model="condition.recurrence_pattern">Weekly</label>
@@ -100,11 +100,11 @@
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <label class="control-label"  for="Name">
-                                                    <strong class="pull-left">Recur every</strong> 
-                                                    <input class="pull-left" style="width:10%; margin-left:10px;" type="number" name="schedule" v-model="condition.recurrence_schedule"/> 
-                                                    <strong v-if="condition.recurrence_pattern == 'weekly'" class="pull-left" style="margin-left:10px;">week(s)</strong>
-                                                    <strong v-else-if="condition.recurrence_pattern == 'monthly'" class="pull-left" style="margin-left:10px;">month(s)</strong>
-                                                    <strong v-else-if="condition.recurrence_pattern == 'yearly'" class="pull-left" style="margin-left:10px;">year(s)</strong>
+                                                    <strong class="float-start">Recur every</strong> 
+                                                    <input class="float-start" style="width:10%; margin-left:10px;" type="number" name="schedule" v-model="condition.recurrence_schedule"/> 
+                                                    <strong v-if="condition.recurrence_pattern == 'weekly'" class="float-start" style="margin-left:10px;">week(s)</strong>
+                                                    <strong v-else-if="condition.recurrence_pattern == 'monthly'" class="float-start" style="margin-left:10px;">month(s)</strong>
+                                                    <strong v-else-if="condition.recurrence_pattern == 'yearly'" class="float-start" style="margin-left:10px;">year(s)</strong>
                                                 </label>
                                             </div>
                                         </div>

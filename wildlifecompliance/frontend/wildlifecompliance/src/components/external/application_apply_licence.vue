@@ -22,7 +22,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <br /><br />
                             <div class="col-sm-12">
                                 <div class="row">
                                     <label class="col-sm-6">
@@ -46,7 +45,7 @@
                                                         <div v-if="type.selected">
                                                             <div v-for="(purpose,index2) in type.purpose" class="checkbox purpose-clear-left">
 
-                                                                <div v-if="purpose.is_valid_age" class ="col-sm-12">
+                                                                <div v-if="purpose.is_valid_age" class ="margin-left-20">
                                                                     <input type="checkbox"
                                                                         :value="purpose.id"
                                                                         :id="purpose.id"
@@ -76,9 +75,9 @@
                                 </div>
                             </div>
                             <div class="col-sm-12">
-                                <button v-if="showSpinner" type="button" class="btn btn-primary pull-right" style="margin-left: 10px;" disabled><i class="fa fa-spinner fa-spin" />Continue</button>
-                                <button v-else @click.prevent="submit()" type="button" class="btn btn-primary pull-right" style="margin-left: 10px;">Continue</button>
-                                <div class="pull-right" style="font-size: 18px;">
+                                <button v-if="showSpinner" type="button" class="btn btn-primary float-end" style="margin-left: 10px;" disabled><i class="fa fa-spinner fa-spin" />Continue</button>
+                                <button v-else @click.prevent="submit()" type="button" class="btn btn-primary float-end" style="margin-left: 10px;">Continue</button>
+                                <div class="float-end" style="font-size: 18px;">
                                     <strong>Estimated application fee: {{toCurrency(application_fee)}}</strong><br>
                                     <strong>Estimated licence fee: {{toCurrency(licence_fee)}}</strong><br>
                                 </div>

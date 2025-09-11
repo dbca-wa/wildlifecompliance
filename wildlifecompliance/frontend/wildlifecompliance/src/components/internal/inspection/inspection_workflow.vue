@@ -8,7 +8,7 @@
                         <div class="form-group">
                           <div class="row">
                               <div class="col-sm-3">
-                                  <label class="control-label pull-left" for="details">Details</label>
+                                  <label class="control-label float-start" for="details">Details</label>
                               </div>
             			      <div class="col-sm-6">
                                   <textarea class="form-control" placeholder="add details" id="details" v-model="workflowDetails"/>
@@ -18,7 +18,7 @@
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left"  for="Name">Attachments</label>
+                                    <label class="control-label float-start"  for="Name">Attachments</label>
                                 </div>
             			        <div class="col-sm-9">
                                     <filefield ref="comms_log_file" name="comms-log-file" :isRepeatable="true" :documentActionUrl="inspection.commsLogsDocumentUrl"/>

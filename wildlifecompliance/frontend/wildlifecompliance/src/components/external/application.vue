@@ -39,7 +39,7 @@
                     <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
                         <div class="navbar-inner">
                             <div class="container">
-                                <p class="pull-right" style="margin-top:5px;">
+                                <p class="float-end" style="margin-top:5px;">
                                     <span v-if="showCardPayButton || showCashPayButton" style="margin-right: 5px; font-size: 18px; display: block;">
                                         <strong>Estimated application fee: {{toCurrency(adjusted_application_fee)}}</strong>
                                         <strong>Estimated licence fee: {{toCurrency(application.licence_fee)}}</strong>
@@ -51,7 +51,7 @@
                                     <input v-show="showCardPayButton" type="button" @click.prevent="pay_and_submit" class="btn btn-primary" value="Pay and Submit"/>
                                     <input v-show="showCashPayButton" type="button" @click.prevent="submit_and_record" class="btn btn-primary" value="Submit and Record"/>
                                     <input v-show="showNonePayButton" type="button" @click.prevent="submit_and_record" class="btn btn-primary" value="Migrate"/>                   
-                                    <button v-if="isProcessing" disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Processing</button>
+                                    <button v-if="isProcessing" disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Processing</button>
                                 </p>
                             </div>
                         </div>
@@ -61,8 +61,8 @@
                     <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
                         <div class="navbar-inner">
                             <div class="container">
-                                <p class="pull-right" style="margin-top:5px;">
-                                    <button v-if="isProcessing" disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Processing</button>
+                                <p class="float-end" style="margin-top:5px;">
+                                    <button v-if="isProcessing" disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Processing</button>
                                     <router-link v-else class="btn btn-primary" :to="{name: 'external-applications-dash'}">Back to Dashboard</router-link>
                                 </p>
                             </div>

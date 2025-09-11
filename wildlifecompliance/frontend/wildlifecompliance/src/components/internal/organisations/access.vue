@@ -52,7 +52,7 @@
                                         <select ref="assigned_officer" :disabled="!officerCanProcess" class="form-control" v-model="access.assigned_officer">
                                             <option v-for="member in organisation_access_group_members" :value="member.id" v-bind:key="member.id">{{member.name}}</option>
                                         </select>
-                                        <a v-if="officerCanProcess" @click.prevent="assignToMe()" class="actionBtn pull-right">Assign to me</a>
+                                        <a v-if="officerCanProcess" @click.prevent="assignToMe()" class="actionBtn float-end">Assign to me</a>
                                     </div>
                                 </div>
                             </div>

@@ -174,7 +174,7 @@
                                             <div v-if="siezureNoticeVisibility" class="form-group">
                                                 <div class="row">
                                                     <div class="col-sm-3">
-                                                        <label class="control-label pull-left" for="Name">Seizure Notice</label>
+                                                        <label class="control-label float-start" for="Name">Seizure Notice</label>
                                                     </div>
                                                     <div v-if="parentModal" class="col-sm-9">
                                                         <filefield

@@ -18,7 +18,7 @@
                                         <div class="form-group">
                                             <div class="row">
                                                 <div class="col-sm-3">
-                                                    <label class="control-label pull-left">Final Comments</label>
+                                                    <label class="control-label float-start">Final Comments</label>
                                                 </div>
                                                 <div class="col-sm-9">
                                                     <textarea class="form-control" v-model="assessment.final_comment" :readonly="!canCompleteAssessment" style="width: 100%; max-width: 100%;" />
@@ -27,9 +27,9 @@
                                         </div>
                                         <div class="row" v-if="canCompleteAssessment">
                                             <div class="col-sm-12">
-                                                <button v-if="!savingAssessment" @click.prevent="saveAssessment()" class="btn btn-primary pull-right assessment-button">Save Assessment</button>
-                                                <button v-if="!savingAssessment" @click.prevent="completeAssessment()" class="btn btn-primary pull-right assessment-button">Mark Complete</button>
-                                                <button v-else disabled class="btn btn-primary pull-right"><i class="fa fa-spin fa-spinner"></i>&nbsp;Saving</button>
+                                                <button v-if="!savingAssessment" @click.prevent="saveAssessment()" class="btn btn-primary float-end assessment-button">Save Assessment</button>
+                                                <button v-if="!savingAssessment" @click.prevent="completeAssessment()" class="btn btn-primary float-end assessment-button">Mark Complete</button>
+                                                <button v-else disabled class="btn btn-primary float-end"><i class="fa fa-spin fa-spinner"></i>&nbsp;Saving</button>
                                             </div>
                                         </div>
                                     </div>
@@ -60,7 +60,7 @@
                             <div class="panel panel-default">
                                 <div v-if="canSendToAssessor" class="row">
                                     <div class="col-sm-10" style="margin-bottom: 10px">
-                                            <label class="control-label pull-left"  for="Name">Assessor Group</label>
+                                            <label class="control-label float-start"  for="Name">Assessor Group</label>
                                             <select class="form-control" v-model="selectedAssessor">
                                                 <option 
                                                     v-for="(assessor, idx) in relevantAssessorGroup"

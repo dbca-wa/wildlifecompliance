@@ -6,7 +6,7 @@
 
                     <div class="form-group"><div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left">Reason</label>
+                            <label class="control-label float-start">Reason</label>
                         </div>
                         <div class="col-sm-7">
                             <textarea class="form-control" placeholder="add reason" id="reason" v-model="workflowDetails"/>
@@ -15,7 +15,7 @@
 
                     <div class="form-group"><div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left"  for="Name">Attachments</label>
+                            <label class="control-label float-start"  for="Name">Attachments</label>
                         </div>
                         <div class="col-sm-9">
                             <filefield ref="comms_log_file" name="comms-log-file" :isRepeatable="true" :documentActionUrl="offence.commsLogsDocumentUrl" />

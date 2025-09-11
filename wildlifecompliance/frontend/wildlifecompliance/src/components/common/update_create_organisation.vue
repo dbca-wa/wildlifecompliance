@@ -72,9 +72,9 @@
         </div>
         <div class="form-group">
             <div class="col-sm-12">
-                <div v-if="show_spinner"><i class='fa fa-2x fa-spinner fa-spin pull-right'></i></div>
+                <div v-if="show_spinner"><i class='fa fa-2x fa-spinner fa-spin float-end'></i></div>
                 <div v-else>
-                    <button class="pull-right btn btn-primary" @click.prevent="save()">Save Organisation</button>
+                    <button class="float-end btn btn-primary" @click.prevent="save()">Save Organisation</button>
                 </div>
             </div>
         </div>

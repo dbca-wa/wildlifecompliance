@@ -10,7 +10,7 @@
                 <div class="panel panel-default">
                     <div class="row">
                         <div class="col-md-12">
-                            <button class="btn btn-primary pull-right" @click.prevent="addTableEntry()" name="add-masterlist">New Question</button>
+                            <button class="btn btn-primary float-end" @click.prevent="addTableEntry()" name="add-masterlist">New Question</button>
                         </div>
                     </div>
                     <div class="row"><br/></div> 
@@ -47,7 +47,7 @@
 
                     <div class="row">
                         <div class="col-md-3">
-                            <label class="control-label pull-left" >Question</label>
+                            <label class="control-label float-start" >Question</label>
                         </div>
                         <div class="col-md-9">
                             <textarea class="form-control" name="question" v-model="masterlist.question"></textarea>
@@ -56,7 +56,7 @@
                     <div class="row"><div class="col-md-12" >&nbsp;</div></div>
                     <div class="row">
                         <div class="col-md-3">
-                            <label class="control-label pull-left" >Answer Type</label>
+                            <label class="control-label float-start" >Answer Type</label>
                         </div>
                         <div class="col-md-6">
                             <select class="form-control" ref="select_answer_type" name="select-answer-type" v-model="masterlist.answer_type">
@@ -80,7 +80,7 @@
 
                     <div class="row">
                         <div class="col-md-3">
-                            <label class="control-label pull-left" >Help text url</label>
+                            <label class="control-label float-start" >Help text url</label>
                         </div>
                         <div class="col-md-9">
                             <textarea class="form-control" name="help_text_url" v-model="masterlist.help_text_url"></textarea>

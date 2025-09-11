@@ -57,10 +57,10 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <button @click.prevent="generateByAccount()" class="btn btn-primary pull-left" >Generate Report By Accounts</button>
+                                    <button @click.prevent="generateByAccount()" class="btn btn-primary float-start" >Generate Report By Accounts</button>
                                 </div>
                                 <div class="col-sm-6 clearfix">
-                                  <button @click.prevent="generateFlatReport()" class="btn btn-primary pull-left" >Generate Report Flat</button>
+                                  <button @click.prevent="generateFlatReport()" class="btn btn-primary float-start" >Generate Report Flat</button>
                                 </div>
                             </div>
                     </div>
@@ -87,7 +87,7 @@
                                       </div>
                                     </div>
                                     <div class="form-group">
-                                        <button @click.prevent="runOracleJob()" class="btn btn-primary pull-left" >Run Job</button>
+                                        <button @click.prevent="runOracleJob()" class="btn btn-primary float-start" >Run Job</button>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">

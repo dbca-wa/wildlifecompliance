@@ -7,7 +7,7 @@
 <!--
                     <div class="form-group"><div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left">Recipient</label>
+                            <label class="control-label float-start">Recipient</label>
                         </div>
                         <div class="col-sm-7">
                             {{ recipient_details }}
@@ -17,7 +17,7 @@
 
                     <div class="form-group"><div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left">Details</label>
+                            <label class="control-label float-start">Details</label>
                         </div>
                         <div class="col-sm-7">
                             <textarea class="form-control" placeholder="add reason" id="reason" v-model="details"/>
@@ -26,7 +26,7 @@
 
                     <div class="form-group"><div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label pull-left"  for="Name">Attachments</label>
+                            <label class="control-label float-start"  for="Name">Attachments</label>
                         </div>
                         <div class="col-sm-9">
                             <filefield ref="comms_log_file" name="comms-log-file" :isRepeatable="true" :documentActionUrl="sanction_outcome.commsLogsDocumentUrl" />

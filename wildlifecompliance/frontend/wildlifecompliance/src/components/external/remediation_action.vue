@@ -90,10 +90,10 @@
                         <div v-if="canSaveSubmit" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
                             <div class="navbar-inner">
                                 <div class="container">
-                                    <p class="pull-right" style="margin-top:5px;">
-                                        <input type="button" @click.prevent="submit" class="btn btn-primary pull-right button-gap" value="Submit"/>
-                                        <input type="button" @click.prevent="save" class="btn btn-primary pull-right button-gap" value="Save and Continue"/>
-                                        <input type="button" @click.prevent="saveExit" class="btn btn-primary pull-right button-gap" value="Save and Exit"/>
+                                    <p class="float-end" style="margin-top:5px;">
+                                        <input type="button" @click.prevent="submit" class="btn btn-primary float-end button-gap" value="Submit"/>
+                                        <input type="button" @click.prevent="save" class="btn btn-primary float-end button-gap" value="Save and Continue"/>
+                                        <input type="button" @click.prevent="saveExit" class="btn btn-primary float-end button-gap" value="Save and Exit"/>
                                     </p>
                                 </div>
                             </div>

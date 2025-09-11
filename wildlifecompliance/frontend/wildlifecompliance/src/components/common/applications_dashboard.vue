@@ -37,7 +37,7 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <router-link  style="margin-top:25px;" class="btn btn-primary pull-right" :to="{ name: 'apply_application_organisation' }">New Application</router-link>
+                            <router-link  style="margin-top:25px;" class="btn btn-primary float-end" :to="{ name: 'apply_application_organisation' }">New Application</router-link>
                         </div>
                     </div>
                     <div class="row">
