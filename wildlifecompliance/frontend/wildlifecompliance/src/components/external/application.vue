@@ -10,16 +10,6 @@
                 </ul>
             </div>
 
-              <!-- <div :id="activityTab" class="tab-pane fade">
-                  <div v-for="(activity, index) in allCurrentActivities">
-                      <renderer-block
-                          :component="activity"
-                          v-if="activity.id == selected_activity_tab_id"
-                          v-bind:key="`renderer_block_${index}`"
-                          />
-                  </div>
-                  {{ this.$slots.default }}
-              </div> -->
               <Application v-if="isApplicationLoaded">
 
                 <div :class="`${form_width ? form_width : 'col-md-9'}`" id="tabs">
