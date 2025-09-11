@@ -424,16 +424,6 @@ export default {
                         });
                         vm.application_submitters = submitters;
                     });
-                    // Grab Status from the data in the table
-                    // var statusColumn = vm.visibleDatatable.vmDataTable.columns(vm.getColumnIndex('status'));
-                    // statusColumn.data().unique().sort().each( function ( d, j ) {
-                    //     let statusTitles = [];
-                    //     $.each(d,(index,a) => {
-                    //         a != null && !statusTitles.filter(status => status.id == a.id ).length ? statusTitles.push(a): '';
-                    //     })
-                    //     //vm.application_status = statusTitles;
-                    //     vm.application_status = vm.customer_status;
-                    // });
                 }
             },
             application_headers:internal_application_headers,

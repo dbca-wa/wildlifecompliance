@@ -71,10 +71,13 @@ class ReturnFilterBackend(DatatablesFilterBackend):
         # then apply additional filters.
         super_queryset = super(ReturnFilterBackend, self).filter_queryset(
             request, queryset, view).distinct().order_by('-id')
+        
+        total_count = queryset.count()
 
         date_from = request.GET.get('date_from')
         date_to = request.GET.get('date_to')
         status = request.GET.get('status')
+
         queryset = super_queryset
 
         if queryset.model is Return:
@@ -82,11 +85,14 @@ class ReturnFilterBackend(DatatablesFilterBackend):
             # apply user selected filters
             status = status.lower() if status else 'all'
             if status != 'all':
-                status_ids = []
-                for returns in queryset:
-                    if status in returns.processing_status.lower():
-                        status_ids.append(returns.id)
-                queryset = queryset.filter(id__in=status_ids).distinct()
+                status_filters = [status]
+                if status == 'current':
+                    status_filters = ['draft']
+
+                if status == 'expired':
+                    status_filters = ['expired','discarded']
+
+                queryset = queryset.filter(processing_status__in=status_filters).distinct()
             if date_from:
                 date_from = datetime.strptime(
                     date_from, '%Y-%m-%d') + timedelta(days=1)
@@ -96,6 +102,12 @@ class ReturnFilterBackend(DatatablesFilterBackend):
                     date_to, '%Y-%m-%d') + timedelta(days=1)
                 queryset = queryset.filter(due_date__lte=date_to)
 
+        fields = self.get_fields(request)
+        ordering = self.get_ordering(request, view, fields)
+        if len(ordering):
+            queryset = queryset.order_by(*ordering)
+
+        setattr(view, '_datatables_total_count', total_count)
         return queryset
 
 
@@ -700,6 +712,28 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except ValidationError as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(e)
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
+        
+    @action(detail=True, methods=['GET', ])
+    def get_return_selects(self, request, *args, **kwargs):
+        '''
+        Returns all drop-down lists for application dashboard.
+        '''
+        try:
+            all_status = []
+            for i in Return.CUSTOMER_DISPLAYABLE_STATE:
+                all_status.append(Return.CUSTOMER_DISPLAYABLE_STATE[i])
+
+            return Response({"all_status":list(set(all_status))})
+
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(repr(e.error_dict))
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))

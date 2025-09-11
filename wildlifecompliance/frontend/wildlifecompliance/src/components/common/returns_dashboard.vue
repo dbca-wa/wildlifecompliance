@@ -54,7 +54,8 @@ import { v4 as uuid } from 'uuid';
 import datatable from '@vue-utils/datatable.vue'
 import {
     api_endpoints,
-    helpers
+    helpers,
+    fetch_util
 }from '@/utils/hooks'
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {
@@ -93,6 +94,9 @@ export default {
             table_headers:["Number","Due Date","Status","Licence","Action"],
             table_options:{
                 serverSide: true,
+                order: [
+                    [0, 'desc']
+                ],
                 language: {
                     processing: "<i class='fa fa-4x fa-spinner fa-spin'></i>"
                 },
@@ -124,7 +128,8 @@ export default {
                         data: "processing_status",
                         mRender:function (data,type,full) {
                             return vm.is_external ? full.customer_status : full.processing_status;
-                        }                        
+                        },
+                        searchable: false                       
                     },
                     {
                         data: "licence",
@@ -151,7 +156,8 @@ export default {
                             }
                             return links;
                         },
-                        searchable: false
+                        searchable: false,
+                        orderable: false
                     },
                 ],
                 processing: true,
@@ -163,15 +169,6 @@ export default {
                             vm.$refs.return_datatable.vmDataTable.search( this.value ).draw();
                         }
                     }, 0)));
-                    // Grab Status from the data in the table
-                    var titleColumn = vm.$refs.return_datatable.vmDataTable.columns(2);
-                    titleColumn.data().unique().sort().each( function ( d, j ) {
-                        let statusTitles = [];
-                        $.each(d,(index,a) => {
-                            a != null && statusTitles.indexOf(a)<0 ? statusTitles.push(a): '';
-                        })
-                        vm.return_statusTitles = statusTitles;
-                    });
                 }
             }
         }
@@ -220,6 +217,17 @@ export default {
         },
         initialiseSearch:function(){
             this.dateSearch();
+            let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.returns,'1/get_return_selects'))
+            request.then(res=>{
+                this.return_statusTitles = res.all_status
+            }).catch((error) => {
+                console.log(error)
+                swal.fire(
+                    'Get Return Selects Error',
+                    helpers.apiVueResourceError(error),
+                    'error'
+                )
+            });
         },
         dateSearch:function(){
             let vm = this;
