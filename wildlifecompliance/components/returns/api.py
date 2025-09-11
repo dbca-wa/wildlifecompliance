@@ -719,7 +719,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['GET', ])
     def get_return_selects(self, request, *args, **kwargs):
         '''
-        Returns all drop-down lists for application dashboard.
+        Returns all drop-down lists for returns dashboard.
         '''
         try:
             all_status = []

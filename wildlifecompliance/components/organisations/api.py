@@ -820,25 +820,6 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    # @action(detail=False, methods=['GET',])
-    # def user_organisation_request_list(self, request, *args, **kwargs):
-    #     try:
-    #         queryset = self.get_queryset()
-    #         queryset = queryset.filter(requester = request.user)
-
-    #         # instance = OrganisationRequest.objects.get(requester = request.user)
-    #         serializer = self.get_serializer(queryset, many=True)
-    #         return Response(serializer.data)
-    #     except serializers.ValidationError:
-    #         print(traceback.print_exc())
-    #         raise
-    #     except ValidationError as e:
-    #         print(traceback.print_exc())
-    #         raise serializers.ValidationError(repr(e.error_dict))
-    #     except Exception as e:
-    #         print(traceback.print_exc())
-    #         raise serializers.ValidationError(str(e))
-
     @action(detail=False, methods=['GET', ])
     def get_pending_requests(self, request, *args, **kwargs):
         try:
@@ -1057,6 +1038,32 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             qs = instance.comms_logs.all()
             serializer = OrganisationRequestCommsSerializer(qs, many=True)
             return Response(serializer.data)
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(repr(e.error_dict))
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
+        
+    @action(detail=True, methods=['GET', ])
+    def get_access_selects(self, request, *args, **kwargs):
+        '''
+        Returns all drop-down lists for OAR dashboard.
+        '''
+        try:
+            all_status = []
+            for i in OrganisationRequest.STATUS_CHOICES:
+                all_status.append(i[1])
+
+            all_roles = []
+            for i in OrganisationRequest.ROLE_CHOICES:
+                all_roles.append(i[1])
+
+            return Response({"all_status":list(set(all_status)),"all_roles":list(set(all_roles))})
+
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
