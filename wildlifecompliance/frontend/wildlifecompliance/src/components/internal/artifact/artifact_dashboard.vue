@@ -39,8 +39,8 @@
                     </span>-->
                 </div>
             </div>
-            <div class="col-md-3 pull-right">
-                <button @click.prevent="createArtifact" class="btn btn-primary pull-right">New Object</button>
+            <div class="col-md-6 float-end">
+                <button @click.prevent="createArtifact" class="btn btn-primary float-end">New Object</button>
             </div>
         </div>
 
@@ -87,7 +87,7 @@ export default {
             dtOptions: {
                 serverSide: true,
                 searchDelay: 1000,
-                lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+                lengthMenu: [ [10, 25, 50, 100], [10, 25, 50, 100] ],
                 order: [
                     [0, 'desc']
                 ],

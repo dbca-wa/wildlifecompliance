@@ -44,7 +44,7 @@
                                                             </div>
                                                             <div class="col-sm-12" v-if="getPickedPurpose(p.purpose.id).isProposed">
                                                                 <div class="col-sm-3">
-                                                                    <label class="control-label pull-left" for="Name">Additional Fee</label>
+                                                                    <label class="control-label float-start" for="Name">Additional Fee</label>
                                                                 </div>
                                                                 <div class="col-sm-6">
                                                                     <input type="text" ref="licence_fee" class="form-control" style="width:20%;" v-model="p.additional_fee" />
@@ -52,7 +52,7 @@
                                                             </div>
                                                             <div class="col-sm-12" v-if="getPickedPurpose(p.purpose.id).isProposed">
                                                                 <div class="col-sm-3">
-                                                                    <label class="control-label pull-left" for="Name">Fee Description 1</label>
+                                                                    <label class="control-label float-start" for="Name">Fee Description 1</label>
                                                                 </div>
                                                                 <div class="col-sm-6">
                                                                     <input type="text" ref="licence_fee_text" class="form-control" style="width:70%;" v-model="p.additional_fee_text" />
@@ -64,7 +64,7 @@
 
                                                                 <div class="col-sm-12">
                                                                     <div class="col-sm-3">
-                                                                        <label class="control-label pull-left" for="Name">Details</label>
+                                                                        <label class="control-label float-start" for="Name">Details</label>
                                                                         <div v-show="free_text.is_additional_info" ><br/><br/>
                                                                             <input type="checkbox" checked disabled/>
                                                                             <label>Is additional info</label>
@@ -88,7 +88,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left" for="Name">Details for Applicant</label>
+                                        <label class="control-label float-start" for="Name">Details for Applicant</label>
                                     </div>
                                     <div class="col-sm-9">
                                         <textarea name="licence_details" class="form-control" style="width:70%;" v-model="propose_issue.reason"></textarea>
@@ -98,7 +98,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left" for="Name">Copy email</label>
+                                        <label class="control-label float-start" for="Name">Copy email</label>
                                     </div>
                                     <div class="col-sm-9">
                                             <input type="text" class="form-control" name="licence_cc" style="width:70%;" v-model="propose_issue.cc_email">
@@ -108,7 +108,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left" for="Name">Documents for Applicant</label>
+                                        <label class="control-label float-start" for="Name">Documents for Applicant</label>
                                     </div>
             			            <div class="col-sm-9">
                                         <filefield 
@@ -123,7 +123,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left" for="Name">Details for Approver</label>
+                                        <label class="control-label float-start" for="Name">Details for Approver</label>
                                     </div>
                                     <div class="col-sm-9">
                                         <textarea name="licence_details" class="form-control" style="width:70%;" v-model="propose_issue.approver_detail"></textarea>
@@ -133,7 +133,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left" for="Name">Documents for Approver</label>
+                                        <label class="control-label float-start" for="Name">Documents for Approver</label>
                                     </div>
             			            <div class="col-sm-9">
                                         <filefield 

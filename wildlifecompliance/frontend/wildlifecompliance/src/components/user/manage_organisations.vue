@@ -64,10 +64,10 @@
                                 <div class="col-sm-3">
                                     <input type="text" disabled class="form-control" name="organisation" v-model="orgReq.abn" placeholder="">
                                 </div>
-                                    <span class="btn btn-info btn-file pull-left">
+                                    <span class="btn btn-info btn-file float-start">
                                         Upload New File <input type="file" ref="uploadedFile" @change="uploadNewFileUpdateOrgRequest(orgReq)"/>
                                     </span>
-                                    <span class="pull-left" style="margin-left:10px;margin-top:10px;">{{uploadedFileName}}</span>
+                                    <span class="float-start" style="margin-left:10px;margin-top:10px;">{{uploadedFileName}}</span>
                               </div>
                           </div>
 
@@ -103,8 +103,8 @@
 
 
                                     <div class="col-sm-12">
-                                      <button v-if="!registeringOrg" @click.prevent="orgConsultRequest()" class="btn btn-primary pull-left">Submit</button>
-                                      <button v-else disabled class="btn btn-primary pull-right"><i class="fa fa-spin fa-spinner"></i>&nbsp;Submitting</button>
+                                      <button v-if="!registeringOrg" @click.prevent="orgConsultRequest()" class="btn btn-primary float-start">Submit</button>
+                                      <button v-else disabled class="btn btn-primary float-end"><i class="fa fa-spin fa-spinner"></i>&nbsp;Submitting</button>
                                     </div>
                               </div>
                            </div>
@@ -143,8 +143,8 @@
                                     <input type="text" class="form-control" name="abn" v-model="newOrg.pin2" placeholder="">
                                   </div>
                                   <div class="col-sm-2">
-                                    <button v-if="!validatingPins" @click.prevent="validatePins()" class="btn btn-primary pull-left">Validate</button>
-                                    <button v-else class="btn btn-primary pull-left"><i class="fa fa-spin fa-spinner"></i>&nbsp;Validating Pins</button>
+                                    <button v-if="!validatingPins" @click.prevent="validatePins()" class="btn btn-primary float-start">Validate</button>
+                                    <button v-else class="btn btn-primary float-start"><i class="fa fa-spin fa-spinner"></i>&nbsp;Validating Pins</button>
                                   </div>
                               </div>
                               <div class="form-group" v-else-if="!newOrg.exists && newOrg.detailsChecked">
@@ -152,15 +152,15 @@
                                     This organisation has not yet been registered with this system. Please upload a letter with an organisation letterhead stating that you are an employee of this organisation.<br/>
                                   </label>
                                   <div class="col-sm-12">
-                                    <span class="btn btn-info btn-file pull-left">
+                                    <span class="btn btn-info btn-file float-start">
                                         Attach File <input type="file" ref="uploadedFile" @change="readFile()"/>
                                     </span>
-                                    <span class="pull-left" style="margin-left:10px;margin-top:10px;">{{uploadedFileName}}</span>
+                                    <span class="float-start" style="margin-left:10px;margin-top:10px;">{{uploadedFileName}}</span>
                                   </div>
                                   <label for="" class="col-sm-10 control-label" style="text-align:left;">You will be notified by email once the Department has checked the organisation details.</label>
                                   <div class="col-sm-12">
-                                    <button v-if="!registeringOrg" @click.prevent="orgRequest()" class="btn btn-primary pull-right">Submit</button>
-                                    <button v-else disabled class="btn btn-primary pull-right"><i class="fa fa-spin fa-spinner"></i>&nbsp;Submitting</button>
+                                    <button v-if="!registeringOrg" @click.prevent="orgRequest()" class="btn btn-primary float-end">Submit</button>
+                                    <button v-else disabled class="btn btn-primary float-end"><i class="fa fa-spin fa-spinner"></i>&nbsp;Submitting</button>
                                   </div>
                               </div>
                               <div class="form-group" v-else-if="newOrg.exists && !newOrg.detailsChecked">
@@ -168,15 +168,15 @@
                                     Please upload a letter with an organisation letterhead stating that you are an employee of this organisation.<br/>
                                   </label>
                                   <div class="col-sm-12">
-                                    <span class="btn btn-info btn-file pull-left">
+                                    <span class="btn btn-info btn-file float-start">
                                         Attach File <input type="file" ref="uploadedFile" @change="readFile()"/>
                                     </span>
-                                    <span class="pull-left" style="margin-left:10px;margin-top:10px;">{{uploadedFileName}}</span>
+                                    <span class="float-start" style="margin-left:10px;margin-top:10px;">{{uploadedFileName}}</span>
                                   </div>
                                   <label for="" class="col-sm-10 control-label" style="text-align:left;">You will be notified by email once the Department has checked the organisation details.</label>
                                   <div class="col-sm-12">
-                                    <button v-if="!registeringOrg" @click.prevent="orgRequest()" class="btn btn-primary pull-right">Submit</button>
-                                    <button v-else disabled class="btn btn-primary pull-right"><i class="fa fa-spin fa-spinner"></i>&nbsp;Submitting</button>
+                                    <button v-if="!registeringOrg" @click.prevent="orgRequest()" class="btn btn-primary float-end">Submit</button>
+                                    <button v-else disabled class="btn btn-primary float-end"><i class="fa fa-spin fa-spinner"></i>&nbsp;Submitting</button>
                                   </div>
                               </div>
                               

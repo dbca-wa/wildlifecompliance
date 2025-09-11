@@ -49,7 +49,7 @@
         <div v-if="canUserAction" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
             <div class="navbar-inner">
                 <div class="container">
-                    <p class="pull-right" style="margin-top:5px;">
+                    <p class="float-end" style="margin-top:5px;">
                         <button v-if="showSpinner && showExit" disabled type="button" @click.prevent="save('exit')" class="btn btn-primary">
                             <i class="fa fa-spinner fa-spin"/> Saving</button>
                         <button v-else type="button" @click.prevent="saveExit()" class="btn btn-primary" >Save and Exit</button>

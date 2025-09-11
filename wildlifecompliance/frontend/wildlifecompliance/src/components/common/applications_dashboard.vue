@@ -37,7 +37,7 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <router-link  style="margin-top:25px;" class="btn btn-primary pull-right" :to="{ name: 'apply_application_organisation' }">New Application</router-link>
+                            <router-link  style="margin-top:25px;" class="btn btn-primary float-end" :to="{ name: 'apply_application_organisation' }">New Application</router-link>
                         </div>
                     </div>
                     <div class="row">
@@ -358,7 +358,7 @@ export default {
             application_ex_options:{
                 serverSide: true,
                 searchDelay: 1000,
-                lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+                lengthMenu: [ [10, 25, 50, 100], [10, 25, 50, 100] ],
                 order: [
                     [0, 'desc']
                 ],
@@ -424,23 +424,13 @@ export default {
                         });
                         vm.application_submitters = submitters;
                     });
-                    // Grab Status from the data in the table
-                    // var statusColumn = vm.visibleDatatable.vmDataTable.columns(vm.getColumnIndex('status'));
-                    // statusColumn.data().unique().sort().each( function ( d, j ) {
-                    //     let statusTitles = [];
-                    //     $.each(d,(index,a) => {
-                    //         a != null && !statusTitles.filter(status => status.id == a.id ).length ? statusTitles.push(a): '';
-                    //     })
-                    //     //vm.application_status = statusTitles;
-                    //     vm.application_status = vm.customer_status;
-                    // });
                 }
             },
             application_headers:internal_application_headers,
             application_options:{
                 serverSide: true,
                 searchDelay: 1000,
-                lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+                lengthMenu: [ [10, 25, 50, 100], [10, 25, 50, 100] ],
                 order: [
                     [0, 'desc']
                 ],

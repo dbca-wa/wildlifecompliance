@@ -106,7 +106,7 @@ export default {
             dtOptions: {
                 serverSide: true,
                 searchDelay: 1000,
-                lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+                lengthMenu: [ [10, 25, 50, 100], [10, 25, 50, 100] ],
                 order: [
                     [0, 'desc']
                 ],
@@ -169,8 +169,8 @@ export default {
                     },
                     {
                         data: 'offender',
-                        searchable: true,
-                        orderable: true,
+                        searchable: false,
+                        orderable: false,
                         mRender: function (data, type, row){
                             let name = '';
                             let num_chars = 30;

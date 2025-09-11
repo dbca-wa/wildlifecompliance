@@ -9,7 +9,7 @@
                             <div class="row">
                                 <div class="col-sm-offset-2 col-sm-8">
                                     <div class="form-group">
-                                        <label class="control-label pull-left"  for="Name">To</label>
+                                        <label class="control-label float-start"  for="Name">To</label>
                                         <textarea readonly class="form-control" v-model="assessment.assessor_group_name"> </textarea>
                                     </div>
                                 </div>
@@ -17,7 +17,7 @@
                             <div class="row">
                                 <div class="col-sm-offset-2 col-sm-8">
                                     <div class="form-group">
-                                        <label class="control-label pull-left"  for="Name">Details</label>
+                                        <label class="control-label float-start"  for="Name">Details</label>
                                         <textarea class="form-control" name="name" v-model="assessment.text" ></textarea>
                                     </div>
                                 </div>

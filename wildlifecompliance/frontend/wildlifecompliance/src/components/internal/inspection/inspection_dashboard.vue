@@ -48,9 +48,9 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 pull-right">
+            <div class="col-md-6 float-end">
                 <button v-if="visibilityCreateNewButton" @click.prevent="createInspection"
-                    class="btn btn-primary pull-right">New Inspection</button>
+                    class="btn btn-primary float-end">New Inspection</button>
             </div>    
         </div>
             
@@ -117,7 +117,7 @@
                 dtOptions: {
                     serverSide: true,
                     searchDelay: 1000,
-                    lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+                    lengthMenu: [ [10, 25, 50, 100], [10, 25, 50, 100] ],
                     order: [
                         [0, 'desc']
                     ],

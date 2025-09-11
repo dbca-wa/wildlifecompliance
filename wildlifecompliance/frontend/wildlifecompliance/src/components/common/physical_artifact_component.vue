@@ -174,7 +174,7 @@
                                             <div v-if="siezureNoticeVisibility" class="form-group">
                                                 <div class="row">
                                                     <div class="col-sm-3">
-                                                        <label class="control-label pull-left" for="Name">Seizure Notice</label>
+                                                        <label class="control-label float-start" for="Name">Seizure Notice</label>
                                                     </div>
                                                     <div v-if="parentModal" class="col-sm-9">
                                                         <filefield
@@ -352,7 +352,7 @@ export default {
             dtOptions: {
                 serverSide: true,
                 searchDelay: 1000,
-                lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+                lengthMenu: [ [10, 25, 50, 100], [10, 25, 50, 100] ],
                 order: [
                     [0, 'desc']
                 ],

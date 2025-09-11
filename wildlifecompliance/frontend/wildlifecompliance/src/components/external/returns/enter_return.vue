@@ -40,10 +40,10 @@
                 <label style="width:10%;" for="ReplaceNo">Add to</label>
             </div>
             <div v-if="nilReturn === 'no' && spreadsheetReturn === 'yes'" class="row">
-                <span class="btn btn-primary btn-file pull-left">Upload File
+                <span class="btn btn-primary btn-file float-start">Upload File
                     <input type="file" ref="spreadsheet" @change="uploadFile()"/>
                 </span>
-                <span class="pull-left" style="margin-left:10px;margin-top:10px;">{{uploadedFileName}}</span>
+                <span class="float-start" style="margin-left:10px;margin-top:10px;">{{uploadedFileName}}</span>
             </div>
             <div class="row"></div>
             <div v-if="refreshGrid && nilReturn === 'no'" class="row">

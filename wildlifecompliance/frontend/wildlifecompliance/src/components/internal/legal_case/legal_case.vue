@@ -200,14 +200,14 @@
                                 <div>
                                     <div class="row action-button">
                                         <!--div v-if="canUserAction" class="col-sm-12"-->
-                                        <!--div class="col-sm-1 pull-right" /-->
+                                        <!--div class="col-sm-1 float-end" /-->
                                         <div v-if="!readonlyRunningSheet">
-                                              <a @click="createNewRunningSheetEntry()" class="btn btn-primary pull-right new-row-button" >
+                                              <a @click="createNewRunningSheetEntry()" class="btn btn-primary float-end new-row-button" >
                                                 New Row
                                               </a>
                                         </div>
                                         <div v-else>
-                                              <a class="btn btn-primary pull-right new-row-button" disabled>
+                                              <a class="btn btn-primary float-end new-row-button" disabled>
                                                 New Row
                                               </a>
                                         </div>
@@ -301,7 +301,7 @@
         <div v-if="canUserAction" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
             <div class="navbar-inner">
                 <div class="container">
-                    <p class="pull-right" style="margin-top:5px;">
+                    <p class="float-end" style="margin-top:5px;">
                         <button v-if="showSpinner && showExit" disabled type="button" @click.prevent="save('exit')" class="btn btn-primary">
                             <i class="fa fa-spinner fa-spin"/> Saving</button>
                         <button v-else type="button" @click.prevent="saveExit()" class="btn btn-primary" >Save and Exit</button>

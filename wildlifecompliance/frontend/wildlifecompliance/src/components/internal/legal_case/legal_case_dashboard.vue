@@ -38,9 +38,9 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 pull-right">
+            <div class="col-md-6 float-end">
                 <button @click.prevent="createLegalCase"
-                    class="btn btn-primary pull-right">New Case</button>
+                    class="btn btn-primary float-end">New Case</button>
             </div>    
         </div>
             
@@ -99,7 +99,7 @@
                 dtOptions: {
                     serverSide: true,
                     searchDelay: 1000,
-                    lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+                    lengthMenu: [ [10, 25, 50, 100], [10, 25, 50, 100] ],
                     order: [
                         [0, 'desc']
                     ],
@@ -146,7 +146,7 @@
                             orderable: true
                         },
                         {
-                            data: 'created_date',
+                            data: 'case_created_date',
                             searchable: false,
                             orderable: true
                         },

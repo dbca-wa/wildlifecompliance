@@ -19,7 +19,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <button class="btn btn-primary pull-right" @click.prevent="addTableEntry()" name="add_purpose">New Section</button>
+                            <button class="btn btn-primary float-end" @click.prevent="addTableEntry()" name="add_purpose">New Section</button>
                         </div>
                     </div>
                     <div class="row"><br/></div> 
@@ -55,7 +55,7 @@
                 <form class="form-horizontal" name="schema_purpose">
                     <div class="row">
                         <div class="col-md-3">
-                            <label class="control-label pull-left" >Licence Purpose</label>
+                            <label class="control-label float-start" >Licence Purpose</label>
                         </div>
                         <div class="col-md-6">
                             <select class="form-control" ref="select_purpose" name="select-purpose" v-model="sectionPurpose.licence_purpose" >
@@ -69,7 +69,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-3">
-                            <label class="control-label pull-left" >Section Label</label>
+                            <label class="control-label float-start" >Section Label</label>
                         </div>
                         <div class="col-md-6">
                             <input type='text' class="form-control" v-model='sectionPurpose.section_label' >
@@ -80,7 +80,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-3">
-                            <label class="control-label pull-left" >Section Index</label>
+                            <label class="control-label float-start" >Section Index</label>
                         </div>
                         <div class="col-md-3">
                             <input type='text' class="form-control" v-model='sectionPurpose.index' >

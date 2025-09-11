@@ -15,7 +15,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left" for="offence-identifier">Identifier</label>
+                                    <label class="control-label float-start" for="offence-identifier">Identifier</label>
                                 </div>
                                 <div class="col-sm-6">
                                     <div v-if="offence">
@@ -26,7 +26,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left">Region</label>
+                                    <label class="control-label float-start">Region</label>
                                 </div>
                                 <div class="col-sm-7">
                                   <select class="form-control col-sm-9" v-on:change.prevent="offence.region_id=$event.target.value; updateDistricts('updateFromUI')" v-bind:value="offence.region_id">
@@ -39,7 +39,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left">District</label>
+                                    <label class="control-label float-start">District</label>
                                 </div>
                                 <div class="col-sm-7">
                                   <select class="form-control" v-model="offence.district_id">
@@ -128,7 +128,7 @@
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-sm-3">
-                                            <label class="control-label pull-left" for="offence-details">Details</label>
+                                            <label class="control-label float-start" for="offence-details">Details</label>
                                         </div>
                                         <div class="col-sm-6">
                                             <div v-if="offence">
@@ -145,7 +145,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left"  for="Name">Attachments</label>
+                                        <label class="control-label float-start"  for="Name">Attachments</label>
                                     </div>
                                     <div class="col-sm-9">
                                         <FileField 

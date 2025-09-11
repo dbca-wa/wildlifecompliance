@@ -27,7 +27,7 @@
                             </div>
                            
                             <div class="col-sm-12">
-                                <button :disabled="org_applicant === null" @click.prevent="submit()" class="btn btn-primary pull-right">Continue</button>
+                                <button :disabled="org_applicant === null" @click.prevent="submit()" class="btn btn-primary float-end">Continue</button>
                             </div>
                         </form>
                     </div>

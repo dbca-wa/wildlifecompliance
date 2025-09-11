@@ -259,7 +259,7 @@
                                     <button @click.prevent="makeTeamLead" class="btn btn-primary">Make Team Lead</button>
                                 </div-->
                                 <!--div class="col-sm-2">
-                                    <button @click.prevent="clearInspectionTeam" class="btn btn-primary pull-right">Clear</button>
+                                    <button @click.prevent="clearInspectionTeam" class="btn btn-primary float-end">Clear</button>
                                 </div-->
                               </div>
                             </div>
@@ -345,7 +345,7 @@
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <label class="control-label pull-left"  for="Name">Inspection report</label>
+                                            <label class="control-label float-start"  for="Name">Inspection report</label>
                                         </div>
                                         <div class="col-sm-9" v-if="inspection.inspectionReportDocumentUrl">
                                             <filefield
@@ -382,7 +382,7 @@
         <div v-if="inspection.can_user_action" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
             <div class="navbar-inner">
                 <div class="container">
-                    <p class="pull-right" style="margin-top:5px;">
+                    <p class="float-end" style="margin-top:5px;">
                         <input type="button" @click.prevent="save('exit')" class="btn btn-primary" value="Save and Exit"/>
                         <input type="button" @click.prevent="save('noexit')" class="btn btn-primary" value="Save and Continue"/>
                     </p>

@@ -11,7 +11,7 @@
                     <div class="panel panel-default" >
                         <form class="form-horizontal" action="index.html" method="post">
                             <div class="col-sm-12">
-                                <button @click.prevent="addContact()" style="margin-bottom:10px;" class="btn btn-primary pull-right">Add Contact</button>
+                                <button @click.prevent="addContact()" style="margin-bottom:10px;" class="btn btn-primary float-end">Add Contact</button>
                             </div>
                             </br></br>
                             <datatable ref="contacts_datatable" id="organisation_contacts_datatable" :dtOptions="contacts_options" :dtHeaders="contacts_headers"/>

@@ -21,8 +21,8 @@
                                             <div class="form-group">
 
                                                 <div class="row">
-                                                    <div class="col-sm-12"><label class="control-label pull-left">Proposed Purposes:</label></div>
-                                                    <div class="col-sm-12"><label class="control-label pull-left">&nbsp;</label></div>
+                                                    <div class="col-sm-12"><label class="control-label float-start">Proposed Purposes:</label></div>
+                                                    <div class="col-sm-12"><label class="control-label float-start">&nbsp;</label></div>
                                                     <div class="col-sm-12">
                                                         <div v-for="(p, index) in applicationSelectedActivitiesForPurposes" v-bind:key="`p_${index}`">
                                                             <FormSection
@@ -56,7 +56,7 @@
                                                                         </div>
                                                                         <div class="col-sm-12">
                                                                             <div class="col-sm-3" v-if="getPickedPurpose(p.purpose.id).isProposed">
-                                                                                <label class="control-label pull-left" for="Name">Additional Fee</label>
+                                                                                <label class="control-label float-start" for="Name">Additional Fee</label>
                                                                             </div>
                                                                             <div class="col-sm-6" v-if="getPickedPurpose(p.purpose.id).isProposed">
                                                                                 <input type="text" ref="licence_fee" class="form-control" style="width:50%;" v-model="p.additional_fee" />
@@ -64,7 +64,7 @@
                                                                         </div>
                                                                         <div class="col-sm-12">
                                                                             <div class="col-sm-3" v-if="getPickedPurpose(p.purpose.id).isProposed">
-                                                                                <label class="control-label pull-left" for="Name">Fee Description</label>
+                                                                                <label class="control-label float-start" for="Name">Fee Description</label>
                                                                             </div>
                                                                             <div class="col-sm-6" v-if="getPickedPurpose(p.purpose.id).isProposed">
                                                                                 <input type="text" :name='"licence_fee_text_" + index' class="form-control" style="width:100%;" v-model="p.additional_fee_text" />
@@ -77,7 +77,7 @@
 
                                                                             <div class="col-sm-12">
                                                                                 <div class="col-sm-3">
-                                                                                    <label class="control-label pull-left" for="Name">Details</label>
+                                                                                    <label class="control-label float-start" for="Name">Details</label>
                                                                                     <div v-show="free_text.is_additional_info" ><br/><br/>
                                                                                         <input type="checkbox" checked disabled/>
                                                                                         <label>Is additional info</label>
@@ -120,7 +120,7 @@
                                     <div class="row">
                                         <div class="col-sm-3">
                                             
-                                            <label class="control-label pull-left"  for="details">Details</label>
+                                            <label class="control-label float-start"  for="details">Details</label>
                                         </div>
                                         <div class="col-sm-9">
                                             <div class="input-group date" ref="details" style="width: 70%;">
@@ -130,7 +130,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-3">
-                                            <label class="control-label pull-left"  for="details">CC Email</label>
+                                            <label class="control-label float-start"  for="details">CC Email</label>
                                         </div>
                                         <div class="col-sm-9">
                                             <div class="input-group date" ref="cc_email" style="width: 70%;">
@@ -140,7 +140,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-3">
-                                            <label class="control-label pull-left"  for="details">Files to be attached to email</label>
+                                            <label class="control-label float-start"  for="details">Files to be attached to email</label>
                                         </div>
                                         <div class="col-sm-9">
                                             <filefield 
@@ -163,7 +163,7 @@
                             <div class="panel panel-default">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left"  for="details">ID Check</label>
+                                        <label class="control-label float-start"  for="details">ID Check</label>
                                     </div>
                                     <div class="col-sm-9">
 
@@ -176,7 +176,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left"  for="details">Character Check</label>
+                                        <label class="control-label float-start"  for="details">Character Check</label>
                                     </div>
                                     <div class="col-sm-9">
 
@@ -188,7 +188,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label pull-left"  for="details">Return Check</label>
+                                        <label class="control-label float-start"  for="details">Return Check</label>
                                     </div>
                                     <div class="col-sm-9">
 
@@ -212,14 +212,14 @@
                         <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
                             <div class="navbar-inner">
                                 <div class="container" v-if="canIssueOrDecline">
-                                    <p class="pull-right" style="margin-top:5px;">
-                                        <button v-if="showSpinner" type="button" class="btn btn-primary pull-right" ><i class="fa fa-spinner fa-spin"/>Issue/Decline</button>
-                                        <button v-else class="btn btn-primary pull-right" @click.prevent="ok()">Issue/Decline</button>
+                                    <p class="float-end" style="margin-top:5px;">
+                                        <button v-if="showSpinner" type="button" class="btn btn-primary float-end" ><i class="fa fa-spinner fa-spin"/>Issue/Decline</button>
+                                        <button v-else class="btn btn-primary float-end" @click.prevent="ok()">Issue/Decline</button>
                                     </p>
                                 </div>
                                 <div class="container" v-else>
-                                    <p class="pull-right" style="margin-top:5px;">
-                                        <button disabled class="btn btn-primary pull-right" @click.prevent="ok()">Issue/Decline</button>
+                                    <p class="float-end" style="margin-top:5px;">
+                                        <button disabled class="btn btn-primary float-end" @click.prevent="ok()">Issue/Decline</button>
                                     </p>
                                 </div>
                             </div>

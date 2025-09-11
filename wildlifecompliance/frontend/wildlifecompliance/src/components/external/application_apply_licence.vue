@@ -22,7 +22,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <br /><br />
                             <div class="col-sm-12">
                                 <div class="row">
                                     <label class="col-sm-6">
@@ -38,16 +37,15 @@
                                              
                                             <div class="row">
 
+                                                <div v-if="category.checked && !(selected_apply_org_id != '' && type.not_for_organisation == true)" class="col-sm-9">
 
-                                                <div v-if="category.checked && selected_apply_org_id != ''" class="col-sm-9">
-
-                                                    <div v-for="(type,index1) in categoryActivity" class="checkbox margin-left-20">
+                                                    <div v-for="(type,index1) in category.activity" class="checkbox margin-left-20">
                                                         <input type="checkbox" ref="selected_activity_type" name ="activity" :value="type.id" :id = "type.id" v-model="category.activity[index1].selected" @change="handleActivityCheckboxChange(index,index1)"> {{type.short_name}}
 
                                                         <div v-if="type.selected">
                                                             <div v-for="(purpose,index2) in type.purpose" class="checkbox purpose-clear-left">
 
-                                                                <div v-if="purpose.is_valid_age" class ="col-sm-12">
+                                                                <div v-if="purpose.is_valid_age" class ="margin-left-20">
                                                                     <input type="checkbox"
                                                                         :value="purpose.id"
                                                                         :id="purpose.id"
@@ -77,9 +75,9 @@
                                 </div>
                             </div>
                             <div class="col-sm-12">
-                                <button v-if="showSpinner" type="button" class="btn btn-primary pull-right" style="margin-left: 10px;" disabled><i class="fa fa-spinner fa-spin" />Continue</button>
-                                <button v-else @click.prevent="submit()" type="button" class="btn btn-primary pull-right" style="margin-left: 10px;">Continue</button>
-                                <div class="pull-right" style="font-size: 18px;">
+                                <button v-if="showSpinner" type="button" class="btn btn-primary float-end" style="margin-left: 10px;" disabled><i class="fa fa-spinner fa-spin" />Continue</button>
+                                <button v-else @click.prevent="submit()" type="button" class="btn btn-primary float-end" style="margin-left: 10px;">Continue</button>
+                                <div class="float-end" style="font-size: 18px;">
                                     <strong>Estimated application fee: {{toCurrency(application_fee)}}</strong><br>
                                     <strong>Estimated licence fee: {{toCurrency(licence_fee)}}</strong><br>
                                 </div>
@@ -168,15 +166,6 @@ export default {
     FormSection
   },
   computed: {
-        categoryActivity: function() {
-            let activityList = [];
-            this.category.activity.forEach(activity => {
-                if (!(activity.type.not_for_organisation == true)) {
-                    activityList.add(activity);
-                }
-            });
-            return activityList;
-        },
         ...mapGetters([
             'selected_apply_org_id',
             'selected_apply_proxy_id',
@@ -292,6 +281,7 @@ export default {
         let vm = this
         var input = $(vm.$refs.selected_activity_type)[0];
         if(vm.licence_categories[index].activity[index1].selected){
+
             for(var activity_index=0, len2=vm.licence_categories[index].activity[index1].purpose.length; activity_index<len2; activity_index++){
                 vm.licence_categories[index].activity[index1].purpose[activity_index].selected = this.isAmendment || this.isRenewal;
                 if (this.isAmendment) {
@@ -312,10 +302,10 @@ export default {
             ))).map(purpose => purpose.id);
         let request = fetch_util.fetchUrl('/api/application/estimate_price/', 
             {
-                method:'POST', body:{
+                method:'POST', body:JSON.stringify({
                     'purpose_ids': purpose_ids,
                     'licence_type': this.selected_apply_licence_select,
-                }
+                })
             })
         request.then(res => {
                 this.application_fee = res.fees.application;

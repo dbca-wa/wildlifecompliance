@@ -50,7 +50,7 @@
                                 <select ref="assigned_to" class="form-control" v-model="returns.assigned_to">
                                     <option v-for="member in returns.activity_curators" :value="member.id" v-bind:key="member.id">{{member.first_name}} {{member.last_name}}</option>
                                 </select>
-                                <a @click.prevent="assignToMe()" class="actionBtn pull-right">Assign to me</a>
+                                <a @click.prevent="assignToMe()" class="actionBtn float-end">Assign to me</a>
                             </div>
                         </div>
                     </div>

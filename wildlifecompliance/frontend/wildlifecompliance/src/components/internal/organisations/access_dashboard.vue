@@ -24,13 +24,12 @@
 </div>
 </template>
 <script>
-import $ from 'jquery'
 import datatable from '@vue-utils/datatable.vue'
 import {
-  api_endpoints,
-  helpers
-}
-from '@/utils/hooks'
+    api_endpoints,
+    helpers,
+    fetch_util
+} from '@/utils/hooks'
 export default {
   name: 'OrganisationAccessDashboard',
   data() {
@@ -49,7 +48,7 @@ export default {
         org_access_request_options:{
                 serverSide: true,
                 searchDelay: 1000,
-                lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+                lengthMenu: [ [10, 25, 50, 100], [10, 25, 50, 100] ],
                 order: [
                     [0, 'desc']
                 ],
@@ -88,6 +87,7 @@ export default {
                     {
                         data:"status.name",
                         searchable: false,
+                        orderable: false,
                     },
                     {
                         data:"lodgement_date",
@@ -103,6 +103,7 @@ export default {
                     {
                         data:"id",
                         searchable: false,
+                        orderable: false,
                         mRender:function (data, type, full){
                             let links = '';
                             links += (full.can_be_processed && full.user_can_process_org_access_requests) ?
@@ -112,64 +113,10 @@ export default {
                         }
                     },
                 ],
-                initComplete: function(){
-                    // Grab Organisation from the data in the table
-                    var organisationColumn = vm.$refs.org_access_table.vmDataTable.columns(1);
-                    organisationColumn.data().unique().sort().each( function ( d, j ) {
-                        let organisationChoices = [];
-                        $.each(d,(index,a) => {
-                            a != null && organisationChoices.indexOf(a) < 0 ? organisationChoices.push(a): '';
-                        })
-                        vm.organisationChoices = organisationChoices;
-                    });
-                    // Grab Applicant from the data in the table
-                    var applicantColumn = vm.$refs.org_access_table.vmDataTable.columns(2);
-                    applicantColumn.data().unique().sort().each( function ( d, j ) {
-                        let applicationChoices = [];
-                        $.each(d,(index,a) => {
-                            a != null && applicationChoices.indexOf(a) < 0 ? applicationChoices.push(a): '';
-                        })
-                        vm.applicantChoices = applicationChoices;
-                    });
-                    // Grab Role from the data in the table
-                    var roleColumn = vm.$refs.org_access_table.vmDataTable.columns(3);
-                    roleColumn.data().unique().sort().each( function ( d, j ) {
-                        let roleChoices = [];
-                        $.each(d,(index,a) => {
-                            a != null && roleChoices.indexOf(a) < 0 ? roleChoices.push(a): '';
-                        })
-                        vm.roleChoices = roleChoices;
-                    });
-                    // Grab Status from the data in the table
-                    var statusColumn = vm.$refs.org_access_table.vmDataTable.columns(4);
-                    statusColumn.data().unique().sort().each( function ( d, j ) {
-                        let statusChoices = [];
-                        $.each(d,(index,a) => {
-                            a != null && statusChoices.indexOf(a) < 0 ? statusChoices.push(a): '';
-                        })
-                        vm.statusChoices = statusChoices;
-                    });
-                }
             },
         }
     },
     watch: {
-        filterOrganisation: function() {
-            let vm = this;
-            if (vm.filterOrganisation!= 'All') {
-                vm.$refs.org_access_table.vmDataTable.columns(1).search(vm.filterOrganisation).draw();
-            } else {
-                vm.$refs.org_access_table.vmDataTable.columns(1).search('').draw();
-            }
-        },
-        filterApplicant: function() {
-            let vm = this;
-            if (vm.filterApplicant != 'All') {
-                vm.$refs.org_access_table.vmDataTable.columns(2).search(vm.filterApplicant).draw();
-            } else {
-                vm.$refs.org_access_table.vmDataTable.columns(2).search('').draw();
-            }
-        },
         filterRole: function() {
             let vm = this;
             if (vm.filterRole != 'All') {
@@ -197,6 +144,20 @@ export default {
     },
     methods: {},
     mounted: function () {
+        let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.organisation_requests,'1/get_access_selects'))
+        this.$nextTick(() => {
+            request.then(res=>{
+                this.statusChoices = res.all_status
+                this.roleChoices = res.all_roles
+            }).catch((error) => {
+                console.log(error)
+                swal.fire(
+                    'Get Return Selects Error',
+                    helpers.apiVueResourceError(error),
+                    'error'
+                )
+            });
+        })
     }
 }
 </script>

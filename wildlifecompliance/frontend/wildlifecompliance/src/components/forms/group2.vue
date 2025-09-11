@@ -15,7 +15,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <label :id="`${id}_${groupIdx}`" class="inline">{{label}} {{add_1(groupIdx)}}</label>
-                    <a class="collapse-link-top pull-right" @click.prevent="toggleGroupVisibility(group)">
+                    <a class="collapse-link-top float-end" @click.prevent="toggleGroupVisibility(group)">
                         <span v-if="isExpanded(group)" class="glyphicon glyphicon-chevron-down"></span>
                         <span v-else class="glyphicon glyphicon-chevron-up"></span>
                     </a>

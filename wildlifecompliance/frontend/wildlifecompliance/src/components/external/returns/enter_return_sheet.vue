@@ -17,7 +17,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group" v-if="!readonly" >
-                        <button class="btn btn-primary pull-right" @click.prevent="addSheetRow()" name="sheet_entry">New Entry</button>
+                        <button class="btn btn-primary float-end" @click.prevent="addSheetRow()" name="sheet_entry">New Entry</button>
                     </div>
                 </div>
             </div>

@@ -35,7 +35,7 @@
                                 </div> -->
                             </div>
                             <div class="col-sm-12">
-                                <button  @click.prevent="submit()" class="btn btn-primary pull-right">Continue</button>
+                                <button  @click.prevent="submit()" class="btn btn-primary float-end">Continue</button>
                             </div>
                         </form>
                     </div>

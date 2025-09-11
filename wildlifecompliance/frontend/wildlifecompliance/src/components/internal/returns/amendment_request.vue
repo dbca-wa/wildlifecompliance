@@ -12,7 +12,7 @@
                             <div class="row">
                                 <div class="col-sm-offset-2 col-sm-8">
                                     <div class="form-group">
-                                        <label class="control-label pull-left" >Reason</label>
+                                        <label class="control-label float-start" >Reason</label>
                                         <select class="form-control" name="reason" ref="reason" v-model="amendment.reason">
                                             <option v-for="item in reason_choices" :value="item.key">{{item.value}}</option>
                                         </select>
@@ -22,7 +22,7 @@
                             <div class="row">
                                 <div class="col-sm-offset-2 col-sm-8">
                                     <div class="form-group">
-                                        <label class="control-label pull-left" >Comments to User</label>
+                                        <label class="control-label float-start" >Comments to User</label>
                                         <textarea class="form-control" name="text" v-model="amendment.text" ></textarea>
                                     </div>
                                 </div>

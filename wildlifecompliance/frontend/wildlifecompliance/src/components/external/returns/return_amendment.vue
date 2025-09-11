@@ -1,7 +1,7 @@
 <template>
     <div v-if="isReturnsLoaded">
         <div v-if="visibleRequests.length" class="row" style="color:red;">
-            <div class="col-lg-12 pull-right">
+            <div class="col-lg-12 float-end">
                 <FormSection
                     :form-collapse="false"
                     label="An amendment has been requested for this Return"

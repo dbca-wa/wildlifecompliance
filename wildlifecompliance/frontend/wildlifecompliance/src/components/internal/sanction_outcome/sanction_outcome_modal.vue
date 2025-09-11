@@ -26,7 +26,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left" for="identifier">Identifier</label>
+                                    <label class="control-label float-start" for="identifier">Identifier</label>
                                 </div>
                                 <div class="col-sm-7">
                                     <div v-show="sanction_outcome">
@@ -37,7 +37,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left">Region</label>
+                                    <label class="control-label float-start">Region</label>
                                 </div>
                                 <div class="col-sm-7">
                                   <select class="form-control col-sm-9" v-on:change.prevent="sanction_outcome.region_id=$event.target.value; updateDistricts('updatefromUI')" v-bind:value="sanction_outcome.region_id">
@@ -50,7 +50,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left">District</label>
+                                    <label class="control-label float-start">District</label>
                                 </div>
                                 <div class="col-sm-7">
                                   <select class="form-control" v-model="sanction_outcome.district_id">
@@ -63,7 +63,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left">Offence</label>
+                                    <label class="control-label float-start">Offence</label>
                                 </div>
                                 <div class="col-sm-7">
                                     <div v-show="sanction_outcome">
@@ -79,7 +79,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left">Offender</label>
+                                    <label class="control-label float-start">Offender</label>
                                 </div>
                                 <div class="col-sm-7">
                                     <div v-if="sanction_outcome && sanction_outcome.current_offence && sanction_outcome.current_offence.offenders">
@@ -105,7 +105,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left">Vehicle Registration Number</label>
+                                    <label class="control-label float-start">Vehicle Registration Number</label>
                                 </div>
                                 <div class="col-sm-7">
                                     <input :disabled="!is_parking_offence" type="text" class="form-control" name="registration_number" placeholder="" v-model="sanction_outcome.registration_number" >
@@ -114,7 +114,7 @@
 
                             <div class="col-sm-12 form-group">
                                 <div class="row col-sm-12">
-                                    <label class="control-label pull-left">Alleged committed offences</label>
+                                    <label class="control-label float-start">Alleged committed offences</label>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-12">
@@ -125,7 +125,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left">Issued on paper?</label>
+                                    <label class="control-label float-start">Issued on paper?</label>
                                 </div>
                                 <div class="col-sm-7">
 
@@ -138,7 +138,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left">Paper ID</label>
+                                    <label class="control-label float-start">Paper ID</label>
                                 </div>
                                 <div class="col-sm-7">
                                     <input type="text" class="form-control" name="paper_id" placeholder="" v-model="sanction_outcome.paper_id" :disabled="!sanction_outcome.issued_on_paper" />
@@ -147,7 +147,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left">Paper notice</label>
+                                    <label class="control-label float-start">Paper notice</label>
                                 </div>
                                 <div id="paper_id_notice">
                                     <div v-if="sanction_outcome.issued_on_paper" class="col-sm-7">
@@ -168,7 +168,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left">Action</label>
+                                    <label class="control-label float-start">Action</label>
                                 </div>
                                 <div class="col-sm-7">
                                     <textarea class="form-control" placeholder="add description" id="sanction-outcome-description" v-model="current_remediation_action.action" />
@@ -177,7 +177,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left">Due Date</label>
+                                    <label class="control-label float-start">Due Date</label>
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="dueDatePicker">
@@ -191,13 +191,13 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-12">
-                                    <input :disabled="!enableAddActionButton" type="button" class="btn btn-primary pull-right" value="Add" @click.prevent="addRemediationActionClicked()" />
+                                    <input :disabled="!enableAddActionButton" type="button" class="btn btn-primary float-end" value="Add" @click.prevent="addRemediationActionClicked()" />
                                 </div>
                             </div></div>
 
                             <div class="col-sm-12 form-group">
                                 <div class="row col-sm-12">
-                                    <label class="control-label pull-left">Remediation Actions</label>
+                                    <label class="control-label float-start">Remediation Actions</label>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-12">
@@ -211,7 +211,7 @@
                         <div :id="dTab" class="tab-pane fade in"><div class="row">
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left">Description</label>
+                                    <label class="control-label float-start">Description</label>
                                 </div>
                                 <div class="col-sm-7">
                                     <textarea class="form-control" placeholder="add description" id="sanction-outcome-description" v-model="sanction_outcome.description"/>
@@ -220,7 +220,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left">Date of Issue</label>
+                                    <label class="control-label float-start">Date of Issue</label>
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="dateOfIssuePicker">
@@ -234,7 +234,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label pull-left">Time of Issue</label>
+                                    <label class="control-label float-start">Time of Issue</label>
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="timeOfIssuePicker">

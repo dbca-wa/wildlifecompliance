@@ -46,7 +46,7 @@
             <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
                 <div class="navbar-inner">
                     <div class="container">
-                        <p class="pull-right" style="margin-top:5px;">
+                        <p class="float-end" style="margin-top:5px;">
                             <button v-if="spinner_exit" style="width:150px;" disabled class="btn btn-primary btn-md"><i class="fa fa-spin fa-spinner"></i>&nbsp;Saving</button>
                             <button v-else-if="!spinner_exit && disable_exit" style="width:150px;" disabled class="btn btn-primary btn-md" name="save_exit">Save and Exit</button>
                             <button v-else style="width:150px;" class="btn btn-primary btn-md" @click.prevent="saveandcontinue(false)" name="save_exit">Save and Exit</button>
@@ -64,7 +64,7 @@
             <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
                 <div class="navbar-inner">
                     <div class="container">
-                        <p class="pull-right" style="margin-top:5px;">
+                        <p class="float-end" style="margin-top:5px;">
                             <button v-if="showSpinner" type="button" class="btn btn-primary" ><i class="fa fa-spinner fa-spin"/>Saving</button>                                                    
                             <button v-else style="width:150px;" class="btn btn-primary btn-md" @click.prevent="save()" name="save_exit">Save Changes</button>
                         </p>

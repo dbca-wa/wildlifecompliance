@@ -19,7 +19,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <button class="btn btn-primary pull-right" @click.prevent="addTableEntry()" name="add_purpose">New Question</button>
+                            <button class="btn btn-primary float-end" @click.prevent="addTableEntry()" name="add_purpose">New Question</button>
                         </div>
                     </div>
                     <div class="row">
@@ -78,7 +78,7 @@
 
                     <div class="row">
                         <div class="col-md-3">
-                            <label class="control-label pull-left" >Licence Purpose</label>
+                            <label class="control-label float-start" >Licence Purpose</label>
                         </div>
                         <div class="col-md-6" v-if="isNewEntry">
                             <select class="form-control" ref="select_purpose" name="select-purpose" v-model="filterQuestionPurpose" >
@@ -97,7 +97,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-3">
-                            <label class="control-label pull-left" >Section</label>
+                            <label class="control-label float-start" >Section</label>
                         </div>
                         <div class="col-md-6" v-if="isNewEntry">
                             <select class="form-control" ref="select_section" name="select-section" v-model="filterQuestionSection" >
@@ -116,7 +116,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-3">
-                            <label class="control-label pull-left" >Question</label>
+                            <label class="control-label float-start" >Question</label>
                         </div>
                         <div class="col-md-9" v-if="isNewEntry">
                             <select class="form-control" ref="select_question" name="select-question" v-model="sectionQuestion.question" >
@@ -158,7 +158,7 @@
 
                     <div class="row">
                         <div class="col-md-3">
-                            <label class="control-label pull-left" >Parent Question</label>
+                            <label class="control-label float-start" >Parent Question</label>
                         </div>
                         <div class="col-md-9">
                             <select class="form-control" ref="select_parent" name="select-parent" v-if="filterQuestionParent(sectionQuestion.parent_question)" v-model="sectionQuestion.parent_question" >
@@ -172,7 +172,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-3">
-                            <label class="control-label pull-left" >Parent Answer</label>
+                            <label class="control-label float-start" >Parent Answer</label>
                         </div>
                         <div class="col-md-3">
                             <select class="form-control" ref="select_answer" name="select-answer" v-model="sectionQuestion.parent_answer" >
@@ -186,7 +186,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-3">
-                            <label class="control-label pull-left" >Group</label>
+                            <label class="control-label float-start" >Group</label>
                         </div>
                         <div class="col-md-6" >
                             <select class="form-control" ref="select_groupp" name="select-groupp" v-if="filterQuestionGroup(sectionQuestion.section_group)" v-model="sectionQuestion.section_group">
@@ -200,7 +200,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-3">
-                            <label class="control-label pull-left" >Index</label>
+                            <label class="control-label float-start" >Index</label>
                         </div>
                         <div class="col-md-3">
                             <input type="text" class="form-control" v-model="sectionQuestion.order"/>

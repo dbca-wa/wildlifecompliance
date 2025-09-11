@@ -24,7 +24,7 @@
                         <div class="col-sm-12">
                         <div class="row">
                             <div class="col-md-3">
-                                <label class="control-label pull-left" >Activity:</label>
+                                <label class="control-label float-start" >Activity:</label>
                             </div>
                             <div class="col-md-3" v-if="isStockEntry">
                                 <label>{{activityList[entryActivity]['label']}}</label>
@@ -40,7 +40,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-3">
-                                <label class="control-label pull-left" >Activity Date:</label>
+                                <label class="control-label float-start" >Activity Date:</label>
                             </div>
                             <div class="col-md-6">
                               <div class="input-group date" ref="activityDateToPicker" name="activityDateToPicker" required="true">
@@ -53,7 +53,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-3">
-                                <label class="control-label pull-left" >Quantity:</label>
+                                <label class="control-label float-start" >Quantity:</label>
                             </div>
                             <div class="col-md-3">
                                 <input type='number' v-model='entryQty' >
@@ -61,7 +61,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-3">
-                                <label class="control-label pull-left" >Total Number:</label>
+                                <label class="control-label float-start" >Total Number:</label>
                             </div>
                             <div class="col-md-3">
                                 <input type='text' v-model='entryTotal' disabled='true' >
@@ -69,7 +69,7 @@
                         </div>
                         <div class="row" v-if="isLicenceRequired">
                             <div class="col-md-3">
-                                <label class="control-label pull-left" >Receiving licence:</label>
+                                <label class="control-label float-start" >Receiving licence:</label>
                             </div>
                             <!-- <div class="col-md-3">  Replaced with Keeper
                                 <input type='text' v-model='entryLicence' >
@@ -77,12 +77,12 @@
                         </div>
                         <div class="row">
                             <div class="col-md-3">
-                                <label class="control-label pull-left" >Name of</label>
+                                <label class="control-label float-start" >Name of</label>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-3">
-                                <label class="control-label pull-left" >Supplier/Recipient:</label>
+                                <label class="control-label float-start" >Supplier/Recipient:</label>
                             </div>
                             <div class="col-md-9">
                                 <input style="width: 95%;" type='text' v-model='entrySupplier' >
@@ -90,12 +90,12 @@
                         </div>
                         <div class="row">
                             <div class="col-md-3">
-                                <label class="control-label pull-left" >Keeper, Import or Export</label>
+                                <label class="control-label float-start" >Keeper, Import or Export</label>
                             </div>
                         </div>                        
                         <div class="row">
                             <div class="col-md-3">
-                                <label class="control-label pull-left" >Licence number:</label>
+                                <label class="control-label float-start" >Licence number:</label>
                             </div>
                             <div class="col-md-9">
                                 <input style="width: 95%;" type='text' v-model='entryLicence' >
@@ -103,7 +103,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-3">
-                                <label class="control-label pull-left" >Comments:</label>
+                                <label class="control-label float-start" >Comments:</label>
                             </div>
                             <div class="col-md-9">
                                 <textarea style="width: 95%;"class="form-control" name="entry_comments" v-model="entryComment"></textarea>
