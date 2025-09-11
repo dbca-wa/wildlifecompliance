@@ -3,3 +3,6 @@
 15 9 * * * python3 /app/manage_wc.py bpoint_ledger_payment_audit_report >> /app/logs/bpoint_ledger_payment_audit_report.log 2>&1
 10 9 * * 0 cd /app && python manage_wc.py appmonitor_check >> logs/appmonitor_check.log 2>&1
 0 9 * * * cd /app && python manage_wc.py find_inconsistent_return_counts >> logs/find_inconsistent_return_counts.log 2>&1
+
+# Log Rotate
+1 0 * * *  /bin/log_rotate.sh  >> /app/logs/log_rotate.log 2>&1
