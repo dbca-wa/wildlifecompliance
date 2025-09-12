@@ -3,15 +3,15 @@
         <div v-if="withSectionsSelector" class="col-lg-12" >
             <h3>Application {{application.id}}: {{application.licence_type_short_name}}</h3>
         </div>
-        <div v-if="withSectionsSelector" class="col-md-3 sections-dropdown">
+        <div v-if="withSectionsSelector" class="col-md-3 sections-dropdown float-start">
             <div class="sections-menu" relative-element-selector="#tabs">
-                <div class="panel panel-default fixed">
-                <div class="panel-heading">
+                <div class="card mb-3">
+                <div class="card-header">
                     <div class="dropdown">
                         <ul class="list-unstyled">
                             <li class="open">
                                 <h5>Sections</h5>
-                                <ul class="dropdown-menu dropdown-panel">
+                                <ul class="dropdown-menu dropdown-panel" style="display:block">
                                     <li v-for="(tab, tab_idx) in renderer_tabs" class='dropdown-submenu'>
                                         <a tabindex='-1' class='section-menu' v-on:click="sectionClick(tab)">
                                             {{tab.name}}
@@ -37,7 +37,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="panel-body" style="padding:0">
+                <div class="card-body border-bottom" style="padding:0">
                 </div>
                 </div>
             </div>
@@ -145,3 +145,27 @@ export default {
   },
 }
 </script>
+
+<style>
+.section-menu {
+  padding: 3px 20px;
+}
+
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu .dropdown-menu {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: 400;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
+}
+
+.navbar-nav li:hover > ul.dropdown-menu {
+    display: block;
+}
+</style>

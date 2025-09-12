@@ -69,21 +69,32 @@ import { mapGetters, mapActions } from 'vuex';
 
 const Group2 = {
     props:{
-        name: String,
-        label: String,
-        id: String,
-        isRequired: String,
-        help_text: String,
-        help_text_url: String,
+        name: {
+            type: String,
+        },
+        label: {
+            type: String,
+        },
+        id: {
+            type: String,
+        },
+        help_text: {
+            type: String,
+        },
+        help_text_url: {
+            type: String,
+        },
         component: {
-            type: Object | null,
+            type: Object,
             required: true
         },
         field_data: {
-            type: Object | null,
+            type: Object,
             required: true
         },
-        readonly:Boolean,
+        readonly: {
+            type:Boolean
+        },
     },
     components: {
         HelpText,

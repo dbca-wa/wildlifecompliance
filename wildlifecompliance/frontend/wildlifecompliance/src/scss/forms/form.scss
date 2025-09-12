@@ -20,7 +20,7 @@ $sections-menu-width: 249px;
 .sections-dropdown {
 
     @media only screen and (max-width: $tablet-screen-size) {
-        display: none;
+        //display: none;
     }
 
     a {
