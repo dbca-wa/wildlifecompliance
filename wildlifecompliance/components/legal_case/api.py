@@ -129,11 +129,6 @@ from wildlifecompliance.components.main.utils import (
     get_full_name
 )
 
-#class FakeRequest():
- #   def __init__(self, data):
-  #      self.data = data
-
-
 class LegalCaseFilterBackend(DatatablesFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
@@ -203,17 +198,9 @@ class LegalCaseFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-#class LegalCaseRenderer(DatatablesRenderer):
-#    def render(self, data, accepted_media_type=None, renderer_context=None):
-#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-#        return super(LegalCaseRenderer, self).render(data, accepted_media_type, renderer_context)
-
-
 class LegalCasePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (LegalCaseFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    #renderer_classes = (LegalCaseRenderer,)
     queryset = LegalCase.objects.none()
     serializer_class = LegalCaseDatatableSerializer
     page_size = 10
