@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import {
     UPDATE_RENDERER_TABS,
     UPDATE_RENDERER_SECTIONS,

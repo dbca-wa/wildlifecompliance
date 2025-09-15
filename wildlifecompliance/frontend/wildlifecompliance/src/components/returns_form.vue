@@ -8,7 +8,7 @@
 </template>
 
 <script>
-    import Vue from 'vue'
+     'vue'
     import {
   api_endpoints,
   helpers

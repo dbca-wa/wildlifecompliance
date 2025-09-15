@@ -558,7 +558,7 @@
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
-import Vue from "vue";
+ "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 
 import CommsLogs from "@/components/common/comms_logs.vue";

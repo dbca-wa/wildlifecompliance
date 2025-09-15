@@ -60,7 +60,7 @@ import { v4 as uuid } from 'uuid';
 import datatable from '@vue-utils/datatable.vue'
 import utils from '@/components/external/utils'
 import $ from 'jquery'
-import Vue from 'vue'
+ 'vue'
 import Returns from '../../returns_form.vue'
 import { mapActions, mapGetters } from 'vuex'
 import CommsLogs from '@common-components/comms_logs.vue'

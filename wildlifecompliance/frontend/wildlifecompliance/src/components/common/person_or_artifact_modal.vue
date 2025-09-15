@@ -97,7 +97,7 @@
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
-import Vue from "vue";
+ "vue";
 import modal from '@vue-utils/bootstrap-modal.vue';
 import SearchPersonOrganisation from './search_person_or_organisation.vue'
 import DocumentArtifact from './document_artifact_component.vue'

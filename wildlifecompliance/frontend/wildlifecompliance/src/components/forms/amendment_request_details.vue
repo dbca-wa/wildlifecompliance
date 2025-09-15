@@ -22,7 +22,7 @@
 
 
 <script>
-import Vue from 'vue'
+ 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import helpers from "@/utils/helpers.js";
 

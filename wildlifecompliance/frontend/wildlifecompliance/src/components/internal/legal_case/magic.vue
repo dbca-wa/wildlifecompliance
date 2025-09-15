@@ -8,7 +8,7 @@
     </div>
 </template>
 <script>
-import Vue from "vue";
+ "vue";
 import modal from '@vue-utils/bootstrap-modal.vue';
 
 export default {

@@ -79,7 +79,7 @@
 </template>
 <script>
 import $ from 'jquery'
-import Vue from 'vue'
+ 'vue'
 import { mapActions, mapGetters } from 'vuex';
 import datatable from '@vue-utils/datatable.vue'
 import CommsLogs from '@common-components/comms_logs.vue'

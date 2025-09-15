@@ -81,7 +81,7 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
-import Vue from 'vue'
+ 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import Returns from '../../returns_form.vue'
 import ReturnQuestion from '../../external/returns/enter_return_question.vue'

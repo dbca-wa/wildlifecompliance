@@ -1,5 +1,4 @@
 import 'es6-promise/auto';
-import Vue from 'vue';
 import Vuex from 'vuex';
 import {
 	applicationStore
@@ -40,8 +39,6 @@ import {
 import {
 	physicalArtifactStore
 } from './modules/physical_artifact';
-
-Vue.use(Vuex);
 
 export default new Vuex.Store({
 	state: {},

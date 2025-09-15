@@ -62,7 +62,7 @@ import 'leaflet.locatecontrol';
 import Awesomplete from 'awesomplete';
 import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import Vue from "vue";
+ "vue";
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';

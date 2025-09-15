@@ -126,7 +126,7 @@
 </div>
 </template>
 <script>
-import Vue from 'vue'
+ 'vue'
 import datatable from '@vue-utils/datatable.vue'
 import CommsLogs from '@common-components/comms_logs.vue'
 import {

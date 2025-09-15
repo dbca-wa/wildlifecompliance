@@ -471,7 +471,7 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
-import Vue from "vue";
+ "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import datatable from '@vue-utils/datatable.vue'
 import utils from "@/components/external/utils";

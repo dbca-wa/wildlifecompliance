@@ -67,7 +67,7 @@
 
 <script>
 import Leaf from "leaflet";
-import Vue from "vue";
+ "vue";
 import "leaflet-measure"; /* This should be imported after leaflet */
 import "leaflet.locatecontrol";
 import Awesomplete from "awesomplete";

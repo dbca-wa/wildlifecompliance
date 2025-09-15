@@ -1,5 +1,4 @@
 import localforage from 'localforage';
-import Vue from 'vue';
 import { fetch_util } from '@/utils/hooks';
 /*
  * Functions below are named after 'Cache' but no cache functionality is used.

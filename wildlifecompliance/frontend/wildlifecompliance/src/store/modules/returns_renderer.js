@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import {
     UPDATE_RETURNS_TRANSFER_SPECIES,
     UPDATE_RETURNS_TABS,

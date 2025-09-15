@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import {
     UPDATE_APPLICATION,
     UPDATE_ORIGINAL_APPLICATION,

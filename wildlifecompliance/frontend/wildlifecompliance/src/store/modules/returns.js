@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import {
     UPDATE_RETURNS,
     UPDATE_RETURNS_ESTIMATE,

@@ -5,14 +5,9 @@
         <template v-if="help_text">
             <HelpText :help_text="help_text" />
         </template>
-
-        <!-- <template v-if="help_text_url">
-            <HelpTextUrl :help_text_url="help_text_url" />
-        </template> -->
         
-
         <CommentBlock 
-            :label="label"
+            :label="commentLabel"
             :name="name"
             :field_data="field_data"
             />
@@ -203,6 +198,13 @@ const ExpanderTable = {
         tableClass: function(){
             const class_name = this.component.header.length > 6 ? "horizontal-scrollable" : "no-scroll-background";
             return class_name;
+        },
+        commentLabel: function(){
+            let commentLabel = this.label
+            if (this.label === undefined || this.label == "") {
+                commentLabel = "Comment"
+            }
+            return commentLabel;
         }
     }
 }

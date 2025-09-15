@@ -46,7 +46,7 @@
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
-import Vue from 'vue'
+ 'vue'
 import {
   api_endpoints,
   helpers

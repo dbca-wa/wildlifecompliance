@@ -1,6 +1,4 @@
 import 'vite/modulepreload-polyfill';
-
-import Vue from 'vue';
 import $ from 'jquery';
 window.$ = $
 window.jQuery = $
@@ -13,6 +11,7 @@ import _ from 'lodash'
 window._ = _
 
 import { createApp } from 'vue';
+import Vuex from 'vuex';
 import App from '@/App.vue';
 import router from '@/router';
 import helpers from '@/utils/helpers';
@@ -50,16 +49,13 @@ import '@/../node_modules/datatables.net-bs5/css/dataTables.bootstrap5.min.css';
 extendMoment(moment);
 
 //Vue.config.devtools = true;
-Vue.config.productionTip = false
+//Vue.config.productionTip = false
 
 export default {
   setup () {
     return { v$: useVuelidate() }
   },
 }
-
-Vue.component('renderer-block', RendererBlock);
-Vue.component('compliance-renderer-block', ComplianceRendererBlock);
 
 // Add CSRF Token to every request
 const customHeaders = new Headers({
@@ -72,7 +68,11 @@ const customHeadersJSON = new Headers({
 
 var mapbox_access_token = '';
 
-Vue.mixin({
+const app = createApp(App);
+app.use(store);
+app.use(router);
+
+app.mixin({
     methods: {
         toCurrency: function(value) {
             if (typeof value !== "number") {
@@ -91,9 +91,9 @@ Vue.mixin({
     },
 })
 
-const app = createApp(App);
-app.use(store)
-app.use(router);
+app.component('renderer-block', RendererBlock);
+app.component('compliance-renderer-block', ComplianceRendererBlock);
+
 router.isReady().then(() => app.mount('#app'));
 
 const fetch = window.fetch;
@@ -132,4 +132,4 @@ window.fetch = ((originalFetch) => {
     };
 })(fetch);
 
-Vue.config.devtools = true
+app.config.devtools = true

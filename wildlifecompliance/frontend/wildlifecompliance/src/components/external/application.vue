@@ -76,7 +76,7 @@
 <script>
 import { v4 as uuid } from 'uuid';
 import Application from '../form.vue'
-import Vue from 'vue'
+ 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import AmendmentRequestDetails from '@/components/forms/amendment_request_details.vue';
 import {

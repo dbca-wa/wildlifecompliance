@@ -156,7 +156,7 @@
     </div>
 </template>
 <script>
-import Vue from "vue";
+ "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "@/components/external/utils";

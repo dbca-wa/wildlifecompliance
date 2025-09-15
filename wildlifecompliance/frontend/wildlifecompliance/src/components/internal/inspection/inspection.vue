@@ -409,7 +409,7 @@
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
-import Vue from "vue";
+ "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import SearchPersonOrganisation from "@/components/common/search_person_or_organisation.vue";
 //import CreateNewPerson from "@/components/common/create_new_person.vue";
