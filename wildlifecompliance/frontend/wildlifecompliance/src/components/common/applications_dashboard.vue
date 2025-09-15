@@ -173,6 +173,12 @@ export default {
                 searchable: false // handled by filter_queryset override method - class ApplicationFilterBackend
             },
             {
+                data: "all_payments_url",
+                visible: false,
+                orderable: false,
+                searchable: false // handled by filter_queryset override method - class ApplicationFilterBackend
+            },
+            {
                 data: "lodgement_date",
                 width: "10%",
                 mRender:function (data,type,full) {
