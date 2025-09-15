@@ -4,7 +4,7 @@
         <div class="col-sm-12">
             <FormSection
                 :form-collapse="false"
-                label="Person and Organisation SearchReturn"
+                label="Person and Organisation Search"
             >
                 <div class="panel panel-default">
                     <div class="form-group">

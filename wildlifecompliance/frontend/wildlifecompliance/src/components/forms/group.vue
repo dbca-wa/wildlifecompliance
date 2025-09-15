@@ -4,21 +4,19 @@
             <div class="panel-body">
                 <label :id="id" class="inline">{{label}}</label>
                     <!--<i data-toggle="tooltip" v-if="help_text" data-placement="right" class="fa fa-question-circle" :title="help_text"> &nbsp; </i>-->
-                <template v-if="help_text">
+                <div v-if="help_text">
                     <HelpText :help_text="help_text" /> 
-                </template>
+                </div>
 
-                <template v-if="help_text_url">
+                <div v-if="help_text_url">
                     <HelpTextUrl :help_text_url="help_text_url" /> 
-                </template>
+                </div>
                 
-                <a class="collapse-link-top float-end" @click.prevent="expand"><span class="glyphicon glyphicon-chevron-down"></span></a>
                 <div class="children-anchor-point collapse in" style="padding-left: 0px"></div>
                 <span :class="{'hidden':isRemovable}" v-if="isPreviewMode">
                     <a :id="'remove_'+name" >Remove {{label}}</a>
                 </span>
-                <a class="collapse-link-bottom float-end"  @click.prevent="minimize"><span class="glyphicon glyphicon-chevron-up"></span></a>
-                <div :class="{'row':true,'collapse':true, 'in':isExpanded}" style="margin-top:10px;" >
+                <div :class="{'row':true,}" style="margin-top:10px;" >
                     <div class="col-sm-12">
                         <slot></slot>
                     </div>
@@ -33,7 +31,7 @@ import HelpText from './help_text.vue'
 import HelpTextUrl from './help_text_url.vue'
 export default {
     name:"group",
-    props:["label", "name", "id", "help_text", "help_text_url", "isRemovable","isPreviewMode"],
+    props:["label", "name", "id", "help_text", "help_text_url", "isRemovable","isPreviewMode","field_data"],
     data:function () {
         return{
             isExpanded:true
@@ -48,10 +46,6 @@ export default {
             this.isExpanded = false;
         }
     },
-    mounted:function () {
-        var vm =this;
-        //$('[data-toggle="tooltip"]').tooltip();
-    }
 }
 </script>
 

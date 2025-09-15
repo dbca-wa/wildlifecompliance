@@ -18,8 +18,8 @@
         </FormSection>
 
         <Group v-if="component.type === 'group'"
-            :field_data="value"
             :label="label"
+            :field_data="value"
             :name="component_name"
             :id="element_id()"
             :help_text="help_text"
@@ -419,6 +419,7 @@ const RendererBlock = {
         return this.renderer_form_data;
     },
     formDataRecord: function() {
+        
         if(this.json_data[this.component_name] == null) {
             this.setFormValue({
                 key: this.component_name,

@@ -15,7 +15,7 @@
             <div class="row header-titles-row">
             
                 <div v-for="(header, index) in component.header"
-                    :class="`col-xs-${getColXSValue(header.colSize)} truncate-text`"
+                    :class="`col-md-${getColXSValue(header.colSize)} truncate-text`"
                     v-bind:key="`expander_header_${component.name}_${index}`">
                         {{ header.label }}
                 </div>
@@ -23,7 +23,7 @@
             <div class="expander-table" v-for="(table, tableIdx) in expanderTables">
                 <div class="row header-row">
                     <div v-for="(header, index) in component.header"
-                        :class="`col-xs-${getColXSValue(header.colSize)}`"
+                        :class="`col-md-${getColXSValue(header.colSize)}`"
                         v-bind:key="`expander_header_${component.name}_${index}`">
                             <span v-if="index===0 && component.expander && component.expander.length>0" :class="`expand-icon ${isExpanded(table) ? 'collapse' : ''}`"
                                 v-on:click="toggleTableVisibility(table)"></span>
@@ -43,7 +43,7 @@
                 </div>
                 <div :class="{'hidden': !isExpanded(table)}">
                     <div class="row expander-row" v-for="(subcomponent, index) in component.expander" v-bind:key="`expander_row_${component.name}_${index}`">
-                        <div class="col-xs-12">
+                        <div class="col-md-12">
                             <renderer-block
                                 :component="subcomponent"
                                 :json_data="value"
@@ -56,8 +56,10 @@
             </div>
         </div>
         <div class="row" v-if="!readonly">
+            <div class="col-md-3">
             <input type="button" value="Add New" class="btn btn-primary add-new-button"
                 @click.prevent="addNewTable">
+            </div>
         </div>
     </div>
 </template>
@@ -206,7 +208,7 @@ const ExpanderTable = {
             }
             return commentLabel;
         }
-    }
+    },
 }
 
 export default ExpanderTable;
@@ -220,11 +222,11 @@ export default ExpanderTable;
     white-space: nowrap;
     background-color: #efefef;
 }
-.horizontal-scrollable > .row > .col-xs-2 {
+.horizontal-scrollable > .row > .col-md-2 {
     display: inline-block;
     float: none;
 }
-.horizontal-scrollable > .expander-table> .row > .col-xs-2 {
+.horizontal-scrollable > .expander-table> .row > .col-md-2 {
     display: inline-block;
     float: none;
 }
