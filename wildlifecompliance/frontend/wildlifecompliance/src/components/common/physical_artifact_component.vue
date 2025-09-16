@@ -853,7 +853,7 @@ export default {
             // department_users
             $(vm.$refs.physical_artifact_officers).select2({
                     minimumInputLength: 2,
-                    "theme": "bootstrap",
+                    "theme": "bootstrap-5",
                     allowClear: true,
                     placeholder:"",
                     ajax: {
@@ -882,7 +882,7 @@ export default {
                 });
             // department_users_custodian
             $(vm.$refs.physical_artifact_custodians).select2({
-                    "theme": "bootstrap",
+                    "theme": "bootstrap-5",
                     allowClear: true,
                     placeholder:"",
                     minimumInputLength: 2,

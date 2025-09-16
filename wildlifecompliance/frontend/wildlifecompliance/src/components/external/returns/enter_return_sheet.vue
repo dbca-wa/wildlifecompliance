@@ -474,7 +474,7 @@ export default {
         let vm = this;
 
         $(vm.$refs.species_selector).select2({
-            "theme": "bootstrap",
+            "theme": "bootstrap-5",
             minimumInputLength: 2,
             placeholder:"Select Species...",
         }).
@@ -490,7 +490,7 @@ export default {
         let vm = this;
 
         $(vm.$refs.activity_filter_selector).select2({
-            "theme": "bootstrap",
+            "theme": "bootstrap-5",
             // placeholder:"Select Species..."
         }).
         on("select2:select",function (e) {

@@ -188,7 +188,7 @@ export default {
             let data = '';
             setTimeout(function (e) {
                    $('#'+vm.selectid).select2({
-                       "theme": "bootstrap",
+                       "theme": "bootstrap-5",
                        tags: true,
                        placeholder:"Select...",
                        minimumInputLength: 3,

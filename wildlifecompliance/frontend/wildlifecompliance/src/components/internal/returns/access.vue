@@ -174,7 +174,7 @@ export default {
             }
             // Assigned officer select
             $(vm.$refs.assigned_to).select2({
-                "theme": "bootstrap",
+                "theme": "bootstrap-5",
                 allowClear: true,
                 placeholder:"Select Officer"
             }).

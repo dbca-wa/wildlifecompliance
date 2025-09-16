@@ -295,7 +295,7 @@ export default {
             let vm = this;
             $(vm.$refs.person_lookup).select2({
                 minimumInputLength: 2,
-                "theme": "bootstrap",
+                "theme": "bootstrap-5",
                 allowClear: true,
                 placeholder:"Select Person",
                 ajax: {
@@ -334,7 +334,7 @@ export default {
             let vm = this;
             // Initialise select2 for organisation
             $(vm.$refs.searchOrg).select2({
-                "theme": "bootstrap",
+                "theme": "bootstrap-5",
                 allowClear: true,
                 placeholder:"Select Organisation"
             }).

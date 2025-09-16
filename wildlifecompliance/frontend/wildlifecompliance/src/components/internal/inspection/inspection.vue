@@ -428,7 +428,7 @@ import filefield from '@common-components/compliance_file.vue';
 import InspectionWorkflow from './inspection_workflow.vue';
 import RelatedItems from "@/components/common/related_items.vue";
 import MapLocation from "../../common/map_location.vue";
-import "select2/dist/css/select2.min.css";
+//import "select2/dist/css/select2.min.css";
 
 import hash from 'object-hash';
 
@@ -1090,7 +1090,7 @@ export default {
 
       // Initialise select2 for officer list
       $(vm.$refs.inspectionteam).select2({
-          "theme": "bootstrap",
+          "theme": "bootstrap-5",
           allowClear: true,
           placeholder:"Select Team Member"
                   }).

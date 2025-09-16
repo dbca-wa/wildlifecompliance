@@ -388,7 +388,7 @@ import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal.vue';
 import Inspection from '../inspection/create_inspection_modal.vue';
 import filefield from '@common-components/compliance_file.vue';
 import RelatedItems from "@/components/common/related_items.vue";
-import "select2/dist/css/select2.min.css";
+//import "select2/dist/css/select2.min.css";
 
 import hash from 'object-hash';
 import Magic from './magic.vue';

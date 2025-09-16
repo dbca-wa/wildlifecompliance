@@ -780,7 +780,7 @@ export default {
             // department_users
             $(vm.$refs.document_artifact_interviewer).select2({
                     minimumInputLength: 2,
-                    "theme": "bootstrap",
+                    "theme": "bootstrap-5",
                     allowClear: true,
                     placeholder:"",
                     ajax: {
