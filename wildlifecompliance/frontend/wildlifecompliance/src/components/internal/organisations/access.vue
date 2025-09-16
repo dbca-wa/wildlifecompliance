@@ -1,7 +1,7 @@
 <template>
 <div class="container" id="internalOrgAccess">
     <div class="row">
-        <h3>Organisation Access Request {{ access.id }}</h3>
+        <h3>Organisation Access Request: {{ access.lodgement_number }}</h3>
         <div class="col-md-4">
             <CommsLogs :comms_url="comms_url" :logs_url="logs_url" comms_add_url="test"/>
             <div class="">
@@ -34,7 +34,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="">
                 <div class="card mb-3">
                     <div class="card-header">
                         Workflow 
@@ -71,46 +71,48 @@
         </div>
         <div class="col-md-8">
             <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3>Organisation Access Request {{ requestType }}</h3>
-                    </div>
-                    <div class="panel-body panel-collapse">
+
+                <FormSection
+                    :form-collapse="false"
+                    :label="`Organisation Access Request ` + requestType"
+                    index="org_access_request"
+                >
+                    <div class="card-body">
                         <div class="row">
                             <div class="col-sm-12">
                                 <form class="form-horizontal" name="access_form">
-                                    <div class="form-group">
-                                        <label for="" class="col-sm-3 control-label">Organisation</label>
+                                    <div class="form-group row">
+                                        <label for="" class="col-sm-3 control-label fw-bold">Organisation</label>
                                         <div class="col-sm-6">
                                             <input type="text" disabled class="form-control" name="name" placeholder="" v-model="access.name">
                                         </div>
                                     </div>   
-                                    <div class="form-group">
-                                        <label for="" class="col-sm-3 control-label">ABN</label>
+                                    <div class="form-group row">
+                                        <label for="" class="col-sm-3 control-label fw-bold">ABN</label>
                                         <div class="col-sm-6">
                                             <input type="text" disabled class="form-control" name="abn" placeholder="" v-model="access.abn">
                                         </div>
                                     </div>   
-                                    <div class="form-group">
-                                        <label for="" class="col-sm-3 control-label">Letter</label>
+                                    <div class="form-group row">
+                                        <label for="" class="col-sm-3 control-label fw-bold">Letter</label>
                                         <div class="col-sm-6">
-                                            <a target="_blank" :href="access.identification"><i class="fa fa-file-pdf-o"></i>&nbsp;Organisation Proof Document</a>
+                                            <a target="_blank" :href="access.identification"><i class="bi bi-file-pdf"></i>&nbsp;Organisation Proof Document</a>
                                         </div>
                                     </div>   
-                                    <div class="form-group" style="margin-top:50px;">
-                                        <label for="" class="col-sm-3 control-label">Phone</label>
+                                    <div class="form-group row" style="margin-top:50px;">
+                                        <label for="" class="col-sm-3 control-label fw-bold">Phone</label>
                                         <div class="col-sm-6">
                                             <input type="text" disabled class="form-control" name="phone" placeholder="" v-model="access.requester.phone_number">
                                         </div>
                                     </div>   
-                                    <div class="form-group">
-                                        <label for="" class="col-sm-3 control-label">Mobile</label>
+                                    <div class="form-group row">
+                                        <label for="" class="col-sm-3 control-label fw-bold">Mobile</label>
                                         <div class="col-sm-6">
                                             <input type="text" disabled class="form-control" name="mobile" placeholder="" v-model="access.requester.mobile_number">
                                         </div>
                                     </div>   
-                                    <div class="form-group">
-                                        <label for="" class="col-sm-3 control-label">Email</label>
+                                    <div class="form-group row">
+                                        <label for="" class="col-sm-3 control-label fw-bold">Email</label>
                                         <div class="col-sm-6">
                                             <input type="text" disabled class="form-control" name="email" placeholder="" v-model="access.requester.email">
                                         </div>
@@ -119,7 +121,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </FormSection>
             </div>
         </div>
     </div>
@@ -129,6 +131,7 @@
  'vue'
 import datatable from '@vue-utils/datatable.vue'
 import CommsLogs from '@common-components/comms_logs.vue'
+import FormSection from "@/components/forms/section_toggle.vue";
 import {
   api_endpoints,
   helpers, fetch_util
@@ -308,7 +311,8 @@ export default {
   },
   components: {
     datatable,
-    CommsLogs
+    CommsLogs,
+    FormSection
   },
   computed: {
     isLoading: function () {
@@ -441,8 +445,9 @@ export default {
             showCancelButton: true,
             confirmButtonText: 'Send Request'
         }).then((result) => {
+            console.log(result)
             if (result) {
-                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result)))
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result.value)))
                 request.then((response) => {
                     swal.fire({
                         title: "Amendment Request",

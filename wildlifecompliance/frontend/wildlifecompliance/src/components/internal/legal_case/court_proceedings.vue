@@ -4,7 +4,7 @@
 
                 <div class="row file-upload-container">
                     <label class="col-md-3">Prosecution Notice</label>
-                    <i style="color:red" class="fa fa-file-pdf-o col-md-1" id="prosecution-notice-icon"></i>
+                    <i style="color:red" class="bi bi-file-pdf col-md-1" id="prosecution-notice-icon"></i>
                     <label class="col-md-3">Attach signed file </label>
                     <div class="col-md-5">
                         <filefield ref="prosecution_notice_document"
@@ -17,7 +17,7 @@
                 </div>
                 <div class="row file-upload-container">
                     <label class="col-md-3">Court Hearing Notice</label>
-                    <i style="color:red" class="fa fa-file-pdf-o col-md-1" id="court-hearing-notice-icon"></i>
+                    <i style="color:red" class="bi bi-file-pdf col-md-1" id="court-hearing-notice-icon"></i>
                     <label class="col-md-3">Attach signed file </label>
                     <div class="col-md-5">
                         <filefield ref="court_hearing_notice_document"

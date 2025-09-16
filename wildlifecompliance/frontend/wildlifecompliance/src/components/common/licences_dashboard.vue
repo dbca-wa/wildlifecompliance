@@ -189,7 +189,7 @@ export default {
                     {
                         data: "licence_document",
                         mRender:function(data,type,full){
-                            return `<a href='#' view-licence='${full.id}'><i style="color:red" class="fa fa-file-pdf-o"></i></a>`;
+                            return `<a href='#' view-licence='${full.id}'><i style="color:red" class="bi bi-file-pdf"></i></a>`;
                         },
                         orderable: false,
                         searchable: false
@@ -945,7 +945,7 @@ export default {
                             ${row.data()['invoice_url'] ?
                             `<tr>
                                 <td class="width_15pc"><strong>Invoice:&nbsp;</strong></td>
-                                <td><a href="${row.data()['invoice_url']}'" target="_blank"><i style="color:red" class="fa fa-file-pdf-o"></i></a></td>
+                                <td><a href="${row.data()['invoice_url']}'" target="_blank"><i style="color:red" class="bi bi-file-pdf"></i></a></td>
                             </tr>` : ' ' } `;
 
                     child_row += `</table>`
