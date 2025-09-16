@@ -57,9 +57,9 @@
                         <FormSection
                             :form-collapse="false"
                             :label=title
-                            :index=title
+                            index="assessor_panel"
                         >
-                            <div class="panel panel-default">
+                            <div class="card-body">
                                 <div v-if="canSendToAssessor" class="row">
                                     <div class="col-sm-10" style="margin-bottom: 10px">
                                             <label class="control-label float-start"  for="Name">Assessor Group</label>
@@ -88,7 +88,6 @@
                         </FormSection>
                         <Conditions
                             :key="`assessor_condition_${selected_activity_tab_id}`"
-                            :final_view_conditions="final_view_conditions"
                             :activity="selectedActivity"/>
                     </div>
                 </div>
@@ -144,12 +143,6 @@ export default {
         Application,
         Conditions,
         SendToAssessor,
-    },
-    props:{
-        final_view_conditions: {
-            type: Boolean,
-            default: false,
-        },
     },
     computed: {
         ...mapGetters([
