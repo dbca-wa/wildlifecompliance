@@ -117,7 +117,7 @@ export const rendererStore = {
             state.form_data[key] = currentValue;
         },
         [REMOVE_FORM_FIELD] (state, key) {
-            Vue.delete(state.form_data, key);
+            delete state.form_data[key];
         },
     },
     actions: {

@@ -1,17 +1,15 @@
 <template lang="html">
     <div v-if="readonly">
-        <div class="radio">
-            <label :id="id">
-                <input ref="radioB" :name="name" disabled type="radio" :value="value" @change="handleChange"  :required="isRequired" :data-conditions="options" :checked="isChecked"/>{{ label}}
-            </label>
+        <div class="radio form-check">
+            <label class="form-check-label" :id="id">{{ label}}</label>
+            <input class="form-check-input" ref="radioB" :name="name" disabled type="radio" :value="value" @change="handleChange"  :required="isRequired" :data-conditions="options" :checked="isChecked"/>            
         </div>
         <input type="hidden" :name="name" :value="savedValue.value"/>
     </div>
     <div v-else>
-        <div class="radio">
-            <label :id="id">
-                <input ref="radioB" :name="name" type="radio" :value="value" @change="handleChange"  :required="isRequired" :data-conditions="options" :checked="isChecked"/>{{ label}}
-            </label>
+        <div class="radio form-check">
+            <label class="form-check-label" :id="id">{{ label}}</label>
+            <input class="form-check-input" ref="radioB" :name="name" type="radio" :value="value" @change="handleChange"  :required="isRequired" :data-conditions="options" :checked="isChecked"/>
         </div>
     </div>
 </template>

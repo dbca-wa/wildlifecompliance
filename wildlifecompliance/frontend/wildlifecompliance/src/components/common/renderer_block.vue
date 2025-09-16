@@ -162,7 +162,7 @@
             :help_text_url="help_text_url"/>
 
         <div class="form-group" v-if="component.type === 'radiobuttons'">
-            <label :id="element_id()" class="inline" style="white-space: pre-line;">{{label}} <HelpTextUrl :help_text_url="help_text_url"/></label>
+            <label :id="element_id()" class="inline fw-bold" style="white-space: pre-line;">{{label}} <HelpTextUrl :help_text_url="help_text_url"/></label>
                 
                 <CommentBlock 
                     :label="label"
@@ -212,7 +212,7 @@
         </div>
 
         <div class="form-group" v-if="component.type === 'declaration'">
-            <label>{{label}}</label>
+            <label class="fw-bold">{{label}}</label>
             <Checkbox
                 :name="component_name"
                 :label="label"
@@ -309,7 +309,6 @@
 
     </span>
 </template>
-
 
 <script>
 import { mapActions, mapGetters } from 'vuex';

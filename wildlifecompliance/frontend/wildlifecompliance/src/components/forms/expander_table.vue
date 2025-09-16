@@ -37,8 +37,8 @@
                                 v-bind:key="`expander_header_contents_${component.name}_${index}`"
                                 />
                             </span>
-                            <a v-if="tableIdx && index == component.header.length-1 && !readonly" class="delete-icon fa fa-trash-o" title="Delete row"
-                                @click.prevent="removeTable(table)"></a>
+                            <button v-if="tableIdx && index == component.header.length-1 && !readonly" title="Delete row" type="button" class="btn btn-danger float-end" style="margin-bottom: 5px"
+                                @click.prevent="removeTable(table)"><i class="bi bi-trash"></i></button>
                     </div>
                 </div>
                 <div :class="{'hidden': !isExpanded(table)}">

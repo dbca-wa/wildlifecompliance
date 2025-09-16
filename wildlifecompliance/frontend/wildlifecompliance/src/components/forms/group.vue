@@ -1,8 +1,8 @@
 <template lang="html">
     <div class="top-buffer bottom-buffer">
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <label :id="id" class="inline">{{label}}</label>
+        <div class="card mb-3">
+            <div class="card-body border-bottom">
+                <label :id="id" class="inline fw-bold">{{label}}</label>
                     <!--<i data-toggle="tooltip" v-if="help_text" data-placement="right" class="fa fa-question-circle" :title="help_text"> &nbsp; </i>-->
                 <div v-if="help_text">
                     <HelpText :help_text="help_text" /> 

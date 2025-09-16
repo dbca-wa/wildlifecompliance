@@ -7,7 +7,7 @@
                 index="applications"
                 :subtitle=subtitle
             >
-                <div class="panel panel-default">
+                <div class="card-body border-bottom">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">

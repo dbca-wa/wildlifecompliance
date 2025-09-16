@@ -1,6 +1,6 @@
 <template lang="html">
     <div class="form-group">
-        <label :id="id" for="label" style="white-space: pre-line;">{{ value }} <HelpTextUrl v-if="help_text_url" :help_text_url="help_text_url" /></label>
+        <label :id="id" class="fw-bold" for="label" style="white-space: pre-line;">{{ value }} <HelpTextUrl v-if="help_text_url" :help_text_url="help_text_url" /></label>
     </div>
 </template>
 
