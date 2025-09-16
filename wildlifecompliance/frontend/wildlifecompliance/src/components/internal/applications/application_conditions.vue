@@ -1,4 +1,26 @@
-<template id="application_conditions">     
+<template id="application_conditions">
+
+        <FormSection
+            :form-collapse="false"
+            label="Proposed Conditions"
+            index="proposed_conditions"
+        >
+            <div class="card-body">
+                <div class="row">
+                <form class="form-horizontal" action="index.html" method="post">
+                    <div class="float-end">
+                        <button v-if="canAddConditions" @click.prevent="addCondition()" style="margin-bottom:10px;" class="btn btn-primary pull-right">Add Condition</button>
+                    </div>
+                </form>
+                </div>
+                <div class="row">
+                    <datatable ref="conditions_datatable" :id="panelBody" :dtOptions="condition_options" :dtHeaders="condition_headers"/>
+                </div>
+            </div>
+        </FormSection>
+        <ConditionDetail ref="condition_detail" :application_id="application.id" :conditions="conditions" :licence_activity_tab="selected_activity_tab_id"
+        :condition="viewedCondition" :purposes="purposes"/>
+
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
