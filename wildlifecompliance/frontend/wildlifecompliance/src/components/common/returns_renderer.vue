@@ -1,26 +1,10 @@
 <template lang="html">
-    <div>
         <h3>{{ displayable_number }}</h3>
         <div class="col-md-4">
 
             <MenuAccess ref="menu_access" v-show="!is_external"></MenuAccess>          
 
         </div>
-
-        <!-- Tabs Layout -->
-        <div class="col-md-8" >
-            <div id="tabs" v-show="displayable_tabs">
-                <ul class="nav nav-pills mb-3" id="tab-section" data-tabs="tabs" >
-                    <li class="nav-item active"><a id="0" class="nav-link" data-toggle="pill" v-on:click="selectReturnsTab(0)">{{tabs[0]}}</a></li>
-                    <li class="nav-item" v-if="returns.has_payment" ><a id="1" class="nav-link" data-toggle="pill" v-on:click="selectReturnsTab(1)">{{tabs[1]}}</a></li>
-                </ul>
-            </div>
-            <div class="tab-content">
-              {{ this.$slots.default }}
-            </div>
-        </div>
-
-    </div>
 </template>
 
 

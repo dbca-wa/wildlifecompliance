@@ -7,7 +7,7 @@
             :form-collapse="false"
             label="Condition Details"
         >                
-            <div class="panel panel-default">
+            <div class="card-body">
                 <div class="col-sm-8">
                     <form class="form-horizontal" name="return_form">
                         <div class="form-group">

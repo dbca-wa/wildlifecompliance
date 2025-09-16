@@ -1,5 +1,5 @@
 <template lang="html">
-    <div>
+    <div class="row">
         <ReturnsRendererForm
             :form_width="form_width"
         />
