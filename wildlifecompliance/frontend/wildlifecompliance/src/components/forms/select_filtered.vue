@@ -5,13 +5,11 @@ search and calls the server api with a filtered_list_url.
 <template lang="html">
     <div>
         <div class="form-group">
-            <label :id="id" for="label" class="inline" style="white-space: pre-line;">{{label}} <HelpTextUrl :help_text_url="help_text_url" /></label>
+            <label :id="id" for="label" class="inline fw-bold" style="white-space: pre-line;">{{label}} <HelpTextUrl :help_text_url="help_text_url" /></label>
 
-            <template v-if="help_text">
+            <div v-if="help_text">
                 <HelpText :help_text="help_text" />
-            </template>
-
-            
+            </div>
 
             <CommentBlock 
                 :label="label"
@@ -19,7 +17,7 @@ search and calls the server api with a filtered_list_url.
                 :field_data="field_data"
                 />
 
-            <template v-if="readonly">
+            <div v-if="readonly">
                 <select v-if="!isMultiple" disabled ref="selectB" :id="selectid" :name="name" class="form-control" :data-conditions="cons" style="width:100%">
                     <!-- <option value="">Select...</option> -->
                     <option v-for="(op, idx1) in species"  :value="op.value" @change="handleChange" :selected="op.value == value" v-bind:key="`value_${op.value}_${idx1}`">{{ op.label }}</option>
@@ -28,14 +26,14 @@ search and calls the server api with a filtered_list_url.
                     <!-- <option value="">Select...</option> -->
                     <option v-for="(op, idx1) in species"  :value="op.value" :selected="multipleSelection(op.value)" v-bind:key="`value_${op.value}_${idx1}`">{{ op.label }}</option>
                 </select>
-                <template v-if="isMultiple">
+                <div v-if="isMultiple">
                     <input v-for="(v, idx2) in value" input type="hidden" :name="name" :value="v" :required="isRequired" v-bind:key="`value_${v}_${idx2}`"/>
-                </template>
-                <template v-else>
+                </div>
+                <div v-else>
                     <input type="hidden" :name="name" :value="value" :required="isRequired"/>
-                </template>
-            </template>
-            <template v-else>
+                </div>
+            </div>
+            <div v-else>
                 <select v-if="!isMultiple" ref="selectB" :id="selectid" :name="name" class="form-control" :data-conditions="cons" style="width:100%" :required="isRequired">
                     <!-- <option value="">Select...</option> -->
                     <option v-for="(op, idx1) in species" :value="op.value" selected="selected" v-bind:key="`value_${op.value}_${idx1}`">{{ op.label }}</option>
@@ -44,7 +42,7 @@ search and calls the server api with a filtered_list_url.
                     <!-- <option value="">Select...</option> -->
                     <option v-for="(op, idx1) in species" :value="op.value" selected="selected" v-bind:key="`value_${op.value}_${idx1}`">{{ op.label }}</option>
                 </select>
-            </template>
+            </div>
         </div>
 
     </div>
@@ -135,7 +133,6 @@ export default {
                         results[i] = specie 
                     }
                 }
-
             }
             else {
 
@@ -191,9 +188,8 @@ export default {
             let data = '';
             setTimeout(function (e) {
                    $('#'+vm.selectid).select2({
-                       "theme": "bootstrap",
+                       "theme": "bootstrap-5",
                        tags: true,
-                    //    allowClear: true,
                        placeholder:"Select...",
                        minimumInputLength: 3,
                        type: 'GET',
@@ -206,19 +202,14 @@ export default {
                         e.stopImmediatePropagation();
                         e.preventDefault();
                         var selected = $(e.currentTarget);
-                        //vm.handleChange(selected[0])
-                        // if( vm.isMultiple){
                         vm.field_data.value = vm.multipleSelected = selected.val();
-                        // }
                    }).
                    on("select2:unselect",function (e) {
                         e.stopImmediatePropagation();
                         e.preventDefault();
                         var selected = $(e.currentTarget);
                         vm.handleChange(selected[0])
-                        // if( vm.isMultiple){
                         vm.field_data.value = vm.multipleSelected = selected.val();
-                        // }
                    });
                    if (vm.value) {
                        vm.handleChange(vm.$refs.selectB);

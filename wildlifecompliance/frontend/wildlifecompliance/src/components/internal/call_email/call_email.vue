@@ -558,7 +558,7 @@
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
-import Vue from "vue";
+ "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 
 import CommsLogs from "@/components/common/comms_logs.vue";
@@ -574,7 +574,7 @@ import CallWorkflow from './call_email_workflow.vue';
 import Offence from '../offence/offence_modal.vue';
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal.vue';
 
-import "select2/dist/css/select2.min.css";
+//import "select2/dist/css/select2.min.css";
 
 import Inspection from '../inspection/create_inspection_modal.vue';
 import RelatedItems from "@/components/common/related_items.vue";

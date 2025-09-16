@@ -19,7 +19,7 @@
                     </tr>
                     <tr>
                         <td><strong>Invoice:</strong></td>
-                        <td><a :href="returns.invoice_url" target="_blank"><i style="color:red" class="fa fa-file-pdf-o"></i></a></td>
+                        <td><a :href="returns.invoice_url" target="_blank"><i style="color:red" class="bi bi-file-pdf"></i></a></td>
                     </tr>
                     </thead>
                 </table>
@@ -36,7 +36,7 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
-import Vue from 'vue'
+ 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import CommsLogs from '@common-components/comms_logs.vue'
 import {

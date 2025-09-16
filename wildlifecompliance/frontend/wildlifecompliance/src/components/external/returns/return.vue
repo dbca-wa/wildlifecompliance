@@ -47,7 +47,7 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
-import Vue from 'vue'
+ 'vue'
 import Returns from '../../returns_form.vue'
 import ReturnSheet from './enter_return_sheet.vue'
 import ReturnQuestion from './enter_return_question.vue'

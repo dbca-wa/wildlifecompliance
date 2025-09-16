@@ -191,7 +191,7 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
-import Vue from 'vue'
+ 'vue'
 import $ from 'jquery'
 import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import SecureBaseLink from '@common-components/securebase_link.vue';

@@ -1,5 +1,5 @@
 <template lang="html">
-    <div>
+    <div class="row">
         <ReturnsRendererForm
             :form_width="form_width"
         />
@@ -8,7 +8,7 @@
 </template>
 
 <script>
-    import Vue from 'vue'
+     'vue'
     import {
   api_endpoints,
   helpers

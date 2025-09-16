@@ -79,11 +79,11 @@ const ExpanderTable = {
         help_text: String,
         help_text_url: String,
         component: {
-            type: Object | null,
+            type: Object,
             required: true
         },
         field_data: {
-            type: Object | null,
+            type: Object,
             required: true
         },
         readonly:Boolean,

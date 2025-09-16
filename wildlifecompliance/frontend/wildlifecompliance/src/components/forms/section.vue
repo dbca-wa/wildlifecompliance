@@ -2,6 +2,7 @@
     <FormSectionToggle
         :form-collapse="false"
         :label=label
+        :index="section_id"
     >
         <div class="panel panel-default" >
           <slot></slot>

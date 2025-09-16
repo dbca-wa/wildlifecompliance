@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import Vue from "vue";
+ "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";

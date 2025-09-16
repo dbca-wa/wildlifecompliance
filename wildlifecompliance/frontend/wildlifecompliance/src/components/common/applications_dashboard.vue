@@ -7,7 +7,7 @@
                 index="applications"
                 :subtitle=subtitle
             >
-                <div class="panel panel-default">
+                <div class="card-body border-bottom">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -168,6 +168,12 @@ export default {
             },
             {
                 data: "payment_status",
+                visible: false,
+                orderable: false,
+                searchable: false // handled by filter_queryset override method - class ApplicationFilterBackend
+            },
+            {
+                data: "all_payments_url",
                 visible: false,
                 orderable: false,
                 searchable: false // handled by filter_queryset override method - class ApplicationFilterBackend
@@ -740,7 +746,7 @@ export default {
                             ${activity_invoice_url ?
                             `<tr>
                                 <td><strong>Invoice:&nbsp;</strong></td>
-                                <td><a href="${activity_invoice_url}'" target="_blank"><i style="color:red" class="fa fa-file-pdf-o"></i></a></td>
+                                <td><a href="${activity_invoice_url}'" target="_blank"><i style="color:red" class="bi bi-file-pdf"></i></a></td>
                             </tr>` : ' ' } `;
 
                     child_row += `</table>`

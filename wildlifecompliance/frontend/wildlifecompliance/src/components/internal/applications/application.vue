@@ -216,61 +216,62 @@
                             <FormSection
                                 :form-collapse="false"
                                 label="Applicant"
+                                index="applicant"
                             >
-                                <div v-if="applicantType == 'org'" class="panel panel-default">
+                                <div v-if="applicantType == 'org'" class="card-body">
                                       <form class="form-horizontal">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Name</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold">Name</label>
                                             <div class="col-sm-6">
                                                 <input disabled type="text" class="form-control" name="applicantName" placeholder="" v-model="application.org_applicant.name">
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label" >ABN/ACN</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold" >ABN/ACN</label>
                                             <div class="col-sm-6">
                                                 <input disabled type="text" class="form-control" name="applicantABN" placeholder="" v-model="application.org_applicant.abn">
                                             </div>
                                           </div>
                                       </form>
                                 </div>
-                                <div v-if="applicantType == 'proxy'" class="panel panel-default">
+                                <div v-if="applicantType == 'proxy'" class="card-body">
                                       <form class="form-horizontal">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Given Name(s)</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold">Given Name(s)</label>
                                             <div class="col-sm-6">
                                                 <input disabled type="text" class="form-control" name="applicantName" placeholder="" v-model="application.proxy_applicant.first_name">
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Surname</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold">Surname</label>
                                             <div class="col-sm-6">
                                                 <input disabled type="text" class="form-control" name="applicantName" placeholder="" v-model="application.proxy_applicant.last_name">
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label" >Date of Birth</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold" >Date of Birth</label>
                                             <div class="col-sm-6">
                                                 <input disabled type="text" class="form-control" name="applicantABN" placeholder="" v-model="application.proxy_applicant.dob">
                                             </div>
                                           </div>
                                       </form>
                                 </div>
-                                <div v-if="applicantType == 'submitter'" class="panel panel-default">
+                                <div v-if="applicantType == 'submitter'" class="card-body">
                                       <form class="form-horizontal">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Given Name(s)</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold">Given Name(s)</label>
                                             <div class="col-sm-6">
                                                 <input disabled type="text" class="form-control" name="applicantName" placeholder="" v-model="application.submitter.first_name">
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Surname</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold">Surname</label>
                                             <div class="col-sm-6">
                                                 <input disabled type="text" class="form-control" name="applicantName" placeholder="" v-model="application.submitter.last_name">
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label" >Date of Birth</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold" >Date of Birth</label>
                                             <div class="col-sm-6">
                                                 <input disabled type="text" class="form-control" name="applicantABN" placeholder="" v-model="application.submitter.dob">
                                             </div>
@@ -285,55 +286,56 @@
                             <FormSection
                                 :form-collapse="false"
                                 label="Address Details"
+                                index="address_details"
                             >
-                                <div v-if="applicantType == 'org' && application.org_applicant.address" class="panel panel-default">
+                                <div v-if="applicantType == 'org' && application.org_applicant.address" class="card-body">
                                       <form class="form-horizontal">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Street</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold">Street</label>
                                             <div class="col-sm-6">
                                                 <input disabled type="text" class="form-control" name="street" placeholder="" v-model="application.org_applicant.address.line1">
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label" >Town/Suburb</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold" >Town/Suburb</label>
                                             <div class="col-sm-6">
                                                 <input disabled type="text" class="form-control" name="surburb" placeholder="" v-model="application.org_applicant.address.locality">
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">State</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold">State</label>
                                             <div class="col-sm-2">
                                                 <input disabled type="text" class="form-control" name="country" placeholder="" v-model="application.org_applicant.address.state">
                                             </div>
-                                            <label for="" class="col-sm-2 control-label">Postcode</label>
+                                            <label for="" class="col-sm-2 control-label fw-bold">Postcode</label>
                                             <div class="col-sm-2">
                                                 <input disabled type="text" class="form-control" name="postcode" placeholder="" v-model="application.org_applicant.address.postcode">
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label" >Country</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold" >Country</label>
                                             <div class="col-sm-4">
                                                 <input disabled type="text" class="form-control" name="country" v-model="application.org_applicant.address.country"/>
                                             </div>
                                           </div>
                                        </form>
                                 </div>
-                                <div v-if="applicantType == 'proxy' && application.proxy_applicant.residential_address" class="panel panel-default">
+                                <div v-if="applicantType == 'proxy' && application.proxy_applicant.residential_address" class="card-body">
                                       <form class="form-horizontal">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Street</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold">Street</label>
                                             <div class="col-sm-6">
                                                 <input disabled type="text" class="form-control" name="street" placeholder="" v-model="application.proxy_applicant.residential_address.line1">
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label" >Town/Suburb</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold" >Town/Suburb</label>
                                             <div class="col-sm-6">
                                                 <input disabled type="text" class="form-control" name="surburb" placeholder="" v-model="application.proxy_applicant.residential_address.locality">
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">State</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold">State</label>
                                             <div class="col-sm-2">
                                                 <input disabled type="text" class="form-control" name="country" placeholder="" v-model="application.proxy_applicant.residential_address.state">
                                             </div>
@@ -342,30 +344,30 @@
                                                 <input disabled type="text" class="form-control" name="postcode" placeholder="" v-model="application.proxy_applicant.residential_address.postcode">
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label" >Country</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold" >Country</label>
                                             <div class="col-sm-4">
                                                 <input disabled type="text" class="form-control" name="country" v-model="application.proxy_applicant.residential_address.country"/>
                                             </div>
                                           </div>
                                        </form>
                                 </div>
-                                <div v-if="applicantType == 'submitter' && application.submitter.residential_address" class="panel panel-default">
+                                <div v-if="applicantType == 'submitter' && application.submitter.residential_address" class="card-body">
                                       <form class="form-horizontal">
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Street</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold">Street</label>
                                             <div class="col-sm-6">
                                                 <input disabled type="text" class="form-control" name="street" placeholder="" v-model="application.submitter.residential_address.line1">
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label" >Town/Suburb</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold" >Town/Suburb</label>
                                             <div class="col-sm-6">
                                                 <input disabled type="text" class="form-control" name="surburb" placeholder="" v-model="application.submitter.residential_address.locality">
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">State</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold">State</label>
                                             <div class="col-sm-2">
                                                 <input disabled type="text" class="form-control" name="country" placeholder="" v-model="application.submitter.residential_address.state">
                                             </div>
@@ -374,8 +376,8 @@
                                                 <input disabled type="text" class="form-control" name="postcode" placeholder="" v-model="application.submitter.residential_address.postcode">
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label" >Country</label>
+                                          <div class="form-group row">
+                                            <label for="" class="col-sm-3 control-label fw-bold" >Country</label>
                                             <div class="col-sm-4">
                                                 <input disabled type="text" class="form-control" name="country" v-model="application.submitter.residential_address.country"/>
                                             </div>
@@ -390,49 +392,50 @@
                             <FormSection
                                 :form-collapse="false"
                                 label="Contact Details"
+                                index="contact_details"
                             >
-                                <div v-if="applicantType == 'org'" class="panel panel-default">
+                                <div v-if="applicantType == 'org'" class="card-body">
                                     <table ref="contacts_datatable" :id="contacts_table_id" class="hover table table-striped table-bordered dt-responsive" cellspacing="0" width="100%">
                                     </table>
                                 </div>
-                                <div v-if="applicantType == 'proxy'" class="panel panel-default">
+                                <div v-if="applicantType == 'proxy'" class="card-body">
                                   <form class="form-horizontal">
-                                      <div class="form-group">
-                                        <label for="" class="col-sm-3 control-label">Phone</label>
+                                      <div class="form-group row">
+                                        <label for="" class="col-sm-3 control-label fw-bold">Phone</label>
                                         <div class="col-sm-6">
                                             <input disabled type="text" class="form-control" name="applicantPhoneNumber" placeholder="" v-model="application.proxy_applicant.phone_number">
                                         </div>
                                       </div>
-                                      <div class="form-group">
-                                        <label for="" class="col-sm-3 control-label">Mobile</label>
+                                      <div class="form-group row">
+                                        <label for="" class="col-sm-3 control-label fw-bold">Mobile</label>
                                         <div class="col-sm-6">
                                             <input disabled type="text" class="form-control" name="applicantMobileNumber" placeholder="" v-model="application.proxy_applicant.mobile_number">
                                         </div>
                                       </div>
-                                      <div class="form-group">
-                                        <label for="" class="col-sm-3 control-label" >Email</label>
+                                      <div class="form-group row">
+                                        <label for="" class="col-sm-3 control-label fw-bold" >Email</label>
                                         <div class="col-sm-6">
                                             <input disabled type="text" class="form-control" name="applicantEmail" placeholder="" v-model="application.proxy_applicant.email">
                                         </div>
                                       </div>
                                   </form>
                                 </div>
-                                <div v-if="applicantType == 'submitter'" class="panel panel-default">
+                                <div v-if="applicantType == 'submitter'" class="card-body">
                                   <form class="form-horizontal">
-                                      <div class="form-group">
-                                        <label for="" class="col-sm-3 control-label">Phone</label>
+                                      <div class="form-group row">
+                                        <label for="" class="col-sm-3 control-label fw-bold">Phone</label>
                                         <div class="col-sm-6">
                                             <input disabled type="text" class="form-control" name="applicantPhoneNumber" placeholder="" v-model="application.submitter.phone_number">
                                         </div>
                                       </div>
-                                      <div class="form-group">
-                                        <label for="" class="col-sm-3 control-label">Mobile</label>
+                                      <div class="form-group row">
+                                        <label for="" class="col-sm-3 control-label fw-bold">Mobile</label>
                                         <div class="col-sm-6">
                                             <input disabled type="text" class="form-control" name="applicantMobileNumber" placeholder="" v-model="application.submitter.mobile_number">
                                         </div>
                                       </div>
-                                      <div class="form-group">
-                                        <label for="" class="col-sm-3 control-label" >Email</label>
+                                      <div class="form-group row">
+                                        <label for="" class="col-sm-3 control-label fw-bold" >Email</label>
                                         <div class="col-sm-6">
                                             <input disabled type="text" class="form-control" name="applicantEmail" placeholder="" v-model="application.submitter.email">
                                         </div>
@@ -447,8 +450,9 @@
                         <FormSection
                             :form-collapse="false"
                             label="Check List"
+                            index="check_list"
                         >
-                            <div class="panel panel-default">
+                            <div class="card-body">
                                 <div class="row">
                                     <div class="col-sm-4">ID Check</div>
                                     <div class="col-sm-4">
@@ -509,9 +513,8 @@
                                     {{ this.$slots.default }}
 
                                     <div v-if="showNavBarBottom" class="row" style="margin-bottom:50px;">
-                                        <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
+                                        <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5; display: block; ">
                                             <div class="navbar-inner">
-                                                <div class="container">
                                                     <p class="float-end" style="margin-top:5px;">
                                                         <span style="margin-right: 5px; font-size: 18px; display: block;" v-if="updatedFee" >
                                                             <strong>Updated application fee: {{toCurrency(application.application_fee)}}</strong>
@@ -521,7 +524,6 @@
                                                         <button v-else-if="showSpinner && !showRequestSpinner" type="button" class="btn btn-primary" ><i class="fa fa-spinner fa-spin"/>Saving</button>                                                    
                                                         <button v-else="!applicationIsDraft && canSaveApplication" class="btn btn-primary" @click.prevent="save_button()">Save Changes</button>
                                                     </p>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -551,6 +553,7 @@
                     <FormSection
                         :form-collapse="false"
                         label="Decision"
+                        index="decision"
                     >
                         <div class="panel panel-default">
                             <div v-for="activity in application.activities.filter(activity => ['issue_refund','issued'].includes(activity.decision_action))">
@@ -1354,10 +1357,10 @@ export default {
                         this.missing_fields.push(missing_field)
                     }
                     this.highlight_missing_fields()
-                    var top = ($('#error').offset() || { "top": NaN }).top;
+                    /*var top = ($('#error').offset() || { "top": NaN }).top;
                     $('html, body').animate({
                         scrollTop: top
-                    }, 1);
+                    }, 1);*/
                     return false;
                 }
                 swal.fire(
@@ -1374,9 +1377,9 @@ export default {
                 $(`[name=${missing_field.name}`).addClass('missing-field');
             }
             var top = ($('#error').offset() || { "top": NaN }).top;
-            $('html, body').animate({
+            /*$('html, body').animate({
                 scrollTop: top
-            }, 1);
+            }, 1);*/
         },
         save_button: async function() {
             await this.save()
@@ -1689,7 +1692,7 @@ export default {
             }
             // Assigned officer select
             $(vm.$refs.assigned_officer).select2({
-                "theme": "bootstrap",
+                "theme": "bootstrap-5",
                 allowClear: true,
                 placeholder:"Select Officer"
             }).

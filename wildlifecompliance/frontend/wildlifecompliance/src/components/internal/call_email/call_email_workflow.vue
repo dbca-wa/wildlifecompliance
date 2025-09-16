@@ -364,7 +364,7 @@ export default {
         $(document).ready(function() {
             //$(vm.$refs.referrerList).select2();
             $(vm.$refs.referrerList).select2({
-                "theme": "bootstrap",
+                "theme": "bootstrap-5",
                 allowClear: true,
                 placeholder:"Select Referrer"
                         }).

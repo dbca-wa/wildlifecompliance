@@ -1,4 +1,3 @@
-import Vue from 'vue'
 import { createRouter, createWebHistory } from 'vue-router';
 import Organisations from '@/components/user/manage_organisations.vue'
 import ManageOrganisation from '@/components/external/organisations/manage.vue'

@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import Vue from "vue";
+ "vue";
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";

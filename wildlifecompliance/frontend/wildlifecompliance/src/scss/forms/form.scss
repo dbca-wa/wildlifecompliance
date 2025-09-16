@@ -20,7 +20,7 @@ $sections-menu-width: 249px;
 .sections-dropdown {
 
     @media only screen and (max-width: $tablet-screen-size) {
-        display: none;
+        //display: none;
     }
 
     a {
@@ -89,4 +89,12 @@ $sections-menu-width: 249px;
   color: white;
   background-color: blue;
   border: 1px solid #888888;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.btn {
+    margin-right: 5px;
 }

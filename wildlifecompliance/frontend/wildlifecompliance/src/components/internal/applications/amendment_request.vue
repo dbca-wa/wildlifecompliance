@@ -49,7 +49,7 @@
 
 <script>
 //import $ from 'jquery'
-import Vue from 'vue'
+ 'vue'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import {helpers, api_endpoints, fetch_util} from "@/utils/hooks.js"
@@ -210,7 +210,7 @@ export default {
             
             // Intialise select2
             $(vm.$refs.reason).select2({
-                "theme": "bootstrap",
+                "theme": "bootstrap-5",
                 allowClear: true,
                 placeholder:"Select Reason"
             }).

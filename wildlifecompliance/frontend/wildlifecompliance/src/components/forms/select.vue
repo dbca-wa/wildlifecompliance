@@ -1,7 +1,7 @@
 <template lang="html">
     <div>
         <div class="form-group">
-            <label :id="id" style="white-space: pre-line;">{{label}} <HelpTextUrl :help_text_url="help_text_url" /></label>
+            <label :id="id" style="white-space: pre-line;" class="fw-bold">{{label}} <HelpTextUrl :help_text_url="help_text_url" /></label>
 
             <template v-if="help_text">
                 <HelpText :help_text="help_text" />
@@ -103,7 +103,7 @@ export default {
             let vm =this;
             setTimeout(function (e) {
                    $('#'+vm.selectid).select2({
-                       "theme": "bootstrap",
+                       "theme": "bootstrap-5",
                        allowClear: true,
                        placeholder:"Select..."
                    }).

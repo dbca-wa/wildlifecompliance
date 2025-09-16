@@ -11,6 +11,7 @@
                         <FormSection
                             :form-collapse="false"
                             label="Assessment Details"
+                            index="assessment_details"
                         >
                             <div class="panel panel-default">
                                 <form class="form-horizontal" name="assessment_form" method="put">
@@ -56,8 +57,9 @@
                         <FormSection
                             :form-collapse="false"
                             :label=title
+                            index="assessor_panel"
                         >
-                            <div class="panel panel-default">
+                            <div class="card-body">
                                 <div v-if="canSendToAssessor" class="row">
                                     <div class="col-sm-10" style="margin-bottom: 10px">
                                             <label class="control-label float-start"  for="Name">Assessor Group</label>
@@ -84,12 +86,9 @@
                                 </div>
                             </div>
                         </FormSection>
-                        <div :id="`${selectedActivity.id}`" class="tab-pane fade in">
-                            <Conditions
-                                :key="`assessor_condition_${selected_activity_tab_id}`"
-                                :final_view_conditions="final_view_conditions"
-                                :activity="selectedActivity"/>
-                        </div>
+                        <Conditions
+                            :key="`assessor_condition_${selected_activity_tab_id}`"
+                            :activity="selectedActivity"/>
                     </div>
                 </div>
             </div>
@@ -145,12 +144,6 @@ export default {
         Conditions,
         SendToAssessor,
     },
-    props:{
-        final_view_conditions: {
-            type: Boolean,
-            default: false,
-        },
-    },
     computed: {
         ...mapGetters([
             'application',
@@ -181,7 +174,6 @@ export default {
             }
         },
         relevantAssessorGroup: function() {
-            console.log(this.assessorGroup)
             let relevantAssessors = [];
             this.assessorGroup.forEach(assessor => {
                 if (this.isAssessorRelevant(assessor)) {

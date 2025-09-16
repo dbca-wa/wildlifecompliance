@@ -6,33 +6,32 @@
         <FormSection
             :form-collapse="false"
             label="Condition Details"
+            index="condition_details"
         >                
-            <div class="panel panel-default">
-                <div class="col-sm-8">
+            <div class="card-body">
                     <form class="form-horizontal" name="return_form">
-                        <div class="form-group">
-                            <label for="" class="col-sm-3 control-label">Licence Activity</label>
+                        <div class="form-group row">
+                            <label for="" class="col-sm-3 control-label fw-bold">Licence Activity</label>
                             <div class="col-sm-6" v-if='returns.condition'>
                                 {{returns.condition.licence_activity.name}}
                             </div>                         
                             <div class="col-sm-6" v-else> &nbsp;</div>                        
                         </div>
-                        <div class="form-group">
-                            <label for="" class="col-sm-3 control-label">Condition</label>
+                        <div class="form-group row">
+                            <label for="" class="col-sm-3 control-label fw-bold">Condition</label>
                             <div class="col-sm-6" v-if='returns.condition'>
                                 <textarea disabled class="form-control" name="details" placeholder="" v-model="returns.condition.condition"></textarea>
                             </div>
                             <div class="col-sm-6" v-else> &nbsp;</div>
                         </div>
-                        <div class="form-group">
-                            <label for="" class="col-sm-3 control-label">Due Date</label>
+                        <div class="form-group row">
+                            <label for="" class="col-sm-3 control-label fw-bold">Due Date</label>
                             <div class="col-sm-6" v-if='returns.condition'>
                                 {{returns.condition.due_date}}
                             </div>
                             <div class="col-sm-6" v-else> &nbsp;</div>
                         </div>
                     </form>
-                </div>
             </div>
         </FormSection>
 
@@ -43,32 +42,28 @@
         <!-- End template for Return Tab -->
 
         <div v-show="showSaveAndContinueButton" class="row" style="margin-bottom:50px;">
-            <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
+            <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5; display: block;">
                 <div class="navbar-inner">
-                    <div class="container">
                         <p class="float-end" style="margin-top:5px;">
-                            <button v-if="spinner_exit" style="width:150px;" disabled class="btn btn-primary btn-md"><i class="fa fa-spin fa-spinner"></i>&nbsp;Saving</button>
-                            <button v-else-if="!spinner_exit && disable_exit" style="width:150px;" disabled class="btn btn-primary btn-md" name="save_exit">Save and Exit</button>
+                            <button v-if="spinner_exit" disabled class="btn btn-primary btn-md"><i class="fa fa-spin fa-spinner"></i>&nbsp;Saving</button>
+                            <button v-else-if="!spinner_exit && disable_exit" disabled class="btn btn-primary btn-md" name="save_exit">Save and Exit</button>
                             <button v-else style="width:150px;" class="btn btn-primary btn-md" @click.prevent="saveandcontinue(false)" name="save_exit">Save and Exit</button>
 
-                            <button v-if="spinner_continue" style="width:150px;"  disabled class="btn btn-primary btn-md"><i class="fa fa-spin fa-spinner"></i>&nbsp;Saving</button>
-                            <button v-else-if="!spinner_continue && disable_continue" disabled style="width:150px;" class="btn btn-primary btn-md" name="save_continue">Save and Continue</button>
-                            <button v-else style="width:150px;" class="btn btn-primary btn-md" @click.prevent="saveandcontinue(true)" name="save_continue">Save and Continue</button>
+                            <button v-if="spinner_continue" disabled class="btn btn-primary btn-md"><i class="fa fa-spin fa-spinner"></i>&nbsp;Saving</button>
+                            <button v-else-if="!spinner_continue && disable_continue" disabled class="btn btn-primary btn-md" name="save_continue">Save and Continue</button>
+                            <button v-else class="btn btn-primary btn-md" @click.prevent="saveandcontinue(true)" name="save_continue">Save and Continue</button>
                         </p>
-                    </div>
                 </div>
             </div>
         </div>
 
         <div v-show="showSaveButton" class="row" style="margin-bottom:50px;">
-            <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
+            <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5; display: block; ">
                 <div class="navbar-inner">
-                    <div class="container">
                         <p class="float-end" style="margin-top:5px;">
                             <button v-if="showSpinner" type="button" class="btn btn-primary" ><i class="fa fa-spinner fa-spin"/>Saving</button>                                                    
                             <button v-else style="width:150px;" class="btn btn-primary btn-md" @click.prevent="save()" name="save_exit">Save Changes</button>
                         </p>
-                    </div>
                 </div>
             </div>
         </div>
@@ -81,7 +76,7 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
-import Vue from 'vue'
+ 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import Returns from '../../returns_form.vue'
 import ReturnQuestion from '../../external/returns/enter_return_question.vue'

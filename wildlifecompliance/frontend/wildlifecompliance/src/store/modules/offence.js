@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import {
     api_endpoints,
     helpers, fetch_util

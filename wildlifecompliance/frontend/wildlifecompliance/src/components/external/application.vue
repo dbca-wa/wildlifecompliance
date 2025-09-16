@@ -9,16 +9,16 @@
                     </li>
                 </ul>
             </div>
-
               <Application v-if="isApplicationLoaded">
-
-                <div :class="`${form_width ? form_width : 'col-md-9'}`" id="tabs">
+                <div class="row">
+                  
+                  <div id="tabs">
                     <ul class="nav nav-pills mb-3" id="tabs-section" data-tabs="tabs">
                         <li class="nav-item" v-for="(activity, index) in listVisibleActivities">
-                            <a :class="{'nav-link amendment-highlight': application.has_amendment}"
-                                data-toggle="pill" v-on:click="selectTab(activity)">{{activity.label}}</a>
+                            <a :class="{'nav-link amendment-highlight': application.has_amendment}" class="nav-link"
+                                data-bs-toggle="pill" v-on:click="selectTab(activity)">{{activity.label}}</a>
                         </li>
-                    </ul>
+                    </ul>         
                     <div class="tab-content">
                         <div v-for="(activity, index) in allCurrentActivities">
                             <AmendmentRequestDetails :activity_id="activity.id" />
@@ -30,15 +30,15 @@
                         </div>
                         {{ this.$slots.default }}
                     </div>
+                  </div>
                 </div>
-           
                 <input type="hidden" name="csrfmiddlewaretoken" :value="csrf_token"/>
                 <input type='hidden' name="schema" :value="JSON.stringify(application)" />
                 <input type='hidden' name="application_id" :value="1" />
                 <div v-if="!application.readonly && userCanSubmit" class="row" style="margin-bottom:50px;">
-                    <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
+                    <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5; display:block;">
                         <div class="navbar-inner">
-                            <div class="container">
+                            
                                 <p class="float-end" style="margin-top:5px;">
                                     <span v-if="showCardPayButton || showCashPayButton" style="margin-right: 5px; font-size: 18px; display: block;">
                                         <strong>Estimated application fee: {{toCurrency(adjusted_application_fee)}}</strong>
@@ -53,7 +53,7 @@
                                     <input v-show="showNonePayButton" type="button" @click.prevent="submit_and_record" class="btn btn-primary" value="Migrate"/>                   
                                     <button v-if="isProcessing" disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Processing</button>
                                 </p>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -76,7 +76,7 @@
 <script>
 import { v4 as uuid } from 'uuid';
 import Application from '../form.vue'
-import Vue from 'vue'
+ 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import AmendmentRequestDetails from '@/components/forms/amendment_request_details.vue';
 import {
@@ -268,7 +268,7 @@ export default {
       this.missing_fields.length = 0;
       this.highlight_missing_fields();
 
-      let request = await this.saveFormData({ url: this.application_form_data_url, draft: true , submit: is_submitting});
+      let request = this.saveFormData({ url: this.application_form_data_url, draft: true , submit: is_submitting});
       request.then(res=>{
         this.isProcessing = false;
         is_saved = true;
@@ -279,10 +279,10 @@ export default {
                 this.missing_fields.push(missing_field)
             }
             this.highlight_missing_fields()
-            var top = ($('#error').offset() || { "top": NaN }).top;
+            /*var top = ($('#error').offset() || { "top": NaN }).top;
             $('html, body').animate({
                 scrollTop: top
-            }, 1);
+            }, 1);*/
         }
 
         swal.fire(
@@ -316,10 +316,10 @@ export default {
           $(`[name=${missing_field.name}`).addClass('missing-field');
       }
 
-      var top = ($('#error').offset() || { "top": NaN }).top;
+      /*var top = ($('#error').offset() || { "top": NaN }).top;
       $('html, body').animate({
           scrollTop: top
-      }, 1);
+      }, 1);*/
     },
     submit: async function(){
         let vm = this;

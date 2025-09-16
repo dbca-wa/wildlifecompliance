@@ -154,7 +154,7 @@ export default {
             vm.multipleSelected = vm.field_data.value;
             setTimeout(function (e) {
                    $('#'+vm.selectid).select2({
-                       "theme": "bootstrap",
+                       "theme": "bootstrap-5",
                        allowClear: true,
                        placeholder:"Select..."
                    }).

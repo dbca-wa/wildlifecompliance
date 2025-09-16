@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="">Species Available:</label>
+                        <label for="" class="fw-bold">Species Available:</label>
                         <select required v-if="returns.species" class="form-control" ref="species_selector" name="species_selector" id="species_selector">
                           <option v-if="Object.values(returns.species_saved).length === 0" value="" disabled selected></option>
                           <option class="change-species" v-for="(specie, s_idx) in returns.species_list" :value="s_idx" :selected="s_idx === specie_selection" :species_id="s_idx" v-bind:key="`specie_${s_idx}`" >{{specie}}</option>
@@ -24,7 +24,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="form-group">
-                        <label for="">Species already added for this Return:</label>
+                        <label for="" class="fw-bold">Species already added for this Return:</label>
                         <div v-show="true" v-for="(specie, a_idx) in returns.species_saved" v-bind:key="`selected_${a_idx}`" >
                           <span v-if='a_idx === returns.species'>&nbsp;&nbsp;&nbsp;{{specie}}</span>
                           <button v-else class="btn btn-link" :name="`specie_link_${a_idx}`" @click.prevent="getSheetSpecies(a_idx)" >{{specie}}</button>
@@ -35,7 +35,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="">Activity Type:</label>
+                        <label for="" class="fw-bold">Activity Type:</label>
                         <select ref="activity_filter_selector" name="activity_filter_selector" class="form-control" v-model="filterActivityType">
                             <option value="All">All</option>
                             <option v-for="(sa, sa_idx) in sheet_activity_type" :value="sa['label']" v-bind:key="`sa_type_${sa_idx}`">{{sa['label']}}</option>
@@ -60,7 +60,7 @@ import { v4 as uuid } from 'uuid';
 import datatable from '@vue-utils/datatable.vue'
 import utils from '@/components/external/utils'
 import $ from 'jquery'
-import Vue from 'vue'
+ 'vue'
 import Returns from '../../returns_form.vue'
 import { mapActions, mapGetters } from 'vuex'
 import CommsLogs from '@common-components/comms_logs.vue'
@@ -474,7 +474,7 @@ export default {
         let vm = this;
 
         $(vm.$refs.species_selector).select2({
-            "theme": "bootstrap",
+            "theme": "bootstrap-5",
             minimumInputLength: 2,
             placeholder:"Select Species...",
         }).
@@ -490,7 +490,7 @@ export default {
         let vm = this;
 
         $(vm.$refs.activity_filter_selector).select2({
-            "theme": "bootstrap",
+            "theme": "bootstrap-5",
             // placeholder:"Select Species..."
         }).
         on("select2:select",function (e) {

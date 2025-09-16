@@ -253,11 +253,7 @@ export default {
     props: {
         application: Object,
         licence_activity_tab:Number,
-        applicantType:String,
-        final_view_conditions: {
-            type: Boolean,
-            default: false,
-        },        
+        applicantType:String,     
     },
     data: function() {
         let vm = this;

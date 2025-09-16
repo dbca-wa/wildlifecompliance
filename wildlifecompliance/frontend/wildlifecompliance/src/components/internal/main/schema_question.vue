@@ -669,7 +669,7 @@ export default {
         initQuestionSelector: function () {
                 const self = this;
                 $(self.$refs.select_question).select2({
-                    "theme": "bootstrap",
+                    "theme": "bootstrap-5",
                     allowClear: true,
                     minimumInputLength: 2,
                     placeholder:"Select Question..."
@@ -690,7 +690,7 @@ export default {
         initParentSelector: function () {
                 const self = this;
                 $(self.$refs.select_parent).select2({
-                    "theme": "bootstrap",
+                    "theme": "bootstrap-5",
                     allowClear: true,
                     minimumInputLength: 2,
                     placeholder:"Select Parent Question..."
@@ -710,7 +710,7 @@ export default {
         // initAnswerSelector: function () {
         //         const self = this;
         //         $(self.$refs.select_answer).select2({
-        //             "theme": "bootstrap",
+        //             "theme": "bootstrap-5",
         //             allowClear: true,
         //             minimumInputLength: 2,
         //             placeholder:"Select Parent Answer..."
@@ -728,7 +728,7 @@ export default {
         initGroupSelector: function () {
                 const self = this;
                 $(self.$refs.select_group).select2({
-                    "theme": "bootstrap",
+                    "theme": "bootstrap-5",
                     allowClear: true,
                     minimumInputLength: 2,
                     placeholder:"Select Section Group..."

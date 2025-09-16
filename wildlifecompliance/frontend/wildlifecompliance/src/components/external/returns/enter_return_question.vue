@@ -23,7 +23,7 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
-import Vue from 'vue'
+ 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import CommsLogs from '@common-components/comms_logs.vue'
 import AmendmentRequestDetails from './return_amendment.vue';

@@ -79,7 +79,7 @@
 </template>
 <script>
 import $ from 'jquery'
-import Vue from 'vue'
+ 'vue'
 import { mapActions, mapGetters } from 'vuex';
 import datatable from '@vue-utils/datatable.vue'
 import CommsLogs from '@common-components/comms_logs.vue'
@@ -174,7 +174,7 @@ export default {
             }
             // Assigned officer select
             $(vm.$refs.assigned_to).select2({
-                "theme": "bootstrap",
+                "theme": "bootstrap-5",
                 allowClear: true,
                 placeholder:"Select Officer"
             }).

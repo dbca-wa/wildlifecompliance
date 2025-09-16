@@ -12,27 +12,14 @@
         <div class="repeatable-group" v-for="(group, groupIdx) in repeatableGroups" 
             :id="`repeatable_group_${component.name}_${groupIdx}`"
             v-bind:key="`repeatable_group_${component.name}_${groupIdx}`">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <label :id="`${id}_${groupIdx}`" class="inline">{{label}} {{add_1(groupIdx)}}</label>
-                    <a class="collapse-link-top float-end" @click.prevent="toggleGroupVisibility(group)">
-                        <span v-if="isExpanded(group)" class="glyphicon glyphicon-chevron-down"></span>
-                        <span v-else class="glyphicon glyphicon-chevron-up"></span>
-                    </a>
-                </div>
 
-                <div class="panel-body">
-                    <!-- DEBUGGING
-                    <p> name: {{name}} </p>
-                    <p> value: {{value}} </p>
-                    <p> component: {{component}} </p>
-                    <p> children: {{component.children}} </p>
-                    <p> {{groupIdx}} group: {{group}} </p>
-                    <p> {{groupIdx}} value: {{value}} </p>
-                    <p> Expanded: {{ !isExpanded(group) }} </p>
-                    -->
-
-                    <div :class="{'collapse':true, 'in':!isExpanded(group)}" style="margin-top:10px;" >
+            <FormSection
+                :form-collapse="isExpanded(group)"
+                :label="label +` `+ add_1(groupIdx)"
+                :index="`repeatable_group_${component.name}_${groupIdx}`"
+            >
+                <div class="card-body border-bottom">
+                    <div style="margin-top:10px;" >
 
                         <div v-for="(subcomponent, index) in components[group].children"
                             v-bind:key="`repeatable_group_subcomponent_${subcomponent.name}_${index}`">
@@ -51,12 +38,15 @@
 
                     </div>
                 </div>
-            </div>
+
+            </FormSection>
         </div>
 
         <div class="row" v-if="component.isRepeatable && !readonly">
+            <div class="col-md-6">
             <button type="button" class="btn btn-primary add-new-button"
                 @click.prevent="addNewGroup">Add {{label}}</button>
+            </div>
         </div>
 
     </div>
@@ -66,28 +56,41 @@
 import HelpText from './help_text.vue';
 import HelpTextUrl from './help_text_url.vue';
 import { mapGetters, mapActions } from 'vuex';
+import FormSection from "@/components/forms/section_toggle.vue";
 
 const Group2 = {
     props:{
-        name: String,
-        label: String,
-        id: String,
-        isRequired: String,
-        help_text: String,
-        help_text_url: String,
+        name: {
+            type: String,
+        },
+        label: {
+            type: String,
+        },
+        id: {
+            type: String,
+        },
+        help_text: {
+            type: String,
+        },
+        help_text_url: {
+            type: String,
+        },
         component: {
-            type: Object | null,
+            type: Object,
             required: true
         },
         field_data: {
-            type: Object | null,
+            type: Object,
             required: true
         },
-        readonly:Boolean,
+        readonly: {
+            type:Boolean
+        },
     },
     components: {
         HelpText,
         HelpTextUrl,
+        FormSection,
     },
     data(){
         return {
@@ -107,17 +110,6 @@ const Group2 = {
         isExpanded: function(tableId) {
             return this.expanded[tableId];
         },
-        toggleGroupVisibility: function(tableId) {
-            if(this.expanded[tableId]) {
-                this.$delete(this.expanded, tableId);
-            }
-            else {
-                this.$set(this.expanded, tableId, true);
-            }
-            console.log('toggle: ' + JSON.stringify(this.expanded));
-
-            return this.expanded[tableId];
-        },
         removeGroup: function(tableId) {
             if(this.expanded[tableId]) {
                 this.$delete(this.expanded, tableId);
@@ -129,9 +121,6 @@ const Group2 = {
                 this.existingGroups.filter(table => table != tableId)
             );
             delete this.components[tableId]
-            //console.log("Remove: " + JSON.stringify(this.components))
-            //console.log("*************************************************************")
-            // this.refreshApplicationFees();
         },
         addNewGroup: function(params={}) {
             let { tableId } = params;
@@ -142,7 +131,6 @@ const Group2 = {
             this.updateVisibleGroups(
                 this.existingGroups
             );
-            // this.refreshApplicationFees();
         },
         updateVisibleGroups: function(tableList) {
             this.setFormValue({

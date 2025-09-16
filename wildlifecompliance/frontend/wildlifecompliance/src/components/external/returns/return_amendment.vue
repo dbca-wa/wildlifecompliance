@@ -22,7 +22,7 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
-import Vue from 'vue'
+ 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import helpers from "@/utils/helpers.js";
 

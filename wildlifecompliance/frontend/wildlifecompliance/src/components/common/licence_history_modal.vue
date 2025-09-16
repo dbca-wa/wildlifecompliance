@@ -24,7 +24,7 @@
     </div>
 </template>
 <script>
-import Vue from "vue";
+ "vue";
 import modal from "@/utils/vue/bootstrap-modal.vue";
 import datatable from "@/utils/vue/datatable.vue";
 import alert from '@vue-utils/alert.vue';
@@ -85,7 +85,7 @@ export default {
                     {
                         data:"history_document_url",
                         mRender:function(data,type,full){
-                            return `<a href="${data}" target="_blank"><i style="color:red" class="fa fa-file-pdf-o"></i></a>`;
+                            return `<a href="${data}" target="_blank"><i style="color:red" class="bi bi-file-pdf"></i></a>`;
                         },
                         orderable: false
                     },

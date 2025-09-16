@@ -356,7 +356,7 @@ export default {
             let vm = this;
             // Intialise select2
             $(vm.$refs.standard_req).select2({
-                "theme": "bootstrap",
+                "theme": "bootstrap-5",
                 allowClear: true,
                 minimumInputLength: 2,
                 placeholder:"Select Condition..."
@@ -379,7 +379,7 @@ export default {
             let vm = this;
 
             $(vm.$refs.select_purpose).select2({
-                "theme": "bootstrap",
+                "theme": "bootstrap-5",
                 allowClear: true,
                 placeholder:"Select Purpose..."
             }).

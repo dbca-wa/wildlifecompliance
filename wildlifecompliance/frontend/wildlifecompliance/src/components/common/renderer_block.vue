@@ -9,7 +9,7 @@
         </div>
 
         <FormSection v-if="component.type === 'section'"
-            :label="component.label" :Index="component_name" :id="component_name">
+            :label="label" :Index="component_name" :id="component_name">
                 <renderer-block v-for="(subcomponent, index) in component.children"
                     :component="subcomponent"
                     :instance="instance"
@@ -18,8 +18,8 @@
         </FormSection>
 
         <Group v-if="component.type === 'group'"
+            :label="label"
             :field_data="value"
-            :label="component.label"
             :name="component_name"
             :id="element_id()"
             :help_text="help_text"
@@ -38,7 +38,7 @@
             :name="component_name"
             :component="component"
             :id="element_id()"
-            :label="component.label"
+            :label="label"
             :help_text="help_text"
             :help_text_url="help_text_url"/>
 
@@ -47,7 +47,7 @@
             :name="component_name"
             :field_data="value"
             :id="element_id()"
-            :label="component.label"
+            :label="label"
             :help_text="help_text"
             :readonly="is_readonly"
             :isRequired="component.isRequired"
@@ -58,7 +58,7 @@
             :name="component.name"
             :field_data="value"
             :id="element_id()"
-            :label="component.label"
+            :label="label"
             :help_text="help_text"
             :readonly="is_readonly"
             :isRequired="component.isRequired"
@@ -71,7 +71,7 @@
             :id="element_id()"
             :min="component.min"
             :max="component.max"
-            :label="component.label"
+            :label="label"
             :help_text="help_text"
             :readonly="is_readonly"
             :isRequired="component.isRequired"
@@ -82,7 +82,7 @@
             :name="component_name"
             :field_data="value"
             :id="element_id()"
-            :label="component.label"
+            :label="label"
             :help_text="help_text"
             :readonly="is_readonly"
             :isRequired="component.isRequired"
@@ -92,7 +92,7 @@
             <SelectBlock
                 :readonly="is_readonly"
                 :name="component_name"
-                :label="component.label"
+                :label="label"
                 :field_data="value"
                 :id="element_id()"
                 :options="component.options"
@@ -113,7 +113,7 @@
 
         <SelectBlock v-if="component.type === 'multi-select'"
             :name="component_name"
-            :label="component.label"
+            :label="label"
             :field_data="value"
             :id="element_id()"
             :options="component.options"
@@ -129,7 +129,7 @@
             :name="component_name"
             :field_data="value"
             :id="element_id()"
-            :label="component.label"
+            :label="label"
             :help_text="help_text"
             :isRequired="component.isRequired"
             :help_text_url="help_text_url"/>
@@ -140,7 +140,7 @@
             :name="component_name"
             :field_data="value"
             :id="element_id()"
-            :label="component.label"
+            :label="label"
             :help_text="help_text"
             :isRequired="component.isRequired"
             :help_text_url="help_text_url"/>
@@ -151,21 +151,21 @@
             :name="component_name"
             :component="component"
             :id="element_id()"
-            :label="component.label"
+            :label="label"
             :help_text="help_text"
             :isRequired="component.isRequired"
             :help_text_url="help_text_url"/>
 
         <LabelBlock v-if="component.type === 'label'"
-            :value="component.label"
+            :value="label"
             :id="element_id()"
             :help_text_url="help_text_url"/>
 
         <div class="form-group" v-if="component.type === 'radiobuttons'">
-            <label :id="element_id()" class="inline" style="white-space: pre-line;">{{component.label}} <HelpTextUrl :help_text_url="help_text_url"/></label>
+            <label :id="element_id()" class="inline fw-bold" style="white-space: pre-line;">{{label}} <HelpTextUrl :help_text_url="help_text_url"/></label>
                 
                 <CommentBlock 
-                    :label="component.label"
+                    :label="label"
                     :name="component_name"
                     :field_data="value"
                     /> 
@@ -193,7 +193,7 @@
             <Checkbox
                 :group="component.group"
                 :name="component_name"
-                :label="component.label"
+                :label="label"
                 :id="element_id(1)"
                 :help_text="help_text"
                 :help_text_url="help_text_url"
@@ -212,10 +212,10 @@
         </div>
 
         <div class="form-group" v-if="component.type === 'declaration'">
-            <label>{{component.label}}</label>
+            <label class="fw-bold">{{label}}</label>
             <Checkbox
                 :name="component_name"
-                :label="component.label"
+                :label="label"
                 :field_data="value"
                 :help_text="component.help_text"
                 :handleChange="handleComponentChange(component)"
@@ -229,7 +229,7 @@
 
         <File v-if="component.type === 'file'"
             :name="component_name"
-            :label="component.label"
+            :label="label"
             :field_data="value"
             :id="element_id()"
             :isRepeatable="strToBool(component.isRepeatable)"
@@ -243,7 +243,7 @@
 
         <DateField v-if="component.type === 'date'"
             :name="component_name"
-            :label="component.label"
+            :label="label"
             :field_data="value"
             :id="element_id()"
             :readonly="is_readonly"
@@ -257,7 +257,7 @@
             :headers="component.headers"
             :field_data="component.data"
             :id="element_id()"
-            :label="component.label"
+            :label="label"
             :help_text="help_text"
             :readonly="is_readonly"
             :isRequired="component.isRequired"
@@ -265,7 +265,7 @@
 
         <Species v-if="component.type === 'species'"
             :name="component.name"
-            :label="component.label"
+            :label="label"
             :field_data="value"
             :id="element_id()"
             :options="component.component_attribute"
@@ -278,7 +278,7 @@
             :help_text_url="help_text_url"/>
 
         <SpeciesGroup v-if="component.type === 'species-group'"         
-            :label="component.label"
+            :label="label"
             :name="component_name"
             :id="element_id()"
             :help_text="help_text"
@@ -293,7 +293,7 @@
 
         <SpeciesFiltered v-if="component.type === 'species-all'"
             :name="component.name"
-            :label="component.label"
+            :label="label"
             :field_data="value"
             :id="element_id()"
             :options="component.component_attribute"
@@ -309,7 +309,6 @@
 
     </span>
 </template>
-
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
@@ -390,6 +389,13 @@ const RendererBlock = {
         'isComponentVisible',
         'isComponentEditableForOfficer',
     ]),
+    label: function () {
+        let label = "";
+        if (this.component != undefined && this.component.label != undefined) {
+            label = this.component.label;
+        }
+        return label;
+    },
     is_readonly: function() {
         return this.component.readonly ? this.component.readonly : this.application.readonly ? !this.isComponentEditableForOfficer : this.application.readonly;
     },
@@ -412,6 +418,7 @@ const RendererBlock = {
         return this.renderer_form_data;
     },
     formDataRecord: function() {
+        
         if(this.json_data[this.component_name] == null) {
             this.setFormValue({
                 key: this.component_name,

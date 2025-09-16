@@ -237,7 +237,7 @@
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
-import Vue from "vue";
+ "vue";
 //import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
@@ -780,7 +780,7 @@ export default {
             // department_users
             $(vm.$refs.document_artifact_interviewer).select2({
                     minimumInputLength: 2,
-                    "theme": "bootstrap",
+                    "theme": "bootstrap-5",
                     allowClear: true,
                     placeholder:"",
                     ajax: {

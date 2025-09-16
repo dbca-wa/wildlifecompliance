@@ -1385,7 +1385,7 @@ class DTInternalApplicationSerializer(BaseApplicationSerializer):
     #activities = ApplicationSelectedActivityDashboardSerializer(many=True, read_only=True)
     #activities = ApplicationSelectedActivitySerializer(many=True, read_only=True)
     payment_url = serializers.SerializerMethodField(read_only=True)
-    all_payments_url = serializers.SerializerMethodField(read_only=True)                                   # 1.7s
+    #all_payments_url = serializers.SerializerMethodField(read_only=True)                                   # 1.7s
     can_view_richtext_src = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
