@@ -217,7 +217,7 @@
 <script>
 import { v4 as uuid } from 'uuid';
 //import $ from 'jquery'
- 'vue'
+ 
 import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
 import AddContact from '@common-components/add_contact.vue'

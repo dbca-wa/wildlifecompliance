@@ -22,7 +22,6 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
- 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import helpers from "@/utils/helpers.js";
 

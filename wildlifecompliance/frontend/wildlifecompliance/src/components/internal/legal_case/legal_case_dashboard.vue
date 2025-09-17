@@ -65,7 +65,7 @@
 <script>
     import $ from 'jquery'
     import datatable from '@vue-utils/datatable.vue'
-     'vue'
+   
     import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
     import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
     import FormSection from "@/components/forms/section_toggle.vue";
