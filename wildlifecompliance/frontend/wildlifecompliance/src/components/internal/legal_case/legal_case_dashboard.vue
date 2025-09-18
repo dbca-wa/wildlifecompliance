@@ -1,6 +1,6 @@
 <template>
     <div class="container" id="internalInspectionDash">
-        <FormSection :label="`Case`" :Index="`0`">
+        <FormSection :label="`Case`" :index="`0`">
 
         <div class="row">
             <div class="col-md-3">
@@ -51,10 +51,6 @@
             </div>
         </div>
         </FormSection>
-
-        <!--FormSection :label="`Location`" :Index="`1`">
-            <MapLocations />
-        </FormSection-->
 
         <div v-if="legalCaseInitialised">
             <CreateLegalCaseModal ref="add_legal_case"  v-bind:key="createLegalCaseBindId"/>

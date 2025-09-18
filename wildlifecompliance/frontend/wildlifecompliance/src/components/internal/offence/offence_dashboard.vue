@@ -1,6 +1,6 @@
 <template>
     <div class="container" id="internalOffenceDash">
-        <FormSection :label="`Offence`" :Index="`0`">
+        <FormSection :label="`Offence`" :index="`0`">
             <div class="row">
                 <div class="col-md-3">
                     <label class="">Sanction Outcome Type:</label>
@@ -51,7 +51,7 @@
             </div>
         </FormSection>
 
-        <FormSection :label="`Location`" :Index="`1`">
+        <FormSection :label="`Location`" :index="`1`">
             <MapLocations />
         </FormSection>
 

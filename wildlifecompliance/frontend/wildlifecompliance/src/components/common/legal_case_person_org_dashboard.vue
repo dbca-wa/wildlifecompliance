@@ -1,6 +1,6 @@
 <template>
     <div id="legalCasePersonOrgDash">
-        <FormSection :label="`Case`" :Index="`0`">            
+        <FormSection :label="`Case`" :index="`0`">            
         <div class="row">
             <div class="col-lg-12">
                 <datatable ref="legal_case_table" id="legal-case-table" :dtOptions="dtOptions" :dtHeaders="dtHeaders" />

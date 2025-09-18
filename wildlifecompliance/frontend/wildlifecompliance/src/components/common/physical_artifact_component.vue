@@ -26,7 +26,7 @@
                             </ul>
                             <div class="tab-content">
                                 <div :id="objectTab" :class="objectTabClass">
-                                    <FormSection :formCollapse="false" :label="artifactTypeDisplay" Index="0" :hideHeader="!physicalArtifactIdExists">
+                                    <FormSection :formCollapse="false" :label="artifactTypeDisplay" index="0" :hideHeader="!physicalArtifactIdExists">
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                               <div class="row">

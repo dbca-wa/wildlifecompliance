@@ -158,7 +158,7 @@
                         </ul>
                         <div id="pills-tabContent" class="tab-content">
                             <div :id="soTab" class="tab-pane fade in active show" role="tabpanel">
-                                <FormSection :formCollapse="false" :label="typeDisplay" Index="1">
+                                <FormSection :formCollapse="false" :label="typeDisplay" index="1">
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
                                             <label>Identifier</label>
@@ -267,7 +267,7 @@
                             </div>
 
                             <div :id="raTab" class="tab-pane fade in" role="tabpanel">
-                                <FormSection :formCollapse="false" label="Remediation Actions" Index="2">
+                                <FormSection :formCollapse="false" label="Remediation Actions" index="2">
                                     <div class="col-sm-12 form-group">
                                         <div class="row col-sm-12">
                                             <label class="control-label float-start">Remediation Actions</label>
@@ -282,7 +282,7 @@
                             </div>
 
                             <div :id="deTab" class="tab-pane fade in" role="tabpanel">
-                                <FormSection :formCollapse="false" label="Details" Index="3">
+                                <FormSection :formCollapse="false" label="Details" index="3">
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
                                             <label>Description</label>
@@ -332,7 +332,7 @@
                                     </div></div>
                                 </FormSection>
 
-                                <FormSection v-if="visibilityParkingInfringementSection" :formCollapse="false" label="Further Offender Details" Index="4">
+                                <FormSection v-if="visibilityParkingInfringementSection" :formCollapse="false" label="Further Offender Details" index="4">
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
                                             <label>Registration Holder:</label>
@@ -375,7 +375,7 @@
                                     </div></div>
                                 </FormSection>
 
-                                <FormSection v-if="sanction_outcome.due_dates && sanction_outcome.due_dates.length>0" :formCollapse="false" label="Due Date" Index="5">
+                                <FormSection v-if="sanction_outcome.due_dates && sanction_outcome.due_dates.length>0" :formCollapse="false" label="Due Date" index="5">
                                     <div v-for="item in sanction_outcome.due_dates">
                                         <div class="form-group"><div class="row">
                                             <div class="col-sm-3">
@@ -396,7 +396,7 @@
                             </div>
 
                             <div :id="reTab" class="tab-pane fade in" role="tabpanel">
-                                <FormSection :formCollapse="false" label="Related Items" Index="6">
+                                <FormSection :formCollapse="false" label="Related Items" index="6">
                                     <div class="col-sm-12 form-group"><div class="row">
                                         <div class="col-sm-12">
                                             <RelatedItems v-bind:key="relatedItemsBindId" :parent_update_related_items="setRelatedItems" :readonlyForm="readonlyForm" />

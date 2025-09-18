@@ -1,6 +1,6 @@
 <template>
     <div id="intelligenceInformation">
-        <FormSection :label="`Intelligence Information`" :Index="`0`">
+        <FormSection :label="`Intelligence Information`" :index="`0`">
         <div class="row">
             <div class="col-lg-6">
                 <textarea

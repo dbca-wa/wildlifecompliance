@@ -19,7 +19,7 @@
                     </div>
                     <div class="tab-content">
                         <div :id="newTab" class="tab-pane fade in active">
-                        <FormSection :formCollapse="false" :label="artifactTypeDisplay" Index="0" :hideHeader="!documentArtifactIdExists">
+                        <FormSection :formCollapse="false" :label="artifactTypeDisplay" index="0" :hideHeader="!documentArtifactIdExists">
                             <div :id="objectTab" class="tab-pane fade in active li-top-buffer">
                                 <div class="col-sm-12">
                                     <div class="form-group">

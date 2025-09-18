@@ -10,7 +10,7 @@
         </div>
 
         <FormSection v-if="component.type === 'section'"
-            :label="component.label" :Index="component_name" :id="component_name">
+            :label="component.label" :index="component_name" :id="component_name">
                 <compliance-renderer-block v-for="(subcomponent, index) in component.children"
                     :component="subcomponent"
                     :instance="instance"

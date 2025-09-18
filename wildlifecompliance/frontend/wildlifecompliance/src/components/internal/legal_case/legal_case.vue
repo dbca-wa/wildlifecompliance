@@ -195,7 +195,7 @@
                     </ul>
                     <div class="tab-content">
                         <div :id="runTab" class="tab-pane fade in active">
-                          <FormSection :formCollapse="false" label="Running Sheet" Index="0">
+                          <FormSection :formCollapse="false" label="Running Sheet" index="0">
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div>
                                     <div class="row action-button">

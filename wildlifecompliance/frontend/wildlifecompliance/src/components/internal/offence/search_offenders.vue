@@ -2,7 +2,7 @@
     <div class="">
         <div class="col-sm-12 form-group"><div class="row">
                 <div v-if="showSearchOffender" class="alert alert-info">Search existing offender records or create new offender record.</div>
-                <label v-if="showSearchOffender" class="col-sm-4">Search offender</label>
+                <label v-if="showSearchOffender" class="col-sm-4 fw-bold">Search Offender</label>
         </div></div>
         <div class="form-group"><div class="row">
             <div class="col-sm-12">
