@@ -49,7 +49,7 @@
     </div>
 </template>
 <script>
- "vue";
+
 import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";

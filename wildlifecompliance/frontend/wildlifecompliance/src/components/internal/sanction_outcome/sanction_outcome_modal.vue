@@ -270,7 +270,7 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
- "vue";
+
 import modal from "@/utils/vue/bootstrap-modal.vue";
 import datatable from "@/utils/vue/datatable.vue";
 import filefield from "@/components/common/compliance_file.vue";

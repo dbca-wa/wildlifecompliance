@@ -75,15 +75,6 @@
                                 </a>
                           </div>
                         </div>
-
-                        <!--div  class="row action-button">
-                          <div v-if="!readonlyForm" class="col-sm-12">
-                                <a ref="close" @click="addWorkflow('close')" class="btn btn-primary btn-block">
-                                  Close
-                                </a>
-                          </div>
-                        </div-->
-
                     </div>
                 </div>
             </div>
@@ -148,7 +139,7 @@
                             <div class="form-group">
                               <div class="row">
                                 <div class="col-sm-3">
-                                  <label>Inspection type</label>
+                                  <label class="fw-bold">Inspection type</label>
                                 </div>
                                 <div class="col-sm-6">
                                   <select :disabled="readonlyForm" class="form-control" v-model="inspection.inspection_type_id" @change="loadSchema">
@@ -162,7 +153,7 @@
                             <div class="form-group">
                               <div class="row">
                                 <div class="col-sm-3">
-                                  <label>Title</label>
+                                  <label class="fw-bold">Title</label>
                                 </div>
                                 <div class="col-sm-9">
                                   <input :readonly="readonlyForm" class="form-control" v-model="inspection.title"/>
@@ -172,7 +163,7 @@
                             <div class="form-group">
                               <div class="row">
                                 <div class="col-sm-3">
-                                  <label>Details</label>
+                                  <label class="fw-bold">Details</label>
                                 </div>
                                 <div class="col-sm-9">
                                   <textarea :readonly="readonlyForm" class="form-control" v-model="inspection.details"/>
@@ -181,33 +172,20 @@
                             </div>
 
                             <div class="form-group"><div class="row">
-                                <label class="col-sm-3">Planned for (Date)</label>
+                                <label class="col-sm-3 fw-bold">Planned for (Date)</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="plannedForDatePicker">
                                         <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="inspection.planned_for_date" />
-                                        <!--<span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>-->
                                     </div>
                                 </div>
 
-                                <label class="col-sm-3">Planned for (Time)</label>
+                                <label class="col-sm-3 fw-bold">Planned for (Time)</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" id="plannedForTimePicker">
                                       <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="inspection.planned_for_time"/>
-                                      <!--<span class="input-group-addon">
-                                          <span class="glyphicon glyphicon-calendar"></span>
-                                      </span>-->
                                     </div>
                                 </div>
                             </div></div>
-                            <!--div class="col-sm-12 form-group"><div class="row">
-                                <label class="col-sm-4">Party Inspected</label>
-                                    <input :disabled="readonlyForm" class="col-sm-1" id="individual" type="radio" v-model="inspection.party_inspected" v-bind:value="`individual`">
-                                    <label class="col-sm-1" for="individual">Person</label>
-                                    <input :disabled="readonlyForm" class="col-sm-1" id="organisation" type="radio" v-model="inspection.party_inspected" v-bind:value="`organisation`">
-                                    <label class="col-sm-1" for="organisation">Organisation</label>
-                            </div></div-->
 
                             <div class="form-group"><div class="row">
                                 <SearchPersonOrganisation
@@ -221,26 +199,15 @@
                                 showCreateUpdate
                                 ref="search_person_organisation"
                                 v-bind:key="updateSearchPersonOrganisationBindId"/>
-                                <!--div class="col-sm-1">
-                                    <input type="button" class="btn btn-primary" value="Add" @click.prevent="addOffenderClicked()" />
-                                </div-->
-                                <!--div class="col-sm-2">
-                                    <input :disabled="readonlyForm" type="button" class="btn btn-primary" value="Create New Person" @click.prevent="createNewPersonClicked()" />
-                                </div-->
                             </div></div>
-                            <!--div class="col-sm-12 form-group"><div class="row">
-                                <div class="col-sm-12" v-if="!readonlyForm">
-                                  <CreateNewPerson :displayComponent="displayCreateNewPerson" @new-person-created="newPersonCreated"/>
-                                </div>
-                                <div class="col-sm-12" v-if="!readonlyForm">
-                                  <CreateNewOrganisation/>
-                                </div>
-                            </div></div-->
-                            <div class="form-group"><div class="row">
-                              <label class="col-sm-4" for="inspection_inform">Inform party to be inspected</label>
-                              <input :disabled="readonlyForm" type="checkbox" id="inspection_inform" v-model="inspection.inform_party_being_inspected">
 
-                            </div></div>
+                            <div class="row">
+                              <label class="col-sm-4 fw-bold" for="inspection_inform">Inform party to be inspected</label>
+                              <div class="col-sm-4">
+                              <input :disabled="readonlyForm" type="checkbox" id="inspection_inform" v-model="inspection.inform_party_being_inspected">
+                              </div>
+                            </div>
+
                           </FormSection>
                           <FormSection :formCollapse="false" label="Inspection Team" Index="1">
                             <div class="form-group">
@@ -252,15 +219,9 @@
                                     </option>
                                   </select>
                                 </div>
-                                <div class="col-sm-2">
+                                <div class="col-sm-4">
                                     <button :disabled="readonlyForm" @click.prevent="addTeamMember" class="btn btn-primary">Add Member</button>
                                 </div>
-                                <!--div class="col-sm-2">
-                                    <button @click.prevent="makeTeamLead" class="btn btn-primary">Make Team Lead</button>
-                                </div-->
-                                <!--div class="col-sm-2">
-                                    <button @click.prevent="clearInspectionTeam" class="btn btn-primary float-end">Clear</button>
-                                </div-->
                               </div>
                             </div>
                             <div class="col-sm-12 form-group"><div class="row">
@@ -389,9 +350,6 @@
                 </div>
             </div>
         </div>
-        <!--div v-if="workflow_type">
-          <InspectionWorkflow ref="add_workflow" :workflow_type="workflow_type" v-bind:key="workflowBindId" />
-        </div-->
         <div v-if="offenceInitialised">
             <Offence
             ref="offence"
@@ -409,18 +367,13 @@
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
- "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import SearchPersonOrganisation from "@/components/common/search_person_or_organisation.vue";
-//import CreateNewPerson from "@/components/common/create_new_person.vue";
-//import CreateNewOrganisation from "@/components/common/create_new_organisation.vue";
 import Assignment from "../assignment.vue";
 import CommsLogs from "@/components/common/comms_logs.vue";
 import datatable from '@vue-utils/datatable.vue'
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
-import utils from "@/components/external/utils";
-import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import moment from 'moment';
+import { mapGetters, mapActions } from "vuex";
 
 import Offence from '../offence/offence_modal.vue';
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal.vue';
@@ -428,7 +381,6 @@ import filefield from '@common-components/compliance_file.vue';
 import InspectionWorkflow from './inspection_workflow.vue';
 import RelatedItems from "@/components/common/related_items.vue";
 import MapLocation from "../../common/map_location.vue";
-//import "select2/dist/css/select2.min.css";
 
 import hash from 'object-hash';
 

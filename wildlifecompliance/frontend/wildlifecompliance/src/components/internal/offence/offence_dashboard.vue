@@ -62,7 +62,7 @@
 </template>
 
 <script>
- "vue";
+
 import $ from 'jquery'
 import datatable from '@vue-utils/datatable.vue'
 //import FormSection from "@/components/compliance_forms/section.vue";

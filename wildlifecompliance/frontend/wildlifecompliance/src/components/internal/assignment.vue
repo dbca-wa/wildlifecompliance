@@ -24,7 +24,7 @@
     </div>
 </template>
 <script>
- "vue";
+
 import { api_endpoints, helpers, fetch_util } from "@/utils/hooks";
 export default {
     name: 'Assignment',

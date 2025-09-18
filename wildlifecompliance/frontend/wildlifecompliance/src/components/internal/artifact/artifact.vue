@@ -64,7 +64,7 @@
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
- "vue";
+
 import FormSection from "@/components/forms/section_toggle.vue";
 import CommsLogs from "@/components/common/comms_logs.vue";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";

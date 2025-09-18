@@ -228,7 +228,7 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
- "vue";
+
 import Awesomplete from "awesomplete";
 import modal from "@/utils/vue/bootstrap-modal.vue";
 import datatable from "@/utils/vue/datatable.vue";

@@ -14,7 +14,7 @@
     </div>
 </template>
 <script>
- "vue";
+
 import datatable from '@vue-utils/datatable.vue'
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "@/components/external/utils";
