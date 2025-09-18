@@ -19,18 +19,16 @@
             </div>
         </div>
 
-        <div class="col-sm-4 form-group"><div class="row">
-            <label class="col-sm-4">Latitude:</label>
-            <div v-if="marker_lat">
-                <input :readonly="readonly" type="number" min="-90" max="90" class="form-control" v-model.number="marker_lat" />
+        <div class="row">
+            <div class="col-sm-6">
+            <label class="col-sm-3">Latitude:</label>
+                <input v-if="marker_lat" :readonly="readonly" type="number" min="-90" max="90" class="form-control" v-model.number="marker_lat" />
             </div>
-        </div></div>
-        <div class="col-sm-4 form-group"><div class="row">
-            <label class="col-sm-4">Longitude:</label>
-            <div v-if="marker_lng">
-                <input :readonly="readonly" type="number" min="-180" max="180" class="form-control" v-model.number="marker_lng" />
+            <div class="col-sm-6">
+            <label class="col-sm-3">Longitude:</label>
+                <input v-if="marker_lng" :readonly="readonly" type="number" min="-180" max="180" class="form-control" v-model.number="marker_lng" />
             </div>
-        </div></div>
+        </div>
     </div>
 </template>
 

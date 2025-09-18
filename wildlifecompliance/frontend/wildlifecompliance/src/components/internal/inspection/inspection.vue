@@ -105,7 +105,7 @@
                             Location
                           </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" v-if="rendererVisibility">
                           <a class="nav-link"
                             data-bs-toggle="pill"
                             role="tab" :href="'#'+cTab">
@@ -134,7 +134,7 @@
                           role="tabpanel"
                         >
 
-                          <FormSection :formCollapse="false" label="Inspection Details" Index="0">
+                          <FormSection :formCollapse="false" label="Inspection Details" index="inspection_details">
 
                             <div class="form-group">
                               <div class="row">
@@ -209,7 +209,7 @@
                             </div>
 
                           </FormSection>
-                          <FormSection :formCollapse="false" label="Inspection Team" Index="1">
+                          <FormSection :formCollapse="false" label="Inspection Team" index="inspection_team">
                             <div class="form-group">
                               <div class="row">
                                 <div class="col-sm-6">
@@ -231,14 +231,13 @@
                             </div></div>
                           </FormSection>
 
-
                         </div>
 
                         <div :id="lTab" 
                           class="tab-pane fade in"
                           role="tabpanel"
                         >
-                            <FormSection :formCollapse="false" label="Location">
+                            <FormSection :formCollapse="false" label="Location" index="location">
                                     <MapLocation 
                                         v-if="inspection.location" 
                                         :key="lTab" 
@@ -250,30 +249,30 @@
                                     />
                                     <div :id="idLocationFieldsAddress" v-if="inspection.location">
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <label class="col-sm-4">Street</label>
+                                            <label class="col-sm-4 fw-bold">Street</label>
                                             <input class="form-control" v-model="inspection.location.properties.street" readonly />
                                         </div></div>
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <label class="col-sm-4">Town/Suburb</label>
+                                            <label class="col-sm-4 fw-bold">Town/Suburb</label>
                                             <input class="form-control" v-model="inspection.location.properties.town_suburb" readonly />
                                         </div></div>
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <label class="col-sm-4">State</label>
+                                            <label class="col-sm-4 fw-bold">State</label>
                                             <input class="form-control" v-model="inspection.location.properties.state" readonly />
                                         </div></div>
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <label class="col-sm-4">Postcode</label>
+                                            <label class="col-sm-4 fw-bold">Postcode</label>
                                             <input class="form-control" v-model="inspection.location.properties.postcode" readonly />
                                         </div></div>
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <label class="col-sm-4">Country</label>
+                                            <label class="col-sm-4 fw-bold">Country</label>
                                             <input class="form-control" v-model="inspection.location.properties.country" readonly />
                                         </div></div>
                                     </div>
 
                                     <div :id="idLocationFieldsDetails" v-if="inspection.location">
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <label class="col-sm-4">Details</label>
+                                            <label class="col-sm-4 fw-bold">Details</label>
                                             <textarea class="form-control location_address_field" v-model="inspection.location.properties.details" />
                                         </div></div>
                                     </div>
@@ -282,9 +281,9 @@
 
                         <div :id="cTab" 
                           class="tab-pane fade in"
-                          role="tabpanel"
+                          role="tabpanel" v-if="rendererVisibility"
                         >
-                            <FormSection :formCollapse="false" label="Checklist">
+                            <FormSection :formCollapse="false" label="Checklist" index="checklist">
                                 <div class="col-sm-12 form-group">
                                   <div v-if="rendererVisibility" class="row">
                                       <div v-for="(item, index) in current_schema">
@@ -302,11 +301,11 @@
                           class="tab-pane fade in"
                           role="tabpanel"
                         >
-                            <FormSection :formCollapse="false" label="Inspection report">
+                            <FormSection :formCollapse="false" label="Inspection report" index="inspection_report">
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <label class="control-label float-start"  for="Name">Inspection report</label>
+                                            <label class="control-label float-start fw-bold"  for="Name">Inspection report</label>
                                         </div>
                                         <div class="col-sm-9" v-if="inspection.inspectionReportDocumentUrl">
                                             <filefield
@@ -325,7 +324,7 @@
                           class="tab-pane fade in"
                           role="tabpanel"
                         >
-                            <FormSection :formCollapse="false" label="Related Items">
+                            <FormSection :formCollapse="false" label="Related Items" index="related_items">
                                 <div class="col-sm-12 form-group"><div class="row">
                                     <div class="col-sm-12" v-if="relatedItemsVisibility">
                                         <RelatedItems v-bind:key="relatedItemsBindId" :parent_update_related_items="setRelatedItems" :readonlyForm="!canUserAction"/>
@@ -340,15 +339,16 @@
             </div>
           </div>
         </div>
-        <div v-if="inspection.can_user_action" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
-            <div class="navbar-inner">
-                <div class="container">
-                    <p class="float-end" style="margin-top:5px;">
-                        <input type="button" @click.prevent="save('exit')" class="btn btn-primary" value="Save and Exit"/>
-                        <input type="button" @click.prevent="save('noexit')" class="btn btn-primary" value="Save and Continue"/>
-                    </p>
-                </div>
-            </div>
+        <div class="row" style="margin-bottom:50px;">
+          <div v-if="inspection.can_user_action" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5; display: block;">
+              <div class="navbar-inner">
+                      <p class="float-end" style="margin-top:5px;">
+                          <input v-if="!isProcessing" type="button" @click.prevent="save('exit')" class="btn btn-primary" value="Save and Exit"/>
+                          <input v-if="!isProcessing" type="button" @click.prevent="save('noexit')" class="btn btn-primary" value="Save and Continue"/>
+                          <button v-if="isProcessing" disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Processing</button>
+                      </p>
+              </div>
+          </div>
         </div>
         <div v-if="offenceInitialised">
             <Offence
@@ -389,6 +389,7 @@ export default {
   name: "ViewInspection",
   data: function() {
     return {
+      isProcessing: false,
       uuid: 0,
       objectHash: null,
       iTab: 'iTab'+uuid(),
@@ -488,8 +489,6 @@ export default {
     FormSection,
     datatable,
     SearchPersonOrganisation,
-    //CreateNewPerson,
-    //CreateNewOrganisation,
     Offence,
     SanctionOutcome,
     filefield,
@@ -915,6 +914,7 @@ export default {
       console.log(returnToDash)
       let savedInspection = null;
       let savedPerson = null;
+      this.isProcessing = true;
       if (this.inspection.id) {
           if (this.$refs.search_person_organisation && this.$refs.search_person_organisation.entityIsPerson) {
               console.log("savePerson")
@@ -922,17 +922,20 @@ export default {
               // if person save ok, continue with Inspection save
               if (savedPerson && savedPerson.ok) {
                   savedInspection = await this.saveInspection({ create: false, internal: false });
+                  this.isProcessing = false;
               }
           } else {
               console.log("no savePerson")
               savedInspection = await this.saveInspection({ create: false, internal: false });
+              this.isProcessing = false;
           }
       } else {
           savedInspection = await this.saveInspection({ create: true, internal: false });
+          this.isProcessing = false;
       }
       this.calculateHash();
       //console.log(savedInspection);
-      if (savedInspection && savedInspection.ok && returnToDash === 'exit') {
+      if (savedInspection && savedInspection.id && returnToDash === 'exit') {
         // remove redundant eventListeners
         window.removeEventListener('beforeunload', this.leaving);
         window.removeEventListener('onblur', this.leaving);
