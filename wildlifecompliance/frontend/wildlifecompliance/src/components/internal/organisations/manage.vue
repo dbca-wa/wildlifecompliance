@@ -410,7 +410,7 @@ export default {
                 swal.fire({
                     title: "Delete Contact",
                     text: "Are you sure you want to remove "+ name + "("+ email + ") as a contact  ?",
-                    type: "error",
+                    icon: "error",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {

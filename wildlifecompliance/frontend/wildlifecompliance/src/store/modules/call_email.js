@@ -387,7 +387,7 @@ export const callemailStore = {
                         await swal.fire({
                             title: 'Error',
                             html: helpers.formatError(err),
-                            type: "error",
+                            icon: "error",
                         })
                     }
                 } else {
@@ -400,8 +400,8 @@ export const callemailStore = {
                     }catch(err) {
                         await swal.fire({
                             title: 'Mandatory Field',
-                            html: helpers.formatError(err),
-                            type: "error",
+                            html: err,
+                            icon: "error",
                         })
                     }
                 }

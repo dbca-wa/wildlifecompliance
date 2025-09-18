@@ -324,7 +324,7 @@ export default {
               await swal.fire({
                   title: 'Mandatory Field',
                   html: helpers.formatError(err),
-                  type: "error",
+                  icon: "error",
               })
           }
       },

@@ -282,7 +282,7 @@ export default {
             swal.fire({
                 title: "Remove Condition",
                 text: "Are you sure you want to remove this condition?",
-                type: "warning",
+                icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: 'Remove Condition',
                 confirmButtonColor:'#d9534f'

@@ -11,7 +11,6 @@ import _ from 'lodash'
 window._ = _
 
 import { createApp } from 'vue';
-import Vuex from 'vuex';
 import App from '@/App.vue';
 import router from '@/router';
 import helpers from '@/utils/helpers';

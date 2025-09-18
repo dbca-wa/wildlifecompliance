@@ -373,7 +373,7 @@ export default {
             swal.fire({
                 title: "Create Application",
                 text: "Please ensure at least one licence purpose is selected",
-                type: "error",
+                icon: "error",
             })
         } else {
             data.organisation_id=vm.selected_apply_org_id;

@@ -10,7 +10,6 @@ export default {
                             (data.constructor.name === 'Array' && data) ||
                             (data && data.message) ||
                             response.statusText;
-                        console.error(error);
                         reject(error);
                     }
                     resolve(data);

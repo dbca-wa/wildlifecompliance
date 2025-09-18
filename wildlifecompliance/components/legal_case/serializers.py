@@ -1356,6 +1356,7 @@ class LegalCaseDatatableSerializer(serializers.ModelSerializer):
                 'user_action',
                 'assigned_to',
                 'assigned_to_id',
+                'case_created_date'
                 )
 
     def get_user_action(self, obj):
