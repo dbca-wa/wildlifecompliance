@@ -812,7 +812,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 returned_data = process_generic_document(request, instance.brief_of_evidence)
                 return Response(returned_data)
             else:
-                return Response()
+                return Response({"filedata":[]})
 
         except serializers.ValidationError:
             print(traceback.print_exc())
@@ -920,7 +920,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             if returned_data:
                 return Response(returned_data)
             else:
-                return Response()
+                return Response({"filedata":[]})
 
         except serializers.ValidationError:
             print(traceback.print_exc())
@@ -963,7 +963,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             if returned_data:
                 return Response(returned_data)
             else:
-                return Response()
+                return Response({"filedata":[]})
 
         except serializers.ValidationError:
             print(traceback.print_exc())
@@ -998,7 +998,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 returned_data = process_generic_document(request, instance.prosecution_brief)
                 return Response(returned_data)
             else:
-                return Response()
+                return Response({"filedata":[]})
 
         except serializers.ValidationError:
             print(traceback.print_exc())
@@ -1032,7 +1032,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             if returned_data:
                 return Response(returned_data)
             else:
-                return Response()
+                return Response({"filedata":[]})
 
         except serializers.ValidationError:
             print(traceback.print_exc())
@@ -1066,7 +1066,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             if returned_data:
                 return Response(returned_data)
             else:
-                return Response()
+                return Response({"filedata":[]})
 
         except serializers.ValidationError:
             print(traceback.print_exc())
@@ -1095,7 +1095,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             if returned_data:
                 return Response(returned_data)
             else:
-                return Response()
+                return Response({"filedata":[]})
 
         except serializers.ValidationError:
             print(traceback.print_exc())
@@ -1337,7 +1337,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             if returned_data:
                 return Response(returned_data)
             else:
-                return Response()
+                return Response({"filedata":[]})
 
         except serializers.ValidationError:
             print(traceback.print_exc())

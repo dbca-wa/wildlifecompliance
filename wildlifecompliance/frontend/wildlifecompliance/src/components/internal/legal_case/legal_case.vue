@@ -1,18 +1,15 @@
 <template lang="html">
     <div class="container">
       <div class="row">
-        <div class="col-md-3">
           <h3>Case: {{ legal_case.number }}</h3>
-        </div>
-      </div>
           <div class="col-md-3">
             <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                         Workflow
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div class="row">
                             <div class="col-sm-12">
                                 <strong>Status</strong><br/>
@@ -31,12 +28,12 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="">
+                <div class="card mb-3">
+                    <div class="card-header">
                         Action
                     </div>
-                    <div class="panel-body panel-collapse">
+                    <div class="card-body border-bottom">
                         <div class="row">
                             <div v-if="canUserAction && openStatus" class="col-sm-12 action-button">
                                   <a @click="openInspection()" class="btn btn-primary btn-block" >
@@ -66,7 +63,6 @@
                         <div  class="row">
                           <div v-if="canUserAction && openStatus" class="col-sm-12 action-button">
                                 <a @click="addWorkflow('brief_of_evidence')" class="btn btn-primary btn-block">
-                                <!--a @click="createBriefOfEvidence" class="btn btn-primary btn-block"-->
                                   Brief of Evidence
                                 </a>
                           </div>
@@ -74,7 +70,6 @@
                         <div  class="row">
                           <div v-if="canUserAction && briefOfEvidenceStatus" class="col-sm-12 action-button">
                                 <a @click="addWorkflow('back_to_case')" class="btn btn-primary btn-block">
-                                <!--a @click="createProsecutionBrief" class="btn btn-primary btn-block"-->
                                   Back To Case
                                 </a>
                           </div>
@@ -82,7 +77,6 @@
                         <div  class="row">
                           <div v-if="canUserAction && briefOfEvidenceVisibility" class="col-sm-12 action-button">
                                 <a @click="printDocument('brief_of_evidence')" class="btn btn-primary btn-block">
-                                <!--a @click="createProsecutionBrief" class="btn btn-primary btn-block"-->
                                   Print Brief of Evidence
                                 </a>
                           </div>
@@ -90,7 +84,6 @@
                         <div  class="row">
                           <div v-if="canUserAction && briefOfEvidenceStatus" class="col-sm-12 action-button">
                                 <a @click="addWorkflow('send_to_manager')" class="btn btn-primary btn-block">
-                                <!--a @click="createProsecutionBrief" class="btn btn-primary btn-block"-->
                                   Send To Manager
                                 </a>
                           </div>
@@ -98,7 +91,6 @@
                         <div  class="row">
                           <div v-if="backToOfficerVisibility" class="col-sm-12 action-button">
                                 <a @click="addWorkflow('back_to_officer')" class="btn btn-primary btn-block">
-                                <!--a @click="createProsecutionBrief" class="btn btn-primary btn-block"-->
                                   Back To Officer
                                 </a>
                           </div>
@@ -106,7 +98,6 @@
                         <div class="row">
                           <div v-if="canUserAction && withManagerStatus" class="col-sm-12 action-button">
                                 <a @click="addWorkflow('approve_brief_of_evidence')" class="btn btn-primary btn-block">
-                                <!--a @click="createProsecutionBrief" class="btn btn-primary btn-block"-->
                                   Approve
                                 </a>
                           </div>
@@ -114,7 +105,6 @@
                         <div class="row">
                           <div v-if="canUserAction && withProsecutionCoordinatorStatus" class="col-sm-12 action-button">
                                 <a @click="addWorkflow('prosecution_brief')" class="btn btn-primary btn-block">
-                                <!--a @click="createProsecutionBrief" class="btn btn-primary btn-block"-->
                                   Prosecution Brief
                                 </a>
                           </div>
@@ -122,7 +112,6 @@
                         <div class="row">
                           <div v-if="canUserAction && withProsecutionCoordinatorProsecutionBriefStatus" class="col-sm-12 action-button">
                                 <a @click="addWorkflow('send_to_prosecution_council')" class="btn btn-primary btn-block">
-                                <!--a @click="createProsecutionBrief" class="btn btn-primary btn-block"-->
                                   Send To Prosecution Council
                                 </a>
                           </div>
@@ -130,7 +119,6 @@
                         <div  class="row">
                           <div v-if="canUserAction && prosecutionBriefVisibility" class="col-sm-12 action-button">
                                 <a @click="printDocument('prosecution_brief')" class="btn btn-primary btn-block">
-                                <!--a @click="createProsecutionBrief" class="btn btn-primary btn-block"-->
                                   Print Prosecution Brief
                                 </a>
                           </div>
@@ -138,7 +126,6 @@
                         <div class="row">
                           <div v-if="canUserAction && withProsecutionCouncilStatus" class="col-sm-12 action-button">
                                 <a @click="addWorkflow('back_to_prosecution_coordinator')" class="btn btn-primary btn-block">
-                                <!--a @click="createProsecutionBrief" class="btn btn-primary btn-block"-->
                                   Back to Prosecution Coordinator
                                 </a>
                           </div>
@@ -146,7 +133,6 @@
                         <div class="row">
                           <div v-if="canUserAction && withProsecutionCouncilStatus" class="col-sm-12 action-button">
                                 <a @click="addWorkflow('endorse_prosecution_brief')" class="btn btn-primary btn-block">
-                                <!--a @click="createProsecutionBrief" class="btn btn-primary btn-block"-->
                                   Endorse Prosecution Brief
                                 </a>
                           </div>
@@ -154,7 +140,6 @@
                         <div class="row">
                           <div v-if="canUserAction && withProsecutionManagerStatus" class="col-sm-12 action-button">
                                 <a @click="addWorkflow('approve_for_court')" class="btn btn-primary btn-block">
-                                <!--a @click="createProsecutionBrief" class="btn btn-primary btn-block"-->
                                   Approve for Court
                                 </a>
                           </div>
@@ -162,7 +147,6 @@
                         <div class="row">
                           <div v-if="canUserAction && withProsecutionManagerStatus" class="col-sm-12 action-button">
                                 <a @click="addWorkflow('back_to_prosecution_council')" class="btn btn-primary btn-block">
-                                <!--a @click="createProsecutionBrief" class="btn btn-primary btn-block"-->
                                   Back to Prosecution Council
                                 </a>
                           </div>
@@ -184,23 +168,19 @@
 
                 <div class="container-fluid">
                     <ul class="nav nav-pills">
-                        <li class="nav-item active"><a data-toggle="tab" :href="'#'+runTab">Running Sheet</a></li>
-                        <li class="nav-item"><a data-toggle="tab" :href="'#'+cTab" >Case Details</a></li>
-                        <li v-if="briefOfEvidenceVisibility" class="nav-item"><a data-toggle="tab" :href="'#'+bTab" >Brief of Evidence</a></li>
-                        <li v-if="prosecutionBriefVisibility" class="nav-item"><a data-toggle="tab" :href="'#'+pTab" >Prosecution Brief</a></li>
-                        <!--li v-if="withProsecutionCoordinatorCourtStatus" class="nav-item"><a data-toggle="tab" :href="'#'+cpTab" >Court Proceedings</a></li-->
-                        <li v-if="courtProceedingsVisibility" class="nav-item"><a data-toggle="tab" :href="'#'+cpTab" >Court Proceedings</a></li>
-                        <li class="nav-item"><a data-toggle="tab" :href="'#'+rTab">Related Items</a></li>
-                        <!--li class="nav-item"><a data-toggle="tab" :href="'#'+gTab">Generated Documents</a></li-->
+                        <li class="nav-item active"><a class="nav-link active" data-bs-toggle="tab" :href="'#'+runTab">Running Sheet</a></li>
+                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" :href="'#'+cTab" >Case Details</a></li>
+                        <li v-if="briefOfEvidenceVisibility" class="nav-item"><a class="nav-link" data-bs-toggle="tab" :href="'#'+bTab" >Brief of Evidence</a></li>
+                        <li v-if="prosecutionBriefVisibility" class="nav-item"><a class="nav-link" data-bs-toggle="tab" :href="'#'+pTab" >Prosecution Brief</a></li>
+                        <li v-if="courtProceedingsVisibility" class="nav-item"><a class="nav-link" data-bs-toggle="tab" :href="'#'+cpTab" >Court Proceedings</a></li>
+                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" :href="'#'+rTab">Related Items</a></li>
                     </ul>
                     <div class="tab-content">
-                        <div :id="runTab" class="tab-pane fade in active">
+                        <div :id="runTab" class="tab-pane fade in active show">
                           <FormSection :formCollapse="false" label="Running Sheet" index="0">
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div>
                                     <div class="row action-button">
-                                        <!--div v-if="canUserAction" class="col-sm-12"-->
-                                        <!--div class="col-sm-1 float-end" /-->
                                         <div v-if="!readonlyRunningSheet">
                                               <a @click="createNewRunningSheetEntry()" class="btn btn-primary float-end new-row-button" >
                                                 New Row
@@ -226,18 +206,18 @@
                         <div :id="cTab" class="tab-pane fade in">
                             <FormSection :formCollapse="false" label="Case Details">
                                 <div class="col-sm-12 form-group"><div class="row">
-                                    <label class="col-sm-10">Title
+                                    <label class="col-sm-10 fw-bold">Title
                                         <input :readonly="readonlyForm" type="text" class="form-control" v-model="legal_case.title" />
                                     </label>
                                 </div></div>
                                 <div class="col-sm-12 form-group"><div class="row">
-                                    <label class="col-sm-10">Details
+                                    <label class="col-sm-10 fw-bold">Details
                                         <textarea :readonly="readonlyForm" class="form-control location_address_field" v-model="legal_case.details" />
                                     </label>
                                 </div></div>
                                 <div class="col-sm-12 form-group"><div class="row">
                                     <div v-if="legal_case.defaultDocumentUrl">
-                                        <label class="col-sm-10">Documents
+                                        <label class="col-sm-10 fw-bold">Documents
                                             <filefield
                                             ref="legal_case_documents"
                                             name="legal-case-documents"
@@ -278,29 +258,15 @@
                                 </div></div>
                             </FormSection>
                         </div>
-                        <!--div :id="gTab" class="tab-pane fade in">
-                            <FormSection :formCollapse="false" label="Generated Documents">
-                                <div class="col-sm-12 form-group"><div class="row">
-                                    <div v-if="legal_case.generatedDocumentsUrl">
-                                        <filefield
-                                        ref="generated_documents"
-                                        name="generated-documents"
-                                        :isRepeatable="true"
-                                        :readonly="true"
-                                        :documentActionUrl="legal_case.generatedDocumentsUrl"
-                                        />
-                                    </div>
-                                </div></div>
-                            </FormSection>
-                        </div-->
                     </div>
                 </div>
             </div>
           </div>
+        </div>
 
-        <div v-if="canUserAction" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
-            <div class="navbar-inner">
-                <div class="container">
+        <div class="row" style="margin-bottom:50px;">
+            <div v-if="canUserAction" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5; display: block; ">
+                <div class="navbar-inner">
                     <p class="float-end" style="margin-top:5px;">
                         <button v-if="showSpinner && showExit" disabled type="button" @click.prevent="save('exit')" class="btn btn-primary">
                             <i class="fa fa-spinner fa-spin"/> Saving</button>
@@ -312,6 +278,7 @@
                 </div>
             </div>
         </div>
+
         <div v-if="offenceInitialised">
             <Offence
             ref="offence"
@@ -1664,24 +1631,9 @@ export default {
           await this.loadLegalCase({ legal_case_id: this.$route.params.legal_case_id });
       }
       await this.loadCurrentUser({ url: `/api/my_compliance_user_details` });
-      //console.log(this)
 
       this.calculateHash();
       this.constructRunningSheetTableWrapper();
-      /*
-      if (this.legal_case && this.legal_case.boe_roi_options) {
-          for (let item of this.legal_case.boe_roi_options) {
-              let cloned_item = _.cloneDeep(item);
-              this.boeRoiOptions.push(cloned_item)
-          }
-      }
-      if (this.legal_case && this.legal_case.boe_other_statements_options) {
-          for (let item of this.legal_case.boe_other_statements_options) {
-              let cloned_item = _.cloneDeep(item);
-              this.boeOtherStatementsOptions.push(cloned_item)
-          }
-      }
-      */
   },
   destroyed: function() {
       window.removeEventListener('beforeunload', this.leaving);
@@ -1693,16 +1645,6 @@ export default {
           this.addEventListeners();
           // removes header from both brief_of_evidence and prosecution_brief
           $('.vue-treeselect__control').css("display", "none");
-          /*
-          if (this.openStatus) {
-              this.constructRunningSheetTableWrapper();
-          }
-          */
-          /*
-          if (this.runningSheetVisibility) {
-              this.constructRunningSheetTableWrapper();
-          }
-          */
       });
   },
 };
