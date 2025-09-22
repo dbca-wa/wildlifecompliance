@@ -1,249 +1,232 @@
 <template lang="html">
-    <div class="container-fluid">
         <div :class="componentClass">
-<!--
-            <div class="form-group">
-                <div class="row">
--->
+
                     <div v-if="!legalCaseExists || !parentModal">
-                        <ul class="nav nav-pills">
-                            <li class="nav-item active"><a data-toggle="tab" :href="'#'+newTab">Object</a></li>
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+rTab">Related Items</a></li>
+                        <ul class="nav nav-pills mb-3" id="tabs-main" data-tabs="tabs">
+                            <li class="nav-item active"><a data-bs-toggle="tab" class="nav-link active" :href="'#'+newTab">Object</a></li>
+                            <li class="nav-item"><a data-bs-toggle="tab" class="nav-link" :href="'#'+rTab">Related Items</a></li>
                         </ul>
                     </div>
                     <div v-else>
-                        <ul class="nav nav-pills">
-                            <li class="nav-item active"><a data-toggle="tab" :href="'#'+newTab">New</a></li>
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+existingTab" >Existing</a></li>
+                        <ul class="nav nav-pills mb-3" id="tabs-main" data-tabs="tabs">
+                            <li class="nav-item active"><a class="nav-link" data-bs-toggle="tab" :href="'#'+newTab">New</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" :href="'#'+existingTab" >Existing</a></li>
                         </ul>
                     </div>
-                    <div class="tab-content">
-                        <div :id="newTab" class="tab-pane fade in active">
-                        <FormSection :formCollapse="false" :label="artifactTypeDisplay" index="0" :hideHeader="!documentArtifactIdExists">
-                            <div :id="objectTab" class="tab-pane fade in active li-top-buffer">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                      <div class="row">
-                                        <div class="col-sm-3">
-                                          <label>Document Type</label>
-                                        </div>
-                                        <div class="col-sm-6">
-                                          <select :disabled="readonlyForm" class="form-control" v-model="document_artifact.document_type" ref="setArtifactType">
-                                            <option  v-for="option in documentArtifactTypes" :value="option.id" v-bind:key="option.id">
-                                              {{ option.display }}
-                                            </option>
-                                          </select>
-                                        </div>
-                                      </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-sm-3">
-                                                <label class="control-label float-start" for="Name">Document</label>
-                                            </div>
-                                            <div v-if="!documentArtifactId" class="col-sm-9">
-                                                <filefield
-                                                ref="default_document"
-                                                name="default-document"
-                                                :isRepeatable="true"
-                                                documentActionUrl="temporary_document"
-                                                @update-temp-doc-coll-id="setTemporaryDocumentCollectionId"/>
-                                            </div>
-                                            <div v-else class="col-sm-9">
-                                                <filefield 
-                                                ref="document_artifact_documents" 
-                                                name="document-artifact-documents" 
-                                                :isRepeatable="true" 
-                                                :documentActionUrl="document_artifact.defaultDocumentUrl" 
-                                                :readonly="readonlyForm"
-                                                v-bind:key="documentArtifactId"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                      <div class="row">
-                                        <div class="col-sm-3">
-                                          <label>Identifier</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                          <input :readonly="readonlyForm" class="form-control" v-model="document_artifact.identifier"/>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div v-if="statementVisibility" class="form-group">
-                                      <div class="row">
-                                        <div class="col-sm-3">
-                                          <label>Statement</label>
-                                        </div>
-                                        <div v-if="parentModal" class="col-sm-6">
-                                          <select :disabled="readonlyForm" class="form-control" v-model="document_artifact.statement_id" ref="setStatement">
-                                            <option  v-for="option in legal_case.statement_artifacts" :value="option.id" v-bind:key="option.id">
-                                            {{ option.document_type_display }}: {{ option.identifier }}
-                                            </option>
-                                          </select>
-                                        </div>
-                                        <div v-else class="col-sm-6">
-                                          <select :disabled="readonlyForm" class="form-control" v-model="document_artifact.statement_id" ref="setStatement">
-                                            <option  v-for="option in document_artifact.available_statement_artifacts" :value="option.id" v-bind:key="option.id">
-                                            {{ option.document_type_display }}: {{ option.identifier }}
-                                            </option>
-                                          </select>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div v-if="offenceVisibility" class="form-group">
-                                      <div class="row">
-                                        <div class="col-sm-3">
-                                          <label>Offence</label>
-                                        </div>
-                                        <div class="col-sm-6">
-                                          <select :disabled="readonlyForm" class="form-control" v-model="document_artifact.offence_id" @change.prevent="setOffenderId(null)">
-                                            <option  v-for="option in legal_case.offence_list" :value="option.id" v-bind:key="option.id">
-                                                <div v-if="option.id">
-                                                    {{ option.lodgement_number }}: {{ option.identifier }}
+                    <div id="pills-tabContent" class="tab-content">
+                        <div :id="newTab" class="tab-pane fade active show" role="tabpanel">
+                            <FormSection :formCollapse="false" :label="artifactTypeDisplay" index="0" :hideHeader="!documentArtifactIdExists">
+                                <div class="card-body">
+                                    <div :id="objectTab">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-sm-3">
+                                                <label class="fw-bold">Document Type</label>
                                                 </div>
-                                            </option>
-                                          </select>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div v-if="offenceVisibility" class="form-group">
-                                      <div class="row">
-                                        <div class="col-sm-3">
-                                          <label>Offender</label>
-                                        </div>
-                                        <div class="col-sm-6">
-                                          <select :disabled="readonlyForm" class="form-control" v-model="document_artifact.offender_id">
-                                            <option  v-for="option in offenderList" :value="option.offender_id" v-bind:key="option.offender_id">
-                                            <div v-if="option.id">
-                                                {{ option.full_name }}: {{ option.email }}
-                                            </div>
-                                            </option>
-                                          </select>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div class="form-group">
-                                      <div class="row">
-                                        <div class="col-sm-3">
-                                          <label>Description</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                          <textarea :readonly="readonlyForm" class="form-control" v-model="document_artifact.description"/>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div v-if="personProvidingStatementVisibility" class="form-group">
-                                        <div class="row">
-                                            <div class="col-sm-3">
-                                                <label>{{ personProvidingStatementLabel }}</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <SearchPersonOrganisation 
-                                                :parentEntity="personProvidingStatementEntity"
-                                                personOnly
-                                                :isEditable="!readonlyForm" 
-                                                classNames="form-control" 
-                                                @entity-selected="setPersonProvidingStatement"
-                                                showCreateUpdate
-                                                ref="document_artifact_search_person_organisation"
-                                                v-bind:key="updateSearchPersonOrganisationBindId"
-                                                addFullName
-                                                :displayTitle="false"
-                                                domIdHelper="document_artifact"
-                                                departmentalStaff
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div v-show="interviewerVisibility" class="form-group">
-                                        <div class="row">
-                                            <div class="col-sm-3">
-                                                <label >{{ interviewerLabel }}</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <!--select :disabled="readonlyForm" ref="document_artifact_department_users" class="form-control" v-model="officerInterviewerEmailAddress">
-                                                    <option  v-for="option in departmentStaffList" :value="option.email" v-bind:key="option.pk">
-                                                    {{ option.name }} 
+                                                <div class="col-sm-6">
+                                                <select :disabled="readonlyForm" class="form-control" v-model="document_artifact.document_type" ref="setArtifactType">
+                                                    <option  v-for="option in documentArtifactTypes" :value="option.id" v-bind:key="option.id">
+                                                    {{ option.display }}
                                                     </option>
-                                                </select-->
-                                                <select 
-                                                    id="document_artifact_interviewer"  
-                                                    name="document_artifact_interviewer"  
-                                                    ref="document_artifact_interviewer" 
-                                                    class="form-control" 
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <label class="col-sm-3">Date</label>
-                                            <div class="col-sm-3">
-                                                <div class="input-group date" ref="artifactDatePicker">
-                                                    <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="document_artifact.artifact_date" />
-                                                    <!--<span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>-->
+                                                </select>
                                                 </div>
                                             </div>
-                                            <label class="col-sm-3">Time</label>
-                                            <div class="col-sm-3">
-                                                <div class="input-group date" ref="artifactTimePicker">
-                                                  <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="document_artifact.artifact_time"/>
-                                                  <!--<span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>-->
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+                                                        <label class="control-label float-start fw-bold" for="Name">Document</label>
+                                                    </div>
+                                                    <div v-if="!documentArtifactId" class="col-sm-9">
+                                                        <filefield
+                                                        ref="default_document"
+                                                        name="default-document"
+                                                        :isRepeatable="true"
+                                                        documentActionUrl="temporary_document"
+                                                        @update-temp-doc-coll-id="setTemporaryDocumentCollectionId"/>
+                                                    </div>
+                                                    <div v-else class="col-sm-9">
+                                                        <filefield 
+                                                        ref="document_artifact_documents" 
+                                                        name="document-artifact-documents" 
+                                                        :isRepeatable="true" 
+                                                        :documentActionUrl="document_artifact.defaultDocumentUrl" 
+                                                        :readonly="readonlyForm"
+                                                        v-bind:key="documentArtifactId"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-sm-3">
+                                                <label class="fw-bold">Identifier</label>
+                                                </div>
+                                                <div class="col-sm-9">
+                                                <input :readonly="readonlyForm" class="form-control" v-model="document_artifact.identifier"/>
+                                                </div>
+                                            </div>
+                                            </div>
+                                            <div v-if="statementVisibility" class="form-group">
+                                            <div class="row">
+                                                <div class="col-sm-3">
+                                                <label class="fw-bold">Statement</label>
+                                                </div>
+                                                <div v-if="parentModal" class="col-sm-6">
+                                                <select :disabled="readonlyForm" class="form-control" v-model="document_artifact.statement_id" ref="setStatement">
+                                                    <option  v-for="option in legal_case.statement_artifacts" :value="option.id" v-bind:key="option.id">
+                                                    {{ option.document_type_display }}: {{ option.identifier }}
+                                                    </option>
+                                                </select>
+                                                </div>
+                                                <div v-else class="col-sm-6">
+                                                <select :disabled="readonlyForm" class="form-control" v-model="document_artifact.statement_id" ref="setStatement">
+                                                    <option  v-for="option in document_artifact.available_statement_artifacts" :value="option.id" v-bind:key="option.id">
+                                                    {{ option.document_type_display }}: {{ option.identifier }}
+                                                    </option>
+                                                </select>
+                                                </div>
+                                            </div>
+                                            </div>
+                                            <div v-if="offenceVisibility" class="form-group">
+                                            <div class="row">
+                                                <div class="col-sm-3">
+                                                <label class="fw-bold">Offence</label>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                <select :disabled="readonlyForm" class="form-control" v-model="document_artifact.offence_id" @change.prevent="setOffenderId(null)">
+                                                    <option  v-for="option in legal_case.offence_list" :value="option.id" v-bind:key="option.id">
+                                                        <div v-if="option.id">
+                                                            {{ option.lodgement_number }}: {{ option.identifier }}
+                                                        </div>
+                                                    </option>
+                                                </select>
+                                                </div>
+                                            </div>
+                                            </div>
+                                            <div v-if="offenceVisibility" class="form-group">
+                                            <div class="row">
+                                                <div class="col-sm-3">
+                                                <label class="fw-bold">Offender</label>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                <select :disabled="readonlyForm" class="form-control" v-model="document_artifact.offender_id">
+                                                    <option  v-for="option in offenderList" :value="option.offender_id" v-bind:key="option.offender_id">
+                                                    <div v-if="option.id">
+                                                        {{ option.full_name }}: {{ option.email }}
+                                                    </div>
+                                                    </option>
+                                                </select>
+                                                </div>
+                                            </div>
+                                            </div>
+                                            <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-sm-3">
+                                                <label class="fw-bold">Description</label>
+                                                </div>
+                                                <div class="col-sm-9">
+                                                <textarea :readonly="readonlyForm" class="form-control" v-model="document_artifact.description"/>
+                                                </div>
+                                            </div>
+                                            </div>
+                                            <div v-if="personProvidingStatementVisibility" class="form-group">
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+                                                        <label class="fw-bold">{{ personProvidingStatementLabel }}</label>
+                                                    </div>
+                                                    <div class="col-sm-9">
+                                                        <SearchPersonOrganisation 
+                                                        :parentEntity="personProvidingStatementEntity"
+                                                        personOnly
+                                                        :isEditable="!readonlyForm" 
+                                                        classNames="form-control" 
+                                                        @entity-selected="setPersonProvidingStatement"
+                                                        showCreateUpdate
+                                                        ref="document_artifact_search_person_organisation"
+                                                        v-bind:key="updateSearchPersonOrganisationBindId"
+                                                        addFullName
+                                                        :displayTitle="false"
+                                                        domIdHelper="document_artifact"
+                                                        departmentalStaff
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div v-show="interviewerVisibility" class="form-group">
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+                                                        <label class="fw-bold">{{ interviewerLabel }}</label>
+                                                    </div>
+                                                    <div class="col-sm-9">
+                                                        <select 
+                                                            id="document_artifact_interviewer"  
+                                                            name="document_artifact_interviewer"  
+                                                            ref="document_artifact_interviewer" 
+                                                            class="form-control" 
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <label class="col-sm-3 fw-bold">Date</label>
+                                                    <div class="col-sm-3">
+                                                        <div class="input-group date" ref="artifactDatePicker">
+                                                            <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="document_artifact.artifact_date" />
+                                                        </div>
+                                                    </div>
+                                                    <label class="col-sm-3 fw-bold">Time</label>
+                                                    <div class="col-sm-3">
+                                                        <div class="input-group date" ref="artifactTimePicker">
+                                                        <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="document_artifact.artifact_time"/>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </FormSection>
+                            </FormSection>
                         </div>
-                        <div v-if="parentModal" :id="existingTab" class="tab-pane fade in li-top-buffer">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <datatable ref="existing_artifact_table" id="existing-artifact-table" :dtOptions="dtOptions" :dtHeaders="dtHeaders" />
+                        <div v-if="parentModal && legalCaseExists" :id="existingTab" class="tab-pane fade" role="tabpanel">
+                            <FormSection :formCollapse="false" label="Existing Artifacts" index="existing_artifacts">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <datatable ref="existing_artifact_table" id="existing-artifact-table" :dtOptions="dtOptions" :dtHeaders="dtHeaders" />
+                                    </div>
                                 </div>
                             </div>
+                            </FormSection>
                         </div>
-                        <div v-if="!parentModal" :id="rTab" class="tab-pane fade in">
-                            <FormSection :formCollapse="false" label="Related Items">
-                                <div class="col-sm-12 form-group"><div class="row">
-                                    <div class="col-sm-12" v-if="relatedItemsVisibility">
-                                        <RelatedItems 
-                                        :parent_update_related_items="setRelatedItems" 
-                                        v-bind:key="relatedItemsBindId" 
-                                        :readonlyForm="readonlyForm"
-                                        parentComponentName="document_artifact"
-                                        />
-                                    </div>
-                                </div></div>
+                        <div v-if="!legalCaseExists || !parentModal" :id="rTab" class="tab-pane fade" role="tabpanel">
+                            <FormSection :formCollapse="false" label="Related Items" index="related_items">
+                                <div class="card-body">
+                                    <div class="col-sm-12 form-group"><div class="row">
+                                        <div class="col-sm-12" v-if="relatedItemsVisibility">
+                                            <RelatedItems 
+                                            :parent_update_related_items="setRelatedItems" 
+                                            v-bind:key="relatedItemsBindId" 
+                                            :readonlyForm="readonlyForm"
+                                            parentComponentName="document_artifact"
+                                            />
+                                        </div>
+                                    </div></div>
+                                </div>
                             </FormSection>
                         </div>
                     </div>
-<!--
-                </div>
-            </div>
--->
         </div>
-
-    </div>
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
-
-//import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import filefield from '@common-components/compliance_file.vue';
-
-import moment from 'moment';
 import SearchPersonOrganisation from './search_person_or_organisation.vue'
 import FormSection from "@/components/forms/section_toggle.vue";
 import RelatedItems from "@/components/common/related_items.vue";
@@ -268,19 +251,10 @@ export default {
             documentArtifactTypes: [],
             departmentStaffList: [],
             selectedDepartmentStaffMember: {},
-            //offenderList: [],
             selectedCustodian: {},
             entity: {
                 id: null,
             },
-            /*
-            statementArtifactTypes: [
-                'Record of Interview',
-                'Witness Statement',
-                'Expert Statement',
-                'Officer Statement',
-                ],
-                */
             statementArtifactTypes: [
                 'record_of_interview',
                 'witness_statement',
@@ -288,9 +262,6 @@ export default {
                 'officer_statement',
                 ],
             statementVisibility: false,
-            //departmentStaffList: [],
-            //personProvidingStatementLabel: '',
-            //interviewerLabel: '',
             dtOptions: {
                 serverSide: true,
                 searchDelay: 1000,
@@ -308,12 +279,6 @@ export default {
                     dataSrc: 'data',
                     data: function(d) {
                         d.object_type = 'document_artifact'
-                        /*
-                        d.type = vm.filterType;
-                        d.status = vm.filterStatus;
-                        d.date_from = vm.filterDateFromPicker;
-                        d.date_to = vm.filterDateToPicker;
-                        */
                     }
                 },
                 columns: [
@@ -332,28 +297,6 @@ export default {
                         searchable: true,
                         orderable: true
                     },
-                    /*
-                    {
-                        data: 'artifact_date',
-                        searchable: false,
-                        orderable: true,
-                        mRender: function (data, type, full) {
-                            return data != '' && data != null ? moment(data).format('YYYY-MM-DD') : '';
-                        }
-                    },
-                    {
-                        searchable: false,
-                        orderable: false,
-                        mRender: function (data, type,full){
-                            return '---';
-                        }
-                    },
-                    {
-                        searchable: false,
-                        orderable: false,
-                        data: 'status'
-                    },
-                    */
                     {
                         searchable: false,
                         orderable: false,
@@ -377,11 +320,6 @@ export default {
                 'Number',
                 'Document Type',
                 'Identifier',
-                /*
-                'Date',
-                'Custodian',
-                'Status',
-                */
                 'Documents',
                 'Action',
             ],
@@ -426,11 +364,6 @@ export default {
         ...mapGetters('legalCaseStore', {
             legal_case: "legal_case",
         }),
-        /*
-        canUserAction: function() {
-            return true;
-        },
-        */
         componentClass: function() {
             let componentClass = '';
             if (this.parentModal) {
@@ -438,22 +371,6 @@ export default {
             }
             return componentClass;
         },
-        /*
-        readonlyForm: function() {
-            let retValue = false;
-            if (!this.readonly) {
-                retValue = true;
-            }
-            return retValue;
-        },
-        legalCaseExists: function() {
-            let exists = false;
-            if (this.legal_case && this.legal_case.id) {
-                exists = true;
-            }
-            return exists;
-        },
-        */
         offenderList: function() {
             let offenderList = [{ 
                 "id": null,
@@ -513,9 +430,7 @@ export default {
         officerInterviewerEmailAddress: function() {
           let emailAddress = null;
           if (this.document_artifact && this.document_artifact.officer_interviewer) {
-          //if (this.selectedDepartmentStaffMember) {
               emailAddress = this.document_artifact.officer_interviewer.email;
-              //emailAddress = this.selectedDepartmentStaffMember.email;
           }
           return emailAddress;
         },
@@ -526,29 +441,20 @@ export default {
           }
           return recordExists;
         },
-        /*
         artifactType: function() {
-          console.log("artifact type")
           let aType = ''
           if (this.document_artifact && this.document_artifact.document_type) {
-              aType = this.document_artifact.document_type.artifact_type;
-          }
-          return aType;
-        },
-        */
-        artifactType: function() {
-          console.log("artifact type")
-          let aType = ''
-          if (this.document_artifact) {
               aType = this.document_artifact.document_type;
+          }
+          if (aType == '') {
+              aType = 'Unspecified';
           }
           return aType;
         },
         artifactTypeDisplay: function() {
             let display = '';
-            if (this.artifactType) {
+            if (this.artifactType) {                
                 for (let documentArtifactType of this.documentArtifactTypes) {
-                    //if (this.artifactType && this.artifactType.id === this.artifactType) {
                     if (documentArtifactType.id === this.artifactType) {
                         display = documentArtifactType.display;
                     }
@@ -626,7 +532,6 @@ export default {
             let timeNow = Date.now()
             let bindId = null;
             if (this.document_artifact && this.document_artifact.id) {
-                //bindId = 'document_artifact_' + this.document_artifact.id + '_' + this.uuid;
                 bindId = 'document_artifact_' + this.document_artifact.id + '_' + timeNow.toString();
             } else {
                 bindId = timeNow.toString();
@@ -651,7 +556,6 @@ export default {
             setInterviewerId: 'setInterviewerId',
             setInterviewerEmail: 'setInterviewerEmail',
             setTemporaryDocumentCollectionId: 'setTemporaryDocumentCollectionId',
-            //setDocumentArtifactLegalId: 'setDocumentArtifactLegalId',
             setOffenderId: 'setOffenderId',
             setOfficerInterviewer: 'setOfficerInterviewer',
             setOfficerInterviewerId: 'setOfficerInterviewerId',
@@ -662,7 +566,6 @@ export default {
         setStatementVisibility: function() {
             if (
                 // legal case exists and Document Type is not a statementArtifactType
-                //(this.legalCaseExists && this.artifactType && !this.statementArtifactTypes.includes(this.artifactType)) ||
                 ((this.linkedLegalCase || this.legalCaseExists) && this.artifactType && !this.statementArtifactTypes.includes(this.artifactType)) ||
                 // OR document_artifact already has a linked statement
                 (this.document_artifact && this.document_artifact.statement)
@@ -675,14 +578,7 @@ export default {
                 this.statementVisibility = false;
             }
         },
-        /*
-        setTemporaryDocumentCollectionId: function(val) {
-            this.temporary_document_collection_id = val;
-        },
-        */
         setPersonProvidingStatement: function(entity) {
-            console.log(entity);
-            //Object.assign(this.entity, entity)
             this.setPersonProvidingStatementId(entity.id);
         },
         save: async function() {
@@ -702,38 +598,9 @@ export default {
             }
             console.log(this.document_artifact.error_message)
             this.$emit('error-message', {
-                /*
-                id: this.document_artifact.id,
-                data_type: 'document_artifact',
-                identifier: this.document_artifact.identifier,
-                artifact_type: this.artifactType,
-                display: this.artifactType,
-                */
                 error_message: this.document_artifact.error_message
             });
         },
-        /*
-
-        save: async function() {
-            if (this.document_artifact.id) {
-                await this.saveDocumentArtifact({ create: false, internal: false, legal_case_id: this.legalCaseId });
-            } else {
-                await this.saveDocumentArtifact({ create: true, internal: false, legal_case_id: this.legalCaseId });
-            }
-        },
-        create: async function() {
-            await this.saveDocumentArtifact({ create: true, internal: true, legal_case_id: this.legalCaseId });
-            this.$nextTick(() => {
-                this.$emit('entity-selected', {
-                    id: this.document_artifact.id,
-                    data_type: 'document_artifact',
-                    identifier: this.document_artifact.identifier,
-                    artifact_type: this.artifactType,
-                    display: this.artifactTypeDisplay,
-                });
-            });
-        },
-        */
         cancel: async function() {
             if (this.$refs.default_document) {
                 await this.$refs.default_document.cancel();
@@ -763,12 +630,10 @@ export default {
                         display: documentArtifactType,
                     });
             });
-            //this.$parent.$parent.ok();
         },
         setOfficerInterviewerWrapper: async function(selectedData) {
             for (let officer of this.departmentStaffList) {
                 if (officer.email === selectedData) {
-                    //this.selectedDepartmentStaffMember = Object.assign({}, officer
                     this.selectedDepartmentStaffMember = officer
                 }
             }
@@ -785,7 +650,6 @@ export default {
                     placeholder:"",
                     ajax: {
                         url: api_endpoints.staff_member_lookup,
-                        //url: api_endpoints.vessel_rego_nos,
                         dataType: 'json',
                         data: function(params) {
                             console.log(params)
@@ -800,13 +664,10 @@ export default {
                 on("select2:select",function (e) {
                     let selected = $(e.currentTarget);
                     let selectedData = selected.val();
-                    console.log(selectedData);
-                    //vm.setOfficerInterviewerWrapper(selectedData);
                     vm.setOfficerInterviewerId(selectedData);
                 }).
                 on("select2:unselect",function (e) {
                     var selected = $(e.currentTarget);
-                    //vm.setOfficerInterviewerWrapper(null);
                     vm.setOfficerInterviewerId(null);
                 });
 
@@ -816,18 +677,7 @@ export default {
                 '.row_insert',
                 (e) => {
                     this.emitDocumentArtifact(e);
-                    //console.log(e.target)
-                    //this.$emit('entity-selected', {
-                    //this.insertrunningSheetKeydown(e);
                 });
-            
-            /*
-            // artifact type events
-            let artifactEvent = $(vm.$refs.setArtifactType);
-            artifactEvent.on("change", function(e) {
-            let artifactTypeId = e.target.value;
-            });
-            */
         },
         compare: function(a, b) {
             console.log("compare")

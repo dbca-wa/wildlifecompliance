@@ -2,7 +2,7 @@
     <div>
         <div class="row form-group">
             <div class="col-sm-4">
-                <label for="entity-selector">Select entity</label>
+                <label class="fw-bold" for="entity-selector">Select entity</label>
                 <select :disabled="readonlyForm" class="form-control" v-model="selectedEntity" id="entity-selector">
                     <option value="call_email">Call / Email</option>
                     <option value="inspection">Inspection</option>
@@ -20,7 +20,7 @@
         </div>
         <div class="row form-group">
             <div class="col-sm-8">
-                <label for="comment">Add comment</label>
+                <label class="fw-bold" for="comment">Add comment</label>
                 <input ref="comment" id="comment" :readonly="readonlyForm" class="form-control" v-model="comment"/>
             </div>
         </div>

@@ -9,7 +9,6 @@
                     </div>
                     <div v-else>
                         <ul class="nav nav-pills">
-                            <!--li class="nav-item active"><a data-toggle="tab" :href="'#'+newTab">New</a></li-->
                             <li class="nav-item active"><a data-toggle="tab" @click="updateTabSelected('objectTab')" :href="'#'+newTab">New</a></li>
                             <li class="nav-item"><a data-toggle="tab" :href="'#'+existingTab" >Existing</a></li>
                         </ul>
@@ -20,7 +19,6 @@
                                 <li :class="objectTabListClass"><a data-toggle="tab" @click="updateTabSelected('objectTab')" :href="'#'+objectTab">Object</a></li>
                                 <li :class="detailsTabListClass"><a data-toggle="tab" @click="updateTabSelected('detailsTab')" :href="'#'+detailsTab" >Details</a></li>
                                 <li :class="storageTabListClass"><a data-toggle="tab" @click="updateTabSelected('storageTab')" :href="'#'+storageTab" >Storage</a></li>
-                                <!--li v-if="disposalTabVisibility" :class="disposalTabListClass"><a data-toggle="tab" @click="updateTabSelected('disposalTab')" :href="'#'+disposalTab" >Disposal</a></li-->
                                 <li :class="disposalTabListClass"><a data-toggle="tab" @click="updateTabSelected('disposalTab')" :href="'#'+disposalTab" >Disposal</a></li>
                                 <li v-if="!parentModal" :class="relatedItemsTabListClass"><a data-toggle="tab" @click="updateTabSelected('relatedItemsTab')" :href="'#'+relatedItemsTab" >Related Items</a></li>
                             </ul>
@@ -80,11 +78,6 @@
                                                             ref="physical_artifact_officers" 
                                                             class="form-control" 
                                                         />
-                                                        <!--select :disabled="readonlyForm" ref="physical_artifact_department_users" class="form-control" v-model="physical_artifact.officer_email">
-                                                            <option  v-for="option in departmentStaffList" :value="option.email" v-bind:key="option.pk">
-                                                            {{ option.name }}
-                                                            </option>
-                                                        </select-->
                                                     </div>
                                                 </div>
                                             </div>

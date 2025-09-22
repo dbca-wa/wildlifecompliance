@@ -5,50 +5,45 @@
           <h3>Object: {{ artifactComponentNumber }}</h3>
         </div>
       </div>
-          <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
             <CommsLogs :comms_url="comms_url" :logs_url="logs_url" :comms_add_url="comms_add_url" :disable_add_entry="false"/>
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        Workflow
-                    </div>
-                    <div class="panel-body panel-collapse">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <strong>Status</strong><br/>
-                                {{ artifactStatusDisplay }}<br/>
-                            </div>
+            <div class="card mb-3">
+                <div class="card-header">
+                    Workflow
+                </div>
+                <div class="card-body border-bottom">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <strong>Status</strong><br/>
+                            {{ artifactStatusDisplay }}<br/>
                         </div>
                     </div>
                 </div>
             </div>
 
           </div>
-          <div class="col-md-9" id="main-column">
-            <div class="row">
-                <div class="container-fluid">
+          <div class="col-md-8">
 
-                    <div v-if="showDocumentArtifactComponent" class="row">
-                        <DocumentArtifact 
-                        ref="document_artifact"
-                        :readonlyForm="!canUserAction"
-                        v-bind:key="updateDocumentArtifactBindId"
-                        />
-                    </div>
-                    <div v-if="showPhysicalArtifactComponent" class="row">
-                        <PhysicalArtifact 
-                        ref="physical_artifact"
-                        :readonlyForm="!canUserAction"
-                        v-bind:key="updatePhysicalArtifactBindId"
-                        />
-                    </div>
-                </div>
-            </div>
+            <DocumentArtifact 
+            v-if="showDocumentArtifactComponent"
+            ref="document_artifact"
+            :readonlyForm="!canUserAction"
+            v-bind:key="updateDocumentArtifactBindId"
+            />
+
+            <PhysicalArtifact 
+            v-if="showPhysicalArtifactComponent"
+            ref="physical_artifact"
+            :readonlyForm="!canUserAction"
+            v-bind:key="updatePhysicalArtifactBindId"
+            />
+
           </div>
-
-        <div v-if="canUserAction" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
-            <div class="navbar-inner">
-                <div class="container">
+        </div>
+        <div class="row" style="margin-bottom:50px;">
+            <div v-if="canUserAction" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5; display: block;">
+                <div class="navbar-inner">
                     <p class="float-end" style="margin-top:5px;">
                         <button v-if="showSpinner && showExit" disabled type="button" @click.prevent="save('exit')" class="btn btn-primary">
                             <i class="fa fa-spinner fa-spin"/> Saving</button>
@@ -58,7 +53,7 @@
                         <button v-else type="button" @click.prevent="save()" class="btn btn-primary">Save and Continue</button>
                     </p>
                 </div>
-            </div>
+            </div>        
         </div>
     </div>
 </template>
