@@ -131,7 +131,7 @@ export default {
             this.show_spinner = true;
             let post_url = '/api/organisations_compliancemanagement/';
             
-            let returnedOrganisation = await fetch.fetchUrl(post_url, {method:'POST', body:JSON.stringify(this.organisation)});
+            let returnedOrganisation = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(this.organisation)});
             console.log(returnedOrganisation)
             this.show_spinner = false;
         },

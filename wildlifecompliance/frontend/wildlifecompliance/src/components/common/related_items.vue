@@ -175,12 +175,11 @@ export default {
             'comment': this.$refs.weak_links_lookup.comment,
         }
         // post payload to url, then
-        let relatedItems = await fetch.fetchUrl(url, {method:'POST', body:JSON.stringify(payload)});
-        if (relatedItems.ok) {
-            await this.parent_update_related_items(relatedItems.body);
-            return relatedItems
+        let relatedItems = await fetch_util.fetchUrl(url, {method:'POST', body:JSON.stringify(payload)});
+        if (relatedItems) {
+            await this.parent_update_related_items(relatedItems);
         }
-
+        return relatedItems
     },
     removeWeakLink: async function(e) {
         let secondContentType = e.target.getAttribute("second-content-type");
@@ -194,7 +193,7 @@ export default {
             'second_object_id': secondObjectId,
         }
         // post payload to url, then
-        let relatedItems = await fetch.fetchUrl(url, {method:'POST', body:JSON.stringify(payload)});
+        let relatedItems = await fetch_util.fetchUrl(url, {method:'POST', body:JSON.stringify(payload)});
         if (relatedItems.ok) {
             await this.parent_update_related_items(relatedItems.body);
         }

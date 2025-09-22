@@ -437,7 +437,7 @@ export default {
                     }
                 }
 
-                savedEmailUser = await fetch.fetchUrl(fetchUrl,{method:'POST', body: payload});
+                savedEmailUser = await fetch_util.fetchUrl(fetchUrl,{method:'POST', body: payload});
                 if (!savedEmailUser.body.residential_address) {
                     savedEmailUser.body.residential_address = this.getDefaultAddress()
                 }

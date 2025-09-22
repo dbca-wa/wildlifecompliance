@@ -48,18 +48,10 @@ export default {
         }
     },
     props: {
-       //  classNames: {
-       //      type: String,
-       //      required: false,
-       //      default: "form-control no-label"
-       //  },
        maxItems: {
            required: false,
            default: 10
        },
-       //  search_type: {
-       //      required: false,
-       //  },
         readonlyForm: {
             required: false,
             default: false
@@ -90,7 +82,7 @@ export default {
         callCreateWeakLink: function() {
             this.$nextTick(async () => {
                 let res = await this.$parent.createWeakLink();
-                if (res.ok) {
+                if (res) {
                     this.selectedEntity = null;
                     this.comment = '';
                     this.$refs.elemId.value = '';
@@ -121,7 +113,6 @@ export default {
                     myLabel = "<div data-item-id=" + item.id + " data-type=" + item.model_name + ">" + myLabel + "</div>";
                     return {
                         label: myLabel,
-                        //value: [name, abn].filter(Boolean).join(", "),
                         value: [item.item_identifier, item.item_description].filter(Boolean).join(", "),
                         id: item.id
                     };
@@ -190,9 +181,7 @@ export default {
                 type: "POST",
                 url: search_url,
                 dataType: "json",
-                //data: JSON.stringify(payload),
                 data: payload,
-                //contentType: "application/json",
                 success: (data) => {
                     if (data) {
                         let limit = Math.min(this.maxItems, data.length);
