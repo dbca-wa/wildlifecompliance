@@ -36,7 +36,7 @@ private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/"
 logger = logging.getLogger(__name__)
 
 
-class Artifact(RevisionedMixin):
+class Artifact(SanitiseMixin):
     STATUS_ACTIVE = 'active'
     STATUS_WAITING_FOR_DISPOSAL = 'waiting_for_disposal'
     STATUS_CLOSED = 'closed'

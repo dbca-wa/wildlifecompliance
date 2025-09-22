@@ -4,280 +4,272 @@
             <div class="form-group">
                 <div class="row">
                     <div v-if="!legalCaseExists">
-                        <ul class="nav nav-pills">
+                        <ul class="nav nav-pills mb-3">
                         </ul>
                     </div>
                     <div v-else>
-                        <ul class="nav nav-pills">
-                            <li class="nav-item active"><a data-toggle="tab" @click="updateTabSelected('objectTab')" :href="'#'+newTab">New</a></li>
-                            <li class="nav-item"><a data-toggle="tab" :href="'#'+existingTab" >Existing</a></li>
+                        <ul class="nav nav-pills mb-3">
+                            <li class="nav-item active"><a class="nav-link" data-bs-toggle="tab" @click="updateTabSelected('objectTab')" :href="'#'+newTab">New</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" :href="'#'+existingTab" >Existing</a></li>
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div :id="newTab" class="tab-pane fade in active">
-                            <ul class="nav nav-pills">
-                                <li :class="objectTabListClass"><a data-toggle="tab" @click="updateTabSelected('objectTab')" :href="'#'+objectTab">Object</a></li>
-                                <li :class="detailsTabListClass"><a data-toggle="tab" @click="updateTabSelected('detailsTab')" :href="'#'+detailsTab" >Details</a></li>
-                                <li :class="storageTabListClass"><a data-toggle="tab" @click="updateTabSelected('storageTab')" :href="'#'+storageTab" >Storage</a></li>
-                                <li :class="disposalTabListClass"><a data-toggle="tab" @click="updateTabSelected('disposalTab')" :href="'#'+disposalTab" >Disposal</a></li>
-                                <li v-if="!parentModal" :class="relatedItemsTabListClass"><a data-toggle="tab" @click="updateTabSelected('relatedItemsTab')" :href="'#'+relatedItemsTab" >Related Items</a></li>
+                        <div :id="newTab" class="tab-pane fade in active show">
+                            <ul class="nav nav-pills mb-3">
+                                <li :class="objectTabListClass"><a class="nav-link" data-bs-toggle="tab" @click="updateTabSelected('objectTab')" :href="'#'+objectTab">Object</a></li>
+                                <li :class="detailsTabListClass" v-if="detailsSchemaVisibility"><a class="nav-link" data-bs-toggle="tab" @click="updateTabSelected('detailsTab')" :href="'#'+detailsTab" >Details</a></li>
+                                <li :class="storageTabListClass" v-if="storageSchemaVisibility"><a class="nav-link" data-bs-toggle="tab" @click="updateTabSelected('storageTab')" :href="'#'+storageTab" >Storage</a></li>
+                                <li :class="disposalTabListClass"><a class="nav-link" data-bs-toggle="tab" @click="updateTabSelected('disposalTab')" :href="'#'+disposalTab" >Disposal</a></li>
+                                <li v-if="!parentModal" :class="relatedItemsTabListClass"><a class="nav-link" data-bs-toggle="tab" @click="updateTabSelected('relatedItemsTab')" :href="'#'+relatedItemsTab" >Related Items</a></li>
                             </ul>
                             <div class="tab-content">
                                 <div :id="objectTab" :class="objectTabClass">
                                     <FormSection :formCollapse="false" :label="artifactTypeDisplay" index="0" :hideHeader="!physicalArtifactIdExists">
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                              <div class="row">
-                                                <div class="col-sm-3">
-                                                  <label>Physical Type</label>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                  <select :disabled="readonlyForm" class="form-control" v-model="physical_artifact.physical_artifact_type_id" @change="loadSchema">
-                                                    <option  v-for="option in physicalArtifactTypes" :value="option.id" v-bind:key="option.id">
-                                                      {{ option.artifact_type_display }}
-                                                    </option>
-                                                  </select>
-                                                </div>
-                                              </div>
-                                            </div>
-                                        </div>
-                                        <div v-if="parentModal" class="col-sm-12 form-group"><div class="row">
-                                          <label class="col-sm-6">Object used within this case?</label>
-                                            <input :disabled="readonlyForm" class="col-sm-1" id="yes" type="radio" v-model="physical_artifact.used_within_case" v-bind:value="true">
-                                            <label class="col-sm-1" for="yes">Yes</label>
-                                            <input :disabled="readonlyForm" class="col-sm-1" id="no" type="radio" v-model="physical_artifact.used_within_case" v-bind:value="false">
-                                            <label class="col-sm-1" for="no">No</label>
-                                        </div></div>
-                                        <div v-if="parentModal" class="col-sm-12 form-group"><div class="row">
-                                          <label class="col-sm-6">Object is sensitive / non-disclosable?</label>
-                                            <input :disabled="readonlyForm" class="col-sm-1" id="yes" type="radio" v-model="physical_artifact.sensitive_non_disclosable" v-bind:value="true">
-                                            <label class="col-sm-1" for="yes">Yes</label>
-                                            <input :disabled="readonlyForm" class="col-sm-1" id="no" type="radio" v-model="physical_artifact.sensitive_non_disclosable" v-bind:value="false">
-                                            <label class="col-sm-1" for="no">No</label>
-                                        </div></div>
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                              <div class="row">
-                                                <div class="col-sm-3">
-                                                  <label>Identifier</label>
-                                                </div>
-                                                <div class="col-sm-9">
-                                                  <input :readonly="readonlyForm" class="form-control" v-model="physical_artifact.identifier"/>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div class="form-group">
+                                        <div class="card-body">
+                                            <div class="col-sm-12">
+                                                <div class="form-group">
                                                 <div class="row">
                                                     <div class="col-sm-3">
-                                                        <label>Officer</label>
+                                                    <label class="fw-bold">Physical Type</label>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                    <select :disabled="readonlyForm" class="form-control" v-model="physical_artifact.physical_artifact_type_id" @change="loadSchema">
+                                                        <option  v-for="option in physicalArtifactTypes" :value="option.id" v-bind:key="option.id">
+                                                        {{ option.artifact_type_display }}
+                                                        </option>
+                                                    </select>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                            </div>
+                                            <div v-if="parentModal" class="col-sm-12 form-group"><div class="row">
+                                            <label class="col-sm-6 fw-bold">Object used within this case?</label>
+                                                <input :disabled="readonlyForm" class="col-sm-1" id="yes" type="radio" v-model="physical_artifact.used_within_case" v-bind:value="true">
+                                                <label class="col-sm-1 fw-bold" for="yes">Yes</label>
+                                                <input :disabled="readonlyForm" class="col-sm-1" id="no" type="radio" v-model="physical_artifact.used_within_case" v-bind:value="false">
+                                                <label class="col-sm-1 fw-bold" for="no">No</label>
+                                            </div></div>
+                                            <div v-if="parentModal" class="col-sm-12 form-group"><div class="row">
+                                            <label class="col-sm-6 fw-bold">Object is sensitive / non-disclosable?</label>
+                                                <input :disabled="readonlyForm" class="col-sm-1" id="yes" type="radio" v-model="physical_artifact.sensitive_non_disclosable" v-bind:value="true">
+                                                <label class="col-sm-1 fw-bold" for="yes">Yes</label>
+                                                <input :disabled="readonlyForm" class="col-sm-1" id="no" type="radio" v-model="physical_artifact.sensitive_non_disclosable" v-bind:value="false">
+                                                <label class="col-sm-1 fw-bold" for="no">No</label>
+                                            </div></div>
+                                            <div class="col-sm-12">
+                                                <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+                                                    <label class="fw-bold">Identifier</label>
                                                     </div>
                                                     <div class="col-sm-9">
-                                                        <select 
-                                                            id="physical_artifact_officers"  
-                                                            name="physical_artifact_officers"  
-                                                            ref="physical_artifact_officers" 
-                                                            class="form-control" 
-                                                        />
+                                                    <input :readonly="readonlyForm" class="form-control" v-model="physical_artifact.identifier"/>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div v-if="statementVisibility" class="form-group">
-                                              <div class="row">
-                                                <div class="col-sm-3">
-                                                  <label>Statement</label>
                                                 </div>
-                                                <div v-if="parentModal" class="col-sm-6">
-                                                  <select :disabled="readonlyForm" class="form-control" v-model="physical_artifact.statement_id" ref="setStatement">
-                                                    <option  v-for="option in legal_case.statement_artifacts" :value="option.id" v-bind:key="option.id">
-                                                    {{ option.document_type_display }}: {{ option.identifier }}
-                                                    </option>
-                                                  </select>
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <div class="col-sm-3">
+                                                            <label class="fw-bold">Officer</label>
+                                                        </div>
+                                                        <div class="col-sm-9">
+                                                            <select 
+                                                                id="physical_artifact_officers"  
+                                                                name="physical_artifact_officers"  
+                                                                ref="physical_artifact_officers" 
+                                                                class="form-control" 
+                                                            />
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div v-else class="col-sm-6">
-                                                  <select :disabled="readonlyForm" class="form-control" v-model="physical_artifact.statement_id" ref="setStatement">
-                                                    <option  v-for="option in physical_artifact.available_statement_artifacts" :value="option.id" v-bind:key="option.id">
-                                                    {{ option.document_type_display }}: {{ option.identifier }}
-                                                    </option>
-                                                  </select>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div v-if="custodianVisibility" class="form-group">
+                                                <div v-if="statementVisibility" class="form-group">
                                                 <div class="row">
                                                     <div class="col-sm-3">
-                                                        <label>Custodian</label>
+                                                    <label class="fw-bold">Statement</label>
                                                     </div>
-                                                    <div class="col-sm-9">
-                                                            {{ selectedStatementArtifact.custodian }}
+                                                    <div v-if="parentModal" class="col-sm-6">
+                                                    <select :disabled="readonlyForm" class="form-control" v-model="physical_artifact.statement_id" ref="setStatement">
+                                                        <option  v-for="option in legal_case.statement_artifacts" :value="option.id" v-bind:key="option.id">
+                                                        {{ option.document_type_display }}: {{ option.identifier }}
+                                                        </option>
+                                                    </select>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <div v-else class="form-group">
-                                                <div class="row">
-                                                    <div class="col-sm-3">
-                                                        <label>Custodian</label>
-                                                    </div>
-                                                    <div class="col-sm-9">
-                                                        <select 
-                                                            id="physical_artifact_custodians"  
-                                                            name="physical_artifact_custodians"  
-                                                            ref="physical_artifact_custodians" 
-                                                            class="form-control" 
-                                                        />
-                                                        <!--select :disabled="readonlyForm" ref="physical_artifact_department_users_custodian" class="form-control" v-model="physical_artifact.custodian_email">
-                                                            <option  v-for="option in departmentStaffList" :value="option.email" v-bind:key="option.pk">
-                                                            {{ option.name }}
-                                                            </option>
-                                                        </select-->
+                                                    <div v-else class="col-sm-6">
+                                                    <select :disabled="readonlyForm" class="form-control" v-model="physical_artifact.statement_id" ref="setStatement">
+                                                        <option  v-for="option in physical_artifact.available_statement_artifacts" :value="option.id" v-bind:key="option.id">
+                                                        {{ option.document_type_display }}: {{ option.identifier }}
+                                                        </option>
+                                                    </select>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="row">
-                                                    <label class="col-sm-3">Date</label>
-                                                    <div class="col-sm-3">
-                                                        <div class="input-group date" ref="artifactDatePicker">
-                                                            <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="physical_artifact.artifact_date" />
+                                                </div>
+                                                <div v-if="custodianVisibility" class="form-group">
+                                                    <div class="row">
+                                                        <div class="col-sm-3">
+                                                            <label class="fw-bold">Custodian</label>
+                                                        </div>
+                                                        <div class="col-sm-9">
+                                                                {{ selectedStatementArtifact.custodian }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div v-else class="form-group">
+                                                    <div class="row">
+                                                        <div class="col-sm-3">
+                                                            <label class="fw-bold">Custodian</label>
+                                                        </div>
+                                                        <div class="col-sm-9">
+                                                            <select 
+                                                                id="physical_artifact_custodians"  
+                                                                name="physical_artifact_custodians"  
+                                                                ref="physical_artifact_custodians" 
+                                                                class="form-control" 
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-sm-3 fw-bold">Date</label>
+                                                        <div class="col-sm-3">
+                                                            <div class="input-group date" ref="artifactDatePicker">
+                                                                <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="physical_artifact.artifact_date" />
+                                                                <!--<span class="input-group-addon">
+                                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                                                </span>-->
+                                                            </div>
+                                                        </div>
+                                                        <label class="col-sm-3 fw-bold">Time</label>
+                                                        <div class="col-sm-3">
+                                                            <div class="input-group date" ref="artifactTimePicker">
+                                                            <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="physical_artifact.artifact_time"/>
                                                             <!--<span class="input-group-addon">
                                                                 <span class="glyphicon glyphicon-calendar"></span>
                                                             </span>-->
-                                                        </div>
-                                                    </div>
-                                                    <label class="col-sm-3">Time</label>
-                                                    <div class="col-sm-3">
-                                                        <div class="input-group date" ref="artifactTimePicker">
-                                                          <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="physical_artifact.artifact_time"/>
-                                                          <!--<span class="input-group-addon">
-                                                              <span class="glyphicon glyphicon-calendar"></span>
-                                                          </span>-->
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="form-group">
-                                              <div class="row">
-                                                <div class="col-sm-3">
-                                                  <label>Description</label>
-                                                </div>
-                                                <div class="col-sm-9">
-                                                  <textarea :readonly="readonlyForm" class="form-control" v-model="physical_artifact.description"/>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div v-if="siezureNoticeVisibility" class="form-group">
+                                                <div class="form-group">
                                                 <div class="row">
                                                     <div class="col-sm-3">
-                                                        <label class="control-label float-start" for="Name">Seizure Notice</label>
+                                                    <label  class="fw-bold">Description</label>
                                                     </div>
-                                                    <div v-if="parentModal" class="col-sm-9">
-                                                        <filefield
-                                                        ref="default_document"
-                                                        name="default_document"
-                                                        :isRepeatable="true"
-                                                        documentActionUrl="temporary_document"
-                                                        :readonly="readonlyForm"
-                                                        @update-temp-doc-coll-id="addToTemporaryDocumentCollectionList"/>
+                                                    <div class="col-sm-9">
+                                                    <textarea :readonly="readonlyForm" class="form-control" v-model="physical_artifact.description"/>
                                                     </div>
-                                                    <div v-else class="col-sm-9">
-                                                        <filefield 
-                                                        ref="physical_artifact_documents" 
-                                                        name="physical-artifact-documents" 
-                                                        :isRepeatable="true" 
-                                                        :documentActionUrl="physical_artifact.defaultDocumentUrl" 
-                                                        :readonly="readonlyForm"
+                                                </div>
+                                                </div>
+                                                <div v-if="siezureNoticeVisibility" class="form-group">
+                                                    <div class="row">
+                                                        <div class="col-sm-3">
+                                                            <label class="control-label float-start fw-bold" for="Name">Seizure Notice</label>
+                                                        </div>
+                                                        <div v-if="parentModal" class="col-sm-9">
+                                                            <filefield
+                                                            ref="default_document"
+                                                            name="default_document"
+                                                            :isRepeatable="true"
+                                                            documentActionUrl="temporary_document"
+                                                            :readonly="readonlyForm"
+                                                            @update-temp-doc-coll-id="addToTemporaryDocumentCollectionList"/>
+                                                        </div>
+                                                        <div v-else class="col-sm-9">
+                                                            <filefield 
+                                                            ref="physical_artifact_documents" 
+                                                            name="physical-artifact-documents" 
+                                                            :isRepeatable="true" 
+                                                            :documentActionUrl="physical_artifact.defaultDocumentUrl" 
+                                                            :readonly="readonlyForm"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </FormSection>
+                                </div>
+                                <div :id="detailsTab" :class="detailsTabClass" v-bind:key="artifactType" v-if="detailsSchemaVisibility">
+                                    <FormSection :formCollapse="false" label="Details">
+                                        <div class="card-body">
+                                            <div class="col-sm-12 form-group"><div class="row">
+                                                <div>
+                                                    <div v-for="(item, index) in detailsSchema">
+                                                    <compliance-renderer-block
+                                                        :component="item"
+                                                        :readonlyForm="readonlyForm"
+                                                        v-bind:key="`compliance_renderer_block${index}`"
+                                                        @update-temp-doc-coll-id="addToTemporaryDocumentCollectionList"
                                                         />
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div></div>
                                         </div>
                                     </FormSection>
                                 </div>
-                                <!--div :id="detailsTab" class="tab-pane fade in li-top-buffer">
-                                    details
-                                </div>
-                                <div :id="storageTab" class="tab-pane fade in li-top-buffer">
-                                    storage
-                                </div>
-                                <div :id="disposalTab" class="tab-pane fade in li-top-buffer">
-                                    disposal
-                                </div-->
-                                <div :id="detailsTab" :class="detailsTabClass" v-bind:key="artifactType">
-                                    <FormSection :formCollapse="false" label="Details">
-                                        <div class="col-sm-12 form-group"><div class="row">
-                                            <div v-if="detailsSchemaVisibility">
-                                                <div v-for="(item, index) in detailsSchema">
-                                                <compliance-renderer-block
-                                                    :component="item"
-                                                    :readonlyForm="readonlyForm"
-                                                    v-bind:key="`compliance_renderer_block${index}`"
-                                                    @update-temp-doc-coll-id="addToTemporaryDocumentCollectionList"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div></div>
-                                    </FormSection>
-                                </div>
-                                <div :id="storageTab" :class="storageTabClass">
+                                <div :id="storageTab" :class="storageTabClass" v-if="storageSchemaVisibility">
                                     <FormSection :formCollapse="false" label="Storage" v-bind:key="artifactType">
-                                        <div class="col-sm-12 form-group"><div class="row">
-                                            <div v-if="storageSchemaVisibility"> 
-                                                <div v-for="(item, index) in storageSchema">
-                                                <compliance-renderer-block
-                                                    :component="item"
-                                                    :readonlyForm="readonlyForm"
-                                                    v-bind:key="`compliance_renderer_block${index}`"
-                                                    />
+                                        <div class="card-body">
+                                            <div class="col-sm-12 form-group"><div class="row">
+                                                <div> 
+                                                    <div v-for="(item, index) in storageSchema">
+                                                    <compliance-renderer-block
+                                                        :component="item"
+                                                        :readonlyForm="readonlyForm"
+                                                        v-bind:key="`compliance_renderer_block${index}`"
+                                                        />
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div></div>
+                                            </div></div>
+                                        </div>
                                     </FormSection>
                                 </div>
-                                <!--div v-if="disposalTabVisibility" :id="disposalTab" :class="disposalTabClass"-->
                                 <div :id="disposalTab" :class="disposalTabClass">
                                     <FormSection :formCollapse="false" label="Disposal">
-                                        <div class="col-sm-12 form-group"><div class="row">
-                                            <div class="col-sm-3">
-                                              <label>Disposal Method</label>
-                                            </div>
-                                            <div class="col-sm-6">
-                                              <select :disabled="readonlyForm" class="form-control" v-model="physical_artifact.disposal_method">
-                                                <option  v-for="option in disposalMethods" :value="option" v-bind:key="option.id">
-                                                  {{ option.disposal_method }}
-                                                </option>
-                                              </select>
-                                            </div>
-                                        </div></div>
-                                        <div class="col-sm-12 form-group"><div class="row">
-                                            <label class="col-sm-3">Date</label>
-                                            <div class="col-sm-3">
-                                                <div class="input-group date" ref="disposalDatePicker">
-                                                    <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="physical_artifact.disposal_date" />
-                                                    <!--<span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>-->
+                                        <div class="card-body">
+                                            <div class="col-sm-12 form-group"><div class="row">
+                                                <div class="col-sm-3">
+                                                <label class="fw-bold">Disposal Method</label>
                                                 </div>
+                                                <div class="col-sm-6">
+                                                <select :disabled="readonlyForm" class="form-control" v-model="physical_artifact.disposal_method">
+                                                    <option  v-for="option in disposalMethods" :value="option" v-bind:key="option.id">
+                                                    {{ option.disposal_method }}
+                                                    </option>
+                                                </select>
+                                                </div>
+                                            </div></div>
+                                            <div class="col-sm-12 form-group"><div class="row">
+                                                <label class="col-sm-3 fw-bold">Date</label>
+                                                <div class="col-sm-3">
+                                                    <div class="input-group date" ref="disposalDatePicker">
+                                                        <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="physical_artifact.disposal_date" />
+                                                    </div>
+                                                </div>
+                                            </div></div>
+                                            <div class="col-sm-3">
+                                            <label class="fw-bold">Disposal details</label>
                                             </div>
-                                        </div></div>
-                                        <div class="col-sm-3">
-                                          <label>Disposal details</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                          <textarea :readonly="readonlyForm" class="form-control" v-model="physical_artifact.disposal_details"/>
+                                            <div class="col-sm-9">
+                                            <textarea :readonly="readonlyForm" class="form-control" v-model="physical_artifact.disposal_details"/>
+                                            </div>
                                         </div>
                                     </FormSection>
                                 </div>
                                 <div :id="relatedItemsTab" v-if="!parentModal" :class="relatedItemsTabClass">
                                     <FormSection :formCollapse="false" label="Related Items">
-                                        <div class="col-sm-12 form-group"><div class="row">
-                                            <div class="col-sm-12" v-if="relatedItemsVisibility">
-                                                <RelatedItems
-                                                :parent_update_related_items="setRelatedItems" 
-                                                v-bind:key="relatedItemsBindId" 
-                                                :readonlyForm="readonlyForm"
-                                                parentComponentName="physical_artifact"
-                                                />
-                                            </div>
-                                        </div></div>
+                                        <div class="card-body">
+                                            <div class="col-sm-12 form-group"><div class="row">
+                                                <div class="col-sm-12" v-if="relatedItemsVisibility">
+                                                    <RelatedItems
+                                                    :parent_update_related_items="setRelatedItems" 
+                                                    v-bind:key="relatedItemsBindId" 
+                                                    :readonlyForm="readonlyForm"
+                                                    parentComponentName="physical_artifact"
+                                                    />
+                                                </div>
+                                            </div></div>
+                                        </div>
                                     </FormSection>
                                 </div>
                             </div>
@@ -324,8 +316,6 @@ export default {
             isModalOpen: false,
             processingDetails: false,
             documentActionUrl: '',
-            //temporary_physical_collection_id: null,
-            //temporary_physical_collection_list: [],
             physicalArtifactTypes: [],
             departmentStaffList: [],
             selectedCustodian: {},
@@ -359,12 +349,6 @@ export default {
                     dataSrc: 'data',
                     data: function(d) {
                         d.object_type = 'physical_artifact'
-                        /*
-                        d.type = vm.filterType;
-                        d.status = vm.filterStatus;
-                        d.date_from = vm.filterDateFromPicker;
-                        d.date_to = vm.filterDateToPicker;
-                        */
                     }
                 },
                 columns: [
@@ -397,7 +381,6 @@ export default {
                             let documentArtifactType = data.artifact_type ? data.artifact_type.replace(/\s/g, '~') : null;
                             let documentArtifactIdentifier = data.identifier ? data.identifier.replace(/\s/g, '~') : null;
                             return `<a data-id=${documentArtifactId} data-artifact-type=${documentArtifactType} data-data-type="document_artifact" data-identifier=${documentArtifactIdentifier} class="row_insert" href="#">Insert</a><br/>`
-                            //return `<a class="row_insert" href="#">Insert</a><br/>`
                         }
                     }
                 ],
@@ -406,11 +389,6 @@ export default {
                 'Number',
                 'Document Type',
                 'Identifier',
-                /*
-                'Date',
-                'Custodian',
-                'Status',
-                */
                 'Documents',
                 'Action',
             ],
@@ -485,7 +463,7 @@ export default {
         componentClass: function() {
             let componentClass = '';
             if (this.parentModal) {
-                componentClass = 'col-sm-11 child-artifact-component';
+                componentClass = 'col-sm-12 child-artifact-component';
             }
             return componentClass;
         },
@@ -538,15 +516,6 @@ export default {
           }
           return ret_val;
         },
-        /*
-        legalCaseExists: function() {
-          let caseExists = false;
-          if (this.legal_case && this.legal_case.id) {
-              caseExists = true;
-          }
-          return caseExists;
-        },
-        */
         linkedLegalCase: function() {
             let caseExists = false;
             if (this.physical_artifact && this.physical_artifact.legal_case_id_list && this.physical_artifact.legal_case_id_list.length > 0) {
@@ -559,12 +528,6 @@ export default {
         },
         officerVisibility: function() {
             let visibility = true;
-            /*
-            let visibility = false;
-            if (this.artifactType !== 'Expert Statement' && this.statementArtifactTypes.includes(this.artifactType)) {
-                visibility = true;
-            }
-            */
             return visibility;
         },
         physicalArtifactId: function() {
@@ -603,7 +566,6 @@ export default {
             let display = '';
             if (this.artifactType) {
                 for (let physicalArtifactType of this.physicalArtifactTypes) {
-                    //if (this.artifactType && this.artifactType.id === this.artifactType) {
                     if (physicalArtifactType.artifact_type === this.artifactType) {
                         display = physicalArtifactType.artifact_type_display;
                     }
@@ -611,15 +573,6 @@ export default {
             }
             return display;
         },
-        /*
-        readonlyForm: function() {
-            let retValue = true;
-            if (!this.readonly) {
-                retValue = false;
-            }
-            return retValue;
-        },
-        */
         updateSearchPersonOrganisationBindId: function() {
             this.uuid += 1
             return "PhysicalArtifact_SearchPerson_" + this.uuid.toString();
@@ -661,13 +614,15 @@ export default {
         },
         objectTabListClass: function() {
             let tabClass = 'nav-item';
+            console.log(this.objectTabSelected)
             if (this.objectTabSelected) {
                 tabClass += ' active';
             }
+            console.log(tabClass)
             return tabClass;
         },
         objectTabClass: function() {
-            let tabClass = 'li-top-buffer tab-pane fade in';
+            let tabClass = 'li-top-buffer tab-pane fade in show';
             if (this.objectTabSelected) {
                 tabClass += ' active';
             }
@@ -1030,10 +985,6 @@ export default {
 </script>
 
 <style lang="css">
-.child-artifact-component {
-    margin-top: 20px;
-    margin-left: 20px;
-}
 .li-top-buffer {
     margin-top: 20px;
 }

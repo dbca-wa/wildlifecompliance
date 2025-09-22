@@ -4,7 +4,7 @@
                     <div v-if="!legalCaseExists || !parentModal">
                         <ul class="nav nav-pills mb-3" id="tabs-main" data-tabs="tabs">
                             <li class="nav-item active"><a data-bs-toggle="tab" class="nav-link active" :href="'#'+newTab">Object</a></li>
-                            <li class="nav-item"><a data-bs-toggle="tab" class="nav-link" :href="'#'+rTab">Related Items</a></li>
+                            <li class="nav-item" v-if="relatedItemsVisibility"><a data-bs-toggle="tab" class="nav-link" :href="'#'+rTab">Related Items</a></li>
                         </ul>
                     </div>
                     <div v-else>
@@ -203,7 +203,7 @@
                             </div>
                             </FormSection>
                         </div>
-                        <div v-if="!legalCaseExists || !parentModal" :id="rTab" class="tab-pane fade" role="tabpanel">
+                        <div v-if="(!legalCaseExists || !parentModal) && relatedItemsVisibility" :id="rTab" class="tab-pane fade" role="tabpanel">
                             <FormSection :formCollapse="false" label="Related Items" index="related_items">
                                 <div class="card-body">
                                     <div class="col-sm-12 form-group"><div class="row">
@@ -742,9 +742,6 @@ export default {
 </script>
 
 <style lang="css">
-.child-artifact-component {
-    margin-top: 20px;
-}
 .li-top-buffer {
     margin-top: 20px;
 }
