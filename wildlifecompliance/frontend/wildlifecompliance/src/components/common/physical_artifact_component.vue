@@ -191,7 +191,6 @@
                                 </div>
                                 <div :id="detailsTab" :class="detailsTabClass" v-bind:key="artifactType" v-if="detailsSchemaVisibility">
                                     <FormSection :formCollapse="false" label="Details">
-                                        <div class="card-body">
                                             <div class="col-sm-12 form-group"><div class="row">
                                                 <div>
                                                     <div v-for="(item, index) in detailsSchema">
@@ -204,12 +203,10 @@
                                                     </div>
                                                 </div>
                                             </div></div>
-                                        </div>
                                     </FormSection>
                                 </div>
                                 <div :id="storageTab" :class="storageTabClass" v-if="storageSchemaVisibility">
                                     <FormSection :formCollapse="false" label="Storage" v-bind:key="artifactType">
-                                        <div class="card-body">
                                             <div class="col-sm-12 form-group"><div class="row">
                                                 <div> 
                                                     <div v-for="(item, index) in storageSchema">
@@ -221,7 +218,6 @@
                                                     </div>
                                                 </div>
                                             </div></div>
-                                        </div>
                                     </FormSection>
                                 </div>
                                 <div :id="disposalTab" :class="disposalTabClass">
@@ -881,15 +877,16 @@ export default {
         loadSchema: async function() {
             this.$nextTick(async () => {
                 if (this.artifactTypeId) {
-                    console.log("really load schema")
                     let url = helpers.add_endpoint_json(
                                 api_endpoints.physical_artifact_types,
                                 this.artifactTypeId + '/get_schema',
                                 );
                     let returnedSchema = await cache_helper.getSetCache(
-                    'PhysicalArtifactTypeSchema',
-                    this.artifactTypeId.toString(),
-                    url);
+                        'PhysicalArtifactTypeSchema',
+                        this.artifactTypeId.toString(),
+                        url
+                    );
+                    console.log(returnedSchema)
                     if (returnedSchema) {
                         Object.assign(this.detailsSchema, returnedSchema.details_schema);
                         Object.assign(this.storageSchema, returnedSchema.storage_schema);
