@@ -189,7 +189,6 @@ export default {
                       this.$parent.constructRelatedItemsTable();
                   }
                   this.close();
-                  //this.$router.push({ name: 'internal-inspection-dash' });
               }
           }
       },

@@ -6,20 +6,20 @@
                 :form-collapse="false"
                 label="Person and Organisation Search"
             >
-                <div class="panel panel-default">
+                <div class="card-body mb-3">
                     <div class="form-group">
                         <div class="row">   
                             <div class="form-check form-check-inline col-md-3">
-                            <input type="radio" value="starts_with" v-model="search_option"/> 
-                            <label class="form-check-label">Starts with</label>
+                            <input class="form-check-input" type="radio" value="starts_with" v-model="search_option"/> 
+                            <label class="form-check-label fw-bold">Starts with</label>
                             </div>
                             <div class="form-check form-check-inline col-md-3">
-                            <input type="radio" value="ends_with" v-model="search_option"/> 
-                            <label class="form-check-label">Ends with</label>
+                            <input class="form-check-input" type="radio" value="ends_with" v-model="search_option"/> 
+                            <label class="form-check-label fw-bold">Ends with</label>
                             </div>
                             <div class="form-check form-check-inline col-md-3">
-                            <input type="radio" value="contains" v-model="search_option"/> 
-                            <label class="form-check-label">Contains</label>
+                            <input class="form-check-input" type="radio" value="contains" v-model="search_option"/> 
+                            <label class="form-check-label fw-bold">Contains</label>
                             </div>
                         </div>
                         <div class="row">
@@ -52,27 +52,27 @@
                 :form-collapse="false"
                 label="Keywords"
             >
-                <div class="panel panel-default">
+                <div class="card-body mb-3">
                     <div class="row">
                       <div>
                         <div class="form-group">
-                          <label for="" class="control-label col-lg-12">Filter</label>
+                          <label for="" class="control-label col-lg-12 fw-bold">Filter</label>
                           <div class="form-check form-check-inline col-md-3">
                               <input  class="form-check-input" ref="searchApplication" id="searchApplication" name="searchApplication" type="checkbox" v-model="searchApplication" />
-                              <label class="form-check-label" for="searchApplication">Application</label>
+                              <label class="form-check-label fw-bold" for="searchApplication">Application</label>
 
                           </div>
                           <div class="form-check form-check-inline col-md-3">
                               <input  class="form-check-input" ref="searchLicence" id="searchLicence" name="searchLicence" type="checkbox" v-model="searchLicence" />
-                              <label class="form-check-label" for="searchLicence">Licence</label>
+                              <label class="form-check-label fw-bold" for="searchLicence">Licence</label>
                           </div>
                           <div class="form-check form-check-inline col-md-3">
                               <input  class="form-check-input" ref="searchReturn" id="searchReturn" name="searchReturn" type="checkbox" v-model="searchReturn" />
-                              <label class="form-check-label" for="searchReturn">Return with requirements</label>
+                              <label class="form-check-label fw-bold" for="searchReturn">Return with requirements</label>
                           </div>
-                          <label for="" class="control-label col-lg-12">Keyword</label>
+                          <label for="" class="control-label col-lg-12 fw-bold">Keyword</label>
                             <div class="col-md-9">
-                              <input type="search"  class="form-control input-sm" name="details" placeholder="" v-model="keyWord"></input>
+                              <input type="search" class="form-control" name="details" placeholder="" v-model="keyWord"></input>
                             </div>
                             <div class="col-md-3">
                               <input type="button" @click.prevent="addKeyword" class="btn btn-primary" value="Add"/>
@@ -114,10 +114,13 @@
                 :form-collapse="false"
                 label="Reference Number"
             >
-                <div class="panel panel-default">
-                    <div class="row col-lg-12">
-                        <span>Search on the following items via Reference Number:</span>
-                        <ul>
+                <div class="card-body mb-3">
+                    <div class="row mb-3">
+                    <span class="fw-bold">Search on the following items via Reference Number:</span>
+                    </div>
+                    <div class="row mb-3">
+                        
+                        <ul style="margin-left:25px">
                             <li>Applications (e.g. A000001)</li>
                             <li>Licences (e.g. L000001)</li>
                             <li>Returns (e.g. R000001)</li>
@@ -137,9 +140,9 @@
                         </ul>
                     </div>
                     <div class="row">
-                       <label for="" class="control-label col-lg-12">Reference Number</label>
+                       <label for="" class="control-label col-lg-12 fw-bold">Reference Number</label>
                           <div class="col-md-8">
-                              <input type="search"  class="form-control input-sm" name="referenceWord" placeholder="" v-model="referenceWord"></input>
+                              <input type="search"  class="form-control" name="referenceWord" placeholder="" v-model="referenceWord"></input>
                           </div>
                           <div v-if="showSpinner">
                             <i class='fa fa-2x fa-spinner fa-spin'></i>
