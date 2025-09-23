@@ -965,7 +965,7 @@ export default {
             if (this.$refs.search_person_organisation && this.$refs.search_person_organisation.entityIsPerson) {
                 savedPerson = await this.$refs.search_person_organisation.parentSave()
                 // if person save ok, continue with Inspection save
-                if (savedPerson && savedPerson.ok) {
+                if (savedPerson) {
                     savedCallEmail = await this.saveCallEmail({ crud: 'save' });
                     this.isProcessing = false;
                 }

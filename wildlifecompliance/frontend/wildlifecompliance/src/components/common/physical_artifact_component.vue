@@ -777,7 +777,6 @@ export default {
             let payload = {
                 "legal_case_id": this.legalCaseId
             }
-            //console.log(payload);
             await fetch_util.fetchUrl(fetchUrl, {method:"PUT",body:JSON.stringify(payload)});
             let physicalArtifactType = e.target.dataset.artifactType.replace(/~/g, ' ');
             let physicalArtifactIdentifier = e.target.dataset.identifier.replace(/~/g, ' ').replace('null', '');
@@ -790,7 +789,6 @@ export default {
                         display: physicalArtifactType,
                     });
             });
-            //this.$parent.$parent.ok();
         },
         addEventListeners: function() {
             let vm = this;

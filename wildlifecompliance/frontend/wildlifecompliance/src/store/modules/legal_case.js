@@ -290,7 +290,7 @@ export const legalCaseStore = {
                     console.log(payload);
                     savedLegalCase = await fetch_util.fetchUrl(fetchUrl, {method:"PUT",body:JSON.stringify(payload)});
                 }
-                if (fullHttpResponse && savedLegalCase.ok) {
+                if (fullHttpResponse) {
                     console.log(savedLegalCase)
                     await dispatch("setLegalCase", savedLegalCase);
                 }

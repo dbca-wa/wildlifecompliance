@@ -194,8 +194,8 @@ export default {
         }
         // post payload to url, then
         let relatedItems = await fetch_util.fetchUrl(url, {method:'POST', body:JSON.stringify(payload)});
-        if (relatedItems.ok) {
-            await this.parent_update_related_items(relatedItems.body);
+        if (relatedItems) {
+            await this.parent_update_related_items(relatedItems);
         }
     },
 

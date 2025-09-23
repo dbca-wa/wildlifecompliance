@@ -920,7 +920,7 @@ export default {
               console.log("savePerson")
               savedPerson = await this.$refs.search_person_organisation.parentSave()
               // if person save ok, continue with Inspection save
-              if (savedPerson && savedPerson.ok) {
+              if (savedPerson) {
                   savedInspection = await this.saveInspection({ create: false, internal: false });
                   this.isProcessing = false;
               }

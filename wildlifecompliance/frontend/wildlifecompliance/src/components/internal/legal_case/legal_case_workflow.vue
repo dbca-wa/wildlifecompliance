@@ -141,13 +141,12 @@ export default {
       ok: async function () {
           const response = await this.sendData();
           console.log(response);
-          if (response.ok) {
+          if (response) {
               this.close();
               if (this.saveAndExit) {
                   this.$router.push({ name: 'internal-legal-case-dash' });
               } else {
                   this.$router.go();
-                  //window.location.reload(true);
               }
           }
       },
@@ -177,7 +176,7 @@ export default {
           // save workflow modal
           try {
               let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
-              if (res.ok) {
+              if (res) {
                   return res
               }
           } catch(err) {

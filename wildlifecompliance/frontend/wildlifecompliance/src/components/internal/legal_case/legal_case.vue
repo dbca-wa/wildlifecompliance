@@ -1464,13 +1464,13 @@ export default {
                 "deleted": true,
             })}
             );
-        if (returnedEntry.ok) {
+        if (returnedEntry) {
             // required for running_sheet_history
-            await this.setRunningSheetEntry(returnedEntry.body);
+            await this.setRunningSheetEntry(returnedEntry);
             let i = 0;
             for (let r of this.runningSheetUrl) {
                 if (r.number === rowNumber) {
-                    this.runningSheetUrl.splice(i, 1, returnedEntry.body);
+                    this.runningSheetUrl.splice(i, 1, returnedEntry);
                     this.runningSheetUrl[i].description = this.tokenToHtml(this.runningSheetUrl[i].description);
                 }
                 i += 1
@@ -1502,13 +1502,13 @@ export default {
                 "deleted": false,
             })}
             );
-        if (returnedEntry.ok) {
+        if (returnedEntry) {
             // required for running_sheet_history
-            await this.setRunningSheetEntry(returnedEntry.body);
+            await this.setRunningSheetEntry(returnedEntry);
             let i = 0;
             for (let r of this.runningSheetUrl) {
                 if (r.number === rowNumber) {
-                    this.runningSheetUrl.splice(i, 1, returnedEntry.body);
+                    this.runningSheetUrl.splice(i, 1, returnedEntry);
                     this.runningSheetUrl[i].description = this.tokenToHtml(this.runningSheetUrl[i].description);
                 }
                 i += 1
