@@ -589,7 +589,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                             instance.number), request)
                     headers = self.get_success_headers(serializer.data)
                     full_http_response = request.data.get('full_http_response')
-                    #no_running_sheet = request.data.get('no_running_sheet')
+                    
                     if full_http_response:
                         return_serializer = self.variable_serializer(request, instance)
                         return Response(
@@ -597,21 +597,14 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                                 status=status.HTTP_201_CREATED,
                                 headers=headers
                                 )
-                    #elif no_running_sheet:
-                     #   return_serializer = LegalCaseNoRunningSheetSerializer(
-                      #          instance, 
-                       #         context={'request': request}
-                        #        )
-                        #return Response(
-                         #       return_serializer.data,
-                          #      status=status.HTTP_201_CREATED,
-                           #     headers=headers
-                            #    )
                     else:
                         return Response(
+                                {},
                                 status=status.HTTP_201_CREATED,
                                 headers=headers
                                 )
+                else:
+                    return Response({})
 
         except serializers.ValidationError:
             print(traceback.print_exc())

@@ -912,9 +912,6 @@ export default {
     }) {
         // destroy modal
         this.personOrArtifactInitialised = false;
-        console.log(row_number_selected);
-        console.log(entity);
-        console.log(action);
         let recordNumber = row_number_selected;
         let recordNumberElement = $('#' + recordNumber)
         let recordDescriptionHtml = ''
@@ -936,8 +933,6 @@ export default {
         }
     },
     insertPersonModalUrl: function({"entity": entity, "recordNumberElement": recordNumberElement}) {
-        console.log(entity);
-        console.log(recordNumberElement);
         let replacementVal = ''
         let urlId = entity.data_type + "-" + entity.id;
         if (entity.full_name) {
@@ -952,7 +947,6 @@ export default {
         return recordDescriptionHtml;
     },
     insertArtifactModalUrl: function({"entity": entity, "recordNumberElement": recordNumberElement}) {
-        console.log(entity)
         let replacementVal = '';
         let urlDescription = entity.identifier ? entity.identifier : entity.display;
         let urlId = entity.data_type + "-" + entity.id;
@@ -960,15 +954,7 @@ export default {
         if (urlDescription) {
             //replacementVal = `<a contenteditable="false" id="${urlId}" class="entity_edit" target="_blank" href="/internal/object/${entity.id}">${urlDescription}</a>`;
             replacementVal = `<span contenteditable="false" id="${urlId}" class="entity_edit">${urlDescription}</span>`;
-            // add to runningSheetArtifactList
-            /*
-            if (this.legal_case && !this.legal_case.runningSheetArtifactList) {
-                this.legal_case.runningSheetArtifactList = []
-            }
-            this.legal_case.runningSheetArtifactList.push(entity)
-            */
         }
-        //let recordDescriptionHtml = recordNumberElement[0].innerHTML.replace(this.tabSelectedKeyCombination, replacementVal).replace(/&nbsp\;/g, ' ');
         let recordDescriptionHtml = recordNumberElement[0].innerHTML.replace(this.tabSelectedKeyCombination, replacementVal);
         console.log(recordDescriptionHtml);
         return recordDescriptionHtml;
@@ -976,27 +962,18 @@ export default {
     cancelModalUrl: function(recordNumberElement) {
         console.log(recordNumberElement)
         let replacementVal = ''
-        //let recordDescriptionHtml = recordNumberElement[0].innerHTML.replace(this.tabSelectedKeyCombination, replacementVal).replace(/&nbsp\;/g, ' ');
         let recordDescriptionHtml = recordNumberElement[0].innerHTML.replace(this.tabSelectedKeyCombination, replacementVal);
         return recordDescriptionHtml;
     },
     insertModalUrl: function({"entity": entity, "recordNumberElement": recordNumberElement}) {
         console.log(entity)
         let replacementVal = ''
-        /*
-        console.log(entity)
-        console.log(recordNumberElement)
-        */
 
         if (entity.url) {
-            //let fullUrl = "https://" + entity.url.trim();
             let fullUrl = entity.urlProtocol + "://" + entity.url.trim();
             replacementVal = `<a contenteditable="false" target="_blank" href=${fullUrl}>${entity.url}</a>`
-            //replacementVal = `<a target="_blank" href=${fullUrl}>${entity.url}</a>`
         }
-        //let recordDescriptionHtml = recordNumberElement[0].innerHTML.replace(this.tabSelectedKeyCombination, replacementVal).replace(/&nbsp\;/g, ' ');
         let recordDescriptionHtml = recordNumberElement[0].innerHTML.replace(this.tabSelectedKeyCombination, replacementVal);
-        //console.log(recordDescriptionHtml)
         return recordDescriptionHtml;
     },
     constructRunningSheetTable: function(pk){
@@ -1004,7 +981,6 @@ export default {
         if (!pk) {
             this.$refs.running_sheet_table.vmDataTable.clear().draw();
         }
-        //let actionColumn = !this.readonlyForm;
         let actionColumn = !this.readonlyRunningSheet;
         if (this.runningSheetUrl){
             for(let i = 0;i < this.runningSheetUrl.length; i++){
@@ -1070,9 +1046,9 @@ export default {
             )
         let updatedRunningSheet = await fetch_util.fetchUrl(fetchUrl, {method:'POST', body:JSON.stringify(payload)});
         console.log(updatedRunningSheet)
-        if (updatedRunningSheet.ok) {
-            await this.setAddRunningSheetEntry(updatedRunningSheet.body);
-            let returnPayload = _.cloneDeep(updatedRunningSheet.body);
+        if (updatedRunningSheet) {
+            await this.setAddRunningSheetEntry(updatedRunningSheet);
+            let returnPayload = _.cloneDeep(updatedRunningSheet);
             returnPayload.description = this.tokenToHtml(returnPayload.description);
             this.runningSheetUrl.push(returnPayload);
             this.constructRunningSheetTable(returnPayload.id);
@@ -1120,7 +1096,6 @@ export default {
       });
     },
     addWorkflow: function(workflow_type) {
-        console.log(workflow_type)
         // open workflow modal
         this.workflow_type = workflow_type;
         this.setLegalCaseWorkflowBindId();
@@ -1193,7 +1168,7 @@ export default {
       this.showExit = false;
     },
     magicMethod: function() {
-        console.log("magic method");
+
         this.$refs.magic.isModalOpen = true;
         this.magic = false;
     },
@@ -1206,21 +1181,12 @@ export default {
         if (this.magic && recordDescription && recordDescription.toLowerCase().includes('shibaken')) {
             this.magicMethod()
         }
-        /*
-        console.log(recordNumber)
-        console.log(recordDescription)
-        console.log(redraw)
-        */
+
         let i = 0;
         for (let r of this.runningSheetUrl) {
             //console.log(r.deleted)
             if (r.number === recordNumber) {
                 r.description = recordDescription
-                /*
-                if (recordDescription) {
-                    r.description = recordDescription
-                }
-                */
                 if (redraw) {
                     this.constructRunningSheetTableEntry( recordNumber );
                 }
@@ -1238,7 +1204,6 @@ export default {
             this.runningSheetEntriesUpdated.push(recordNumber);
         }
 
-        //const ignoreArray = [49, 50, 16]
         const ignoreArray = []
         if (ignoreArray.includes(e.which)) {
             //pass
@@ -1422,7 +1387,6 @@ export default {
     addEventListeners: function() {
       let vm = this;
       let runningSheetTable = $('#running-sheet-table');
-      console.log(runningSheetTable)
       runningSheetTable.on(
           'keydown',
           (e) => {
@@ -1613,8 +1577,6 @@ export default {
     },
     constructRunningSheetTableWrapper: function() {
         this.runningSheetUrl = _.cloneDeep(this.legal_case.running_sheet_entries);
-        console.log('this.runningSheetUrl');
-        console.log(this.runningSheetUrl);
         let i = 0;
         for (let r of this.legal_case.running_sheet_entries) {
             let description = this.tokenToHtml(r.description)

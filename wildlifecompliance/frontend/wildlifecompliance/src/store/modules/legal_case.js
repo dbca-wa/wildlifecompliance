@@ -12,8 +12,6 @@ export const legalCaseStore = {
             user_is_assignee: false,
             user_in_group: false,
             running_sheet_entries: [],
-            //runningSheetArtifactList: [],
-            //runningSheetPersonList: [],
         },
         
     },
@@ -256,14 +254,14 @@ export const legalCaseStore = {
                 // Remove journal_entries from the payload
                 // They seem to be shallow-copied, so you cannot directly delete payload.court_proceedings.journal_entries
                 let temp_journal_entries = Object.create(state.legal_case.court_proceedings.journal_entries);
-                delete payload.court_proceedings.journal_entries
-                state.legal_case.court_proceedings.journal_entries = temp_journal_entries;
+                //delete payload.court_proceedings.journal_entries
+                //state.legal_case.court_proceedings.journal_entries = temp_journal_entries;
 
-                // Remove journal_entries from the payload
-                // They seem to be shallow-copied, so you cannot directly delete payload.court_proceedings.journal_entries
+                // Remove court_dates from the payload
+                // They seem to be shallow-copied, so you cannot directly delete payload.court_proceedings.court_dates
                 let temp_court_dates = Object.create(state.legal_case.court_proceedings.court_dates);
-                delete payload.court_proceedings.court_dates
-                state.legal_case.court_proceedings.court_dates = temp_court_dates;
+                //delete payload.court_proceedings.court_dates
+                //state.legal_case.court_proceedings.court_dates = temp_court_dates;
 
                 if (payload.case_created_date) {
                     payload.case_created_date = moment(payload.planned_for_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
@@ -394,11 +392,5 @@ export const legalCaseStore = {
         setPbDocumentArtifactsTicked({ commit }, pbDocumentArtifactsTicked) {
             commit("updatePbDocumentArtifactsTicked", pbDocumentArtifactsTicked)
         },
-
-        /*
-        setPhysicalArtifactSensitiveUnusedReason({ commit }, reasonEvent) {
-            commit("updatePhysicalArtifactSensitiveUnusedReason", reasonEvent)
-        },
-        */
     },
 };
