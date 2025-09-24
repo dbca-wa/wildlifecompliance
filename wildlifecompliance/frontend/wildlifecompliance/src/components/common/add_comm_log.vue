@@ -17,27 +17,27 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start"  for="Name">To</label>
+                                        <label class="control-label float-start fw-bold"  for="Name">To</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <input type="text" class="form-control" name="to" v-model="to">
+                                        <input type="text" class="form-control fw-bold" name="to" v-model="to">
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start"  for="Name">From</label>
+                                        <label class="control-label float-start fw-bold"  for="Name">From</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <input type="text" class="form-control" name="fromm" v-model="from">
+                                        <input type="text" class="form-control fw-bold" name="fromm" v-model="from">
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start"  for="Name">Type</label>
+                                        <label class="control-label float-start fw-bold" for="Name">Type</label>
                                     </div>
                                     <div class="col-sm-4">
                                         <select class="form-control" name="type" v-model="log_type">
@@ -54,7 +54,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start"  for="Name">Subject/Description</label>
+                                        <label class="control-label float-start fw-bold"  for="Name">Subject/Description</label>
                                     </div>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control" name="subject" style="width:70%;" v-model="subject">
@@ -64,7 +64,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start"  for="Name">Text</label>
+                                        <label class="control-label float-start fw-bold"  for="Name">Text</label>
                                     </div>
                                     <div class="col-sm-9">
                                         <textarea name="text" class="form-control" style="width:70%;" v-model="text"></textarea>
@@ -74,7 +74,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start"  for="Name">Attachments</label>
+                                        <label class="control-label float-start fw-bold" for="Name">Attachments</label>
                                     </div>
                                     <div class="col-sm-9">
                                         <template v-for="(f,i) in files">
@@ -103,11 +103,6 @@
                     </form>
                 </div>
             </div>
-            <!-- <div slot="footer">
-                <button type="button" v-if="addingComms" disabled class="btn btn-default" @click="ok"><i class="fa fa-spinner fa-spin"></i> Adding</button>
-                <button type="button" v-else class="btn btn-default" @click="ok">Add</button>
-                <button type="button" class="btn btn-default" @click="cancel">Cancel</button>
-            </div> -->
             <template #footer>
                 <button type="button" v-if="addingComms" disabled class="btn btn-secondary"><i class="fa fa-spinner fa-spin"></i> Adding</button>
                 <button type="button" v-else class="btn btn-primary" @click="ok">Add</button>
@@ -118,7 +113,6 @@
 </template>
 
 <script>
-// import bootstrapModal from '@vue-utils/bootstrap-modal.vue'
 import bootstrapModal from '@vue-utils/bootstrap5-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import { helpers, fetch_util } from "@/utils/hooks.js"
@@ -145,7 +139,6 @@ export default {
     data:function () {
         let vm = this;
         return {
-            // isModalOpen:false,
             form:null,
             comms: {},
             state: 'proposed_licence',
@@ -167,13 +160,7 @@ export default {
             log_type: "",
             subject: "",
             text: "",
-            /*files: [
-                {
-                    'file': null,
-                    'name': ''
-                }
-            ]*/
-           files: [],
+            files: [],
         }
     },
     computed: {
@@ -223,16 +210,13 @@ export default {
         },
         close:function () {
             let vm = this;
-            // this.isModalOpen = false;
             this.$emit('update:modelValue', false); 
             this.comms = {};
             this.errors = false;
             $('.has-error').removeClass('has-error');
-            // this.validation_form.resetForm();
             if (this.validation_form) {
                 this.validation_form.resetForm();
             }
-
             this.to = "";
             this.from = "";
             this.type = "";
@@ -305,11 +289,6 @@ export default {
                 }
             });
         },
-    },
-    mounted:function () {
-            // let vm =this;
-            // vm.form = document.forms.commsForm;
-            // vm.addFormValidations();
     },
     watch: {
         modelValue(newValue) {

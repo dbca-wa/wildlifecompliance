@@ -425,9 +425,8 @@ export default {
                     'error'
                 )
             } else {
-                let request = fetch_util.fetchUrl(api_endpoints.organisation_requests,{method:'POST', body:JSON.stringify(data)},{
-                    emulateJSON:true
-                })
+                console.log(data)
+                let request = fetch_util.fetchUrl(api_endpoints.organisation_requests,{method:'POST', body:data},{})
                 request.then((response) => {
                     vm.registeringOrg = false;
                     vm.uploadedFile = null;
@@ -436,7 +435,7 @@ export default {
                     swal.fire({
                         title: 'Sent',
                         html: 'Your organisation request has been successfully submitted.',
-                        type: 'success',
+                        icon: 'success',
                     }).then(() => {
                         if (this.$route.name == 'account'){
                            window.location.reload(true);
@@ -493,9 +492,8 @@ export default {
                     'error'
                 )
             } else {
-                let request = fetch_util.fetchUrl(api_endpoints.organisation_requests,{method:'POST', body:JSON.stringify(data)},{
-                    emulateJSON:true
-                })
+                console.log(data)
+                let request = fetch_util.fetchUrl(api_endpoints.organisation_requests,{method:'POST', body:data},{})
                 request.then((response) => {
                     vm.registeringOrg = false;
                     vm.uploadedFile = null;
@@ -504,7 +502,7 @@ export default {
                     swal.fire({
                         title: 'Sent',
                         html: 'Your organisation request has been successfully submitted.',
-                        type: 'success',
+                        icon: 'success',
                     }).then(() => {
                         if (this.$route.name == 'account'){
                            window.location.reload(true);
