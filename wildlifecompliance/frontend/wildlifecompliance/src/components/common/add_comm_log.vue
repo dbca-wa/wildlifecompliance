@@ -20,7 +20,7 @@
                                         <label class="control-label float-start"  for="Name">To</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <input type="text" class="form-control" name="to" v-model="comms.to">
+                                        <input type="text" class="form-control" name="to" v-model="to">
                                     </div>
                                 </div>
                             </div>
@@ -30,7 +30,7 @@
                                         <label class="control-label float-start"  for="Name">From</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <input type="text" class="form-control" name="fromm" v-model="comms.fromm">
+                                        <input type="text" class="form-control" name="fromm" v-model="from">
                                     </div>
                                 </div>
                             </div>
@@ -40,7 +40,7 @@
                                         <label class="control-label float-start"  for="Name">Type</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <select class="form-control" name="type" v-model="comms.log_type">
+                                        <select class="form-control" name="type" v-model="log_type">
                                             <option value="">Select Type</option>
                                             <option value="email">Email</option>
                                             <option value="file_note">File Note</option>
@@ -57,7 +57,7 @@
                                         <label class="control-label float-start"  for="Name">Subject/Description</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="subject" style="width:70%;" v-model="comms.subject">
+                                        <input type="text" class="form-control" name="subject" style="width:70%;" v-model="subject">
                                     </div>
                                 </div>
                             </div>
@@ -67,7 +67,7 @@
                                         <label class="control-label float-start"  for="Name">Text</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <textarea name="text" class="form-control" style="width:70%;" v-model="comms.text"></textarea>
+                                        <textarea name="text" class="form-control" style="width:70%;" v-model="text"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -162,12 +162,18 @@ export default {
                 keepInvalid:true,
                 allowInputToggle:true
             },
-            files: [
+            to: "",
+            from: "",
+            log_type: "",
+            subject: "",
+            text: "",
+            /*files: [
                 {
                     'file': null,
                     'name': ''
                 }
-            ]
+            ]*/
+           files: [],
         }
     },
     computed: {
@@ -197,8 +203,6 @@ export default {
             }
             file_obj.file = _file;
             file_obj.name = _file.name;
-            // immediate file upload
-            //vm.sendData();
         },
         removeFile(index){
             let length = this.files.length;
@@ -228,6 +232,13 @@ export default {
             if (this.validation_form) {
                 this.validation_form.resetForm();
             }
+
+            this.to = "";
+            this.from = "";
+            this.type = "";
+            this.subject = "";
+            this.text = "";
+
             let file_length = vm.files.length;
             this.files = [];
             for (var i = 0; i < file_length;i++){
@@ -240,9 +251,19 @@ export default {
         sendData:function(){
             let vm = this;
             vm.errors = false;
-            let comms = new FormData(vm.form); 
+            let comms = new FormData(); 
+            comms.append('to',this.to);
+            comms.append('fromm',this.from);
+            comms.append('type',this.log_type);
+            comms.append('subject',this.subject);
+            comms.append('text',this.text);
+            comms.append('files',this.files);
+            for (let i = 0; i < vm.files.length; i++) {
+                comms.append('files', vm.files[i].file);
+            }
+            console.log(comms)
             vm.addingComms = true;
-            let request = fetch_util.fetchUrl(vm.url,{method:'POST', body:JSON.stringify(comms)},{})
+            let request = fetch_util.fetchUrl(vm.url,{method:'POST', body:comms},{})
             request.then((response)=>{
                     vm.addingComms = false;
                     vm.close();
