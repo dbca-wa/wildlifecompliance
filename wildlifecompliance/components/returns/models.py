@@ -655,10 +655,10 @@ class Return(models.Model):
             #identify new rows from data
             new_indexes = []
             new_dict = {}
-            for i in return_rows:
-                if i.data and 'rowId' in i.data and 'date' in i.data:
-                    new_indexes.append("{}__{}".format(i.data['rowId'],i.data['date']))
-                    new_dict["{}__{}".format(i.data['rowId'],i.data['date'])] = i.data
+            for i in table_rows:
+                if 'rowId' in i and 'date' in i:
+                    new_indexes.append("{}__{}".format(i['rowId'],i['date']))
+                    new_dict["{}__{}".format(i['rowId'],i['date'])] = i
 
             #identify existing rows (via date and row id)
             existing_indexes = []
