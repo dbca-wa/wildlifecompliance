@@ -1,6 +1,9 @@
 <template lang="html">
     <div id="change-contact">
-        <modal @ok="ok()" @cancel="cancel()" title="Add Contact" large>
+        <modal :modelValue="modelValue"
+            @update:modelValue="$emit('update:modelValue', $event)"
+            ok-text="Add" @submit="ok()" @close="cancel()" title="Add Contact" size="lg">
+            
             <form class="form-horizontal" name="addContactForm">
                 <div class="row">
                     <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
@@ -56,13 +59,17 @@
                     </div>
                 </div>
             </form>
+            <template #footer>
+                <button type="button" v-if="addingContact" disabled class="btn btn-secondary"><i class="fa fa-spinner fa-spin"></i> Adding</button>
+                <button type="button" v-else class="btn btn-primary" @click="ok">Add</button>
+                <button type="button" class="btn btn-secondary" @click="close">Cancel</button>
+            </template>
         </modal>
     </div>
 </template>
 
 <script>
-//import $ from 'jquery'
-import modal from '@vue-utils/bootstrap-modal.vue'
+import modal from '@vue-utils/bootstrap5-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import {helpers,api_endpoints,fetch_util} from "@/utils/hooks.js"
 export default {
@@ -72,14 +79,19 @@ export default {
         alert
     },
     props:{
+            modelValue: {
+                type: Boolean,
+                required: true,
+            },
             org_id:{
                 type:Number,
             },
     },
+    emits: ['update:modelValue'],
     data:function () {
         let vm = this;
         return {
-            isModalOpen:false,
+            addingContact: false,
             form:null,
             contact: {},
             errors: false,
@@ -101,10 +113,8 @@ export default {
                 vm.sendData();
             }
         },
-        cancel:function () {
-        },
         close:function () {
-            this.isModalOpen = false;
+            this.$emit('update:modelValue', false); 
             this.contact = {};
             this.errors = false;
             this.form.reset();
@@ -113,7 +123,7 @@ export default {
             let vm = this;
             let request = fetch_util.fetchUrl(api_endpoints.contact(id))
             request.then((response) => {
-                vm.contact = response; vm.isModalOpen = true;
+                vm.contact = response;
             }).catch((error) => {
                 console.log(error);
             });
@@ -122,34 +132,38 @@ export default {
             let vm = this;
             vm.errors = false;
             if (vm.contact.id){
+                vm.addingContact = true;
                 let contact = vm.contact;
                 let request = fetch_util.fetchUrl(api_endpoints.organisation_contacts(contact.id),
                     {method:"PUT",body:JSON.stringify(contact)},{
                         emulateJSON:true,
                     })
                 request.then((response)=>{
+                        vm.addingContact = false;
                         vm.close();
                     },(error)=>{
                         console.log(error);
+                        vm.addingContact = false;
                         vm.errors = true;
                         vm.errorString = helpers.apiVueResourceError(error);
                     });
             } else {
-                let contact = JSON.parse(JSON.stringify(vm.contact));
+                vm.addingContact = true;
+                let contact = vm.contact;
                 contact.organisation = vm.org_id;
                 let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,vm.org_id+'/add_nonuser_contact'),
-                    {method:'POST', body:contact},{
+                    {method:'POST', body:JSON.stringify(contact)},{
                         emulateJSON:true,
                     })
                 request.then((response)=>{
-                        //vm.$parent.loading.splice('processing contact',1);
+                        vm.addingContact = false;
                         vm.close();
                         vm.$parent.addedContact();
                     },(error)=>{
                         console.log(error);
+                        vm.addingContact = false;
                         vm.errors = true;
                         vm.errorString = helpers.apiVueResourceError(error);
-                        //vm.$parent.loading.splice('processing contact',1);
                     });
                 
             }
@@ -199,12 +213,16 @@ export default {
            let vm = this;
        }
    },
-   mounted:function () {
-       let vm =this;
-       vm.form = document.forms.addContactForm;
-       vm.addFormValidations();
-       //console.log(validate);
-   }
+   watch: {
+        modelValue(newValue) {
+            if (newValue === true) {
+                this.$nextTick(() => {
+                    this.form = document.forms.addContactForm;
+                    this.addFormValidations();
+                });
+            }
+        }
+    },
 }
 </script>
 

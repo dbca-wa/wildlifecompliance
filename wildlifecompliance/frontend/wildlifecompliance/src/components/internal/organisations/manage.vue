@@ -210,7 +210,7 @@
         <!-- </div>
         </div> -->
         <!-- </div> -->
-        <AddContact ref="add_contact" :org_id="org.id" />
+        <AddContact v-model="isAddContactModalOpen" :org_id="org.id" />
     </div>
 </template>
 
@@ -235,6 +235,7 @@ export default {
     data () {
         let vm = this;
         return {
+            isAddContactModalOpen: false,
             adBody: 'adBody'+uuid(),
             aBody: 'aBody'+uuid(),
             pdBody: 'pdBody'+uuid(),

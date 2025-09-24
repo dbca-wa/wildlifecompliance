@@ -82,7 +82,7 @@
                 </FormSection>
             </div>
         </div>
-        <AddContact v-if="loaded" ref="add_contact" :org_id="org_id" />
+        <AddContact v-if="loaded" v-model="isAddContactModalOpen" :org_id="org_id" />
     </div>
 </template>
 
@@ -99,6 +99,7 @@ export default {
     data () {
         let vm = this;
         return {
+            isAddContactModalOpen: false,
             cBody: 'cBody'+uuid(),
             oBody: 'oBody'+uuid(),
             org_id: null,
@@ -245,8 +246,7 @@ export default {
     },
     beforeRouteUpdate: function(to, from, next){
         let id = [utils.fetchOrganisationId(to.params.org_id)];
-        Promise.all(id)
-request.then(res => {
+        Promise.all(id).then(res => {
             let initialisers = [
                 utils.fetchOrganisation(res[0].id),
                 utils.fetchOrganisationPermissions(res[0].id)
@@ -263,8 +263,8 @@ request.then(res => {
         });
     },
     methods: {
-        addContact: function(){
-            this.$refs.add_contact.isModalOpen = true;
+        addContact: function() {
+            this.isAddContactModalOpen = true;
         },
         eventListeners: function(){
             let vm = this;

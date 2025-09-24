@@ -51,43 +51,40 @@ export default {
     apiVueResourceError: function(resp){
         var error_str = '';
         var text = null;
-        if (resp.status === 400) {
-            if (Array.isArray(resp)){
-                text = resp[0];
-            }
-            else if (typeof resp == 'object'){
-                text = resp;
-            }
-            else{
-                text = resp;
-            }
+        if (Array.isArray(resp)){
+            text = resp[0];
+        }
+        else if (typeof resp == 'object'){
+            text = resp;
+        }
+        else{
+            text = resp;
+        }
 
-            if (typeof text == 'object'){
-                if (text.hasOwnProperty('non_field_errors')) {
-                    error_str = text.non_field_errors[0].replace(/[\[\]"]/g, '');
-                }
-                else{
-                    for(const key in text) {
-                      const element = text[key];
-                      if(Array.isArray(element)) {
-                        for(let message of element) {
-                          error_str = message;
-                        }
-                      }
-                      else {
-                        error_str = element;
-                      }
-                    }
-                }
+        if (typeof text == 'object'){
+            if (text.hasOwnProperty('non_field_errors')) {
+                error_str = text.non_field_errors[0].replace(/[\[\]"]/g, '');
             }
             else{
-                error_str = text.replace(/[\[\]"]/g,'');
-                error_str = text.replace(/^['"](.*)['"]$/, '$1');
+                for(const key in text) {
+                  const element = text[key];
+                  if(Array.isArray(element)) {
+                    for(let message of element) {
+                      error_str = message;
+                    }
+                  }
+                  else {
+                    error_str = element;
+                  }
+                }
             }
         }
-        else if ( resp.status === 404) {
-            error_str = 'The resource you are looking for does not exist.';
+        else{
+            error_str = text.replace(/[\[\]"]/g,'');
+            error_str = text.replace(/^['"](.*)['"]$/, '$1');
         }
+        
+
         return error_str;
     },
 
