@@ -2380,7 +2380,6 @@ class ReturnSheet(object):
                     is_empty = False
                     break
             if not is_empty:
-                row_data['rowId'] = str(row_num)
                 rows.append(row_data)
 
         rows = list(sorted(rows, key=lambda row: row['date']))
