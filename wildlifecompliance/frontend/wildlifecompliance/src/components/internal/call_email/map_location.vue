@@ -19,21 +19,21 @@
             </div>
         </div>
 
-        <div class="col-sm-4 form-group"><div class="row">
-            <label class="col-sm-4">Latitude:</label>
+        <div class="row">
+        <div class="col-sm-4 form-group">
+            <label class="col-sm-4 fw-bold">Latitude:</label>
             <div v-if="call_email.location">
                 <input :readonly="isReadonly" type="number" min="-90" max="90" class="form-control" v-model.number="call_email.location.geometry.coordinates[1]" />
             </div>
-        </div></div>
-        <div class="col-sm-4 form-group"><div class="row">
-            <label class="col-sm-4">Longitude:</label>
+        </div>
+        <div class="col-sm-4 form-group">
+            <label class="col-sm-4 fw-bold">Longitude:</label>
             <div v-if="call_email.location">
                 <input :readonly="isReadonly" type="number" min="-180" max="180" class="form-control" v-model.number="call_email.location.geometry.coordinates[0]" />
             </div>
-        </div></div>
-
-        <div class="col-sm-4 form-group"><div class="row">
-            <label class="col-sm-6">BEN Number:</label>
+        </div>
+        <div class="col-sm-4 form-group">
+            <label class="col-sm-6 fw-bold">BEN Number:</label>
             <div>
                 <input :readonly="isReadonly" type="text" class="form-control" v-model="call_email.location.properties.ben_number" />
             </div>
@@ -41,30 +41,30 @@
 
         <div :id="idLocationFieldsAddress">
             <div class="col-sm-12 form-group"><div class="row">
-                <label class="col-sm-4">Street</label>
+                <label class="col-sm-4 fw-bold">Street</label>
                 <input :readonly="isReadonly" class="form-control" v-model="call_email.location.properties.street" readonly />
             </div></div>
             <div class="col-sm-12 form-group"><div class="row">
-                <label class="col-sm-4">Town/Suburb</label>
+                <label class="col-sm-4 fw-bold">Town/Suburb</label>
                 <input :readonly="isReadonly" class="form-control" v-model="call_email.location.properties.town_suburb" readonly />
             </div></div>
             <div class="col-sm-12 form-group"><div class="row">
-                <label class="col-sm-4">State</label>
+                <label class="col-sm-4 fw-bold">State</label>
                 <input :readonly="isReadonly" class="form-control" v-model="call_email.location.properties.state" readonly />
             </div></div>
             <div class="col-sm-12 form-group"><div class="row">
-                <label class="col-sm-4">Postcode</label>
+                <label class="col-sm-4 fw-bold">Postcode</label>
                 <input :readonly="isReadonly" class="form-control" v-model="call_email.location.properties.postcode" readonly />
             </div></div>
             <div class="col-sm-12 form-group"><div class="row">
-                <label class="col-sm-4">Country</label>
+                <label class="col-sm-4 fw-bold">Country</label>
                 <input :readonly="isReadonly" class="form-control" v-model="call_email.location.properties.country" readonly />
             </div></div>
         </div>
 
         <div :id="idLocationFieldsDetails">
             <div class="col-sm-12 form-group"><div class="row">
-                <label class="col-sm-4">Details</label>
+                <label class="col-sm-4 fw-bold">Details</label>
                 <textarea :readonly="isReadonly" class="form-control location_address_field" v-model="call_email.location.properties.details" />
             </div></div>
         </div>
@@ -85,7 +85,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-measure/dist/leaflet-measure.css';
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css'
 import { api_endpoints } from "@/utils/hooks";
- "vue";
+
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import markerGrayLocked from '../../../assets/marker-gray-locked.svg';
 import markerGreenLocked from '../../../assets/marker-green-locked.svg';

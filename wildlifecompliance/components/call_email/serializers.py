@@ -387,17 +387,20 @@ class SaveCallEmailSerializer(serializers.ModelSerializer):
             )
 
     def validate(self, data):
-        custom_errors = {}
+        custom_errors = []
         if not self.context.get('draft'):
             if not data.get("classification_id"):
-                custom_errors["Classification"] = "You must choose classification"
+                #custom_errors["Classification"] = "You must choose classification"
+                custom_errors.append("You must choose classification")
             if not data.get("call_type_id"):
-                custom_errors["Call Type"] = "You must choose call type"
+                #custom_errors["Call Type"] = "You must choose call type"
+                custom_errors.append("You must choose call type")
             if not data.get("brief_nature_of_call"):
-                custom_errors["Brief Nature of Call"] = "You must fill in brief nature of call"
+                #custom_errors["Brief Nature of Call"] = "You must fill in brief nature of call"
+                custom_errors.append("You must fill in brief nature of call")
 
-            if custom_errors.keys():
-                raise serializers.ValidationError(custom_errors)
+            if custom_errors:
+                raise serializers.ValidationError({"message":custom_errors})
 
         return data
 

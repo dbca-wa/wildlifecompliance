@@ -418,13 +418,13 @@ export default {
                 swal.fire({
                     title: "Delete Masterlist",
                     text: "Are you sure you want to delete?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
 
                 }).then(async (result) => {
 
-                    if (result) {
+                    if (result.ok) {
                         let request = fetch_util.fetchUrl(
                             helpers.add_endpoint_json(api_endpoints.schema_masterlist,(self.masterlist.id+'/delete_masterlist')), {method:"DELETE"}
                         )

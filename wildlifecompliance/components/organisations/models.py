@@ -597,7 +597,6 @@ class Organisation(SanitiseMixin):
    #        and org_contact.user_status == OrganisationContact.ORG_CONTACT_STATUS_ACTIVE \
    #        and org_contact.user_role == OrganisationContact.ORG_CONTACT_ROLE_ADMIN
 
-    @property
     def can_user_edit(self, email):
         """
         :return: True if the application is in one of the editable status.

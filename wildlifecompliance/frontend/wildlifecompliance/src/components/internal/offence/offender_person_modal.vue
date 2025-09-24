@@ -158,7 +158,7 @@ import { api_endpoints, helpers, fetch_util } from "@/utils/hooks";
 import utils from '@/components/internal/utils'
 import modal from "@/utils/vue/bootstrap-modal.vue";
 
- "vue";
+
 
 export default {
   name: "Offender",

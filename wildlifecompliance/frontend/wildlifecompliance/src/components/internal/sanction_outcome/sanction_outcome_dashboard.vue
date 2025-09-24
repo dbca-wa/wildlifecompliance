@@ -1,6 +1,6 @@
 <template>
     <div class="container" id="internalSanctionOutcomeDash">
-        <FormSection :label="`Sanction Outcome`" :Index="`0`">
+        <FormSection :label="`Sanction Outcome`" :index="`0`">
 
         <div class="row">
             <div class="col-md-3">

@@ -8,14 +8,17 @@
                     index="contact_details"
                     subtitle="View and update the organisation's contact details"
                 >
-                    <div class="panel panel-default" >
-                        <form class="form-horizontal" action="index.html" method="post">
-                            <div class="col-sm-12">
-                                <button @click.prevent="addContact()" style="margin-bottom:10px;" class="btn btn-primary float-end">Add Contact</button>
+                    <div class="card-body" >
+                        <div class="row">
+                            <div class="col-md-12">
+                            <button @click.prevent="addContact()" style="margin-bottom:10px;" class="btn btn-primary float-end">Add Contact</button>
                             </div>
-                            </br></br>
-                            <datatable ref="contacts_datatable" id="organisation_contacts_datatable" :dtOptions="contacts_options" :dtHeaders="contacts_headers"/>
-                        </form>
+                        </div>
+                        <div class="row">
+                            <form class="form-horizontal" action="index.html" method="post">
+                                <datatable ref="contacts_datatable" id="organisation_contacts_datatable" :dtOptions="contacts_options" :dtHeaders="contacts_headers"/>
+                            </form>
+                        </div>
                   </div>
                 </FormSection>
             </div>
@@ -29,37 +32,38 @@
                     subtitle="Manage the user accounts linked to the organisation"
                 >
                     <div class="panel panel-default">
-                        <div class="col-sm-12 row">
+                        <div class="col-sm-12 row form-group">
                             <h6>Use the Organisation Administrator pin codes if you want the new user to be linked as organisation administrator.<br> Use the Organisation User pin codes if you want the new user to be linked as organisation user.</h6>
                         </div>
                         <form class="form-horizontal" action="index.html" method="post">
-                             <div class="col-sm-6 row">
-                                <div class="form-group">
-                                    <label for="" class="col-sm-6 control-label"> Organisation User Pin Code 1:</label>
+                             <div class="row form-group">
                                     <div class="col-sm-6">
-                                        <label class="control-label">{{org.pins.three}}</label>
+                                        <label for="" class="control-label"> Organisation User Pin Code 1:</label>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="" class="col-sm-6 control-label" >Organisation User Pin Code 2:</label>
                                     <div class="col-sm-6">
-                                        <label class="control-label">{{org.pins.four}}</label>
+                                        {{org.pins.three}}
                                     </div>
-                                </div>
+                                    <div class="col-sm-6">
+                                        <label for="" class="control-label" >Organisation User Pin Code 2:</label>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        {{org.pins.four}}
+                                    </div>
                             </div>
-                             <div class="col-sm-6 row">
-                                <div class="form-group" :disabled ='!myorgperms.is_admin'>
-                                    <label for="" class="col-sm-6 control-label"> Organisation Administrator Pin Code 1:</label>
+                            
+                             <div class="row form-group" :disabled ='!myorgperms.is_admin'>
                                     <div class="col-sm-6">
-                                        <label class="control-label">{{org.pins.one}}</label>
+                                        <label for="" class="control-label"> Organisation Administrator Pin Code 1:</label>
                                     </div>
-                                </div>
-                                <div class="form-group" :disabled ='!myorgperms.is_admin'>
-                                    <label for="" class="col-sm-6 control-label" >Organisation Administrator Pin Code 2:</label>
                                     <div class="col-sm-6">
-                                        <label class="control-label">{{org.pins.two}}</label>
+                                        {{org.pins.one}}
                                     </div>
-                                </div>
+                                    <div class="col-sm-6">
+                                        <label for="" class="control-label" >Organisation Administrator Pin Code 2:</label>
+                                    </div>
+                                    <div class="col-sm-6">
+                                       {{org.pins.two}}
+                                    </div>
                             </div>
                         </form>
                         <div class="col-sm-12 row">
@@ -78,7 +82,7 @@
                 </FormSection>
             </div>
         </div>
-        <AddContact v-if="loaded" ref="add_contact" :org_id="org_id" />
+        <AddContact v-if="loaded" v-model="isAddContactModalOpen" :org_id="org_id" />
     </div>
 </template>
 
@@ -95,6 +99,7 @@ export default {
     data () {
         let vm = this;
         return {
+            isAddContactModalOpen: false,
             cBody: 'cBody'+uuid(),
             oBody: 'oBody'+uuid(),
             org_id: null,
@@ -223,8 +228,7 @@ export default {
     },
     beforeRouteEnter: function(to, from, next){
         let id = [utils.fetchOrganisationId(to.params.org_id)];
-        Promise.all(id)
-request.then(res => {
+        Promise.all(id).then(res => {
             let initialisers = [
                 utils.fetchOrganisation(res[0].id),
                 utils.fetchOrganisationPermissions(res[0].id)
@@ -242,8 +246,7 @@ request.then(res => {
     },
     beforeRouteUpdate: function(to, from, next){
         let id = [utils.fetchOrganisationId(to.params.org_id)];
-        Promise.all(id)
-request.then(res => {
+        Promise.all(id).then(res => {
             let initialisers = [
                 utils.fetchOrganisation(res[0].id),
                 utils.fetchOrganisationPermissions(res[0].id)
@@ -260,8 +263,8 @@ request.then(res => {
         });
     },
     methods: {
-        addContact: function(){
-            this.$refs.add_contact.isModalOpen = true;
+        addContact: function() {
+            this.isAddContactModalOpen = true;
         },
         eventListeners: function(){
             let vm = this;
@@ -274,7 +277,7 @@ request.then(res => {
                 swal.fire({
                     title: "Delete Contact",
                     text: "Are you sure you want to remove "+ name + " (" + email + ") as a contact?",
-                    type: "error",
+                    icon: "error",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
@@ -833,11 +836,11 @@ request.then(res => {
             swal.fire({
                 title: "Unlink From Organisation",
                 text: "Are you sure you want to unlink " + person.name + " from " + org.name + "?",
-                type: "question",
+                icon: "question",
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then((result) => {
-                if (result) {
+                if (result.ok) {
                     let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'),{method:'POST', body:JSON.stringify({'user':person.id})},{
                         emulateJSON:true
                     })

@@ -34,7 +34,7 @@
                                 class="tab-pane fade in active show"
                                 role="tabpanel"
                             >
-                                <FormSection :formCollapse="false" label="Remediation Action" Index="1">
+                                <FormSection :formCollapse="false" label="Remediation Action" index="1">
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-4">
                                             <label>Action Required</label>
@@ -81,7 +81,7 @@
                                 class="tab-pane fade in"
                                 role="tabpanel"
                             >
-                                <FormSection :formCollapse="false" label="Confirmation" Index="2">
+                                <FormSection :formCollapse="false" label="Confirmation" index="2">
 
                                 </FormSection>
                             </div>
@@ -108,7 +108,7 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
- "vue";
+
 import FormSection from "@/components/forms/section_toggle.vue";
 //import datatable from '@vue-utils/datatable.vue'
 //import utils from "@/components/external/utils";

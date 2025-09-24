@@ -158,10 +158,10 @@
                         </ul>
                         <div id="pills-tabContent" class="tab-content">
                             <div :id="soTab" class="tab-pane fade in active show" role="tabpanel">
-                                <FormSection :formCollapse="false" :label="typeDisplay" Index="1">
+                                <FormSection :formCollapse="false" :label="typeDisplay" index="1">
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
-                                            <label>Identifier</label>
+                                            <label class="fw-bold">Identifier</label>
                                         </div>
                                         <div class="col-sm-6">
                                             <input :readonly="readonlyForm" class="form-control" v-model="sanction_outcome.identifier"/>
@@ -170,7 +170,7 @@
 
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
-                                            <label>Offence</label>
+                                            <label class="fw-bold">Offence</label>
                                         </div>
                                         <div class="col-sm-6">
                                             <input readonly="true" class="form-control" v-model="displayOffence"/>
@@ -179,7 +179,7 @@
 
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
-                                            <label>Offender</label>
+                                            <label class="fw-bold">Offender</label>
                                         </div>
                                         <div class="col-sm-6">
 
@@ -190,9 +190,6 @@
                                                         <span v-if="offender">
                                                             {{ offender.person.first_name + ' ' + offender.person.last_name + ', DOB:' + offender.person.dob }}
                                                         </span>
-                                                        <!--<span v-else-if="offender.organisation">
-                                                            {{ offender.organisation.name + ', ABN: ' + offender.organisation.abn }}
-                                                        </span>-->
                                                     </option>
                                                 </select>
                                             </div>
@@ -202,7 +199,7 @@
 
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
-                                            <label>Vehicle Registration Number</label>
+                                            <label class="fw-bold">Vehicle Registration Number</label>
                                         </div>
                                         <div class="col-sm-6">
                                             <input :readonly="readonlyForm" class="form-control" v-model="sanction_outcome.registration_number"/>
@@ -211,13 +208,8 @@
 
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-5">
-                                            <label>Alleged committed offence</label>
+                                            <label class="fw-bold">Alleged committed offence</label>
                                         </div>
-                                            <!--
-                                        <div class="col-sm-6" v-for="item in sanction_outcome.alleged_offences">
-                                            <input :readonly="readonlyForm" class="form-control" v-model="item.act + ', ' + item.name + ', ' + item.offence_text"/>
-                                        </div>
-                                            -->
                                         <div class="col-sm-12 form-group"><div class="row">
                                             <div class="col-sm-12">
                                                 <datatable ref="alleged_committed_offence_table" id="alleged-committed-offence-table" :dtOptions="dtOptionsAllegedOffence" :dtHeaders="dtHeadersAllegedOffence" />
@@ -228,7 +220,7 @@
 
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
-                                            <label>Issued on paper?</label>
+                                            <label class="fw-bold">Issued on paper?</label>
                                         </div>
                                         <div class="col-sm-6">
                                             <input :disabled="readonlyForm" class="col-sm-1" id="issued_on_paper_yes" type="radio" v-model="sanction_outcome.issued_on_paper" :value="true" />
@@ -240,7 +232,7 @@
 
                                        <div class="col-sm-12 form-group"><div class="row">
                                            <div class="col-sm-3">
-                                               <label class="control-label float-start">Paper ID</label>
+                                               <label class="control-label float-start fw-bold">Paper ID</label>
                                            </div>
                                            <div class="col-sm-7">
                                                <input type="text" :readonly="readonlyForm" class="form-control" name="paper_id" placeholder="" v-model="sanction_outcome.paper_id" :disabled="!sanction_outcome.issued_on_paper" />
@@ -249,7 +241,7 @@
 
                                        <div class="col-sm-12 form-group"><div class="row">
                                            <div class="col-sm-3">
-                                               <label class="control-label float-start">Paper notice</label>
+                                               <label class="control-label float-start fw-bold">Paper notice</label>
                                            </div>
                                            <div id="paper_id_notice">
                                                <div v-if="sanction_outcome.issued_on_paper" class="col-sm-7">
@@ -267,10 +259,10 @@
                             </div>
 
                             <div :id="raTab" class="tab-pane fade in" role="tabpanel">
-                                <FormSection :formCollapse="false" label="Remediation Actions" Index="2">
+                                <FormSection :formCollapse="false" label="Remediation Actions" index="2">
                                     <div class="col-sm-12 form-group">
                                         <div class="row col-sm-12">
-                                            <label class="control-label float-start">Remediation Actions</label>
+                                            <label class="control-label float-start fw-bold">Remediation Actions</label>
                                         </div>
                                         <div class="row">
                                             <div class="col-sm-12">
@@ -282,10 +274,10 @@
                             </div>
 
                             <div :id="deTab" class="tab-pane fade in" role="tabpanel">
-                                <FormSection :formCollapse="false" label="Details" Index="3">
+                                <FormSection :formCollapse="false" label="Details" index="3">
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
-                                            <label>Description</label>
+                                            <label class="fw-bold">Description</label>
                                         </div>
                                         <div class="col-sm-6">
                                             <textarea :disabled="readonlyForm" class="form-control" placeholder="add description" id="sanction-outcome-description" v-model="sanction_outcome.description"/>
@@ -294,48 +286,31 @@
 
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
-                                            <label>Date of Issue</label>
+                                            <label class="fw-bold">Date of Issue</label>
                                         </div>
-                                        <!--
-                                        <div class="col-sm-6">
-                                            <input :readonly="readonlyForm" class="form-control" v-model="sanction_outcome.date_of_issue"/>
-                                        </div>
-                                        -->
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="dateOfIssuePicker">
                                                 <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="sanction_outcome.date_of_issue" :disabled="!sanction_outcome.issued_on_paper || readonlyForm"/>
-                                                <!--<span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>-->
                                             </div>
                                         </div>
                                     </div></div>
 
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
-                                            <label>Time of Issue</label>
+                                            <label class="fw-bold">Time of Issue</label>
                                         </div>
-<!--
-                                        <div class="col-sm-6">
-                                            <input :readonly="readonlyForm" class="form-control" v-model="sanction_outcome.time_of_issue"/>
-                                        </div>
--->
-
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="timeOfIssuePicker">
                                                 <input type="text" class="form-control" placeholder="HH:MM" v-model="sanction_outcome.time_of_issue" :disabled="!sanction_outcome.issued_on_paper || readonlyForm" />
-                                                <!--<span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>-->
                                             </div>
                                         </div>
                                     </div></div>
                                 </FormSection>
 
-                                <FormSection v-if="visibilityParkingInfringementSection" :formCollapse="false" label="Further Offender Details" Index="4">
+                                <FormSection v-if="visibilityParkingInfringementSection" :formCollapse="false" label="Further Offender Details" index="4">
                                     <div class="form-group"><div class="row">
                                         <div class="col-sm-3">
-                                            <label>Registration Holder:</label>
+                                            <label class="fw-bold">Registration Holder:</label>
                                         </div>
                                         <div class="col-sm-9">
                                             <RegistrationHolder
@@ -354,7 +329,7 @@
                                                 :key="registrationHolderBindId" />
                                         </div>
                                         <div class="col-sm-3">
-                                            <label>Driver:</label>
+                                            <label class="fw-bold">Driver:</label>
                                         </div>
                                         <div class="col-sm-9">
                                             <Driver
@@ -375,17 +350,17 @@
                                     </div></div>
                                 </FormSection>
 
-                                <FormSection v-if="sanction_outcome.due_dates && sanction_outcome.due_dates.length>0" :formCollapse="false" label="Due Date" Index="5">
+                                <FormSection v-if="sanction_outcome.due_dates && sanction_outcome.due_dates.length>0" :formCollapse="false" label="Due Date" index="5">
                                     <div v-for="item in sanction_outcome.due_dates">
                                         <div class="form-group"><div class="row">
                                             <div class="col-sm-3">
-                                                <label>Payment due date:</label>
+                                                <label class="fw-bold">Payment due date:</label>
                                             </div>
                                             <div class="col-sm-3">
                                                 <span>{{ formatSODate(item.due_date_applied) }}</span>
                                             </div>
                                             <div class="col-sm-2">
-                                                <label>Reason:</label>
+                                                <label class="fw-bold">Reason:</label>
                                             </div>
                                             <div class="col-sm-4">
                                                 {{ item.reason_for_extension }}
@@ -396,7 +371,7 @@
                             </div>
 
                             <div :id="reTab" class="tab-pane fade in" role="tabpanel">
-                                <FormSection :formCollapse="false" label="Related Items" Index="6">
+                                <FormSection :formCollapse="false" label="Related Items" index="6">
                                     <div class="col-sm-12 form-group"><div class="row">
                                         <div class="col-sm-12">
                                             <RelatedItems v-bind:key="relatedItemsBindId" :parent_update_related_items="setRelatedItems" :readonlyForm="readonlyForm" />
@@ -411,17 +386,16 @@
             </div>
         </div>
 
-        <div v-if="visibilitySaveButton" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
+        <div class="row" style="margin-bottom:50px;">
+        <div v-if="visibilitySaveButton" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5; display: block; ">
             <div class="navbar-inner">
-                <div class="container">
-                    <p class="float-end" style="margin-top:5px;">
-                        <input type="button" @click.prevent="saveExit" class="btn btn-primary" value="Save and Exit"/>
-                        <input type="button" @click.prevent="save" class="btn btn-primary" value="Save and Continue"/>
-                    </p>
-                </div>
+                <p class="float-end" style="margin-top:5px;">
+                    <input type="button" @click.prevent="saveExit" class="btn btn-primary" value="Save and Exit"/>
+                    <input type="button" @click.prevent="save" class="btn btn-primary" value="Save and Continue"/>
+                </p>
             </div>
         </div>
-
+        </div>
 
         <div v-if="workflow_type">
             <SanctionOutcomeWorkflow
@@ -471,10 +445,9 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
- "vue";
+
 import FormSection from "@/components/forms/section_toggle.vue";
 import datatable from '@vue-utils/datatable.vue'
-import utils from "@/components/external/utils";
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import Assignment from "../assignment.vue";
@@ -877,9 +850,6 @@ export default {
                     if (this.sanction_outcome.offender.person){
                         ret = [this.sanction_outcome.offender.person.first_name, this.sanction_outcome.offender.person.last_name].filter(Boolean).join(" ");
                     }
-                    /*} else if (this.sanction_outcome.offender.organisation){
-                        ret = [this.sanction_outcome.offender.organisation.name, this.sanction_outcome.offender.organisation.abn].filter(Boolean).join(" ");
-                    }*/
                 }
             }
             return ret;
@@ -970,18 +940,6 @@ export default {
             }
             return visibility;
         },
-       // visibilitySendToDotButton: function() {
-       //     let visibility = false;
-       //     if (this.sanction_outcome.can_user_action){
-       //         if (this.sanction_outcome.type.id == 'infringement_notice'){
-       //             if (this.sanction_outcome.status.id === this.STATUS_AWAITING_PAYMENT && this.sanction_outcome.is_parking_offence){
-       //                 // This is when Infringement Notice Coordinator sends this IN to Dot
-       //                 visibility = true;
-       //             }
-       //         }
-       //     }
-       //     return visibility;
-       // },
         visibilityParkingInfringementSection: function() {
             let visibility = false;
             if (this.sanction_outcome.is_parking_offence){
@@ -1020,7 +978,6 @@ export default {
             return visibility;
         },
         visibilityEndorseButton: function() {
-            //return true;
             let visibility = false;
             if (this.sanction_outcome.can_user_action){
                 if (this.sanction_outcome.status.id === this.STATUS_AWAITING_ENDORSEMENT || this.sanction_outcome.status.id === this.STATUS_AWAITING_REVIEW){
@@ -1241,7 +1198,6 @@ export default {
             let acoId = parseInt(e.target.getAttribute("data-alleged-committed-offence-id"));
             for (let i=0; i<this.sanction_outcome.alleged_committed_offences.length; i++){
                 if(acoId == this.sanction_outcome.alleged_committed_offences[i].id){
-                    //this.sanction_outcome.alleged_committed_offences[i].removed = true;
                     this.sanction_outcome.alleged_committed_offences[i].included = false;
                 }
             }
@@ -1273,7 +1229,6 @@ export default {
             let acoId = parseInt(e.target.getAttribute("data-alleged-committed-offence-id"));
             for (let i=0; i<this.sanction_outcome.alleged_committed_offences.length; i++){
                 if(acoId == this.sanction_outcome.alleged_committed_offences[i].id){
-                    //this.sanction_outcome.alleged_committed_offences[i].removed = false;
                     this.sanction_outcome.alleged_committed_offences[i].included = true;
                 }
             }
@@ -1339,8 +1294,6 @@ export default {
         },
         updateAssignedToId: async function (body) {
             this.setSanctionOutcome(body);
-            //this.setAssignedToId(body.assigned_to_id);
-            //this.setCanUserAction(body.can_user_action);
             this.updateObjectHash();
             this.assignmentKey += 1;
         },

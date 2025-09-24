@@ -155,8 +155,8 @@ def search_weak_links(request_data):
                 Q(title__icontains=search_text) |
                 Q(details__icontains=search_text) |
                 Q(inspection_type__inspection_type__icontains=search_text) |
-                Q(individual_inspected__first_name__icontains=search_text) |
-                Q(individual_inspected__last_name__icontains=search_text) |
+                #Q(individual_inspected__first_name__icontains=search_text) | TODO replace if needed or remove
+                #Q(individual_inspected__last_name__icontains=search_text) |
                 Q(call_email__number__icontains=search_text)
                 )
     elif 'offence' in components_selected:

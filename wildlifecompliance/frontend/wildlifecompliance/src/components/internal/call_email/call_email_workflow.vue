@@ -316,7 +316,7 @@ export default {
           this.regionId ? payload.append('region_id', this.regionId) : null;
           try {
               const res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
-              if (res.ok) {
+              if (res) {
                   this.$router.push({ name: 'internal-call-email-dash' });
               }
           } catch(err) {
@@ -324,7 +324,7 @@ export default {
               await swal.fire({
                   title: 'Mandatory Field',
                   html: helpers.formatError(err),
-                  type: "error",
+                  icon: "error",
               })
           }
       },

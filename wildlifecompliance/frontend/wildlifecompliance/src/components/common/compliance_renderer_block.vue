@@ -10,7 +10,7 @@
         </div>
 
         <FormSection v-if="component.type === 'section'"
-            :label="component.label" :Index="component_name" :id="component_name">
+            :label="component.label" :index="component_name" :id="component_name">
                 <compliance-renderer-block v-for="(subcomponent, index) in component.children"
                     :component="subcomponent"
                     :instance="instance"
@@ -274,7 +274,7 @@
 import { mapActions, mapGetters } from 'vuex';
 import { helpers, api_endpoints } from "@/utils/hooks.js"
 // import { strToBool } from "@/utils/helpers.js";
-import FormSection from '@/components/forms/section.vue'
+import FormSection from "@/components/forms/section_toggle.vue";
 import Group from '@/components/forms/group.vue'
 import Radio from '@/components/forms/radio.vue'
 import Conditions from '@/components/forms/compliance_conditions.vue'

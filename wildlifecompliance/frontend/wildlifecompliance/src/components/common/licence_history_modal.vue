@@ -1,7 +1,7 @@
 <template lang="html">
     <div id="historyDetail" v-show='showLicenceHistory'>
 
-        <modal transition="modal fade" title="Licence History" large force>
+        <modal transition="modal fade" title="Licence History" large force okText="">
             <div class="container-fluid">
 
                 <form class="form-horizontal" name="licenceHistoryForm">
@@ -18,13 +18,14 @@
                 </form>
 
             </div>
-            <div slot="footer" />
+            <div slot="footer">
+            </div>
         </modal>
 
     </div>
 </template>
 <script>
- "vue";
+
 import modal from "@/utils/vue/bootstrap-modal.vue";
 import datatable from "@/utils/vue/datatable.vue";
 import alert from '@vue-utils/alert.vue';

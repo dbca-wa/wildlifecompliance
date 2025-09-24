@@ -1,6 +1,6 @@
 <template>
     <div id="legalCasePersonOrgDash">
-        <FormSection :label="`Case`" :Index="`0`">            
+        <FormSection :label="`Case`" :index="`0`">            
         <div class="row">
             <div class="col-lg-12">
                 <datatable ref="legal_case_table" id="legal-case-table" :dtOptions="dtOptions" :dtHeaders="dtHeaders" />
@@ -13,7 +13,7 @@
 <script>
     import $ from 'jquery'
     import datatable from '@vue-utils/datatable.vue'
-     'vue'
+   
     import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
     import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
     import FormSection from "@/components/forms/section_toggle.vue";

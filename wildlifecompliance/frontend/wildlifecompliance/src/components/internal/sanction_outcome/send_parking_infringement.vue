@@ -56,7 +56,7 @@
 </template>
 
 <script>
- "vue";
+
 import modal from '@vue-utils/bootstrap-modal.vue';
 import filefield from '@common-components/compliance_file.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";

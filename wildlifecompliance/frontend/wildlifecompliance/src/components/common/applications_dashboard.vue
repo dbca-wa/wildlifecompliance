@@ -583,7 +583,7 @@ export default {
             swal.fire({
                 title: "Discard Application",
                 text: "Are you sure you want to discard this application?",
-                type: "warning",
+                icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: 'Discard Application',
                 confirmButtonColor:'#d9534f'

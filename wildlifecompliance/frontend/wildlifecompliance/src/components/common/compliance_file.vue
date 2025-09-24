@@ -1,20 +1,6 @@
 <template lang="html">
     <div>
         <label :id="id" :num_files="num_documents()" style="display: none;">{{label}}</label>
-        <!--template v-if="help_text">
-            <HelpText :help_text="help_text" />
-        </template-->
-
-        <!--template v-if="help_text_url">
-            <HelpTextUrl :help_text_url="help_text_url" />
-        </template-->
-
-        <!--CommentBlock 
-            :label="label"
-            :name="name"
-            :field_data="field_data"
-            /-->
-
         <div v-if="files">
             <div v-for="v in documents">
                 <p>
@@ -43,19 +29,12 @@ import {
   fetch_util
 }
 from '@/utils/hooks';
-//import CommentBlock from './comment_block.vue';
-//import HelpText from './help_text.vue';
-import { mapGetters } from 'vuex';
 export default {
     name: "FileField",
     props:{
-        //application_id: null,
         name:String,
         label:String,
         id:String,
-        //isRequired:String,
-        //help_text:String,
-        //field_data:Object,
         fileTypes:{
             default:function () {
                 var file_types = 
@@ -72,10 +51,7 @@ export default {
         isRepeatable:Boolean,
         readonly:Boolean,
         documentActionUrl: String,
-        //createDocumentActionUrl: Function,
-        //parent_id: Number,
     },
-    //components: {CommentBlock, HelpText},
     data:function(){
         return {
             repeat:1,
@@ -86,7 +62,6 @@ export default {
             help_text_url:'',
             commsLogId: null,
             temporary_document_collection_id: null,
-            //document_action_url: this.documentActionUrl,
         }
     },
     computed: {
@@ -122,12 +97,6 @@ export default {
             if (vm.isRepeatable && e.target.files) {
                 let  el = $(e.target).attr('data-que');
                 let avail = $('input[name='+e.target.name+']');
-                // Extracting text from a DOM node and interpreting it as HTML 
-                // can lead to a XSS vulnerability when resolving avail list.
-                // avail = [...avail.map(id => {
-                //     return $(avail[id]).attr('data-que');
-                // })];
-                // reinterpreted (below)
                 let avail_map = $('input[name='+e.target.name+']');
                 avail = []
                 $.map(avail_map, function(val, i) {
@@ -150,7 +119,6 @@ export default {
             vm.files.push(e.target.files[0]);
 
             if (e.target.files.length > 0) {
-                //vm.upload_file(e)
                 this.$nextTick(() => {
                     this.save_document(e);
                 });
@@ -160,7 +128,6 @@ export default {
 
         get_documents: async function() {
             this.show_spinner = true;
-
             if (this.document_action_url) {
                 var formData = new FormData();
                 formData.append('action', 'list');
@@ -170,11 +137,12 @@ export default {
                 formData.append('input_name', this.name);
                 formData.append('csrfmiddlewaretoken', this.csrf_token);
                 let res = await fetch_util.fetchUrl(this.document_action_url, {method:'POST', body:JSON.stringify(formData)})
-                this.documents = res.filedata;
-                this.commsLogId = res.comms_instance_id;
+                if (res) {
+                    this.documents = res.filedata;
+                    this.commsLogId = res.comms_instance_id;
+                }
             }
             this.show_spinner = false;
-
         },
 
         delete_document: async function(file) {
@@ -191,10 +159,8 @@ export default {
             if (this.document_action_url) {
                 let res = await fetch_util.fetchUrl(this.document_action_url, {method:'POST', body:JSON.stringify(formData)})
                 this.documents = res.filedata;
-                //this.documents = await this.get_documents()
                 this.commsLogId = res.comms_instance_id;
             }
-            //vm.documents = res;
             this.show_spinner = false;
 
         },
@@ -239,7 +205,6 @@ export default {
                         "input_name": this.name,
                     }
                 );
-                //this.$parent.temporary_document_collection_id = this.temporary_document_collection_id
                 this.$nextTick(async () => {
                     // must emit event here
                     this.handleChange(e);
@@ -285,7 +250,6 @@ export default {
     },
     mounted:function () {
         if (this.value) {
-            //vm.files = (Array.isArray(vm.value))? vm.value : [vm.value];
             if (Array.isArray(this.value)) {
                 this.value;
             } else {

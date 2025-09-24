@@ -29,7 +29,7 @@
 </template>
 
 <script>
- "vue";
+
 import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
@@ -90,7 +90,7 @@ export default {
         }),
         ok: async function () {
             const response = await this.sendData();
-            if (response.ok) {
+            if (response) {
                 this.close();
                 this.$router.push({ name: 'internal-offence-dash' });
             }
@@ -124,8 +124,7 @@ export default {
 
             try {
                 let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
-                console.log(res);
-                if (res.ok) {
+                if (res) {
                     return res
                 }
             } catch(err) {

@@ -4,14 +4,14 @@
             <div class="container-fluid">
                 <div v-if="legalCaseId">
                     <ul class="nav nav-pills">
-                        <li :class="personTabListClass"><a data-toggle="tab" @click="updateTabSelected('pTab')" :href="'#'+pTab">Person</a></li>
-                        <li :class="artifactTabListClass"><a data-toggle="tab" @click="updateTabSelected('aTab')" :href="'#'+aTab" >Object</a></li>
-                        <li :class="urlTabListClass"><a data-toggle="tab" @click="updateTabSelected('uTab')" :href="'#'+uTab">URL</a></li>
+                        <li :class="personTabListClass"><a data-bs-toggle="tab" class="nav-link" @click="updateTabSelected('pTab')" :href="'#'+pTab">Person</a></li>
+                        <li :class="artifactTabListClass"><a data-bs-toggle="tab" class="nav-link" @click="updateTabSelected('aTab')" :href="'#'+aTab" >Object</a></li>
+                        <li :class="urlTabListClass"><a data-bs-toggle="tab" class="nav-link" @click="updateTabSelected('uTab')" :href="'#'+uTab">URL</a></li>
                     </ul>
                 </div>
                 <div v-else>
                     <ul class="nav nav-pills">
-                        <li :class="artifactTabListClass"><a data-toggle="tab" @click="updateTabSelected('aTab')" :href="'#'+aTab" >Object</a></li>
+                        <li :class="artifactTabListClass"><a class="nav-link" data-bs-toggle="tab" @click="updateTabSelected('aTab')" :href="'#'+aTab" >Object</a></li>
                     </ul>
                 </div>
                 <div class="tab-content ul-top-buffer">
@@ -44,12 +44,7 @@
                                 <input type="radio" id="physical" value="physical" v-model="componentType">
                                 <label for="physical">Physical Object</label>
                             </div>
-                            <!--select class="form-control" v-model="componentType">
-                                <option value="document">Document</option>
-                                <option value="physical">Physical Object</option>
-                              </select-->
                         </div>
-                        <!-- div v-if="showDocumentArtifactComponent" class="row" -->
                         <div v-if="showDocumentArtifactComponent">
                             <DocumentArtifact
                             ref="document_artifact"
@@ -61,7 +56,6 @@
                             :entityEdit="entityEdit"
                             />
                         </div>
-                        <!-- div v-if="showPhysicalArtifactComponent" class="row" -->
                         <div v-if="showPhysicalArtifactComponent">
                             <PhysicalArtifact
                             ref="physical_artifact"
@@ -72,10 +66,6 @@
                             :entityEdit="entityEdit"
                             />
                         </div>
-                        <!--Artifact
-                        ref="artifact"
-                        @entity-selected="entitySelected"
-                        /-->
                     </div>
                     <div v-if="legalCaseId" :id="uTab" :class="urlTabClass">
                         <div class="col-sm-12">
@@ -97,7 +87,7 @@
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
- "vue";
+
 import modal from '@vue-utils/bootstrap-modal.vue';
 import SearchPersonOrganisation from './search_person_or_organisation.vue'
 import DocumentArtifact from './document_artifact_component.vue'
@@ -119,9 +109,6 @@ export default {
         uTab: 'uTab' + uuid(),
         componentType: '',
         documentArtifactErrorMessage: '',
-        //image: "/static/wildlifecompliance_vue/img/shibaken.jpg"
-        //image: "/static/wildlifecompliance_vue/img/shibaken.c4c9d81.jpg"
-        //image: "../../../assets/img/shibaken.jpg"
       }
     },
     props: {
@@ -140,11 +127,6 @@ export default {
             type: Object,
             required: false,
         },
-        //caseRunningSheet: {
-        //    type: Boolean,
-        //    required: false,
-        //    default: false,
-        //},
     },
     components: {
       modal,
@@ -241,7 +223,7 @@ export default {
         artifactTabClass: function() {
             let tabClass = 'tab-pane fade in';
             if (this.artifactTabSelected) {
-                tabClass += ' active';
+                tabClass += ' active show';
             }
             return tabClass;
         },
@@ -289,7 +271,6 @@ export default {
                     action: 'cancel',
                 });
             }
-            //this.isModalOpen = false;
             this.close();
         },
         emitModalAction: function() {
@@ -305,7 +286,6 @@ export default {
                 } else {
                     this.cancel();
                 }
-                //this.isModalOpen = false;
                 this.close();
             });
         },
@@ -332,21 +312,6 @@ export default {
             if (this.$parent.$refs.artifact_table) {
                 this.$parent.$refs.artifact_table.vmDataTable.ajax.reload()
             }
-            /*
-            this.$nextTick(() => {
-                if (this.entity.id || this.urlTabSelected && this.urlText) {
-                    this.$emit('modal-action', {
-                        entity: this.entity,
-                        row_number_selected: this.rowNumberSelected,
-                        action: 'ok',
-                    });
-                } else {
-                    this.cancel();
-                }
-                //this.isModalOpen = false;
-                this.close();
-            });
-            */
         },
         close: function () {
             this.isModalOpen = false;
@@ -370,13 +335,7 @@ export default {
             Object.assign(this.entity, urlEntity);
         }
     },
-    /*
-    destroyed: function() {
-        console.log("destroyed")
-    },
-    */
     created: async function() {
-        console.log(this.entityEdit)
         // set componentType
         if (this.entityEdit && this.entityEdit.data_type) {
             if (this.entityEdit.data_type === 'physical_artifact') {

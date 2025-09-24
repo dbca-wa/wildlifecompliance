@@ -45,7 +45,7 @@
     </div>
 </template>
 <script>
- "vue";
+
 import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
@@ -132,10 +132,10 @@ export default {
           this.errorResponse = "";
           if (this.regionDistrictId && this.groupPermission) {
               let allocatedGroupResponse = await this.loadAllocatedGroup({
-              region_district_id: this.regionDistrictId,
-              group_permission: this.groupPermission,
+                region_district_id: this.regionDistrictId,
+                group_permission: this.groupPermission,
               });
-              if (allocatedGroupResponse.ok) {
+              if (allocatedGroupResponse && allocatedGroupresponse.group_id) {
                   this.allocated_group_id = allocatedGroupresponse.group_id;
               } else {
                   // Display http error response on modal
@@ -148,7 +148,7 @@ export default {
       ok: async function () {
           const response = await this.sendData();
           console.log(response);
-          if (response.ok) {
+          if (response) {
               this.close();
               this.$router.push({ name: 'internal-inspection-dash' });
           }
@@ -172,11 +172,11 @@ export default {
           this.allocated_group_id ? payload.append('allocated_group_id', this.allocated_group_id) : null;
 
           let inspectionRes = await this.saveInspection({create: false, internal: true })
-          if (inspectionRes.ok) {
+          if (inspectionRes) {
               try {
                   let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
                   console.log(res);
-                  if (res.ok) {
+                  if (res) {
                       return res
                   }
               } catch(err) {

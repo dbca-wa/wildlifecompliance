@@ -210,14 +210,14 @@
         <!-- </div>
         </div> -->
         <!-- </div> -->
-        <AddContact ref="add_contact" :org_id="org.id" />
+        <AddContact v-model="isAddContactModalOpen" :org_id="org.id" />
     </div>
 </template>
 
 <script>
 import { v4 as uuid } from 'uuid';
 //import $ from 'jquery'
- 'vue'
+ 
 import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
 import AddContact from '@common-components/add_contact.vue'
@@ -235,6 +235,7 @@ export default {
     data () {
         let vm = this;
         return {
+            isAddContactModalOpen: false,
             adBody: 'adBody'+uuid(),
             aBody: 'aBody'+uuid(),
             pdBody: 'pdBody'+uuid(),
@@ -410,7 +411,7 @@ export default {
                 swal.fire({
                     title: "Delete Contact",
                     text: "Are you sure you want to remove "+ name + "("+ email + ") as a contact  ?",
-                    type: "error",
+                    icon: "error",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {

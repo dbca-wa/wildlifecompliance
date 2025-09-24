@@ -191,7 +191,6 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
- 'vue'
 import $ from 'jquery'
 import { api_endpoints, helpers, fetch_util } from '@/utils/hooks'
 import SecureBaseLink from '@common-components/securebase_link.vue';
@@ -426,9 +425,8 @@ export default {
                     'error'
                 )
             } else {
-                let request = fetch_util.fetchUrl(api_endpoints.organisation_requests,{method:'POST', body:JSON.stringify(data)},{
-                    emulateJSON:true
-                })
+                console.log(data)
+                let request = fetch_util.fetchUrl(api_endpoints.organisation_requests,{method:'POST', body:data},{})
                 request.then((response) => {
                     vm.registeringOrg = false;
                     vm.uploadedFile = null;
@@ -437,7 +435,7 @@ export default {
                     swal.fire({
                         title: 'Sent',
                         html: 'Your organisation request has been successfully submitted.',
-                        type: 'success',
+                        icon: 'success',
                     }).then(() => {
                         if (this.$route.name == 'account'){
                            window.location.reload(true);
@@ -494,9 +492,8 @@ export default {
                     'error'
                 )
             } else {
-                let request = fetch_util.fetchUrl(api_endpoints.organisation_requests,{method:'POST', body:JSON.stringify(data)},{
-                    emulateJSON:true
-                })
+                console.log(data)
+                let request = fetch_util.fetchUrl(api_endpoints.organisation_requests,{method:'POST', body:data},{})
                 request.then((response) => {
                     vm.registeringOrg = false;
                     vm.uploadedFile = null;
@@ -505,7 +502,7 @@ export default {
                     swal.fire({
                         title: 'Sent',
                         html: 'Your organisation request has been successfully submitted.',
-                        type: 'success',
+                        icon: 'success',
                     }).then(() => {
                         if (this.$route.name == 'account'){
                            window.location.reload(true);
@@ -597,11 +594,11 @@ export default {
             swal.fire({
                 title: "Unlink From Organisation",
                 text: "Are you sure you want to be unlinked from "+org.name+" ?",
-                type: "question",
+                icon: "question",
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then((result) => {
-                if (result) {
+                if (result.ok) {
                     let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'), {method:'POST', body:JSON.stringify(vm.current_user)},{
                         emulateJSON:true
                     })

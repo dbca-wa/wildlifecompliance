@@ -83,7 +83,6 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
- 'vue'
 import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
 import AddContact from '@common-components/add_contact.vue'
@@ -132,7 +131,7 @@ export default {
             this.show_spinner = true;
             let post_url = '/api/organisations_compliancemanagement/';
             
-            let returnedOrganisation = await fetch.fetchUrl(post_url, {method:'POST', body:JSON.stringify(this.organisation)});
+            let returnedOrganisation = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(this.organisation)});
             console.log(returnedOrganisation)
             this.show_spinner = false;
         },

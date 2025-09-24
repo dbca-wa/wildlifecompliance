@@ -1,13 +1,14 @@
 <template lang="html">
     <div id="CreateInspection">
-        <modal transition="modal fade" @ok="ok()" @cancel="cancel()" title="Create New Inspection" large force>
+        <modal transition="modal fade" @ok="ok()" @cancel="cancel()" title="Create New Inspection" large force okText="Ok">
           <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-12">
+                  <alert v-if="errorResponse" type="danger"><strong>{{errorResponse}}</strong></alert>
                         <div class="form-group">
                           <div class="row">
                             <div class="col-sm-3">
-                              <label>Region</label>
+                              <label class="fw-bold">Region</label>
                             </div>
                             <div class="col-sm-9">
                               <select class="form-control col-sm-9" @change.prevent="updateDistricts()" v-model="region_id">
@@ -21,7 +22,7 @@
                         <div class="form-group">
                           <div class="row">
                             <div class="col-sm-3">
-                              <label>District</label>
+                              <label class="fw-bold">District</label>
                             </div>
                             <div class="col-sm-9">
                               <select class="form-control" @change.prevent="updateAllocatedGroup()" v-model="district_id">
@@ -35,7 +36,7 @@
                         <div class="form-group">
                           <div class="row">
                             <div class="col-sm-3">
-                              <label>Allocate to</label>
+                              <label class="fw-bold">Allocate to</label>
                             </div>
                             <div class="col-sm-9">
                               <select class="form-control" v-model="assigned_to_id">
@@ -50,7 +51,7 @@
                         <div class="form-group">
                           <div class="row">
                             <div class="col-sm-3">
-                              <label>Inspection Type</label>
+                              <label class="fw-bold">Inspection Type</label>
                             </div>
                             <div class="col-sm-9">
                               <select class="form-control" v-model="inspection_type_id">
@@ -65,7 +66,7 @@
                         <div class="form-group">
                           <div class="row">
                               <div class="col-sm-3">
-                                  <label class="control-label float-start" for="details">Details</label>
+                                  <label class="control-label float-start fw-bold" for="details">Details</label>
                               </div>
             			      <div class="col-sm-6">
                                   <textarea class="form-control" placeholder="add details" id="details" v-model="inspectionDetails"/>
@@ -75,7 +76,7 @@
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start"  for="Name">Attachments</label>
+                                    <label class="control-label float-start fw-bold" for="Name">Attachments</label>
                                 </div>
             			        <div class="col-sm-9">
                                     <filefield 
@@ -93,28 +94,20 @@
             </div>
           </div>
             <div slot="footer">
-                <div v-if="errorResponse" class="form-group">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <strong>
-                                <span style="white-space: pre; color: red">{{ errorResponse }}</span>
-                            </strong>
-                        </div>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-default" @click="ok">Ok</button>
-                <button type="button" class="btn btn-default" @click="cancel">Cancel</button>
+                <!--<button type="button" class="btn btn-default" @click="ok">Ok</button>
+                <button type="button" class="btn btn-default" @click="cancel">Cancel</button>-->
             </div>
         </modal>
     </div>
 </template>
 <script>
- "vue";
+
 import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import filefield from '@common-components/compliance_file.vue';
 import { required } from '@vuelidate/validators'
+import alert from '@vue-utils/alert.vue'
 
 export default {
     name: "CreateInspection",
@@ -145,6 +138,7 @@ export default {
     components: {
       modal,
       filefield,
+      alert
     },
     validations: {
         region_id: {
@@ -223,9 +217,9 @@ export default {
                 region_id: this.region_id,
                 district_id: this.district_id ? this.district_id : null,
               });
-              if (allocatedGroupResponse.ok) {
-                  this.allocatedGroup = allocatedGroupresponse;
-                  this.allocated_group_id = allocatedGroupresponse.group_id;
+              if (allocatedGroupResponse) {
+                  this.allocatedGroup = allocatedGroupResponse;
+                  this.allocated_group_id = allocatedGroupResponse.group_id;
               } else {
                   // Display http error response on modal
                   this.errorResponse = allocatedGroupResponse.statusText;
@@ -242,40 +236,41 @@ export default {
       },
 
       ok: async function () {
-          let is_valid_form = this.isValidForm();
-          if (is_valid_form) {
-              const response = await this.sendData();
-              if (response.ok) {
-                  const returnedInspection = response;
-                  // For Inspection Dashboard
-                  if (this.$parent.$refs.inspection_table) {
-                      this.$parent.$refs.inspection_table.vmDataTable.ajax.reload()
-                  }
-                  // For related items table
-                  let parent_update_function_payload = null;
-                  if (this.parent_call_email) {
-                      await this.loadCallEmail({
-                          call_email_id: this.call_email.id,
-                      });
-                  } else if (this.parent_legal_case) {
-                      await this.loadLegalCase({
-                          legal_case_id: this.legal_case.id,
-                      });
-                  }
-                  if (this.$parent.$refs.related_items_table) {
-                      this.$parent.constructRelatedItemsTable();
-                  }
-                  if (returnedInspection && returnedInspection.id) {
-                      this.$emit(
-                          'inspection-created', 
-                          {
-                              'inspection': returnedInspection.id,
-                          });
-                  }
-                  this.close();
+          //let is_valid_form = this.isValidForm();
+          //if (is_valid_form) {
+          //TODO replace client-side form validation with something that works
+            const response = await this.sendData();
+            if (response) {
+                const returnedInspection = response;
+                // For Inspection Dashboard
+                if (this.$parent.$refs.inspection_table) {
+                    this.$parent.$refs.inspection_table.vmDataTable.ajax.reload()
+                }
+                // For related items table
+                let parent_update_function_payload = null;
+                if (this.parent_call_email) {
+                    await this.loadCallEmail({
+                        call_email_id: this.call_email.id,
+                    });
+                } else if (this.parent_legal_case) {
+                    await this.loadLegalCase({
+                        legal_case_id: this.legal_case.id,
+                    });
+                }
+                if (this.$parent.$refs.related_items_table) {
+                    this.$parent.constructRelatedItemsTable();
+                }
+                if (returnedInspection && returnedInspection.id) {
+                    this.$emit(
+                        'inspection-created', 
+                        {
+                            'inspection': returnedInspection.id,
+                        });
+                }
+                this.close();
                   //this.$router.push({ name: 'internal-inspection-dash' });
               }
-          }
+          //}
       },
       isValidForm: function() {
           this.$v.$touch();
@@ -328,12 +323,12 @@ export default {
           !payload.has('allocated_group') ? payload.append('allocated_group', this.allocatedGroup) : null;
 
           try {
-              let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
-              if (res.ok) {
+              let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:payload});
+              if (res) {
                   return res
               }
           } catch(err) {
-                  this.errorResponse = 'Error:' + err.bodyText;
+                  this.errorResponse = 'Error: ' + err;
               }
           
       },

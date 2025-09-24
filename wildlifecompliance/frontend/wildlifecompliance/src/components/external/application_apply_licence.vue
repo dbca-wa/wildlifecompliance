@@ -109,7 +109,6 @@
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
- 'vue'
 import {
   api_endpoints,
   helpers,
@@ -242,12 +241,11 @@ export default {
         swal.fire({
             title: "Create Application",
             text: "Are you sure you want to create an application?",
-            type: "question",
+            icon: "question",
             showCancelButton: true,
             confirmButtonText: 'Accept'
         }).then((result) => {
-            console.log(result)
-            if (result) {
+            if (result.ok) {
                vm.createApplication();
             }
         },(error) => {
@@ -374,7 +372,7 @@ export default {
             swal.fire({
                 title: "Create Application",
                 text: "Please ensure at least one licence purpose is selected",
-                type: "error",
+                icon: "error",
             })
         } else {
             data.organisation_id=vm.selected_apply_org_id;

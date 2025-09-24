@@ -1,6 +1,6 @@
 <template>
     <div id="intelligenceInformation">
-        <FormSection :label="`Intelligence Information`" :Index="`0`">
+        <FormSection :label="`Intelligence Information`" :index="`0`">
         <div class="row">
             <div class="col-lg-6">
                 <textarea
@@ -31,7 +31,7 @@
 </template>
 <script>
     import $ from 'jquery'
-     'vue'
+   
     import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
     import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
     import FormSection from "@/components/forms/section_toggle.vue";

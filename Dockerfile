@@ -42,7 +42,7 @@ RUN apt-get upgrade -y
 # RUN apt-get install -yq vim
 
 RUN apt-get install --no-install-recommends -y curl wget git libmagic-dev gcc \
-    binutils libproj-dev gdal-bin python3-setuptools python3-pip tzdata cron \
+    binutils libproj-dev gdal-bin python3-setuptools python3-pip tzdata \
     rsyslog gunicorn libreoffice virtualenv 
 RUN apt-get install --no-install-recommends -y libpq-dev patch
 RUN apt-get install --no-install-recommends -y postgresql-client mtr htop \
@@ -91,7 +91,7 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt 
 #COPY git_history_recent ./
 RUN touch /app/rand_hash
-
+COPY python-cron ./
 
 # Install the project (ensure that frontend projects have been built prior to this step).
 FROM python_libs_wls

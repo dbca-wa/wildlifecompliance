@@ -345,11 +345,11 @@ export default {
                 swal.fire({
                     title: "Amend Licence",
                     text: "Are you sure you want to add an activity or purpose to this licence?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         vm.setApplyLicenceSelect({licence_select: 'new_activity'});
                         var licence_no = $(this).attr('licence-id');
                         var licence_category_id = $(this).attr('licence-category-id');
@@ -367,11 +367,11 @@ export default {
                 swal.fire({
                     title: "Amend Licence",
                     text: "Are you sure you want to amend all current activities and purposes for this licence?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         vm.setApplyLicenceSelect({licence_select: 'amend_activity'});
                         var licence_no = $(this).attr('licence-id');
                         var licence_category_id = $(this).attr('licence-category-id');
@@ -389,11 +389,11 @@ export default {
                 swal.fire({
                     title: "Amend Purpose Activity",
                     text: "Are you sure you want to amend this purpose activity?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         vm.setApplyLicenceSelect({licence_select: 'amend_activity'});
                         var licence_no = $(this).attr('licence-id');
                         var licence_category_id = $(this).attr('licence-category-id');
@@ -414,11 +414,11 @@ export default {
                 swal.fire({
                     title: "Renew Licence",
                     text: "Are you sure you want to renew all current activities and purposes for this licence?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         vm.setApplyLicenceSelect({licence_select: 'renew_activity'});
                         var licence_no = $(this).attr('licence-id');
                         var licence_category_id = $(this).attr('licence-category-id');
@@ -436,11 +436,11 @@ export default {
                 swal.fire({
                     title: "Renew Activity",
                     text: "Are you sure you want to renew this activity?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         vm.setApplyLicenceSelect({licence_select: 'renew_activity'});
                         var licence_no = $(this).attr('licence-id');
                         var licence_category_id = $(this).attr('licence-category-id');
@@ -461,11 +461,11 @@ export default {
                 swal.fire({
                     title: "Reactivate Renew for Activity",
                     text: "Are you sure you want to reactivate the renew option for purposes on this activity?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         var licence_activity_id = $(this).attr('reactivate-renew-purposes');
                         var licence_id = $(this).attr('lic-id');
                         vm.licence_action = 'reactivate-renew';
@@ -496,11 +496,11 @@ export default {
                 swal.fire({
                     title: "Surrender Licence",
                     text: "Are you sure you want to surrender all current activities and purposes for this licence?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         var licence_id = $(this).attr('surrender-licence');
                         let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/surrender_licence'),{method:'POST'})
                         request.then((response)=>{
@@ -527,11 +527,11 @@ export default {
                 swal.fire({
                     title: "Surrender Activity",
                     text: "Are you sure you want to surrender purposes for this activity?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         var licence_activity_id = $(this).attr('surrender-purposes');
                         var licence_id = $(this).attr('lic-id');
                         vm.licence_action = 'surrender';
@@ -568,11 +568,11 @@ export default {
                 swal.fire({
                     title: "Cancel Licence",
                     text: "Are you sure you want to cancel all current activities and purposes for this licence?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         var licence_id = $(this).attr('cancel-licence');
                         let request = fetch_util.fetchUrl(
                             helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/cancel_licence'),
@@ -601,11 +601,11 @@ export default {
                 swal.fire({
                     title: "Cancel Activity Purposes",
                     text: "Are you sure you want to cancel purposes for this activity?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         var licence_activity_id = $(this).attr('cancel-purposes');
                         var licence_id = $(this).attr('lic-id');
                         vm.licence_action = 'cancel';
@@ -642,11 +642,11 @@ export default {
                 swal.fire({
                     title: "Suspend Licence",
                     text: "Are you sure you want to suspend all current activities and purposes for this licence?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         var licence_id = $(this).attr('suspend-licence');
                         let request = fetch_util.fetchUrl(
                             helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/suspend_licence'),{method:'POST'})
@@ -674,11 +674,11 @@ export default {
                 swal.fire({
                     title: "Suspend Activity Purposes",
                     text: "Are you sure you want to suspend purposes for this activity?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         var licence_activity_id = $(this).attr('suspend-purposes');
                         var licence_id = $(this).attr('lic-id');
                         vm.licence_action = 'suspend';
@@ -715,11 +715,11 @@ export default {
                 swal.fire({
                     title: "Reissue Licence",
                     text: "Are you sure you want to reissue all current activities and purposes for this licence?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         vm.setApplyLicenceSelect({licence_select: 'reissue_activity'});
                         var licence_category_id = $(this).attr('licence-category-id');
                         var licence_activity_id = null;
@@ -735,11 +735,11 @@ export default {
                 swal.fire({
                     title: "Reissue License",
                     text: "Are you sure you want to reissue this activity purpose?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         var licence_activity_id = $(this).attr('reissue-activity');
                         var licence_id = $(this).attr('lic-id');
                         vm.licence_action = 'reissue';
@@ -777,11 +777,11 @@ export default {
                 swal.fire({
                     title: "Reinstate Licence",
                     text: "Are you sure you want to reinstate all suspended activities and purposes for this licence?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         var licence_id = $(this).attr('reinstate-licence');
                         let request = fetch_util.fetchUrl(
                             helpers.add_endpoint_json(api_endpoints.licences,licence_id+'/reinstate_licence'),{method:'POST'}
@@ -810,11 +810,11 @@ export default {
                 swal.fire({
                     title: "Reinstate Activity",
                     text: "Are you sure you want to reinstate purpose for this activity?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
                 }).then((result) => {
-                    if (result) {
+                    if (result.ok) {
                         var licence_activity_id = $(this).attr('reinstate-purposes');
                         var licence_id = $(this).attr('lic-id');
                         vm.licence_action = 'reinstate';
@@ -856,7 +856,7 @@ export default {
             // Create Inspection Listener.
             vm.$refs.licence_datatable.vmDataTable.on('click', 'a[inspection-licence]', function(e) {
                 e.preventDefault();
-                vm.$refs.selected_licence_id = $(this).attr('inspection-licence');
+                vm.selected_licence_id = $(this).attr('inspection-licence');
                 vm.$refs.inspection.isModalOpen = true;
             });
             // Create External view licence listener
@@ -994,7 +994,7 @@ export default {
             const data = {
                 "inspection_id": event.inspection,
             }
-            let licence_id = this.$refs.selected_licence_id
+            let licence_id = this.selected_licence_id
             let request = fetch_util.fetchUrl(
                 helpers.add_endpoint_json(
                     api_endpoints.licences, (licence_id+'/add_licence_inspection')

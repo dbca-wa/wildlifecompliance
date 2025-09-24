@@ -30,7 +30,7 @@
     </div>
 </template>
 <script>
- 'vue'
+ 
 import {
   api_endpoints,
   helpers

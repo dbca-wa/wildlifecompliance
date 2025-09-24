@@ -94,11 +94,11 @@
                         </ul>
                         <div id="pills-tabContent" class="tab-content">
                             <div :id="offenceTab" class="tab-pane fade in active show" role="tabpanel">
-                                <FormSection :formCollapse="false" label="Offence" Index="0">
+                                <FormSection :formCollapse="false" label="Offence" index="0">
 
                                     <div class="col-sm-12 form-group"><div class="row">
                                         <div class="col-sm-3">
-                                            <label class="control-label float-start" for="offence-identifier">Identifier</label>
+                                            <label class="control-label float-start fw-bold" for="offence-identifier">Identifier</label>
                                         </div>
                                         <div class="col-sm-6">
                                             <div v-if="offence">
@@ -108,22 +108,26 @@
                                     </div></div>
 
                                     <div class="col-sm-12 form-group"><div class="row">
-                                        <label class="col-sm-3">Use occurrence from/to</label>
-                                        <input class="col-sm-1" :disabled="readonlyForm" id="occurrence_from_to_true" type="radio" v-model="offence.occurrence_from_to" v-bind:value="true">
-                                        <label class="col-sm-1 radio-button-label" for="occurrence_from_to_true">Yes</label>
-                                        <input class="col-sm-1" :disabled="readonlyForm" id="occurrence_from_to_false" type="radio" v-model="offence.occurrence_from_to" v-bind:value="false">
-                                        <label class="col-sm-1 radio-button-label" for="occurrence_from_to_false">No</label>
+                                        <label class="col-sm-3 fw-bold">Use occurrence from/to</label>
+                                        <div class="col-sm-2">
+                                        <input :disabled="readonlyForm" id="occurrence_from_to_true" type="radio" v-model="offence.occurrence_from_to" v-bind:value="true">
+                                        <label class="radio-button-label fw-bold" for="occurrence_from_to_true">Yes</label>
+                                        </div>
+                                        <div class="col-sm-2">
+                                        <input :disabled="readonlyForm" id="occurrence_from_to_false" type="radio" v-model="offence.occurrence_from_to" v-bind:value="false">
+                                        <label class="radio-button-label fw-bold" for="occurrence_from_to_false">No</label>
+                                        </div>
                                     </div></div>
 
                                     <div class="col-sm-12 form-group"><div class="row">
-                                        <label class="col-sm-3">{{ occurrenceDateLabel }}</label>
+                                        <label class="col-sm-3 fw-bold">{{ occurrenceDateLabel }}</label>
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="occurrenceDateFromPicker">
                                                 <input :readonly="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" :value="date_from" />
                                             </div>
                                         </div>
                                         <div v-show="offence.occurrence_from_to">
-                                            <div class="col-sm-3">
+                                            <div class="col-sm-3 fw-bold">
                                                 <div class="input-group date" ref="occurrenceDateToPicker">
                                                     <input :readonly="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" :value="date_to" />
                                                 </div>
@@ -132,7 +136,7 @@
                                     </div></div>
 
                                     <div class="col-sm-12 form-group"><div class="row">
-                                        <label class="col-sm-3">{{ occurrenceTimeLabel }}</label>
+                                        <label class="col-sm-3 fw-bold">{{ occurrenceTimeLabel }}</label>
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="occurrenceTimeFromPicker">
                                                 <input :readonly="readonlyForm" type="time" class="form-control" placeholder="HH:MM" :value="time_from" />
@@ -148,15 +152,13 @@
                                     </div></div>
 
                                     <div class="col-sm-12 form-group"><div class="row">
-                                        <label class="col-sm-3">Alleged Offence</label>
-                                        <div v-show="!readonlyForm">
-                                            <div class="col-sm-6">
+                                        <label class="col-sm-3 fw-bold">Alleged Offence</label>
+                                            <div v-if="!readonlyForm" class="col-sm-6">
                                                 <input class="form-control" id="alleged-offence" />
                                             </div>
-                                            <div class="col-sm-3">
+                                            <div v-if="!readonlyForm" class="col-sm-3">
                                                 <input type="button" class="btn btn-primary" value="Add" @click.prevent="addAllegedOffenceClicked()" />
                                             </div>
-                                        </div>
                                     </div></div>
 
                                     <div class="col-sm-12 form-group"><div class="row">
@@ -167,43 +169,14 @@
                                 </FormSection>
                             </div>
                             <div :id="detailsTab" class="tab-pane fade in" role="tabpanel">
-                                <FormSection :formCollapse="false" label="Details" Index="1">
+                                <FormSection :formCollapse="false" label="Details" index="1">
                                     <textarea :readonly="readonlyForm" class="form-control" placeholder="add details" v-model="offence.details" />
                                 </FormSection>
                             </div>
-                            <div :id="documentTab" class="tab-pane fade in" role="tabpanel">
-                                <FormSection :formCollapse="false" label="Document" Index="1.5">
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-sm-3">
-                                                <label class="control-label float-start"  for="Name">Attachments</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <!--
-                                                <FileField 
-                                                    ref="comms_log_file" 
-                                                    name="comms-log-file" 
-                                                    :isRepeatable="true" 
-                                                    documentActionUrl="temporary_document" 
-                                                    @update-temp-doc-coll-id="setTemporaryDocumentCollectionId"
-                                                />
-                                                -->
-                                            </div>
-                                        </div>
-                                    </div>
-                                </FormSection>
-                            </div>
-                            <div :id="offenderTab" class="tab-pane fdce in" role="tabpanel">
-                                <FormSection :formCollapse="false" label="Offender(s)" Index="2">
-                                    <!--div class="col-sm-12 form-group"><div class="row">
-                                        <input :disabled="readonlyForm" class="col-sm-1" id="offender_individual" type="radio" v-model="offender_search_type" value="individual">
-                                        <label class="col-sm-1 radio-button-label" for="offender_individual">Individual</label>
-                                        <input :disabled="readonlyForm" class="col-sm-1" id="offender_organisation" type="radio" v-model="offender_search_type" value="organisation">
-                                        <label class="col-sm-1 radio-button-label" for="offender_organisation">Organisation</label>
-                                    </div></div-->
-
+                            <div :id="offenderTab" class="tab-pane fade in" role="tabpanel">
+                                <FormSection :formCollapse="false" label="Offender(s)" index="2">
                                     <div class="col-sm-12 form-group"><div class="row">
-                                        <label class="col-sm-2">Offender</label>
+                                        <label class="col-sm-2 fw-bold">Offender</label>
                                         <div v-show="!readonlyForm">
                                             <div>
                                                 <SearchOffender
@@ -229,7 +202,7 @@
                                 </FormSection>
                             </div>
                             <div :id="locationTab" class="tab-pane fade in" role="tabpanel">
-                                <FormSection :formCollapse="false" label="Location" Index="3">
+                                <FormSection :formCollapse="false" label="Location" index="3">
                                     <MapLocation
                                         v-if="offence.location"
                                         :key="locationTab"
@@ -271,7 +244,7 @@
                                 </FormSection>
                             </div>
                             <div :id="relatedItemsTab" class="tab-pane fade in" role="tabpanel">
-                                <FormSection :formCollapse="false" label="Related Items" Index="4">
+                                <FormSection :formCollapse="false" label="Related Items" index="4">
                                     <div class="col-sm-12 form-group"><div class="row">
                                         <div class="col-sm-12">
                                             <RelatedItems v-bind:key="relatedItemsBindId" :parent_update_related_items="setRelatedItems" :readonlyForm="readonlyForm" />
@@ -285,13 +258,14 @@
             </div>
         </div>
 
-        <div v-if="visibilitySaveButton" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
-            <div class="navbar-inner">
-                <div class="container">
-                    <p class="float-end" style="margin-top:5px;">
-                        <input type="button" @click.prevent="saveExit" class="btn btn-primary" value="Save and Exit"/>
-                        <input type="button" @click.prevent="save" class="btn btn-primary" value="Save and Continue"/>
-                    </p>
+        <div class="row" style="margin-bottom:50px;">
+            <div v-if="visibilitySaveButton" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5; display: block;">
+                <div class="navbar-inner">
+                        <p class="float-end" style="margin-top:5px">
+                            <input v-if="!isProcessing" type="button" @click.prevent="saveExit" class="btn btn-primary" value="Save and Exit"/>
+                            <input v-if="!isProcessing" type="button" @click.prevent="save" class="btn btn-primary" value="Save and Continue"/>
+                            <button v-if="isProcessing" disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Processing</button>
+                        </p>
                 </div>
             </div>
         </div>
@@ -318,18 +292,17 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
- "vue";
+
 import FormSection from "@/components/forms/section_toggle.vue";
 import Assignment from "../assignment.vue";
 import datatable from '@vue-utils/datatable.vue'
 import utils from "../utils";
-import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
-import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
+import { api_endpoints, helpers, fetch_util } from "@/utils/hooks";
+import { mapGetters, mapActions } from "vuex";
 import CommsLogs from "@/components/common/comms_logs.vue";
 import FileField from '@common-components/compliance_file.vue';
 import OffenceWorkflow from './offence_workflow.vue';
 import SearchOffender from './search_offenders.vue'
-//import CreateNewPerson from "@/components/common/create_new_person.vue";
 import MapLocation from "../../common/map_location.vue";
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal.vue';
 
@@ -358,6 +331,7 @@ export default {
         vm.awe = null;
 
         return {
+            isProcessing: false,
             uuid: 0,
             workflow_type :'',
             workflowBindId :'',
@@ -369,7 +343,6 @@ export default {
             offender_modal_key: 0,
             offenceTab: 'offenceTab' + uuid(),
             detailsTab: 'detailsTab' + uuid(),
-            documentTab: 'documentTab' + uuid(),
             offenderTab: 'offenderTab' + uuid(),
             locationTab: 'locationTab' + uuid(),
             relatedItemsTab: 'relatedItemsTab' + uuid(),
@@ -420,7 +393,6 @@ export default {
                 offence_text: ""
             },
             current_offender: null,  // Store the offender temporarily once selected in awesomplete. Cleared when clicking on the "Add" button.
-            //offender_search_type: "individual",
 
             comms_url: helpers.add_endpoint_json(
                 api_endpoints.offence,
@@ -467,13 +439,7 @@ export default {
                         data: 'offender',
                         render: function(data, type, row) {
                             let data_type = '';
-                            //if (row.offender.person){
                             data_type = 'individual';
-                            /*}
-                            TODO check if organisation offender needed
-                            else {
-                                data_type = 'organisation';
-                            }*/
                             if(row.offender.removed){
                                 data_type = '<strike>' + data_type + '</strike>';
                             }
@@ -495,16 +461,6 @@ export default {
                                     myLabel = '<strike>' + myLabel + '</strike>';
                                 }
                             }
-                            //TODO determine if organisation offender needed
-                            /*} else if (row.offender.organisation) {
-                                let name = row.offender.organisation.name ? row.offender.organisation.name : "";
-                                let abn = row.offender.organisation.abn ? "ABN:" + row.offender.organisation.abn : "";
-                                let myLabel = ["<strong>" + name + "</strong>", abn].filter(Boolean).join("<br />");
-                                if (row.offender.removed){
-                                    myLabel = '<strike>' + myLabel + '</strike>';
-                                }
-                                return myLabel;
-                            }*/
                             return myLabel;
                         }
                     },
@@ -592,7 +548,6 @@ export default {
                     {
                         data: 'allegedOffence',
                         render: function(data, type, row) {
-                            //let ret_str = row.allegedOffence.number_linked_sanction_outcomes_active + '/' + row.allegedOffence.number_linked_sanction_outcomes_total;
                             let ret_str = '';
                             if (row.offence.in_editable_status && row.offence.can_user_action){
                                 if (row.allegedOffence.removed){
@@ -718,10 +673,8 @@ export default {
                 if (this.offence.status.id === this.STATUS_OPEN){
                     for (let i=0; i<this.offence.alleged_offences.length; i++){
                         let alleged_offence = this.offence.alleged_offences[i];
-                        //if (alleged_offence.connected_offenders.length < num_offenders){
-                            visibility = true;
-                            break;
-                        //}
+                        visibility = true;
+                        break;
                     }
                 }
             }
@@ -813,6 +766,7 @@ export default {
             return changed;
         },
         save: async function(){
+            this.isProcessing = true;
             try {
                 await this.saveOffence({'fr_date': this.date_from, 'fr_time': this.time_from, 'to_date': this.date_to, 'to_time': this.time_to});
                 await swal.fire("Saved", "The record has been saved", "success");
@@ -823,6 +777,7 @@ export default {
             } catch (err) {
                 this.processError(err);
             }
+            this.isProcessing = false;
         },
         leaving: function(e) {
             let dialogText = 'You have some unsaved changes.';
@@ -837,7 +792,6 @@ export default {
         },
         saveExit: async function() {
             try {
-                //await this.saveOffence();
                 await this.saveOffence({'fr_date': this.date_from, 'fr_time': this.time_from, 'to_date': this.date_to, 'to_time': this.time_to});
                 await swal.fire("Saved", "The record has been saved", "success");
 
@@ -880,8 +834,6 @@ export default {
             await swal.fire("Error", errorText, "error");
         },
         updateAssignedToId: async function (body) {
-            //this.setAssignedToId(body.assigned_to_id);
-            //this.setCanUserAction(body.can_user_action);
             this.setOffence(body);
             this.constructOffendersTable();
             this.constructAllegedOffencesTable();
@@ -892,7 +844,6 @@ export default {
             try {
                 if (this.formChanged()){
                     // Save changes implicitly
-                    //await this.saveOffence();
                     await this.saveOffence({'fr_date': this.date_from, 'fr_time': this.time_from, 'to_date': this.date_to, 'to_time': this.time_to});
                     this.updateObjectHash();
                 }

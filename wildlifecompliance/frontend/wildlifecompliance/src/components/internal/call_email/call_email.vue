@@ -62,9 +62,7 @@
                                 </a>
                           </div>
                         </div>
-                        <!-- <div class="row">
-                          <div class="col-sm-12"/>
-                        </div> -->
+
                         <div v-if="statusId ==='draft' && canUserAction" class="row action-button">
                           <div class="col-sm-12">
                                 <a ref="forwardToRegions" @click="addWorkflow('forward_to_regions')" class="btn btn-primary btn-block">
@@ -73,22 +71,7 @@
                           </div>
                         </div>
 
-                        <!--div v-if="statusId ==='open' && canUserAction" class="row action-button">
-                          <div class="col-sm-12">
-                                <a ref="save" @click="save()" class="btn btn-primary btn-block">
-                                  Save
-                                </a>
-                          </div>
-                        </div-->
-
-                        <!-- <div class="row">
-                          <div class="col-sm-12"/>
-                        </div> -->
                         <div v-if="statusId ==='open_followup' && canUserAction" class="row action-button">
-
-                        <!-- <div v-if="statusId ==='open_followup'" class="row action-button"> -->
-                        <!-- <div class="row action-button"> -->
-
                           <div class="col-sm-12">
                                 <a @click="openOffence()" class="btn btn-primary btn-block">
                                   Offence
@@ -103,7 +86,6 @@
                                 </a>
                           </div>
                         </div>
-                        <!-- Following 3 actions are temporarily commented out  -->
                         <div v-if="statusId ==='open' && canUserAction" class="row action-button">
                           <div class="col-sm-12">
                                 <a ref="allocateForFollowUp" @click="addWorkflow('allocate_for_follow_up')" class="btn btn-primary btn-block" >
@@ -170,33 +152,31 @@
                           role="tabpanel"
                         >
 
-                          <FormSection :formCollapse="false" label="Caller" Index="0">
+                          <FormSection :formCollapse="false" label="Caller" index="0">
                             
-                            <div class="row"><div class="col-sm-8 form-group">
-                              <label class="col-sm-12">Caller name</label>
+                            <div class="row"><div class="col-sm-8 mb-3">
+                              <label class="col-sm-12 fw-bold">Caller name</label>
                               <input :readonly="readonlyForm" class="form-control" v-model="call_email.caller"/>
                             </div></div>
-                            <div class="col-sm-4 form-group"><div class="row">
-                              <label class="col-sm-12">Caller contact information</label>
+                            <div class="row"><div class="col-sm-8 mb-3">
+                              <label class="col-sm-12 fw-bold">Caller contact information</label>
                             <input :readonly="readonlyForm" class="form-control" v-model="call_email.caller_phone_number"/>
                             </div></div>
                             
-                            <div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-4">Anonymous call?</label>
-                                <input :disabled="readonlyForm" class="col-sm-1" id="anon_yes" type="radio" v-model="call_email.anonymous_call" v-bind:value="true">
-                                <label class="col-sm-1" for="anon_yes">Yes</label>
-                                <input :disabled="readonlyForm" class="col-sm-1" id="anon_no" type="radio" v-model="call_email.anonymous_call" v-bind:value="false">
-                                <label class="col-sm-1" for="anon_no">No</label>
-                            </div></div>
-            
-                            <!--div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-4">Caller wishes to remain anonymous?</label>
-                                <input :disabled="readonlyForm" class="col-sm-1" id="call_anon_yes" type="radio" v-model="call_email.caller_wishes_to_remain_anonymous" v-bind:value="true">
-                                <label class="col-sm-1" for="call_anon_yes">Yes</label>
-                                <input :disabled="readonlyForm" class="col-sm-1" id="call_anon_no" type="radio" v-model="call_email.caller_wishes_to_remain_anonymous" v-bind:value="false">
-                                <label class="col-sm-1" for="call_anon_no">No</label>
-                            </div></div-->
-            
+                            <div class="col-sm-12 form-group">
+                              <div class="row">
+                                <label class="col-sm-4 fw-bold">Anonymous call?</label>
+                                <div class="col-sm-2">
+                                <input :disabled="readonlyForm" id="anon_yes" type="radio" v-model="call_email.anonymous_call" v-bind:value="true">
+                                <label class="fw-bold" for="anon_yes">Yes</label>
+                                </div>
+                                <div class="col-sm-2">
+                                <input :disabled="readonlyForm" id="anon_no" type="radio" v-model="call_email.anonymous_call" v-bind:value="false">
+                                <label class="fw-bold" for="anon_no">No</label>
+                                </div>
+                              </div>
+                            </div>
+
                             <div v-show="statusId !=='draft'">
                                 <SearchPersonOrganisation 
                                 :parentEntity="callerEntity"
@@ -211,7 +191,7 @@
                             </div>
                           </FormSection>
             
-                          <FormSection :formCollapse="false" label="Location *" Index="1">
+                          <FormSection :formCollapse="false" label="Location *" index="1">
                               <div v-if="call_email.location">
                                 <MapLocation 
                                 :isReadonly="readonlyForm"
@@ -219,29 +199,23 @@
                               </div>
                           </FormSection>
             
-                          <FormSection :formCollapse="false" label="Details" Index="2">
+                          <FormSection :formCollapse="false" label="Details" index="2">
                             <div class="col-sm-12 form-group"><div class="row">
-                                <label class="col-sm-3">Date of call</label>
+                                <label class="col-sm-3 fw-bold">Date of call</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="dateOfCallPicker">
                                         <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="call_email.date_of_call"/>
-                                        <!--<span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>-->
                                     </div>
                                 </div>
-                                <label class="col-sm-3">Time of call</label>
+                                <label class="col-sm-3 fw-bold">Time of call</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" id="timeOfCallPicker">
                                       <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="call_email.time_of_call"/>
-                                      <!--<span class="input-group-addon">
-                                          <span class="glyphicon glyphicon-calendar"></span>
-                                      </span>-->
                                     </div>
                                 </div>
                             </div></div>
                             <div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-3">Volunteer</label>
+                              <label class="col-sm-3 fw-bold">Volunteer</label>
                             <div class="col-sm-9">
                               <select :disabled="readonlyForm" class="form-control" v-model="call_email.volunteer_id">
                                 <option  v-for="option in call_email.volunteer_list" :value="option.id" v-bind:key="option.id">
@@ -252,89 +226,70 @@
                             </div></div>
             
                             <div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-3">Use occurrence from/to</label>
+                              <label class="col-sm-3 fw-bold">Use occurrence from/to</label>
                               <div class="col-sm-2">
                                 <input :disabled="readonlyForm" type="radio" id="occurenceYes" v-model="call_email.occurrence_from_to" v-bind:value="true">
-                                <label for="occurenceYes">Yes</label>
+                                <label class="fw-bold" for="occurenceYes">Yes</label>
                               </div>
                               <div class="col-sm-2">
                                 <input :disabled="readonlyForm" type="radio" id="occurenceNo" v-model="call_email.occurrence_from_to" v-bind:value="false">
-                                <label for="occurenceNo">No</label>
+                                <label class="fw-bold" for="occurenceNo">No</label>
                               </div>
                             </div></div>
             
                             <div class="col-sm-12 form-group"><div class="row">
-                                <label class="col-sm-3">{{ occurrenceDateLabel }}</label>
+                                <label class="col-sm-3 fw-bold">{{ occurrenceDateLabel }}</label>
                                 <div class="col-sm-4">
                                     <div class="input-group date" ref="occurrenceDateFromPicker">
                                         <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="call_email.occurrence_date_from" />
-                                        <!--<span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>-->
                                     </div>
                                 </div>
                                 <div v-show="call_email.occurrence_from_to">
                                     <div class="col-sm-4">
                                         <div class="input-group date" ref="occurrenceDateToPicker">
                                             <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="call_email.occurrence_date_to" />
-                                            <!--<span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>-->
                                         </div>
                                     </div>
                                 </div>
                             </div></div>
             
                             <div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-3">{{ occurrenceTimeLabel }}</label>
+                              <label class="col-sm-3 fw-bold">{{ occurrenceTimeLabel }}</label>
                               <div class="col-sm-3">
                                   <div class="input-group date" id="occurrenceTimeStartPicker">
                                     <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="call_email.occurrence_time_start"/>
-                                    <!--<span class="input-group-addon">
-                                        <span class="glyphicon glyphicon-calendar"></span>
-                                    </span>-->
                                   </div>
                               </div>
                               <div v-show="call_email.occurrence_from_to">
-                                  <label class="col-sm-3">Occurrence time to</label>
+                                  <label class="col-sm-3 fw-bold">Occurrence time to</label>
                                   <div class="col-sm-3">
                                       <div class="input-group date" id="occurrenceTimeEndPicker">
                                         <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="call_email.occurrence_time_end"/>
-                                        <!--<span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>-->
                                       </div>
                                   </div>
                               </div>
                             </div></div>
               
                             <div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-3">Classification *</label>
-                              <!-- <select :disabled="readonlyForm" class="form-control" v-model="call_email.classification_id">
-                                    <option v-for="option in classification_types" :value="option.id" v-bind:key="option.id">
-                                      {{ option.display }} 
-                                    </option>
-                                </select> -->
-                              <div>
+                              <label class="col-sm-3 fw-bold">Classification *</label>
                                 <div v-for="option in classification_types" class="col-sm-3">
                                   <input :disabled="readonlyForm" type="radio" v-bind:value="option.id" v-bind:key="option.id" :id="'classification_'+option.id" v-model="call_email.classification_id">
-                                  <label :for="'classification_'+option.id">{{ option.display }}</label>
+                                  <label :for="'classification_'+option.id" class="fw-bold">{{ option.display }}</label>
                                 </div>
-                              </div>
                             </div></div>
 
                              <div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-3">Call Type *</label>
+                              <label class="col-sm-3 fw-bold">Call Type *</label>
                               <div  class="col-sm-9">
                                 <div v-for="option in call_types">
                                   <input :disabled="readonlyForm"  @change="filterWildcareSpeciesType($event,option.all_wildcare_species)" type="radio" v-bind:value="option.id" :id="'call_type_'+option.id" v-model="call_email.call_type_id">
-                                   <label :for="'call_type_'+option.id">{{ option.display }}</label>
+                                   <label class="fw-bold" :for="'call_type_'+option.id">{{ option.display }}</label>
                                 </div>
                               </div>
                             </div></div>
 
                             <div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-3">Wildcare Species Type</label>
+                              <label class="col-sm-3 fw-bold">Wildcare Species Type</label>
                               <div class="col-sm-9">
                               <select :disabled="readonlyForm" class="form-control" @change="filterWildcareSpeciesSubType()" v-model="call_email.wildcare_species_type_id">
                                     <option v-for="option in filter_wildcare_species_types" :value="option.id" v-bind:key="option.id" >
@@ -345,7 +300,7 @@
                             </div></div>
 
                             <div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-3">Wildcare Species Sub Type</label>
+                              <label class="col-sm-3 fw-bold">Wildcare Species Sub Type</label>
                               <div class="col-sm-9">
                               <select :disabled="speciesSubTypeDisabled" class="form-control" v-model="call_email.wildcare_species_sub_type_id">
                                     <option v-for="option in filter_wildcare_species_sub_types" :value="option.id" v-bind:key="option.id" >
@@ -355,61 +310,48 @@
                               </div>
                             </div></div>
 
-                            <!--div class="col-sm-12 form-group" v-if="speciesSubTypeDisabled">
-                              <div class="row">
-                                  <label class="col-sm-3">Species Name</label>
-                                  <div class="col-sm-9">
-                                    <input :disabled="readonlyForm" class="form-control" v-model="call_email.species_name"/>
-                                  </div>
-                              </div>
-                            </div-->
-
                             <div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-3">Age</label>
-                              <div>
+                              <label class="col-sm-3 fw-bold">Age</label>
                                 <div v-for="option in age_choices" class="col-sm-2">
                                   <input :disabled="readonlyForm" type="checkbox" :value="option.id" v-bind:key="option.id" :id="'age_'+option.id" v-model="call_email.age"/>
-                                   <label :for="'age_'+option.id" >{{ option.display }}</label>
+                                   <label class="fw-bold" :for="'age_'+option.id" >{{ option.display }}</label>
                                 </div>
-                              </div>
                             </div></div>
 
                             <div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-3">Dead</label>
+                              <label class="col-sm-3 fw-bold">Dead</label>
                               <div class="col-sm-2">
                                 <input :disabled="readonlyForm" id="deadYes" type="radio" v-model="call_email.dead" value="true">
-                                <label for="deadYes">Yes</label>
+                                <label class="fw-bold" for="deadYes">Yes</label>
                               </div>
                               <div class="col-sm-2">
                                 <input :disabled="readonlyForm" id="deadNo" type="radio" v-model="call_email.dead" value="false">
-                                <label for="deadNo">No</label>
+                                <label class="fw-bold" for="deadNo">No</label>
                               </div>
                             </div></div>
 
                             <div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-3">Euthanise</label>
+                              <label class="col-sm-3 fw-bold">Euthanise</label>
                               <div class="col-sm-2">
                                 <input :disabled="readonlyForm" id="euthaniseYes" type="radio" v-model="call_email.euthanise" value="true">
-                                <label for="euthaniseYes">Yes</label>
+                                <label class="fw-bold" for="euthaniseYes">Yes</label>
                               </div>
                               <div class="col-sm-2">
                                 <input :disabled="readonlyForm" id="euthaniseNo" type="radio" v-model="call_email.euthanise" value="false">
-                                <label for="euthaniseNo">No</label>
+                                <label class="fw-bold" for="euthaniseNo">No</label>
                               </div>
                             </div></div>
 
                              <div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-3">Female / Male</label>
-                              <div>
+                              <label class="col-sm-3 fw-bold">Female / Male</label>
                                 <div v-for="option in gender_choices" class="col-sm-2">
                                   <input :disabled="readonlyForm" type="checkbox" @change="checkFemalePinkyJoey" :value="option.id" :id="'gender_'+option.id" v-bind:key="option.id" v-model="call_email.gender"/>
-                                   <label :for="'gender_'+option.id" >{{ option.display }}</label>
+                                   <label class="fw-bold" :for="'gender_'+option.id" >{{ option.display }}</label>
                                 </div>
-                              </div>
                             </div></div>
 
                             <div v-if="isFemalePinkyJoey" class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-3">Pinky / Joey</label>
+                              <label class="col-sm-3 fw-bold">Pinky / Joey</label>
                               <div>
                                 <div v-for="option in baby_kangaroo_choices" class="col-sm-2">
                                   <input :disabled="readonlyForm" type="checkbox" :value="option.id" :id="'babyKangaroo'+option.id" v-bind:key="option.id" v-model="call_email.baby_kangaroo"/>
@@ -420,7 +362,7 @@
 
                             <div class="col-sm-12 form-group">
                               <div class="row">
-                                  <label class="col-sm-3">Number of Animals</label>
+                                  <label class="col-sm-3 fw-bold">Number of Animals</label>
                                   <div class="col-sm-9">
                                     <input :disabled="readonlyForm" class="form-control" v-model="call_email.number_of_animals" />
                                   </div>
@@ -429,7 +371,7 @@
 
                             <div class="col-sm-12 form-group">
                               <div class="row">
-                                  <label class="col-sm-3">Brief nature of call *</label>
+                                  <label class="col-sm-3 fw-bold">Brief nature of call *</label>
                                   <div class="col-sm-9">
                                     <textarea :disabled="readonlyForm" class="form-control" v-model="call_email.brief_nature_of_call" />
                                   </div>
@@ -437,42 +379,25 @@
                             </div>
 
                             <div class="col-sm-12 form-group"><div class="row">
-                              <label class="col-sm-3">Entangled</label>
-                              <div  class="col-sm-8" style="padding:0px">
+                              <label class="col-sm-3 fw-bold">Entangled</label>
+                              <div class="col-sm-8" style="padding:0px">
+                                <div class="row">
                                 <div v-for="option in entangled_choices" class="col-sm-4">
                                   <input :disabled="readonlyForm" type="checkbox" :value="option.id" v-bind:key="option.id" :id="'entangled_'+option.id" v-model="call_email.entangled"/>
-                                   <label :for="'entangled_'+option.id" >{{ option.display }}</label>
+                                  <label class="fw-bold" :for="'entangled_'+option.id" >{{ option.display }}</label>
+                                </div>
                                 </div>
                               </div>
                             </div></div>
 
                              <div v-if="isEntangledOther" class="col-sm-12 form-group">
                               <div class="row">
-                                  <label class="col-sm-3">Entangled Other</label>
+                                  <label class="col-sm-3 fw-bold">Entangled Other</label>
                                   <div class="col-sm-9">
                                     <input :disabled="readonlyForm" class="form-control" v-model="call_email.entangled_other"/>
                                   </div>
                               </div>
                             </div>
-
-                           <!-- <div class="row">
-                                <div class="col-sm-9 form-group">
-                                  <label class="col-sm-4">Report Type</label>
-                                  <select :disabled="readonlyForm" @change.prevent="loadSchema" class="form-control" v-model="call_email.report_type_id">
-                                          <option v-for="option in report_types" :value="option.id" v-bind:key="option.id">
-                                            {{ option.report_type }} 
-                                          </option>
-                                  </select>
-                                </div>
-                                <div class="col-sm-3 form-group">
-                                    <div class="row">
-                                        <label class="col-sm-2 advice-url-label">None </label>
-                                    </div>
-                                    <div class="row">
-                                        <a v-if="reportAdviceUrl" class="advice-url" :href="reportAdviceUrl" target="_blank" >Advice</a>
-                                    </div>
-                                </div>
-                            </div> -->
                             
                             <div v-if="rendererVisibility">  
                               <div v-for="(item, index) in current_schema">
@@ -485,7 +410,7 @@
                             </div>
                           </FormSection>
             
-                          <FormSection v-if="(call_email.referrer && call_email.referrer.length > 0) || call_email.advice_details" :formCollapse="true" label="Outcome" Index="3">
+                          <FormSection v-if="(call_email.referrer && call_email.referrer.length > 0) || call_email.advice_details" :formCollapse="true" label="Outcome" index="3">
                             <div v-if="call_email.referrer && call_email.referrer.length > 0" class="col-sm-12 form-group"><div class="row">
                                 <label class="col-sm-4">Referred To</label>
                                 <select style="width:100%" disabled class="form-control input-sm" multiple="multiple" ref="referrerList" >
@@ -519,17 +444,17 @@
           </div>
         </div>
 
-        <div v-if="call_email.can_user_action" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
-                        <div class="navbar-inner">
-                            <div class="container">
-                                <p class="float-end" style="margin-top:5px;">
-                                    
-                                    <input type="button" @click.prevent="save('exit')" class="btn btn-primary" value="Save and Exit"/>
-                                    <input type="button" @click.prevent="save('noexit')" class="btn btn-primary" value="Save and Continue" />
-                                </p>
-                            </div>
-                        </div>
-        </div>          
+        <div class="row" style="margin-bottom:50px;">
+          <div v-if="call_email.can_user_action" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5; display: block;">
+            <div class="navbar-inner">
+                    <p class="float-end" style="margin-top:5px;">                      
+                        <input v-if="!isProcessing" type="button" @click.prevent="save('exit')" class="btn btn-primary" value="Save and Exit"/>
+                        <input v-if="!isProcessing" type="button" @click.prevent="save('noexit')" class="btn btn-primary" value="Save and Continue" />
+                        <button v-if="isProcessing" disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Processing</button>
+                    </p>
+            </div>
+          </div>          
+        </div>
         <div v-if="workflow_type">
           <CallWorkflow ref="add_workflow" :workflow_type="workflow_type" v-bind:key="workflowBindId" />
         </div>
@@ -558,24 +483,17 @@
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
- "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 
 import CommsLogs from "@/components/common/comms_logs.vue";
 import MapLocation from "./map_location.vue";
-import datatable from '@vue-utils/datatable.vue'
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks.js";
-//import SearchPerson from "./search_person.vue";
 import SearchPersonOrganisation from "@/components/common/search_person_or_organisation.vue";
-import utils from "@/components/external/utils";
-import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import moment from 'moment';
 import CallWorkflow from './call_email_workflow.vue';
 import Offence from '../offence/offence_modal.vue';
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal.vue';
-
-//import "select2/dist/css/select2.min.css";
-
 import Inspection from '../inspection/create_inspection_modal.vue';
 import RelatedItems from "@/components/common/related_items.vue";
 import hash from 'object-hash';
@@ -585,6 +503,7 @@ export default {
   name: "ViewCallEmail",
   data: function() {
     return {
+      isProcessing: false,
       objectHash: null,
       uuid: 0,
       cTab: 'cTab'+uuid(),
@@ -610,7 +529,6 @@ export default {
               {
                   data: 'Action',
                   mRender: function(data, type, row){
-                      // return '<a href="#" class="remove_button" data-offender-id="' + row.id + '">Remove</a>';
                       return '<a href="#">View (not implemented)</a>';
                   }
               },
@@ -628,7 +546,6 @@ export default {
       filter_wildcare_species_types: [],
       wildcare_species_sub_types: [],
       filter_wildcare_species_sub_types: [],
-      //
       speciesSubTypeDisabled: false,
       isFemalePinkyJoey: false,
       entangled_choices: [],
@@ -638,9 +555,7 @@ export default {
       report_types: [],
       referrers: [],
       referrersSelected: [],
-      //allocated_group: [],
       current_schema: [],
-      // regionDistricts: [],
       reportAdviceUrl: '',
       sectionLabel: "Details",
       sectionIndex: 1,
@@ -706,7 +621,6 @@ export default {
     SearchPersonOrganisation,
     CallWorkflow,
     Offence,
-    //datatable,
     RelatedItems,
     SanctionOutcome,
     Inspection,
@@ -922,13 +836,13 @@ export default {
       if (!this.locationExists) {
             await swal.fire({
                 title: 'Mandatory Field',
-                html: "Location must be specified",
-                type: "error",
+                text: "Location must be specified",
+                icon: "error",
             })
       } else {
           try {
               const res = await this.saveCallEmail({ crud: 'forward', internal: true });
-              if (res.ok) {
+              if (res.id) {
                   this.workflow_type = workflow_type;
                   this.updateWorkflowBindId();
                   this.$nextTick(() => {
@@ -1019,19 +933,12 @@ export default {
           }
         }
         //---filter wildcare species sub type as per species type selected
-          /*
-        if(this.speciesSubTypeDisabled === false)
-        {
-        */
-          for(let choice of this.wildcare_species_sub_types){
-            if(choice.wildcare_species_type_id === this.call_email.wildcare_species_type_id)
-            {
-              this.filter_wildcare_species_sub_types.push(choice);
-            }
+        for(let choice of this.wildcare_species_sub_types){
+          if(choice.wildcare_species_type_id === this.call_email.wildcare_species_type_id)
+          {
+            this.filter_wildcare_species_sub_types.push(choice);
           }
-          /*
         }
-        */
         //---to reset pinky/Joey onchange of species type
         this.checkFemalePinkyJoey();
       });
@@ -1050,31 +957,31 @@ export default {
         this.call_email.baby_kangaroo=[];
       }
     },
-    //saveIndividual: function() {
-    //  let noPersonSave = true;
-    //  this.save(noPersonSave)
-    //},
     save: async function (returnToDash) {
         let savedCallEmail = null;
         let savedPerson = null;
+        this.isProcessing = true;
         if (this.call_email.id) {
             if (this.$refs.search_person_organisation && this.$refs.search_person_organisation.entityIsPerson) {
                 savedPerson = await this.$refs.search_person_organisation.parentSave()
                 // if person save ok, continue with Inspection save
-                if (savedPerson && savedPerson.ok) {
+                if (savedPerson) {
                     savedCallEmail = await this.saveCallEmail({ crud: 'save' });
+                    this.isProcessing = false;
                 }
             // no search_person_org
             } else {
                 savedCallEmail = await this.saveCallEmail({ crud: 'save' });
+                this.isProcessing = false;
             }
         } else {
             // new CallEmail
             savedCallEmail = await this.saveCallEmail({ crud: 'create'});
+            this.isProcessing = false;
         }
         // recalc hash after save
         this.calculateHash();
-        if (savedCallEmail && savedCallEmail.ok && returnToDash === 'exit') {
+        if (savedCallEmail && savedCallEmail.id && returnToDash === 'exit') {
             // remove redundant eventListeners
             window.removeEventListener('beforeunload', this.leaving);
             window.removeEventListener('onblur', this.leaving);

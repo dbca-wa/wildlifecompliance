@@ -1,6 +1,6 @@
 <template>
     <div class="container" id="internalInspectionDash">
-        <FormSection :label="`Inspection`" :Index="`0`">
+        <FormSection :label="`Inspection`" :index="`0`">
 
         <div class="row">
             <div class="col-md-3">
@@ -62,7 +62,7 @@
         </div>
         </FormSection>
 
-        <FormSection :label="`Location`" :Index="`1`">
+        <FormSection :label="`Location`" :index="`1`">
             <MapLocations />
         </FormSection>
 
@@ -75,7 +75,7 @@
 <script>
     import $ from 'jquery'
     import datatable from '@vue-utils/datatable.vue'
-     'vue'
+   
     import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
     import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
     import FormSection from "@/components/forms/section_toggle.vue";

@@ -156,7 +156,7 @@
     </div>
 </template>
 <script>
- "vue";
+
 import FormSection from "@/components/forms/section_toggle.vue";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import utils from "@/components/external/utils";
@@ -465,16 +465,13 @@ export default {
                     "deleted": true,
                 })}
             );
-            if (returnedEntry.ok) {
+            if (returnedEntry) {
                 // required for running_sheet_history
-                await this.setCourtProceedingsJournalEntry(returnedEntry.body);
+                await this.setCourtProceedingsJournalEntry(returnedEntry);
                 let i = 0;
                 for (let r of this.courtProceedingsEntriesUrl) {
                     if (r.number === rowNumber) {
-                        //this.courtProceedingsEntriesUrl.splice(i++, 1, returnedEntry.body);
-                        //this.courtProceedingsEntriesUrl[i].description = this.tokenToUrl(this.runningSheetUrl[i].description);
-                        //r = returnedEntry.body;
-                        this.courtProceedingsEntriesUrl[i] = returnedEntry.body;
+                        this.courtProceedingsEntriesUrl[i] = returnedEntry;
                     }
                     i++;
                 }
@@ -512,16 +509,13 @@ export default {
                     "deleted": false,
                 })}
                 );
-            if (returnedEntry.ok) {
+            if (returnedEntry) {
                 // required for running_sheet_history
-                await this.setCourtProceedingsJournalEntry(returnedEntry.body);
+                await this.setCourtProceedingsJournalEntry(returnedEntry);
                 let i = 0;
                 for (let r of this.courtProceedingsEntriesUrl) {
                     if (r.number === rowNumber) {
-                        console.log('update: ' + rowNumber);
-                        //this.runningSheetUrl.splice(i, 1, returnedEntry.body);
-                        //this.runningSheetUrl[i].description = this.tokenToUrl(this.runningSheetUrl[i].description);
-                        this.courtProceedingsEntriesUrl[i] = returnedEntry.body;
+                        this.courtProceedingsEntriesUrl[i] = returnedEntry;
                     }
                     i++;
                 }
@@ -588,9 +582,9 @@ export default {
                 )
             let updatedCourtProceedings = await fetch_util.fetchUrl(fetchUrl, {method:'POST', body:JSON.stringify(payload)});
             console.log(updatedCourtProceedings)
-            if (updatedCourtProceedings.ok) {
-                await this.setAddCourtProceedingsEntry(updatedCourtProceedings.body);
-                let returnPayload = _.cloneDeep(updatedCourtProceedings.body);
+            if (updatedCourtProceedings) {
+                await this.setAddCourtProceedingsEntry(updatedCourtProceedings);
+                let returnPayload = _.cloneDeep(updatedCourtProceedings);
                 this.courtProceedingsEntriesUrl.push(returnPayload);
                 this.constructCourtProceedingsTable(returnPayload.id);
             }

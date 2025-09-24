@@ -75,15 +75,6 @@
                                 </a>
                           </div>
                         </div>
-
-                        <!--div  class="row action-button">
-                          <div v-if="!readonlyForm" class="col-sm-12">
-                                <a ref="close" @click="addWorkflow('close')" class="btn btn-primary btn-block">
-                                  Close
-                                </a>
-                          </div>
-                        </div-->
-
                     </div>
                 </div>
             </div>
@@ -114,7 +105,7 @@
                             Location
                           </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" v-if="rendererVisibility">
                           <a class="nav-link"
                             data-bs-toggle="pill"
                             role="tab" :href="'#'+cTab">
@@ -143,12 +134,12 @@
                           role="tabpanel"
                         >
 
-                          <FormSection :formCollapse="false" label="Inspection Details" Index="0">
+                          <FormSection :formCollapse="false" label="Inspection Details" index="inspection_details">
 
                             <div class="form-group">
                               <div class="row">
                                 <div class="col-sm-3">
-                                  <label>Inspection type</label>
+                                  <label class="fw-bold">Inspection type</label>
                                 </div>
                                 <div class="col-sm-6">
                                   <select :disabled="readonlyForm" class="form-control" v-model="inspection.inspection_type_id" @change="loadSchema">
@@ -162,7 +153,7 @@
                             <div class="form-group">
                               <div class="row">
                                 <div class="col-sm-3">
-                                  <label>Title</label>
+                                  <label class="fw-bold">Title</label>
                                 </div>
                                 <div class="col-sm-9">
                                   <input :readonly="readonlyForm" class="form-control" v-model="inspection.title"/>
@@ -172,7 +163,7 @@
                             <div class="form-group">
                               <div class="row">
                                 <div class="col-sm-3">
-                                  <label>Details</label>
+                                  <label class="fw-bold">Details</label>
                                 </div>
                                 <div class="col-sm-9">
                                   <textarea :readonly="readonlyForm" class="form-control" v-model="inspection.details"/>
@@ -181,33 +172,20 @@
                             </div>
 
                             <div class="form-group"><div class="row">
-                                <label class="col-sm-3">Planned for (Date)</label>
+                                <label class="col-sm-3 fw-bold">Planned for (Date)</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="plannedForDatePicker">
                                         <input :disabled="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="inspection.planned_for_date" />
-                                        <!--<span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>-->
                                     </div>
                                 </div>
 
-                                <label class="col-sm-3">Planned for (Time)</label>
+                                <label class="col-sm-3 fw-bold">Planned for (Time)</label>
                                 <div class="col-sm-3">
                                     <div class="input-group date" id="plannedForTimePicker">
                                       <input :disabled="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="inspection.planned_for_time"/>
-                                      <!--<span class="input-group-addon">
-                                          <span class="glyphicon glyphicon-calendar"></span>
-                                      </span>-->
                                     </div>
                                 </div>
                             </div></div>
-                            <!--div class="col-sm-12 form-group"><div class="row">
-                                <label class="col-sm-4">Party Inspected</label>
-                                    <input :disabled="readonlyForm" class="col-sm-1" id="individual" type="radio" v-model="inspection.party_inspected" v-bind:value="`individual`">
-                                    <label class="col-sm-1" for="individual">Person</label>
-                                    <input :disabled="readonlyForm" class="col-sm-1" id="organisation" type="radio" v-model="inspection.party_inspected" v-bind:value="`organisation`">
-                                    <label class="col-sm-1" for="organisation">Organisation</label>
-                            </div></div-->
 
                             <div class="form-group"><div class="row">
                                 <SearchPersonOrganisation
@@ -221,28 +199,17 @@
                                 showCreateUpdate
                                 ref="search_person_organisation"
                                 v-bind:key="updateSearchPersonOrganisationBindId"/>
-                                <!--div class="col-sm-1">
-                                    <input type="button" class="btn btn-primary" value="Add" @click.prevent="addOffenderClicked()" />
-                                </div-->
-                                <!--div class="col-sm-2">
-                                    <input :disabled="readonlyForm" type="button" class="btn btn-primary" value="Create New Person" @click.prevent="createNewPersonClicked()" />
-                                </div-->
                             </div></div>
-                            <!--div class="col-sm-12 form-group"><div class="row">
-                                <div class="col-sm-12" v-if="!readonlyForm">
-                                  <CreateNewPerson :displayComponent="displayCreateNewPerson" @new-person-created="newPersonCreated"/>
-                                </div>
-                                <div class="col-sm-12" v-if="!readonlyForm">
-                                  <CreateNewOrganisation/>
-                                </div>
-                            </div></div-->
-                            <div class="form-group"><div class="row">
-                              <label class="col-sm-4" for="inspection_inform">Inform party to be inspected</label>
-                              <input :disabled="readonlyForm" type="checkbox" id="inspection_inform" v-model="inspection.inform_party_being_inspected">
 
-                            </div></div>
+                            <div class="row">
+                              <label class="col-sm-4 fw-bold" for="inspection_inform">Inform party to be inspected</label>
+                              <div class="col-sm-4">
+                              <input :disabled="readonlyForm" type="checkbox" id="inspection_inform" v-model="inspection.inform_party_being_inspected">
+                              </div>
+                            </div>
+
                           </FormSection>
-                          <FormSection :formCollapse="false" label="Inspection Team" Index="1">
+                          <FormSection :formCollapse="false" label="Inspection Team" index="inspection_team">
                             <div class="form-group">
                               <div class="row">
                                 <div class="col-sm-6">
@@ -252,15 +219,9 @@
                                     </option>
                                   </select>
                                 </div>
-                                <div class="col-sm-2">
+                                <div class="col-sm-4">
                                     <button :disabled="readonlyForm" @click.prevent="addTeamMember" class="btn btn-primary">Add Member</button>
                                 </div>
-                                <!--div class="col-sm-2">
-                                    <button @click.prevent="makeTeamLead" class="btn btn-primary">Make Team Lead</button>
-                                </div-->
-                                <!--div class="col-sm-2">
-                                    <button @click.prevent="clearInspectionTeam" class="btn btn-primary float-end">Clear</button>
-                                </div-->
                               </div>
                             </div>
                             <div class="col-sm-12 form-group"><div class="row">
@@ -270,14 +231,13 @@
                             </div></div>
                           </FormSection>
 
-
                         </div>
 
                         <div :id="lTab" 
                           class="tab-pane fade in"
                           role="tabpanel"
                         >
-                            <FormSection :formCollapse="false" label="Location">
+                            <FormSection :formCollapse="false" label="Location" index="location">
                                     <MapLocation 
                                         v-if="inspection.location" 
                                         :key="lTab" 
@@ -289,30 +249,30 @@
                                     />
                                     <div :id="idLocationFieldsAddress" v-if="inspection.location">
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <label class="col-sm-4">Street</label>
+                                            <label class="col-sm-4 fw-bold">Street</label>
                                             <input class="form-control" v-model="inspection.location.properties.street" readonly />
                                         </div></div>
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <label class="col-sm-4">Town/Suburb</label>
+                                            <label class="col-sm-4 fw-bold">Town/Suburb</label>
                                             <input class="form-control" v-model="inspection.location.properties.town_suburb" readonly />
                                         </div></div>
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <label class="col-sm-4">State</label>
+                                            <label class="col-sm-4 fw-bold">State</label>
                                             <input class="form-control" v-model="inspection.location.properties.state" readonly />
                                         </div></div>
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <label class="col-sm-4">Postcode</label>
+                                            <label class="col-sm-4 fw-bold">Postcode</label>
                                             <input class="form-control" v-model="inspection.location.properties.postcode" readonly />
                                         </div></div>
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <label class="col-sm-4">Country</label>
+                                            <label class="col-sm-4 fw-bold">Country</label>
                                             <input class="form-control" v-model="inspection.location.properties.country" readonly />
                                         </div></div>
                                     </div>
 
                                     <div :id="idLocationFieldsDetails" v-if="inspection.location">
                                         <div class="col-sm-12 form-group"><div class="row">
-                                            <label class="col-sm-4">Details</label>
+                                            <label class="col-sm-4 fw-bold">Details</label>
                                             <textarea class="form-control location_address_field" v-model="inspection.location.properties.details" />
                                         </div></div>
                                     </div>
@@ -321,9 +281,9 @@
 
                         <div :id="cTab" 
                           class="tab-pane fade in"
-                          role="tabpanel"
+                          role="tabpanel" v-if="rendererVisibility"
                         >
-                            <FormSection :formCollapse="false" label="Checklist">
+                            <FormSection :formCollapse="false" label="Checklist" index="checklist">
                                 <div class="col-sm-12 form-group">
                                   <div v-if="rendererVisibility" class="row">
                                       <div v-for="(item, index) in current_schema">
@@ -341,11 +301,11 @@
                           class="tab-pane fade in"
                           role="tabpanel"
                         >
-                            <FormSection :formCollapse="false" label="Inspection report">
+                            <FormSection :formCollapse="false" label="Inspection report" index="inspection_report">
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <label class="control-label float-start"  for="Name">Inspection report</label>
+                                            <label class="control-label float-start fw-bold"  for="Name">Inspection report</label>
                                         </div>
                                         <div class="col-sm-9" v-if="inspection.inspectionReportDocumentUrl">
                                             <filefield
@@ -364,7 +324,7 @@
                           class="tab-pane fade in"
                           role="tabpanel"
                         >
-                            <FormSection :formCollapse="false" label="Related Items">
+                            <FormSection :formCollapse="false" label="Related Items" index="related_items">
                                 <div class="col-sm-12 form-group"><div class="row">
                                     <div class="col-sm-12" v-if="relatedItemsVisibility">
                                         <RelatedItems v-bind:key="relatedItemsBindId" :parent_update_related_items="setRelatedItems" :readonlyForm="!canUserAction"/>
@@ -379,19 +339,17 @@
             </div>
           </div>
         </div>
-        <div v-if="inspection.can_user_action" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
-            <div class="navbar-inner">
-                <div class="container">
-                    <p class="float-end" style="margin-top:5px;">
-                        <input type="button" @click.prevent="save('exit')" class="btn btn-primary" value="Save and Exit"/>
-                        <input type="button" @click.prevent="save('noexit')" class="btn btn-primary" value="Save and Continue"/>
-                    </p>
-                </div>
-            </div>
+        <div class="row" style="margin-bottom:50px;">
+          <div v-if="inspection.can_user_action" class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5; display: block;">
+              <div class="navbar-inner">
+                      <p class="float-end" style="margin-top:5px;">
+                          <input v-if="!isProcessing" type="button" @click.prevent="save('exit')" class="btn btn-primary" value="Save and Exit"/>
+                          <input v-if="!isProcessing" type="button" @click.prevent="save('noexit')" class="btn btn-primary" value="Save and Continue"/>
+                          <button v-if="isProcessing" disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Processing</button>
+                      </p>
+              </div>
+          </div>
         </div>
-        <!--div v-if="workflow_type">
-          <InspectionWorkflow ref="add_workflow" :workflow_type="workflow_type" v-bind:key="workflowBindId" />
-        </div-->
         <div v-if="offenceInitialised">
             <Offence
             ref="offence"
@@ -409,18 +367,13 @@
 </template>
 <script>
 import { v4 as uuid } from 'uuid';
- "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
 import SearchPersonOrganisation from "@/components/common/search_person_or_organisation.vue";
-//import CreateNewPerson from "@/components/common/create_new_person.vue";
-//import CreateNewOrganisation from "@/components/common/create_new_organisation.vue";
 import Assignment from "../assignment.vue";
 import CommsLogs from "@/components/common/comms_logs.vue";
 import datatable from '@vue-utils/datatable.vue'
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
-import utils from "@/components/external/utils";
-import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import moment from 'moment';
+import { mapGetters, mapActions } from "vuex";
 
 import Offence from '../offence/offence_modal.vue';
 import SanctionOutcome from '../sanction_outcome/sanction_outcome_modal.vue';
@@ -428,7 +381,6 @@ import filefield from '@common-components/compliance_file.vue';
 import InspectionWorkflow from './inspection_workflow.vue';
 import RelatedItems from "@/components/common/related_items.vue";
 import MapLocation from "../../common/map_location.vue";
-//import "select2/dist/css/select2.min.css";
 
 import hash from 'object-hash';
 
@@ -437,6 +389,7 @@ export default {
   name: "ViewInspection",
   data: function() {
     return {
+      isProcessing: false,
       uuid: 0,
       objectHash: null,
       iTab: 'iTab'+uuid(),
@@ -536,8 +489,6 @@ export default {
     FormSection,
     datatable,
     SearchPersonOrganisation,
-    //CreateNewPerson,
-    //CreateNewOrganisation,
     Offence,
     SanctionOutcome,
     filefield,
@@ -963,24 +914,28 @@ export default {
       console.log(returnToDash)
       let savedInspection = null;
       let savedPerson = null;
+      this.isProcessing = true;
       if (this.inspection.id) {
           if (this.$refs.search_person_organisation && this.$refs.search_person_organisation.entityIsPerson) {
               console.log("savePerson")
               savedPerson = await this.$refs.search_person_organisation.parentSave()
               // if person save ok, continue with Inspection save
-              if (savedPerson && savedPerson.ok) {
+              if (savedPerson) {
                   savedInspection = await this.saveInspection({ create: false, internal: false });
+                  this.isProcessing = false;
               }
           } else {
               console.log("no savePerson")
               savedInspection = await this.saveInspection({ create: false, internal: false });
+              this.isProcessing = false;
           }
       } else {
           savedInspection = await this.saveInspection({ create: true, internal: false });
+          this.isProcessing = false;
       }
       this.calculateHash();
       //console.log(savedInspection);
-      if (savedInspection && savedInspection.ok && returnToDash === 'exit') {
+      if (savedInspection && savedInspection.id && returnToDash === 'exit') {
         // remove redundant eventListeners
         window.removeEventListener('beforeunload', this.leaving);
         window.removeEventListener('onblur', this.leaving);

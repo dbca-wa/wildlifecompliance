@@ -1,6 +1,6 @@
 <template id="assignment">
     <div>
-        <div> <!--v-if="allocatedGroup" class="form-group">-->
+        <div>
             <div class="row">
             <div class="col-sm-12 top-buffer-s">
                 <strong>Currently assigned to</strong><br/>
@@ -24,7 +24,7 @@
     </div>
 </template>
 <script>
- "vue";
+
 import { api_endpoints, helpers, fetch_util } from "@/utils/hooks";
 export default {
     name: 'Assignment',
@@ -88,8 +88,8 @@ export default {
                     method:'POST',body:JSON.stringify({'id_list': id_list}),
                 }
             );
-            if (allocatedGroupResponse.ok) {
-                this.allowed_groups = allocatedGroupresponse;
+            if (allocatedGroupResponse !== undefined) {
+                this.allowed_groups = allocatedGroupResponse;
             } 
         },        
     },

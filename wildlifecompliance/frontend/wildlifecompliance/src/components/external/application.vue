@@ -76,7 +76,7 @@
 <script>
 import { v4 as uuid } from 'uuid';
 import Application from '../form.vue'
- 'vue'
+ 
 import { mapActions, mapGetters } from 'vuex'
 import AmendmentRequestDetails from '@/components/forms/amendment_request_details.vue';
 import {
@@ -190,45 +190,47 @@ export default {
       swal.fire({
           title: swal_title,
           html: swal_html,
-          type: "question",
+          icon: "question",
           showCancelButton: true,
           confirmButtonText: 'Discard',
           confirmButtonColor: '#d9534f',
       }).then((result) => {
-          let request = fetch_util.fetchUrl(this.activity_discard_url, {method:"DELETE", params: {'activity_id': this.selected_activity_tab_id}})
-          request.then(res=>{
-            swal.fire(
-              'Activity Discarded',
-              `${this.selected_activity_tab_name} has been discarded from this application.`,
-              'success'
-            );
+          if (result.ok) {
+            let request = fetch_util.fetchUrl(this.activity_discard_url, {method:"DELETE", params: {'activity_id': this.selected_activity_tab_id}})
+            request.then(res=>{
+              swal.fire(
+                'Activity Discarded',
+                `${this.selected_activity_tab_name} has been discarded from this application.`,
+                'success'
+              );
 
-            // No activities left? Redirect out of the application screen.
-            if(res.processing_status === 'discarded') {
-              this.$router.push({
-                  name:"external-applications-dash",
-              });
-            }
-            else {
-              this.load({ url: `/api/application/${this.application.id}.json` }).then(() => {
-                const newTab = this.unfinishedActivities[0];
-                if(newTab == null) {
-                  this.$router.push({
+              // No activities left? Redirect out of the application screen.
+              if(res.processing_status === 'discarded') {
+                this.$router.push({
                     name:"external-applications-dash",
-                  });
-                }
-                else {
-                  this.setActivityTab({id: newTab.id, name: newTab.label});
-                }
-              });
-            }
-        },err=>{
-          swal.fire(
-            'Error',
-            helpers.apiVueResourceError(err),
-            'error'
-          )
-        });
+                });
+              }
+              else {
+                this.load({ url: `/api/application/${this.application.id}.json` }).then(() => {
+                  const newTab = this.unfinishedActivities[0];
+                  if(newTab == null) {
+                    this.$router.push({
+                      name:"external-applications-dash",
+                    });
+                  }
+                  else {
+                    this.setActivityTab({id: newTab.id, name: newTab.label});
+                  }
+                });
+              }
+          },err=>{
+            swal.fire(
+              'Error',
+              helpers.apiVueResourceError(err),
+              'error'
+            )
+          });
+        }
       },(error) => {
       });
     },
@@ -328,12 +330,12 @@ export default {
         swal.fire({
             title: swal_title,
             html: swal_html,
-            type: "question",
+            icon: "question",
             showCancelButton: true,
             confirmButtonText: 'Submit'
 
         }).then( async (result) => {
-            if (result) {
+            if (result.ok) {
                 let is_submitting = true
                 let is_saved = await this.save_form(is_submitting);
                 if (is_saved) {
@@ -383,12 +385,12 @@ export default {
         swal.fire({
             title: swal_title,
             html: swal_html,
-            type: "question",
+            icon: "question",
             showCancelButton: true,
             confirmButtonText: 'Submit'
 
         }).then(async (result) => {
-            if (result) {
+            if (result.ok) {
               let is_submitting = true;
               let is_saved = await vm.save_form(is_submitting);
 
@@ -442,11 +444,11 @@ export default {
         swal.fire({
             title: swal_title,
             html: swal_html,
-            type: "question",
+            icon: "question",
             showCancelButton: true,
             confirmButtonText: 'Submit'
         }).then(async (result) => {
-            if (result) {
+            if (result.ok) {
               let is_submitting = true;
               let is_saved = await this.save_form(is_submitting)
               

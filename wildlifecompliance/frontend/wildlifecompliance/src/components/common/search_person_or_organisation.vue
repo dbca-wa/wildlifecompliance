@@ -6,13 +6,15 @@
             <div v-if="info" class="alert alert-warning">{{ info }}</div>
             </div>
             <div class="row">
-                <label v-if="componentTitle" class="col-sm-4">{{ componentTitle }}</label>
-                <label v-else-if="displayTitle" class="col-sm-4">{{ labelTitle }}</label>
-                <div v-if="!personOnly">
-                    <input :disabled="!isEditable" class="col-sm-1" id="individual" type="radio" v-model="searchType" v-bind:value="`individual`">
-                    <label class="col-sm-1" for="individual">Person</label>
-                    <input :disabled="!isEditable" class="col-sm-1" id="organisation" type="radio" v-model="searchType" v-bind:value="`organisation`">
-                    <label class="col-sm-1" for="organisation">Organisation</label>
+                <label v-if="componentTitle" class="col-sm-4 fw-bold">{{ componentTitle }}</label>
+                <label v-else-if="displayTitle" class="col-sm-4 fw-bold">{{ labelTitle }}</label>
+                <div class="col-sm-4">
+                    <input :disabled="!isEditable" id="individual" type="radio" v-model="searchType" v-bind:value="`individual`">
+                    <label class="fw-bold" for="individual">Person</label>
+                </div>
+                <div class="col-sm-4">
+                    <input :disabled="!isEditable" id="organisation" type="radio" v-model="searchType" v-bind:value="`organisation`">
+                    <label class="fw-bold" for="organisation">Organisation</label>
                 </div>
             </div>
         </div>
@@ -144,7 +146,7 @@ export default {
         },
         labelTitle: function() {
             if (this.searchType) {
-                return "Search " + this.searchType;
+                return "Search " + this.searchType.charAt(0).toUpperCase() + this.searchType.slice(1);
             }
         },
         updateCreatePersonBindId: function() {

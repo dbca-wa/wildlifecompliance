@@ -201,7 +201,7 @@
                 <div v-if="applicationDetailsVisible && showingApplication">
                     <div>
                     <ul class="nav nav-pills mb-3" id="tabs-main" data-tabs="tabs">
-                        <li class="nav-item"><a ref="applicantTab" class="nav-link" data-bs-toggle="pill" v-on:click="selectApplicantTab()" :href="'#'+applicantTab">Applicant</a></li>
+                        <li class="nav-item active"><a ref="applicantTab" class="nav-link" data-bs-toggle="pill" v-on:click="selectApplicantTab()" :href="'#'+applicantTab">Applicant</a></li>
                         <!-- <li class="nav-item"><a ref="applicationTab" class="nav-link" data-toggle="pill" :href="'#'+applicationTab">Application</a></li> -->
                         <li class="nav-item" v-for="(activity, index) in allCurrentActivities">
                             <a :class="{'nav-link amendment-highlight': application.has_amendment}" class="nav-link"
@@ -1193,11 +1193,11 @@ export default {
             swal.fire({
                 title: "Accept ID Check",
                 text: "Are you sure you want to accept this ID Check?",
-                type: "question",
+                icon: "question",
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result) {
+                if (result.ok) {
                     let request = fetch_util.fetchUrl(
                         helpers.add_endpoint_json(
                             api_endpoints.applications,(vm.application.id+'/accept_id_check')),
@@ -1217,11 +1217,11 @@ export default {
             swal.fire({
                 title: "Reset ID Check",
                 text: "Are you sure you want to reset this ID Check?",
-                type: "question",
+                icon: "question",
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result) {
+                if (result.ok) {
                     let request = fetch_util.fetchUrl(
                         helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_id_check'))
                         ,{method:'POST'}
@@ -1240,11 +1240,11 @@ export default {
             swal.fire({
                 title: "Request Update ID Check",
                 text: "Are you sure you want to request this ID Check update?",
-                type: "question",
+                icon: "question",
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result) {
+                if (result.ok) {
                     let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/request_id_check')),{method:'POST'})
                     request.then((response) => {
                         vm.setIdCheckStatus(response.id_check_status);
@@ -1260,11 +1260,11 @@ export default {
             swal.fire({
                 title: "Accept Character Check",
                 text: "Are you sure you want to accept this Character Check?",
-                type: "question",
+                icon: "question",
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result) {
+                if (result.ok) {
                     let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_character_check')),{method:'POST'})
                     request.then((response) => {
                         vm.setCharacterCheckStatus(response.character_check_status);
@@ -1280,11 +1280,11 @@ export default {
             swal.fire({
                 title: "Reset Character Check",
                 text: "Are you sure you want to reset this Character Check?",
-                type: "question",
+                icon: "question",
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result) {
+                if (result.ok) {
                     let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_character_check')),{method:'POST'})
                     request.then((response) => {
                         vm.setCharacterCheckStatus(response.character_check_status);
@@ -1300,11 +1300,11 @@ export default {
             swal.fire({
                 title: "Accept Return Check",
                 text: "Are you sure you want to accept this Return Check?",
-                type: "question",
+                icon: "question",
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result) {
+                if (result.ok) {
                     let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_return_check')),{method:'POST'})
                     request.then((response) => {
                         vm.setReturnCheckStatus(response.return_check_status);
@@ -1320,11 +1320,11 @@ export default {
             swal.fire({
                 title: "Reset Return Check",
                 text: "Are you sure you want to reset this Return Check?",
-                type: "question",
+                icon: "question",
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result) {
+                if (result.ok) {
                     let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_return_check')),{method:'POST'})
                     request.then((response) => {
                         vm.setReturnCheckStatus(response.return_check_status);
