@@ -407,11 +407,11 @@ export default {
         swal.fire({
             title: "Accept Organisation Request",
             text: "Are you sure you want to accept this organisation request?",
-            type: "question",
+            icon: "question",
             showCancelButton: true,
             confirmButtonText: 'Accept'
         }).then((result) => {
-            if (result) {
+            if (result.ok) {
                 let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/accept')))
                 request.then((response) => {
                     swal.fire({
@@ -439,14 +439,13 @@ export default {
         swal.fire({
             title: "Amendment Request",
             text: "Request a new letter from the user.",
-            type: "question",
+            icon: "question",
             input: "textarea",
             inputPlaceholder: 'Type your reason for your amendment request here',
             showCancelButton: true,
             confirmButtonText: 'Send Request'
         }).then((result) => {
-            console.log(result)
-            if (result) {
+            if (result.ok) {
                 let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result.value)))
                 request.then((response) => {
                     swal.fire({
@@ -474,11 +473,11 @@ export default {
         swal.fire({
             title: "Decline Organisation Request",
             text: "Are you sure you want to decline this organisation request?",
-            type: "question",
+            icon: "question",
             showCancelButton: true,
             confirmButtonText: 'Accept'
         }).then((result) => {
-            if (result) {
+            if (result.ok) {
                 let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/decline')))
                 request.then((response) => {
                     swal.fire({

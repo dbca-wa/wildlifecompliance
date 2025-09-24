@@ -637,13 +637,13 @@ export default {
                 swal.fire({
                     title: "Delete Section Question",
                     text: "Are you sure you want to delete?",
-                    type: "question",
+                    icon: "question",
                     showCancelButton: true,
                     confirmButtonText: 'Accept'
 
                 }).then(async (result) => {
 
-                    if (result) {
+                    if (result.ok) {
 
                         let request = fetch_util.fetchUrl(
                             helpers.add_endpoint_json(api_endpoints.schema_question,(self.sectionQuestion.id+'/delete_question')), 

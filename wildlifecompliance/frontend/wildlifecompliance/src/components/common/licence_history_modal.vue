@@ -1,7 +1,7 @@
 <template lang="html">
     <div id="historyDetail" v-show='showLicenceHistory'>
 
-        <modal transition="modal fade" title="Licence History" large force>
+        <modal transition="modal fade" title="Licence History" large force okText="">
             <div class="container-fluid">
 
                 <form class="form-horizontal" name="licenceHistoryForm">
@@ -18,7 +18,8 @@
                 </form>
 
             </div>
-            <div slot="footer" />
+            <div slot="footer">
+            </div>
         </modal>
 
     </div>

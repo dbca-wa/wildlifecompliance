@@ -241,12 +241,11 @@ export default {
         swal.fire({
             title: "Create Application",
             text: "Are you sure you want to create an application?",
-            type: "question",
+            icon: "question",
             showCancelButton: true,
             confirmButtonText: 'Accept'
         }).then((result) => {
-            console.log(result)
-            if (result) {
+            if (result.ok) {
                vm.createApplication();
             }
         },(error) => {
