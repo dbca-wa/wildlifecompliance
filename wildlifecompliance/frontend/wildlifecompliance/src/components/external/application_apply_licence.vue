@@ -245,7 +245,7 @@ export default {
             showCancelButton: true,
             confirmButtonText: 'Accept'
         }).then((result) => {
-            if (result.ok) {
+            if (result.isConfirmed) {
                vm.createApplication();
             }
         },(error) => {

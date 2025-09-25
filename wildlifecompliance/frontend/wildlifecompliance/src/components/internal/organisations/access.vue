@@ -411,7 +411,7 @@ export default {
             showCancelButton: true,
             confirmButtonText: 'Accept'
         }).then((result) => {
-            if (result.ok) {
+            if (result.isConfirmed) {
                 let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/accept')))
                 request.then((response) => {
                     swal.fire({
@@ -445,7 +445,7 @@ export default {
             showCancelButton: true,
             confirmButtonText: 'Send Request'
         }).then((result) => {
-            if (result.ok) {
+            if (result.isConfirmed) {
                 let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/amendment_request/?reason='+result.value)))
                 request.then((response) => {
                     swal.fire({
@@ -477,7 +477,7 @@ export default {
             showCancelButton: true,
             confirmButtonText: 'Accept'
         }).then((result) => {
-            if (result.ok) {
+            if (result.isConfirmed) {
                 let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisation_requests,(vm.access.id+'/decline')))
                 request.then((response) => {
                     swal.fire({

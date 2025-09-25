@@ -429,7 +429,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then((result) => {
-                if (result.ok) {
+                if (result.isConfirmed) {
                     let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'), {method:'POST', body:JSON.stringify(vm.user)},{
                         emulateJSON:true
                     })

@@ -195,7 +195,7 @@ export default {
           confirmButtonText: 'Discard',
           confirmButtonColor: '#d9534f',
       }).then((result) => {
-          if (result.ok) {
+          if (result.isConfirmed) {
             let request = fetch_util.fetchUrl(this.activity_discard_url, {method:"DELETE", params: {'activity_id': this.selected_activity_tab_id}})
             request.then(res=>{
               swal.fire(
@@ -335,7 +335,7 @@ export default {
             confirmButtonText: 'Submit'
 
         }).then( async (result) => {
-            if (result.ok) {
+            if (result.isConfirmed) {
                 let is_submitting = true
                 let is_saved = await this.save_form(is_submitting);
                 if (is_saved) {
@@ -390,7 +390,7 @@ export default {
             confirmButtonText: 'Submit'
 
         }).then(async (result) => {
-            if (result.ok) {
+            if (result.isConfirmed) {
               let is_submitting = true;
               let is_saved = await vm.save_form(is_submitting);
 
@@ -448,7 +448,7 @@ export default {
             showCancelButton: true,
             confirmButtonText: 'Submit'
         }).then(async (result) => {
-            if (result.ok) {
+            if (result.isConfirmed) {
               let is_submitting = true;
               let is_saved = await this.save_form(is_submitting)
               
