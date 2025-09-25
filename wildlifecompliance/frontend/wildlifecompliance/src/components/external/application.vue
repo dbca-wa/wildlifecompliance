@@ -270,22 +270,19 @@ export default {
       this.missing_fields.length = 0;
       this.highlight_missing_fields();
 
-      let request = this.saveFormData({ url: this.application_form_data_url, draft: true , submit: is_submitting});
-      request.then(res=>{
+      let request = await this.saveFormData({ url: this.application_form_data_url, draft: true , submit: is_submitting});
+      console.log(request)
+      if (request.success) {
         this.isProcessing = false;
         is_saved = true;
-
-      },err=>{
-        if (err.body.hasOwnProperty("missing")){
-            for (const missing_field of err.body.missing) {
-                this.missing_fields.push(missing_field)
-            }
-            this.highlight_missing_fields()
-            /*var top = ($('#error').offset() || { "top": NaN }).top;
-            $('html, body').animate({
-                scrollTop: top
-            }, 1);*/
-        }
+      } else {
+        //TODO refactor and reinstate below if needed (has not been in use)
+        //if (err.body.hasOwnProperty("missing")){
+        //    for (const missing_field of err.body.missing) {
+        //        this.missing_fields.push(missing_field)
+        //    }
+        //    this.highlight_missing_fields()
+        //}
 
         swal.fire(
             'Error',
@@ -294,7 +291,7 @@ export default {
         ).then((result) => {
             this.isProcessing = false;
         })
-      });
+      };
       return is_saved
     },
     save: async function(e) {
