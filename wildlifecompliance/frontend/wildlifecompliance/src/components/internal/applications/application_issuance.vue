@@ -14,57 +14,54 @@
                             <FormSection
                                 :form-collapse="false"
                                 :label="`Issue/Decline - ${item.name}`"
+                                :index="`issue_activity_content_${index}`"
                             >
-                                <div class="panel panel-default">
+                                <div class="card-body">
                                     <form class="form-horizontal" action="index.html" method="post">
                                         <div class="col-sm-12">
                                             <div class="form-group">
 
                                                 <div class="row">
-                                                    <div class="col-sm-12"><label class="control-label float-start">Proposed Purposes:</label></div>
+                                                    <div class="col-sm-12"><label class="control-label float-start fw-bold">Proposed Purposes:</label></div>
                                                     <div class="col-sm-12"><label class="control-label float-start">&nbsp;</label></div>
                                                     <div class="col-sm-12">
                                                         <div v-for="(p, index) in applicationSelectedActivitiesForPurposes" v-bind:key="`p_${index}`">
                                                             <FormSection
                                                                 :form-collapse="false"
                                                                 :label=p.purpose.short_name
-                                                                :index=index
+                                                                :index="`p_${index}`"
                                                             >
-                                                                <div class="panel panel-primary">
+                                                                <div class="">
                                                                     <div class="row">
                                                                         <div class="col-sm-12">
                                                                             <div class="col-sm-3">
-                                                                                <input type="radio" :value ="true" :id="p.purpose.id" v-model="getPickedPurpose(p.purpose.id).isProposed" /> Issue &nbsp;
-                                                                                <input type="radio" :value ="false" :id="p.purpose.id" v-model="getPickedPurpose(p.purpose.id).isProposed" /> Decline &nbsp;
+                                                                                <input type="radio" :value ="true" :id="p.purpose.id" v-model="getPickedPurpose(p.purpose.id).isProposed" class="fw-bold" /> Issue &nbsp;
+                                                                                <input type="radio" :value ="false" :id="p.purpose.id" v-model="getPickedPurpose(p.purpose.id).isProposed" class="fw-bold"/> Decline &nbsp;
                                                                             </div>
-                                                                            <div class="col-sm-3">
+                                                                            <div class="col-sm-6">
+                                                                                <label class="control-label fw-bold" v-if="getPickedPurpose(p.purpose.id).isProposed">Start Date</label>
                                                                                 <div class="input-group date" v-if="getPickedPurpose(p.purpose.id).isProposed" :ref="`start_date_${p.id}`" style="width: 100%;">
                                                                                     <input :readonly="p.processing_status!=='reissue' && (!canEditLicenceDates && p.proposed_end_date)" type="date" class="form-control" :name="`start_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_start_date">
-                                                                                    <!--<span class="input-group-addon">
-                                                                                        <span class="glyphicon glyphicon-calendar"></span>
-                                                                                    </span>-->
                                                                                 </div>
                                                                             </div>                                                                                                                                                 
-                                                                            <div class="col-sm-3">                                                        
+                                                                            <div class="col-sm-6">      
+                                                                                <label class="control-label fw-bold" v-if="getPickedPurpose(p.purpose.id).isProposed">End Date</label>                                                  
                                                                                 <div class="input-group date" v-if="getPickedPurpose(p.purpose.id).isProposed" :ref="`end_date_${p.id}`" style="width: 100%;">
                                                                                     <input :readonly="p.processing_status!=='reissue' && (!canEditLicenceDates && p.proposed_end_date)" type="date" class="form-control" :name="`end_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_end_date">
-                                                                                    <!--<span class="input-group-addon">
-                                                                                        <span class="glyphicon glyphicon-calendar"></span>
-                                                                                    </span>-->
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-sm-12">
                                                                             <div class="col-sm-3" v-if="getPickedPurpose(p.purpose.id).isProposed">
-                                                                                <label class="control-label float-start" for="Name">Additional Fee</label>
+                                                                                <label class="control-label fw-bold">Additional Fee</label>
                                                                             </div>
-                                                                            <div class="col-sm-6" v-if="getPickedPurpose(p.purpose.id).isProposed">
+                                                                            <div class="" v-if="getPickedPurpose(p.purpose.id).isProposed">
                                                                                 <input type="text" ref="licence_fee" class="form-control" style="width:50%;" v-model="p.additional_fee" />
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-sm-12">
                                                                             <div class="col-sm-3" v-if="getPickedPurpose(p.purpose.id).isProposed">
-                                                                                <label class="control-label float-start" for="Name">Fee Description</label>
+                                                                                <label class="control-label fw-bold" for="Name">Fee Description</label>
                                                                             </div>
                                                                             <div class="col-sm-6" v-if="getPickedPurpose(p.purpose.id).isProposed">
                                                                                 <input type="text" :name='"licence_fee_text_" + index' class="form-control" style="width:100%;" v-model="p.additional_fee_text" />
@@ -77,10 +74,10 @@
 
                                                                             <div class="col-sm-12">
                                                                                 <div class="col-sm-3">
-                                                                                    <label class="control-label float-start" for="Name">Details</label>
+                                                                                    <label class="control-label fw-bold">Details</label>
                                                                                     <div v-show="free_text.is_additional_info" ><br/><br/>
                                                                                         <input type="checkbox" checked disabled/>
-                                                                                        <label>Is additional info</label>
+                                                                                        <label class="fw-bold">Is additional info</label>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-sm-9">
@@ -120,7 +117,7 @@
                                     <div class="row">
                                         <div class="col-sm-3">
                                             
-                                            <label class="control-label float-start"  for="details">Details</label>
+                                            <label class="control-label float-start fw-bold"  for="details">Details</label>
                                         </div>
                                         <div class="col-sm-9">
                                             <div class="input-group date" ref="details" style="width: 70%;">
@@ -130,7 +127,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-3">
-                                            <label class="control-label float-start"  for="details">CC Email</label>
+                                            <label class="control-label float-start fw-bold"  for="details">CC Email</label>
                                         </div>
                                         <div class="col-sm-9">
                                             <div class="input-group date" ref="cc_email" style="width: 70%;">
@@ -140,7 +137,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-3">
-                                            <label class="control-label float-start"  for="details">Files to be attached to email</label>
+                                            <label class="control-label float-start fw-bold"  for="details">Files to be attached to email</label>
                                         </div>
                                         <div class="col-sm-9">
                                             <filefield 
@@ -163,7 +160,7 @@
                             <div class="panel panel-default">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start"  for="details">ID Check</label>
+                                        <label class="control-label float-start fw-bold"  for="details">ID Check</label>
                                     </div>
                                     <div class="col-sm-9">
 
@@ -176,7 +173,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start"  for="details">Character Check</label>
+                                        <label class="control-label float-start fw-bold"  for="details">Character Check</label>
                                     </div>
                                     <div class="col-sm-9">
 
@@ -188,7 +185,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start"  for="details">Return Check</label>
+                                        <label class="control-label float-start fw-bold"  for="details">Return Check</label>
                                     </div>
                                     <div class="col-sm-9">
 
@@ -208,24 +205,19 @@
                     || (applicantType == 'submitter' && application.submitter.residential_address)">Click <a href="#"  @click.prevent="preview()">here</a> to preview the licence document.</p>
                     <p v-else >Preview not available - applicant address not set</p>
 
-                    <div class="row" style="margin-bottom:50px;">
-                        <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
-                            <div class="navbar-inner">
-                                <div class="container" v-if="canIssueOrDecline">
-                                    <p class="float-end" style="margin-top:5px;">
+                    <div class="row">
+                        <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5; display: block; ">
+                            <div class="navbar-inner"  >
+                                    <p class="float-end" style="margin-top:5px;" v-if="canIssueOrDecline">
                                         <button v-if="showSpinner" type="button" class="btn btn-primary float-end" ><i class="fa fa-spinner fa-spin"/>Issue/Decline</button>
                                         <button v-else class="btn btn-primary float-end" @click.prevent="ok()">Issue/Decline</button>
                                     </p>
-                                </div>
-                                <div class="container" v-else>
-                                    <p class="float-end" style="margin-top:5px;">
+                                    <p class="float-end" style="margin-top:5px;" v-else>
                                         <button disabled class="btn btn-primary float-end" @click.prevent="ok()">Issue/Decline</button>
                                     </p>
-                                </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
 
             
@@ -799,18 +791,9 @@ export default {
         },
 
     },
-    updated: function(){
-        this.eventListeners();
-    },
     mounted: function(){
         let vm = this;
         this.fetchProposeIssue();
-
-        this.$nextTick(() => {
-            vm.eventListeners();
-
-        });
-
     },
     
 }
