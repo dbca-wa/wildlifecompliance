@@ -9,6 +9,7 @@
 <script>
 
 export default {
+    emits: ['update-formatted-text'],
     props: {
         formatted_text_prop: {
             type: String,
@@ -61,10 +62,10 @@ export default {
         updateFormatedText: function (_, contents) {
             if (this.pushed > 0) {
                     this.pushed--;
-                } else {
-                    this.changed++;
-                    this.$emit('update-formatted-text', {"formatted_text":contents, "purpose_index":this.purpose_index, "activity_index":this.activity_index, "species_index":this.species_index})
-                }
+            } else {
+                this.changed++;
+                this.$emit('update-formatted-text', {"formatted_text":contents, "purpose_index":this.purpose_index, "activity_index":this.activity_index, "species_index":this.species_index})
+            }
         }
     },
     mounted: function() {

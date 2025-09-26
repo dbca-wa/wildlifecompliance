@@ -64,8 +64,7 @@ export const userStore = {
                 return getters.hasRole('licensing_officer') || getters.application.can_current_user_edit;
             }
             if (getters.isReturnsLoaded){
-
-                return getters.returns.activity_curators.find(curator => curator.id === getters.current_user.id) || getters.returns.submitter.id === getters.current_user.id;
+                return getters.returns.activity_curators.find(curator => curator.id === getters.current_user.id);
             }
             return false
         },

@@ -81,7 +81,7 @@
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-sm-9">
-                                                                                    <summernote :formatted_text="free_text.details" :purpose_index="index" :activity_index="0" :species_index="pt_idx" @update-formatted-text="updateFormattedText"></summernote>
+                                                                                    <summernote :formatted_text_prop="free_text.details" :purpose_index="index" :activity_index="0" :species_index="pt_idx" @update-formatted-text="updateFormattedText"></summernote>
                                                                                 </div>
                                                                             </div>
 

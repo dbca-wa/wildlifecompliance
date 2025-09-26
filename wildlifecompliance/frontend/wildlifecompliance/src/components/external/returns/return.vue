@@ -2,8 +2,8 @@
 <form method="POST" name="external_returns_form" enctype="multipart/form-data">
 <div class="container" id="externalReturn">
     <Returns v-if="isReturnsLoaded" >
-        <div class='col-md-3'/>
-        <div class='col-md-9' >
+        <div class='col-md-3'></div>
+        <div class='col-md-9'>
 
             <ReturnSheet v-if="selected_returns_tab_id===0 && returns.format==='sheet'"></ReturnSheet>
             <ReturnQuestion v-if="selected_returns_tab_id===0 && returns.format==='question'"></ReturnQuestion>
@@ -12,29 +12,27 @@
 
             <!-- End template for Return Tab -->
 
-            <div class="row" style="margin-bottom:50px;" v-show="showButtons" >
-                <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
+            <div class="row" v-show="showButtons" >
+                <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5; display:block; ">
                     <div class="navbar-inner">
-                        <div class="container">
                             <p class="float-end" style="margin-top:5px;">
                                 <strong style="font-size: 18px;" v-if="isPayable">Return submission fee: {{toCurrency(returns_estimate_fee)}}</strong><br>
 
-                                  <button v-if="spinner_exit" style="width:150px;" disabled class="btn btn-primary btn-md"><i class="fa fa-spin fa-spinner"></i>&nbsp;Saving</button>
-                                  <button v-else-if="!spinner_exit && disable_exit" style="width:150px;" disabled class="btn btn-primary btn-md" name="save_exit">Save and Exit</button>
-                                  <button v-else style="width:150px;" class="btn btn-primary btn-md" @click.prevent="save(false)" name="save_exit">Save and Exit</button>
+                                  <button v-if="spinner_exit" disabled class="btn btn-primary btn-md"><i class="fa fa-spin fa-spinner"></i>&nbsp;Saving</button>
+                                  <button v-else-if="!spinner_exit && disable_exit" disabled class="btn btn-primary btn-md" name="save_exit">Save and Exit</button>
+                                  <button v-else class="btn btn-primary btn-md" @click.prevent="save(false)" name="save_exit">Save and Exit</button>
 
-                                  <button v-if="spinner_continue" style="width:150px;"  disabled class="btn btn-primary btn-md"><i class="fa fa-spin fa-spinner"></i>&nbsp;Saving</button>
-                                  <button v-else-if="!spinner_continue && disable_continue" disabled style="width:150px;" class="btn btn-primary btn-md" name="save_continue">Save and Continue</button>
-                                  <button v-else style="width:150px;" class="btn btn-primary btn-md" @click.prevent="save(true)" name="save_continue">Save and Continue</button>
+                                  <button v-if="spinner_continue"  disabled class="btn btn-primary btn-md"><i class="fa fa-spin fa-spinner"></i>&nbsp;Saving</button>
+                                  <button v-else-if="!spinner_continue && disable_continue" disabled class="btn btn-primary btn-md" name="save_continue">Save and Continue</button>
+                                  <button v-else class="btn btn-primary btn-md" @click.prevent="save(true)" name="save_continue">Save and Continue</button>
 
-                                  <button v-if="spinner_submit" style="width:150px;" disabled class="btn btn-primary btn-md"><i class="fa fa-spin fa-spinner"></i>&nbsp;Submitting</button>
-                                  <button v-if="!spinner_submit && !isPayable && isSubmittable && !disable_submit" style="width:150px;" class="btn btn-primary btn-md" @click.prevent="save_and_submit()" name="submit">Submit</button>
-                                  <button v-else-if="!spinner_submit && disable_submit && !isPayable && isSubmittable" disabled style="width:150px;" class="btn btn-primary btn-md" name="submit">Submit</button>
-                                  <button v-else-if="!spinner_submit && !disable_submit && isPayable && isSubmittable" style="width:150px;" class="btn btn-primary btn-md" @click.prevent="submit_and_checkout()" name="submit">Pay and Submit</button>
-                                  <button v-else-if="isPayable && isSubmittable && disable_submit" disabled style="width:150px;" class="btn btn-primary btn-md" name="submit">Pay and Submit</button>                           
+                                  <button v-if="spinner_submit" disabled class="btn btn-primary btn-md"><i class="fa fa-spin fa-spinner"></i>&nbsp;Submitting</button>
+                                  <button v-if="!spinner_submit && !isPayable && isSubmittable && !disable_submit" class="btn btn-primary btn-md" @click.prevent="save_and_submit()" name="submit">Submit</button>
+                                  <button v-else-if="!spinner_submit && disable_submit && !isPayable && isSubmittable" disabled class="btn btn-primary btn-md" name="submit">Submit</button>
+                                  <button v-else-if="!spinner_submit && !disable_submit && isPayable && isSubmittable" class="btn btn-primary btn-md" @click.prevent="submit_and_checkout()" name="submit">Pay and Submit</button>
+                                  <button v-else-if="isPayable && isSubmittable && disable_submit" disabled class="btn btn-primary btn-md" name="submit">Pay and Submit</button>                           
 
                             </p>
-                        </div>
                     </div>
                 </div>
             </div>

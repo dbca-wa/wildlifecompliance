@@ -6,7 +6,7 @@
                     :form-collapse="false"
                     label="An amendment has been requested for this Application"
                 >
-                <div class="panel panel-default">
+                <div class="card-body">
                     <div v-for="a in visibleRequests">
                         <p><b>Activity:</b> {{a.licence_activity.name}}</p>
                         <p><b>Reason:</b> {{a.reason.name}}</p>
