@@ -318,7 +318,7 @@ export default {
 
                 }).then(async (result) => {
 
-                    if (result.ok) {
+                    if (result.isConfirmed) {
 
                         let request = fetch_util.fetchUrl(
                             helpers.add_endpoint_json(api_endpoints.schema_purpose,(self.sectionPurpose.id+'/delete_purpose')), {method:"DELETE"}

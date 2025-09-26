@@ -395,7 +395,7 @@ export default {
 
                 }).then(async (result) => {
 
-                    if (result.ok) {
+                    if (result.isConfirmed) {
 
                         let request = fetch_util.fetchUrl(
                             helpers.add_endpoint_json(api_endpoints.schema_group,(self.sectionGroup.id+'/delete_group')), {method:"DELETE"}

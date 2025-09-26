@@ -1197,7 +1197,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result.ok) {
+                if (result.isConfirmed) {
                     let request = fetch_util.fetchUrl(
                         helpers.add_endpoint_json(
                             api_endpoints.applications,(vm.application.id+'/accept_id_check')),
@@ -1221,7 +1221,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result.ok) {
+                if (result.isConfirmed) {
                     let request = fetch_util.fetchUrl(
                         helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_id_check'))
                         ,{method:'POST'}
@@ -1244,7 +1244,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result.ok) {
+                if (result.isConfirmed) {
                     let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/request_id_check')),{method:'POST'})
                     request.then((response) => {
                         vm.setIdCheckStatus(response.id_check_status);
@@ -1264,7 +1264,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result.ok) {
+                if (result.isConfirmed) {
                     let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_character_check')),{method:'POST'})
                     request.then((response) => {
                         vm.setCharacterCheckStatus(response.character_check_status);
@@ -1284,7 +1284,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result.ok) {
+                if (result.isConfirmed) {
                     let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_character_check')),{method:'POST'})
                     request.then((response) => {
                         vm.setCharacterCheckStatus(response.character_check_status);
@@ -1304,7 +1304,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result.ok) {
+                if (result.isConfirmed) {
                     let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/accept_return_check')),{method:'POST'})
                     request.then((response) => {
                         vm.setReturnCheckStatus(response.return_check_status);
@@ -1324,7 +1324,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Accept'
             }).then(async (result) => {
-                if (result.ok) {
+                if (result.isConfirmed) {
                     let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/reset_return_check')),{method:'POST'})
                     request.then((response) => {
                         vm.setReturnCheckStatus(response.return_check_status);
