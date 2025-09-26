@@ -37,9 +37,10 @@
                                              
                                             <div class="row">
 
-                                                <div v-if="category.checked && !(selected_apply_org_id != '' && type.not_for_organisation == true)" class="col-sm-9">
+                                                <div v-if="category.checked" class="col-sm-9">
 
                                                     <div v-for="(type,index1) in category.activity" class="checkbox margin-left-20">
+                                                        <div v-if="!(selected_apply_org_id != '' && type.not_for_organisation == true)">
                                                         <input type="checkbox" ref="selected_activity_type" name ="activity" :value="type.id" :id = "type.id" v-model="category.activity[index1].selected" @change="handleActivityCheckboxChange(index,index1)"> {{type.short_name}}
 
                                                         <div v-if="type.selected">
@@ -62,6 +63,7 @@
                                                                 </div>
 
                                                             </div>
+                                                        </div>
                                                         </div>
                                                     </div>
                                                 </div> 

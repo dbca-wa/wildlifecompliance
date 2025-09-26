@@ -34,9 +34,9 @@
                                                                 <div class="">
                                                                     <div class="row">
                                                                         <div class="col-sm-12">
-                                                                            <div class="col-sm-3">
-                                                                                <input type="radio" :value ="true" :id="p.purpose.id" v-model="getPickedPurpose(p.purpose.id).isProposed" class="fw-bold" /> Issue &nbsp;
-                                                                                <input type="radio" :value ="false" :id="p.purpose.id" v-model="getPickedPurpose(p.purpose.id).isProposed" class="fw-bold"/> Decline &nbsp;
+                                                                            <div class="col-sm-3 fw-bold">
+                                                                                <input type="radio" :value ="true" :id="p.purpose.id" v-model="getPickedPurpose(p.purpose.id).isProposed"/> Issue &nbsp;
+                                                                                <input type="radio" :value ="false" :id="p.purpose.id" v-model="getPickedPurpose(p.purpose.id).isProposed"/> Decline &nbsp;
                                                                             </div>
                                                                             <div class="col-sm-6">
                                                                                 <label class="control-label fw-bold" v-if="getPickedPurpose(p.purpose.id).isProposed">Start Date</label>

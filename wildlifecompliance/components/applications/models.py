@@ -2843,12 +2843,12 @@ class Application(RevisionedMixin):
                             proposed.proposed_start_date = \
                                 datetime.datetime.strptime(
                                     p_proposed[
-                                        'proposed_start_date'], '%d/%m/%Y')
+                                        'proposed_start_date'], '%Y-%m-%d')
 
                             proposed.proposed_end_date = \
                                 datetime.datetime.strptime(
                                     p_proposed[
-                                        'proposed_end_date'], '%d/%m/%Y')
+                                        'proposed_end_date'], '%Y-%m-%d')
 
                             # 2. Set proposal additional fee.
                             additional_fee = p_proposed['additional_fee']
