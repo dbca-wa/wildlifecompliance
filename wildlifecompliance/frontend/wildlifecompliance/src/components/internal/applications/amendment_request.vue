@@ -6,13 +6,13 @@
                     <form class="form-horizontal" name="amendForm">
                         <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                         <div class="col-sm-12">
-                            <div class="row">
-                                <label class="control-label">Request Amendment for the application</label>
+                            <div class="row form-group">
+                                <label class="control-label fw-bold">Request Amendment for the application</label>
                             </div>
                             <div class="row">
                                 <div class="form-group">
                                     <div class="col-sm-offset-2 col-sm-8">
-                                        <label class="control-label" for="Name">Select licensed activities to amend</label>
+                                        <label class="control-label fw-bold" for="Name">Select licensed activities to amend</label>
                                         <div v-for="activity in amendableActivities">
                                             <div>
                                                 <input type="checkbox" :value ="activity.id" :name="activity.name" :id="activity.id" v-model="amendment.activity_list">{{activity.name}}
@@ -24,7 +24,7 @@
                             <div class="row">
                                 <div class="col-sm-offset-2 col-sm-8">
                                     <div class="form-group">
-                                        <label class="control-label float-start"  for="Name">Reason</label>
+                                        <label class="control-label fw-bold"  for="Name">Reason</label>
                                         <select class="form-control" name="reason" ref="reason" v-model="amendment.reason">
                                             <option v-for="item in reason_choices" :value="item.key">{{item.value}}</option>
                                         </select>
@@ -34,7 +34,7 @@
                             <div class="row">
                                 <div class="col-sm-offset-2 col-sm-8">
                                     <div class="form-group">
-                                        <label class="control-label float-start"  for="Name">Additional Comments to User</label>
+                                        <label class="control-label fw-bold"  for="Name">Additional Comments to User</label>
                                         <textarea class="form-control" name="name" v-model="amendment.text">{{amendment.text}}</textarea>
                                     </div>
                                 </div>
@@ -209,7 +209,7 @@ export default {
             let vm = this;
             
             // Intialise select2
-            $(vm.$refs.reason).select2({
+            /*$(vm.$refs.reason).select2({
                 "theme": "bootstrap-5",
                 allowClear: true,
                 placeholder:"Select Reason"
@@ -221,7 +221,7 @@ export default {
             on("select2:unselect",function (e) {
                 var selected = $(e.currentTarget);
                 vm.amendment.reason = selected.val();
-            });
+            });*/
        }
    },
    mounted:function () {

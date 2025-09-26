@@ -1,6 +1,6 @@
 <template lang="html">
     <div id="proposedIssuanceLicence">
-        <modal transition="modal fade" @ok="ok()" @cancel="cancel()" :title="title" large>
+        <modal transition="modal fade" @ok="ok()" @cancel="cancel()" :title="title" large okText="Propose Issue">
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="licenceForm">
@@ -18,43 +18,39 @@
                                                     :label=p.purpose.short_name
                                                     :index=p_idx
                                                 >
-                                                    <div class="panel panel-primary">
+                                                    <div class="card-body">
                                                         <div class="row">
                                                             <div class="col-sm-12">
-                                                                <div class="col-sm-3">
-                                                                    <input type="radio" :value ="true" :id="p.purpose.id" v-model="getPickedPurpose(p.purpose.id).isProposed" /> Issue &nbsp;
-                                                                    <input type="radio" :value ="false" :id="p.purpose.id" v-model="getPickedPurpose(p.purpose.id).isProposed" /> Decline &nbsp;
+                                                                <div class="col-sm-3 fw-bold">
+                                                                    <input type="radio" :value ="true" :id="p.purpose.id" v-model="getPickedPurpose(p.purpose.id).isProposed"/> Issue &nbsp;
+                                                                    <input type="radio" :value ="false" :id="p.purpose.id" v-model="getPickedPurpose(p.purpose.id).isProposed"/> Decline &nbsp;
                                                                 </div>
-                                                                <div class="col-sm-3">
+                                                                <div class="col-sm-6">
+                                                                    <label class="control-label fw-bold" v-if="getPickedPurpose(p.purpose.id).isProposed">Start Date</label>
                                                                     <div class="input-group date" v-if="getPickedPurpose(p.purpose.id).isProposed" :ref="`start_date_${p.id}`" style="width: 100%;">
                                                                         <input :readonly="!canEditLicenceDates && p.proposed_start_date" type="date" class="form-control" :name="`start_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_start_date">
-                                                                        <!--<span class="input-group-addon">
-                                                                            <span class="glyphicon glyphicon-calendar"></span>
-                                                                        </span>-->
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-sm-3">                                                        
+                                                                <div class="col-sm-6">  
+                                                                    <label class="control-label fw-bold" v-if="getPickedPurpose(p.purpose.id).isProposed">End Date</label>                                                        
                                                                     <div class="input-group date" v-if="getPickedPurpose(p.purpose.id).isProposed" :ref="`end_date_${p.id}`" style="width: 100%;">
                                                                         <input :readonly="!canEditLicenceDates && p.proposed_end_date" type="date" class="form-control" :name="`end_date_${p.id}`" placeholder="DD/MM/YYYY" v-model="p.proposed_end_date">
-                                                                        <!--<span class="input-group-addon">
-                                                                            <span class="glyphicon glyphicon-calendar"></span>
-                                                                        </span>-->
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-12" v-if="getPickedPurpose(p.purpose.id).isProposed">
                                                                 <div class="col-sm-3">
-                                                                    <label class="control-label float-start" for="Name">Additional Fee</label>
+                                                                    <label class="control-label fw-bold" for="Name">Additional Fee</label>
                                                                 </div>
-                                                                <div class="col-sm-6">
+                                                                <div class="">
                                                                     <input type="text" ref="licence_fee" class="form-control" style="width:20%;" v-model="p.additional_fee" />
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-12" v-if="getPickedPurpose(p.purpose.id).isProposed">
                                                                 <div class="col-sm-3">
-                                                                    <label class="control-label float-start" for="Name">Fee Description 1</label>
+                                                                    <label class="control-label fw-bold" for="Name">Fee Description</label>
                                                                 </div>
-                                                                <div class="col-sm-6">
+                                                                <div class="">
                                                                     <input type="text" ref="licence_fee_text" class="form-control" style="width:70%;" v-model="p.additional_fee_text" />
                                                                 </div>
                                                             </div>
@@ -64,14 +60,14 @@
 
                                                                 <div class="col-sm-12">
                                                                     <div class="col-sm-3">
-                                                                        <label class="control-label float-start" for="Name">Details</label>
+                                                                        <label class="control-label fw-bold" for="Name">Details</label>
                                                                         <div v-show="free_text.is_additional_info" ><br/><br/>
                                                                             <input type="checkbox" checked disabled/>
-                                                                            <label>Is additional info</label>
+                                                                            <label class="fw-bold">Is additional info</label>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-sm-9">
-                                                                        <summernote :formatted_text="free_text.details" :purpose_index="p_idx" :activity_index="index" :species_index="pt_idx" @update-formatted-text="updateFormattedText"></summernote>
+                                                                        <summernote :formatted_text_prop="free_text.details" :purpose_index="p_idx" :activity_index="index" :species_index="pt_idx" @update-formatted-text="updateFormattedText"></summernote>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -88,7 +84,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start" for="Name">Details for Applicant</label>
+                                        <label class="control-label float-start fw-bold" for="Name">Details for Applicant</label>
                                     </div>
                                     <div class="col-sm-9">
                                         <textarea name="licence_details" class="form-control" style="width:70%;" v-model="propose_issue.reason"></textarea>
@@ -98,7 +94,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start" for="Name">Copy email</label>
+                                        <label class="control-label float-start fw-bold" for="Name">Copy email</label>
                                     </div>
                                     <div class="col-sm-9">
                                             <input type="text" class="form-control" name="licence_cc" style="width:70%;" v-model="propose_issue.cc_email">
@@ -108,7 +104,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start" for="Name">Documents for Applicant</label>
+                                        <label class="control-label float-start fw-bold" for="Name">Documents for Applicant</label>
                                     </div>
             			            <div class="col-sm-9">
                                         <filefield 
@@ -123,7 +119,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start" for="Name">Details for Approver</label>
+                                        <label class="control-label float-start fw-bold" for="Name">Details for Approver</label>
                                     </div>
                                     <div class="col-sm-9">
                                         <textarea name="licence_details" class="form-control" style="width:70%;" v-model="propose_issue.approver_detail"></textarea>
@@ -133,7 +129,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start" for="Name">Documents for Approver</label>
+                                        <label class="control-label float-start fw-bold" for="Name">Documents for Approver</label>
                                     </div>
             			            <div class="col-sm-9">
                                         <filefield 
@@ -162,9 +158,9 @@
                 </div>
             </div>
             <div slot="footer">
-                <button type="button" v-if="issuingLicence" disabled class="btn btn-primary" @click="ok"><i class="fa fa-spinner fa-spin"></i>Proposing Issue</button>
+                <!--<button type="button" v-if="issuingLicence" disabled class="btn btn-primary" @click="ok"><i class="fa fa-spinner fa-spin"></i>Proposing Issue</button>
                 <button type="button" v-else class="btn btn-primary" @click="ok">Propose Issue</button>
-                <button type="button" class="btn btn-primary" @click="cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" @click="cancel">Cancel</button>-->
             </div>
         </modal>
     </div>

@@ -337,7 +337,7 @@ export default {
                 let is_saved = await this.save_form(is_submitting);
                 if (is_saved) {
                   this.isProcessing = true;
-                  let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/submit'),{})
+                  let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/submit'),{method:'POST'})
                   request.then(res=>{
                       this.setApplication(res);
                       this.isProcessing = false;

@@ -1,21 +1,27 @@
 <template lang="html">
     <div id="applicationConditionDetail">
-        <modal transition="modal fade" @ok="ok()" @cancel="cancel()" title="Condition" large>
+        <modal transition="modal fade" @ok="ok()" @cancel="cancel()" title="Condition" large okText="Update">
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="conditionForm">
                         <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                         <div class="col-sm-12">
                             <div class="form-group">
-                                <label class="radio-inline control-label"><input type="radio" name="conditionType" :value="true" v-model="condition.standard">Standard Condition</label>
-                                <label class="radio-inline"><input type="radio" name="conditionType" :value="false" v-model="condition.standard">Free Text Condition</label>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                <label class="radio-inline control-label fw-bold"><input type="radio" name="conditionType" :value="true" v-model="condition.standard">Standard Condition</label>
+                                </div>
+                                <div class="col-sm-3">
+                                <label class="radio-inline fw-bold"><input type="radio" name="conditionType" :value="false" v-model="condition.standard">Free Text Condition</label>
+                                </div>
+                            </div>
                             </div>
                         </div>
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start"  for="Name">Purpose</label>
+                                        <label class="control-label float-start fw-bold"  for="Name">Purpose</label>
                                     </div>
                                     <div class="col-sm-9" >
                                         <div style="width:70% !important">
@@ -29,7 +35,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start"  for="Name">Condition</label>
+                                        <label class="control-label float-start fw-bold"  for="Name">Condition</label>
                                     </div>
                                     <div class="col-sm-9" v-if="condition.standard">
                                         <div style="width:70% !important">
@@ -46,7 +52,7 @@
                             <div class="form-group">
                                 <div class="row" v-if="!condition.standard || showDueDate">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start"  for="Name">Due Date</label>
+                                        <label class="control-label float-start fw-bold"  for="Name">Due Date</label>
                                     </div>
                                     <div class="col-sm-9">
                                         <div class="input-group date" ref="due_date" style="width: 70%;">
@@ -61,7 +67,7 @@
                             <div class="form-group" v-if="!condition.standard && validDate">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label class="control-label float-start"  for="Name">Return Type</label>
+                                        <label class="control-label float-start fw-bold"  for="Name">Return Type</label>
                                     </div>
                                     <div class="col-sm-9">
                                         <div style="width:70% !important">
@@ -76,7 +82,7 @@
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-sm-3">
-                                            <label class="control-label float-start"  for="Name">Recurrence</label>
+                                            <label class="control-label float-start fw-bold"  for="Name">Recurrence</label>
                                         </div>
                                         <div class="col-sm-9">
                                             <label class="checkbox-inline"><input type="checkbox" v-model="condition.recurrence"></label>
@@ -87,11 +93,15 @@
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-sm-3">
-                                                <label class="control-label float-start"  for="Name">Recurrence pattern</label>
+                                                <label class="control-label float-start fw-bold"  for="Name">Recurrence pattern</label>
                                             </div>
-                                            <div class="col-sm-9">
+                                            <div class="col-sm-3">
                                                 <label class="radio-inline control-label"><input type="radio" name="recurrenceSchedule" value="weekly" v-model="condition.recurrence_pattern">Weekly</label>
+                                            </div>
+                                            <div class="col-sm-3">
                                                 <label class="radio-inline control-label"><input type="radio" name="recurrenceSchedule" value="monthly" v-model="condition.recurrence_pattern">Monthly</label>
+                                            </div>
+                                            <div class="col-sm-3">
                                                 <label class="radio-inline control-label"><input type="radio" name="recurrenceSchedule" value="yearly" v-model="condition.recurrence_pattern">Yearly</label>
                                             </div>
                                         </div>
@@ -116,7 +126,7 @@
                 </div>
             </div>
             <div slot="footer">
-                <template v-if="condition.id">
+                <!--<template v-if="condition.id">
                     <button type="button" v-if="updatingCondition" disabled class="btn btn-primary" @click="ok"><i class="fa fa-spinnner fa-spin"></i> Updating</button>
                     <button type="button" v-else class="btn btn-primary" @click="ok">Update</button>
                 </template>
@@ -124,7 +134,7 @@
                     <button type="button" v-if="addingCondition" disabled class="btn btn-primary" @click="ok"><i class="fa fa-spinner fa-spin"></i> Adding</button>
                     <button type="button" v-else class="btn btn-primary" @click="ok">Add</button>
                 </template>
-                <button type="button" class="btn btn-primary" @click="cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" @click="cancel">Cancel</button>-->
             </div>
         </modal>
     </div>
@@ -359,7 +369,10 @@ export default {
                 "theme": "bootstrap-5",
                 allowClear: true,
                 minimumInputLength: 2,
-                placeholder:"Select Condition..."
+                placeholder:"Select Condition...",
+                dropdownParent: $(
+                    'div#applicationConditionDetail .modal-body'
+                ),
             }).
             on("select2:selecting",function (e) {
                 var selected = $(e.currentTarget);
@@ -381,7 +394,10 @@ export default {
             $(vm.$refs.select_purpose).select2({
                 "theme": "bootstrap-5",
                 allowClear: true,
-                placeholder:"Select Purpose..."
+                placeholder:"Select Purpose...",
+                dropdownParent: $(
+                    'div#applicationConditionDetail .modal-body'
+                ),
             }).
             on("select2:select",function (e) {
                 var selected = $(e.currentTarget);

@@ -2,55 +2,72 @@
   <FormSection
       :form-collapse="false"
       label="Return"
+      index="return"
   >
-    <div class="panel panel-default">
+    <div class="card-body">
     <AmendmentRequestDetails v-show="is_external"/>
         <div class="col-md-12" v-if="returns.has_species">
             <div class="form-group">
-                <label for="">Species Available:</label>
+                <label class="fw-bold" for="">Species Available:</label>
                 <select class="form-control" ref="selected_species" v-model="returns.species">
                     <option class="change-species" v-for="(specie, s_idx) in returns.species_list" :value="s_idx" :species_id="s_idx" v-bind:key="`specie_${s_idx}`" >{{specie}}</option>
                 </select>
             </div>
         </div>
         <div class="col-sm-12">
-            <div class="row">
-                <label style="width:70%;" class="col-sm-4">Do you want to Lodge a nil Return?</label>
+            <div class="row form-group">
+                <label class="fw-bold">Do you want to Lodge a nil Return?</label>
+                <div class="col-md-3">
                 <input type="radio" id="nilYes" name="nilYes" value="yes" v-model='returns.nil_return' :disabled='isReadOnly'>
-                <label style="width:10%;" for="nilYes">Yes</label>
+                <label for="nilYes">Yes</label>
+                </div>
+                <div class="col-md-3">
                 <input type="radio" id="nilNo" name="nilNo" value="no" v-model='returns.nil_return' :disabled='isReadOnly'>
-                <label style="width:10%;" for="nilNo">No</label>
+                <label for="nilNo">No</label>
+                </div>
             </div>
-            <div v-if="nilReturn === 'yes'" class="row">
-                <label style="width:70%;" class="col-sm-4">Reason for providing a Nil return.</label>
+            <div v-if="nilReturn === 'yes'" class="row form-group">
+                <label class="col-sm-4">Reason for providing a Nil return.</label>
                 <input type="textarea" name="nilReason" v-model="returns.nilReason">
             </div>
-            <div v-if="nilReturn === 'no'" class="row">
-                <label style="width:70%;" class="col-sm-4">Do you want to upload spreadsheet with Return data?<br>(Download <a v-bind:href="returns.template">spreadsheet template</a>)</label>
+            <div v-if="nilReturn === 'no'" class="row form-group">
+                <label class="fw-bold">Do you want to upload spreadsheet with Return data?<br>(Download <a v-bind:href="returns.template">spreadsheet template</a>)</label>
+                <div class="col-md-3">
                 <input type="radio" name="SpreadsheetYes" value="yes" v-model='spreadsheetReturn' :disabled='isReadOnly'>
-                <label style="width:10%;" for="SpreadsheetYes">Yes</label>
+                <label for="SpreadsheetYes">Yes</label>
+                </div>
+                <div class="col-md-3">
                 <input type="radio" name="SpreadsheetNo" value="no" v-model='spreadsheetReturn' :disabled='isReadOnly' >
-                <label style="width:10%;" for="SpreadsheetNo">No</label>
+                <label for="SpreadsheetNo">No</label>
+                </div>
             </div>
-            <div v-if="nilReturn === 'no' && spreadsheetReturn === 'yes'" class="row">
-                <label style="width:70%;" class="col-sm-4">Do you want to add to existing data or replace existing data?</label>
+            <div v-if="nilReturn === 'no' && spreadsheetReturn === 'yes'" class="row form-group">
+                <label class="col-sm-4 fw-bold">Do you want to add to existing data or replace existing data?</label>
+                <div class="col-md-3">
                 <input type="radio" name="ReplaceYes" value="yes" v-model='replaceReturn' :disabled='isReadOnly'>
-                <label style="width:10%;" for="ReplaceYes">Replace</label>
+                <label for="ReplaceYes">Replace</label>
+                </div>
+                <div class="col-md-3">
                 <input type="radio" name="ReplaceNo" value="no" v-model='replaceReturn' :disabled='isReadOnly'>
-                <label style="width:10%;" for="ReplaceNo">Add to</label>
+                <label for="ReplaceNo">Add to</label>
+                </div>
             </div>
-            <div v-if="nilReturn === 'no' && spreadsheetReturn === 'yes'" class="row">
+            <div v-if="nilReturn === 'no' && spreadsheetReturn === 'yes'" class="row form-group">
+                <div class="col-md-3">
                 <span class="btn btn-primary btn-file float-start">Upload File
                     <input type="file" ref="spreadsheet" @change="uploadFile()"/>
                 </span>
+                </div>
+                <div class="col-md-6">
                 <span class="float-start" style="margin-left:10px;margin-top:10px;">{{uploadedFileName}}</span>
+                </div>
             </div>
             <div class="row"></div>
             <div v-if="refreshGrid && nilReturn === 'no'" class="row">
                 <renderer-block v-for="(data, key) in returns.table"
                           :component="data"
                           v-bind:key="`returns-grid-data_${key}`"
-                />
+                /></br>
             </div>
             <div class="margin-left-20"></div>
             <!-- End of Spreadsheet Return -->
@@ -159,7 +176,7 @@ export default {
             this.spreadsheetReturn = 'yes'
             this.refresh_grid = true
         },exception=>{
-		        swal.fire('Error Uploading', exception.body.error, 'error');
+		        swal.fire('Error Uploading', helpers.apiVueResourceError(), 'error');
         });
     },
     getSpecies: async function(_id){

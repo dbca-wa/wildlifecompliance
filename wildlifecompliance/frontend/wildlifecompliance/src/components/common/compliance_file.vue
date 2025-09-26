@@ -93,7 +93,7 @@ export default {
     methods:{
         handleChange: function (e) {
             let vm = this;
-
+            console.log(e)
             if (vm.isRepeatable && e.target.files) {
                 let  el = $(e.target).attr('data-que');
                 let avail = $('input[name='+e.target.name+']');
@@ -197,7 +197,7 @@ export default {
         handleChangeWrapper: async function(e) {
             if (this.documentActionUrl === 'temporary_document' && !this.temporary_document_collection_id) {
                 // If temporary_document, create TemporaryDocumentCollection object and allow document_action_url to update
-                let res = await fetch_util.fetchUrl(this.document_action_url)
+                let res = await fetch_util.fetchUrl(this.document_action_url, {method:'POST'})
                 this.temporary_document_collection_id = res.id
                 await this.$emit('update-temp-doc-coll-id',
                     {

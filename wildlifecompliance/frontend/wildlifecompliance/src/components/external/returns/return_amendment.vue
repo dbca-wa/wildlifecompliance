@@ -1,6 +1,6 @@
 <template>
     <div v-if="isReturnsLoaded">
-        <div v-if="visibleRequests.length" class="row" style="color:red;">
+        <div v-if="visibleRequests && visibleRequests.length" class="row" style="color:red;">
             <div class="col-lg-12 float-end">
                 <FormSection
                     :form-collapse="false"

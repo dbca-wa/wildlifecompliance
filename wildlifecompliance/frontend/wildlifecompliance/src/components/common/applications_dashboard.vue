@@ -588,7 +588,7 @@ export default {
                 confirmButtonText: 'Discard Application',
                 confirmButtonColor:'#d9534f'
             }).then((result) => {
-                if (result) {
+                if (result.isConfirmed) {
                     let request = fetch_util.fetchUrl(api_endpoints.discard_application(application_id), {method:"DELETE"})
                     request.then((response) => {
                         swal.fire(

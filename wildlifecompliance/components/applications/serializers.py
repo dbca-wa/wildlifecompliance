@@ -1941,7 +1941,7 @@ class ApplicationLogEntrySerializer(CommunicationLogEntrySerializer):
 
 class ApplicationConditionSerializer(serializers.ModelSerializer):
     due_date = serializers.DateField(
-        input_formats=['%d/%m/%Y'],
+        input_formats=['%Y-%m-%d'],
         required=False,
         allow_null=True)
     purpose_name = serializers.SerializerMethodField(read_only=True)
@@ -2149,12 +2149,14 @@ class ProposedLicenceSerializer(serializers.Serializer):
                     for p_proposed in proposed_purposes:
                         if p_proposed['purpose']['id'] not in proposed_ids:
                             continue
+                        
                         start_date = p_proposed['proposed_start_date']
+                        print("START DATE",start_date)
                         end_date = p_proposed['proposed_end_date']
                         s_time = datetime.datetime.strptime(
-                            start_date, '%d/%m/%Y')
+                            start_date, '%Y-%m-%d')
                         e_time = datetime.datetime.strptime(
-                            end_date, '%d/%m/%Y')
+                            end_date, '%Y-%m-%d')
                         if e_time < s_time:
                             raise serializers.ValidationError(
                                 'End Date can not be before start date.')

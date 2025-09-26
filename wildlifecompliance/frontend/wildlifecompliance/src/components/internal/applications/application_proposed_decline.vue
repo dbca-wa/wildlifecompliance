@@ -1,27 +1,17 @@
 <template lang="html">
     <div id="change-contact">
-        <modal transition="modal fade" @ok="ok()" @cancel="cancel()" :title="title" large>
+        <modal transition="modal fade" @ok="ok()" @cancel="cancel()" :title="title" large okText="Propose Decline">
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="declineForm">
                         <alert v-if="showError" type="danger"><strong>{{errorString}}</strong></alert>
                         <div class="col-sm-12">
                             <div class="form-group">
-                                <!-- <div class="row">
-                                    <div class="col-sm-12">
-                                        <label class="control-label" for="Name">Select licensed activities to Propose Decline</label>
-                                        <div v-for="activity in visibleLicenceActivities">
-                                            <div>
-                                                <input type="checkbox" :value ="activity.id" :id="activity.id" v-model="propose_decline.activity">{{activity.name}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> -->
                             </div>
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <label class="control-label" for="Name">Provide Reason for the proposed decline </label>
+                                        <label class="control-label fw-bold" for="Name">Provide Reason for the proposed decline </label>
                                         <textarea style="width: 70%;"class="form-control" name="reason" v-model="propose_decline.reason"></textarea>
                                     </div>
                                 </div>
@@ -29,7 +19,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <label class="control-label" for="Name">Proposed CC email</label>
+                                        <label class="control-label fw-bold" for="Name">Proposed CC email</label>
                                         <input type="text" style="width: 70%;"class="form-control" name="cc_email" v-model="propose_decline.cc_email"/>
                                     </div>
                                 </div>
@@ -39,9 +29,9 @@
                 </div>
             </div>
             <div slot="footer">
-                <button type="button" v-if="decliningApplication" disabled class="btn btn-primary" @click="ok"><i class="fa fa-spinner fa-spin"></i>Proposing Decline</button>
+                <!--<button type="button" v-if="decliningApplication" disabled class="btn btn-primary" @click="ok"><i class="fa fa-spinner fa-spin"></i>Proposing Decline</button>
                 <button type="button" v-else class="btn btn-primary" @click="ok">Propose Decline</button>
-                <button type="button" class="btn btn-primary" @click="cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" @click="cancel">Cancel</button>-->
             </div>
         </modal>
     </div>

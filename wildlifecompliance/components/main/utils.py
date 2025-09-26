@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.http import HttpResponseRedirect, HttpResponse
+from rest_framework.response import Response
 from ledger_api_client.utils import (
     create_basket_session,
     create_checkout_session,
@@ -126,7 +127,7 @@ def checkout(
     print(checkout_params)
     create_checkout_session(request, checkout_params)
 
-    response = HttpResponse(
+    response = Response(
         reverse('ledgergw-payment-details')
     )
 
