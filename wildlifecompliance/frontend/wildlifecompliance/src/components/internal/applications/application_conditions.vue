@@ -287,7 +287,7 @@ export default {
                 confirmButtonText: 'Remove Condition',
                 confirmButtonColor:'#d9534f'
             }).then((result) => {
-                if (result) {
+                if (result.isConfirmed) {
                     let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.application_conditions,_id+'/delete'), {method:"DELETE"})
                     request.then((response) => {
                         vm.$refs.conditions_datatable.vmDataTable.ajax.reload();
