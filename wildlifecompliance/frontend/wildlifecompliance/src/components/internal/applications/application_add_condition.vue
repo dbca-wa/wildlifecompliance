@@ -369,7 +369,10 @@ export default {
                 "theme": "bootstrap-5",
                 allowClear: true,
                 minimumInputLength: 2,
-                placeholder:"Select Condition..."
+                placeholder:"Select Condition...",
+                dropdownParent: $(
+                    'div#applicationConditionDetail .modal-body'
+                ),
             }).
             on("select2:selecting",function (e) {
                 var selected = $(e.currentTarget);
@@ -391,7 +394,10 @@ export default {
             $(vm.$refs.select_purpose).select2({
                 "theme": "bootstrap-5",
                 allowClear: true,
-                placeholder:"Select Purpose..."
+                placeholder:"Select Purpose...",
+                dropdownParent: $(
+                    'div#applicationConditionDetail .modal-body'
+                ),
             }).
             on("select2:select",function (e) {
                 var selected = $(e.currentTarget);
