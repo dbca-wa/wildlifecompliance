@@ -222,7 +222,7 @@
                                         <div class="col-sm-3">
                                             <label class="fw-bold">Issued on paper?</label>
                                         </div>
-                                        <div class="col-sm-6">
+                                        <div class="col-sm-7">
                                             <input :disabled="readonlyForm" class="col-sm-1" id="issued_on_paper_yes" type="radio" v-model="sanction_outcome.issued_on_paper" :value="true" />
                                             <label class="col-sm-1 radio-button-label" for="issued_on_paper_yes">Yes</label>
                                             <input :disabled="readonlyForm" class="col-sm-1" id="issued_on_paper_no" type="radio" v-model="sanction_outcome.issued_on_paper" :value="false" />
