@@ -6,7 +6,7 @@
 
                     <div class="form-group"><div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label float-start">Reason</label>
+                            <label class="control-label float-start fw-bold">Reason</label>
                         </div>
                         <div class="col-sm-7">
                             <textarea class="form-control" placeholder="add reason" id="reason" v-model="workflowDetails"/>
@@ -15,7 +15,7 @@
 
                     <div class="form-group"><div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label float-start"  for="Name">Attachments</label>
+                            <label class="control-label float-start fw-bold" for="Name">Attachments</label>
                         </div>
                         <div class="col-sm-9">
                             <filefield ref="comms_log_file" name="comms-log-file" :isRepeatable="true" :documentActionUrl="sanction_outcome.commsLogsDocumentUrl" />
@@ -35,9 +35,9 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" v-if="processingDetails" disabled class="btn btn-default" @click="ok"><i class="fa fa-spinner fa-spin"></i> Adding</button>
+                <!--<button type="button" v-if="processingDetails" disabled class="btn btn-default" @click="ok"><i class="fa fa-spinner fa-spin"></i> Adding</button>
                 <button type="button" v-else class="btn btn-default" @click="ok">Ok</button>
-                <button type="button" class="btn btn-default" @click="cancel">Cancel</button>
+                <button type="button" class="btn btn-default" @click="cancel">Cancel</button>-->
             </div>
         </modal>
     </div>
@@ -202,7 +202,7 @@ export default {
             this.$refs.comms_log_file.commsLogId ? payload.append('comms_log_id', this.$refs.comms_log_file.commsLogId) : null;
             this.workflow_type ? payload.append('workflow_type', this.workflow_type) : null;
 
-            let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
+            let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:payload});
             return res
         },
         uploadFile(target,file_obj){

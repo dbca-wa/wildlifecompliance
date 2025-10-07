@@ -7,7 +7,7 @@
                         <div class="form-group">
                           <div class="row">
                             <div class="col-sm-3">
-                              <label>Region</label>
+                              <label class="fw-bold">Region</label>
                             </div>
                             <div class="col-sm-9">
                               <select class="form-control col-sm-9" @change.prevent="updateDistricts()" v-model="region_id">
@@ -21,7 +21,7 @@
                         <div class="form-group">
                           <div class="row">
                             <div class="col-sm-3">
-                              <label>District</label>
+                              <label class="fw-bold">District</label>
                             </div>
                             <div class="col-sm-9">
                               <select class="form-control" @change.prevent="updateAllocatedGroup()" v-model="district_id">
@@ -35,7 +35,7 @@
                         <div class="form-group">
                           <div class="row">
                             <div class="col-sm-3">
-                              <label>Allocate to</label>
+                              <label class="fw-bold">Allocate to</label>
                             </div>
                             <div class="col-sm-9">
                               <select class="form-control" v-model="assigned_to_id">
@@ -49,7 +49,7 @@
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-sm-3">
-                                  <label>Title</label>
+                                  <label class="fw-bold">Title</label>
                                 </div>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" v-model="legalCaseTitle" />
@@ -60,7 +60,7 @@
                         <div class="form-group">
                           <div class="row">
                             <div class="col-sm-3">
-                              <label>Case priority</label>
+                              <label class="fw-bold">Case priority</label>
                             </div>
                             <div class="col-sm-9">
                               <select class="form-control" v-model="legal_case_priority_id">
@@ -75,7 +75,7 @@
                         <div class="form-group">
                           <div class="row">
                               <div class="col-sm-3">
-                                  <label class="control-label float-start" for="details">Details</label>
+                                  <label class="control-label float-start fw-bold" for="details">Details</label>
                               </div>
             			      <div class="col-sm-6">
                                   <textarea class="form-control" placeholder="add details" id="details" v-model="legalCaseDetails"/>
@@ -85,7 +85,7 @@
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start"  for="Name">Attachments</label>
+                                    <label class="control-label float-start fw-bold"  for="Name">Attachments</label>
                                 </div>
             			        <div class="col-sm-9">
                                     <filefield 
@@ -112,8 +112,8 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" class="btn btn-default" @click="ok">Ok</button>
-                <button type="button" class="btn btn-default" @click="cancel">Cancel</button>
+                <!--<button type="button" class="btn btn-default" @click="ok">Ok</button>
+                <button type="button" class="btn btn-default" @click="cancel">Cancel</button>-->
             </div>
         </modal>
     </div>
