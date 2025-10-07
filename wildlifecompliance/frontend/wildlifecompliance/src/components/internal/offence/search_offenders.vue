@@ -82,11 +82,11 @@ export default {
     },
     computed: {
         updateSearchPersonOrganisationBindId: function() {
-            this.uuid += 1
+            //this.uuid += 1
             return 'offender' + this.uuid
         },
         elemId: function() {
-            this.uuid += 1
+            //this.uuid += 1
             let domId = this.uuid + 'search';
 
             if (this.domIdHelper) {
@@ -127,7 +127,7 @@ export default {
             this.showCreateNewOffender = true;
             this.showSearchOffender = true;
             this.creatingPerson = false;
-            this.uuid += 1;
+            //this.uuid += 1;
             this.$nextTick(()=>{
                 this.initAwesomplete();
             });
@@ -181,8 +181,8 @@ export default {
             }
         },
         initAwesomplete: function() {
+            console.log("initAwesomeplate")
             let vm = this;
-
             let element_search = document.getElementById(vm.elemId);
             if (element_search != null) {
                 vm.awesomplete_obj = new Awesomplete(element_search, {

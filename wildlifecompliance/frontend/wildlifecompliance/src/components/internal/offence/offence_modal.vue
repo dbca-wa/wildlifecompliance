@@ -2,20 +2,20 @@
     <div>
         <modal transition="modal fade" @ok="ok()" @cancel="cancel()" :title="modalTitle" large force>
             <div class="container-fluid">
-                <ul class="nav nav-pills">
-                    <li class="nav-item active"><a data-toggle="tab" :href="'#'+oTab">Offence</a></li>
-                    <li class="nav-item"><a data-toggle="tab" :href="'#'+dTab">Details</a></li>
-                    <li class="nav-item"><a data-toggle="tab" :href="'#'+documentTab">Document</a></li>
-                    <li class="nav-item"><a data-toggle="tab" :href="'#'+pTab">Offender(s)</a></li>
-                    <li class="nav-item"><a data-toggle="tab" :href="'#'+lTab" @click="mapOffenceClicked">Location</a></li>
+                <ul class="nav nav-pills mb-3">
+                    <li class="nav-item active"><a class="nav-link active" data-bs-toggle="tab" :href="'#'+oTab">Offence</a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" :href="'#'+dTab">Details</a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" :href="'#'+documentTab">Document</a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" :href="'#'+pTab">Offender(s)</a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" :href="'#'+lTab" @click="mapOffenceClicked">Location</a></li>
                 </ul>
                 <div class="tab-content">
-                    <div :id="oTab" class="tab-pane fade in active">
+                    <div :id="oTab" class="tab-pane fade in active show">
                         <div class="row">
 
                             <div class="col-sm-12 form-group"><div class="row">
-                                <div class="col-sm-3">
-                                    <label class="control-label float-start" for="offence-identifier">Identifier</label>
+                                <div class="col-sm-4">
+                                    <label class="control-label fw-bold float-start" for="offence-identifier">Identifier</label>
                                 </div>
                                 <div class="col-sm-6">
                                     <div v-if="offence">
@@ -25,8 +25,8 @@
                             </div></div>
 
                             <div class="col-sm-12 form-group"><div class="row">
-                                <div class="col-sm-3">
-                                    <label class="control-label float-start">Region</label>
+                                <div class="col-sm-4">
+                                    <label class="control-label fw-bold float-start">Region</label>
                                 </div>
                                 <div class="col-sm-7">
                                   <select class="form-control col-sm-9" v-on:change.prevent="offence.region_id=$event.target.value; updateDistricts('updateFromUI')" v-bind:value="offence.region_id">
@@ -38,8 +38,8 @@
                             </div></div>
 
                             <div class="col-sm-12 form-group"><div class="row">
-                                <div class="col-sm-3">
-                                    <label class="control-label float-start">District</label>
+                                <div class="col-sm-4">
+                                    <label class="control-label fw-bold float-start">District</label>
                                 </div>
                                 <div class="col-sm-7">
                                   <select class="form-control" v-model="offence.district_id">
@@ -51,65 +51,62 @@
                             </div></div>
 
                             <div class="col-sm-12 form-group"><div class="row">
-                                <label class="col-sm-3">Use occurrence from/to</label>
-                                <input class="col-sm-1" id="occurrence_from_to_true" type="radio" v-model="offence.occurrence_from_to" v-bind:value="true">
-                                <label class="col-sm-1 radio-button-label" for="occurrence_from_to_true">Yes</label>
-                                <input class="col-sm-1" id="occurrence_from_to_false" type="radio" v-model="offence.occurrence_from_to" v-bind:value="false">
-                                <label class="col-sm-1 radio-button-label" for="occurrence_from_to_false">No</label>
+                                <div class="col-sm-4"><label class="fw-bold">Use occurrence from/to</label></div>
+                                <div class="col-sm-3">
+                                  <input id="occurrence_from_to_true" type="radio" v-model="offence.occurrence_from_to" v-bind:value="true">
+                                  <label class="radio-button-label" for="occurrence_from_to_true">Yes</label>
+                                </div>
+                                <div class="col-sm-3">
+                                  <input id="occurrence_from_to_false" type="radio" v-model="offence.occurrence_from_to" v-bind:value="false">
+                                  <label class="radio-button-label" for="occurrence_from_to_false">No</label>
+                                </div>
                             </div></div>
 
                             <div class="col-sm-12 form-group"><div class="row">
-                                <label class="col-sm-3">{{ occurrenceDateLabel }}</label>
+                                <div class="col-sm-4">
+                                  <label class="fw-bold">{{ occurrenceDateLabel }}</label>
+                                </div>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="occurrenceDateFromPicker">
                                         <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="offence.occurrence_date_from" />
-                                        <!--<span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>-->
                                     </div>
                                 </div>
-                                <label v-show="offence.occurrence_from_to" class="col-sm-1">to</label>
-                                <div v-show="offence.occurrence_from_to">
-                                    <div class="col-sm-3">
-                                        <div class="input-group date" ref="occurrenceDateToPicker">
-                                            <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="offence.occurrence_date_to" />
-                                            <!--<span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>-->
-                                        </div>
+                                <div class="col-sm-1" v-show="offence.occurrence_from_to">
+                                  <label>to</label>
+                                </div>
+                                <div v-show="offence.occurrence_from_to" class="col-sm-3">
+                                    
+                                    <div class="input-group date" ref="occurrenceDateToPicker">
+                                        <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="offence.occurrence_date_to" />
                                     </div>
                                 </div>
                             </div></div>
 
                             <div class="col-sm-12 form-group"><div class="row">
-                                <label class="col-sm-3">{{ occurrenceTimeLabel }}</label>
+                                <div class="col-sm-4">
+                                  <label class="fw-bold">{{ occurrenceTimeLabel }}</label>
+                                </div>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="occurrenceTimeFromPicker">
                                         <input type="time" class="form-control" placeholder="HH:MM" v-model="offence.occurrence_time_from" />
-                                        <!--<span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>-->
                                     </div>
                                 </div>
-                                <label v-show="offence.occurrence_from_to" class="col-sm-1">to</label>
-                                <div v-show="offence.occurrence_from_to">
-                                    <div class="col-sm-3">
-                                        <div class="input-group date" ref="occurrenceTimeToPicker">
-                                            <input type="time" class="form-control" placeholder="HH:MM" v-model="offence.occurrence_time_to" />
-                                            <!--<span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>-->
-                                        </div>
+                                <div class="col-sm-1" v-show="offence.occurrence_from_to">
+                                  <label v-show="offence.occurrence_from_to" class="col-sm-1">to</label>
+                                </div>
+                                <div v-show="offence.occurrence_from_to" class="col-sm-3">
+                                    <div class="input-group date" ref="occurrenceTimeToPicker">
+                                        <input type="time" class="form-control" placeholder="HH:MM" v-model="offence.occurrence_time_to" />
                                     </div>
                                 </div>
                             </div></div>
 
                             <div class="col-sm-12 form-group"><div class="row">
-                                <label class="col-sm-3">Alleged Offence</label>
+                                <label class="col-sm-4 fw-bold">Alleged Offence</label>
                                 <div class="col-sm-6">
                                     <input class="form-control" id="alleged-offence" />
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-2">
                                     <input type="button" class="btn btn-primary" value="Add" @click.prevent="addAllegedOffenceClicked()" />
                                 </div>
                             </div></div>
@@ -127,10 +124,10 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <div class="row">
-                                        <div class="col-sm-3">
-                                            <label class="control-label float-start" for="offence-details">Details</label>
+                                        <div class="col-sm-4">
+                                            <label class="control-label float-start fw-bold" for="offence-details">Details</label>
                                         </div>
-                                        <div class="col-sm-6">
+                                        <div class="col-sm-8">
                                             <div v-if="offence">
                                                 <textarea class="form-control" placeholder="add details" id="offence-details" v-model="offence.details" v-bind:key="offence.id"/>
                                             </div>
@@ -144,10 +141,10 @@
                     <div :id="documentTab" class="tab-pane face in">
                             <div class="form-group">
                                 <div class="row">
-                                    <div class="col-sm-3">
-                                        <label class="control-label float-start"  for="Name">Attachments</label>
+                                    <div class="col-sm-4">
+                                        <label class="control-label float-start fw-bold" for="Name">Attachments</label>
                                     </div>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-8">
                                         <FileField 
                                             ref="comms_log_file" 
                                             name="comms-log-file" 
@@ -218,9 +215,9 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" v-if="processingDetails" disabled class="btn btn-default" @click="ok"><i class="fa fa-spinner fa-spin"></i> Adding</button>
+                <!--<button type="button" v-if="processingDetails" disabled class="btn btn-default" @click="ok"><i class="fa fa-spinner fa-spin"></i> Adding</button>
                 <button type="button" v-else class="btn btn-default" @click="ok">Ok</button>
-                <button type="button" class="btn btn-default" @click="cancel">Cancel</button>
+                <button type="button" class="btn btn-default" @click="cancel">Cancel</button>-->
             </div>
         </modal>
     </div>

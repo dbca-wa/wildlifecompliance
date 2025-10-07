@@ -135,7 +135,7 @@ export default {
             return changed;
         },
         elemId: function() {
-            this.uuid += 1
+            //this.uuid += 1
             let domId = this.searchType + this.uuid + 'search';
 
             if (this.domIdHelper) {
