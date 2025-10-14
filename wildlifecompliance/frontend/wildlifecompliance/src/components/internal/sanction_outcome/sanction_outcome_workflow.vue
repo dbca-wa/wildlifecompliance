@@ -3,10 +3,16 @@
         <modal transition="modal fade" @ok="ok()" @cancel="cancel()" :title="modalTitle" large force>
             <div class="container-fluid">
                 <div class="row col-sm-12">
-
+                    <div v-if="errorResponse" class="form-group">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <alert type="danger">{{errorResponse}}</alert>
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group"><div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label float-start">Reason</label>
+                            <label class="control-label float-start fw-bold">Reason</label>
                         </div>
                         <div class="col-sm-7">
                             <textarea class="form-control" placeholder="add reason" id="reason" v-model="workflowDetails"/>
@@ -15,7 +21,7 @@
 
                     <div class="form-group"><div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label float-start"  for="Name">Attachments</label>
+                            <label class="control-label float-start fw-bold" for="Name">Attachments</label>
                         </div>
                         <div class="col-sm-9">
                             <filefield ref="comms_log_file" name="comms-log-file" :isRepeatable="true" :documentActionUrl="sanction_outcome.commsLogsDocumentUrl" />
@@ -26,18 +32,10 @@
 
             </div>
             <div slot="footer">
-                <div v-if="errorResponse" class="form-group">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <strong>
-                                <span style="white-space: pre; color: red;" v-html="errorResponse"></span>
-                            </strong>
-                        </div>
-                    </div>
-                </div>
-                <button type="button" v-if="processingDetails" disabled class="btn btn-default" @click="ok"><i class="fa fa-spinner fa-spin"></i> Adding</button>
+                
+                <!--<button type="button" v-if="processingDetails" disabled class="btn btn-default" @click="ok"><i class="fa fa-spinner fa-spin"></i> Adding</button>
                 <button type="button" v-else class="btn btn-default" @click="ok">Ok</button>
-                <button type="button" class="btn btn-default" @click="cancel">Cancel</button>
+                <button type="button" class="btn btn-default" @click="cancel">Cancel</button>-->
             </div>
         </modal>
     </div>
@@ -49,7 +47,7 @@ import modal from '@vue-utils/bootstrap-modal.vue';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import filefield from '@common-components/compliance_file.vue';
-
+import alert from '@vue-utils/alert.vue'
 export default {
     name: "SanctionOutcomeWorkflow",
     data: function() {
@@ -72,6 +70,7 @@ export default {
     components: {
       modal,
       filefield,
+      alert,
     },
     props:{
         workflow_type: {
@@ -155,23 +154,23 @@ export default {
         },
         processError: async function(err) {
             let errorText = '';
-            if (err.body.non_field_errors) {
+            if (err.non_field_errors) {
                 // When non field errors raised
-                for (let i=0; i<err.body.non_field_errors.length; i++){
-                    errorText += err.body.non_field_errors[i] + '<br />';
+                for (let i=0; i<err.non_field_errors.length; i++){
+                    errorText += err.non_field_errors[i];
                 }
-            } else if(Array.isArray(err.body)) {
+            } else if(Array.isArray(err)) {
                 // When general errors raised
-                for (let i=0; i<err.body.length; i++){
-                    errorText += err.body[i] + '<br />';
+                for (let i=0; i<err.length; i++){
+                    errorText += err[i] ;
                 }
             } else {
                 // When field errors raised
-                for (let field_name in err.body){
-                    if (err.body.hasOwnProperty(field_name)){
+                for (let field_name in err){
+                    if (err.hasOwnProperty(field_name)){
                         errorText += field_name + ': ';
-                        for (let j=0; j<err.body[field_name].length; j++){
-                            errorText += err.body[field_name][j] + '<br />';
+                        for (let j=0; j<err[field_name].length; j++){
+                            errorText += err[field_name][j];
                         }
                     }
                 }
@@ -202,7 +201,7 @@ export default {
             this.$refs.comms_log_file.commsLogId ? payload.append('comms_log_id', this.$refs.comms_log_file.commsLogId) : null;
             this.workflow_type ? payload.append('workflow_type', this.workflow_type) : null;
 
-            let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
+            let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:payload});
             return res
         },
         uploadFile(target,file_obj){

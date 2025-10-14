@@ -731,8 +731,7 @@ class ReturnDataSheet(SpreadSheet):
             return False
         for row in table_rows:
             self.errors.append(self.schema.get_error_fields(row))
-
-        return self.errors[1].__len__() == 0
+        return self.errors
 
     def create_return_data(self):
         '''

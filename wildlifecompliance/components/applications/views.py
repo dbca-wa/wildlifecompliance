@@ -124,6 +124,10 @@ class ApplicationSuccessView(TemplateView):
         submit_success = True
         try:
             application = get_session_application(request.session)
+            if not ApplicationInvoice.objects.filter(application=application).exists():
+                logger.error(f"ApplicationInvoice record does not exist for application {application}")
+                return redirect(reverse('external'))
+
             invoice_ref = ApplicationInvoice.objects.filter(application=application).order_by('invoice_datetime').last().invoice_reference
             invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
             application.submit(request)

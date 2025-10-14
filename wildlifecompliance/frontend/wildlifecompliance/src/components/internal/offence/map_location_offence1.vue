@@ -19,46 +19,58 @@
             </div>
         </div>
 
-        <div class="col-sm-4 form-group"><div class="row">
-            <label class="col-sm-4">Latitude:</label>
-            <div v-if="offence.location">
+        <div class="col-sm-12 form-group"><div class="row">
+            <label class="col-sm-4 fw-bold">Latitude:</label>
+            <div class="col-sm-8" v-if="offence.location">
                 <input type="number" min="-90" max="90" class="form-control" v-model.number="offence.location.geometry.coordinates[1]" />
             </div>
         </div></div>
-        <div class="col-sm-4 form-group"><div class="row">
-            <label class="col-sm-4">Longitude:</label>
-            <div v-if="offence.location">
+        <div class="col-sm-12 form-group"><div class="row">
+            <label class="col-sm-4 fw-bold">Longitude:</label>
+            <div class="col-sm-8" v-if="offence.location">
                 <input type="number" min="-180" max="180" class="form-control" v-model.number="offence.location.geometry.coordinates[0]" />
             </div>
         </div></div>
 
         <div :id="idLocationFieldsAddress">
             <div class="col-sm-12 form-group"><div class="row">
-                <label class="col-sm-4">Street</label>
+                <label class="col-sm-4 fw-bold">Street</label>
+                <div class="col-sm-8">
                 <input class="form-control" v-model="offence.location.properties.street" readonly />
+                </div>
             </div></div>
             <div class="col-sm-12 form-group"><div class="row">
-                <label class="col-sm-4">Town/Suburb</label>
+                <label class="col-sm-4 fw-bold">Town/Suburb</label>
+                <div class="col-sm-8">
                 <input class="form-control" v-model="offence.location.properties.town_suburb" readonly />
+                </div>
             </div></div>
             <div class="col-sm-12 form-group"><div class="row">
-                <label class="col-sm-4">State</label>
+                <label class="col-sm-4 fw-bold">State</label>
+                <div class="col-sm-8">
                 <input class="form-control" v-model="offence.location.properties.state" readonly />
+                </div>
             </div></div>
             <div class="col-sm-12 form-group"><div class="row">
-                <label class="col-sm-4">Postcode</label>
+                <label class="col-sm-4 fw-bold">Postcode</label>
+                <div class="col-sm-8">
                 <input class="form-control" v-model="offence.location.properties.postcode" readonly />
+                </div>
             </div></div>
             <div class="col-sm-12 form-group"><div class="row">
-                <label class="col-sm-4">Country</label>
+                <label class="col-sm-4 fw-bold">Country</label>
+                <div class="col-sm-8">
                 <input class="form-control" v-model="offence.location.properties.country" readonly />
+                </div>
             </div></div>
         </div>
 
         <div :id="idLocationFieldsDetails">
             <div class="col-sm-12 form-group"><div class="row">
-                <label class="col-sm-4">Details</label>
+                <label class="col-sm-4 fw-bold">Details</label>
+                <div class="col-sm-8">
                 <textarea class="form-control location_address_field" v-model="offence.location.properties.details" />
+                </div>
             </div></div>
         </div>
     

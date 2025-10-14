@@ -150,7 +150,7 @@ export default {
               region_district_id: this.regionDistrictId,
               group_permission: 'officer',
               });
-              if (allocatedGroupResponse.ok) {
+              if (allocatedGroupResponse) {
                   console.log(allocatedGroupresponse.allocated_group);
                   this.allocatedGroup = allocatedGroupresponse.allocated_group;
                   this.allocated_group_id = allocatedGroupresponse.group_id;
@@ -174,7 +174,7 @@ export default {
           if (is_valid_form) {
               const response = await this.sendData();
               console.log(response);
-              if (response.ok) {
+              if (response) {
                   // For LegalCase Dashboard
                   if (this.$parent.$refs.legal_case_table) {
                       this.$parent.$refs.legal_case_table.vmDataTable.ajax.reload()
@@ -235,10 +235,8 @@ export default {
 
           try {
               let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
-              console.log(res);
-              if (res.ok) {
-                  return res
-              }
+              return res
+              
           } catch(err) {
                   this.errorResponse = 'Error:' + err.statusText;
               }

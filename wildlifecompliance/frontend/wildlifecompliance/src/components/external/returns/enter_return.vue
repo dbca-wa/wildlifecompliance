@@ -67,7 +67,7 @@
                 <renderer-block v-for="(data, key) in returns.table"
                           :component="data"
                           v-bind:key="`returns-grid-data_${key}`"
-                /></br>
+                />
             </div>
             <div class="margin-left-20"></div>
             <!-- End of Spreadsheet Return -->
@@ -156,8 +156,9 @@ export default {
     validate_upload: async function(e) {
       this.refresh_grid = false
       let _data = new FormData(this.form);
+      console.log(this.spreadsheet)
       _data.append('spreadsheet', this.spreadsheet)
-      let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/upload_details'),{method:'POST', body:JSON.stringify(_data)},{
+      let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/upload_details'),{method:'POST', body:_data},{
                     emulateJSON:true,
         })
       request.then((response)=>{
@@ -175,8 +176,8 @@ export default {
             this.nilReturn = 'no'
             this.spreadsheetReturn = 'yes'
             this.refresh_grid = true
-        },exception=>{
-		        swal.fire('Error Uploading', helpers.apiVueResourceError(), 'error');
+        },error=>{
+		        swal.fire('Error Uploading', helpers.apiVueResourceError(error), 'error');
         });
     },
     getSpecies: async function(_id){
