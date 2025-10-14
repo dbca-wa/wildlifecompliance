@@ -4,6 +4,7 @@
           <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-12">
+                  <alert v-if="errorResponse" type="danger"><strong>{{errorResponse}}</strong></alert>
                         <div class="form-group">
                           <div class="row">
                             <div class="col-sm-3">
@@ -103,15 +104,6 @@
             </div>
           </div>
             <div slot="footer">
-                <div v-if="errorResponse" class="form-group">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <strong>
-                                <span style="white-space: pre; color: red">{{ errorResponse }}</span>
-                            </strong>
-                        </div>
-                    </div>
-                </div>
                 <!--<button type="button" class="btn btn-default" @click="ok">Ok</button>
                 <button type="button" class="btn btn-default" @click="cancel">Cancel</button>-->
             </div>
@@ -125,6 +117,7 @@ import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import filefield from '@common-components/compliance_file.vue';
 import { required } from '@vuelidate/validators'
+import alert from '@vue-utils/alert.vue'
 
 export default {
     name: "CreateInspection",
@@ -135,7 +128,6 @@ export default {
             processingDetails: false,
             form: null,
             regions: [],
-            // regionDistricts: [],
             availableDistricts: [],
             legalCasePriorities: [],
             externalOrganisations: [],
@@ -156,6 +148,7 @@ export default {
     components: {
       modal,
       filefield,
+      alert,
     },
     validations: {
         region_id: {
@@ -180,13 +173,6 @@ export default {
               return true;
           }
       },
-      // regionDistrictId: function() {
-      //     if (this.district_id || this.region_id) {
-      //         return this.district_id ? this.district_id : this.region_id;
-      //     } else {
-      //         return null;
-      //     }
-      // },
     },
     methods: {
       ...mapActions('legalCaseStore', {
@@ -224,15 +210,16 @@ export default {
       },
       updateAllocatedGroup: async function() {
           this.errorResponse = "";
+          this.allocatedGroup = [];
           if (this.region_id) {
               let allocatedGroupResponse = await this.loadAllocatedGroup({
-                workflow_type: 'allocate_for_case',
+                workflow_type: 'allocate_for_inspection',
                 region_id: this.region_id,
                 district_id: this.district_id ? this.district_id : null,
               });
-              if (allocatedGroupResponse.ok) {
-                  this.allocatedGroup = allocatedGroupresponse;
-                  this.allocated_group_id = allocatedGroupresponse.group_id;
+              if (allocatedGroupResponse) {
+                  this.allocatedGroup = allocatedGroupResponse;
+                  this.allocated_group_id = allocatedGroupResponse.group_id;
               } else {
                   // Display http error response on modal
                   this.errorResponse = allocatedGroupResponse.statusText;
@@ -240,7 +227,7 @@ export default {
               // Display empty group error on modal
               if (!this.errorResponse &&
                   this.allocatedGroup &&
-                  this.allocatedGroup.length <= 1) {
+                  this.allocatedGroup.length < 1) {
                   this.errorResponse = 'This group has no members';
               }
           } else {
@@ -249,10 +236,11 @@ export default {
       },
 
       ok: async function () {
-          let is_valid_form = this.isValidForm();
-          if (is_valid_form) {
+          //let is_valid_form = this.isValidForm();
+          //if (is_valid_form) {
+          //TODO replace client-side form validation with something that works
               const response = await this.sendData();
-              if (response.ok) {
+              if (response) {
                   // For LegalCase Dashboard
                   if (this.$parent.$refs.legal_case_table) {
                       this.$parent.$refs.legal_case_table.vmDataTable.ajax.reload()
@@ -269,10 +257,10 @@ export default {
                   this.close();
                   //this.$router.push({ name: 'internal-inspection-dash' });
               }
-          }
+          //}
       },
       isValidForm: function() {
-          this.$v.$touch();
+          //this.$v.$touch();
           if (this.$v.$invalid) {
               this.errorResponse = 'Invalid form:\n';
               if (this.$v.region_id.$invalid) {
@@ -313,14 +301,11 @@ export default {
           this.temporary_document_collection_id ? payload.append('temporary_document_collection_id', this.temporary_document_collection_id.temp_doc_id) : null;
 
           try {
-              let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
-              console.log(res);
-              if (res.ok) {
-                  return res
-              }
+              let res = await fetch_util.fetchUrl(post_url, {method:'POST', body:payload});
+              return res
           } catch(err) {
               console.log(err);
-              this.errorResponse = 'Error:' + err.bodyText;
+              this.errorResponse = 'Error: ' + err;
           }
           
       },
@@ -338,11 +323,6 @@ export default {
               districts: [],
               region: null,
             });
-        // let returned_region_districts = await cache_helper.getSetCacheList(
-        //     'RegionDistricts', 
-        //     api_endpoints.region_district
-        //     );
-        // Object.assign(this.regionDistricts, returned_region_districts);
 
         // legal_case_priorities
         let returned_legal_case_priorities = await cache_helper.getSetCacheList(
@@ -372,17 +352,6 @@ export default {
               }
           }
         }
-
-        // If no Region/District selected, initialise region as Kensington
-        // if (!this.regionDistrictId) {
-        //     for (let record of this.regionDistricts) {
-        //         if (record.district === 'KENSINGTON') {
-        //             this.district_id = null;
-        //             this.region_id = record.id;
-        //         }
-        //     }
-        // }
-        // ensure availableDistricts and allocated group is current
         this.updateDistricts();
         await this.updateAllocatedGroup();
     },
