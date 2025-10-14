@@ -303,7 +303,7 @@
             v-bind:key="inspectionBindId"
             />
         </div>
-        <Magic ref="magic" />
+
         <div v-if="personOrArtifactInitialised">
             <PersonOrArtifactModal
             ref="person_or_artifact_modal"
@@ -358,7 +358,6 @@ import RelatedItems from "@/components/common/related_items.vue";
 //import "select2/dist/css/select2.min.css";
 
 import hash from 'object-hash';
-import Magic from './magic.vue';
 //import SearchPersonOrganisationModal from '@common-components/search_person_or_organisation_modal';
 import PersonOrArtifactModal from '@common-components/person_or_artifact_modal.vue';
 import _ from 'lodash';
@@ -441,8 +440,6 @@ export default {
             searchPersonKeyPressed: false,
             searchArtifactKeyPressed: false,
             insertUrlKeyPressed: false,
-            //magicValue: null,
-            magic: true,
             dtHeadersRunningSheet: [
                 "id",
                 "Number",
@@ -549,7 +546,6 @@ export default {
     filefield,
     RelatedItems,
     Inspection,
-    Magic,
     PersonOrArtifactModal,
     RunningSheetHistory,
     LegalCaseWorkflow,
@@ -1167,21 +1163,12 @@ export default {
       this.showSpinner = false;
       this.showExit = false;
     },
-    magicMethod: function() {
-
-        this.$refs.magic.isModalOpen = true;
-        this.magic = false;
-    },
     updateRunningSheetUrlEntry: function({
           recordNumber,
           recordDescription,
           redraw
     }) {
         console.log("updateRunningSheetUrl")
-        if (this.magic && recordDescription && recordDescription.toLowerCase().includes('shibaken')) {
-            this.magicMethod()
-        }
-
         let i = 0;
         for (let r of this.runningSheetUrl) {
             //console.log(r.deleted)
