@@ -765,7 +765,7 @@ export default {
             this.processingDetails = true;
             let response = await this.sendData();
 
-            if (response.ok) {
+            if (response) {
                 // Refresh offence table on the dashboard page
                 if (this.$parent.$refs.offence_table){
                     this.$parent.$refs.offence_table.vmDataTable.ajax.reload();

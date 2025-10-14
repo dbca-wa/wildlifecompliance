@@ -645,7 +645,7 @@ export default {
                 this.processingDetails = true;
                 let response = await this.sendData();
 
-                if(response.ok){
+                if(response){
                     if (this.$parent.offence && this.offence.id) {
                         await this.loadOffence({
                             offence_id: this.offence.id,

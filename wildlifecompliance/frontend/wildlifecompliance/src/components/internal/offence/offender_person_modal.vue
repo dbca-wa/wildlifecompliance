@@ -227,7 +227,7 @@ export default {
             this.processingDetails = true;
             let response = await this.sendData();
 
-            if (response.ok) {
+            if (response) {
                 // Refresh offence table
                 this.$nextTick(()=>{
                     this.$parent.$router.go()
