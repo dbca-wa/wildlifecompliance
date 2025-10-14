@@ -195,10 +195,10 @@ export default {
   text-decoration: none;
   background-color: #eee;
 }
-.nav-item {
+/*.nav-item {
   background-color: hsla(0, 0%, 78%, .8) !important;
   margin-bottom: 2px;
-}
+}*/
 .advice-url-label {
   visibility: hidden;
 }
