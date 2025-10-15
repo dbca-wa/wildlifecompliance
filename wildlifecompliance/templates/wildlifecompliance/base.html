@@ -17,7 +17,7 @@
 {% system_maintenance_due as system_maintenance_due %}
 {% is_external_url as is_external_url %}
 {% is_internal_url as is_internal_url %}
-{% RAND_HASH as RAND_HASH %}
+{% GIT_COMMIT_HASH as GIT_COMMIT_HASH %}
 {% system_name_var as system_name_var %}
 {% COMPLIANCE_LINKS_ENABLED as compliance_links_enabled %}
 
@@ -29,7 +29,7 @@
 {% endblock %}
 
 {% block extra_css %}
-<link type="text/css" href="{% static 'wildlifecompliance/css/base.css' %}" rel="stylesheet">
+<link type="text/css" href="{% static 'wildlifecompliance/css/base.css' %}?v={{ GIT_COMMIT_HASH }}" rel="stylesheet">
 {% endblock %}
 
 {% block custom_js %}

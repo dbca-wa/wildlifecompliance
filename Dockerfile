@@ -90,7 +90,6 @@ COPY --chown=oim:oim requirements.txt ./
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt 
 #COPY git_history_recent ./
-RUN touch /app/rand_hash
 COPY python-cron ./
 
 # Install the project (ensure that frontend projects have been built prior to this step).
