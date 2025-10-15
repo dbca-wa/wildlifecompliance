@@ -25,7 +25,7 @@
                             <h2 id="headingOne">
                             <button id="collapse1" class="collapsed-heading" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
                                 What is an infringement notice?
-                                <span class="bi bi-plus-lg" id="collapse1-icon" style="margin-left: auto;"></span>
+                                <span class="icon bi bi-plus" id="collapse1-icon" style="margin-left: auto;"></span>
                             </button>
                             </h2>
                             <div id="collapseOne" class="collapse" aria-labelledby="headingOne">
@@ -40,7 +40,7 @@
                             <h2 id="headingTwo">
                             <button id="collapse2" class="collapsed-heading" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                                 Pay an infringement notice
-                                <span class="bi bi-plus-lg" id="collapse2-icon" style="margin-left: auto;"></span>
+                                <span class="icon bi bi-plus" id="collapse2-icon" style="margin-left: auto;"></span>
                             </button>
                             </h2>
                             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo">
@@ -63,7 +63,7 @@
                             <h2 id="headingThree">
                             <button id="collapse3" class="collapsed-heading" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                                 What happens if I don’t deal with the infringement notice?
-                                <span class="bi bi-plus-lg" id="collapse3-icon" style="margin-left: auto;"></span>
+                                <span class="icon bi bi-plus" id="collapse3-icon" style="margin-left: auto;"></span>
                             </button>
                             </h2>
                             <div id="collapseThree" class="collapse" aria-labelledby="headingThree">
@@ -78,7 +78,7 @@
                             <h2 id="headingFour">
                             <button id="collapse4" class="collapsed-heading" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
                                 Request a review
-                                <span class="bi bi-plus-lg" id="collapse4-icon" style="margin-left: auto;"></span>
+                                <span class="icon bi bi-plus" id="collapse4-icon" style="margin-left: auto;"></span>
                             </button>
                             </h2>
                             <div id="collapseFour" class="collapse" aria-labelledby="headingFour">
@@ -95,7 +95,7 @@
                             <h2 id="headingFive">
                             <button id="collapse5" class="collapsed-heading" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
                                 Apply for an extension of time
-                                <span class="bi bi-plus-lg" id="collapse5-icon" style="margin-left: auto;"></span>
+                                <span class="icon bi bi-plus" id="collapse5-icon" style="margin-left: auto;"></span>
                             </button>
                             </h2>
                             <div id="collapseFive" class="collapse" aria-labelledby="headingFive">
@@ -110,7 +110,7 @@
                             <h2 id="headingSix">
                             <button id="collapse6" class="collapsed-heading" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
                                 Elect to take the matter to court
-                                <span class="bi bi-plus-lg" id="collapse6-icon" style="margin-left: auto;"></span>
+                                <span class="icon bi bi-plus" id="collapse6-icon" style="margin-left: auto;"></span>
                             </button>
                             </h2>
                             <div id="collapseSix" class="collapse" aria-labelledby="headingSix">
@@ -127,6 +127,14 @@
    </div>
 
 <style>
+
+.icon {
+    font-size: 50px;
+    font-weight: 900;
+    margin-top: -25px;
+    margin-bottom: -25px;
+    margin-right: -15px;
+}
 
 .collapsed-heading { 
     flex: 1; 
@@ -155,7 +163,6 @@
 {% endblock %}
 
 {% block custom_js %}
-<script src="{% static 'wildlifecompliance/js/bootstrap.min.js' %}"></script>
 <script>
     $(document).ready(function(){
         $('.collapsed-heading').on('click', function(e) {
@@ -164,14 +171,13 @@
             var new12 = this.id;
 
             if ($('#'+new12).hasClass('collapsed')) {
-                $("#"+new12+"-icon").removeClass('bi-dash-lg') .addClass('bi-plus-lg')
+                $("#"+new12+"-icon").removeClass('bi-dash') .addClass('bi-plus')
             } else {
-                $("#"+new12+"-icon").removeClass('bi-plus-lg') .addClass('bi-dash-lg')
+                $("#"+new12+"-icon").removeClass('bi-plus') .addClass('bi-dash')
             }
 
             e.preventDefault(); 
         });
     });
 </script>
-
 {% endblock %}

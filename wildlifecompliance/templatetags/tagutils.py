@@ -9,10 +9,6 @@ def get_instance_type():
     return settings.EMAIL_INSTANCE
 
 @register.simple_tag()
-def RAND_HASH():
-    return settings.RAND_HASH
-
-@register.simple_tag()
 def COMPLIANCE_LINKS_ENABLED():
     return settings.COMPLIANCE_LINKS_ENABLED
 
