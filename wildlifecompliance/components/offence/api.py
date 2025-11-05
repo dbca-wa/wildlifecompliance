@@ -746,11 +746,11 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                                 "dob":dob,
                                 "phone_number":dict['p_number'],
                                 "mobile_number":dict['m_number'],
-                                "address_street":dict['line1'],
-                                "address_locality":dict['locality'],
-                                "address_state":dict['state'],
-                                "address_country":dict['country'],
-                                "address_postcode":dict['postcode'],
+                                "address_street":dict['residential_address']['line1'],
+                                "address_locality":dict['residential_address']['locality'],
+                                "address_state":dict['residential_address']['state'],
+                                "address_country":dict['residential_address']['country'],
+                                "address_postcode":dict['residential_address']['postcode'],
                             }
                             offender_person = OffenderPersonSerializer(data=offender_person_data)
                             offender_person.is_valid(raise_exception=True)
