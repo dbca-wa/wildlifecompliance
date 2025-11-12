@@ -225,7 +225,7 @@ export const offenceStore = {
             Object.assign(payload, state.offence);
 
             if (payload.occurrence_date_from && payload.occurrence_time_from){
-                let occurrence_datetime_from = moment(payload.occurrence_date_from + ' ' + payload.occurrence_time_from, 'DD/MM/YYYY LT');
+                let occurrence_datetime_from = moment(payload.occurrence_date_from + ' ' + payload.occurrence_time_from, 'YYYY-MM-DD HH:mm');
                 payload.occurrence_datetime_from = occurrence_datetime_from.toDate().toISOString();
             } else {
                 throw new Error('Occurrence date-from and time-from cannot be empty');
@@ -233,7 +233,7 @@ export const offenceStore = {
 
             if (payload.occurrence_from_to) {
                 if (payload.occurrence_date_to && payload.occurrence_time_to){
-                    let occurrence_datetime_to = moment(payload.occurrence_date_to + ' ' + payload.occurrence_time_to, 'DD/MM/YYYY LT');
+                    let occurrence_datetime_to = moment(payload.occurrence_date_to + ' ' + payload.occurrence_time_to, 'YYYY-MM-DD HH:mm');
                     payload.occurrence_datetime_to = occurrence_datetime_to.toDate().toISOString();
                 } else {
                     throw new Error('Occurrence date-to and time-to cannot be empty');

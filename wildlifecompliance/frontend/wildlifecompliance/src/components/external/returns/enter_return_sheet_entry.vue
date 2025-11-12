@@ -1,6 +1,6 @@
 <template lang="html">
     <div id="externalReturnSheetEntry">
-        <modal transition="modal fade" :title="title" large>
+      <modal transition="modal fade" @ok="ok()" @cancel="cancel()" :title="title" large okText="Update">
             <div class="container-fluid">
                 <div id="error" v-if="missing_fields.length > 0" style="margin: 10px; padding: 5px; color: red; border:1px solid red;">
                     <b>Please answer the following mandatory question(s):</b>
@@ -114,9 +114,9 @@
                 </div>
             </div>
             <div slot="footer">
-                <button v-show="!isPayable" style="width:150px;" class="btn btn-primary" @click.prevent="update()">Update</button>
+                <!-- <button v-show="!isPayable" style="width:150px;" class="btn btn-primary" @click.prevent="update()">Update</button>
                 <button v-show="isPayable" style="width:150px;" class="btn btn-primary" @click.prevent="check_and_pay()">Pay</button>
-                <button style="width:150px;" class="btn btn-primary" @click.prevent="cancel()">Cancel</button>
+                <button style="width:150px;" class="btn btn-primary" @click.prevent="cancel()">Cancel</button> -->
             </div>
         </modal>
     </div>
@@ -257,7 +257,8 @@ export default {
       addToList: function() {
 
       },
-      update: async function () {
+      // update: async function () {
+        ok: async function () {
         const self = this;
 
         let is_valid = await this.validateMissingFields();
@@ -294,7 +295,8 @@ export default {
 
           } else {
 
-              self.row_of_data.row.add(_data).node().id = newRowId;
+              // self.row_of_data.row.add(_data).node().id = newRowId;
+              const newRow = self.row_of_data.row.add(_data);
               self.row_of_data.draw();
               self.species_cache[self.returns.sheet_species] = self.return_table.data();
               let species_name = '[NOT SAVED] ' + self.returns.species_list[self.returns.sheet_species]
