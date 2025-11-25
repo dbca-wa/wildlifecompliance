@@ -1,6 +1,6 @@
 <template lang="html">
     <div>
-        <modal transition="modal fade" @ok="ok()" @cancel="cancel()" :title="modalTitle" large force>
+        <modal transition="modal fade" @ok="ok()" @cancel="cancel()" :title="modalTitle" large force okText="Send to Manager">
             <div class="container-fluid">
                 <div class="col-sm-12 form-group"><div class="row">
                     <label class="col-sm-1">Type</label>
@@ -16,17 +16,17 @@
                 </div></div>
 
                 <div v-show="displayTabs">
-                    <ul class="nav nav-pills">
-                        <li class="nav-item active"><a data-toggle="tab" :href="'#'+nTab">{{ firstTabTitle }}</a></li>
-                        <li class="nav-item" v-show="displayRemediationActions"><a data-toggle="tab" :href="'#'+aTab">Remediation Actions</a></li>
-                        <li class="nav-item"><a data-toggle="tab" :href="'#'+dTab">Details</a></li>
+                    <ul class="nav nav-pills mb-3" id="tabs-main" data-tabs="tabs">
+                        <li class="nav-item"><a class="nav-link active" data-bs-toggle="pill" role="tab" :href="'#'+nTab">{{ firstTabTitle }}</a></li>
+                        <li class="nav-item" v-show="displayRemediationActions"><a class="nav-link" data-bs-toggle="pill" role="tab" :href="'#'+aTab">Remediation Actions</a></li>
+                        <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" role="tab" :href="'#'+dTab">Details</a></li>
                     </ul>
                     <div class="tab-content">
-                        <div :id="nTab" class="tab-pane fade in active"><div class="row">
+                        <div :id="nTab" class="tab-pane fade active show"><div class="row">
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start" for="identifier">Identifier</label>
+                                    <label class="control-label float-start fw-bold" for="identifier">Identifier</label>
                                 </div>
                                 <div class="col-sm-7">
                                     <div v-show="sanction_outcome">
@@ -37,7 +37,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start">Region</label>
+                                    <label class="control-label float-start fw-bold">Region</label>
                                 </div>
                                 <div class="col-sm-7">
                                   <select class="form-control col-sm-9" v-on:change.prevent="sanction_outcome.region_id=$event.target.value; updateDistricts('updatefromUI')" v-bind:value="sanction_outcome.region_id">
@@ -50,7 +50,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start">District</label>
+                                    <label class="control-label float-start fw-bold">District</label>
                                 </div>
                                 <div class="col-sm-7">
                                   <select class="form-control" v-model="sanction_outcome.district_id">
@@ -63,7 +63,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start">Offence</label>
+                                    <label class="control-label float-start fw-bold">Offence</label>
                                 </div>
                                 <div class="col-sm-7">
                                     <div v-show="sanction_outcome">
@@ -79,7 +79,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start">Offender</label>
+                                    <label class="control-label float-start fw-bold">Offender</label>
                                 </div>
                                 <div class="col-sm-7">
                                     <div v-if="sanction_outcome && sanction_outcome.current_offence && sanction_outcome.current_offence.offenders">
@@ -105,7 +105,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start">Vehicle Registration Number</label>
+                                    <label class="control-label float-start fw-bold">Vehicle Registration Number</label>
                                 </div>
                                 <div class="col-sm-7">
                                     <input :disabled="!is_parking_offence" type="text" class="form-control" name="registration_number" placeholder="" v-model="sanction_outcome.registration_number" >
@@ -114,7 +114,7 @@
 
                             <div class="col-sm-12 form-group">
                                 <div class="row col-sm-12">
-                                    <label class="control-label float-start">Alleged committed offences</label>
+                                    <label class="control-label float-start fw-bold">Alleged committed offences</label>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-12">
@@ -125,7 +125,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start">Issued on paper?</label>
+                                    <label class="control-label float-start fw-bold">Issued on paper?</label>
                                 </div>
                                 <div class="col-sm-7">
 
@@ -138,7 +138,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start">Paper ID</label>
+                                    <label class="control-label float-start fw-bold">Paper ID</label>
                                 </div>
                                 <div class="col-sm-7">
                                     <input type="text" class="form-control" name="paper_id" placeholder="" v-model="sanction_outcome.paper_id" :disabled="!sanction_outcome.issued_on_paper" />
@@ -147,7 +147,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start">Paper notice</label>
+                                    <label class="control-label float-start fw-bold">Paper notice</label>
                                 </div>
                                 <div id="paper_id_notice">
                                     <div v-if="sanction_outcome.issued_on_paper" class="col-sm-7">
@@ -164,11 +164,11 @@
 
                         </div></div>
 
-                        <div :id="aTab" class="tab-pane fade in"><div class="row">
+                        <div :id="aTab" class="tab-pane fade"><div class="row">
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start">Action</label>
+                                    <label class="control-label float-start fw-bold">Action</label>
                                 </div>
                                 <div class="col-sm-7">
                                     <textarea class="form-control" placeholder="add description" id="sanction-outcome-description" v-model="current_remediation_action.action" />
@@ -177,7 +177,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start">Due Date</label>
+                                    <label class="control-label float-start fw-bold">Due Date</label>
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="dueDatePicker">
@@ -197,7 +197,7 @@
 
                             <div class="col-sm-12 form-group">
                                 <div class="row col-sm-12">
-                                    <label class="control-label float-start">Remediation Actions</label>
+                                    <label class="control-label float-start fw-bold">Remediation Actions</label>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-12">
@@ -208,10 +208,10 @@
 
                         </div></div>
 
-                        <div :id="dTab" class="tab-pane fade in"><div class="row">
+                        <div :id="dTab" class="tab-pane fade"><div class="row">
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start">Description</label>
+                                    <label class="control-label float-start fw-bold">Description</label>
                                 </div>
                                 <div class="col-sm-7">
                                     <textarea class="form-control" placeholder="add description" id="sanction-outcome-description" v-model="sanction_outcome.description"/>
@@ -220,7 +220,7 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start">Date of Issue</label>
+                                    <label class="control-label float-start fw-bold">Date of Issue</label>
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="dateOfIssuePicker">
@@ -234,14 +234,11 @@
 
                             <div class="col-sm-12 form-group"><div class="row">
                                 <div class="col-sm-3">
-                                    <label class="control-label float-start">Time of Issue</label>
+                                    <label class="control-label float-start fw-bold">Time of Issue</label>
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="input-group date" ref="timeOfIssuePicker">
                                         <input type="time" class="form-control" placeholder="HH:MM" v-model="sanction_outcome.time_of_issue" :disabled="!sanction_outcome.issued_on_paper" />
-                                        <!--<span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>-->
                                     </div>
                                 </div>
                             </div></div>
@@ -258,11 +255,11 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" v-if="processingDetails" disabled class="btn btn-default" @click="ok"><i class="fa fa-spinner fa-spin"></i> Adding</button>
+                <!--<button type="button" v-if="processingDetails" disabled class="btn btn-default" @click="ok"><i class="fa fa-spinner fa-spin"></i> Adding</button>
                 <span v-else>
                     <button type="button" :disabled="!displaySendToManagerButton" class="btn btn-default" @click="ok">Send to Manager</button>
                 </span>
-                <button type="button" class="btn btn-default" @click="cancel">Cancel</button>
+                <button type="button" class="btn btn-default" @click="cancel">Cancel</button>-->
             </div>
         </modal>
     </div>
@@ -642,20 +639,22 @@ export default {
         },
         ok: async function() {
             try{
-                this.processingDetails = true;
-                let response = await this.sendData();
+                if (!this.processingDetails) {
+                    this.processingDetails = true;
+                    let response = await this.sendData();
 
-                if(response){
-                    if (this.$parent.offence && this.offence.id) {
-                        await this.loadOffence({
-                            offence_id: this.offence.id,
-                        });
+                    if(response){
+                        if (this.$parent.offence && this.offence.id) {
+                            await this.loadOffence({
+                                offence_id: this.offence.id,
+                            });
+                        }
                     }
-                }
 
-                this.close();
-                this.processingDetails = false;
-                this.$emit('sanction_outcome_created');
+                    this.close();
+                    this.processingDetails = false;
+                    this.$emit('sanction_outcome_created');
+                }
             } catch(err) {
                 this.processError(err);
                 this.processingDetails = false;
@@ -743,7 +742,7 @@ export default {
             vm.$refs.tbl_remediation_actions.vmDataTable.row
               .add({
                 id: helpers.guid(),
-                due_date: moment(vm.current_remediation_action.due_date, "DD/MM/YYYY").format("DD/MM/YYYY"),
+                due_date: moment(vm.current_remediation_action.due_date).format("YYYY-MM-DD"),
                 action_text: vm.current_remediation_action.action
               })
               .draw();
@@ -861,8 +860,8 @@ export default {
             let payload = new Object();
             Object.assign(payload, vm.sanction_outcome);
             if (payload.date_of_issue) {
-                payload.date_of_issue = moment(payload.date_of_issue, "DD/MM/YYYY").format("YYYY-MM-DD");
-                payload.time_of_issue = moment(payload.time_of_issue, 'LT').format('HH:mm');
+                payload.date_of_issue = moment(payload.date_of_issue).format("YYYY-MM-DD");
+                payload.time_of_issue = moment(payload.time_of_issue).format('hh:mm');
             }
             payload.alleged_offence_ids_included = alleged_offence_ids_included;
             payload.alleged_offence_ids_excluded = alleged_offence_ids_excluded;
@@ -881,7 +880,7 @@ export default {
             let remediation_actions = remediation_actions_data.toArray()
             payload.remediation_actions = remediation_actions;
             for (let i = 0; i < payload.remediation_actions.length; i++) {
-                payload.remediation_actions[i].due_date = moment(payload.remediation_actions[i].due_date, "DD/MM/YYYY").format("YYYY-MM-DD");
+                payload.remediation_actions[i].due_date = moment(payload.remediation_actions[i].due_date).format("YYYY-MM-DD");
             }
 
             payload.call_email_id = this.$parent.call_email ? this.$parent.call_email.id : null;

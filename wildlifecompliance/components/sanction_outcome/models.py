@@ -614,7 +614,6 @@ class SanctionOutcome(SanitiseMixin):
         self.save()
 
     def create_due_dates(self, extended_by_id=None):
-        print('create_due_dates')
         # Construct description
         offender, title = self.get_offender()
         recipient = ''
@@ -626,22 +625,30 @@ class SanctionOutcome(SanitiseMixin):
             recipient = ' to the {}'.format(offender.person.email)
         reason_for_extension = 'Issue infringement notice on ' + self.date_of_issue.strftime("%d/%m/%Y") + recipient
 
-        due_date_config = SanctionOutcomeDueDateConfiguration.get_config_by_date(self.date_of_issue)
-        self.due_date_extended_max = self.date_of_issue + relativedelta(years=1)
-        data = {}
-        data['due_date_1st'] = self.date_of_issue + relativedelta(days=due_date_config.due_date_window_1st)
-        data['due_date_2nd'] = self.date_of_issue + relativedelta(days=due_date_config.due_date_window_1st + due_date_config.due_date_window_2nd)
-        data['reason_for_extension'] = reason_for_extension
-        data['extended_by_id'] = extended_by_id
-        data['sanction_outcome_id'] = self.id
-        serializer = SaveSanctionOutcomeDueDateSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        try:
+            due_date_config = SanctionOutcomeDueDateConfiguration.get_config_by_date(self.date_of_issue)
+            self.due_date_extended_max = self.date_of_issue + relativedelta(years=1)
+            data = {}
+            data['due_date_1st'] = self.date_of_issue + relativedelta(days=due_date_config.due_date_window_1st)
+            data['due_date_2nd'] = self.date_of_issue + relativedelta(days=due_date_config.due_date_window_1st + due_date_config.due_date_window_2nd)
+            data['reason_for_extension'] = reason_for_extension
+            data['extended_by_id'] = extended_by_id
+            data['sanction_outcome_id'] = self.id
+            serializer = SaveSanctionOutcomeDueDateSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+        except Exception as e:
+            print(e)
+            raise serializers.ValidationError("Sanction Outcome Due Date Configuration not provided")
 
     def set_penalty_amounts(self):
         amounts = self.retrieve_penalty_amounts_by_date()
-        self.penalty_amount_1st = amounts.amount
-        self.penalty_amount_2nd = amounts.amount_after_due
+        try:
+            self.penalty_amount_1st = amounts.amount
+            self.penalty_amount_2nd = amounts.amount_after_due
+        except Exception as e:
+            print(e)
+            raise serializers.ValidationError("Penalty amounts not available")
 
     def decline(self, request):
         self.status = self.STATUS_DECLINED

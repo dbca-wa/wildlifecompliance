@@ -41,17 +41,16 @@ def retrieve_context(sanction_outcome):
     offender_family_name = get_last_name(offender)
     offender_given_name = get_first_name(offender)
     offender_dob = get_dob(offender).strftime('%d/%m/%Y')
-    offender_postcode = offender.residential_address.postcode if offender.residential_address else ''
+    offender_postcode = offender.address_postcode if offender.address_postcode else ''
     
     offender_residential_address = ', '.join(filter(None,[
-        offender.residential_address.line1,
-        offender.residential_address.line2,
-        offender.residential_address.line3,
-        offender.residential_address.state,
-        offender.residential_address.country.name if offender.residential_address.country else '',
-    ])) if offender.residential_address else ''
+        offender.address_street if offender.address_street else '',
+        offender.address_locality if offender.address_locality else '',
+        offender.address_state if offender.address_state else '',
+        offender.address_country.name if offender.address_country else '',
+    ]))
     
-    offender_email = offender.person.email if offender.person else ''
+    offender_email = offender.email if offender.email else ''
     rego = sanction_outcome.registration_number if sanction_outcome.registration_number else ''
     offence_date = sanction_outcome.offence.offence_occurrence_datetime.strftime('%d/%m/%Y') if sanction_outcome.offence.offence_occurrence_datetime else ''
     offence_time = sanction_outcome.offence.offence_occurrence_datetime.strftime('%I:%M %p') if sanction_outcome.offence.offence_occurrence_datetime else ''

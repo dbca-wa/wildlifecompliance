@@ -562,8 +562,9 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
 
                     if not item['id']:
                         try:
-                            dob = datetime.strptime(item['dob'], '%d/%m/%Y').date()
-                        except:
+                            dob = datetime.strptime(item['dob'], '%Y-%m-%d').date()
+                        except Exception as e:
+                            print(e)
                             dob = ''
                         if 'person_id' in item:
                         
@@ -735,7 +736,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
 
                             address = dict['residential_address']
                             try:
-                                dob = datetime.strptime(dict['dob'], '%d/%m/%Y').date()
+                                dob = datetime.strptime(dict['dob'], '%Y-%m-%d').date()
                             except:
                                 dob = ''
 
@@ -746,20 +747,22 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                                 "dob":dob,
                                 "phone_number":dict['p_number'],
                                 "mobile_number":dict['m_number'],
-                                "address_street":dict['residential_address']['line1'],
-                                "address_locality":dict['residential_address']['locality'],
-                                "address_state":dict['residential_address']['state'],
-                                "address_country":dict['residential_address']['country'],
-                                "address_postcode":dict['residential_address']['postcode'],
+                                "address_street":address['line1'],
+                                "address_locality":address['locality'],
+                                "address_state":address['state'],
+                                "address_country":address['country'],
+                                "address_postcode":address['postcode'],
                             }
                             offender_person = OffenderPersonSerializer(data=offender_person_data)
                             offender_person.is_valid(raise_exception=True)
                             offender_person.save()
+                            offender_person = offender_person.instance
                         else:
                             try:
                                 offender_person = OffenderPerson.objects.get(id=dict["person_id"])
                             except:
                                 raise serializers.ValidationError("Invalid Offender Id provided")
+                        
                         serializer_offender = SaveOffenderSerializer(
                             data={
                                 'offence_id': saved_offence_instance.id, 

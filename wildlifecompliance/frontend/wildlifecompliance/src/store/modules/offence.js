@@ -85,16 +85,16 @@ export const offenceStore = {
                 };
             }
             if (offence.occurrence_date_from) {
-                offence.occurrence_date_from = moment(offence.occurrence_date_from, 'YYYY-MM-DD').format('YYYY-MM-DD');
+                offence.occurrence_date_from = moment(offence.occurrence_date_from, 'DD/MM/YYYY').format('YYYY-MM-DD');
             }
             if (offence.occurrence_date_to) {
-                offence.occurrence_date_to = moment(offence.occurrence_date_to, 'YYYY-MM-DD').format('YYYY-MM-DD');
+                offence.occurrence_date_to = moment(offence.occurrence_date_to, 'DD/MM/YYYY').format('YYYY-MM-DD');
             }
             if (offence.occurrence_time_from) {
-                offence.occurrence_time_from = moment(offence.occurrence_time_from, 'HH:mm:ss').format('LT');
+                offence.occurrence_time_from = moment(offence.occurrence_time_from, 'hh:mm').format('LT');
             }
             if (offence.occurrence_time_to) {
-                offence.occurrence_time_to = moment(offence.occurrence_time_to, 'HH:mm:ss').format('LT');
+                offence.occurrence_time_to = moment(offence.occurrence_time_to, 'hh:mm').format('LT');
             }
             state.offence = offence;
         },
@@ -187,7 +187,7 @@ export const offenceStore = {
                 let payload = new Object();
                 Object.assign(payload, state.offence);
                 if (params.fr_date && params.fr_time){
-                    let occurrence_datetime_from = moment(params.fr_date + ' ' + params.fr_time, 'DD/MM/YYYY LT');
+                    let occurrence_datetime_from = moment(params.fr_date + ' ' + params.fr_time, 'YYYY-MM-DD hh:mm');
                     payload.occurrence_datetime_from = occurrence_datetime_from.toDate().toISOString();
                 } else {
                     throw new Error('Occurrence date-from and time-from cannot be empty');
@@ -195,7 +195,7 @@ export const offenceStore = {
 
                 if (payload.occurrence_from_to) {
                     if (params.to_date && params.to_time){
-                        let occurrence_datetime_to = moment(params.to_date + ' ' + params.to_time, 'DD/MM/YYYY LT');
+                        let occurrence_datetime_to = moment(params.to_date + ' ' + params.to_time, 'YYYY-MM-DD hh:mm');
                         payload.occurrence_datetime_to = occurrence_datetime_to.toDate().toISOString();
                     } else {
                         throw new Error('Occurrence date-to and time-to cannot be empty');
@@ -218,22 +218,20 @@ export const offenceStore = {
             console.log('createOffence');
             let fetchUrl = '/api/offence/';
 
-            console.log('this: ')
-            console.log(this)
-
             let payload = new Object();
             Object.assign(payload, state.offence);
 
             if (payload.occurrence_date_from && payload.occurrence_time_from){
-                let occurrence_datetime_from = moment(payload.occurrence_date_from + ' ' + payload.occurrence_time_from, 'YYYY-MM-DD HH:mm');
+                let occurrence_datetime_from = moment(payload.occurrence_date_from + ' ' + payload.occurrence_time_from, 'DD-MM-YYYY hh:mm');
                 payload.occurrence_datetime_from = occurrence_datetime_from.toDate().toISOString();
             } else {
                 throw new Error('Occurrence date-from and time-from cannot be empty');
             }
+            console.log(payload.occurrence_datetime_from)
 
             if (payload.occurrence_from_to) {
                 if (payload.occurrence_date_to && payload.occurrence_time_to){
-                    let occurrence_datetime_to = moment(payload.occurrence_date_to + ' ' + payload.occurrence_time_to, 'YYYY-MM-DD HH:mm');
+                    let occurrence_datetime_to = moment(payload.occurrence_date_to + ' ' + payload.occurrence_time_to, 'DD-MM-YYYY hh:mm');
                     payload.occurrence_datetime_to = occurrence_datetime_to.toDate().toISOString();
                 } else {
                     throw new Error('Occurrence date-to and time-to cannot be empty');
