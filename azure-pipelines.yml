@@ -29,8 +29,8 @@ stages:
         command: buildAndPush
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
         tags: | 
-              latest
-              $(tagDate)
+              django5_latest
+              django5_$(tagDate)
         containerRegistry: DockerHub
         repository: dbcawa/wildlifecompliance
     - task: Docker@2
@@ -39,7 +39,7 @@ stages:
         command: buildAndPush
         dockerfile: '$(Build.SourcesDirectory)/dockerdev/Dockerfile'
         tags: | 
-              wildlifecompliance_dev_latest
-              wildlifecompliance_dev_$(tagDate)              
+              wildlifecompliance_django5_dev_latest
+              wildlifecompliance_django5_dev_$(tagDate)              
         containerRegistry: DockerHub
         repository: dbcawa/docker_app_dev       
