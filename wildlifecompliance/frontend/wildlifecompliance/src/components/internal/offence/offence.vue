@@ -713,12 +713,12 @@ export default {
         constructOffenceDedicatedPage: async function(){
             await this.loadOffenceVuex({offence_id: this.$route.params.offence_id});
             if (this.offence.occurrence_datetime_from){
-                this.date_from = moment(this.offence.occurrence_datetime_from).format("DD/MM/YYYY");
-                this.time_from = moment(this.offence.occurrence_datetime_from).format("LT");
+                this.date_from = moment(this.offence.occurrence_datetime_from).format("YYYY-MM-DD");
+                this.time_from = moment(this.offence.occurrence_datetime_from).format("hh:ss");
             }
             if (this.offence.occurrence_datetime_to){
-                this.date_to = moment(this.offence.occurrence_datetime_to).format("DD/MM/YYYY");
-                this.time_to = moment(this.offence.occurrence_datetime_to).format("LT");
+                this.date_to = moment(this.offence.occurrence_datetime_to).format("YYYY-MM-DD");
+                this.time_to = moment(this.offence.occurrence_datetime_to).format("hh:ss");
             }
             this.constructAllegedOffencesTable();
             this.constructOffendersTable();

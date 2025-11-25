@@ -960,7 +960,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                     serializer = SanctionOutcomeCommsLogEntrySerializer(instance=workflow_entry, data=email_data, partial=True)
                     serializer.is_valid(raise_exception=True)
                     serializer.save()
-
+                res_json = json.dumps({'id':instance.id})
                 # Return
                 return HttpResponse(res_json, content_type='application/json')
 
