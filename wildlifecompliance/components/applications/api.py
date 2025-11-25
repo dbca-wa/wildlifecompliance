@@ -1086,7 +1086,6 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
             request.session["payment_pk"] = instance.pk
             request.session["payment_model"] = "application"
-
             return checkout_result
         except serializers.ValidationError:
             print(traceback.print_exc())

@@ -620,10 +620,10 @@ export default {
         },
         payLicenceFee: function(application_id, activity_id) {
             let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/licence_fee_checkout/'), 
-                {method:'POST', body:{
+                {method:'POST', body:JSON.stringify({
                     application_id,
                     activity_id
-                }}
+                })}
             )
             request.then(res=>{
                     window.location.href = res;
@@ -637,9 +637,9 @@ export default {
         },
         payApplicationFee: function(application_id) {
             let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,application_id+'/application_fee_checkout/'), 
-                {method:'POST', body:{
+                {method:'POST', body:JSON.stringify({
                     application_id
-                }}
+                })}
             )
             request.then(res=>{
                     window.location.href = res;

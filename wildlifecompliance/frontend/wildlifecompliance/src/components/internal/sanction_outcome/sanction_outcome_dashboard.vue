@@ -301,6 +301,11 @@ export default {
         this.constructOptionsRegion();
         // this.constructOptionsDistrict();
     },
+    computed: {
+        csrf_token: function() {
+            return helpers.getCookie('csrftoken')
+        },
+    },
     methods: {
         updateDistricts: function(updateFromUI) {
             this.sanction_outcome_availableDistricts = []; // This is a list of options for district
@@ -324,13 +329,18 @@ export default {
             let vm = this;
 
             vm.$refs.sanction_outcome_table.vmDataTable.on('click', 'a[data-pay-infringement-penalty]', function(e) {
+                console.log('data-pay-infringement-penalty')
                 e.preventDefault();
                 var id = $(e.target).attr('data-pay-infringement-penalty');
                 vm.payInfringementPenalty(id);
             });
         },
         payInfringementPenalty: function(sanction_outcome_id){
-            let request = fetch_util.fetchUrl('/infringement_penalty/' + sanction_outcome_id + '/')
+            console.log('payInfringementPenalty')
+            let request = fetch_util.fetchUrl(
+                '/infringement_penalty/' + sanction_outcome_id + '/',
+                {method:'POST'}
+            )
             request.then(res=>{
                     window.location.href = res;
                 },err=>{
