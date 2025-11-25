@@ -208,7 +208,7 @@ export default {
                             let licence_category_id = full.current_application.category_id ? full.current_application.category_id : '';
                             if (full.is_latest_in_category) {
                                 if (vm.is_external && full.can_add_purpose){
-                                    links += `<a licence-id='${full.id}' add-activity-purpose='${full.id}' org-id='${org_id}' proxy-id='${proxy_id}' licence-category-id='${licence_category_id}'>Amend</a><br/>`;
+                                    links += `<a href="#" licence-id='${full.id}' add-activity-purpose='${full.id}' org-id='${org_id}' proxy-id='${proxy_id}' licence-category-id='${licence_category_id}'>Amend</a><br/>`;
                                 }
                                 // if (full.can_action['can_amend']) {
                                 //     links += `<a amend-licence='${full.id}' org-id='${org_id}' proxy-id='${proxy_id}' licence-category-id='${licence_category_id}'>Amend</a><br/>`
@@ -217,26 +217,26 @@ export default {
                                 //     links += `<a licence-id='${full.id}' renew-licence='${full.id}' org-id='${org_id}' proxy-id='${proxy_id}' licence-category-id='${licence_category_id}'>Renew</a><br/>`
                                 // }
                                 if (!vm.is_external && full.can_action['can_reactivate_renew']) {
-                                    links += `<a reactivate-renew-licence='${full.id}'>Reactivate Renew</a><br/>`
+                                    links += `<a href="#" reactivate-renew-licence='${full.id}'>Reactivate Renew</a><br/>`
                                 }
                                 if (full.can_action['can_surrender']) {
-                                    links += `<a surrender-licence='${full.id}'>Surrender</a><br/>`
+                                    links += `<a href="#" surrender-licence='${full.id}'>Surrender</a><br/>`
                                 }
                                 if (!vm.is_external && full.can_action['can_cancel']) {
-                                    links += `<a cancel-licence='${full.id}'>Cancel</a><br/>`
+                                    links += `<a href="#" cancel-licence='${full.id}'>Cancel</a><br/>`
                                 }
                                 if (!vm.is_external && full.can_action['can_suspend']) {
-                                    links += `<a suspend-licence='${full.id}'>Suspend</a><br/>`
+                                    links += `<a href="#" suspend-licence='${full.id}'>Suspend</a><br/>`
                                 }
                                 if (!vm.is_external && full.can_action['can_reinstate']) {
-                                    links += `<a reinstate-licence='${full.id}'>Reinstate</a><br/>`
+                                    links += `<a href="#" reinstate-licence='${full.id}'>Reinstate</a><br/>`
                                 }
                                 if (!vm.is_external && full.can_add_purpose && !full.has_inspection_open) {
-                                    links += `<a inspection-licence='${full.id}'>Request Inspection</a><br/>`
+                                    links += `<a href="#" inspection-licence='${full.id}'>Request Inspection</a><br/>`
                                 }
                             }
                             if (!vm.is_external) {
-                                links += `<a licence-history='${full.id}'>History</a><br/>`
+                                links += `<a href="#" licence-history='${full.id}'>History</a><br/>`
                             }
                             return links;
                         },

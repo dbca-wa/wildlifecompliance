@@ -39,7 +39,6 @@ class InfringementPenaltyView(TemplateView):
         if not sanction_outcome.infringement_penalty:
             sanction_outcome.infringement_penalty = InfringementPenalty.objects.create(created_by=request.user, payment_type=InfringementPenalty.PAYMENT_TYPE_TEMPORARY)
         sanction_outcome.save()
-
         try:
             with transaction.atomic():
                 set_session_infringement_invoice(request.session, sanction_outcome.infringement_penalty)
