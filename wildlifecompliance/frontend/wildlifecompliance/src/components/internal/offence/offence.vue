@@ -123,13 +123,13 @@
                                         <label class="col-sm-3 fw-bold">{{ occurrenceDateLabel }}</label>
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="occurrenceDateFromPicker">
-                                                <input :readonly="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" :value="date_from" />
+                                                <input :readonly="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="date_from" />
                                             </div>
                                         </div>
                                         <div v-show="offence.occurrence_from_to">
                                             <div class="col-sm-3 fw-bold">
                                                 <div class="input-group date" ref="occurrenceDateToPicker">
-                                                    <input :readonly="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" :value="date_to" />
+                                                    <input :readonly="readonlyForm" type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="date_to" />
                                                 </div>
                                             </div>
                                         </div>
@@ -139,13 +139,13 @@
                                         <label class="col-sm-3 fw-bold">{{ occurrenceTimeLabel }}</label>
                                         <div class="col-sm-3">
                                             <div class="input-group date" ref="occurrenceTimeFromPicker">
-                                                <input :readonly="readonlyForm" type="time" class="form-control" placeholder="HH:MM" :value="time_from" />
+                                                <input :readonly="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="time_from" />
                                             </div>
                                         </div>
                                         <div v-show="offence.occurrence_from_to">
                                             <div class="col-sm-3">
                                                 <div class="input-group date" ref="occurrenceTimeToPicker">
-                                                    <input :readonly="readonlyForm" type="time" class="form-control" placeholder="HH:MM" :value="time_to" />
+                                                    <input :readonly="readonlyForm" type="time" class="form-control" placeholder="HH:MM" v-model="time_to" />
                                                 </div>
                                             </div>
                                         </div>
@@ -768,6 +768,7 @@ export default {
         save: async function(){
             this.isProcessing = true;
             try {
+                console.log(this.date_from)
                 await this.saveOffence({'fr_date': this.date_from, 'fr_time': this.time_from, 'to_date': this.date_to, 'to_time': this.time_to});
                 await swal.fire("Saved", "The record has been saved", "success");
 
