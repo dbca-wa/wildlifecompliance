@@ -7,7 +7,7 @@ export default {
                     const data = await response.json();
                     if (!response.ok) {
                         let error =
-                            (data.constructor.name === 'Array' || data.constructor.name === 'Object' && data) ||
+                            ((data.constructor.name === 'Array' || data.constructor.name === 'Object') && data) ||
                             (data && data.message) ||
                             response.statusText;
                         reject(error);
