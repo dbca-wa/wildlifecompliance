@@ -31,7 +31,7 @@
                             </div>
                             <div class="col-md-6" v-if="isAddEntry && !isStockEntry">
                                 <select class="form-control" v-model="entryActivity">
-                                    <option v-for="(activity, activityId) in filteredAutoActivityList"" :value="activityId">{{activity['label']}}</option>
+                                    <option v-for="(activity, activityId) in filteredAutoActivityList" :value="activityId">{{activity['label']}}</option>
                                 </select>
                             </div>
                             <div class="col-md-3" v-if="isChangeEntry && !isStockEntry">
@@ -45,9 +45,6 @@
                             <div class="col-md-6">
                               <div class="input-group date" ref="activityDateToPicker" name="activityDateToPicker" required="true">
                                   <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="entryActivityDate" id="entryActivityDate">
-                                  <!--<span class="input-group-addon">
-                                      <span class="glyphicon glyphicon-calendar"></span>
-                                  </span>-->
                               </div>
                             </div>
                         </div>
@@ -211,19 +208,18 @@ export default {
       isStockEntry: function() {
         return this.entryActivity==='stock'?true:false;
       },
-      filteredActivityList: function() { //TODO fix this (possible source of incorrect return counts?)
+      filteredActivityList: function() {
         let filteredList = Object.assign({}, this.activityList)
         if (filteredList['stock'] && !this.isStockEntry) {
           delete filteredList['stock']
         }
-  
         return filteredList
       },
       filteredAutoActivityList: function() {
-        let filteredList = []
-        this.filteredActivityList.forEach(activity => {
-          if (activity['auto'] == false) {
-            filteredList.add(activity);
+        let filteredList = {}
+        Object.entries(this.filteredActivityList).forEach(activity => {
+          if (activity[1]['auto'] == 'false') {
+            filteredList[activity[0]] = activity[1];
           }
         });
         return filteredList
