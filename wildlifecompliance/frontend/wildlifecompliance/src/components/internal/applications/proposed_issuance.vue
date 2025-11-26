@@ -1,6 +1,6 @@
 <template lang="html">
     <div id="proposedIssuanceLicence">
-        <modal transition="modal fade" @ok="ok()" @cancel="cancel()" :title="title" large okText="Propose Issue">
+        <modal ref="proposedIssuanceLicenceModal" scrollable="true" transition="modal fade" @ok="ok()" @cancel="cancel()" :title="title" large okText="Propose Issue">
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="licenceForm">
@@ -87,7 +87,7 @@
                                         <label class="control-label float-start fw-bold" for="Name">Details for Applicant</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <textarea name="licence_details" class="form-control" style="width:70%;" v-model="propose_issue.reason"></textarea>
+                                        <textarea name="details_for_applicant" class="form-control" style="width:70%;" v-model="propose_issue.reason"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -122,7 +122,7 @@
                                         <label class="control-label float-start fw-bold" for="Name">Details for Approver</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <textarea name="licence_details" class="form-control" style="width:70%;" v-model="propose_issue.approver_detail"></textarea>
+                                        <textarea name="details_for_approver" class="form-control" style="width:70%;" v-model="propose_issue.approver_detail"></textarea>
                                     </div>
                                 </div>
                             </div>   
@@ -277,6 +277,13 @@ export default {
             let vm =this;
             if($(vm.form).valid()){
                 vm.sendData();
+            } else {     
+                vm.errorString = "";
+                Object.keys(vm.validation_form.errorMap).forEach(key => {
+                    vm.errorString += key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + ": " + vm.validation_form.errorMap[key]
+                });
+                vm.errors = true;
+                vm.$refs.proposedIssuanceLicenceModal.$el.querySelector('.modal-body').scrollTop = 0;
             }
         },
         cancel:function () {
@@ -352,14 +359,13 @@ export default {
                     emulateJSON:true,
                 })
             request.then((response)=>{
-
-                    vm.$router.push({name:"internal-dash",});     
-
-                },(error)=>{
-                    vm.errors = true;
-                    vm.issuingLicence = false;
-                    vm.errorString = helpers.apiVueResourceError(error);
-                });
+                vm.$router.push({name:"internal-dash",});     
+            },(error)=>{
+                vm.errors = true;
+                vm.issuingLicence = false;
+                vm.errorString = helpers.apiVueResourceError(error);
+                vm.$refs.proposedIssuanceLicenceModal.$el.querySelector('.modal-body').scrollTop = 0;
+            });
 
             
         },
@@ -369,7 +375,7 @@ export default {
                 rules:  {
                     start_date: { required: this.canEditLicenceDates },
                     due_date: { required: this.canEditLicenceDates },
-                    licence_details: "required",
+                    details_for_applicant: "required",
                     licence_activity: { required: true},
                 },
                 messages: {

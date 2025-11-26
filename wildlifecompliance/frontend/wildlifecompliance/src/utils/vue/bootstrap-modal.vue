@@ -30,14 +30,6 @@
                     <div class="modal-footer">
                         <slot name="footer">
                             <button
-                                type="button"
-                                :class="cancelClass"
-                                class="licensing-btn mb-1"
-                                @click="cancel"
-                            >
-                                {{ cancelText }}
-                            </button>
-                            <button
                                 v-if="okText"
                                 id="okBtn"
                                 type="button"
@@ -48,6 +40,15 @@
                             >
                                 {{ okText }}
                             </button>
+                            <button
+                                type="button"
+                                :class="cancelClass"
+                                class="licensing-btn mb-1"
+                                @click="cancel"
+                            >
+                                {{ cancelText }}
+                            </button>
+                            
                         </slot>
                     </div>
                 </div>
