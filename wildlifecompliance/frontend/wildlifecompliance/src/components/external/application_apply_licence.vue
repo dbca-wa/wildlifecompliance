@@ -125,12 +125,12 @@ export default {
   data: function() {
     let vm = this;
     return {
-        licence_category : this.$route.params.licence_category,
-        licence_activity : this.$route.params.licence_activity,
-        licence_no : this.$route.params.licence_no,
-        select_activity : this.$route.params.select_activity,
-        select_purpose : this.$route.params.select_purpose,
-        select_licence_purpose : this.$route.params.select_licence_purpose,
+        licence_category : this.$route.query.licence_category,
+        licence_activity : this.$route.query.licence_activity,
+        licence_no : this.$route.query.licence_no,
+        select_activity : this.$route.query.select_activity,
+        select_purpose : this.$route.query.select_purpose,
+        select_licence_purpose : this.$route.query.select_licence_purpose,
         application: null,
         agent: {},
         activity :{
