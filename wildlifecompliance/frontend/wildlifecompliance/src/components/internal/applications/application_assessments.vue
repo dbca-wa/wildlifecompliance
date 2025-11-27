@@ -186,7 +186,7 @@ export default {
             this.$nextTick(() => {
                 this.eventListeners();
             });
-            return true;
+            return this.isLicensingOfficer;
         },
         isCompleteAssessmentAction: function() {
             return this.$router.currentRoute.name==='complete-assessment'
