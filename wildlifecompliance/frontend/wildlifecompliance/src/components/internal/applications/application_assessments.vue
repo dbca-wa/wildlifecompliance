@@ -5,6 +5,8 @@
             <modal
                 transition="modal fade"
                 @cancel="close()"
+                okDisabled="true"
+                okText=""
                 title="Assessment Record" large>
                 <div class="container-fluid">
                     <div class="row">
