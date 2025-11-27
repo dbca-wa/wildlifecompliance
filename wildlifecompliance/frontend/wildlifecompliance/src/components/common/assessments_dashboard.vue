@@ -25,34 +25,18 @@
                                     <option v-for="s in application_status" :value="s" v-bind:key="`status_${s.id}`">{{s.name}}</option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="">Submitter</label>
-                                <select class="form-control" v-model="filterApplicationSubmitter">
-                                    <option value="All">All</option>
-                                    <option v-for="s in application_submitters" :value="s.email" v-bind:key="`s_email_${s.email}`">{{s.search_term}}</option>
-                                </select>
-                            </div>
-                        </div>                        
-                    </div>
-                    <div class="row">
+                        </div>                   
+
                         <div class="col-md-3">
                             <label for="">Lodged From</label>
                             <div class="input-group date" ref="applicationDateFromPicker">
                                 <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedFrom">
-                                <!--<span class="input-group-addon">
-                                    <span class="glyphicon glyphicon-calendar"></span>
-                                </span>-->
                             </div>
                         </div>
                         <div class="col-md-3">
                             <label for="">Lodged To</label>
                             <div class="input-group date" ref="applicationDateToPicker">
                                 <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedTo">
-                                <!--<span class="input-group-addon">
-                                    <span class="glyphicon glyphicon-calendar"></span>
-                                </span>-->
                             </div>
                         </div>                   
                     </div>
@@ -99,7 +83,6 @@ export default {
             application_status:[],
             application_licence_types: [],
             application_regions: [],
-            application_submitters: [],
             assessment_headers:["Number","Licence Category","Activity","Type","Submitter","Applicant","Status","Lodged on","Action"],
             assessment_options:{
                 serverSide: true,
@@ -191,7 +174,7 @@ export default {
                         data: "can_be_processed",
                         mRender:function (data,type,full) {
                             let links = '';
-                            links +=  full.can_be_processed ? `<a href='/internal/application/assessment/${full.application_id}'>Process</a><br/>`: `<a href='/internal/application/assessment/${full.application_id}'>View</a><br/>`;
+                            links +=  full.can_be_processed ? `<a href='/internal/assessment/${full.application_id}'>Process</a><br/>`: `<a href='/internal/assessment/${full.application_id}'>View</a><br/>`;
                             return links;
                         },
                         orderable: false,
@@ -209,20 +192,7 @@ export default {
                         })
                         vm.application_licence_types = activityTitles;
                     });
-                    // Grab submitters from the data in the table
-                    var submittersColumn = vm.$refs.assessment_datatable.vmDataTable.columns(vm.getColumnIndex('submitter'));
-                    submittersColumn.data().unique().sort().each( function ( d, j ) {
-                        var submitters = [];
-                        $.each(d,(index, submitter) => {
-                            if (!submitters.find(item => item.email == submitter.email) || submitters.length == 0){
-                                submitters.push({
-                                    'email':submitter.email,
-                                    'search_term': `${submitter.first_name} ${submitter.last_name} (${submitter.email})`
-                                });
-                            }
-                        });
-                        vm.application_submitters = submitters;
-                    });
+
                     // Grab Status from the data in the table
                     var statusColumn = vm.$refs.assessment_datatable.vmDataTable.columns(vm.getColumnIndex('status'));
                     statusColumn.data().unique().sort().each( function ( d, j ) {
