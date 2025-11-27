@@ -13,7 +13,7 @@
                 <div class="row">
                     <div class="panel panel-default">
 
-                        <div class="panel-body panel-collapse collapse in" >
+                        <div class="panel-body">
                             <form class="form-horizontal" name="assessment_form" method="put">
                                 <div class="col-sm-12">
                                     <div class="form-group">
@@ -322,6 +322,7 @@ export default {
             inspection:{
                 isModalOpen: false
             },
+            completing: false,
         }
     },
     components: {
@@ -683,30 +684,35 @@ export default {
         },
         completeAssessmentsToMe: function(){
             let vm = this;
-            const data = {
-                "activity_id" : this.checkedActivities,
-                "final_comment" : this.final_comment,
-            }
-            this.setOriginalApplication(this.application);            
-            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/complete_application_assessments')
-                ), JSON.stringify(data))
-            request.then((response) => {
-                    this.setApplication(response);
-                    this.$router.push({name:"internal-dash"});               
-            }, (error) => {
-                //console.log(error)
-                this.revert();
-                let error_msg = '<br/>';
-                for (var key in error.body) {
-                    error_msg += error.body[key] + '<br/>';
-                }
-                swal.fire({
-                    title: 'Assessment Error',
-                    html: 'There was an error completing assessment.<br/>' + error_msg,
-                    type: 'error'
-                });
 
-            });
+            if (!vm.completing) {
+                vm.completing = true;
+                const data = {
+                    "activity_id" : this.checkedActivities,
+                    "final_comment" : this.final_comment,
+                }
+                this.setOriginalApplication(this.application);            
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,(vm.application.id+'/complete_application_assessments')
+                    ), {method:'POST', body:JSON.stringify(data)})
+                request.then((response) => {
+                        this.setApplication(response);
+                        this.$router.push({name:"internal-dash"});               
+                        vm.completing = false; //in case redirect fails somehow and the case for trying again is valid (if not server-side can handle it)
+                }, (error) => {
+                    vm.completing = false;
+                    this.revert();
+                    let error_msg = '<br/>';
+                    for (var key in error.body) {
+                        error_msg += error.body[key] + '<br/>';
+                    }
+                    swal.fire({
+                        title: 'Assessment Error',
+                        html: 'There was an error completing assessment.<br/>' + error_msg,
+                        type: 'error'
+                    });
+
+                });
+            }
         },
         canSaveApplication: function() {
             return true;

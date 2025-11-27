@@ -13,7 +13,7 @@
                             label="Assessment Details"
                             index="assessment_details"
                         >
-                            <div class="panel panel-default">
+                            <div class="card mb-3">
                                 <form class="form-horizontal" name="assessment_form" method="put">
                                     <div class="col-sm-12">
                                         <div class="form-group">

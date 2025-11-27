@@ -31,18 +31,12 @@
                             <label for="">Lodged From</label>
                             <div class="input-group date" ref="applicationDateFromPicker">
                                 <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedFrom">
-                                <!--<span class="input-group-addon">
-                                    <span class="glyphicon glyphicon-calendar"></span>
-                                </span>-->
                             </div>
                         </div>
                         <div class="col-md-3">
                             <label for="">Lodged To</label>
                             <div class="input-group date" ref="applicationDateToPicker">
                                 <input type="date" class="form-control" placeholder="DD/MM/YYYY" v-model="filterApplicationLodgedTo">
-                                <!--<span class="input-group-addon">
-                                    <span class="glyphicon glyphicon-calendar"></span>
-                                </span>-->
                             </div>
                         </div>                   
                     </div>
