@@ -173,12 +173,6 @@ export default {
                 searchable: false // handled by filter_queryset override method - class ApplicationFilterBackend
             },
             {
-                data: "all_payments_url",
-                visible: false,
-                orderable: false,
-                searchable: false // handled by filter_queryset override method - class ApplicationFilterBackend
-            },
-            {
                 data: "lodgement_date",
                 width: "10%",
                 mRender:function (data,type,full) {
@@ -219,7 +213,13 @@ export default {
                 },
                 orderable: false,
                 searchable: false
-            }
+            },
+            {
+                data: "all_payments_url",
+                visible: false,
+                orderable: false,
+                searchable: false // handled by filter_queryset override method - class ApplicationFilterBackend
+            },
         ]
         
         let external_columns = [
@@ -342,24 +342,7 @@ export default {
             },
             application_licence_types : [],
             application_submitters: [],
-            // application_status: [       // Processing status
-            //     {'id': 'draft', 'name': 'Draft'},
-            //     {'id': 'under_review', 'name': 'Under Review'},
-            //     {'id': 'awaiting_payment', 'name': 'Awaiting Payment'},
-            //     {'id': 'approved', 'name': 'Approved'},
-            //     {'id': 'partially_approved', 'name': 'Partially Approved'},
-            //     {'id': 'declined', 'name': 'Declined'},
-            //     {'id': 'discarded', 'name': 'Discarded'},
-            // ],
             application_status: [],
-            // customer_status: [
-            //     {'id': 'draft', 'name': 'Draft'},
-            //     {'id': 'under_review', 'name': 'Under Review'},
-            //     {'id': 'awaiting_payment', 'name': 'Awaiting Payment'},
-            //     {'id': 'accepted', 'name': 'Approved'},
-            //     {'id': 'partially_approved', 'name': 'Partially Approved'},
-            //     {'id': 'declined', 'name': 'Declined'},
-            // ],
             application_ex_headers: ["Number","Category","Activity","Type","Submitter","Applicant","Status","Lodged on","Action"],
             application_ex_options:{
                 serverSide: true,

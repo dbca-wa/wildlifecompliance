@@ -15,7 +15,7 @@
                   <div id="tabs">
                     <ul class="nav nav-pills mb-3" id="tabs-section" data-tabs="tabs">
                         <li class="nav-item" v-for="(activity, index) in listVisibleActivities">
-                            <a :class="{'nav-link amendment-highlight': application.has_amendment}" class="nav-link"
+                            <a class='nav-link' :class="{'amendment-highlight': application.has_amendment, 'active': activity.id==selected_activity_tab_id}"
                                 data-bs-toggle="pill" v-on:click="selectTab(activity)">{{activity.label}}</a>
                         </li>
                     </ul>         
@@ -42,6 +42,7 @@
                                 <p class="float-end" style="margin-top:5px;">
                                     <span v-if="showCardPayButton || showCashPayButton" style="margin-right: 5px; font-size: 18px; display: block;">
                                         <strong>Estimated application fee: {{toCurrency(adjusted_application_fee)}}</strong>
+                                        &nbsp;
                                         <strong>Estimated licence fee: {{toCurrency(application.licence_fee)}}</strong>
                                     </span>
                                     <input v-if="!isProcessing && canDiscardActivity" type="button" @click.prevent="discardActivity" class="btn btn-danger" value="Discard Activity"/>
@@ -85,13 +86,13 @@ import {
   fetch_util
 }
 from '@/utils/hooks';
+import { handleError } from 'vue';
 export default {
   data: function() {
     let vm = this;
     return {
       form: null,
       isProcessing: false,
-      tabSelected: false,
       application_customer_status_onload: {},
       missing_fields: [],
       adjusted_application_fee: 0,
@@ -116,6 +117,7 @@ export default {
         'renderer_form_data',
         'selected_activity_tab_id',
         'selected_activity_tab_name',
+        'selected_section_name',
         'isApplicationLoaded',
         'unfinishedActivities',
         'current_user',
@@ -148,8 +150,7 @@ export default {
       return !this.isProcessing && this.application.is_reception_paper;
     },
     showNonePayButton: function() {
-      return !this.isProcessing && this.application.is_reception_migrate;
-          
+      return !this.isProcessing && this.application.is_reception_migrate;          
     },
     showSubmitButton: function() {
       return !this.isProcessing && !this.requiresCheckout && !this.showCardPayButton && !this.showNonePayButton;
@@ -177,12 +178,6 @@ export default {
     selectTab: function(component) {
         this.section_tab_id = component.id;
         this.setActivityTab({id: component.id, name: component.label});
-    },
-    eventListeners: function(){
-      if(!this.tabSelected) {
-        $('#tabs-section li:first-child a').click();
-        this.tabSelected = true;
-      }
     },
     discardActivity: function(e) {
       let swal_title = 'Discard Selected Activity';
@@ -491,27 +486,30 @@ export default {
     }, 
 
   },
+  watch:{
+    selected_section_name: {
+      handler(val){
+        let element = document.getElementById(val)
+        if (element) {
+          element.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',   
+              inline: 'nearest'  
+          });
+        }
+      }
+    }
+  },
   mounted: function() {
     this.form = document.forms.new_application;
   },
   beforeRouteEnter: function(to, from, next) {
     next(vm => {
       vm.reloadApplication(to.params.application_id);
-      // vm.refreshApplicationFees();
     });
   },
   updated: function(){
     let vm = this;
-    this.$nextTick(() => {
-        vm.eventListeners();
-    });
-    // if (this.application.customer_status.id=='amendment_required') { // requested amendments.
-    //    // fees can be adjusted from selected components for requested amendments.
-    //   this.adjusted_application_fee = this.application.application_fee - this.application.adjusted_paid_amount
-    // } else {
-    //   // no adjustments for new applications.
-    //   this.adjusted_application_fee = this.application.application_fee
-    // }
     this.adjusted_application_fee = this.application.application_fee
   }
 }

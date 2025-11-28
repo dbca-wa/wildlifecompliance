@@ -6,6 +6,7 @@ from '@/utils/hooks';
 import {
     UPDATE_SELECTED_TAB_ID,
     UPDATE_SELECTED_TAB_NAME,
+    UPDATE_SELECTED_SECTION_NAME,
     UPDATE_SELECTED_TAB_WORKFLOW_STATE,
     UPDATE_CURRENT_USER,
     UPDATE_CURRENT_USER_ID,
@@ -28,13 +29,14 @@ export const userStore = {
         current_user: {},
         reception_method_id: null,
         current_user_id: true,
-        
+        selected_section_name: '',
     },
     getters: {
         current_user: state => state.current_user,
         current_user_id: state => state.current_user_id,
         compliance_allocated_group: state => state.compliance_allocated_group,
         selected_activity_tab_id: state => state.selected_activity_tab_id,
+        selected_section_name: state => state.selected_section_name,
         selected_activity_tab_name: state => state.selected_activity_tab_name,
         selected_activity_tab_workflow_state: state => state.selected_activity_tab_workflow_state,
         selected_apply_org_id: state => state.selected_apply_org_id,
@@ -183,6 +185,9 @@ export const userStore = {
         [UPDATE_SELECTED_TAB_NAME] (state, tab_name) {
             state.selected_activity_tab_name = tab_name;
         },
+        [UPDATE_SELECTED_SECTION_NAME] (state, section) {
+            state.selected_section_name = section;
+        },
         [UPDATE_SELECTED_TAB_WORKFLOW_STATE] (state, { key, value }) {
             state.selected_activity_tab_workflow_state[key] = value;
         },
@@ -209,9 +214,12 @@ export const userStore = {
         },
     },
     actions: {
-        setActivityTab({ commit }, { id, name }) {
-            commit(UPDATE_SELECTED_TAB_ID, id);
-            commit(UPDATE_SELECTED_TAB_NAME, name);
+        async setActivityTab({ commit }, { id, name, section }) {
+            await commit(UPDATE_SELECTED_TAB_ID, id);
+            await commit(UPDATE_SELECTED_TAB_NAME, name);
+            if (section) {
+                commit(UPDATE_SELECTED_SECTION_NAME, section)
+            }
         },
         setActivityTabWorkflowState({ commit }, {tab_id, bool}) {
             commit(UPDATE_SELECTED_TAB_WORKFLOW_STATE, {key: tab_id, value: bool});
