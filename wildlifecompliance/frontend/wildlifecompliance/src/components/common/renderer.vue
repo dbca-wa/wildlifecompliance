@@ -129,6 +129,7 @@ export default {
                 }
         }
         this.setRendererSections(sections);
+        this.sectionClick({"id":Object.keys(sections)[0]})
     },
     sectionClick: function(component) {
         if(this.section_tab_id == component.id) {
@@ -137,6 +138,13 @@ export default {
         else {
             this.section_tab_id = component.id;
         }
+    },
+  },
+  watch: {
+    selected_activity_tab_id: {
+      handler(val){
+        this.section_tab_id = val;
+      }
     },
   },
   mounted: function() {
