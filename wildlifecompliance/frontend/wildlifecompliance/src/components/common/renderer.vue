@@ -23,7 +23,7 @@
                                         </a>
                                         <div class='dropdown-menu-right section-list' id='section-submenu' >
                                             <div v-for="(section, section_idx) in getSections(tab.id)"
-                                                v-on:click="selectTab(tab)"
+                                                v-on:click="selectTab(tab,section)"
                                                 class="menu-row">
                                                     <div>
                                                         <i class="fa fa-circle"></i>
@@ -95,9 +95,13 @@ export default {
         'setRendererSections',
         'setActivityTab',
     ]),
-    selectTab: function(component) {
+    selectTab: function(component,section) {
         this.section_tab_id = component.id;
-        this.setActivityTab({id: component.id, name: component.label});
+        if (section) {
+            this.setActivityTab({id: component.id, name: component.label, section: section.name});
+        } else {
+            this.setActivityTab({id: component.id, name: component.label});
+        }
     },
     getSections: function(tab_id) {
         return tab_id == this.section_tab_id ? this.sectionsForTab(tab_id) : [];

@@ -86,6 +86,7 @@ import {
   fetch_util
 }
 from '@/utils/hooks';
+import { handleError } from 'vue';
 export default {
   data: function() {
     let vm = this;
@@ -116,6 +117,7 @@ export default {
         'renderer_form_data',
         'selected_activity_tab_id',
         'selected_activity_tab_name',
+        'selected_section_name',
         'isApplicationLoaded',
         'unfinishedActivities',
         'current_user',
@@ -483,6 +485,17 @@ export default {
         });
     }, 
 
+  },
+  watch:{
+    selected_section_name: {
+      handler(val){
+        document.getElementById(val).scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',   
+            inline: 'nearest'  
+        });
+      }
+    }
   },
   mounted: function() {
     this.form = document.forms.new_application;
