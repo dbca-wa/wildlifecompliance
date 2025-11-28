@@ -489,11 +489,14 @@ export default {
   watch:{
     selected_section_name: {
       handler(val){
-        document.getElementById(val).scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',   
-            inline: 'nearest'  
-        });
+        let element = document.getElementById(val)
+        if (element) {
+          element.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',   
+              inline: 'nearest'  
+          });
+        }
       }
     }
   },
