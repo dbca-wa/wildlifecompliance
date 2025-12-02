@@ -376,6 +376,7 @@ export default {
                 text: "Please ensure at least one licence purpose is selected",
                 icon: "error",
             })
+            vm.spinner = false;
         } else {
             data.organisation_id=vm.selected_apply_org_id;
             data.proxy_id=vm.selected_apply_proxy_id;

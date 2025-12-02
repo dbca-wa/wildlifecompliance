@@ -93,6 +93,9 @@ export default {
             return this.applicationTitle + " for yourself"
         }
     },
+    applicationTitle: function() {
+        return 'Apply for a new licence';
+    },
   },
   methods: {
     ...mapActions([
