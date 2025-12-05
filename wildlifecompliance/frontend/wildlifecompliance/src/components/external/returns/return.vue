@@ -122,6 +122,7 @@ export default {
       self.is_saving = true
       self.form=document.forms.external_returns_form;
       var data = new FormData(self.form);
+      
       // cache only used in Returns sheets
       for (const speciesID in self.species_cache) { // Running Sheet Cache
         let speciesJSON = []
@@ -152,6 +153,7 @@ export default {
       self.spinner_continue = andContinue;
       self.form=document.forms.external_returns_form;
       var data = new FormData(self.form);
+
       // cache only used in Returns sheets
       for (const speciesID in self.species_cache) { // Running Sheet Cache
         let speciesJSON = []
@@ -170,7 +172,7 @@ export default {
         });
         data.append('transfer', speciesJSON)
       }
-      let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/save'),{method:'POST', body:JSON.stringify(data)},{
+      let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/save'),{method:'POST', body:data},{
                       emulateJSON:true,
                     })
                 request.then((response)=>{
