@@ -150,7 +150,6 @@ export default {
         const { showNotification } = props;
         this.form=document.forms.internal_returns_form;
         var data = new FormData(this.form);
-
         let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/officer_comments'),{method:'POST', body:JSON.stringify(data)},{
                       emulateJSON:true,
 

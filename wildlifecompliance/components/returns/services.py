@@ -1535,12 +1535,13 @@ class ReturnData(object):
                     is_empty = False
                     break
             if not is_empty:
-                deficiency_data = post_data['table_name'] + '-deficiency-field'
-                try:
-                    # test if deficiency exists and include in row_data.
-                    row_data[deficiency_data] = post_data[deficiency_data]
-                except MultiValueDictKeyError:
-                    pass
+                #TODO determine what this is and whether or not it is needed (does not appear to be needed in current workflow)
+                #deficiency_data = post_data['table_name'] + '-deficiency-field'
+                #try:
+                #    # test if deficiency exists and include in row_data.
+                #    row_data[deficiency_data] = post_data[deficiency_data]
+                #except MultiValueDictKeyError:
+                #    pass
                 rows.append(row_data)
         return rows
 

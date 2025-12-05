@@ -13,54 +13,38 @@
           <CommentBlock :label="label" :name="name" :field_data="getDeficiencyField" />
 
           <div class="grid-container">
-              <div v-if="headers">
-                  <label v-for="header in headers" >
-                      <input class="form-control" v-model="header.label" disabled="disabled" />
-                      <div class="grid-item" v-for ="(field, row_no) in field_data" >
-                          <div id="header.name" v-for="(title,key) in field"
-                              :name="`${name}::${header.name}`" :key="`f_${key}`" >
-
-                              <div v-if="header.type === 'date'" >
-                                  <input type="date"
-                                         :id="header.name + '::' + row_no"
-                                         :disabled="header.readonly"
-                                         :name="name + '::' + header.name"
-                                         class="form-control"
-                                         placeholder="DD/MM/YYYY"
-                                         :v-model="setDateValue(title.value, row_no, header.name, header.readonly)"
-                                         :required="isRequired"
-                                  />
-                              </div>
-
-                              <div v-if="header.type === 'string'">
-                                  <input :disabled="header.readonly"
-                                         type="text"
-                                         :id="header.name + '::' + row_no"
-                                         class="form-control"
-                                         :name="name + '::' + header.name"
-                                         v-model="title.value"
-                                         :required="isRequired"
-                                  />
-                              </div>
-
-                              <div v-if="header.type === 'number'" >
-                                  <input :disabled="header.readonly"
-                                         :id="header.name + '::' + row_no"
+              <div class="col-sm-6 form-group" v-if="headers">
+                  <div class="row">
+                      <div class="col-sm-1" v-for="header in headers" >
+                                  <input disabled="true"
                                          type="text"
                                          class="form-control"
-                                         :name="name + '::' + header.name"
-                                         v-model="title.value"
-                                         :required="isRequired"
+                                         :value="header.label"
                                   />
-                              </div>
-
                           </div>
-                      </div>
-                  </label>
+                      
+                  </div>
+                  
+                  <div class="grid-item row" v-for ="(field, row_no) in field_data" >
+                    
+                          <div class="col-sm-1" id="field.name" v-for="(title,key) in field"
+                              :name="`${name}::${key}`" :key="`f_${key}`" >
+                                  <input :disabled="readonly"
+                                         type="text"
+                                         :id="key + '::' + row_no"
+                                         class="form-control"
+                                         :name="name + '::' + key"
+                                         :required="isRequired"
+                                         :v-model="field_data[row_no][key].value"
+                                         :value="field_data[row_no][key].value"
+                                         @input="update($event,key,row_no)"
+                                  />
+                          </div>
+                </div>
               </div>
           </div>
           <div >
-             <button v-show="showAddRow" class="btn btn-link" @click.prevent="addRow()" >Add Row</button>
+             <button class="btn btn-primary btn-md" @click.prevent="addRow()" >Add Row</button>
           </div>
      </div>
 </template>
@@ -82,7 +66,6 @@ const GridBlock = {
   props: ['field_data','headers','name', 'label', 'id', 'help_text', 'help_text_url', 'readonly', 'isRequired'],
   components: {HelpText, HelpTextUrl, CommentBlock},
   data: function() {
-    var grid_item = [{'id': 0, 'name': '', 'value': ''}];
     return {
       show_add_row: false,
     }
@@ -99,17 +82,27 @@ const GridBlock = {
       return this.show_add_row
     },
   },
+  mounted: function() {
+    if (this.field_data.length > 0) {
+      for (const i in this.field_data[0]) {
+        if (this.field_data[0][i].error === undefined) {
+          this.field_data[0][i].error = "";
+        }
+      }
+    }
+  },
   methods: {
+    update: function($event,key,index) {
+      this.field_data[index][key].value = $event.target.value;
+    },
     addRow: function(e) {
       const self = this;
-      self.grid_item = self._props['field_data']; // field_data is an Array of grid items.
-      let index = self.grid_item.length;
-      let fieldObj = Object.assign({}, self.grid_item[0]);
+      let fieldObj = Object.assign({}, this.field_data[0]);
       // schema data type on each field is validated - error value required.
       for(let key in fieldObj) {
         fieldObj[key] = {'value':'', 'error':''};
       };
-      self.grid_item.push(fieldObj);
+      self.field_data.push(fieldObj);
     },
     addColumn: function(e) {
     },
