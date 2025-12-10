@@ -1819,12 +1819,6 @@ def do_process_form(
             form_data_record.component_attribute = component_attribute
 
         if action == ApplicationFormDataRecord.ACTION_TYPE_ASSIGN_VALUE:
-            # if not is_draft and not value \
-            #         and schema_name in required_fields:
-            #     missing_item = {'field_name': field_name}
-            #     missing_item.update(required_fields[schema_name])
-            #     missing_fields.append(missing_item)
-            #     continue
             form_data_record.value = value
 
         if action == ApplicationFormDataRecord.ACTION_TYPE_ASSIGN_SUBMIT:
@@ -1834,15 +1828,6 @@ def do_process_form(
                 missing_fields.append(missing_item)
                 continue
             form_data_record.value = value
-
-        # elif action == \
-        #         ApplicationFormDataRecord.ACTION_TYPE_ASSIGN_COMMENT:
-        #     if can_edit_officer_comments:
-        #         form_data_record.officer_comment = officer_comment
-        #     if can_edit_assessor_comments:
-        #         form_data_record.assessor_comment = assessor_comment
-        #     if can_edit_deficiencies:
-        #         form_data_record.deficiency = deficiency
 
         bulk_mgr.add(form_data_record)
         all_form_fields.append(form_data_record)

@@ -1696,7 +1696,10 @@ class NotifyTransfer(ReturnActivityFacade):
                 ReturnRow(
                     return_table=return_table,
                     data=row) for row in table_rows]
-            ReturnRow.objects.bulk_create(return_rows)
+            
+            for return_row in return_rows:
+                return_row.save()
+
             # log transaction
             from_return.log_user_action(
                 ReturnUserAction.ACTION_SUBMIT_TRANSFER.format(
@@ -1760,7 +1763,9 @@ class AcceptTransfer(ReturnActivityFacade):
                 ReturnRow(
                     return_table=return_table,
                     data=row) for row in table_rows]
-            ReturnRow.objects.bulk_create(return_rows)
+            
+            for return_row in return_rows:
+                return_row.save()
             # log transaction
             from_return.log_user_action(
                 ReturnUserAction.ACTION_ACCEPT_TRANSFER.format(
@@ -1812,7 +1817,9 @@ class DeclineTransfer(ReturnActivityFacade):
                 ReturnRow(
                     return_table=return_table,
                     data=row) for row in table_rows]
-            ReturnRow.objects.bulk_create(return_rows)
+            
+            for return_row in return_rows:
+                return_row.save()
             # log transaction
             from_return.log_user_action(
                 ReturnUserAction.ACTION_DECLINE_TRANSFER.format(

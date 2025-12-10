@@ -639,58 +639,61 @@ class Return(SanitiseMixin):
         :return:
         """
         try:
-            # wrap atomic context here to allow natural handling of a Record
-            # Modified concurrent error. (optimistic lock)
-            # get the Return Table record and save immediately to check if
-            # it has been concurrently modified.
-            return_table, created = ReturnTable.objects.get_or_create(
-                name=table_name, ret=self)
-            return_table.save()
+            with transaction.atomic():
+                # wrap atomic context here to allow natural handling of a Record
+                # Modified concurrent error. (optimistic lock)
+                # get the Return Table record and save immediately to check if
+                # it has been concurrently modified.
+                return_table, created = ReturnTable.objects.get_or_create(
+                    name=table_name, ret=self)
+                return_table.save()
 
-            #get all rows from db
-            existing_rows = return_table.returnrow_set.all()
+                #get all rows from db
+                existing_rows = return_table.returnrow_set.all()
 
-            #get rows from request
-            return_rows = [
-                ReturnRow(
-                    return_table=return_table,
-                    data=row) for row in table_rows]
+                #get rows from request
+                return_rows = [
+                    ReturnRow(
+                        return_table=return_table,
+                        data=row) for row in table_rows]
 
-            #identify new rows from data
-            new_indexes = []
-            new_dict = {}
-            for i in return_rows:
-                if i.data and 'rowId' in i.data and 'date' in i.data:
-                    new_indexes.append("{}__{}".format(i.data['rowId'],i.data['date']))
-                    new_dict["{}__{}".format(i.data['rowId'],i.data['date'])] = i.data
+                #identify new rows from data
+                new_indexes = []
+                new_dict = {}
+                for i in return_rows:
+                    if i.data and 'rowId' in i.data and 'date' in i.data:
+                        new_indexes.append("{}__{}".format(i.data['rowId'],i.data['date']))
+                        new_dict["{}__{}".format(i.data['rowId'],i.data['date'])] = i.data
 
-            #identify existing rows (via date and row id)
-            existing_indexes = []
-            existing_dict = {}
-            for i in existing_rows:
-                if i.data and 'rowId' in i.data and 'date' in i.data:
-                    existing_indexes.append("{}__{}".format(i.data['rowId'],i.data['date']))
-                    existing_dict["{}__{}".format(i.data['rowId'],i.data['date'])] = i.data
+                #identify existing rows (via date and row id)
+                existing_indexes = []
+                existing_dict = {}
+                for i in existing_rows:
+                    if i.data and 'rowId' in i.data and 'date' in i.data:
+                        existing_indexes.append("{}__{}".format(i.data['rowId'],i.data['date']))
+                        existing_dict["{}__{}".format(i.data['rowId'],i.data['date'])] = i.data
 
-            #raise error if an existing row is missing
-            for i in existing_indexes:
-                if not i in new_indexes:
-                    raise serializers.ValidationError("Return Table missing previously existing rows.")
+                #raise error if an existing row is missing
+                for i in existing_indexes:
+                    if not i in new_indexes:
+                        raise serializers.ValidationError("Return Table missing previously existing rows.")
 
-            #raise error if an existing row is set to change and the user is not internal
-            if not is_internal(request):
-                for i in new_indexes:
-                    if i in existing_dict:
-                        if new_dict[i] != existing_dict[i]:
-                            raise serializers.ValidationError("User not authorised to edit existing return rows.")
+                #raise error if an existing row is set to change and the user is not internal
+                if not is_internal(request):
+                    for i in new_indexes:
+                        if i in existing_dict:
+                            if new_dict[i] != existing_dict[i]:
+                                raise serializers.ValidationError("User not authorised to edit existing return rows.")
 
-            # delete any existing rows as they will all be recreated
-            existing_rows.delete()
-            ReturnRow.objects.bulk_create(return_rows)
+                # delete any existing rows as they will all be recreated
+                existing_rows.delete()
 
-            # log transaction
-            self.log_user_action(
-                ReturnUserAction.ACTION_SAVE_REQUEST.format(self), request)
+                for return_row in return_rows:
+                    return_row.save()
+                    
+                # log transaction
+                self.log_user_action(
+                    ReturnUserAction.ACTION_SAVE_REQUEST.format(self), request)
 
         except RecordModifiedError:
             raise IntegrityError(
@@ -858,27 +861,19 @@ class ReturnTable(RevisionedMixin):
 
     def set_rows(self, return_rows):
         '''
-        Set all rows associated with this Return Table with a bulk create.
+        Set all rows associated with this Return Table.
 
-        :param return_rows is a list of rows for bulk creation.
+        :param return_rows is a list of rows for creation.
         '''
-        from wildlifecompliance.components.returns.utils import (
-            BulkCreateManager,
-        )
 
         try:
-            bulk_mgr = BulkCreateManager()      # chunking size = 100
-
+            #bulk_mgr = BulkCreateManager() NOTE: this function was previously using a bulk create function. This has been removed as it is incompatible with the sanitisation mixin.
             for record in return_rows:
-
                 return_row = ReturnRow(
                     return_table=self,
                     data=record.data
                 )
-                bulk_mgr.add(return_row)
-
-            bulk_mgr.done()
-
+                return_row.save()
         except Exception as e:
             logger.error('{0} ID: {1} - {2}'.format(
                 'ReturnTable.set_rows()',
