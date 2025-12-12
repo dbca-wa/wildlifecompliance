@@ -1,6 +1,6 @@
 <template lang="html">
      <div>
-          <label :id="id" :required="isRequired" > {{ label }} </label>
+          <label :id="id" :required="isRequired" class="fw-bold"> {{ label }} </label>
 
           <template v-if="help_text">
               <HelpText :help_text="help_text" />
@@ -10,15 +10,16 @@
               <HelpTextUrl :help_text_url="help_text_url" />
           </template>
 
-          <CommentBlock :label="label" :name="name" :field_data="getDeficiencyField" />
+          <CommentBlock :label="label" :field_data="getDeficiencyField" />
 
           <div class="grid-container">
               <div class="col-sm-6 form-group" v-if="headers">
-                  <div class="row">
-                      <div class="col-sm-1" v-for="header in headers" >
+                  <div class="grid-item row">
+                      
+                      <div class="col-sm-1 grid-column" v-for="header in headers" >
                                   <input disabled="true"
                                          type="text"
-                                         class="form-control"
+                                         class="form-control grid-element"
                                          :value="header.label"
                                   />
                           </div>
@@ -26,19 +27,22 @@
                   </div>
                   
                   <div class="grid-item row" v-for ="(field, row_no) in field_data" >
-                    
-                          <div class="col-sm-1" id="field.name" v-for="(title,key) in field"
+                          
+                          <div class="col-sm-1 grid-column" id="field.name" v-for="(title,key) in field"
                               :name="`${name}::${key}`" :key="`f_${key}`" >
                                   <input :disabled="readonly"
                                          type="text"
                                          :id="key + '::' + row_no"
-                                         class="form-control"
+                                         class="form-control grid-element"
                                          :name="name + '::' + key"
                                          :required="isRequired"
                                          :v-model="field_data[row_no][key].value"
                                          :value="field_data[row_no][key].value"
                                          @input="update($event,key,row_no)"
                                   />
+                          </div>
+                          <div class="col-sm-1">
+                            <button class="btn btn-danger btn-md" @click.prevent="addRow()" ><i class="bi bi-trash"></i></button>
                           </div>
                 </div>
               </div>
@@ -104,6 +108,9 @@ const GridBlock = {
       };
       self.field_data.push(fieldObj);
     },
+    removeRow: function(e) {
+
+    },
     addColumn: function(e) {
     },
     addArea: function(e) {
@@ -145,7 +152,15 @@ export default GridBlock;
         grid-column: 1 / 1;
         grid-row: 1 / 1;
         border: 1px solid #ffffff;
+        margin: auto;    
     }
+    .grid-column {
+        padding: 1px !important;
+    }
+    .grid-element {
+        margin: 1px !important;
+    }
+
 </style>
 
 

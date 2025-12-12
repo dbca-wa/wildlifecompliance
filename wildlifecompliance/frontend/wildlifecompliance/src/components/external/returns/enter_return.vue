@@ -5,7 +5,7 @@
       index="return"
   >
     <div class="card-body">
-    <AmendmentRequestDetails v-show="is_external"/>
+        <AmendmentRequestDetails v-show="is_external"/>
         <div class="col-md-12" v-if="returns.has_species">
             <div class="form-group">
                 <label class="fw-bold" for="">Species Available:</label>
@@ -229,7 +229,7 @@ export default {
       }
       
       $(vm.$refs.selected_species).select2({
-          theme: "bootstrap",
+          theme: "bootstrap-5",
           allowClear: true,
           placeholder: "Select..."
       }).
