@@ -635,10 +635,10 @@ class SpreadSheet(object):
                 row_data[key.lower()] = value[row_num] \
                     if value[row_num] is not None else ''
 
-            # create deficiency key as part of row data
+            # create deficiency key as part of row data #TODO investigate/remove
             table_name = self.ret.return_type.resources[0]['name']
-            table_deficiency = table_name + '-deficiency-field'
-            row_data[table_deficiency] = None
+            #table_deficiency = table_name + '-deficiency-field'
+            #row_data[table_deficiency] = None
 
             self.rows_list.append(row_data)
 

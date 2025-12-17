@@ -1277,7 +1277,8 @@ class ReturnData(object):
             return
 
         returns_tables = request.data.get('table_name')
-        table_deficiency = returns_tables + '-deficiency-field'
+        #TODO investigate defiency col - do we need it? commented out for now
+        #table_deficiency = returns_tables + '-deficiency-field'
 
         def _validate_and_save_key_data(key, data):
             '''
@@ -1328,17 +1329,17 @@ class ReturnData(object):
                 else:
                     raise FieldError('Enter data in correct format.')
 
-            elif key == table_deficiency:
-                # table_info = returns_tables.encode('utf-8')
-                table_info = returns_tables
-                table_rows = self._get_table_rows(
-                    table_info, data)
-                if self.requires_species():
-                    table_info = self._species
-                    # table_rows = None
-                if table_rows:
-                    self._return.save_return_table(
-                        table_info, table_rows, request)
+            #elif key == table_deficiency:
+            #    # table_info = returns_tables.encode('utf-8')
+            #    table_info = returns_tables
+            #    table_rows = self._get_table_rows(
+            #        table_info, data)
+            #    if self.requires_species():
+            #        table_info = self._species
+            #        # table_rows = None
+            #    if table_rows:
+            #        self._return.save_return_table(
+            #            table_info, table_rows, request)
 
         for key in request.data.keys():
             data = request.data
@@ -1408,7 +1409,7 @@ class ReturnData(object):
         tables = []
 
         # retain deficiencies when building.
-        self.set_table_deficiency(rows)
+        #self.set_table_deficiency(rows)
 
         for resource in self._return.return_type.resources:
             resource_name = resource.get('name')
