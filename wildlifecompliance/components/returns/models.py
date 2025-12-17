@@ -502,10 +502,9 @@ class Return(SanitiseMixin):
         '''
         QuerySet of authorised licence activity curators for this return.
         '''
-        groups = self.get_permission_groups('return_curator').values_list(
+        groups = list(self.get_permission_groups('return_curator').values_list(
             'id', flat=True
-        )
-
+        ))
         return EmailUser.objects.filter(
             id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
         ).distinct()
