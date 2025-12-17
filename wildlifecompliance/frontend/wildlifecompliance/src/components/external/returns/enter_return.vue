@@ -182,7 +182,6 @@ export default {
     },
     getSpecies: async function(_id){
       var specie_id = _id
-
       if (this.species_cache[this.returns.species]==null) {
         // cache currently displayed species json
         this.species_cache[this.returns.species] = this.returns.table[0]['data']

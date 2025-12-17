@@ -10,10 +10,10 @@
               <HelpTextUrl :help_text_url="help_text_url" />
           </template>
 
-          <CommentBlock :label="label" :field_data="getDeficiencyField" />
+          <!--<CommentBlock :name="name" :label="label" :field_data="getDeficiencyField" />-->
 
           <div class="grid-container">
-              <div class="col-sm-6 form-group" v-if="headers">
+              <div class="col-sm-3 form-group" v-if="headers">
                   <div class="grid-item row">
                       
                       <div class="col-sm-1 grid-column" v-for="header in headers" >
@@ -42,7 +42,7 @@
                                   />
                           </div>
                           <div class="col-sm-1">
-                            <button class="btn btn-danger btn-md" @click.prevent="addRow()" ><i class="bi bi-trash"></i></button>
+                            <button class="btn btn-danger btn-md" @click.prevent="removeRow(row_no)" ><i class="bi bi-trash"></i></button>
                           </div>
                 </div>
               </div>
@@ -75,13 +75,14 @@ const GridBlock = {
     }
   },
   computed: {
-    getDeficiencyField: function(){
+    //TODO determine if this is needed
+    /*getDeficiencyField: function(){
       var def = this.field_data[0][this.name + '-deficiency-field']
       if (def==null){
         return {'deficiency-value': null}
       }
       return this.field_data[0][this.name + '-deficiency-field']
-    },
+    },*/
     showAddRow: function(){
       return this.show_add_row
     },
@@ -108,12 +109,17 @@ const GridBlock = {
       };
       self.field_data.push(fieldObj);
     },
-    removeRow: function(e) {
-
-    },
-    addColumn: function(e) {
-    },
-    addArea: function(e) {
+    removeRow: function(row_num) {
+      const self = this;
+      if (self.field_data.length > 1) {
+        self.field_data.splice(row_num,1);
+      } else {
+        let fieldObj = Object.assign({}, this.field_data[0]);
+        for(let key in fieldObj) {
+          fieldObj[key] = {'value':'', 'error':''};
+        };
+        self.field_data[0] = fieldObj;
+      }
     },
     setDateValue: function(value, row, name, readonly) {
       const self = this;

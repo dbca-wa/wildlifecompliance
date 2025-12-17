@@ -1289,6 +1289,8 @@ class ReturnData(object):
                 self._return.save()
 
             elif key == "nilNo":
+                self._return.nil_return = False
+                self._return.save()
                 # Not submitting a Nil return so save data.
                 is_valid_data = self._is_post_data_valid(
                     # returns_tables.encode('utf-8'),
@@ -1310,7 +1312,6 @@ class ReturnData(object):
                         for species in self.species_list:
                             try:
                                 species_data = data[species]
-
                             except KeyError:
                                 continue
 
@@ -1339,36 +1340,8 @@ class ReturnData(object):
                     self._return.save_return_table(
                         table_info, table_rows, request)
 
-        # def _parse_species_data(data):
-        #     '''
-        #     parse species data for storing.
-        #     '''
-        #     import json
-
-        #     _parsed_data = request.data
-        #     _json_data = json.loads(data)
-
-        #     for _data in _json_data:
-        #         for _key in _data.keys():
-        #             try:
-        #                 _value = _data[_key]['value']
-        #                 _key_name = '{0}::{1}'.format(returns_tables, _key)
-        #                 _parsed_data[_key_name] = _value
-
-        #             except KeyError:
-        #                 pass
-
-        #     return _parsed_data
-
         for key in request.data.keys():
             data = request.data
-
-            # if key in self._species_list:
-            #     parsed_data = _parse_species_data(request.data[key])
-            #     self.set_species(key)
-            #     data = parsed_data
-            #     key = "nilNo"
-
             _validate_and_save_key_data(key, data)
 
     def get_species_list(self):
@@ -1473,7 +1446,7 @@ class ReturnData(object):
         """
         table_rows = self._get_table_rows(tables_info, post_data)
         if len(table_rows) == 0:
-            return False
+            return True #empty table is valid if resetting return
         schema = Schema(
             self._return.return_type.get_schema_by_name(tables_info))
         if not schema.is_all_valid(table_rows):
@@ -1501,7 +1474,6 @@ class ReturnData(object):
                     continue
                 _data[key] = value
             rows.append(_data)
-
         return rows
 
     def _get_table_rows(self, table_name, post_data):

@@ -178,8 +178,10 @@ export default {
                 request.then((response)=>{
                       let species_id = self.returns.sheet_species;
                       self.setReturns(response);
-                      self.returns.sheet_species = species_id;
-                      self.returns.species = species_id;
+                      if (species_id != null) {
+                        self.returns.sheet_species = species_id;
+                        self.returns.species = species_id;
+                      }
                       self.is_saving = false
                       self.disable_submit = false;
                       self.disable_exit = false;
