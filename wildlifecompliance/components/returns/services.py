@@ -1161,7 +1161,6 @@ class ReturnData(object):
                     "name": f.data['name'],
                     "required": f.required,
                     "type": f_type,
-                    "readonly": False,
                 }
                 if f.is_species:
                     header["species"] = f.species_type
@@ -1171,7 +1170,9 @@ class ReturnData(object):
                 'label': resource.get('title', resource.get('name')),
                 'type': 'grid',
                 'headers': headers,
-                'data': None
+                'data': None,
+                #default readonly if not in draft
+                'readonly': self._return.processing_status != Return.RETURN_PROCESSING_STATUS_DRAFT,
             }
             try:
                 if self.requires_species():

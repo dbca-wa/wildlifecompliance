@@ -254,17 +254,6 @@ class ReturnSerializer(serializers.ModelSerializer):
         )
         return child_return.activity_list if _return.has_sheet else None
 
-    # def get_sheet_species_list(self, _return):
-    #     """
-    #     Gets the list of Species available for a Return Running Sheet.
-    #     :param _return: Return instance.
-    #     :return: List of species for a Return Running Sheet.
-    #     """
-    #     child_return = self.child if self.child else self.get_child_return(
-    #         _return
-    #     )
-    #     return child_return.species_list if _return.has_sheet else None
-
     def get_sheet_species(self, _return):
         """
         Gets the Species available for a Return Running Sheet.

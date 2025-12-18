@@ -41,14 +41,14 @@
                                          @input="update($event,key,row_no)"
                                   />
                           </div>
-                          <div class="col-sm-1">
+                          <div v-if="!readonly" class="col-sm-1">
                             <button class="btn btn-danger btn-md" @click.prevent="removeRow(row_no)" ><i class="bi bi-trash"></i></button>
                           </div>
                 </div>
               </div>
           </div>
           <div >
-             <button class="btn btn-primary btn-md" @click.prevent="addRow()" >Add Row</button>
+             <button v-if="!readonly" class="btn btn-primary btn-md" @click.prevent="addRow()" >Add Row</button>
           </div>
      </div>
 </template>
@@ -88,6 +88,7 @@ const GridBlock = {
     },
   },
   mounted: function() {
+    console.log(this.readonly)
     if (this.field_data.length > 0) {
       for (const i in this.field_data[0]) {
         if (this.field_data[0][i].error === undefined) {
