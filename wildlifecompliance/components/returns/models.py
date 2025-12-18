@@ -249,7 +249,8 @@ class Return(SanitiseMixin):
     # status that allow a customer to edit a Return.
     CUSTOMER_EDITABLE_STATE = [
         RETURN_PROCESSING_STATUS_DRAFT,
-        RETURN_PROCESSING_STATUS_PAYMENT,
+        RETURN_PROCESSING_STATUS_DUE,
+        RETURN_PROCESSING_STATUS_OVERDUE,
     ]
 
     # List of statuses from above that allow a customer to view a Return.

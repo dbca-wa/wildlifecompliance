@@ -1171,8 +1171,8 @@ class ReturnData(object):
                 'type': 'grid',
                 'headers': headers,
                 'data': None,
-                #default readonly if not in draft
-                'readonly': self._return.processing_status != Return.RETURN_PROCESSING_STATUS_DRAFT,
+                #default readonly if not in draft, due, overdue
+                'readonly': not self._return.processing_status in Return.CUSTOMER_EDITABLE_STATE,
             }
             try:
                 if self.requires_species():
