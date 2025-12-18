@@ -1161,7 +1161,6 @@ class ReturnData(object):
                     "name": f.data['name'],
                     "required": f.required,
                     "type": f_type,
-                    "readonly": False,
                 }
                 if f.is_species:
                     header["species"] = f.species_type
@@ -1171,7 +1170,9 @@ class ReturnData(object):
                 'label': resource.get('title', resource.get('name')),
                 'type': 'grid',
                 'headers': headers,
-                'data': None
+                'data': None,
+                #default readonly if not in draft, due, overdue
+                'readonly': not self._return.processing_status in Return.CUSTOMER_EDITABLE_STATE,
             }
             try:
                 if self.requires_species():
@@ -1277,7 +1278,8 @@ class ReturnData(object):
             return
 
         returns_tables = request.data.get('table_name')
-        table_deficiency = returns_tables + '-deficiency-field'
+        #TODO investigate defiency col - do we need it? commented out for now
+        #table_deficiency = returns_tables + '-deficiency-field'
 
         def _validate_and_save_key_data(key, data):
             '''
@@ -1289,6 +1291,8 @@ class ReturnData(object):
                 self._return.save()
 
             elif key == "nilNo":
+                self._return.nil_return = False
+                self._return.save()
                 # Not submitting a Nil return so save data.
                 is_valid_data = self._is_post_data_valid(
                     # returns_tables.encode('utf-8'),
@@ -1310,7 +1314,6 @@ class ReturnData(object):
                         for species in self.species_list:
                             try:
                                 species_data = data[species]
-
                             except KeyError:
                                 continue
 
@@ -1327,48 +1330,20 @@ class ReturnData(object):
                 else:
                     raise FieldError('Enter data in correct format.')
 
-            elif key == table_deficiency:
-                # table_info = returns_tables.encode('utf-8')
-                table_info = returns_tables
-                table_rows = self._get_table_rows(
-                    table_info, data)
-                if self.requires_species():
-                    table_info = self._species
-                    # table_rows = None
-                if table_rows:
-                    self._return.save_return_table(
-                        table_info, table_rows, request)
-
-        # def _parse_species_data(data):
-        #     '''
-        #     parse species data for storing.
-        #     '''
-        #     import json
-
-        #     _parsed_data = request.data
-        #     _json_data = json.loads(data)
-
-        #     for _data in _json_data:
-        #         for _key in _data.keys():
-        #             try:
-        #                 _value = _data[_key]['value']
-        #                 _key_name = '{0}::{1}'.format(returns_tables, _key)
-        #                 _parsed_data[_key_name] = _value
-
-        #             except KeyError:
-        #                 pass
-
-        #     return _parsed_data
+            #elif key == table_deficiency:
+            #    # table_info = returns_tables.encode('utf-8')
+            #    table_info = returns_tables
+            #    table_rows = self._get_table_rows(
+            #        table_info, data)
+            #    if self.requires_species():
+            #        table_info = self._species
+            #        # table_rows = None
+            #    if table_rows:
+            #        self._return.save_return_table(
+            #            table_info, table_rows, request)
 
         for key in request.data.keys():
             data = request.data
-
-            # if key in self._species_list:
-            #     parsed_data = _parse_species_data(request.data[key])
-            #     self.set_species(key)
-            #     data = parsed_data
-            #     key = "nilNo"
-
             _validate_and_save_key_data(key, data)
 
     def get_species_list(self):
@@ -1435,7 +1410,7 @@ class ReturnData(object):
         tables = []
 
         # retain deficiencies when building.
-        self.set_table_deficiency(rows)
+        #self.set_table_deficiency(rows)
 
         for resource in self._return.return_type.resources:
             resource_name = resource.get('name')
@@ -1473,7 +1448,7 @@ class ReturnData(object):
         """
         table_rows = self._get_table_rows(tables_info, post_data)
         if len(table_rows) == 0:
-            return False
+            return True #empty table is valid if resetting return
         schema = Schema(
             self._return.return_type.get_schema_by_name(tables_info))
         if not schema.is_all_valid(table_rows):
@@ -1501,7 +1476,6 @@ class ReturnData(object):
                     continue
                 _data[key] = value
             rows.append(_data)
-
         return rows
 
     def _get_table_rows(self, table_name, post_data):
@@ -1535,12 +1509,13 @@ class ReturnData(object):
                     is_empty = False
                     break
             if not is_empty:
-                deficiency_data = post_data['table_name'] + '-deficiency-field'
-                try:
-                    # test if deficiency exists and include in row_data.
-                    row_data[deficiency_data] = post_data[deficiency_data]
-                except MultiValueDictKeyError:
-                    pass
+                #TODO determine what this is and whether or not it is needed (does not appear to be needed in current workflow)
+                #deficiency_data = post_data['table_name'] + '-deficiency-field'
+                #try:
+                #    # test if deficiency exists and include in row_data.
+                #    row_data[deficiency_data] = post_data[deficiency_data]
+                #except MultiValueDictKeyError:
+                #    pass
                 rows.append(row_data)
         return rows
 
@@ -1695,7 +1670,10 @@ class NotifyTransfer(ReturnActivityFacade):
                 ReturnRow(
                     return_table=return_table,
                     data=row) for row in table_rows]
-            ReturnRow.objects.bulk_create(return_rows)
+            
+            for return_row in return_rows:
+                return_row.save()
+
             # log transaction
             from_return.log_user_action(
                 ReturnUserAction.ACTION_SUBMIT_TRANSFER.format(
@@ -1759,7 +1737,9 @@ class AcceptTransfer(ReturnActivityFacade):
                 ReturnRow(
                     return_table=return_table,
                     data=row) for row in table_rows]
-            ReturnRow.objects.bulk_create(return_rows)
+            
+            for return_row in return_rows:
+                return_row.save()
             # log transaction
             from_return.log_user_action(
                 ReturnUserAction.ACTION_ACCEPT_TRANSFER.format(
@@ -1811,7 +1791,9 @@ class DeclineTransfer(ReturnActivityFacade):
                 ReturnRow(
                     return_table=return_table,
                     data=row) for row in table_rows]
-            ReturnRow.objects.bulk_create(return_rows)
+            
+            for return_row in return_rows:
+                return_row.save()
             # log transaction
             from_return.log_user_action(
                 ReturnUserAction.ACTION_DECLINE_TRANSFER.format(
@@ -2171,6 +2153,9 @@ class ReturnSheet(object):
         :param request:
         :return:
         """
+
+        #TODO re-examine this process (and others like it) - do we limit the number of new rows? Currently everytime a sheet is saved, every row is deleted and replaced - meaning that at least that number of rows are removed and/or added
+
         for species in self.species_list:
             _data = request.data.get(species)
 

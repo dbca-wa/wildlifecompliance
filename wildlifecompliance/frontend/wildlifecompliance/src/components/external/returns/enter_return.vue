@@ -5,7 +5,7 @@
       index="return"
   >
     <div class="card-body">
-    <AmendmentRequestDetails v-show="is_external"/>
+        <AmendmentRequestDetails v-show="is_external"/>
         <div class="col-md-12" v-if="returns.has_species">
             <div class="form-group">
                 <label class="fw-bold" for="">Species Available:</label>
@@ -120,7 +120,8 @@ export default {
       return this.spreadsheet != null ? this.spreadsheet.name: '';
     },
     isReadOnly: function() {
-      this.readonly = this.is_external && this.returns.is_draft ? false : true;
+      this.readonly =  this.returns.is_draft ? false : true;
+      //this.is_external &&
       return this.readonly;
     },
     refreshGrid: function() {
@@ -182,7 +183,6 @@ export default {
     },
     getSpecies: async function(_id){
       var specie_id = _id
-
       if (this.species_cache[this.returns.species]==null) {
         // cache currently displayed species json
         this.species_cache[this.returns.species] = this.returns.table[0]['data']
@@ -229,7 +229,7 @@ export default {
       }
       
       $(vm.$refs.selected_species).select2({
-          theme: "bootstrap",
+          theme: "bootstrap-5",
           allowClear: true,
           placeholder: "Select..."
       }).

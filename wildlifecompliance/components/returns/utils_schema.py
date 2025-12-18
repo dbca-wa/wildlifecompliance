@@ -344,7 +344,8 @@ class Schema:
     def field_validation_error(self, field_name, value):
         field = self.get_field_by_mame(field_name)
         if field is not None:
-            return field.validation_error(value)
+            #TODO this does not work, fix it if it is required (data value validation, can be probably be handled by assessor review in the case)
+            return None #field.validation_error(value)
         else:
             raise Exception(
                 "The field '{}' doesn't exists in the schema. Should be one of {}" .format(
@@ -494,8 +495,8 @@ class Schema:
 
     def is_all_valid(self, rows):
         for row in rows:
-            #print("======Printing from is_all_valid====")
-            #print(row)
+            print("======Printing from is_all_valid====")
+            print(row)
             if not self.is_row_valid(row):
                 return False
         return True

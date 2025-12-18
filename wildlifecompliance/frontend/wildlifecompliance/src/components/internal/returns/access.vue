@@ -62,8 +62,8 @@
                     <!-- Workflow Actions -->
                     <div v-show="showActionButtons" class="col-sm-12 top-buffer-s">
                         <strong>Action</strong><br/><br/>
-                        <button style="width:255px;" class="btn btn-primary btn-md" @click.prevent="acceptReturn()">Accept</button><br/><br/>
-                        <button style="width:255px;" class="btn btn-primary btn-md" @click.prevent="amendmentRequest()">Request Amendment</button>
+                        <button class="btn btn-primary btn-md" @click.prevent="acceptReturn()">Accept</button><br/><br/>
+                        <button class="btn btn-primary btn-md" @click.prevent="amendmentRequest()">Request Amendment</button>
                         <br/><br/>
                     </div>
 
@@ -311,10 +311,11 @@ export default {
             await this.save_wo();
             this.form=document.forms.internal_returns_form;
 
-            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/accept'),{
-                            emulateJSON:true,
-
-            })
+            let request = fetch_util.fetchUrl(
+                helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/accept'),
+                {method:'POST'},
+                {emulateJSON:true}
+            )
             request.then((response)=>{
 
                 // Return to dashboard.

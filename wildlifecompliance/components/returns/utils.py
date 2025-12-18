@@ -252,7 +252,9 @@ def _create_return_data_from_post_data(ret, tables_info, post_data):
             ReturnRow(
                 return_table=return_table,
                 data=row) for row in rows]
-        ReturnRow.objects.bulk_create(return_rows)
+        
+        for return_row in return_rows:
+            return_row.save()
 
 
 class BulkCreateManager(object):
@@ -350,7 +352,7 @@ class ReturnSpeciesUtility(ReturnUtility):
         Set list of species for the Return.
         '''
         species_list = []
-        return_table = []
+        return_tables = []
 
         try:
             if isinstance(a_species_list, list):
@@ -362,12 +364,12 @@ class ReturnSpeciesUtility(ReturnUtility):
 
             for specie_name in species_list:
                 name_id = self.get_id_from_species_name(specie_name)
-                return_table.append(
+                return_tables.append(
                     ReturnTable(name=name_id, ret_id=str(self._return.id))
                 )
 
-            if return_table:
-                ReturnTable.objects.bulk_create(return_table)
+            for return_table in return_tables:
+                return_table.save()
 
         except Exception as e:
             raise Exception('{0} ReturnID: {1} - {2}'.format(
@@ -633,10 +635,10 @@ class SpreadSheet(object):
                 row_data[key.lower()] = value[row_num] \
                     if value[row_num] is not None else ''
 
-            # create deficiency key as part of row data
+            # create deficiency key as part of row data #TODO investigate/remove
             table_name = self.ret.return_type.resources[0]['name']
-            table_deficiency = table_name + '-deficiency-field'
-            row_data[table_deficiency] = None
+            #table_deficiency = table_name + '-deficiency-field'
+            #row_data[table_deficiency] = None
 
             self.rows_list.append(row_data)
 
@@ -704,7 +706,9 @@ class Regulation15Sheet(SpreadSheet):
                 ReturnRow(
                     return_table=return_table,
                     data=row) for row in self.rows_list]
-            ReturnRow.objects.bulk_create(return_rows)
+
+            for return_row in return_rows:
+                return_row.save()
 
         return True
 
@@ -747,7 +751,9 @@ class ReturnDataSheet(SpreadSheet):
                 ReturnRow(
                     return_table=return_table,
                     data=row) for row in self.rows_list]
-            ReturnRow.objects.bulk_create(return_rows)
+
+            for return_row in return_rows:
+                return_row.save()
 
         return True
 

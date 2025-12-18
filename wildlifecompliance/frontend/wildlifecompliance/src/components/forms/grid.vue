@@ -1,6 +1,6 @@
 <template lang="html">
      <div>
-          <label :id="id" :required="isRequired" > {{ label }} </label>
+          <label :id="id" :required="isRequired" class="fw-bold"> {{ label }} </label>
 
           <template v-if="help_text">
               <HelpText :help_text="help_text" />
@@ -10,57 +10,45 @@
               <HelpTextUrl :help_text_url="help_text_url" />
           </template>
 
-          <CommentBlock :label="label" :name="name" :field_data="getDeficiencyField" />
+          <!--<CommentBlock :name="name" :label="label" :field_data="getDeficiencyField" />-->
 
           <div class="grid-container">
-              <div v-if="headers">
-                  <label v-for="header in headers" >
-                      <input class="form-control" v-model="header.label" disabled="disabled" />
-                      <div class="grid-item" v-for ="(field, row_no) in field_data" >
-                          <div id="header.name" v-for="(title,key) in field"
-                              :name="`${name}::${header.name}`" :key="`f_${key}`" >
-
-                              <div v-if="header.type === 'date'" >
-                                  <input type="date"
-                                         :id="header.name + '::' + row_no"
-                                         :disabled="header.readonly"
-                                         :name="name + '::' + header.name"
-                                         class="form-control"
-                                         placeholder="DD/MM/YYYY"
-                                         :v-model="setDateValue(title.value, row_no, header.name, header.readonly)"
-                                         :required="isRequired"
-                                  />
-                              </div>
-
-                              <div v-if="header.type === 'string'">
-                                  <input :disabled="header.readonly"
+              <div class="col-sm-3 form-group" v-if="headers">
+                  <div class="grid-item row">
+                      
+                      <div class="col-sm-1 grid-column" v-for="header in headers" >
+                                  <input disabled="true"
                                          type="text"
-                                         :id="header.name + '::' + row_no"
-                                         class="form-control"
-                                         :name="name + '::' + header.name"
-                                         v-model="title.value"
-                                         :required="isRequired"
+                                         class="form-control grid-element"
+                                         :value="header.label"
                                   />
-                              </div>
-
-                              <div v-if="header.type === 'number'" >
-                                  <input :disabled="header.readonly"
-                                         :id="header.name + '::' + row_no"
-                                         type="text"
-                                         class="form-control"
-                                         :name="name + '::' + header.name"
-                                         v-model="title.value"
-                                         :required="isRequired"
-                                  />
-                              </div>
-
                           </div>
-                      </div>
-                  </label>
+                      
+                  </div>
+                  
+                  <div class="grid-item row" v-for ="(field, row_no) in field_data" >
+                          
+                          <div class="col-sm-1 grid-column" id="field.name" v-for="(title,key) in field"
+                              :name="`${name}::${key}`" :key="`f_${key}`" >
+                                  <input :disabled="readonly"
+                                         type="text"
+                                         :id="key + '::' + row_no"
+                                         class="form-control grid-element"
+                                         :name="name + '::' + key"
+                                         :required="isRequired"
+                                         :v-model="field_data[row_no][key].value"
+                                         :value="field_data[row_no][key].value"
+                                         @input="update($event,key,row_no)"
+                                  />
+                          </div>
+                          <div v-if="!readonly" class="col-sm-1">
+                            <button class="btn btn-danger btn-md" @click.prevent="removeRow(row_no)" ><i class="bi bi-trash"></i></button>
+                          </div>
+                </div>
               </div>
           </div>
           <div >
-             <button v-show="showAddRow" class="btn btn-link" @click.prevent="addRow()" >Add Row</button>
+             <button v-if="!readonly" class="btn btn-primary btn-md" @click.prevent="addRow()" >Add Row</button>
           </div>
      </div>
 </template>
@@ -82,38 +70,56 @@ const GridBlock = {
   props: ['field_data','headers','name', 'label', 'id', 'help_text', 'help_text_url', 'readonly', 'isRequired'],
   components: {HelpText, HelpTextUrl, CommentBlock},
   data: function() {
-    var grid_item = [{'id': 0, 'name': '', 'value': ''}];
     return {
       show_add_row: false,
     }
   },
   computed: {
-    getDeficiencyField: function(){
+    //TODO determine if this is needed
+    /*getDeficiencyField: function(){
       var def = this.field_data[0][this.name + '-deficiency-field']
       if (def==null){
         return {'deficiency-value': null}
       }
       return this.field_data[0][this.name + '-deficiency-field']
-    },
+    },*/
     showAddRow: function(){
       return this.show_add_row
     },
   },
+  mounted: function() {
+    if (this.field_data.length > 0) {
+      for (const i in this.field_data[0]) {
+        if (this.field_data[0][i].error === undefined) {
+          this.field_data[0][i].error = "";
+        }
+      }
+    }
+  },
   methods: {
+    update: function($event,key,index) {
+      this.field_data[index][key].value = $event.target.value;
+    },
     addRow: function(e) {
       const self = this;
-      self.grid_item = self._props['field_data']; // field_data is an Array of grid items.
-      let index = self.grid_item.length;
-      let fieldObj = Object.assign({}, self.grid_item[0]);
+      let fieldObj = Object.assign({}, this.field_data[0]);
       // schema data type on each field is validated - error value required.
       for(let key in fieldObj) {
         fieldObj[key] = {'value':'', 'error':''};
       };
-      self.grid_item.push(fieldObj);
+      self.field_data.push(fieldObj);
     },
-    addColumn: function(e) {
-    },
-    addArea: function(e) {
+    removeRow: function(row_num) {
+      const self = this;
+      if (self.field_data.length > 1) {
+        self.field_data.splice(row_num,1);
+      } else {
+        let fieldObj = Object.assign({}, this.field_data[0]);
+        for(let key in fieldObj) {
+          fieldObj[key] = {'value':'', 'error':''};
+        };
+        self.field_data[0] = fieldObj;
+      }
     },
     setDateValue: function(value, row, name, readonly) {
       const self = this;
@@ -152,7 +158,15 @@ export default GridBlock;
         grid-column: 1 / 1;
         grid-row: 1 / 1;
         border: 1px solid #ffffff;
+        margin: auto;    
     }
+    .grid-column {
+        padding: 1px !important;
+    }
+    .grid-element {
+        margin: 1px !important;
+    }
+
 </style>
 
 
