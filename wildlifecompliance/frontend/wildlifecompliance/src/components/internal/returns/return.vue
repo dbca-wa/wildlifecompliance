@@ -199,45 +199,43 @@ export default {
         });
         data.append('transfer', speciesJSON)
       }
-        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/save'),{method:'POST', body:data},{
-            emulateJSON:true,
-        })
-        request.then((response)=>{
-            let species_id = this.returns.sheet_species;
-            this.setReturns(response);
-            this.returns.sheet_species = species_id;
-            this.returns.species = species_id;
-            this.is_saving = false
-            this.disable_submit = false;
-            this.disable_exit = false;
-            this.disable_continue = false;
-            this.spinner_exit = false;
-            this.spinner_continue = false;
-        if (andContinue) { 
-
+      let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/save'),{method:'POST', body:data},{
+          emulateJSON:true,
+      })
+      request.then((response)=>{
+          let species_id = this.returns.sheet_species;
+          this.setReturns(response);
+          if (species_id != null) {
+              this.returns.sheet_species = species_id;
+              this.returns.species = species_id;
+          }
+          this.is_saving = false
+          this.disable_submit = false;
+          this.disable_exit = false;
+          this.disable_continue = false;
+          this.spinner_exit = false;
+          this.spinner_continue = false;
+          if (andContinue) { 
             swal.fire( 'Save', 
                     'Return Details Saved', 
                     'success'
             )
-
-            } else { // route back to main dashboard
-
+          } else { // route back to main dashboard
             this.$router.push({name:"internal-returns-dash",});
-
-            }
-        },(error)=>{
-            this.is_saving = false
-            this.disable_submit = false;
-            this.disable_exit = false;
-            this.disable_continue = false;
-            this.spinner_exit = false;
-            this.spinner_continue = false;
-            console.log(error);
-            swal.fire('Error',
-                'There was an error saving your return details.<br/>' + error.body,
-                'error'
-            )
-        });
+          }
+      },(error)=>{
+          this.is_saving = false
+          this.disable_submit = false;
+          this.disable_exit = false;
+          this.disable_continue = false;
+          this.spinner_exit = false;
+          this.spinner_continue = false;
+          console.log(error);
+          swal.fire('Error',
+              'There was an error saving your return details.<br/>' + error.body,
+              'error'
+          )
+      });
     },
   },
   beforeRouteEnter: function(to, from, next){

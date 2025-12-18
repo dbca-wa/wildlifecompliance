@@ -153,7 +153,6 @@ export default {
       self.spinner_continue = andContinue;
       self.form=document.forms.external_returns_form;
       var data = new FormData(self.form);
-
       // cache only used in Returns sheets
       for (const speciesID in self.species_cache) { // Running Sheet Cache
         let speciesJSON = []
@@ -173,46 +172,46 @@ export default {
         data.append('transfer', speciesJSON)
       }
       let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,self.returns.id+'/save'),{method:'POST', body:data},{
-                      emulateJSON:true,
-                    })
-                request.then((response)=>{
-                      let species_id = self.returns.sheet_species;
-                      self.setReturns(response);
-                      if (species_id != null) {
-                        self.returns.sheet_species = species_id;
-                        self.returns.species = species_id;
-                      }
-                      self.is_saving = false
-                      self.disable_submit = false;
-                      self.disable_exit = false;
-                      self.disable_continue = false;
-                      self.spinner_exit = false;
-                      self.spinner_continue = false;
-                      if (andContinue) { 
+          emulateJSON:true,
+      })
+      request.then((response)=>{
+            let species_id = self.returns.sheet_species;
+            self.setReturns(response);
+            if (species_id != null) {
+              self.returns.sheet_species = species_id;
+              self.returns.species = species_id;
+            }
+            self.is_saving = false
+            self.disable_submit = false;
+            self.disable_exit = false;
+            self.disable_continue = false;
+            self.spinner_exit = false;
+            self.spinner_continue = false;
+            if (andContinue) { 
 
-                        swal.fire( 'Save', 
-                              'Return Details Saved', 
-                              'success'
-                        )
+              swal.fire( 'Save', 
+                    'Return Details Saved', 
+                    'success'
+              )
 
-                      } else { // route back to main dashboard
+            } else { // route back to main dashboard
 
-                        this.$router.push({name:"external-applications-dash",});
+              this.$router.push({name:"external-applications-dash",});
 
-                      }
-                    },(error)=>{
-                      self.is_saving = false
-                      self.disable_submit = false;
-                      self.disable_exit = false;
-                      self.disable_continue = false;
-                      self.spinner_exit = false;
-                      self.spinner_continue = false;
-                      console.log(error);
-                      swal.fire('Error',
-                           'There was an error saving your return details.<br/>' + error.body,
-                           'error'
-                      )
-                    });
+            }
+          },(error)=>{
+            self.is_saving = false
+            self.disable_submit = false;
+            self.disable_exit = false;
+            self.disable_continue = false;
+            self.spinner_exit = false;
+            self.spinner_continue = false;
+            console.log(error);
+            swal.fire('Error',
+                  'There was an error saving your return details.<br/>' + error.body,
+                  'error'
+            )
+          });
     },
     save_and_submit: async function(e) {
       const self = this;

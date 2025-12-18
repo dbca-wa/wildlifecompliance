@@ -120,7 +120,8 @@ export default {
       return this.spreadsheet != null ? this.spreadsheet.name: '';
     },
     isReadOnly: function() {
-      this.readonly = this.is_external && this.returns.is_draft ? false : true;
+      this.readonly =  this.returns.is_draft ? false : true;
+      //this.is_external &&
       return this.readonly;
     },
     refreshGrid: function() {

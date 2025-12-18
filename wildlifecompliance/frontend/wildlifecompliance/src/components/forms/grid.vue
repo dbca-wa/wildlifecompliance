@@ -88,7 +88,6 @@ const GridBlock = {
     },
   },
   mounted: function() {
-    console.log(this.readonly)
     if (this.field_data.length > 0) {
       for (const i in this.field_data[0]) {
         if (this.field_data[0][i].error === undefined) {
@@ -109,6 +108,7 @@ const GridBlock = {
         fieldObj[key] = {'value':'', 'error':''};
       };
       self.field_data.push(fieldObj);
+      console.log(self.field_data)
     },
     removeRow: function(row_num) {
       const self = this;
