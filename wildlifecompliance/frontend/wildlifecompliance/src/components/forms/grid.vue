@@ -108,7 +108,6 @@ const GridBlock = {
         fieldObj[key] = {'value':'', 'error':''};
       };
       self.field_data.push(fieldObj);
-      console.log(self.field_data)
     },
     removeRow: function(row_num) {
       const self = this;

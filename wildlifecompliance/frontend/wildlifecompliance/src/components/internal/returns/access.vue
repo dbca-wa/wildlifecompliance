@@ -62,8 +62,8 @@
                     <!-- Workflow Actions -->
                     <div v-show="showActionButtons" class="col-sm-12 top-buffer-s">
                         <strong>Action</strong><br/><br/>
-                        <button style="width:255px;" class="btn btn-primary btn-md" @click.prevent="acceptReturn()">Accept</button><br/><br/>
-                        <button style="width:255px;" class="btn btn-primary btn-md" @click.prevent="amendmentRequest()">Request Amendment</button>
+                        <button class="btn btn-primary btn-md" @click.prevent="acceptReturn()">Accept</button><br/><br/>
+                        <button class="btn btn-primary btn-md" @click.prevent="amendmentRequest()">Request Amendment</button>
                         <br/><br/>
                     </div>
 

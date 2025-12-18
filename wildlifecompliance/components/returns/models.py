@@ -1014,21 +1014,21 @@ reversion.register(
         'replaced_by',
         ]
     )
-reversion.register(
-    ReturnTable,
-    follow=[
-        'ret',
-        ]
-    )
-reversion.register(
-    ReturnRow,
-    follow=[
-        'return_table',
-        ]
-    )
-reversion.register(
-    ReturnInvoice,
-    follow=[
-        'invoice_return',
-        ]
-    )
+#reversion.register(
+#    ReturnTable,
+#    follow=[
+#        'ret',
+#        ]
+#    )
+#reversion.register(
+#    ReturnRow,
+#    follow=[
+#        'return_table',
+#        ]
+#    )
+#reversion.register(
+#    ReturnInvoice,
+#    follow=[
+#        'invoice_return',
+#        ]
+#    )
