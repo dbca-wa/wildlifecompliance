@@ -311,10 +311,11 @@ export default {
             await this.save_wo();
             this.form=document.forms.internal_returns_form;
 
-            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/accept'),{
-                            emulateJSON:true,
-
-            })
+            let request = fetch_util.fetchUrl(
+                helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/accept'),
+                {method:'POST'},
+                {emulateJSON:true}
+            )
             request.then((response)=>{
 
                 // Return to dashboard.
