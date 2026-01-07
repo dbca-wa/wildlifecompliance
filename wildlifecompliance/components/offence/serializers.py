@@ -182,9 +182,8 @@ class OffenceSerializer(serializers.ModelSerializer):
     related_items = serializers.SerializerMethodField()
     in_editable_status = serializers.SerializerMethodField()
     user_action = serializers.SerializerMethodField()
-    region_id = serializers.SerializerMethodField()
-    district_id = serializers.SerializerMethodField()
-
+    region_name = serializers.SerializerMethodField()
+    district_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Offence
@@ -197,6 +196,8 @@ class OffenceSerializer(serializers.ModelSerializer):
             'call_email', # TODO: should be call_email_id ?
             'region_id',
             'district_id',
+            'region_name',
+            'district_name',
             'assigned_to_id',
             'allocated_group',
             'allowed_groups',
@@ -319,12 +320,12 @@ class OffenceSerializer(serializers.ModelSerializer):
 
     def get_related_items(self, obj):
         return get_related_items(obj)
-    
-    def get_region_id(self, obj):
-        return obj.region_id
 
-    def get_district_id(self, obj):
-        return obj.district_id
+    def get_region_name(self,obj):
+        return obj.region.name if obj.region else ""
+    
+    def get_district_name(self,obj):
+        return obj.district.name if obj.district else ""
 
 class UpdateAllegedCommittedOffenceSerializer(serializers.ModelSerializer):
 

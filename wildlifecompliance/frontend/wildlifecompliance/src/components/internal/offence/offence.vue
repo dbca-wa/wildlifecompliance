@@ -106,6 +106,24 @@
                                             </div>
                                         </div>
                                     </div></div>
+                                    
+                                    <div class="col-sm-12 form-group"><div class="row">
+                                        <div class="col-sm-4">
+                                            <label class="control-label fw-bold float-start">Region</label>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" disabled v-model="offence.region_name"/>
+                                        </div>
+                                    </div></div>
+
+                                    <div class="col-sm-12 form-group"><div class="row">
+                                        <div class="col-sm-4">
+                                            <label class="control-label fw-bold float-start">District</label>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" disabled v-model="offence.district_name"/>
+                                        </div>
+                                    </div></div>
 
                                     <div class="col-sm-12 form-group"><div class="row">
                                         <label class="col-sm-3 fw-bold">Use occurrence from/to</label>

@@ -1,6 +1,7 @@
 <template lang="html">
     <div>
         <modal transition="modal fade" @ok="ok()" @cancel="cancel()" :title="modalTitle" large force>
+          <alert v-if="errorResponse" type="danger"><strong>{{errorResponse}}</strong></alert>
             <div class="container-fluid">
                 <ul class="nav nav-pills mb-3">
                     <li class="nav-item active"><a class="nav-link active" data-bs-toggle="tab" :href="'#'+oTab">Offence</a></li>
@@ -206,15 +207,6 @@
                 </div>
             </div>
             <div slot="footer">
-                <div v-if="errorResponse" class="form-group">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <strong>
-                                <span style="white-space: pre; color: red;" v-html="errorResponse"></span>
-                            </strong>
-                        </div>
-                    </div>
-                </div>
                 <!--<button type="button" v-if="processingDetails" disabled class="btn btn-default" @click="ok"><i class="fa fa-spinner fa-spin"></i> Adding</button>
                 <button type="button" v-else class="btn btn-default" @click="ok">Ok</button>
                 <button type="button" class="btn btn-default" @click="cancel">Cancel</button>-->
@@ -243,6 +235,8 @@ import { v4 as uuidv4 } from 'uuid';
 import FileField from '@common-components/compliance_file.vue';
 import { data } from "jquery";
 import SearchOffender from './search_offenders.vue'
+import alert from '@vue-utils/alert.vue'
+import { error } from 'jquery';
 
 export default {
   name: "Offence",
@@ -423,6 +417,7 @@ export default {
       SearchPersonOrganisation,
       FileField,
       SearchOffender,
+      alert,
   },
     props:{
       region_id: {
@@ -801,31 +796,32 @@ export default {
     },
     processError: async function(err) {
         let errorText = '';
-        if (err.body){
-            if (err.body.non_field_errors) {
-                // When non field errors raised
-                for (let i=0; i<err.body.non_field_errors.length; i++){
-                    errorText += err.body.non_field_errors[i] + '<br />';
-                }
-            } else if(Array.isArray(err.body)) {
-                // When general errors raised
-                for (let i=0; i<err.body.length; i++){
-                    errorText += err.body[i] + '<br />';
-                }
-            } else {
-                // When field errors raised
-                for (let field_name in err.body){
-                    if (err.body.hasOwnProperty(field_name)){
-                        errorText += field_name + ': ';
-                        for (let j=0; j<err.body[field_name].length; j++){
-                            errorText += err.body[field_name][j] + '<br />';
-                        }
-                    }
-                }
-            }
-        } else {
-            errorText += err.message;
+        if (err.message !== undefined) {
+          errorText += err.message;
+        } else if (err){
+          if (err.non_field_errors) {
+              // When non field errors raised
+              for (let i=0; i<err.non_field_errors.length; i++){
+                  errorText += err.non_field_errors[i] + ' ';
+              }
+          } else if(Array.isArray(err)) {
+              // When general errors raised
+              for (let i=0; i<err.length; i++){
+                  errorText += err[i] + ' ';
+              }
+          } else {
+              // When field errors raised
+              for (let field_name in err){
+                  if (err.hasOwnProperty(field_name)){
+                      errorText += field_name + ': ';
+                      for (let j=0; j<err[field_name].length; j++){
+                          errorText += err[field_name][j] + ' ';
+                      }
+                  }
+              }
+          } 
         }
+        console.log(errorText)
         this.errorResponse = errorText;
     },
     cancel: function() {
