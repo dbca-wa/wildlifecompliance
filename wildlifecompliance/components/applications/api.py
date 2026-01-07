@@ -1935,11 +1935,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 'missing': e.error_list},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        except ValidationError as e:
-            raise serializers.ValidationError(repr(e.error_dict))
         except Exception as e:
             print(traceback.print_exc())
-        raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError(str(e))
 
     @action(detail=True, methods=['get'])
     def select_filtered_species(self, request, *args, **kwargs):

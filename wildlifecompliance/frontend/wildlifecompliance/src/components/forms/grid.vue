@@ -88,7 +88,7 @@ const GridBlock = {
     },
   },
   mounted: function() {
-    if (this.field_data.length > 0) {
+    if (this.field_data && this.field_data.length > 0) {
       for (const i in this.field_data[0]) {
         if (this.field_data[0][i].error === undefined) {
           this.field_data[0][i].error = "";
@@ -111,7 +111,7 @@ const GridBlock = {
     },
     removeRow: function(row_num) {
       const self = this;
-      if (self.field_data.length > 1) {
+      if (this.field_data && self.field_data.length > 1) {
         self.field_data.splice(row_num,1);
       } else {
         let fieldObj = Object.assign({}, this.field_data[0]);

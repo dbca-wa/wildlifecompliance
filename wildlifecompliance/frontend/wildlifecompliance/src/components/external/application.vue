@@ -265,9 +265,9 @@ export default {
       this.missing_fields.length = 0;
       this.highlight_missing_fields();
 
-      let request = await this.saveFormData({ url: this.application_form_data_url, draft: true , submit: is_submitting});
-      console.log(request)
-      if (request.success) {
+      try {
+        let request = await this.saveFormData({ url: this.application_form_data_url, draft: true , submit: is_submitting});
+        if (request.success) {
         this.isProcessing = false;
         is_saved = true;
       } else {
@@ -287,6 +287,16 @@ export default {
             this.isProcessing = false;
         })
       };
+      } catch (error) {
+        console.error(error);
+        swal.fire(
+            'Error',
+            error.toString(),
+            'error'
+        ).then((result) => {
+            this.isProcessing = false;
+        })
+      }
       return is_saved
     },
     save: async function(e) {
