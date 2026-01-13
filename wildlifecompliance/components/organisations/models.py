@@ -918,7 +918,7 @@ class OrganisationRequest(SanitiseFileMixin):
             # Create contact person
 
             # Create contact person
-            org_contact = OrganisationContact.objects.get_or_create(
+            org_contact, _ = OrganisationContact.objects.get_or_create(
                 organisation=org,
                 email=self.requester.email,
             )
