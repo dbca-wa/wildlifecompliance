@@ -60,4 +60,4 @@ pytz~=2025.1
 phonenumbers~=9.0.1
 click~=8.1.8
 future~=1.0.0
-setuptools~=80.4.0
+setuptools==80.9.0
