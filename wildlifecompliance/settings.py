@@ -261,6 +261,7 @@ CACHES = {
 }
 CRON_CLASSES = [
     'wildlifecompliance.cron.OracleIntegrationCronJob',
+    'appmonitor_client.cron.CronJobAppMonitorClient',
 ]
 
 # Add a new formatter
