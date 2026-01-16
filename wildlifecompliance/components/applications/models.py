@@ -22,6 +22,7 @@ from django.utils import timezone
 from six import python_2_unicode_compatible
 from smart_selects.db_fields import ChainedForeignKey
 from ckeditor.fields import RichTextField
+from rest_framework import serializers
 
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
 from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
@@ -474,7 +475,12 @@ class Application(RevisionedMixin):
             self.property_cache[
                 'licence_category_name'] = self.licence_category_name
 
-        self.property_cache['payment_status'] = self.payment_status
+        try:
+            self.property_cache['payment_status'] = self.payment_status
+        except:
+            #we'll assume unpaid if the payment status error occurs
+            self.property_cache['payment_status'] = ApplicationInvoice.PAYMENT_STATUS_UNPAID
+            
         self.set_property_cache_total_paid_amount(self.get_total_paid_amount())
 
         _inv = self.latest_invoice
@@ -704,7 +710,8 @@ class Application(RevisionedMixin):
                 )
 
             except Invoice.DoesNotExist:
-                return ApplicationInvoice.PAYMENT_STATUS_UNPAID
+                #return ApplicationInvoice.PAYMENT_STATUS_UNPAID
+                raise Exception("Payment Status Error - please try again or request assistance.")
 
             return get_invoice_payment_status(latest_invoice.id)
 

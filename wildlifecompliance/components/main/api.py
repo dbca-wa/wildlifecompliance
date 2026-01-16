@@ -1479,7 +1479,7 @@ class AllocatedGroupMembers(views.APIView):
 
             if request.data.get('id_list'):
                 id_list = request.data.get('id_list')
-                members = EmailUser.objects.filter(id__in=ComplianceManagementSystemGroupPermission.objects.filter(group__id__in=id_list).values_list("emailuser",flat=True))
+                members = EmailUser.objects.filter(id__in=list(ComplianceManagementSystemGroupPermission.objects.filter(group__id__in=id_list).values_list("emailuser",flat=True)))
             else:
                 region_id = request.data.get('region_id')
                 district_id = request.data.get('district_id')

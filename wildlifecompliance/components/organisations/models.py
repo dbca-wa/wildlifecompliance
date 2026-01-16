@@ -917,18 +917,21 @@ class OrganisationRequest(SanitiseFileMixin):
                 role = OrganisationContact.ORG_CONTACT_ROLE_ADMIN
             # Create contact person
 
-            OrganisationContact.objects.get_or_create(
+            # Create contact person
+            org_contact, _ = OrganisationContact.objects.get_or_create(
                 organisation=org,
-                first_name=get_first_name(self.requester),
-                last_name=get_last_name(self.requester),
-                mobile_number=self.requester.mobile_number,
-                phone_number=self.requester.phone_number,
-                fax_number=self.requester.fax_number,
                 email=self.requester.email,
-                user_role=role,
-                user_status=OrganisationContact.ORG_CONTACT_STATUS_ACTIVE,
-                is_admin=True
             )
+
+            org_contact.first_name = get_first_name(self.requester)
+            org_contact.last_name = get_last_name(self.requester)
+            org_contact.mobile_number = self.requester.mobile_number
+            org_contact.phone_number = self.requester.phone_number
+            org_contact.fax_number = self.requester.fax_number
+            org_contact.user_role = role
+            org_contact.user_status = OrganisationContact.ORG_CONTACT_STATUS_ACTIVE
+            org_contact.is_admin = True
+            org_contact.save()
 
             # send email to requester
             send_organisation_request_accept_email_notification(self, org, request)
