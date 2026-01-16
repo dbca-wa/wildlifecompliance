@@ -475,7 +475,12 @@ class Application(RevisionedMixin):
             self.property_cache[
                 'licence_category_name'] = self.licence_category_name
 
-        self.property_cache['payment_status'] = self.payment_status
+        try:
+            self.property_cache['payment_status'] = self.payment_status
+        except:
+            #we'll assume unpaid if the payment status error occurs
+            self.property_cache['payment_status'] = ApplicationInvoice.PAYMENT_STATUS_UNPAID
+            
         self.set_property_cache_total_paid_amount(self.get_total_paid_amount())
 
         _inv = self.latest_invoice
