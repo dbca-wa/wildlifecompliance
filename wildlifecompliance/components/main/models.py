@@ -460,6 +460,7 @@ class WildlifeSystemPermission(models.Model):
     codename = models.CharField(_("codename"), max_length=100)
 
     class Meta:
+        app_label = 'wildlifecompliance'
         verbose_name = _("wildlife system permission")
         verbose_name_plural = _("wildlife system permissions")
         ordering = ["codename"]
@@ -477,6 +478,7 @@ class WildlifeSystemGroup(models.Model):
     )
 
     class Meta:
+        app_label = 'wildlifecompliance'
         verbose_name = _("wildlife system group")
         verbose_name_plural = _("wildlife system groups")
 
