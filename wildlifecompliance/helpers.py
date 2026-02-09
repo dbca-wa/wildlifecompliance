@@ -71,24 +71,9 @@ def belongs_to_list(user, group_names):
     groups = Group.objects.filter(name__in=group_names)
     return user.id in list(UsersInGroup.objects.filter(group_id__in=list(groups.values_list('id',flat=True))).values_list('emailuser_id', flat=True))
 
-#def is_model_backend(request):
-#    # Return True if user logged in via single sign-on (i.e. an internal)
-#    logger.debug(
-#        'helpers.is_model_backend(): {0}'.format(
-#            request.session.get('_auth_user_backend')
-#        ))
-#    return 'ModelBackend' in request.session.get('_auth_user_backend')
-
-
-#def is_email_auth_backend(request):
-#    # Return True if user logged in via social_auth (i.e. an external user
-#    # signing in with a login-token)
-#    return 'EmailAuth' in request.session.get('_auth_user_backend')
-
 
 def is_wildlifecompliance_admin(request):
     return request.user.is_authenticated and \
-           in_dbca_domain(request) and \
            (
                request.user.has_perm('wildlifecompliance.system_administrator') or
                request.user.is_superuser or
@@ -98,38 +83,15 @@ def is_wildlifecompliance_admin(request):
 
 
 def is_wildlifecompliance_payment_officer(request):
-    '''
-    Check user for request has payment officer permissions.
+    wildlife_compliance_user = request.user.has_perm('wildlifecompliance.system_administrator') or \
+               request.user.is_superuser
 
-    :return: boolean
-    '''
-    PAYMENTS_GROUP_NAME = 'Wildlife Compliance - Payment Officers'
-    
-    group = Group.objects.filter(name=PAYMENTS_GROUP_NAME)
-    if group.exists():
-        return request.user.id in list(UsersInGroup.objects.filter(group_id=group.first().id).values_list('emailuser_id', flat=True))
-    else:
-        return False
+    if request.user.is_authenticated and (
+            Group.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS).user_set.filter(id=request.user.id)
+        ):
+        wildlife_compliance_user = True
 
-def in_dbca_domain(request):
-    user = request.user
-    domain = user.email.split('@')[1]
-    if domain in settings.DEPT_DOMAINS:
-        if not user.is_staff:
-            # hack to reset department user to is_staff==True, if the user
-            # logged in externally (external departmentUser login defaults to
-            # is_staff=False)
-            user.is_staff = True
-            user.save()
-        return True
-    return False
-
-
-def is_departmentUser(request):
-    return request.user.is_authenticated and (
-            (settings.ALLOW_EMAIL_ADMINS and in_dbca_domain(request)) or
-            is_compliance_management_approved_external_user(request)
-            )
+    return wildlife_compliance_user
 
 
 def is_reception(request):
@@ -146,17 +108,23 @@ def is_reception(request):
 
     return request.user.is_authenticated and is_reception_email
 
-
 def is_customer(request):
-    #return request.user.is_authenticated and is_email_auth_backend(request)
-    return request.user.is_authenticated and not request.user.is_staff
+    return request.user.is_authenticated and not is_internal(request)
 
 
 def is_internal(request):
     if DEBUG and BASIC_AUTH:
         return True
     else:
-        return is_departmentUser(request)
+        return (
+            request.user.is_superuser or
+            is_wildlifecompliance_admin(request) or
+            is_compliance_internal_user(request) or
+            is_officer(request) or
+            is_wildlife_compliance_officer(request) or
+            is_wildlifecompliance_payment_officer(request)
+        )
+
 
 def is_officer(request):
     licence_officer_groups = [group.name for group in ActivityPermissionGroup.objects.filter(
@@ -203,17 +171,6 @@ def is_wildlife_compliance_officer(request):
 
     if request.user.is_authenticated and (
             Group.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).user_set.filter(id=request.user.id)
-        ):
-        wildlife_compliance_user = True
-
-    return wildlife_compliance_user
-
-def is_wildlife_compliance_payment_officer(request):
-    wildlife_compliance_user = request.user.has_perm('wildlifecompliance.system_administrator') or \
-               request.user.is_superuser
-
-    if request.user.is_authenticated and (
-            Group.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS).user_set.filter(id=request.user.id)
         ):
         wildlife_compliance_user = True
 

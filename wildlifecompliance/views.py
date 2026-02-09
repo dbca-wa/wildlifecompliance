@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 
 from datetime import datetime, timedelta
 
-from wildlifecompliance.helpers import is_internal, prefer_compliance_management, in_dbca_domain, \
+from wildlifecompliance.helpers import is_internal, prefer_compliance_management,\
     is_compliance_internal_user, is_wildlifecompliance_admin, is_compliance_management_callemail_readonly_user, belongs_to, \
     is_compliance_management_approved_external_user, is_customer, is_wildlife_compliance_officer
 from wildlifecompliance.forms import *
@@ -97,7 +97,6 @@ class WildlifeComplianceRoutingView(TemplateView):
             print('email: {}'.format(self.request.user.email))
             print("is_authenticated: True")
             print('is_superuser: {}'.format(self.request.user.is_superuser))
-            print('is_dbca_domain: {}'.format(in_dbca_domain(self.request)))
             print('is_compliance_internal_user: {}'.format(is_compliance_internal_user(self.request)))
             print('is_wildlifecompliance_admin: {}'.format(is_wildlifecompliance_admin(self.request)))
             print('prefer compliance management: {}'.format(prefer_compliance_management(self.request)))

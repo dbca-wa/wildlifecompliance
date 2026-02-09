@@ -306,6 +306,7 @@ class UserSerializer(serializers.ModelSerializer):
                 'user_id': obj.id}).data
         return serialized_orgs
     
+    #TODO we do not use this anymore - remove
     def get_acc_mgmt_url(self,obj):
         request = self.context.get('request')
         if settings.LEDGER_UI_URL and request and is_internal(request):

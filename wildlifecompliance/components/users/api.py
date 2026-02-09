@@ -740,7 +740,6 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
                 if user_serializer.is_valid:
                     saved_email_user = user_serializer.save()
                     email_user_refresh = EmailUser.objects.get(id=saved_email_user.id)
-                    #return_serializer = UserSerializer(instance=instance)
                     return_serializer = ComplianceManagementUserSerializer(instance=email_user_refresh)
                     
                     return Response(
