@@ -70,7 +70,6 @@ def create_wlc_user_group_memberships(wlc_ledger_group_id_map, ledger_user_group
         emailuser_id = membership.emailuser_id
         group_id = wlc_ledger_group_id_map[membership.group_id]
         WildlifeSystemGroupUser.objects.create(group_id=group_id,emailuser_id=emailuser_id)
-    print(WildlifeSystemGroupUser.objects.count())
 
 class Command(BaseCommand):
     help = 'Migrate Auth Group Membership, Groups, and Group Permissions from Ledger'
@@ -112,9 +111,6 @@ Are you sure you want to continue? (y/n): """
                 #then user membership
                 ledger_user_group_memberships = get_ledger_user_group_memberships(wlc_ledger_groups)
                 create_wlc_user_group_memberships(wlc_ledger_group_id_map, ledger_user_group_memberships)
-
-                #FOR TESTING
-                #raise RuntimeError("force rollback")
 
                 logger.info('Command {} finished'.format(__name__))
 
