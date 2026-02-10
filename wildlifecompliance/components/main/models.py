@@ -466,7 +466,7 @@ class WildlifeSystemPermission(models.Model):
         ordering = ["codename"]
 
     def __str__(self):
-        return "%s | %s" % (self.name)
+        return self.name
     
 
 class WildlifeSystemGroup(models.Model):
