@@ -104,12 +104,6 @@
                                             </div></div>
                                         </div>
                                         </div>
-                                        <!-- <div class="form-group">
-                                        <div class="col-sm-12">
-                                            <button v-if="!updatingAddress" class="float-end btn btn-primary" @click.prevent="updateAddress()">Update</button>
-                                            <button v-else disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
-                                        </div>
-                                        </div>  -->
                                     </form>
                                 </div>
                             </FormSection>
@@ -146,12 +140,6 @@
                                                 <input :readonly="!isEditable" type="email" class="form-control" name="email" placeholder="" v-model="call_email.email_user.email" v-bind:key="call_email.email_user.id"> </div>
                                             </div>
                                         </div>
-                                        <!-- <div class="form-group">
-                                        <div class="col-sm-12">
-                                            <button v-if="!updatingContact" class="float-end btn btn-primary" @click.prevent="updateContact()">Update</button>
-                                            <button v-else disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
-                                        </div>
-                                        </div> -->
                                     </form>
                                 </div>
                             </FormSection>
@@ -307,62 +295,6 @@ export default {
             let vm = this;
             vm.setEmailUserEmpty();
             vm.$refs.person_search.clearInput();
-        },
-        updateContact: function() {
-            let vm = this;
-            vm.updatingContact = true;
-            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,(vm.call_email.email_user.id+'/update_contact')), {method:'POST', body:JSON.stringify(vm.call_email.email_user)},{
-                emulateJSON:true
-            })
-            request.then((response) => {
-                vm.updatingContact = false;
-                // vm.user = response;
-                if (vm.call_email.email_user.residential_address == null){ vm.call_email.email_user.residential_address = {}; }
-                swal.fire({
-                    title: 'Update Contact Details',
-                    html: 'User contact details has been successfully updated.',
-                    type: 'success',
-                })
-            }, (error) => {
-                vm.updatingContact = false;
-                let error_msg = '<br/>';
-                for (var key in error.body) {
-                    error_msg += key + ': ' + error.body[key] + '<br/>';
-                }
-                swal.fire({
-                    title: 'Update Contact Details',
-                    html: 'There was an error updating the user contact details.<br/>' + error_msg,
-                    type: 'error'
-                })
-            });
-        },
-        updateAddress: function() {
-            let vm = this;
-            vm.updatingAddress = true;
-            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,(vm.call_email.email_user.id+'/update_address')), {method:'POST', body:JSON.stringify(vm.call_email.email_user.residential_address)},{
-                emulateJSON:true
-            })
-            request.then((response) => {
-                vm.updatingAddress = false;
-                vm.call_email.email_user = response;
-                if (vm.call_email.email_user.residential_address == null){ vm.call_email.email_user.residential_address = {}; }
-                swal.fire({
-                    title: 'Update Address Details',
-                    html: 'User address details has been successfully updated.',
-                    type: 'success',
-                })
-            }, (error) => {
-                vm.updatingAddress = false;
-                let error_msg = '<br/>';
-                for (var key in error.body) {
-                    error_msg += key + ': ' + error.body[key] + '<br/>';
-                }
-                swal.fire({
-                    title: 'Update Address Details',
-                    html: 'There was an error updating the user address details.<br/>' + error_msg,
-                    type: 'error'
-                })
-            });
         },
         loadCountries: function(){
             let vm = this;

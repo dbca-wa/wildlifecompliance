@@ -122,12 +122,6 @@
                                                 </select>
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <div class="col-sm-12">
-                                                <button v-if="!updatingAddress" class="float-end btn btn-primary" @click.prevent="updateAddress()">Update</button>
-                                                <button v-else disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
-                                            </div>
-                                          </div>
                                        </form>
                                   </div>
                                 </FormSection>
@@ -159,12 +153,6 @@
                                                 <input type="email" class="form-control" disabled="disabled" name="email" placeholder="" v-model="user.email">
                                             </div>
                                           </div>
-                                          <div class="form-group">
-                                            <div class="col-sm-12">
-                                                <button v-if="!updatingContact" class="float-end btn btn-primary" @click.prevent="updateContact()">Update</button>
-                                                <button v-else disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
-                                            </div>
-                                          </div>
                                        </form>
                                   </div>
                                 </FormSection>
@@ -187,7 +175,6 @@
                                             <div class="col-sm-3">
                                                 <input type="text" disabled class="form-control" name="organisation" v-model="org.abn" placeholder="">
                                             </div>
-                                            <a style="cursor:pointer;text-decoration:none;" @click.prevent="unlinkUser(org)"><i class="fa fa-chain-broken fa-2x" ></i>&nbsp;Unlink</a>
                                           </div>
                                       </div>
                                       <div v-for="orgReq in orgRequest_pending" v-bind:key="orgReq.id">
@@ -238,9 +225,6 @@
                     </div>
                 </div>
             </div>
-        <!-- </div> -->
-        <!-- </div> -->
-        <!-- </div> -->
     </div>
 </template>
 
@@ -286,7 +270,6 @@ export default {
             DATE_TIME_FORMAT: 'DD/MM/YYYY HH:mm:ss',
             activate_tables: false,
             comms_url: helpers.add_endpoint_json(api_endpoints.users,vm.$route.params.user_id+'/comms_log'),
-            //logs_url: helpers.add_endpoint_json(api_endpoints.users,vm.$route.params.user_id+'/action_log'),
             applications_url: api_endpoints.applications_paginated+'internal_datatable_list?format=datatables&user_id='+vm.$route.params.user_id,
             licences_url: api_endpoints.licences_paginated+'internal_datatable_list?format=datatables&user_id='+vm.$route.params.user_id,
             returns_url: api_endpoints.returns_paginated+'user_datatable_list?format=datatables&user_id='+vm.$route.params.user_id,
@@ -332,7 +315,6 @@ export default {
                 vm.user = data[1];
                 vm.user.residential_address = vm.user.residential_address != null ? vm.user.residential_address : {};
                 vm.orgRequest_pending = data[2];
-                //vm.uploadedID = vm.user.identification;
                 vm.uploadedID = vm.user.identification2;
             });
         });
@@ -349,11 +331,6 @@ export default {
         });
     },
     methods: {
-        /*set_tabs:function(){
-            let vm = this;
-            $('#pills-tab a[href="#pills-details"]').tab('show');
-        },*/
-
         eventListeners: function(){
             let vm = this;
             // Fix the table responsiveness when tab is shown
@@ -362,159 +339,6 @@ export default {
                 vm.$refs.licences_table.$refs.licence_datatable.vmDataTable.columns.adjust().responsive.recalc();
                 vm.$refs.returns_table.$refs.return_datatable.vmDataTable.columns.adjust().responsive.recalc();
             });
-        },
-        updateContact: function() {
-            let vm = this;
-            vm.updatingContact = true;
-            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/update_contact')), {method:'POST', body:JSON.stringify(vm.user)},{
-                emulateJSON:true
-            })
-            request.then((response) => {
-                vm.updatingContact = false;
-                vm.user = response;
-                if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
-                swal.fire({
-                    title: 'Update Contact Details',
-                    html: 'User contact details has been successfully updated.',
-                    type: 'success',
-                })
-            }, (error) => {
-                vm.updatingContact = false;
-                let error_msg = '<br/>';
-                for (var key in error.body) {
-                    error_msg += key + ': ' + error.body[key] + '<br/>';
-                }
-                swal.fire({
-                    title: 'Update Contact Details',
-                    html: 'There was an error updating the user contact details.<br/>' + error_msg,
-                    type: 'error'
-                })
-            });
-        },
-        updateAddress: function() {
-            let vm = this;
-            vm.updatingAddress = true;
-            let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/update_address')), {method:'POST', body:JSON.stringify(vm.user.residential_address)},{
-                emulateJSON:true
-            })
-            request.then((response) => {
-                vm.updatingAddress = false;
-                vm.user = response;
-                if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
-                swal.fire({
-                    title: 'Update Address Details',
-                    html: 'User address details has been successfully updated.',
-                    type: 'success',
-                })
-            }, (error) => {
-                vm.updatingAddress = false;
-                let error_msg = '<br/>';
-                for (var key in error.body) {
-                    error_msg += key + ': ' + error.body[key] + '<br/>';
-                }
-                swal.fire({
-                    title: 'Update Address Details',
-                    html: 'There was an error updating the user address details.<br/>' + error_msg,
-                    type: 'error'
-                })
-            });
-        },
-        unlinkUser: function(org){
-            let vm = this;
-            let org_name = org.name;
-            swal.fire({
-                title: "Unlink From Organisation",
-                text: "Are you sure you want to unlink this user from "+org.name+" ?",
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonText: 'Accept'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.organisations,org.id+'/unlink_user'), {method:'POST', body:JSON.stringify(vm.user)},{
-                        emulateJSON:true
-                    })
-                    request.then((response) => {
-                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,vm.user.id)).then((response) => {
-                            vm.user = response
-                            if (vm.user.residential_address == null){ vm.user.residential_address = {}; }
-                            if (vm.user.wildlifecompliance_organisations && vm.user.wildlifecompliance_organisations.length > 0){
-                              vm.managesOrg = 'Yes'
-                            }
-                            swal.fire(
-                                'Unlink',
-                                'The user has been successfully unlinked from '+org_name+'.',
-                                'success'
-                            )
-                        }).catch((error) => {
-                            console.log(error)
-                        })
-                    }).catch((error) => {
-                        swal.fire(
-                            'Unlink',
-                            'There was an error unlinking the user from '+org_name+'.',
-                            'error'
-                        )
-                    });
-                }
-            }).catch((error) => {
-                console.log(error)
-            });
-        },
-        readFileID: async function() {
-            let vm = this;
-            let _file = null;
-            var input = $(vm.$refs.uploadedID)[0];
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.readAsDataURL(input.files[0]);
-                reader.onload = function(e) {
-                    _file = e.target.result;
-                };
-                _file = input.files[0];
-            }
-            vm.uploadedID = _file;
-            await vm.uploadID();
-        },
-        removeID: async function() {
-            this.uploadedID = null;
-        },
-        uploadID: async function() {
-            let vm = this;
-            vm.uploadingID = true;
-            let data = new FormData();
-            //data.append('identification', vm.uploadedID);
-            data.append('identification2', vm.uploadedID);
-            if (vm.uploadedID == null){
-                vm.uploadingID = false;
-                swal.fire({
-                        title: 'Upload ID',
-                        html: 'Please select a file to upload.',
-                        type: 'error'
-                });
-            } else {
-                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.users,(vm.user.id+'/upload_id')),{method:'POST', body:JSON.stringify(data)},{
-                    emulateJSON:true
-                })
-                request.then((response) => {
-                    vm.uploadingID = false;
-                    vm.uploadedID = null;
-                    vm.uploadedID = response.identification2;
-                    vm.user.identification2 = response.identification2;
-                }, (error) => {
-                    console.log(error);
-                    vm.uploadingID = false;
-                    vm.uploadedID = null;
-                    let error_msg = '<br/>';
-                    for (var key in error.body) {
-                        error_msg += key + ': ' + error.body[key] + '<br/>';
-                    }
-                    swal.fire({
-                        title: 'Upload ID',
-                        html: 'There was an error uploading your ID.<br/>' + error_msg,
-                        type: 'error'
-                    });
-                });
-            }
         },
     },
     mounted: function(){

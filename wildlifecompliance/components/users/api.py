@@ -31,9 +31,7 @@ from wildlifecompliance.helpers import (
 from wildlifecompliance.components.users.serializers import (
     UserSerializer,
     DTUserSerializer,
-    UserAddressSerializer,
     PersonalSerializer,
-    ContactSerializer,
     EmailIdentitySerializer,
     MyUserDetailsSerializer,
     ComplianceUserDetailsSerializer,
@@ -41,7 +39,6 @@ from wildlifecompliance.components.users.serializers import (
     ComplianceManagementSaveUserSerializer,
     ComplianceManagementUserSerializer,
     ComplianceManagementSaveUserAddressSerializer,
-    FirstTimeUserSerializer,
 )
 from wildlifecompliance.components.organisations.serializers import OrganisationRequestDTSerializer
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
@@ -284,204 +281,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
-
-    @action(detail=True, methods=['POST', ])
-    def update_contact(self, request, *args, **kwargs):
-        try:
-            with transaction.atomic():
-                instance = self.get_object()
-                serializer = ContactSerializer(instance, data=request.data)
-                serializer.is_valid(raise_exception=True)
-                instance = serializer.save()
-                instance.log_user_action(
-                    EmailUserAction.ACTION_CONTACT_DETAILS_UPDATE.format(
-                        '{} {} ({})'.format(
-                            get_first_name(instance),
-                            get_last_name(instance),
-                            instance.email)),
-                    request)
-
-            serializer = FirstTimeUserSerializer(
-                instance, context={'request': request}
-            )
-
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
-
-    # @action(detail=True, methods=['POST', ])
-    # def update_address(self, request, *args, **kwargs):
-    #     try:
-    #         instance = self.get_object()
-    #         serializer = UserAddressSerializer(data=request.data)
-    #         serializer.is_valid(raise_exception=True)
-    #         address, created = Address.objects.get_or_create(
-    #             # line1=serializer.validated_data['line1'],
-    #             locality=serializer.validated_data['locality'],
-    #             state=serializer.validated_data['state'],
-    #             country=serializer.validated_data['country'],
-    #             postcode=serializer.validated_data['postcode'],
-    #             user=instance
-    #         )
-    #         address.line1 = serializer.validated_data['line1']
-    #         instance.residential_address = address
-    #         with transaction.atomic():
-    #             address.save()
-    #             instance.save()
-    #             instance.log_user_action(
-    #                 EmailUserAction.ACTION_POSTAL_ADDRESS_UPDATE.format(
-    #                     '{} {} ({})'.format(
-    #                         instance.first_name,
-    #                         instance.last_name,
-    #                         instance.email)),
-    #                 request)
-    #         serializer = FirstTimeUserSerializer(
-    #             instance, context={'request': request}
-    #         )
-    #         return Response(serializer.data)
-    #     except serializers.ValidationError:
-    #         print(traceback.print_exc())
-    #         raise
-    #     except ValidationError as e:
-    #         print(traceback.print_exc())
-    #         raise serializers.ValidationError(repr(e.error_dict))
-    #     except Exception as e:
-    #         print(traceback.print_exc())
-    #         raise serializers.ValidationError(str(e))
-
-    @action(detail=True, methods=['POST', ])
-    def update_address(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            serializer = UserAddressSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            if instance.residential_address:
-                address = Address.objects.filter(id=instance.residential_address.id)
-                total_addresses=address.count()
-                if total_addresses > 0:
-                    residential_address = Address.objects.get(id=address[0].id) 
-                    residential_address.locality=serializer.validated_data['locality']
-                    residential_address.state=serializer.validated_data['state']
-                    residential_address.country=serializer.validated_data['country']
-                    residential_address.postcode=serializer.validated_data['postcode']
-                    residential_address.line1=serializer.validated_data['line1']
-                    residential_address.save()
-                    instance.residential_address= residential_address
-            else:
-                address=Address.objects.create(
-                    line1=serializer.validated_data['line1'],
-                    locality=serializer.validated_data['locality'],
-                    state=serializer.validated_data['state'],
-                    country=serializer.validated_data['country'],
-                    postcode=serializer.validated_data['postcode'],
-                    user=instance
-                )
-                address.save()
-                instance.residential_address = address
-                instance.save()
-            with transaction.atomic():
-                # address.save()
-                instance.save()
-                instance.log_user_action(
-                    EmailUserAction.ACTION_POSTAL_ADDRESS_UPDATE.format(
-                        '{} {} ({})'.format(
-                            get_first_name(instance),
-                            get_last_name(instance),
-                            instance.email)),
-                    request)
-            serializer = FirstTimeUserSerializer(
-                instance, context={'request': request}
-            )
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
-
-    @action(detail=True, methods=['POST', ])
-    def upload_id(self, request, *args, **kwargs):
-        from wildlifecompliance.management.securebase_manager import (
-            SecureBaseUtils
-        )
-        try:
-            instance = self.get_object()
-            SecureBaseUtils.timestamp_id_request(request)
-            instance.upload_identification2(request)
-            with transaction.atomic():
-                private_doc = instance.identification2
-                private_doc.file_group = 1
-                private_doc.name = pathlib.Path(request.data.dict()['identification2'].name).name
-                private_doc.extension = pathlib.Path(
-                    request.data.dict()['identification2'].name
-                    ).suffix if (len(
-                        pathlib.Path(
-                            request.data.dict()['identification2'].name
-                        ).suffix) <= PrivateDocument._meta.get_field('extension').max_length
-                    ) else ""
-                private_doc.save()
-                instance.save()
-                instance.log_user_action(
-                    EmailUserAction.ACTION_ID_UPDATE.format(
-                        '{} {} ({})'.format(
-                            get_first_name(instance),
-                            get_last_name(instance),
-                            instance.email)),
-                    request)
-                # For any of the submitter's applications that have requested ID update,
-                # email the assigned officer
-                applications = instance.wildlifecompliance_applications.filter(
-                    submitter=instance,
-                    id_check_status=Application.ID_CHECK_STATUS_AWAITING_UPDATE,
-                    org_applicant=None,
-                    proxy_applicant=None
-                ).exclude(customer_status__in=(
-                    Application.CUSTOMER_STATUS_ACCEPTED,
-                    Application.CUSTOMER_STATUS_DECLINED)
-                ).order_by('id')
-
-                if applications:
-
-                    officers = applications[0].licence_officers
-                    if applications[0].is_assigned:
-                        officers = [applications[0].assigned_officer]
-
-                    send_id_updated_notification(
-                        instance, applications, officers, request
-                    )
-
-                # assigned_officers = [application.assigned_officer.email
-                #                      for application
-                #                      in applications
-                #                      if application.assigned_officer]
-                # remove duplicate email addresses from assigned_officers list
-                # assigned_officers = list(dict.fromkeys(assigned_officers))
-                # if len(assigned_officers) > 0:
-                #     send_id_updated_notification(instance, applications, assigned_officers, request)
-            serializer = UserSerializer(instance, partial=True)
-            return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))

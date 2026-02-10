@@ -7,10 +7,8 @@ from rest_framework import serializers
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
 from wildlifecompliance import settings
 from wildlifecompliance.components.applications.models import ActivityPermissionGroup
-from wildlifecompliance.components.users.models import (
-        #CompliancePermissionGroup, 
-        ComplianceManagementUserPreferences,
-        )
+from wildlifecompliance.components.users.models import ComplianceManagementUserPreferences
+
 from confy import env
 from django.db.models import Q
 
@@ -18,7 +16,6 @@ DEBUG = env('DEBUG', False)
 BASIC_AUTH = env('BASIC_AUTH', False)
 
 logger = logging.getLogger(__name__)
-# logger = logging
 
 def is_new_to_wildlifelicensing(request=None):
     '''
@@ -38,7 +35,6 @@ def is_new_to_wildlifelicensing(request=None):
                     request.user.phone_number or request.user.mobile_number
                 )
                 and (prefer_compliance_management(request)))) else False 
-        #and (#request.user.identification2 or TODO
 
     if not SecureBaseUtils.is_wildlifelicensing_request(request):
         has_user_details = True

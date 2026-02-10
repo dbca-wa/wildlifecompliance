@@ -314,72 +314,6 @@ class UserSerializer(serializers.ModelSerializer):
         return ''
 
 
-class FirstTimeUserSerializer(UserSerializer):
-    '''
-    Specialised UserSerializer with flag for minimal details provided check for 
-    first-time user.
-    '''
-    has_complete_first_time = serializers.SerializerMethodField(read_only=True)
-    prefer_compliance_management = serializers.SerializerMethodField(read_only=True)
-    is_compliance_management_approved_external_user = serializers.SerializerMethodField(read_only=True)
-    sso_setting_url = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = EmailUser
-        fields = (
-            'title',
-            'id',
-            'last_name',
-            'first_name',
-            'dob',
-            'legal_last_name',
-            'legal_first_name',
-            'legal_dob',
-            'email',
-            'identification',
-            'residential_address',
-            'phone_number',
-            'mobile_number',
-            'fax_number',
-            'character_flagged',
-            'character_comments',
-            'wildlifecompliance_organisations',
-            'personal_details',
-            'address_details',
-            'contact_details',
-            'has_complete_first_time',
-            'prefer_compliance_management',
-            'is_compliance_management_approved_external_user',
-            'sso_setting_url',
-        )
-
-    def get_has_complete_first_time(self, obj):
-        '''
-        Verify request user has completed adding reqired details for first time
-        usage.
-        '''
-        is_completed = False
-
-        request = self.context.get('request')
-
-        if is_internal(request):
-            is_completed = True
-        else:
-            is_completed = not is_new_to_wildlifelicensing(request)
-
-        return is_completed
-
-    def get_prefer_compliance_management(self, obj):
-        if ComplianceManagementUserPreferences.objects.filter(email_user_id=obj.id):
-            return obj.compliancemanagementuserpreferences.prefer_compliance_management
-        return False
-
-    def get_is_compliance_management_approved_external_user(self, obj):
-        return is_compliance_management_approved_external_user(self.context.get('request'))
-
-    def get_sso_setting_url(self, obj):
-        return settings.SSO_SETTING_URL
-
 class DTUserSerializer(serializers.ModelSerializer):
 
     dob = serializers.SerializerMethodField(read_only=True)
@@ -425,8 +359,6 @@ class MyUserDetailsSerializer(serializers.ModelSerializer):
     address_details = serializers.SerializerMethodField()
     contact_details = serializers.SerializerMethodField()
     wildlifecompliance_organisations = serializers.SerializerMethodField()
-    #identification = IdentificationSerializer()
-    #identification2 = Identification2Serializer()
     is_customer = serializers.SerializerMethodField()
     is_internal = serializers.SerializerMethodField()
     prefer_compliance_management = serializers.SerializerMethodField()
