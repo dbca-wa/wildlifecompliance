@@ -30,6 +30,8 @@ from wildlifecompliance.components.licences.models import (
     LicenceCategory,
     LicencePurpose,
 )
+from wildlifecompliance.components.main.models import WildlifeSystemPermission, WildlifeSystemGroup, WildlifeSystemGroupUser
+
 from wildlifecompliance.components.main.serializers import (
     CommunicationLogEntrySerializer
 )
@@ -1428,7 +1430,7 @@ class DTInternalApplicationSerializer(BaseApplicationSerializer):
     def get_user_in_officers(self, obj):
         groups = obj.get_permission_groups(['licensing_officer','issuing_officer']).values_list('id', flat=True)
         can_process = EmailUser.objects.filter(
-            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
+            id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
         ).distinct()
         if self.context['request'].user and self.context['request'].user in can_process:
             return True

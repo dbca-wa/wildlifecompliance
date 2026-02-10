@@ -28,7 +28,7 @@ def create_wlc_permissions(wlc_ledger_permissions):
         name = permission.name
         ledger_id = permission.id
 
-        new_permission = WildlifeSystemPermission.objects.create(name=name,codename=codename)
+        new_permission = WildlifeSystemPermission.objects.create(id=ledger_id,name=name,codename=codename)
         new_id = new_permission.id
 
         wlc_ledger_permissions_id_map[ledger_id] = new_id
@@ -37,7 +37,7 @@ def create_wlc_permissions(wlc_ledger_permissions):
 
 def get_wlc_ledger_groups():
     logger.info("Getting all wildlifecompliance groups from ledger")
-    return Group.objects.filter(name__icontains="wildlife compliance")
+    return Group.objects.all()
 
 def create_wlc_groups(wlc_ledger_permissions_id_map, wlc_ledger_groups):
     logger.info("Creating wildlifecompliance groups")
@@ -51,7 +51,7 @@ def create_wlc_groups(wlc_ledger_permissions_id_map, wlc_ledger_groups):
         ledger_permission_ids = list(group.permissions.values_list('id', flat=True))
         wlc_permission_ids = list(map(lambda id: wlc_ledger_permissions_id_map[id], ledger_permission_ids))
         
-        new_group = WildlifeSystemGroup.objects.create(name=name)
+        new_group = WildlifeSystemGroup.objects.create(id=ledger_id,name=name)
         new_group.permissions.add(*wlc_permission_ids)
         new_id = new_group.id
 

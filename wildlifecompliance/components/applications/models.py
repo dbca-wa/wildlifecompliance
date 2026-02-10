@@ -143,7 +143,17 @@ def get_temporary_document_collection(collection_id):
     return temp_doc_collection
 
 
-class ActivityPermissionGroup(Group):
+class ActivityPermissionGroup(WildlifeSystemGroup):
+
+    group_ptr = models.OneToOneField(
+        WildlifeSystemGroup,
+        on_delete=models.CASCADE,
+        parent_link=True,
+        primary_key=True,
+        db_column='group_ptr_id',
+        related_name='+',
+    )
+
     licence_activities = models.ManyToManyField(
         'wildlifecompliance.LicenceActivity',
         blank=True)
@@ -155,10 +165,6 @@ class ActivityPermissionGroup(Group):
 
     def __str__(self):
         return self.name
-        #return '{} ({} members)'.format(
-        #    self.name,
-        #    EmailUser.objects.filter(groups__name=self.name).count()
-        #)
 
     @property
     def display_name(self):
