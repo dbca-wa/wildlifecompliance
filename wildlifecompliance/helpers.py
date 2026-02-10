@@ -9,6 +9,8 @@ from wildlifecompliance import settings
 from wildlifecompliance.components.applications.models import ActivityPermissionGroup
 from wildlifecompliance.components.users.models import ComplianceManagementUserPreferences
 
+from wildlifecompliance.components.main.models import WildlifeSystemPermission, WildlifeSystemGroup, WildlifeSystemGroupUser
+
 from confy import env
 from django.db.models import Q
 
@@ -25,9 +27,9 @@ def belongs_to(user, group_name):
     :param group_name:
     :return:
     """
-    group = Group.objects.filter(name=group_name)
+    group = WildlifeSystemGroup.objects.filter(name=group_name)
     if group.exists():
-        return user.id in list(UsersInGroup.objects.filter(group_id=group.first().id).values_list('emailuser_id', flat=True))
+        return user.id in list(WildlifeSystemGroupUser.objects.filter(group_id=group.first().id).values_list('emailuser_id', flat=True))
     else:
         return False
 
