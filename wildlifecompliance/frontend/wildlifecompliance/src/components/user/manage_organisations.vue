@@ -634,15 +634,10 @@ export default {
     beforeRouteEnter: function(to,from,next){
         let request = fetch_util.fetchUrl(api_endpoints.my_user_details)
         request.then((response) => {
-            if (to.name == 'first-time' && response.address_details && response.personal_details && response.contact_details && response.has_complete_first_time){
-                window.location.href='/';
-            }
-            else{
-                next(vm => {
-                    vm.current_user = response
-                    if (vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0) { vm.managesOrg = 'Yes' }
-                });
-            }
+            next(vm => {
+                vm.current_user = response
+                if (vm.current_user.wildlifecompliance_organisations && vm.current_user.wildlifecompliance_organisations.length > 0) { vm.managesOrg = 'Yes' }
+            });            
         }).catch((error) => {
             console.log(error);
         });

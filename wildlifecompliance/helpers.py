@@ -17,31 +17,6 @@ BASIC_AUTH = env('BASIC_AUTH', False)
 
 logger = logging.getLogger(__name__)
 
-def is_new_to_wildlifelicensing(request=None):
-    '''
-    Verify request user holds minimum details to use Wildlife Licensing.
-    '''
-    from wildlifecompliance.management.securebase_manager import (
-        SecureBaseUtils
-    )
-
-    has_user_details = True if ((not request.user.first_name) or 
-                (not request.user.last_name) or 
-                (not request.user.legal_first_name) or
-                (not request.user.legal_last_name) or
-                (not request.user.dob ) or 
-                (not request.user.residential_address) or 
-                (not (
-                    request.user.phone_number or request.user.mobile_number
-                )
-                and (prefer_compliance_management(request)))) else False 
-
-    if not SecureBaseUtils.is_wildlifelicensing_request(request):
-        has_user_details = True
-
-    if is_internal(request):
-        has_user_details = True
-    return not has_user_details
 
 def belongs_to(user, group_name):
     """
@@ -152,10 +127,6 @@ def prefer_compliance_management(request):
 
     if request.user.is_authenticated:
         preference = ComplianceManagementUserPreferences.objects.get(email_user=request.user)
-        #if preference.prefer_compliance_management and (
-        #        is_compliance_management_readonly_user(request) or is_compliance_management_callemail_readonly_user(request)
-        #        ):
-        #if preference.prefer_compliance_management or is_compliance_management_callemail_readonly_user(request):
         if preference.prefer_compliance_management:
             ret_value = True
 
