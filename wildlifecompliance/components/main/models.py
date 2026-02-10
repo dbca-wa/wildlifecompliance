@@ -493,6 +493,9 @@ class WildlifeSystemGroupUser(models.Model):
 
     def __str__(self):
         return str(self.group)
+    
+    class Meta:
+        app_label = 'wildlifecompliance'
 
 
 class ComplianceManagementSystemGroup(models.Model):

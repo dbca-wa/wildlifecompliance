@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from django.contrib.auth.models import Permission, Group
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
+from ledger_api_client.ledger_models import UsersInGroup
 from wildlifecompliance.components.main.models import WildlifeSystemPermission, WildlifeSystemGroup, WildlifeSystemGroupUser
 
 def get_wlc_ledger_permissions(wlc_ledger_groups):
@@ -53,20 +53,24 @@ def create_wlc_groups(wlc_ledger_permissions_id_map, wlc_ledger_groups):
         
         new_group = WildlifeSystemGroup.objects.create(name=name)
         new_group.permissions.add(*wlc_permission_ids)
-        print(name,new_group.permissions.all())
         new_id = new_group.id
 
         wlc_ledger_group_id_map[ledger_id] = new_id
 
-    print(wlc_ledger_group_id_map)
     return wlc_ledger_group_id_map
 
-def get_ledger_user_group_memberships():
+def get_ledger_user_group_memberships(wlc_ledger_groups):
     logger.info("Getting all user group memberships from ledger")
-    return UsersInGroup.objects.all()
+    return UsersInGroup.objects.filter(group_id__in=wlc_ledger_groups.values_list('id',flat=True))
 
 def create_wlc_user_group_memberships(wlc_ledger_group_id_map, ledger_user_group_memberships):
-    pass
+    logger.info("Creating user group memberships")
+
+    for membership in ledger_user_group_memberships:
+        emailuser_id = membership.emailuser_id
+        group_id = wlc_ledger_group_id_map[membership.group_id]
+        WildlifeSystemGroupUser.objects.create(group_id=group_id,emailuser_id=emailuser_id)
+    print(WildlifeSystemGroupUser.objects.count())
 
 class Command(BaseCommand):
     help = 'Migrate Auth Group Membership, Groups, and Group Permissions from Ledger'
@@ -105,12 +109,12 @@ Are you sure you want to continue? (y/n): """
                 wlc_ledger_permissions_id_map = create_wlc_permissions(wlc_ledger_permissions)
                 wlc_ledger_group_id_map = create_wlc_groups(wlc_ledger_permissions_id_map, wlc_ledger_groups)
 
+                #then user membership
+                ledger_user_group_memberships = get_ledger_user_group_memberships(wlc_ledger_groups)
+                create_wlc_user_group_memberships(wlc_ledger_group_id_map, ledger_user_group_memberships)
+
                 #FOR TESTING
                 #raise RuntimeError("force rollback")
-
-                #then user membership
-                ledger_user_group_memberships = get_ledger_user_group_memberships()
-                create_wlc_user_group_memberships(wlc_ledger_group_id_map, ledger_user_group_memberships)
 
                 logger.info('Command {} finished'.format(__name__))
 
