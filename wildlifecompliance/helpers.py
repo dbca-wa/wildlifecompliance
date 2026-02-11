@@ -68,13 +68,15 @@ def is_wildlifecompliance_admin(request):
 
 
 def is_wildlifecompliance_payment_officer(request):
-    wildlife_compliance_user = user_has_perm(request.user, 'wildlifecompliance.system_administrator') or \
-               request.user.is_superuser
+    wildlife_compliance_user = user_has_perm(request.user, 'wildlifecompliance.system_administrator') or request.user.is_superuser
 
-    if request.user.is_authenticated and (
-            WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS).wildlifesystemgroupuser_set.filter(emailuser_id=request.user.id)
-        ):
-        wildlife_compliance_user = True
+    try:
+        if request.user.is_authenticated and (
+                WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS).wildlifesystemgroupuser_set.filter(emailuser_id=request.user.id)
+            ):
+            wildlife_compliance_user = True
+    except:
+        logging.error(f"{settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS} does not exist in WildlifeSystemGroup. Payment officers cannot be authorised until group added to WildlifeSystemGroup or settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS corrected.")
 
     return wildlife_compliance_user
 
@@ -147,13 +149,15 @@ def prefer_compliance_management(request):
     return ret_value
 
 def is_wildlife_compliance_officer(request):
-    wildlife_compliance_user = user_has_perm(request.user, 'wildlifecompliance.system_administrator') or \
-               request.user.is_superuser
+    wildlife_compliance_user = user_has_perm(request.user, 'wildlifecompliance.system_administrator') or request.user.is_superuser
 
-    if request.user.is_authenticated and (
-            WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).wildlifesystemgroupuser_set.filter(emailuser_id=request.user.id)
-        ):
-        wildlife_compliance_user = True
+    try:
+        if request.user.is_authenticated and (
+                WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).wildlifesystemgroupuser_set.filter(emailuser_id=request.user.id)
+            ):
+            wildlife_compliance_user = True
+    except:
+        logging.error(f"{settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS} does not exist in WildlifeSystemGroup. Wildlife compliance officers cannot be authorised until group added to WildlifeSystemGroup or settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS corrected.")
 
     return wildlife_compliance_user
 
@@ -228,18 +232,6 @@ def is_able_to_view_sanction_outcome_pdf(request):
         is_compliance_management_manager(request) or
         is_compliance_management_infringement_notice_coordinator(request)
         ) else False
-
-
-def get_all_officers():
-    licence_officer_groups = ActivityPermissionGroup.objects.filter(
-            permissions__codename__in=['wildlifecompliance.organisation_access_request',
-                                       'wildlifecompliance.licensing_officer',
-                                       'wildlifecompliance.issuing_officer',
-                                       'wildlifecompliance.assessor',
-                                       'wildlifecompliance.return_curator',
-                                       'wildlifecompliance.payment_officer'])
-    return EmailUser.objects.filter(
-        groups__name__in=licence_officer_groups)
 
 def is_in_organisation_contacts(request, organisation):
     return request.user.email in organisation.contacts.all().values_list('email', flat=True)
