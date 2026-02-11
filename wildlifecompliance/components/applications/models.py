@@ -1825,7 +1825,7 @@ class Application(RevisionedMixin):
                 ) else [activity_id]
            )
         if app_label:
-            qs = qs.filter(permissions__content_type__app_label=app_label)
+            qs = qs.filter(permissions__codename__startswith=f"{app_label}.")
         return qs.first() if first else qs
 
     def assign_application_assessment(self, request):
@@ -3777,7 +3777,7 @@ class Application(RevisionedMixin):
                 ) else [activity_id]
             )
         if app_label:
-            qs = qs.filter(permissions__content_type__app_label=app_label)
+            qs = qs.filter(permissions__codename__startswith=f"{app_label}.")
         return qs.first() if first else qs
 
     @staticmethod
@@ -6875,7 +6875,7 @@ class ApplicationCondition(OrderedModel):
                 ) else [activity_id]
         )
         if app_label:
-            qs = qs.filter(permissions__content_type__app_label=app_label)
+            qs = qs.filter(permissions__codename__startswith=f"{app_label}.")
         return qs.first() if first else qs
 
     def get_officer_permission_group(self, user, first=True):
@@ -6893,7 +6893,7 @@ class ApplicationCondition(OrderedModel):
                 ) else [activity_id]
         )
         if app_label:
-            qs = qs.filter(permissions__content_type__app_label=app_label)
+            qs = qs.filter(permissions__codename__startswith=f"{app_label}.")
         return qs.first() if first else qs
 
 

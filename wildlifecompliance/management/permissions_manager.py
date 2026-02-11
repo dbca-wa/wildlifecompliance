@@ -236,7 +236,7 @@ class PermissionUser(object):
             ) else [licence_activity_id]
         )
         if app_label:
-            group_queryset = group_queryset.filter(permissions__content_type__app_label=app_label)
+            group_queryset = group_queryset.filter(permissions__codename__startswith=f"{app_label}.")
         return group_queryset.count()
 
     def get_wildlifelicence_permission_group(self, permission_codename, activity_id=None, first=True):
@@ -254,6 +254,6 @@ class PermissionUser(object):
                 ) else [activity_id]
             )
         if app_label:
-            qs = qs.filter(permissions__content_type__app_label=app_label)
+            qs = qs.filter(permissions__codename__startswith=f"{app_label}.")
         return qs.first() if first else qs
 
