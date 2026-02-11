@@ -508,7 +508,7 @@ class SubmitRequestCommand(ApplicationCommand):
 
         type_id = self.application.licence_type_data["id"]
         officer_groups = ActivityPermissionGroup.objects.filter(
-            permissions__codename='licensing_officer',
+            permissions__codename='wildlifecompliance.licensing_officer',
             licence_activities__purpose__licence_category__id=type_id
         )
         group_users = EmailUser.objects.filter(

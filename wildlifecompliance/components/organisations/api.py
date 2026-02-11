@@ -1106,8 +1106,8 @@ class OrganisationAccessGroupMembers(views.APIView):
         if is_wildlife_compliance_officer(request):
             groups = ActivityPermissionGroup.objects.filter(
                 permissions__codename__in=[
-                    'organisation_access_request',
-                    'system_administrator'
+                    'wildlifecompliance.organisation_access_request',
+                    'wildlifecompliance.system_administrator'
                 ]
             )
             for group in groups:

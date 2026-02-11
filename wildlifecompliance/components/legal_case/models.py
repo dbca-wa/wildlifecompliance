@@ -320,19 +320,10 @@ class LegalCase(RevisionedMixin):
             LegalCaseUserAction.ACTION_SEND_TO_MANAGER.format(self.number), 
             request)
         # set allocated group to 
-        #region_district_id = self.district_id if self.district_id else self.region_id
-        #region_district = Region.objects.get(id=region_district_id)
-        #region_district = self.allocated_group.region_district
         region = self.allocated_group.region
         district = self.allocated_group.district
 
         self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_MANAGER,district=district,region=region)
-
-        #if type(region_district) is District:
-        #    self.allocated_group = CompliancePermissionGroup.district_groups.get(district=region_district, permissions__codename="manager")
-        #elif type(region_district) is Region:
-        #    self.allocated_group = CompliancePermissionGroup.district_groups.get(region=region_district, permissions__codename="manager")
-        #self.allocated_group = CompliancePermissionGroup.objects.get(region_district=region_district, permissions__codename="manager")
         self.save()
 
     def back_to_case(self, request):
@@ -351,10 +342,6 @@ class LegalCase(RevisionedMixin):
             LegalCaseUserAction.ACTION_BACK_TO_OFFICER.format(self.number), 
             request)
         # set allocated group to 
-        #region_district_id = self.district_id if self.district_id else self.region_id
-        #region_district = RegionDistrict.objects.get(id=region_district_id)
-        #self.allocated_group = CompliancePermissionGroup.objects.get(region_district=region_district, permissions__codename="officer")
-        #region_district = self.allocated_group.region_district
         self.allocated_group = ComplianceManagementSystemGroup.objects.get(district=self.district, region=self.region, name=settings.GROUP_OFFICER)
         self.save()
 

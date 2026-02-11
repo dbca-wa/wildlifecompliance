@@ -1620,7 +1620,7 @@ class Application(RevisionedMixin):
 
                 self.save()
                 officer_groups = ActivityPermissionGroup.objects.filter(
-                    permissions__codename='licensing_officer',
+                    permissions__codename='wildlifecompliance.licensing_officer',
                     licence_activities__purpose__licence_category__id=self.licence_type_data["id"]
                 )
                 group_users = EmailUser.objects.filter(
@@ -1783,7 +1783,7 @@ class Application(RevisionedMixin):
             email_list = [selected_activity.assigned_officer.email]
         else:
             officer_groups = ActivityPermissionGroup.objects.filter(
-                permissions__codename='licensing_officer',
+                permissions__codename='wildlifecompliance.licensing_officer',
                 licence_activities__id=activity_id
             )
             group_users = EmailUser.objects.filter(
@@ -1815,7 +1815,7 @@ class Application(RevisionedMixin):
                     self, user, activity_id=None, first=True):
         app_label = get_app_label()
         user_id = user.id
-        groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename="assessor")
+        groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename="wildlifecompliance.assessor")
         groups_with_user = WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
         qs = WildlifeSystemGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
         if activity_id is not None:
@@ -2325,7 +2325,7 @@ class Application(RevisionedMixin):
 
         UNDER_REVIEW = self.PROCESSING_STATUS_UNDER_REVIEW
         officer_groups = ActivityPermissionGroup.objects.filter(
-            permissions__codename='licensing_officer',
+            permissions__codename='wildlifecompliance.licensing_officer',
             licence_activities__purpose__licence_category__id=self.licence_type_data["id"]
         )
         group_users = EmailUser.objects.filter(
@@ -3791,20 +3791,6 @@ class Application(RevisionedMixin):
             user = EmailUser.objects.get(pk=proxy_id) if proxy_details['proxy_id'] else request.user
             if not user.wildlifecompliance_organisations.filter(pk=organisation_id):
                 proxy_details['organisation_id'] = None
-
-        #if not proxy_id and not organisation_id:
-        #    return proxy_details
-
-        # Only licensing officers can apply as a proxy
-        # if not Application.get_request_user_permission_group(
-        #     permission_codename='licensing_officer',
-        #     first=True
-        # ):
-        #     proxy_details['proxy_id'] = None
-
-        # user = EmailUser.objects.get(pk=proxy_id) if proxy_details['proxy_id'] else request.user
-        # if organisation_id and not user.wildlifecompliance_organisations.filter(pk=organisation_id):
-        #     proxy_details['organisation_id'] = None
 
         return proxy_details
 
@@ -6878,7 +6864,7 @@ class ApplicationCondition(OrderedModel):
         app_label = get_app_label()
 
         user_id = user.id
-        groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename="assessor")
+        groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename="wildlifecompliance.assessor")
         groups_with_user = WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
         qs = WildlifeSystemGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
 
@@ -6896,7 +6882,7 @@ class ApplicationCondition(OrderedModel):
         app_label = get_app_label()
 
         user_id = user.id
-        groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename="licensing_officer")
+        groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename="wildlifecompliance.licensing_officer")
         groups_with_user = WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
         qs = WildlifeSystemGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
 

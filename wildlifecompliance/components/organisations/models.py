@@ -934,7 +934,7 @@ class OrganisationRequest(SanitiseFileMixin):
             send_organisation_request_accept_email_notification(self, org, request)
             # Notify other Organisation Access Group members of acceptance.
             groups = ActivityPermissionGroup.objects.filter(
-                permissions__codename='organisation_access_request'
+                permissions__codename='wildlifecompliance.organisation_access_request'
             )
             for group in groups:
                 recipients = [member.email for member in group.members.exclude(
@@ -1061,7 +1061,7 @@ class OrganisationRequest(SanitiseFileMixin):
                 send_organisation_request_decline_email_notification(self, request)
                 # Notify other members of organisation access group of decline.
                 groups = ActivityPermissionGroup.objects.filter(
-                    permissions__codename='organisation_access_request'
+                    permissions__codename='wildlifecompliance.organisation_access_request'
                 )
                 for group in groups:
                     recipients = [member.email for member in group.members.exclude(
@@ -1076,7 +1076,7 @@ class OrganisationRequest(SanitiseFileMixin):
         # user submits a new organisation request
         # send email to organisation access group
         groups = ActivityPermissionGroup.objects.filter(
-            permissions__codename='organisation_access_request'
+            permissions__codename='wildlifecompliance.organisation_access_request'
         )
         for group in groups:
             org_access_recipients = [member.email for member in group.members]
