@@ -18,6 +18,16 @@ BASIC_AUTH = env('BASIC_AUTH', False)
 
 logger = logging.getLogger(__name__)
 
+def user_has_perm(user,perm):
+    
+    if user.is_superuser:
+        return True
+    
+    groups_with_perm = WildlifeSystemGroup.objects.filter(permissions__codename=perm)
+    groups_with_user = WildlifeSystemGroup.objects.filter(id__in=WildlifeSystemGroupUser.objects.filter(emailuser=user).values_list('group_id',flat=True))
+
+    common_groups = groups_with_perm & groups_with_user
+    return common_groups.exists()
 
 def belongs_to(user, group_name):
     """
@@ -47,7 +57,7 @@ def belongs_to_list(user, group_names):
 def is_wildlifecompliance_admin(request):
     return request.user.is_authenticated and \
            (
-               request.user.has_perm('wildlifecompliance.system_administrator') or
+               user_has_perm(request.user, 'wildlifecompliance.system_administrator') or
                request.user.is_superuser or
                is_cm_compliance_admin(request) or
                is_cm_licensing_admin(request)
@@ -55,7 +65,7 @@ def is_wildlifecompliance_admin(request):
 
 
 def is_wildlifecompliance_payment_officer(request):
-    wildlife_compliance_user = request.user.has_perm('wildlifecompliance.system_administrator') or \
+    wildlife_compliance_user = user_has_perm(request.user, 'wildlifecompliance.system_administrator') or \
                request.user.is_superuser
 
     if request.user.is_authenticated and (
@@ -100,12 +110,12 @@ def is_internal(request):
 
 def is_officer(request):
     licence_officer_groups = [group.name for group in ActivityPermissionGroup.objects.filter(
-            permissions__codename__in=['organisation_access_request',
-                                       'licensing_officer',
-                                       'issuing_officer',
-                                       'assessor',
-                                       'return_curator',
-                                       'payment_officer'])]
+            permissions__codename__in=['wildlifecompliance.organisation_access_request',
+                                       'wildlifecompliance.licensing_officer',
+                                       'wildlifecompliance.issuing_officer',
+                                       'wildlifecompliance.assessor',
+                                       'wildlifecompliance.return_curator',
+                                       'wildlifecompliance.payment_officer'])]
     licence_officer_groups = []
     return (request.user.is_authenticated 
         and (belongs_to_list(request.user, licence_officer_groups) 
@@ -134,7 +144,7 @@ def prefer_compliance_management(request):
     return ret_value
 
 def is_wildlife_compliance_officer(request):
-    wildlife_compliance_user = request.user.has_perm('wildlifecompliance.system_administrator') or \
+    wildlife_compliance_user = user_has_perm(request.user, 'wildlifecompliance.system_administrator') or \
                request.user.is_superuser
 
     if request.user.is_authenticated and (

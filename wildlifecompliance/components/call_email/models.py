@@ -15,13 +15,10 @@ from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseM
 
 from wildlifecompliance.components.main.models import (
         CommunicationsLogEntry,
-        UserAction, 
         Document,
-        #CallEmailTriageGroup, OfficerGroup, ManagerGroup,
         ComplianceManagementSystemGroup,
         )
 from wildlifecompliance.components.main.related_item import can_close_record
-#from wildlifecompliance.components.users.models import CompliancePermissionGroup
 from wildlifecompliance.components.main.models import Region, District
 
 from django.conf import settings
@@ -609,12 +606,13 @@ class ComplianceFormDataRecord(SanitiseMixin):
 
     @staticmethod
     def process_form(request, CallEmail, form_data, action=ACTION_TYPE_ASSIGN_VALUE):
-        can_edit_comments = request.user.has_perm(
+        from wildlifecompliance.helpers import user_has_perm
+        can_edit_comments = user_has_perm(request.user, 
             'wildlifecompliance.licensing_officer'
-        ) or request.user.has_perm(
+        ) or user_has_perm(request.user, 
             'wildlifecompliance.assessor'
         )
-        can_edit_deficiencies = request.user.has_perm(
+        can_edit_deficiencies = user_has_perm(request.user, 
             'wildlifecompliance.licensing_officer'
         )
 

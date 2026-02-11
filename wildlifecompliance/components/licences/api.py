@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import pytz
 
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
-from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
+from wildlifecompliance.helpers import user_has_perm, is_wildlife_compliance_officer
 from wildlifecompliance.components.licences.services import LicenceService
 from wildlifecompliance.components.licences.models import (
     WildlifeLicence,
@@ -411,7 +411,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             if not type(purpose_ids_list) == list:
                 raise serializers.ValidationError(
                     'Purpose IDs must be a list')
-            if not request.user.has_perm('wildlifecompliance.issuing_officer'):
+            if not user_has_perm(request.user, 'wildlifecompliance.issuing_officer'):
                 raise serializers.ValidationError(
                     'You are not authorised to reactivate renew for licenced activities')
             if LicencePurpose.objects.filter(id__in=purpose_ids_list).\
@@ -474,7 +474,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         try:
             purpose_ids_list = request.data.get('purpose_ids_list', None)
 
-            if not request.user.has_perm('wildlifecompliance.issuing_officer'):
+            if not user_has_perm(request.user, 'wildlifecompliance.issuing_officer'):
                 raise serializers.ValidationError(
                     'You are not authorised to surrender licenced activities')
 
@@ -502,7 +502,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['POST', ])
     def cancel_licence(self, request, pk=None, *args, **kwargs):
         try:
-            if not request.user.has_perm('wildlifecompliance.issuing_officer'):
+            if not user_has_perm(request.user, 'wildlifecompliance.issuing_officer'):
                 raise serializers.ValidationError(
                     'You are not authorised to cancel licences')
             if pk:
@@ -531,7 +531,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         try:
             purpose_ids_list = request.data.get('purpose_ids_list', None)
 
-            if not request.user.has_perm('wildlifecompliance.issuing_officer'):
+            if not user_has_perm(request.user, 'wildlifecompliance.issuing_officer'):
                 raise serializers.ValidationError(
                     'You are not authorised to cancel licenced activities')
 
@@ -559,7 +559,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['POST', ])
     def suspend_licence(self, request, pk=None, *args, **kwargs):
         try:
-            if not request.user.has_perm('wildlifecompliance.issuing_officer'):
+            if not user_has_perm(request.user, 'wildlifecompliance.issuing_officer'):
                 raise serializers.ValidationError(
                     'You are not authorised to suspend licences')
             if pk:
@@ -593,7 +593,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         try:
             purpose_ids_list = request.data.get('purpose_ids_list', None)
 
-            if not request.user.has_perm('wildlifecompliance.issuing_officer'):
+            if not user_has_perm(request.user, 'wildlifecompliance.issuing_officer'):
                 raise serializers.ValidationError(MSG_NOAUTH)
 
             if not purpose_ids_list and pk:
@@ -620,7 +620,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['POST', ])
     def reinstate_licence(self, request, pk=None, *args, **kwargs):
         try:
-            if not request.user.has_perm('wildlifecompliance.issuing_officer'):
+            if not user_has_perm(request.user, 'wildlifecompliance.issuing_officer'):
                 raise serializers.ValidationError(
                     'You are not authorised to reinstate licences')
             if pk:
@@ -651,7 +651,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         try:
             purpose_ids_list = request.data.get('purpose_ids_list', None)
 
-            if not request.user.has_perm('wildlifecompliance.issuing_officer'):
+            if not user_has_perm(request.user, 'wildlifecompliance.issuing_officer'):
                 raise serializers.ValidationError(MSG_NOAUTH)
 
             if not purpose_ids_list and pk:
@@ -683,7 +683,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             # if not type(purpose_ids_list) == list:
             #     raise serializers.ValidationError(
             #         'Purpose IDs must be a list')
-            if not request.user.has_perm('wildlifecompliance.issuing_officer'):
+            if not user_has_perm(request.user, 'wildlifecompliance.issuing_officer'):
                 raise serializers.ValidationError(
                     'You are not authorised to reissue licenced activities')
             # if LicencePurpose.objects.filter(id__in=purpose_ids_list).\
@@ -716,7 +716,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['POST', ])
     def regenerate_licence_pdf(self, request, pk=None, *args, **kwargs):
         try:
-            if not request.user.has_perm('wildlifecompliance.issuing_officer'):
+            if not user_has_perm(request.user, 'wildlifecompliance.issuing_officer'):
                 raise serializers.ValidationError(
                     'You are not authorised to reinstate licences')
             if pk:

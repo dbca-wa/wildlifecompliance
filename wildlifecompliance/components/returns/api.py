@@ -18,7 +18,7 @@ from rest_framework_datatables.renderers import DatatablesRenderer
 
 from ledger_api_client.utils import calculate_excl_gst
 
-from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
+from wildlifecompliance.helpers import user_has_perm, is_wildlife_compliance_officer
 from wildlifecompliance.components.returns.utils import (
     SpreadSheet,
     checkout,
@@ -601,7 +601,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 raise serializers.ValidationError(
                     'A user with the id passed in does not exist')
 
-            if not request.user.has_perm(
+            if not user_has_perm(request.user, 
               'wildlifecompliance.return_curator'):
                 raise serializers.ValidationError(
                     'You are not authorised to assign officers')

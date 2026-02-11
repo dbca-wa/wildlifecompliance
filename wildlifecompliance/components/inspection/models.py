@@ -484,12 +484,13 @@ class InspectionFormDataRecord(SanitiseMixin):
 
     @staticmethod
     def process_form(request, Inspection, form_data, action=ACTION_TYPE_ASSIGN_VALUE):
-        can_edit_comments = request.user.has_perm(
+        from wildlifecompliance.helpers import user_has_perm
+        can_edit_comments = user_has_perm(request.user, 
             'wildlifecompliance.licensing_officer'
-        ) or request.user.has_perm(
+        ) or user_has_perm(request.user, 
             'wildlifecompliance.assessor'
         )
-        can_edit_deficiencies = request.user.has_perm(
+        can_edit_deficiencies = user_has_perm(request.user, 
             'wildlifecompliance.licensing_officer'
         )
 

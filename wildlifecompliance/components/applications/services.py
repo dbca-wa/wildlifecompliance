@@ -7,6 +7,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from wildlifecompliance import settings
+from wildlifecompliance.helpers import user_has_perm
 
 from wildlifecompliance.components.licences.models import (
     LicencePurpose,
@@ -1732,15 +1733,15 @@ def do_process_form(
     from wildlifecompliance.components.applications.utils import \
             MissingFieldsException
 
-    can_edit_officer_comments = request.user.has_perm(
+    can_edit_officer_comments = user_has_perm(request.user, 
         'wildlifecompliance.licensing_officer'
     )
-    can_edit_assessor_comments = request.user.has_perm(
+    can_edit_assessor_comments = user_has_perm(request.user, 
         'wildlifecompliance.assessor'
     )
     can_edit_comments = can_edit_officer_comments \
         or can_edit_assessor_comments
-    can_edit_deficiencies = request.user.has_perm(
+    can_edit_deficiencies = user_has_perm(request.user, 
         'wildlifecompliance.licensing_officer'
     )
 

@@ -27,7 +27,7 @@ from wildlifecompliance.components.main.utils import (
     set_session_activity,
     delete_session_application
 )
-from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
+from wildlifecompliance.helpers import user_has_perm, is_internal, is_wildlife_compliance_officer
 from wildlifecompliance.components.applications.email import (
     send_application_amendment_notification,
 )
@@ -1341,7 +1341,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             except EmailUser.DoesNotExist:
                 raise serializers.ValidationError(
                     'A user with the id passed in does not exist')
-            if not request.user.has_perm('wildlifecompliance.licensing_officer'):
+            if not user_has_perm(request.user, 'wildlifecompliance.licensing_officer'):
                 raise serializers.ValidationError(
                     'You are not authorised to assign officers to applications')
             if user not in instance.licence_officers:
@@ -1431,7 +1431,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 raise serializers.ValidationError('A user with the id passed in\
                     does not exist.')
 
-            if not request.user.has_perm('wildlifecompliance.issuing_officer'):
+            if not user_has_perm(request.user, 'wildlifecompliance.issuing_officer'):
                 raise serializers.ValidationError('You are not authorised to\
                     assign approvers for application activity.')
 

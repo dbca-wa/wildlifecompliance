@@ -41,7 +41,9 @@ from django.core.files.storage import FileSystemStorage
 private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
 
 def is_wildlife_compliance_officer(request):
-    wildlife_compliance_user = request.user.has_perm('wildlifecompliance.system_administrator') or \
+    from wildlifecompliance.helpers import user_has_perm
+    
+    wildlife_compliance_user = user_has_perm(request.user, 'wildlifecompliance.system_administrator') or \
                request.user.is_superuser
 
     if request.user.is_authenticated and (
