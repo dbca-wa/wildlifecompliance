@@ -2,8 +2,6 @@ import datetime
 
 from dateutil.relativedelta import relativedelta
 from django.db import transaction
-#from django.contrib.auth.models import Permission
-#from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
 from django.db.models import Q, Max
 

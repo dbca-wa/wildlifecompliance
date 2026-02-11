@@ -31,7 +31,6 @@ from wildlifecompliance.components.users.serializers import (
     UserAddressSerializer,
 )
 from wildlifecompliance.components.offence.serializers import OrganisationSerializer
-from django.contrib.auth.models import Permission, ContentType
 from wildlifecompliance.components.main.utils import (
     get_full_name
 )

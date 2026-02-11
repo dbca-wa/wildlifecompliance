@@ -6,7 +6,6 @@ from django.contrib.gis.db.models import PointField
 from django.db.models import Manager as GeoManager
 from django.db.models import JSONField
 from django.db.models import Max
-from django.contrib.auth.models import Permission, ContentType
 from multiselectfield import MultiSelectField
 from six import python_2_unicode_compatible
 from rest_framework import serializers

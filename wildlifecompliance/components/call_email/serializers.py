@@ -34,7 +34,6 @@ from django.core.exceptions import ValidationError
 from wildlifecompliance.components.main.fields import CustomChoiceField
 
 from wildlifecompliance.components.users.serializers import UserAddressSerializer
-from django.contrib.auth.models import Permission, ContentType
 
 from wildlifecompliance.components.main.utils import (
     get_first_name,

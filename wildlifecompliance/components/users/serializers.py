@@ -22,7 +22,6 @@ from wildlifecompliance.helpers import (
 from rest_framework import serializers
 from django.core.exceptions import ValidationError
 from rest_framework.fields import CurrentUserDefault
-from django.contrib.auth.models import Permission
 
 from wildlifecompliance.components.main.utils import (
     get_full_name,
@@ -589,79 +588,3 @@ class EmailIdentitySerializer(serializers.ModelSerializer):
             'user',
             'email'
         )
-
-
-#class RegionDistrictSerializer(serializers.ModelSerializer):
-#    # region = RegionDistrictSerializer(many=True)
-#
-#    class Meta:
-#        model = RegionDistrict
-#        fields = (
-#            'id',
-#            'district',
-#            'region',
-#            'display_name',
-#            'districts'
-#        )
-
-
-#class CompliancePermissionGroupSerializer(serializers.ModelSerializer):
-#
-#    class Meta:
-#        model = CompliancePermissionGroup
-#        fields = (
-#            'id',
-#            'name',
-#            'region_id',
-#            'district_id',
-#            'display_name',
-#            )
-#
-#
-#class CompliancePermissionGroupMembersSerializer(serializers.ModelSerializer):
-#    members = ComplianceUserDetailsOptimisedSerializer(many=True)
-#
-#    class Meta:
-#        model = CompliancePermissionGroup
-#        fields = (
-#            'members',
-#            )
-
-
-class PermissionSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Permission
-        fields = (
-            'codename',
-        )
-        read_only_fields = (
-            'codename',
-        )
-
-
-#class CompliancePermissionGroupDetailedSerializer(serializers.ModelSerializer):
-#    #region_district = RegionDistrictSerializer(many=True)
-#    members = ComplianceUserDetailsOptimisedSerializer(many=True)
-#    # permissions = PermissionSerializer(many=True)
-#    permissions_list = serializers.SerializerMethodField(read_only=True)
-#
-#    class Meta:
-#        model = CompliancePermissionGroup
-#        fields = (
-#            'id',
-#            'name',
-#            #'region_district',
-#            'region_id', 
-#            'district_id',
-#            'display_name',
-#            'members',
-#            # 'permissions',
-#            'permissions_list',
-#            )
-#
-#    def get_permissions_list(self, obj):
-#        permissions_list = []
-#        for permission in obj.permissions.all():
-#            permissions_list.append(permission.codename)
-#        return permissions_list

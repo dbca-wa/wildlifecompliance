@@ -14,7 +14,6 @@ from django.db.models.signals import pre_delete
 from django.db.models.query import QuerySet
 from django.dispatch import receiver
 from django.db.models import JSONField
-from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
