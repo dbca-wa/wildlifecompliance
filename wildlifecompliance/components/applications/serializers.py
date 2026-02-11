@@ -1428,7 +1428,7 @@ class DTInternalApplicationSerializer(BaseApplicationSerializer):
         return self.context['request'].user.is_superuser
 
     def get_user_in_officers(self, obj):
-        groups = obj.get_permission_groups(['licensing_officer','issuing_officer']).values_list('id', flat=True)
+        groups = obj.get_permission_groups(['wildlifecompliance.licensing_officer','wildlifecompliance.issuing_officer']).values_list('id', flat=True)
         can_process = EmailUser.objects.filter(
             id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
         ).distinct()
@@ -1440,114 +1440,6 @@ class DTInternalApplicationSerializer(BaseApplicationSerializer):
     def get_payment_status(self, obj):
         value = obj.get_property_cache_key('payment_status')
         return value['payment_status']
-
-
-
-#class DTInternalApplicationDashboardSerializer(BaseApplicationSerializer):
-#    submitter = EmailUserSerializer()
-#    applicant = serializers.CharField(read_only=True)
-#    org_applicant = OrganisationSerializer()
-#    proxy_applicant = EmailUserSerializer()
-#    processing_status = CustomChoiceField(read_only=True, choices=Application.PROCESSING_STATUS_CHOICES)
-#    customer_status = CustomChoiceField(read_only=True)
-#    can_current_user_edit = serializers.SerializerMethodField(read_only=True)
-#    payment_status = serializers.SerializerMethodField(read_only=True)
-#    can_be_processed = serializers.SerializerMethodField(read_only=True)
-#    user_in_officers = serializers.SerializerMethodField(read_only=True)
-#    application_type = CustomChoiceField(read_only=True)
-#    activities = ApplicationSelectedActivityDashboardSerializer(many=True, read_only=True)
-#    #activities = ApplicationSelectedActivitySerializer(many=True, read_only=True)
-#    payment_url = serializers.SerializerMethodField(read_only=True)
-#    all_payments_url = serializers.SerializerMethodField(read_only=True)
-#
-#    class Meta:
-#        model = Application
-#        fields = (
-#            'id',
-#            'customer_status',
-#            'processing_status',
-#            'applicant',
-#            'proxy_applicant',
-#            'org_applicant',
-#            'submitter',
-#            'lodgement_number',
-#            'lodgement_date',
-#            'category_id',
-#            'category_name',
-#            'activity_names',
-#            'activity_purpose_string',
-#            'purpose_string',
-#            'can_user_view',
-#            'can_current_user_edit',
-#            'payment_status',
-#            'can_be_processed',
-#            'user_in_officers',
-#            'application_type',
-#            'activities',
-#            'invoice_url',
-#            'payment_url',
-#            'all_payments_url',
-#        )
-#        # the serverSide functionality of datatables is such that only columns that have field 'data'
-#        # defined are requested from the serializer. Use datatables_always_serialize to force render
-#        # of fields that are not listed as 'data' in the datatable columns
-#        datatables_always_serialize = fields
-#
-#    def get_user_in_officers(self, obj):
-#        groups = obj.get_permission_groups(['licensing_officer','issuing_officer']).values_list('id', flat=True)
-#        can_process = EmailUser.objects.filter(groups__id__in=groups).distinct()
-#        if self.context['request'].user and self.context['request'].user in can_process:
-#            return True
-#
-#        return False
-
-
-# class _DTExternalApplicationSerializer(BaseApplicationSerializer):
-#     submitter = EmailUserSerializer()
-#     applicant = serializers.CharField(read_only=True)
-#     org_applicant = ExternalOrganisationSerializer()
-#     proxy_applicant = EmailUserSerializer()
-#     processing_status = CustomChoiceField(read_only=True, choices=Application.PROCESSING_STATUS_CHOICES)
-#     customer_status = CustomChoiceField(read_only=True)
-#     can_current_user_edit = serializers.SerializerMethodField(read_only=True)
-#     payment_status = serializers.SerializerMethodField(read_only=True)
-#     application_type = CustomChoiceField(read_only=True)
-#     activities = ExternalApplicationSelectedActivitySerializer(many=True, read_only=True)
-#     invoice_url = serializers.SerializerMethodField(read_only=True)
-#     payment_url = serializers.SerializerMethodField(read_only=True)
-
-#     class Meta:
-#         model = Application
-#         fields = (
-#             'id',
-#             'customer_status',
-#             'processing_status',
-#             'applicant',
-#             'org_applicant',
-#             'proxy_applicant',
-#             'submitter',
-#             'lodgement_number',
-#             'lodgement_date',
-#             'category_id',
-#             'category_name',
-#             'activity_names',
-#             'activity_purpose_string',
-#             'purpose_string',
-#             'can_user_view',
-#             'can_current_user_edit',
-#             'payment_status',
-#             'application_type',
-#             'activities',
-#             'invoice_url',
-#             'payment_url',
-#             'can_pay_application',
-#             'can_pay_licence',
-
-#         )
-#         # the serverSide functionality of datatables is such that only columns that have field 'data'
-#         # defined are requested from the serializer. Use datatables_always_serialize to force render
-#         # of fields that are not listed as 'data' in the datatable columns
-#         datatables_always_serialize = fields
 
 
 class DTExternalApplicationSerializer(BaseApplicationSerializer):
@@ -2230,7 +2122,7 @@ class DTAssessmentSerializer(serializers.ModelSerializer):
         return EmailUserSerializer(obj.application.submitter).data
 
     def get_can_be_processed(self, obj):
-        groups = obj.application.get_permission_groups(['assessor']).values_list('id', flat=True)
+        groups = obj.application.get_permission_groups(['wildlifecompliance.assessor']).values_list('id', flat=True)
         can_process = EmailUser.objects.filter(id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))).distinct()
         if self.context['request'].user and self.context['request'].user in can_process and obj.status == obj.STATUS_AWAITING_ASSESSMENT:
             return True

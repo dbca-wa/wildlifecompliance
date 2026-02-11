@@ -887,9 +887,9 @@ class Application(RevisionedMixin):
     def officers_and_assessors(self):
         logger.debug('Application.officers_and_assessors()')
         groups = list(self.get_permission_groups(
-            ['licensing_officer',
-             'assessor',
-             'issuing_officer']
+            ['wildlifecompliance.licensing_officer',
+             'wildlifecompliance.assessor',
+             'wildlifecompliance.issuing_officer']
         ).values_list('id', flat=True))
         return EmailUser.objects.filter(
             id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))

@@ -504,7 +504,7 @@ class Return(SanitiseMixin):
         '''
         QuerySet of authorised licence activity curators for this return.
         '''
-        groups = list(self.get_permission_groups('return_curator').values_list(
+        groups = list(self.get_permission_groups('wildlifecompliance.return_curator').values_list(
             'id', flat=True
         ))
         return EmailUser.objects.filter(
