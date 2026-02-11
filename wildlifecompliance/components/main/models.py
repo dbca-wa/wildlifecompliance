@@ -455,6 +455,49 @@ class RegionGIS(models.Model):
         return "{}: {}".format(self.id, self.region_name)
 
 
+class WildlifeSystemPermission(models.Model):
+    name = models.CharField(_("name"), max_length=255)
+    codename = models.CharField(_("codename"), max_length=100,unique=True)
+
+    class Meta:
+        app_label = 'wildlifecompliance'
+        verbose_name = _("wildlife system permission")
+        verbose_name_plural = _("wildlife system permissions")
+        ordering = ["codename"]
+
+    def __str__(self):
+        return self.name
+    
+
+class WildlifeSystemGroup(models.Model):
+    name = models.CharField(_("name"), max_length=150, unique=True)
+    permissions = models.ManyToManyField(
+        WildlifeSystemPermission,
+        verbose_name=_("permissions"),
+        blank=True,
+    )
+
+    class Meta:
+        app_label = 'wildlifecompliance'
+        verbose_name = _("wildlife system group")
+        verbose_name_plural = _("wildlife system groups")
+
+    def __str__(self):
+        return self.name
+
+
+class WildlifeSystemGroupUser(models.Model):
+    group = models.ForeignKey(WildlifeSystemGroup, on_delete=models.PROTECT)
+    emailuser = models.ForeignKey(EmailUser, on_delete=models.PROTECT, blank=True, null=True, db_constraint=False)
+    active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.group)
+    
+    class Meta:
+        app_label = 'wildlifecompliance'
+
+
 class ComplianceManagementSystemGroup(models.Model):
 
     #name = models.CharField(max_length=150, unique=True)

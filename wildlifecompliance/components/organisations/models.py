@@ -1,19 +1,14 @@
 from __future__ import unicode_literals
 
 from django.db import models, transaction
-from django.contrib.sites.models import Site
-from django.dispatch import receiver
-from django.db.models.signals import pre_delete, pre_save
 from six import python_2_unicode_compatible
 from django.core.exceptions import ValidationError
-from django.db.models import JSONField
 from rest_framework import status
 
 from ledger_api_client.utils import get_organisation, get_search_organisation, create_organisation
 
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
-from django.contrib.auth.models import Group
-from wildlifecompliance.components.main.models import UserAction, CommunicationsLogEntry
+from wildlifecompliance.components.main.models import UserAction, CommunicationsLogEntry, WildlifeSystemGroup
 from wildlifecompliance.components.organisations.utils import random_generator, get_officer_email_list
 from wildlifecompliance.components.organisations.emails import (
     send_organisation_request_accept_email_notification,
@@ -33,7 +28,7 @@ from wildlifecompliance.components.organisations.emails import (
     send_organisation_id_upload_email_notification,
     send_organisation_contact_consultant_email_notification,
 )
-from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin, SanitiseFileMixin
+from wildlifecompliance.components.main.models import SanitiseMixin, SanitiseFileMixin
 from wildlifecompliance.components.main.models import Document
 from wildlifecompliance.components.main.utils import (
     get_first_name,
@@ -46,11 +41,13 @@ from django.core.files.storage import FileSystemStorage
 private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
 
 def is_wildlife_compliance_officer(request):
-    wildlife_compliance_user = request.user.has_perm('wildlifecompliance.system_administrator') or \
+    from wildlifecompliance.helpers import user_has_perm
+
+    wildlife_compliance_user = user_has_perm(request.user, 'wildlifecompliance.system_administrator') or \
                request.user.is_superuser
 
     if request.user.is_authenticated and (
-            Group.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).user_set.filter(id=request.user.id)
+            WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).wildlifesystemgroupuser_set.filter(emailuser_id=request.user.id)
         ):
         wildlife_compliance_user = True
 
@@ -937,7 +934,7 @@ class OrganisationRequest(SanitiseFileMixin):
             send_organisation_request_accept_email_notification(self, org, request)
             # Notify other Organisation Access Group members of acceptance.
             groups = ActivityPermissionGroup.objects.filter(
-                permissions__codename='organisation_access_request'
+                permissions__codename='wildlifecompliance.organisation_access_request'
             )
             for group in groups:
                 recipients = [member.email for member in group.members.exclude(
@@ -1064,7 +1061,7 @@ class OrganisationRequest(SanitiseFileMixin):
                 send_organisation_request_decline_email_notification(self, request)
                 # Notify other members of organisation access group of decline.
                 groups = ActivityPermissionGroup.objects.filter(
-                    permissions__codename='organisation_access_request'
+                    permissions__codename='wildlifecompliance.organisation_access_request'
                 )
                 for group in groups:
                     recipients = [member.email for member in group.members.exclude(
@@ -1079,7 +1076,7 @@ class OrganisationRequest(SanitiseFileMixin):
         # user submits a new organisation request
         # send email to organisation access group
         groups = ActivityPermissionGroup.objects.filter(
-            permissions__codename='organisation_access_request'
+            permissions__codename='wildlifecompliance.organisation_access_request'
         )
         for group in groups:
             org_access_recipients = [member.email for member in group.members]

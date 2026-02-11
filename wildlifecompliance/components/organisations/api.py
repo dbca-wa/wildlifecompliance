@@ -26,7 +26,7 @@ from django.core.cache import cache
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address as OrganisationAddress
 from ledger_api_client.country_models import Country
 from datetime import datetime, timedelta, date
-from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
+from wildlifecompliance.helpers import user_has_perm, is_wildlife_compliance_officer
 from wildlifecompliance.components.organisations.models import (
     Organisation,
     OrganisationContact,
@@ -853,7 +853,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
                 return Response("user not authorised to assign organisation request")
             instance = self.get_object()
             user = request.user
-            if not request.user.has_perm('wildlifecompliance.organisation_access_request'):
+            if not user_has_perm(request.user, 'wildlifecompliance.organisation_access_request'):
                 raise serializers.ValidationError(
                     'You do not have permission to process organisation access requests')
             instance.assign_officer(request.user, request)
@@ -886,7 +886,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             except EmailUser.DoesNotExist:
                 raise serializers.ValidationError(
                     'A user with the id passed in does not exist')
-            if not request.user.has_perm('wildlifecompliance.organisation_access_request'):
+            if not user_has_perm(request.user, 'wildlifecompliance.organisation_access_request'):
                 raise serializers.ValidationError(
                     'You do not have permission to process organisation access requests')
 
@@ -1106,8 +1106,8 @@ class OrganisationAccessGroupMembers(views.APIView):
         if is_wildlife_compliance_officer(request):
             groups = ActivityPermissionGroup.objects.filter(
                 permissions__codename__in=[
-                    'organisation_access_request',
-                    'system_administrator'
+                    'wildlifecompliance.organisation_access_request',
+                    'wildlifecompliance.system_administrator'
                 ]
             )
             for group in groups:

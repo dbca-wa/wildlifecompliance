@@ -10,6 +10,7 @@ from wildlifecompliance.components.main.utils import to_local_tz
 #from reversion.admin import VersionAdmin
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from django.apps import apps
+from django.contrib.admin.widgets import FilteredSelectMultiple
 
 logger = logging.getLogger(__name__)
 
@@ -205,3 +206,21 @@ class FileExtensionWhitelistAdmin(admin.ModelAdmin):
         "model",
     )
     form = ModelForm
+
+class WildlifeSystemGroupUserInline(admin.TabularInline):
+    model = models.WildlifeSystemGroupUser
+    extra = 0
+    raw_id_fields = ('emailuser',)
+
+class WildlifeSystemPermissionForm(django_forms.ModelForm):
+    permissions = django_forms.ModelMultipleChoiceField(
+        queryset=models.WildlifeSystemPermission.objects.all(),
+        widget=FilteredSelectMultiple("permissions", is_stacked=False),
+    )
+
+@admin.register(models.WildlifeSystemGroup)
+class WildlifeSystemGroupAdmin(admin.ModelAdmin):
+    list_display = ('id','name')
+    search_fields = ('id','name')
+    inlines = [WildlifeSystemGroupUserInline]
+    form = WildlifeSystemPermissionForm

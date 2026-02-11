@@ -101,7 +101,6 @@ from wildlifecompliance.components.organisations.models import (
     Organisation,    
 )
 from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
-from django.contrib.auth.models import Permission, ContentType
 
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 from rest_framework_datatables.filters import DatatablesFilterBackend

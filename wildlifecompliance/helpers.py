@@ -2,15 +2,14 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.contrib.auth.models import Group
 from rest_framework import serializers
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance import settings
 from wildlifecompliance.components.applications.models import ActivityPermissionGroup
-from wildlifecompliance.components.users.models import (
-        #CompliancePermissionGroup, 
-        ComplianceManagementUserPreferences,
-        )
+from wildlifecompliance.components.users.models import ComplianceManagementUserPreferences
+
+from wildlifecompliance.components.main.models import WildlifeSystemGroup, WildlifeSystemGroupUser
+
 from confy import env
 from django.db.models import Q
 
@@ -18,34 +17,20 @@ DEBUG = env('DEBUG', False)
 BASIC_AUTH = env('BASIC_AUTH', False)
 
 logger = logging.getLogger(__name__)
-# logger = logging
 
-def is_new_to_wildlifelicensing(request=None):
-    '''
-    Verify request user holds minimum details to use Wildlife Licensing.
-    '''
-    from wildlifecompliance.management.securebase_manager import (
-        SecureBaseUtils
-    )
+def user_has_perm(user,perm):
+    
+    if not user or not perm:
+        return False
 
-    has_user_details = True if ((not request.user.first_name) or 
-                (not request.user.last_name) or 
-                (not request.user.legal_first_name) or
-                (not request.user.legal_last_name) or
-                (not request.user.dob ) or 
-                (not request.user.residential_address) or 
-                (not (
-                    request.user.phone_number or request.user.mobile_number
-                )
-                and (prefer_compliance_management(request)))) else False 
-        #and (#request.user.identification2 or TODO
+    if user.is_superuser:
+        return True
+    
+    groups_with_perm = WildlifeSystemGroup.objects.filter(permissions__codename=perm)
+    groups_with_user = WildlifeSystemGroup.objects.filter(id__in=WildlifeSystemGroupUser.objects.filter(emailuser_id=user.id).values_list('group_id',flat=True))
 
-    if not SecureBaseUtils.is_wildlifelicensing_request(request):
-        has_user_details = True
-
-    if is_internal(request):
-        has_user_details = True
-    return not has_user_details
+    common_groups = groups_with_perm & groups_with_user
+    return common_groups.exists()
 
 def belongs_to(user, group_name):
     """
@@ -54,9 +39,9 @@ def belongs_to(user, group_name):
     :param group_name:
     :return:
     """
-    group = Group.objects.filter(name=group_name)
+    group = WildlifeSystemGroup.objects.filter(name=group_name)
     if group.exists():
-        return user.id in list(UsersInGroup.objects.filter(group_id=group.first().id).values_list('emailuser_id', flat=True))
+        return user.id in list(WildlifeSystemGroupUser.objects.filter(group_id=group.first().id).values_list('emailuser_id', flat=True))
     else:
         return False
 
@@ -68,29 +53,14 @@ def belongs_to_list(user, group_names):
     :param list_of_group_names:
     :return:
     """
-    groups = Group.objects.filter(name__in=group_names)
-    return user.id in list(UsersInGroup.objects.filter(group_id__in=list(groups.values_list('id',flat=True))).values_list('emailuser_id', flat=True))
-
-#def is_model_backend(request):
-#    # Return True if user logged in via single sign-on (i.e. an internal)
-#    logger.debug(
-#        'helpers.is_model_backend(): {0}'.format(
-#            request.session.get('_auth_user_backend')
-#        ))
-#    return 'ModelBackend' in request.session.get('_auth_user_backend')
-
-
-#def is_email_auth_backend(request):
-#    # Return True if user logged in via social_auth (i.e. an external user
-#    # signing in with a login-token)
-#    return 'EmailAuth' in request.session.get('_auth_user_backend')
+    groups = WildlifeSystemGroup.objects.filter(name__in=group_names)
+    return user.id in list(WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups.values_list('id',flat=True))).values_list('emailuser_id', flat=True))
 
 
 def is_wildlifecompliance_admin(request):
     return request.user.is_authenticated and \
-           in_dbca_domain(request) and \
            (
-               request.user.has_perm('wildlifecompliance.system_administrator') or
+               user_has_perm(request.user, 'wildlifecompliance.system_administrator') or
                request.user.is_superuser or
                is_cm_compliance_admin(request) or
                is_cm_licensing_admin(request)
@@ -98,38 +68,17 @@ def is_wildlifecompliance_admin(request):
 
 
 def is_wildlifecompliance_payment_officer(request):
-    '''
-    Check user for request has payment officer permissions.
+    wildlife_compliance_user = user_has_perm(request.user, 'wildlifecompliance.system_administrator') or request.user.is_superuser
 
-    :return: boolean
-    '''
-    PAYMENTS_GROUP_NAME = 'Wildlife Compliance - Payment Officers'
-    
-    group = Group.objects.filter(name=PAYMENTS_GROUP_NAME)
-    if group.exists():
-        return request.user.id in list(UsersInGroup.objects.filter(group_id=group.first().id).values_list('emailuser_id', flat=True))
-    else:
-        return False
+    try:
+        if request.user.is_authenticated and (
+                WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS).wildlifesystemgroupuser_set.filter(emailuser_id=request.user.id)
+            ):
+            wildlife_compliance_user = True
+    except:
+        logging.error(f"{settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS} does not exist in WildlifeSystemGroup. Payment officers cannot be authorised until group added to WildlifeSystemGroup or settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS corrected.")
 
-def in_dbca_domain(request):
-    user = request.user
-    domain = user.email.split('@')[1]
-    if domain in settings.DEPT_DOMAINS:
-        if not user.is_staff:
-            # hack to reset department user to is_staff==True, if the user
-            # logged in externally (external departmentUser login defaults to
-            # is_staff=False)
-            user.is_staff = True
-            user.save()
-        return True
-    return False
-
-
-def is_departmentUser(request):
-    return request.user.is_authenticated and (
-            (settings.ALLOW_EMAIL_ADMINS and in_dbca_domain(request)) or
-            is_compliance_management_approved_external_user(request)
-            )
+    return wildlife_compliance_user
 
 
 def is_reception(request):
@@ -146,26 +95,32 @@ def is_reception(request):
 
     return request.user.is_authenticated and is_reception_email
 
-
 def is_customer(request):
-    #return request.user.is_authenticated and is_email_auth_backend(request)
-    return request.user.is_authenticated and not request.user.is_staff
+    return request.user.is_authenticated and not is_internal(request)
 
 
 def is_internal(request):
     if DEBUG and BASIC_AUTH:
         return True
     else:
-        return is_departmentUser(request)
+        return (
+            request.user.is_superuser or
+            is_wildlifecompliance_admin(request) or
+            is_compliance_internal_user(request) or
+            is_officer(request) or
+            is_wildlife_compliance_officer(request) or
+            is_wildlifecompliance_payment_officer(request)
+        )
+
 
 def is_officer(request):
     licence_officer_groups = [group.name for group in ActivityPermissionGroup.objects.filter(
-            permissions__codename__in=['organisation_access_request',
-                                       'licensing_officer',
-                                       'issuing_officer',
-                                       'assessor',
-                                       'return_curator',
-                                       'payment_officer'])]
+            permissions__codename__in=['wildlifecompliance.organisation_access_request',
+                                       'wildlifecompliance.licensing_officer',
+                                       'wildlifecompliance.issuing_officer',
+                                       'wildlifecompliance.assessor',
+                                       'wildlifecompliance.return_curator',
+                                       'wildlifecompliance.payment_officer'])]
     licence_officer_groups = []
     return (request.user.is_authenticated 
         and (belongs_to_list(request.user, licence_officer_groups) 
@@ -188,34 +143,21 @@ def prefer_compliance_management(request):
 
     if request.user.is_authenticated:
         preference = ComplianceManagementUserPreferences.objects.get(email_user=request.user)
-        #if preference.prefer_compliance_management and (
-        #        is_compliance_management_readonly_user(request) or is_compliance_management_callemail_readonly_user(request)
-        #        ):
-        #if preference.prefer_compliance_management or is_compliance_management_callemail_readonly_user(request):
         if preference.prefer_compliance_management:
             ret_value = True
 
     return ret_value
 
 def is_wildlife_compliance_officer(request):
-    wildlife_compliance_user = request.user.has_perm('wildlifecompliance.system_administrator') or \
-               request.user.is_superuser
+    wildlife_compliance_user = user_has_perm(request.user, 'wildlifecompliance.system_administrator') or request.user.is_superuser
 
-    if request.user.is_authenticated and (
-            Group.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).user_set.filter(id=request.user.id)
-        ):
-        wildlife_compliance_user = True
-
-    return wildlife_compliance_user
-
-def is_wildlife_compliance_payment_officer(request):
-    wildlife_compliance_user = request.user.has_perm('wildlifecompliance.system_administrator') or \
-               request.user.is_superuser
-
-    if request.user.is_authenticated and (
-            Group.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS).user_set.filter(id=request.user.id)
-        ):
-        wildlife_compliance_user = True
+    try:
+        if request.user.is_authenticated and (
+                WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).wildlifesystemgroupuser_set.filter(emailuser_id=request.user.id)
+            ):
+            wildlife_compliance_user = True
+    except:
+        logging.error(f"{settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS} does not exist in WildlifeSystemGroup. Wildlife compliance officers cannot be authorised until group added to WildlifeSystemGroup or settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS corrected.")
 
     return wildlife_compliance_user
 
@@ -290,18 +232,6 @@ def is_able_to_view_sanction_outcome_pdf(request):
         is_compliance_management_manager(request) or
         is_compliance_management_infringement_notice_coordinator(request)
         ) else False
-
-
-def get_all_officers():
-    licence_officer_groups = ActivityPermissionGroup.objects.filter(
-            permissions__codename__in=['organisation_access_request',
-                                       'licensing_officer',
-                                       'issuing_officer',
-                                       'assessor',
-                                       'return_curator',
-                                       'payment_officer'])
-    return EmailUser.objects.filter(
-        groups__name__in=licence_officer_groups)
 
 def is_in_organisation_contacts(request, organisation):
     return request.user.email in organisation.contacts.all().values_list('email', flat=True)

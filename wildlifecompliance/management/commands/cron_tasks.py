@@ -1,4 +1,3 @@
-from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
 from django.core.mail import send_mail
@@ -46,14 +45,15 @@ class Command(BaseCommand):
         send_mail(subject, body, settings.EMAIL_FROM, to, fail_silently=False, html_message=log_txt)
 
 
+#TODO fix this - it does not work as it references a model that no longer exists - but this is used by several cron tasks
 def get_infringement_notice_coordinators():
     compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
-    permissions = Permission.objects.filter(codename='infringement_notice_coordinator',
-                                            content_type_id=compliance_content_type.id)
-    allowed_groups = CompliancePermissionGroup.objects.filter(permissions__in=permissions)
+    #permissions = Permission.objects.filter(codename='infringement_notice_coordinator',
+    #                                        content_type_id=compliance_content_type.id)
+    #allowed_groups = CompliancePermissionGroup.objects.filter(permissions__in=permissions)
     members = []
-    for group in allowed_groups.all():
-        for member in group.members:
-            members.append(member)
+    #for group in allowed_groups.all():
+    #    for member in group.members:
+    #        members.append(member)
     return members
 

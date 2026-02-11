@@ -14,7 +14,6 @@ from django.db.models.signals import pre_delete
 from django.db.models.query import QuerySet
 from django.dispatch import receiver
 from django.db.models import JSONField
-from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -24,7 +23,7 @@ from smart_selects.db_fields import ChainedForeignKey
 from ckeditor.fields import RichTextField
 from rest_framework import serializers
 
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 from ledger_api_client.ledger_models import Invoice
 from ledger_api_client.utils import get_invoice_properties
@@ -47,7 +46,9 @@ from wildlifecompliance.components.organisations.emails import (
 from wildlifecompliance.components.main.models import (
     CommunicationsLogEntry,
     UserAction,
-    Document
+    Document,
+    WildlifeSystemGroup,
+    WildlifeSystemGroupUser,
 )
 from wildlifecompliance.components.main.process_document import (
     save_issuance_document_obj,
@@ -141,7 +142,17 @@ def get_temporary_document_collection(collection_id):
     return temp_doc_collection
 
 
-class ActivityPermissionGroup(Group):
+class ActivityPermissionGroup(WildlifeSystemGroup):
+
+    group_ptr = models.OneToOneField(
+        WildlifeSystemGroup,
+        on_delete=models.CASCADE,
+        parent_link=True,
+        primary_key=True,
+        db_column='group_ptr_id',
+        related_name='+',
+    )
+
     licence_activities = models.ManyToManyField(
         'wildlifecompliance.LicenceActivity',
         blank=True)
@@ -153,10 +164,6 @@ class ActivityPermissionGroup(Group):
 
     def __str__(self):
         return self.name
-        #return '{} ({} members)'.format(
-        #    self.name,
-        #    EmailUser.objects.filter(groups__name=self.name).count()
-        #)
 
     @property
     def display_name(self):
@@ -164,9 +171,9 @@ class ActivityPermissionGroup(Group):
 
     @property
     def members(self):
-        groups = Group.objects.filter(id=self.id)
+        groups = WildlifeSystemGroup.objects.filter(id=self.id)
         return EmailUser.objects.filter(
-            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
+            id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
         ).distinct()
 
     @staticmethod
@@ -856,9 +863,9 @@ class Application(RevisionedMixin):
         logger.debug('Application.licence_officers()')
         if not self.LICENCE_OFFICERS:
             groups = list(self.get_permission_groups(
-                'licensing_officer').values_list('id', flat=True))
+                'wildlifecompliance.licensing_officer').values_list('id', flat=True))
             self.LICENCE_OFFICERS = EmailUser.objects.filter(
-                id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
+                id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
             ).distinct()
         
         return self.LICENCE_OFFICERS
@@ -866,11 +873,11 @@ class Application(RevisionedMixin):
     @property
     def licence_approvers(self):
         logger.debug('Application.licence_approvers() - start')
-        groups = list(self.get_permission_groups('issuing_officer')\
+        groups = list(self.get_permission_groups('wildlifecompliance.issuing_officer')\
             .values_list('id', flat=True))
 
         approvers = EmailUser.objects.filter(
-            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
+            id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
         ).distinct()
         logger.debug('Application.licence_approvers() - end')
         return approvers
@@ -879,12 +886,12 @@ class Application(RevisionedMixin):
     def officers_and_assessors(self):
         logger.debug('Application.officers_and_assessors()')
         groups = list(self.get_permission_groups(
-            ['licensing_officer',
-             'assessor',
-             'issuing_officer']
+            ['wildlifecompliance.licensing_officer',
+             'wildlifecompliance.assessor',
+             'wildlifecompliance.issuing_officer']
         ).values_list('id', flat=True))
         return EmailUser.objects.filter(
-            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
+            id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
         ).distinct()
 
     @property
@@ -1612,11 +1619,11 @@ class Application(RevisionedMixin):
 
                 self.save()
                 officer_groups = ActivityPermissionGroup.objects.filter(
-                    permissions__codename='licensing_officer',
+                    permissions__codename='wildlifecompliance.licensing_officer',
                     licence_activities__purpose__licence_category__id=self.licence_type_data["id"]
                 )
                 group_users = EmailUser.objects.filter(
-                    id__in=list(UsersInGroup.objects.filter(group_id__in=officer_groups).values_list("emailuser_id",flat=True))
+                    id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=officer_groups).values_list("emailuser_id",flat=True))
                 ).distinct()
 
                 if self.amendment_requests:
@@ -1775,11 +1782,11 @@ class Application(RevisionedMixin):
             email_list = [selected_activity.assigned_officer.email]
         else:
             officer_groups = ActivityPermissionGroup.objects.filter(
-                permissions__codename='licensing_officer',
+                permissions__codename='wildlifecompliance.licensing_officer',
                 licence_activities__id=activity_id
             )
             group_users = EmailUser.objects.filter(
-                id__in=list(UsersInGroup.objects.filter(group_id__in=officer_groups).values_list("emailuser_id",flat=True))
+                id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=officer_groups).values_list("emailuser_id",flat=True))
             ).distinct()
             email_list = [user.email for user in group_users]
 
@@ -1807,17 +1814,15 @@ class Application(RevisionedMixin):
                     self, user, activity_id=None, first=True):
         app_label = get_app_label()
         user_id = user.id
-        groups_with_permissions = Group.objects.filter(permissions__codename="assessor")
-        groups_with_user = UsersInGroup.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
-        qs = Group.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+        groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename="wildlifecompliance.assessor")
+        groups_with_user = WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
+        qs = ActivityPermissionGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
         if activity_id is not None:
            qs = qs.filter(
-                activitypermissiongroup__licence_activities__id__in=activity_id if isinstance(
-                    activity_id, (list, models.query.QuerySet)
-                ) else [activity_id]
+                licence_activities__id__in=activity_id if isinstance(activity_id, (list, models.query.QuerySet)) else [activity_id]
            )
         if app_label:
-            qs = qs.filter(permissions__content_type__app_label=app_label)
+            qs = qs.filter(permissions__codename__startswith=f"{app_label}.")
         return qs.first() if first else qs
 
     def assign_application_assessment(self, request):
@@ -1835,19 +1840,16 @@ class Application(RevisionedMixin):
                     raise Exception("Assessment record ID %s \
                     does not exist!" % (assessment_id))
 
-                assessor_group = self \
-                    .get_assessor_permission_group(
+                assessor_group = self.get_assessor_permission_group(
                         request.user,
                         activity_id=assessment.licence_activity_id,
                         first=True
                     )
                 if not assessor_group:
-                    raise Exception("Missing assessor permissions for Activity \
-                        ID: %s" % (assessment.licence_activity_id))
+                    raise Exception("Missing assessor permissions for Activity ID: %s" % (assessment.licence_activity_id))
 
                 # Set the actioner and assessor for the action.
-                assessor = EmailUser.objects \
-                    .get(id=assessor_id) if assessor_id else assessor_id
+                assessor = EmailUser.objects.get(id=assessor_id) if assessor_id else assessor_id
                 assessment.actioned_by = request.user
                 assessment.assigned_assessor = assessor
                 assessment.save()
@@ -1885,8 +1887,7 @@ class Application(RevisionedMixin):
                 for assessment in assessments:
 
                     # check user has assessor permission
-                    assessor_group = \
-                        self.get_assessor_permission_group(
+                    assessor_group = self.get_assessor_permission_group(
                             request.user,
                             activity_id=assessment.licence_activity_id,
                             first=True
@@ -2317,11 +2318,11 @@ class Application(RevisionedMixin):
 
         UNDER_REVIEW = self.PROCESSING_STATUS_UNDER_REVIEW
         officer_groups = ActivityPermissionGroup.objects.filter(
-            permissions__codename='licensing_officer',
+            permissions__codename='wildlifecompliance.licensing_officer',
             licence_activities__purpose__licence_category__id=self.licence_type_data["id"]
         )
         group_users = EmailUser.objects.filter(
-            id__in=list(UsersInGroup.objects.filter(group_id__in=officer_groups).values_list("emailuser_id",flat=True))
+            id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=officer_groups).values_list("emailuser_id",flat=True))
         ).distinct()
 
         if self.processing_status == UNDER_REVIEW:
@@ -3759,17 +3760,22 @@ class Application(RevisionedMixin):
             app_label = settings.SYSTEM_APP_LABEL
         except AttributeError:
             app_label = ''
-        qs = request.user.groups.filter(
+
+        user_id = request.user.id if request.user else None
+        groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename=permission_codename)
+        groups_with_user = WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
+        qs = ActivityPermissionGroup.objects.filter(
             permissions__codename=permission_codename
-        )
+        ).filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+
         if activity_id is not None:
             qs = qs.filter(
-                activitypermissiongroup__licence_activities__id__in=activity_id if isinstance(
+                licence_activities__id__in=activity_id if isinstance(
                     activity_id, (list, models.query.QuerySet)
                 ) else [activity_id]
             )
         if app_label:
-            qs = qs.filter(permissions__content_type__app_label=app_label)
+            qs = qs.filter(permissions__codename__startswith=f"{app_label}.")
         return qs.first() if first else qs
 
     @staticmethod
@@ -3783,20 +3789,6 @@ class Application(RevisionedMixin):
             user = EmailUser.objects.get(pk=proxy_id) if proxy_details['proxy_id'] else request.user
             if not user.wildlifecompliance_organisations.filter(pk=organisation_id):
                 proxy_details['organisation_id'] = None
-
-        #if not proxy_id and not organisation_id:
-        #    return proxy_details
-
-        # Only licensing officers can apply as a proxy
-        # if not Application.get_request_user_permission_group(
-        #     permission_codename='licensing_officer',
-        #     first=True
-        # ):
-        #     proxy_details['proxy_id'] = None
-
-        # user = EmailUser.objects.get(pk=proxy_id) if proxy_details['proxy_id'] else request.user
-        # if organisation_id and not user.wildlifecompliance_organisations.filter(pk=organisation_id):
-        #     proxy_details['organisation_id'] = None
 
         return proxy_details
 
@@ -4897,10 +4889,10 @@ class ApplicationSelectedActivity(SanitiseMixin):
         Authorised licence officers for this Selected Activity.
         """
         groups = ActivityPermissionGroup.get_groups_for_activities(
-            self.licence_activity, 'licensing_officer').values_list("id", flat=True)
+            self.licence_activity, 'wildlifecompliance.licensing_officer').values_list("id", flat=True)
 
         return EmailUser.objects.filter(
-            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
+            id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
         ).distinct()
 
     @property
@@ -4909,10 +4901,10 @@ class ApplicationSelectedActivity(SanitiseMixin):
         Authorised issuing officers for this Selected Activity.
         """
         groups = ActivityPermissionGroup.get_groups_for_activities(
-            self.licence_activity, 'issuing_officer').values_list("id", flat=True)
+            self.licence_activity, 'wildlifecompliance.issuing_officer').values_list("id", flat=True)
 
         return EmailUser.objects.filter(
-            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
+            id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
         ).distinct()
 
     @property
@@ -6849,8 +6841,7 @@ class ApplicationCondition(OrderedModel):
             # Get the Application Selected Activity for this condition.
             licence_activity_id = self.licence_activity_id
         )
-        if activity.processing_status ==\
-             ApplicationSelectedActivity.PROCESSING_STATUS_WITH_ASSESSOR:
+        if activity.processing_status == ApplicationSelectedActivity.PROCESSING_STATUS_WITH_ASSESSOR:
             # Set the source_group when added by the assessor.
             group = self.get_assessor_permission_group(user)
             self.source_group = group.activitypermissiongroup
@@ -6870,36 +6861,34 @@ class ApplicationCondition(OrderedModel):
         app_label = get_app_label()
 
         user_id = user.id
-        groups_with_permissions = Group.objects.filter(permissions__codename="assessor")
-        groups_with_user = UsersInGroup.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
-        qs = Group.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+        groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename="wildlifecompliance.assessor")
+        groups_with_user = WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
+        qs = ActivityPermissionGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
 
         activity_id = self.licence_activity.id
         qs = qs.filter(
-            activitypermissiongroup__licence_activities__id__in=activity_id\
+            licence_activities__id__in=activity_id\
                 if isinstance(activity_id, (list, models.query.QuerySet)
                 ) else [activity_id]
         )
         if app_label:
-            qs = qs.filter(permissions__content_type__app_label=app_label)
+            qs = qs.filter(permissions__codename__startswith=f"{app_label}.")
         return qs.first() if first else qs
 
     def get_officer_permission_group(self, user, first=True):
         app_label = get_app_label()
 
         user_id = user.id
-        groups_with_permissions = Group.objects.filter(permissions__codename="licensing_officer")
-        groups_with_user = UsersInGroup.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
-        qs = Group.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+        groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename="wildlifecompliance.licensing_officer")
+        groups_with_user = WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
+        qs = ActivityPermissionGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
 
         activity_id = self.licence_activity.id
         qs = qs.filter(
-            activitypermissiongroup__licence_activities__id__in=activity_id\
-                if isinstance(activity_id, (list, models.query.QuerySet)
-                ) else [activity_id]
+            licence_activities__id__in=activity_id if isinstance(activity_id, (list, models.query.QuerySet)) else [activity_id]
         )
         if app_label:
-            qs = qs.filter(permissions__content_type__app_label=app_label)
+            qs = qs.filter(permissions__codename__startswith=f"{app_label}.")
         return qs.first() if first else qs
 
 

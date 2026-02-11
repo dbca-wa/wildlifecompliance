@@ -3,12 +3,7 @@ import logging
 from django.urls import reverse
 from django.shortcuts import redirect
 from urllib.parse import quote_plus
-from django.conf import settings
 
-from wildlifecompliance.management.securebase_manager import (
-    SecureBaseUtils,
-    SecureAuthorisationEnforcer,
-)
 from wildlifecompliance.components.users.models import ComplianceManagementUserPreferences
 from wildlifecompliance.components.applications.models import Application
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome
@@ -58,10 +53,6 @@ class FirstTimeNagScreenMiddleware(object):
                 preference.prefer_compliance_management = False
                 preference.save()
 
-        #print(not is_compliance_management_user(request) and SecureBaseUtils.is_wildlifelicensing_request(request))
-        #if not is_compliance_management_user(request) and SecureBaseUtils.is_wildlifelicensing_request(request):
-        #    first_time_nag = SecureAuthorisationEnforcer(request)
-        #else:
         first_time_nag = FirstTimeDefaultNag()
 
         response = first_time_nag.process_request(request)

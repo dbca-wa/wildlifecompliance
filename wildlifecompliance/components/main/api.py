@@ -58,7 +58,7 @@ from wildlifecompliance.components.main.process_document import delete_document
 from wildlifecompliance.helpers import (
     is_internal,
     is_wildlife_compliance_officer,
-    is_wildlife_compliance_payment_officer,
+    is_wildlifecompliance_payment_officer,
     is_compliance_internal_user,
 )
 
@@ -1415,7 +1415,7 @@ class OracleJob(views.APIView):
 
     def get(self, request, format=None):
         
-        if not is_wildlife_compliance_payment_officer(request):
+        if not is_wildlifecompliance_payment_officer(request):
             return Response()
 
         try:

@@ -1,13 +1,10 @@
-import datetime
 import json
 import logging
 import os
 
 import pytz
 from django.contrib.auth.models import Group
-from django.contrib.gis.geos import GEOSGeometry, fromfile
-from django.core.exceptions import MultipleObjectsReturned
-from ledger_api_client.settings_base import TIME_ZONE
+from django.contrib.gis.geos import GEOSGeometry
 from django.conf import settings
 
 from wildlifecompliance import settings
@@ -18,7 +15,11 @@ from wildlifecompliance.components.call_email.models import Classification
 
 logger = logging.getLogger(__name__)
 
-
+#NOTE: this appears to create default groups - it creates default ledger groups derived from settings.py and compliance groups
+#This should be safe to leave alone for now, pending further review
+#New groups from a settings list, possibly derived from env var, is redundant as groups can simply be added via admin
+#Initial Compliance groups would seem better served with fixtures 
+#if necessary, we can refactor this to use new models (in the case of the ledger group model, changing it to interact with the new local model)
 class DefaultDataManager(object):
 
     def __init__(self):

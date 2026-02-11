@@ -27,7 +27,7 @@ from wildlifecompliance.components.main.utils import (
     set_session_activity,
     delete_session_application
 )
-from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
+from wildlifecompliance.helpers import user_has_perm, is_internal, is_wildlife_compliance_officer
 from wildlifecompliance.components.applications.email import (
     send_application_amendment_notification,
 )
@@ -1341,7 +1341,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             except EmailUser.DoesNotExist:
                 raise serializers.ValidationError(
                     'A user with the id passed in does not exist')
-            if not request.user.has_perm('wildlifecompliance.licensing_officer'):
+            if not user_has_perm(request.user, 'wildlifecompliance.licensing_officer'):
                 raise serializers.ValidationError(
                     'You are not authorised to assign officers to applications')
             if user not in instance.licence_officers:
@@ -1431,7 +1431,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 raise serializers.ValidationError('A user with the id passed in\
                     does not exist.')
 
-            if not request.user.has_perm('wildlifecompliance.issuing_officer'):
+            if not user_has_perm(request.user, 'wildlifecompliance.issuing_officer'):
                 raise serializers.ValidationError('You are not authorised to\
                     assign approvers for application activity.')
 
@@ -2470,7 +2470,7 @@ class AssessmentPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         # Get the assessor groups the current user is member of
         perm_user = PermissionUser(request.user)
         assessor_groups = perm_user.get_wildlifelicence_permission_group(
-            'assessor', first=False)
+            'wildlifecompliance.assessor', first=False)
 
         # For each assessor groups get the assessments
         queryset = self.get_queryset().none()
@@ -2514,7 +2514,7 @@ class AssessmentViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def user_list(self, request, *args, **kwargs):
         # Get the assessor groups the current user is member of
         perm_user = PermissionUser(request.user)
-        assessor_groups = perm_user.get_wildlifelicence_permission_group('assessor', first=False)
+        assessor_groups = perm_user.get_wildlifelicence_permission_group('wildlifecompliance.assessor', first=False)
 
         # For each assessor groups get the assessments
         queryset = self.get_queryset().none()
@@ -2633,9 +2633,9 @@ class AssessorGroupViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def get_queryset(self, application=None):
         if is_wildlife_compliance_officer(self.request):
             if application is not None:
-                return application.get_permission_groups('assessor') 
+                return application.get_permission_groups('wildlifecompliance.assessor') 
             return ActivityPermissionGroup.objects.filter(
-                permissions__codename='assessor'
+                permissions__codename='wildlifecompliance.assessor'
             )
         return ActivityPermissionGroup.objects.none()
 

@@ -98,53 +98,6 @@ class SecureBase(object):
         :param: message string to be logged.
         '''
 
-
-class SecureAuthorisationEnforcer(SecureBase):
-    '''
-    A SecureBase object to generically (interception) enforce an authorisation
-    policy onto a client request.
-    '''
-    def __init__(self, a_request):
-        super(SecureBase, self).__init__()
-        self.request = a_request
-
-    def __str__(self):
-        return 'SecureAuthrorisationEnforcer - user: {0}'.format(
-            self.request.user.email
-        )
-
-    def validate_request(self):
-        '''
-        super.validate_request(self)
-        '''
-        pass
-
-    def log_request(self, message):
-        '''
-        super.log_request(self, message)
-        '''
-        pass
-
-    def process_request(self, request=None):
-        '''
-        Process a privileged request.
-        '''
-        from wildlifecompliance.helpers import is_new_to_wildlifelicensing
-
-        if (self.request.method == 'GET' and 'api' not in self.request.path
-                and 'admin' not in self.request.path
-                and self.request.user.is_authenticated
-                and 'static' not in request.path
-                and "/ledger-ui/" not in request.get_full_path()):
-
-            path_first_time = '/ledger-ui/accounts-firsttime'
-            if is_new_to_wildlifelicensing(self.request):
-                path_logout = reverse('logout')
-                self.request.session['new_to_wildlifecompliance'] = True
-                if self.request.path not in (path_first_time, path_logout):
-                    return redirect(path_first_time + "?next=" + quote_plus(request.get_full_path()))
-
-
 class SecurePipe(SecureBase):
     '''
     A SecureBase object to provide a simple and standardised way to protect

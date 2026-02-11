@@ -1,17 +1,17 @@
 import string
 import random
 
-
 def can_manage_org(organisation, user):
+    from wildlifecompliance.helpers import user_has_perm
     from wildlifecompliance.components.organisations.models import UserDelegation
     try:
         UserDelegation.objects.get(organisation=organisation,user=user)
         return can_admin_org(organisation, user)
     except UserDelegation.DoesNotExist:
         pass
-    if user.has_perm('wildlifecompliance.system_administrator'):
+    if user_has_perm(user,'wildlifecompliance.system_administrator'):
         return True
-    return user.has_perm('wildlifecompliance.organisation_access_request')
+    return user_has_perm(user,'wildlifecompliance.organisation_access_request')
 
 
 def is_last_admin(organisation, user):

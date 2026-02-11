@@ -7,11 +7,14 @@ from django.db import transaction
 from django.utils import timezone
 
 from wildlifecompliance import settings
+from wildlifecompliance.helpers import user_has_perm
 
 from wildlifecompliance.components.licences.models import (
     LicencePurpose,
     LicenceSpecies,
 )
+
+from wildlifecompliance.components.main.models import WildlifeSystemGroupUser
 
 from wildlifecompliance.components.applications.payments import (
     ApplicationFeePolicy,
@@ -41,10 +44,6 @@ from wildlifecompliance.components.applications.models import (
 
 from wildlifecompliance.exceptions import ApplicationServiceException
 logger = logging.getLogger(__name__)
-
-from ledger_api_client.ledger_models import UsersInGroup
-# logger = logging
-
 
 class ApplicationService(object):
     """
@@ -509,11 +508,11 @@ class SubmitRequestCommand(ApplicationCommand):
 
         type_id = self.application.licence_type_data["id"]
         officer_groups = ActivityPermissionGroup.objects.filter(
-            permissions__codename='licensing_officer',
+            permissions__codename='wildlifecompliance.licensing_officer',
             licence_activities__purpose__licence_category__id=type_id
         )
         group_users = EmailUser.objects.filter(
-            id__in=list(UsersInGroup.objects.filter(group_id__in=officer_groups).values_list("emailuser_id",flat=True))
+            id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=officer_groups).values_list("emailuser_id",flat=True))
         ).distinct()
 
         requires_refund = self.application.requires_refund_at_submit()
@@ -1734,15 +1733,15 @@ def do_process_form(
     from wildlifecompliance.components.applications.utils import \
             MissingFieldsException
 
-    can_edit_officer_comments = request.user.has_perm(
+    can_edit_officer_comments = user_has_perm(request.user, 
         'wildlifecompliance.licensing_officer'
     )
-    can_edit_assessor_comments = request.user.has_perm(
+    can_edit_assessor_comments = user_has_perm(request.user, 
         'wildlifecompliance.assessor'
     )
     can_edit_comments = can_edit_officer_comments \
         or can_edit_assessor_comments
-    can_edit_deficiencies = request.user.has_perm(
+    can_edit_deficiencies = user_has_perm(request.user, 
         'wildlifecompliance.licensing_officer'
     )
 

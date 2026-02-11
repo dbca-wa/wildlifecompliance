@@ -49,7 +49,7 @@ class DefaultCondition(admin.ModelAdmin):
 
 @admin.register(models.ActivityPermissionGroup)
 class ActivityPermissionGroupAdmin(admin.ModelAdmin):
-    list_display = ['name', 'display_name']
+    list_display = ['name']
     filter_horizontal = ('licence_activities',)
     search_fields=('name',)
     form = forms.ActivityPermissionGroupAdminForm

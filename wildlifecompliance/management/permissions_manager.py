@@ -4,13 +4,11 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import Group, ContentType, Permission
 from django.db import transaction, models
-# from ledger.accounts.utils import get_app_label
 from wildlifecompliance.components.licences.models import LicenceActivity
 from wildlifecompliance.components.applications.models import ActivityPermissionGroup
-#from wildlifecompliance.components.users.models import CompliancePermissionGroup
-from wildlifecompliance.components.main.models import Region, District
 
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
+#NOTE whenever we refer to "new" or "local" group models, we are referring to these
+from wildlifecompliance.components.main.models import WildlifeSystemGroupUser, WildlifeSystemGroup
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +57,10 @@ class PermissionCollector(object):
 
         return collected_objects
 
-
+#NOTE this is used to create custom permissions to push them to ledger
+#Should be safe to keep for now but would be better served using fixtures or the admin interface
+#New custom permissions will no longer be used so this collector will no longer serve any purpose
+#if necessary, we can refactor this to use new models
 class CustomPermissionCollector(PermissionCollector):
 
     COLLECTION_SOURCE = 'CUSTOM_GROUP_PERMISSIONS'
@@ -117,7 +118,9 @@ class CustomPermissionCollector(PermissionCollector):
 
         return actual
 
-
+#NOTE this generates ActivityPermissionGroup records based on Group records
+#This should be disabled for now to prevent the creation of new ActivityPermissionGroups out of sync with the new local group model
+#We should potentially rework this collector to work with the new group models - so although we should disable its use for now we should still keep it in case we need it
 class CustomGroupCollector(PermissionCollector):
 
     COLLECTION_SOURCE = 'PERMISSION_GROUPS'
@@ -198,158 +201,6 @@ class CustomGroupCollector(PermissionCollector):
 
         return actual
 
-
-#class CompliancePermissionCollector(PermissionCollector):
-#
-#    COLLECTION_SOURCE = 'COMPLIANCE_GROUP_PERMISSIONS'
-#
-#    def get_or_create_models(self):
-#        """
-#        A mapping of permission name to permission instance. If the permission does not exist, it is created.
-#        """
-#        default_permissions = self.default_objects()
-#        actual = {}
-#
-#        try:
-#            for permission_name, config in default_permissions.items():
-#
-#                try:
-#                    content_type = ContentType.objects.get(
-#                        model=config['model'],
-#                        app_label=config['app_label'],
-#                    )
-#                except ObjectDoesNotExist:
-#                    logger.error("Content Type {app_label} - {model} not found for permission: {codename}".format(
-#                        app_label=config['app_label'],
-#                        model=config['model'],
-#                        codename=permission_name,
-#                    ))
-#                    continue
-#
-#                permission, created = Permission.objects.get_or_create(
-#                    name=config['name'],
-#                    content_type_id=content_type.id,
-#                    codename=permission_name
-#                )
-#                if created:
-#                    logger.info("Created custom permission: %s" % (permission_name))
-#
-#                # Only assign permissions to default groups if they didn't exist in the database before.
-#                # Don't re-add permissions that were revoked by admins manually!
-#                if 'default_groups' in config and created:
-#                    for group_name in config['default_groups']:
-#                        try:
-#                            group = Group.objects.get(name=group_name)
-#                        except ObjectDoesNotExist:
-#                            logger.error("Cannot assign permission {permission_name} to a non-existent group: {group}".format(
-#                                permission_name=permission_name,
-#                                group=group_name
-#                            ))
-#                            continue
-#
-#                        group.permissions.add(permission)
-#                        logger.info("Assigned permission {permission_name} to group: {group}".format(
-#                            permission_name=permission_name,
-#                            group=group_name
-#                        ))
-#
-#                actual[permission_name] = permission
-#
-#        except BaseException as e:
-#            logger.error("Creating permissions for {0}: {1}".format(
-#                permission_name, e))
-#
-#        return actual
-#
-#
-#class ComplianceGroupCollector(PermissionCollector):
-#
-#    COLLECTION_SOURCE = 'COMPLIANCE_PERMISSION_GROUPS'
-#
-#    def get_or_create_group(self, group_name, config, region=None, district=None):
-#        created = None
-#        if settings.COMPLIANCE_GROUP_PREFIX and settings.COMPLIANCE_GROUP_PREFIX not in group_name:
-#            group_name = "{prefix} - {name}".format(
-#                prefix=settings.COMPLIANCE_GROUP_PREFIX,
-#                name=group_name
-#            )
-#        group = CompliancePermissionGroup.objects.filter(name=group_name).first()
-#        if not group:
-#            base_group = Group.objects.filter(name=group_name).first()
-#            if base_group:
-#                group = created = CompliancePermissionGroup.objects.create(
-#                    group_ptr_id=base_group.id,
-#                    name=base_group.name
-#                )
-#            else:
-#                # Check if groups with the same permissions (but a different name) already exist.
-#                # Do not re-create groups that have been manually re-named by admins.
-#                #existing_groups = None
-#                if config['permissions']:
-#                    groups_by_permission = CompliancePermissionGroup.objects.filter(permissions__codename__in=config['permissions'])
-#                    if region or district:
-#                        groups_by_permission = groups_by_permission.filter(region=region, district=district)
-#                    group = groups_by_permission.first()
-#                    #if region or district:
-#                        #existing_groups = groups_by_permission.filter(region=region, district=district)
-#                if not group:
-#                    group, created = CompliancePermissionGroup.objects.get_or_create(name=group_name, region=region, district=district)
-#
-#        if created:
-#            logger.info("Created compliance group: %s" % (group_name))
-#
-#        if config['permissions'] and created:
-#            for permission_codename in config['permissions']:
-#                try:
-#                    permission = Permission.objects.get(
-#                        codename=permission_codename
-#                    )
-#
-#                    group.permissions.add(permission)
-#                    logger.info("Assigned permission {permission_name} to group: {group}".format(
-#                        permission_name=permission_codename,
-#                        group=group_name
-#                    ))
-#                except ObjectDoesNotExist:
-#                    logger.error("Cannot assign non-existent permission {permission_name} to: {group}".format(
-#                        permission_name=permission_codename,
-#                        group=group_name
-#                    ))
-#                    raise 
-#
-#        return group
-#
-#    def get_or_create_models(self):
-#        """
-#        A mapping of group name to group instance. If the group does not exist, it is created.
-#        """
-#        default_groups = self.default_objects()
-#        actual = {}
-#
-#        try:
-#
-#            for group_name, config in default_groups.items():
-#                if config['per_district']:
-#                    #for region_district in RegionDistrict.objects.all():
-#                    #    compliance_group_name = "{}: {}".format(group_name, region_district.display_name())
-#                    #    group = self.get_or_create_group(compliance_group_name, config, region_district)
-#                    #    group.region_district.add(region_district)
-#                    for region in Region.objects.all():
-#                        compliance_group_name = "{}: {}".format(group_name, region.name)
-#                        group = self.get_or_create_group(compliance_group_name, config, region=region, district=None)
-#                    for district in District.objects.all():
-#                        compliance_group_name = "{}: {}".format(group_name, district.name)
-#                        group = self.get_or_create_group(compliance_group_name, config, region=None, district=district)
-#                else:
-#                    group = self.get_or_create_group(group_name, config)
-#    
-#        except BaseException as e:
-#            logger.error("Creating mapping group to district for {0}: {1}".format(
-#                group_name, e))
-#
-#        return actual
-#
-
 class CollectorManager(object):
 
     def __init__(self):
@@ -360,13 +211,10 @@ class CollectorManager(object):
             logger.info("Verifying presence of custom group permissions in the database...")
             CustomPermissionCollector().get_or_create_models()
             logger.info("Verifying presence of custom groups in the database...")
-            CustomGroupCollector().get_or_create_models()
-            logger.info("Finished collecting custom groups and permissions.")
-            #logger.info("Verifying presence of compliance group permissions in the database...")
-            #CompliancePermissionCollector().get_or_create_models()
-            #logger.info("Verifying presence of compliance groups in the database...")
-            #ComplianceGroupCollector().get_or_create_models()
-            #logger.info("Finished collecting compliance groups and permissions.")
+
+            #NOTE disabled for now by may be required later pending rework...
+            #CustomGroupCollector().get_or_create_models()
+            #logger.info("Finished collecting custom groups and permissions.")
 
 class PermissionUser(object):
     def __init__(self, a_user):
@@ -376,36 +224,37 @@ class PermissionUser(object):
         app_label = get_app_label()
 
         user_id = self._user.id
-        groups_with_permissions = Group.objects.filter(permissions__codename__in=permission_codename if isinstance(
+        groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename__in=permission_codename if isinstance(
             permission_codename, (list, models.query.QuerySet)
         ) else [permission_codename])
         
-        groups_with_user = UsersInGroup.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
-        group_queryset = Group.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+        groups_with_user = WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
+        group_queryset = ActivityPermissionGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
         group_queryset = group_queryset.filter(
-            activitypermissiongroup__licence_activities__id__in=licence_activity_id if isinstance(
+            licence_activities__id__in=licence_activity_id if isinstance(
                 licence_activity_id, (list, models.query.QuerySet)
             ) else [licence_activity_id]
         )
         if app_label:
-            group_queryset = group_queryset.filter(permissions__content_type__app_label=app_label)
+            group_queryset = group_queryset.filter(permissions__codename__startswith=f"{app_label}.")
         return group_queryset.count()
 
     def get_wildlifelicence_permission_group(self, permission_codename, activity_id=None, first=True):
         app_label = get_app_label()
 
         user_id = self._user.id
-        groups_with_permissions = Group.objects.filter(permissions__codename=permission_codename)
-        groups_with_user = UsersInGroup.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
-        qs = Group.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+        groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename=permission_codename)
+        groups_with_user = WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
+        qs = ActivityPermissionGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
 
         if activity_id is not None:
             qs = qs.filter(
-                activitypermissiongroup__licence_activities__id__in=activity_id if isinstance(
+                licence_activities__id__in=activity_id if isinstance(
                     activity_id, (list, models.query.QuerySet)
                 ) else [activity_id]
             )
         if app_label:
-            qs = qs.filter(permissions__content_type__app_label=app_label)
+            qs = qs.filter(permissions__codename__startswith=f"{app_label}.")
+            
         return qs.first() if first else qs
 

@@ -66,6 +66,7 @@ While connected to the new wildlife compliance database insert the rows from the
 
 # Step 8: Run all other migrations
 
+`python manage_wc.py migrate wildlifecompliance 0648_wildlifesystemgroupuser.py`
 `python manage_wc.py migrate`
 
 # Step 9: Update fauna license category row
@@ -73,3 +74,11 @@ While connected to the new wildlife compliance database insert the rows from the
 While connected to the new wildlife compliance database, run the following:
 
 `UPDATE wildlifecompliance_licencecategory SET name='Fauna', short_name='Fauna', code='FAU' WHERE id=12;`
+
+# Step 10: Migrate Ledger Auth Groups
+
+`python manage_wc.py migrate_group_auth_from_ledger`
+
+# Step 11: Run remaining migrations
+
+`python manage_wc.py migrate wildlifecompliance`

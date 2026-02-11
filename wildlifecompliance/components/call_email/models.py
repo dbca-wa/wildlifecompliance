@@ -6,7 +6,6 @@ from django.contrib.gis.db.models import PointField
 from django.db.models import Manager as GeoManager
 from django.db.models import JSONField
 from django.db.models import Max
-from django.contrib.auth.models import Permission, ContentType
 from multiselectfield import MultiSelectField
 from six import python_2_unicode_compatible
 from rest_framework import serializers
@@ -15,13 +14,10 @@ from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseM
 
 from wildlifecompliance.components.main.models import (
         CommunicationsLogEntry,
-        UserAction, 
         Document,
-        #CallEmailTriageGroup, OfficerGroup, ManagerGroup,
         ComplianceManagementSystemGroup,
         )
 from wildlifecompliance.components.main.related_item import can_close_record
-#from wildlifecompliance.components.users.models import CompliancePermissionGroup
 from wildlifecompliance.components.main.models import Region, District
 
 from django.conf import settings
@@ -426,21 +422,7 @@ class CallEmail(RevisionedMixin):
 
     @property
     def get_related_items_descriptor(self):
-        #return '{0}, {1}'.format(self.status, self.caller)
         return self.caller
-    # @property
-    # def related_items(self):
-    #     return get_related_items(self)
-
-    #def set_allocated_group(self, permission_codename, region_id=None, district_id=None):
-    #    #import ipdb; ipdb.set_trace()
-    #    if district_id:
-    #        region_id = None
-    #    compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
-    #    permission = Permission.objects.filter(codename=permission_codename).filter(content_type_id=compliance_content_type.id).first()
-    #    self.allocated_group = CompliancePermissionGroup.objects.get(permissions=permission, region_id=region_id, district_id=district_id)
-    #    #request_data.update({'allocated_group_id': group.id})
-    #    self.save()
 
     def forward_to_regions(self, request):
         if not self.location:
@@ -609,12 +591,13 @@ class ComplianceFormDataRecord(SanitiseMixin):
 
     @staticmethod
     def process_form(request, CallEmail, form_data, action=ACTION_TYPE_ASSIGN_VALUE):
-        can_edit_comments = request.user.has_perm(
+        from wildlifecompliance.helpers import user_has_perm
+        can_edit_comments = user_has_perm(request.user, 
             'wildlifecompliance.licensing_officer'
-        ) or request.user.has_perm(
+        ) or user_has_perm(request.user, 
             'wildlifecompliance.assessor'
         )
-        can_edit_deficiencies = request.user.has_perm(
+        can_edit_deficiencies = user_has_perm(request.user, 
             'wildlifecompliance.licensing_officer'
         )
 
