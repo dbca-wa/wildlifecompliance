@@ -72,7 +72,7 @@ def is_wildlifecompliance_payment_officer(request):
                request.user.is_superuser
 
     if request.user.is_authenticated and (
-            WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS).user_set.filter(id=request.user.id)
+            WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS).wildlifesystemgroupuser_set.filter(emailuser_id=request.user.id)
         ):
         wildlife_compliance_user = True
 
@@ -151,7 +151,7 @@ def is_wildlife_compliance_officer(request):
                request.user.is_superuser
 
     if request.user.is_authenticated and (
-            WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).user_set.filter(id=request.user.id)
+            WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).wildlifesystemgroupuser_set.filter(emailuser_id=request.user.id)
         ):
         wildlife_compliance_user = True
 

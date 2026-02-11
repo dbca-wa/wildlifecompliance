@@ -281,37 +281,10 @@ class InspectionSerializer(serializers.ModelSerializer):
         returned_data.insert(0, blank_field)
 
         return returned_data
-        #all_officer_objs = []
-        #compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
-        #permission = Permission.objects.filter(codename='officer').filter(content_type_id=compliance_content_type.id).first()
-        #for group in permission.group_set.all():
-        #    for user in group.user_set.all():
-        #        all_officer_objs.append(user)
-
-        #unique_officers = list(set(all_officer_objs))
-        #sorted_unique_officers = sorted(unique_officers, key=lambda officer: officer.last_name)
-
-        #serialized_officers = IndividualSerializer(sorted_unique_officers, many=True)
-        #returned_data = serialized_officers.data
-        #blank_field = [{
-        #    'dob': '',
-        #    'email': '',
-        #    'full_name': '',
-        #    'id': None,
-        #    }]
-
-        #returned_data.insert(0, blank_field)
-        #print(returned_data)
-        #return returned_data
-
+        
     def get_inspection_report(self, obj):
         return [[r.name, r._file.url] for r in obj.report.all()]
     
-    # def get_region_id(self, obj):
-    #     return obj.region_id
-    
-    # def get_district_id(self, obj):
-    #     return obj.district_id
 
 class SaveInspectionSerializer(serializers.ModelSerializer):
     assigned_to_id = serializers.IntegerField(

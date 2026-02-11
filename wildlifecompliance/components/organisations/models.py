@@ -42,12 +42,12 @@ private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/"
 
 def is_wildlife_compliance_officer(request):
     from wildlifecompliance.helpers import user_has_perm
-    
+
     wildlife_compliance_user = user_has_perm(request.user, 'wildlifecompliance.system_administrator') or \
                request.user.is_superuser
 
     if request.user.is_authenticated and (
-            WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).user_set.filter(id=request.user.id)
+            WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).wildlifesystemgroupuser_set.filter(emailuser_id=request.user.id)
         ):
         wildlife_compliance_user = True
 
