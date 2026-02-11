@@ -200,7 +200,7 @@ class ApplicationSelectedActivityCanActionSerializer(serializers.Serializer):
         return (
             user_has_perm(user,'wildlifecompliance.system_administrator') or
             perm_user.has_wildlifelicenceactivity_perm(
-                    ['issuing_officer'],
+                    ['wildlifecompliance.issuing_officer'],
                     obj.get('licence_activity_id')
                 )
             ) and obj.get('can_reissue')
