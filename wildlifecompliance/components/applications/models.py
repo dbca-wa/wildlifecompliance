@@ -1816,12 +1816,10 @@ class Application(RevisionedMixin):
         user_id = user.id
         groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename="wildlifecompliance.assessor")
         groups_with_user = WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
-        qs = WildlifeSystemGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+        qs = ActivityPermissionGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
         if activity_id is not None:
            qs = qs.filter(
-                activitypermissiongroup__licence_activities__id__in=activity_id if isinstance(
-                    activity_id, (list, models.query.QuerySet)
-                ) else [activity_id]
+                licence_activities__id__in=activity_id if isinstance(activity_id, (list, models.query.QuerySet)) else [activity_id]
            )
         if app_label:
             qs = qs.filter(permissions__codename__startswith=f"{app_label}.")
@@ -1842,19 +1840,16 @@ class Application(RevisionedMixin):
                     raise Exception("Assessment record ID %s \
                     does not exist!" % (assessment_id))
 
-                assessor_group = self \
-                    .get_assessor_permission_group(
+                assessor_group = self.get_assessor_permission_group(
                         request.user,
                         activity_id=assessment.licence_activity_id,
                         first=True
                     )
                 if not assessor_group:
-                    raise Exception("Missing assessor permissions for Activity \
-                        ID: %s" % (assessment.licence_activity_id))
+                    raise Exception("Missing assessor permissions for Activity ID: %s" % (assessment.licence_activity_id))
 
                 # Set the actioner and assessor for the action.
-                assessor = EmailUser.objects \
-                    .get(id=assessor_id) if assessor_id else assessor_id
+                assessor = EmailUser.objects.get(id=assessor_id) if assessor_id else assessor_id
                 assessment.actioned_by = request.user
                 assessment.assigned_assessor = assessor
                 assessment.save()
@@ -1892,8 +1887,7 @@ class Application(RevisionedMixin):
                 for assessment in assessments:
 
                     # check user has assessor permission
-                    assessor_group = \
-                        self.get_assessor_permission_group(
+                    assessor_group = self.get_assessor_permission_group(
                             request.user,
                             activity_id=assessment.licence_activity_id,
                             first=True
@@ -3766,12 +3760,17 @@ class Application(RevisionedMixin):
             app_label = settings.SYSTEM_APP_LABEL
         except AttributeError:
             app_label = ''
-        qs = request.user.groups.filter(
+
+        user_id = request.user.id if request.user else None
+        groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename=permission_codename)
+        groups_with_user = WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
+        qs = ActivityPermissionGroup.objects.filter(
             permissions__codename=permission_codename
-        )
+        ).filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+
         if activity_id is not None:
             qs = qs.filter(
-                activitypermissiongroup__licence_activities__id__in=activity_id if isinstance(
+                licence_activities__id__in=activity_id if isinstance(
                     activity_id, (list, models.query.QuerySet)
                 ) else [activity_id]
             )
@@ -6842,8 +6841,7 @@ class ApplicationCondition(OrderedModel):
             # Get the Application Selected Activity for this condition.
             licence_activity_id = self.licence_activity_id
         )
-        if activity.processing_status ==\
-             ApplicationSelectedActivity.PROCESSING_STATUS_WITH_ASSESSOR:
+        if activity.processing_status == ApplicationSelectedActivity.PROCESSING_STATUS_WITH_ASSESSOR:
             # Set the source_group when added by the assessor.
             group = self.get_assessor_permission_group(user)
             self.source_group = group.activitypermissiongroup
@@ -6865,11 +6863,11 @@ class ApplicationCondition(OrderedModel):
         user_id = user.id
         groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename="wildlifecompliance.assessor")
         groups_with_user = WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
-        qs = WildlifeSystemGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+        qs = ActivityPermissionGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
 
         activity_id = self.licence_activity.id
         qs = qs.filter(
-            activitypermissiongroup__licence_activities__id__in=activity_id\
+            licence_activities__id__in=activity_id\
                 if isinstance(activity_id, (list, models.query.QuerySet)
                 ) else [activity_id]
         )
@@ -6883,13 +6881,11 @@ class ApplicationCondition(OrderedModel):
         user_id = user.id
         groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename="wildlifecompliance.licensing_officer")
         groups_with_user = WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
-        qs = WildlifeSystemGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+        qs = ActivityPermissionGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
 
         activity_id = self.licence_activity.id
         qs = qs.filter(
-            activitypermissiongroup__licence_activities__id__in=activity_id\
-                if isinstance(activity_id, (list, models.query.QuerySet)
-                ) else [activity_id]
+            licence_activities__id__in=activity_id if isinstance(activity_id, (list, models.query.QuerySet)) else [activity_id]
         )
         if app_label:
             qs = qs.filter(permissions__codename__startswith=f"{app_label}.")

@@ -229,9 +229,9 @@ class PermissionUser(object):
         ) else [permission_codename])
         
         groups_with_user = WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
-        group_queryset = WildlifeSystemGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+        group_queryset = ActivityPermissionGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
         group_queryset = group_queryset.filter(
-            activitypermissiongroup__licence_activities__id__in=licence_activity_id if isinstance(
+            licence_activities__id__in=licence_activity_id if isinstance(
                 licence_activity_id, (list, models.query.QuerySet)
             ) else [licence_activity_id]
         )
@@ -245,15 +245,16 @@ class PermissionUser(object):
         user_id = self._user.id
         groups_with_permissions = WildlifeSystemGroup.objects.filter(permissions__codename=permission_codename)
         groups_with_user = WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups_with_permissions.values_list('id',flat=True)),emailuser_id=user_id)
-        qs = WildlifeSystemGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
+        qs = ActivityPermissionGroup.objects.filter(id__in=list(groups_with_user.values_list('group_id', flat=True)))
 
         if activity_id is not None:
             qs = qs.filter(
-                activitypermissiongroup__licence_activities__id__in=activity_id if isinstance(
+                licence_activities__id__in=activity_id if isinstance(
                     activity_id, (list, models.query.QuerySet)
                 ) else [activity_id]
             )
         if app_label:
             qs = qs.filter(permissions__codename__startswith=f"{app_label}.")
+            
         return qs.first() if first else qs
 
