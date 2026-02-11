@@ -2470,7 +2470,7 @@ class AssessmentPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         # Get the assessor groups the current user is member of
         perm_user = PermissionUser(request.user)
         assessor_groups = perm_user.get_wildlifelicence_permission_group(
-            'assessor', first=False)
+            'wildlifecompliance.assessor', first=False)
 
         # For each assessor groups get the assessments
         queryset = self.get_queryset().none()
@@ -2514,7 +2514,7 @@ class AssessmentViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def user_list(self, request, *args, **kwargs):
         # Get the assessor groups the current user is member of
         perm_user = PermissionUser(request.user)
-        assessor_groups = perm_user.get_wildlifelicence_permission_group('assessor', first=False)
+        assessor_groups = perm_user.get_wildlifelicence_permission_group('wildlifecompliance.assessor', first=False)
 
         # For each assessor groups get the assessments
         queryset = self.get_queryset().none()

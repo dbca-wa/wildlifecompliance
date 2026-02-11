@@ -450,8 +450,6 @@ class SanctionOutcome(SanitiseMixin):
             # instance.save()
             pass
 
-        #permissions = Permission.objects.filter(codename=codename, content_type_id=compliance_content_type.id)
-
         # 3. Find groups which has the permission(s) determined above in the regionDistrict.
         if per_district:
             groups = ComplianceManagementSystemGroup.objects.filter(region=region, district=district, name=codename)

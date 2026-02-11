@@ -149,16 +149,6 @@ class Offence(RevisionedMixin):
     @staticmethod
     # Rewrite for Region District models
     def get_allocated_group(region_id, district_id):
-        #region_district = RegionDistrict.objects.filter(id=regionDistrictId)
-
-        # 2. Determine which permission(s) is going to be applied
-        # compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
-        # codename = 'officer'
-        # per_district = True
-
-        # permissions = Permission.objects.filter(codename=codename, content_type_id=compliance_content_type.id)
-
-        # 3. Find groups which has the permission(s) determined above in the regionDistrict.
         try:
             return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id)
         except:
