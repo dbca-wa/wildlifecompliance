@@ -5,7 +5,7 @@ import logging
 from django.urls import reverse
 from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance import settings
-from wildlifecompliance.helpers import is_internal
+from wildlifecompliance.helpers import user_has_perm
 from wildlifecompliance.components.applications.models import (
     Application,
     ApplicationUserAction,
@@ -198,7 +198,7 @@ class ApplicationSelectedActivityCanActionSerializer(serializers.Serializer):
             return False
         perm_user = PermissionUser(user)
         return (
-            user.has_perm('wildlifecompliance.system_administrator') or
+            user_has_perm(user,'wildlifecompliance.system_administrator') or
             perm_user.has_wildlifelicenceactivity_perm(
                     ['issuing_officer'],
                     obj.get('licence_activity_id')
@@ -1775,14 +1775,14 @@ class InternalApplicationSerializer(BaseApplicationSerializer):
             'issuing_officer',
             'return_curator'
         ]
-        is_administrator = user.has_perm(
+        is_administrator = user_has_perm(user,
             'wildlifecompliance.system_administrator'
         )
         roles = []
         perm_user = PermissionUser(user)
         for activity in obj.selected_activities.all():
             for role in available_roles:
-                if is_administrator or perm_user.has_wildlifelicenceactivity_perm(role, activity.licence_activity_id):
+                if is_administrator or perm_user.has_wildlifelicenceactivity_perm(f"wildlifecompliance.{role}", activity.licence_activity_id):
                     roles.append(
                         {
                             'activity_id': activity.licence_activity_id,

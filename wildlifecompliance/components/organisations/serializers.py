@@ -26,6 +26,8 @@ from wildlifecompliance.components.main.utils import (
     get_full_name
 )
 
+from wildlifecompliance.helpers import user_has_perm
+
 #class LedgerOrganisationSerializer(serializers.ModelSerializer):
 #    class Meta:
 #        model = ledger_organisation
@@ -400,8 +402,7 @@ class OrganisationRequestSerializer(serializers.ModelSerializer):
         return obj.status == OrganisationRequest.ORG_REQUEST_STATUS_WITH_ASSESSOR
 
     def get_user_can_process_org_access_requests(self, obj):
-        if self.context['request'].user and self.context['request'].\
-                user.has_perm('wildlifecompliance.organisation_access_request'):
+        if self.context['request'].user and user_has_perm(self.context['request'].user,'wildlifecompliance.organisation_access_request'):
             return True
         return False
 
