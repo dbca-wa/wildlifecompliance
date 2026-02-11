@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 from django.contrib.auth.models import Permission, Group
 from ledger_api_client.ledger_models import UsersInGroup
 from wildlifecompliance.components.main.models import WildlifeSystemPermission, WildlifeSystemGroup, WildlifeSystemGroupUser
+from django.db.models import Q
 
 def get_wlc_ledger_permissions(wlc_ledger_groups):
     logger.info("Getting all wildlifecompliance permissions from ledger")
@@ -15,7 +16,7 @@ def get_wlc_ledger_permissions(wlc_ledger_groups):
     group_id_lists = list(map(lambda group: group.permissions.values_list('id', flat=True), wlc_ledger_groups))
     group_id_list = list(set([id for id_list in group_id_lists for id in id_list]))
 
-    return Permission.objects.filter(id__in=group_id_list)
+    return Permission.objects.filter(Q(id__in=group_id_list)|Q(content_type__app_label="wildlifecompliance"))
 
 def create_wlc_permissions(wlc_ledger_permissions):
     logger.info("Creating wildlifecompliance permissions")

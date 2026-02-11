@@ -457,7 +457,7 @@ class RegionGIS(models.Model):
 
 class WildlifeSystemPermission(models.Model):
     name = models.CharField(_("name"), max_length=255)
-    codename = models.CharField(_("codename"), max_length=100)
+    codename = models.CharField(_("codename"), max_length=100,unique=True)
 
     class Meta:
         app_label = 'wildlifecompliance'
