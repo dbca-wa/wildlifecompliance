@@ -1,8 +1,8 @@
 import string
 import random
-from wildlifecompliance.helpers import user_has_perm
 
 def can_manage_org(organisation, user):
+    from wildlifecompliance.helpers import user_has_perm
     from wildlifecompliance.components.organisations.models import UserDelegation
     try:
         UserDelegation.objects.get(organisation=organisation,user=user)
