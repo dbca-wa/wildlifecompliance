@@ -876,7 +876,7 @@ class SaveAssessmentSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("No licence activity supplied!")
 
         group_match = ActivityPermissionGroup.get_groups_for_activities(
-            licence_activity, 'assessor').filter(id=assessor_group.id).first()
+            licence_activity, 'wildlifecompliance.assessor').filter(id=assessor_group.id).first()
         if not group_match:
             raise serializers.ValidationError("Invalid group (ID: %s) selected to assess activity ID: %s" % (
                 assessor_group, licence_activity))

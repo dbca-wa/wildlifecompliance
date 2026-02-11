@@ -4905,7 +4905,7 @@ class ApplicationSelectedActivity(SanitiseMixin):
         Authorised licence officers for this Selected Activity.
         """
         groups = ActivityPermissionGroup.get_groups_for_activities(
-            self.licence_activity, 'licensing_officer').values_list("id", flat=True)
+            self.licence_activity, 'wildlifecompliance.licensing_officer').values_list("id", flat=True)
 
         return EmailUser.objects.filter(
             id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
@@ -4917,7 +4917,7 @@ class ApplicationSelectedActivity(SanitiseMixin):
         Authorised issuing officers for this Selected Activity.
         """
         groups = ActivityPermissionGroup.get_groups_for_activities(
-            self.licence_activity, 'issuing_officer').values_list("id", flat=True)
+            self.licence_activity, 'wildlifecompliance.issuing_officer').values_list("id", flat=True)
 
         return EmailUser.objects.filter(
             id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
