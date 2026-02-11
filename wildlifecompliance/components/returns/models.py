@@ -5,7 +5,7 @@ from django.db import models, transaction
 from django.db.utils import IntegrityError
 from django.db.models import JSONField
 from django.utils import timezone
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 from ledger_api_client.ledger_models import Invoice
 from rest_framework import serializers
@@ -18,7 +18,8 @@ from wildlifecompliance.components.applications.models import (
 from wildlifecompliance.components.main.models import (
     CommunicationsLogEntry,
     UserAction,
-    Document
+    Document,
+    WildlifeSystemGroupUser
 )
 from wildlifecompliance.components.returns.email import (
     send_external_submit_email_notification,
@@ -507,7 +508,7 @@ class Return(SanitiseMixin):
             'id', flat=True
         ))
         return EmailUser.objects.filter(
-            id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
+            id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=groups).values_list('emailuser_id', flat=True))
         ).distinct()
 
     @transaction.atomic

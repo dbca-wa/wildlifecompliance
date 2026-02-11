@@ -2633,9 +2633,9 @@ class AssessorGroupViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def get_queryset(self, application=None):
         if is_wildlife_compliance_officer(self.request):
             if application is not None:
-                return application.get_permission_groups('assessor') 
+                return application.get_permission_groups('wildlifecompliance.assessor') 
             return ActivityPermissionGroup.objects.filter(
-                permissions__codename='assessor'
+                permissions__codename='wildlifecompliance.assessor'
             )
         return ActivityPermissionGroup.objects.none()
 

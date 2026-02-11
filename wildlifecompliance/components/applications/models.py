@@ -24,7 +24,7 @@ from smart_selects.db_fields import ChainedForeignKey
 from ckeditor.fields import RichTextField
 from rest_framework import serializers
 
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance.components.main.models import RevisionedMixin, SanitiseMixin
 from ledger_api_client.ledger_models import Invoice
 from ledger_api_client.utils import get_invoice_properties
@@ -864,7 +864,7 @@ class Application(RevisionedMixin):
         logger.debug('Application.licence_officers()')
         if not self.LICENCE_OFFICERS:
             groups = list(self.get_permission_groups(
-                'licensing_officer').values_list('id', flat=True))
+                'wildlifecompliance.licensing_officer').values_list('id', flat=True))
             self.LICENCE_OFFICERS = EmailUser.objects.filter(
                 id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))
             ).distinct()
@@ -874,7 +874,7 @@ class Application(RevisionedMixin):
     @property
     def licence_approvers(self):
         logger.debug('Application.licence_approvers() - start')
-        groups = list(self.get_permission_groups('issuing_officer')\
+        groups = list(self.get_permission_groups('wildlifecompliance.issuing_officer')\
             .values_list('id', flat=True))
 
         approvers = EmailUser.objects.filter(

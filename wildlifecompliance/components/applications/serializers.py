@@ -3,7 +3,7 @@ import datetime
 import logging
 
 from django.urls import reverse
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance import settings
 from wildlifecompliance.helpers import is_internal
 from wildlifecompliance.components.applications.models import (
@@ -2231,7 +2231,7 @@ class DTAssessmentSerializer(serializers.ModelSerializer):
 
     def get_can_be_processed(self, obj):
         groups = obj.application.get_permission_groups(['assessor']).values_list('id', flat=True)
-        can_process = EmailUser.objects.filter(id__in=list(UsersInGroup.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))).distinct()
+        can_process = EmailUser.objects.filter(id__in=list(WildlifeSystemGroupUser.objects.filter(group_id__in=groups).values_list("emailuser_id",flat=True))).distinct()
         if self.context['request'].user and self.context['request'].user in can_process and obj.status == obj.STATUS_AWAITING_ASSESSMENT:
             return True
 

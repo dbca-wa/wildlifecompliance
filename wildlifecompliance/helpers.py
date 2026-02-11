@@ -2,14 +2,13 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.contrib.auth.models import Group
 from rest_framework import serializers
-from ledger_api_client.ledger_models import EmailUserRO as EmailUser, UsersInGroup
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 from wildlifecompliance import settings
 from wildlifecompliance.components.applications.models import ActivityPermissionGroup
 from wildlifecompliance.components.users.models import ComplianceManagementUserPreferences
 
-from wildlifecompliance.components.main.models import WildlifeSystemPermission, WildlifeSystemGroup, WildlifeSystemGroupUser
+from wildlifecompliance.components.main.models import WildlifeSystemGroup, WildlifeSystemGroupUser
 
 from confy import env
 from django.db.models import Q
@@ -41,8 +40,8 @@ def belongs_to_list(user, group_names):
     :param list_of_group_names:
     :return:
     """
-    groups = Group.objects.filter(name__in=group_names)
-    return user.id in list(UsersInGroup.objects.filter(group_id__in=list(groups.values_list('id',flat=True))).values_list('emailuser_id', flat=True))
+    groups = WildlifeSystemGroup.objects.filter(name__in=group_names)
+    return user.id in list(WildlifeSystemGroupUser.objects.filter(group_id__in=list(groups.values_list('id',flat=True))).values_list('emailuser_id', flat=True))
 
 
 def is_wildlifecompliance_admin(request):
@@ -60,7 +59,7 @@ def is_wildlifecompliance_payment_officer(request):
                request.user.is_superuser
 
     if request.user.is_authenticated and (
-            Group.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS).user_set.filter(id=request.user.id)
+            WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS).user_set.filter(id=request.user.id)
         ):
         wildlife_compliance_user = True
 
@@ -139,7 +138,7 @@ def is_wildlife_compliance_officer(request):
                request.user.is_superuser
 
     if request.user.is_authenticated and (
-            Group.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).user_set.filter(id=request.user.id)
+            WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).user_set.filter(id=request.user.id)
         ):
         wildlife_compliance_user = True
 
