@@ -20,11 +20,14 @@ logger = logging.getLogger(__name__)
 
 def user_has_perm(user,perm):
     
+    if not user or not perm:
+        return False
+
     if user.is_superuser:
         return True
     
     groups_with_perm = WildlifeSystemGroup.objects.filter(permissions__codename=perm)
-    groups_with_user = WildlifeSystemGroup.objects.filter(id__in=WildlifeSystemGroupUser.objects.filter(emailuser=user).values_list('group_id',flat=True))
+    groups_with_user = WildlifeSystemGroup.objects.filter(id__in=WildlifeSystemGroupUser.objects.filter(emailuser_id=user.id).values_list('group_id',flat=True))
 
     common_groups = groups_with_perm & groups_with_user
     return common_groups.exists()
@@ -229,12 +232,12 @@ def is_able_to_view_sanction_outcome_pdf(request):
 
 def get_all_officers():
     licence_officer_groups = ActivityPermissionGroup.objects.filter(
-            permissions__codename__in=['organisation_access_request',
-                                       'licensing_officer',
-                                       'issuing_officer',
-                                       'assessor',
-                                       'return_curator',
-                                       'payment_officer'])
+            permissions__codename__in=['wildlifecompliance.organisation_access_request',
+                                       'wildlifecompliance.licensing_officer',
+                                       'wildlifecompliance.issuing_officer',
+                                       'wildlifecompliance.assessor',
+                                       'wildlifecompliance.return_curator',
+                                       'wildlifecompliance.payment_officer'])
     return EmailUser.objects.filter(
         groups__name__in=licence_officer_groups)
 

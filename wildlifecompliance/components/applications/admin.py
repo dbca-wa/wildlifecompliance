@@ -47,19 +47,19 @@ class DefaultCondition(admin.ModelAdmin):
     raw_id_fields = ('standard_condition',  'licence_activity')
 
 
-#@admin.register(models.ActivityPermissionGroup)
-#class ActivityPermissionGroupAdmin(admin.ModelAdmin):
-#    list_display = ['name', 'display_name']
-#    filter_horizontal = ('licence_activities',)
-#    search_fields=('name',)
-#    form = forms.ActivityPermissionGroupAdminForm
-#
-#    def has_delete_permission(self, request, obj=None):
-#        return super(
-#            ActivityPermissionGroupAdmin,
-#            self).has_delete_permission(
-#            request,
-#            obj)
+@admin.register(models.ActivityPermissionGroup)
+class ActivityPermissionGroupAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    filter_horizontal = ('licence_activities',)
+    search_fields=('name',)
+    form = forms.ActivityPermissionGroupAdminForm
+
+    def has_delete_permission(self, request, obj=None):
+        return super(
+            ActivityPermissionGroupAdmin,
+            self).has_delete_permission(
+            request,
+            obj)
 
 
 class ApplicationInvoiceInline(admin.TabularInline):
