@@ -1921,6 +1921,8 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                     request.data,
                     action=action
                 )
+                if is_submit:
+                    instance.submitter = request.user
                 instance.save()
                 instance.log_user_action(
                     ApplicationUserAction.ACTION_SAVE_APPLICATION.format(

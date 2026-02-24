@@ -1508,7 +1508,11 @@ class Application(RevisionedMixin):
                     self.save()
                     return
                 self.customer_status = Application.CUSTOMER_STATUS_UNDER_REVIEW
-                self.submitter = request.user
+
+                #TODO set submitter before payment
+                if request.user and isinstance(request.user,EmailUser):
+                    self.submitter = request.user
+                
                 self.lodgement_date = timezone.now()
                 # set assess status to True everytime.
                 # flag is only used for assessments and conditions and is set
@@ -1545,8 +1549,6 @@ class Application(RevisionedMixin):
                                 raise Exception("Active licence not found for activity ID: %s" % activity["id"])
                             self.set_activity_processing_status(
                                 activity["id"], ApplicationSelectedActivity.PROCESSING_STATUS_OFFICER_FINALISATION)
-                            # selected_activity = \
-                            #     self.get_selected_activity(activity["id"])
                             selected_activity.proposed_action =\
                                 ApplicationSelectedActivity.PROPOSED_ACTION_ISSUE
 
@@ -1580,13 +1582,14 @@ class Application(RevisionedMixin):
                                 ac.standard = True
                                 ac.save()
 
-                                self.log_user_action(
-                                    ApplicationUserAction.ACTION_CREATE_CONDITION.format(
-                                        ac.condition[:256],
-                                        ac.licence_purpose.short_name,
-                                    ),
-                                    request
-                                )
+                                #TODO create this log elsewhere where user is available
+                                #self.log_user_action(
+                                #    ApplicationUserAction.ACTION_CREATE_CONDITION.format(
+                                #        ac.condition[:256],
+                                #        ac.licence_purpose.short_name,
+                                #    ),
+                                #    request
+                                #)
 
                         '''
                         Process Selected Activity Purposes for the selected
@@ -1627,9 +1630,10 @@ class Application(RevisionedMixin):
                 ).distinct()
 
                 if self.amendment_requests:
-                    self.log_user_action(
-                        ApplicationUserAction.ACTION_ID_REQUEST_AMENDMENTS_SUBMIT.format(
-                            self.lodgement_number), request)
+                    #TODO create this log elsewhere where user is available
+                    #self.log_user_action(
+                    #    ApplicationUserAction.ACTION_ID_REQUEST_AMENDMENTS_SUBMIT.format(
+                    #        self.lodgement_number), request)
                     if requires_refund:
                         self.alert_for_refund(request)
                     else:
@@ -1637,10 +1641,11 @@ class Application(RevisionedMixin):
                             group_users, self, request)
 
                 else:
+                    #TODO create this log elsewhere where user is available
                     # Create a log entry for the application
-                    self.log_user_action(
-                        ApplicationUserAction.ACTION_LODGE_APPLICATION.format(
-                            self.id), request)
+                    #self.log_user_action(
+                    #    ApplicationUserAction.ACTION_LODGE_APPLICATION.format(
+                    #        self.id), request)
 
                     # notify linked officer groups of submission.
                     if requires_refund:
