@@ -1923,6 +1923,10 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 )
                 if is_submit:
                     instance.submitter = request.user
+                    if instance.amendment_requests:
+                        instance.log_user_action(ApplicationUserAction.ACTION_ID_REQUEST_AMENDMENTS_SUBMIT.format(instance.lodgement_number), request)
+                    else:
+                        instance.log_user_action(ApplicationUserAction.ACTION_LODGE_APPLICATION.format(instance.id), request)
                 instance.save()
                 instance.log_user_action(
                     ApplicationUserAction.ACTION_SAVE_APPLICATION.format(

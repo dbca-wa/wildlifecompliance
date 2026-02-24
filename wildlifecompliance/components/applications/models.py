@@ -1509,7 +1509,6 @@ class Application(RevisionedMixin):
                     return
                 self.customer_status = Application.CUSTOMER_STATUS_UNDER_REVIEW
 
-                #TODO set submitter before payment
                 if request.user and isinstance(request.user,EmailUser):
                     self.submitter = request.user
                 
@@ -1630,10 +1629,6 @@ class Application(RevisionedMixin):
                 ).distinct()
 
                 if self.amendment_requests:
-                    #TODO create this log elsewhere where user is available
-                    #self.log_user_action(
-                    #    ApplicationUserAction.ACTION_ID_REQUEST_AMENDMENTS_SUBMIT.format(
-                    #        self.lodgement_number), request)
                     if requires_refund:
                         self.alert_for_refund(request)
                     else:
@@ -1641,12 +1636,6 @@ class Application(RevisionedMixin):
                             group_users, self, request)
 
                 else:
-                    #TODO create this log elsewhere where user is available
-                    # Create a log entry for the application
-                    #self.log_user_action(
-                    #    ApplicationUserAction.ACTION_LODGE_APPLICATION.format(
-                    #        self.id), request)
-
                     # notify linked officer groups of submission.
                     if requires_refund:
                         self.alert_for_refund(request)

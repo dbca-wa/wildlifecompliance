@@ -81,7 +81,7 @@ class InfringementPenaltySuccessViewPreload(APIView):
 
         return HttpResponse(status=status.HTTP_200_OK)
 
-# from commercialoperator.components.proposals.utils import proposal_submit
+
 class InfringementPenaltySuccessView(TemplateView):
     template_name = 'wildlifecompliance/wc_payments/success.html'
 
