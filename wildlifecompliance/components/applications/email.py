@@ -5,7 +5,7 @@ from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.utils.encoding import smart_bytes
 from django.urls import reverse
 from django.conf import settings
-from ledger_api_client.ledger_models import Invoice
+from ledger_api_client.ledger_models import Invoice, EmailUserRO as EmailUser
 
 from wildlifecompliance.components.main.utils import (
     get_choice_value,
@@ -641,7 +641,7 @@ def _log_application_email(email_message, application, sender=None):
 
     customer = application.submitter
 
-    staff = sender
+    staff = sender if isinstance(sender, EmailUser) else None
 
     kwargs = {
         'subject': subject,

@@ -192,7 +192,7 @@ class ApplicationSuccessViewPreload(APIView):
 
         return HttpResponse(status=status.HTTP_200_OK)
 
-#TODO move submit logic to preload
+
 class ApplicationSuccessView(TemplateView):
     template_name = 'wildlifecompliance/application_success.html'
 
