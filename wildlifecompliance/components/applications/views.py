@@ -93,7 +93,6 @@ class ApplicationSuccessViewPreload(APIView):
 
         try:
             application = Application.objects.get(lodgement_number=lodgement_number)
-            #application.submit(request)
         except Exception as e:
             print(e)
             traceback.print_exc
@@ -111,25 +110,7 @@ class ApplicationSuccessViewPreload(APIView):
             traceback.print_exc
             delete_session_application(request.session)
             return redirect(reverse('external'))
-
-        return HttpResponse(status=status.HTTP_200_OK)
-
-
-class ApplicationSuccessView(TemplateView):
-    template_name = 'wildlifecompliance/application_success.html'
-
-    def get(self, request, *args, **kwargs):
-        print("ApplicationSuccessView")
-
-        submit_success = True
         try:
-            application = get_session_application(request.session)
-            if not ApplicationInvoice.objects.filter(application=application).exists():
-                logger.error(f"ApplicationInvoice record does not exist for application {application}")
-                return redirect(reverse('external'))
-
-            invoice_ref = ApplicationInvoice.objects.filter(application=application).order_by('invoice_datetime').last().invoice_reference
-            invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
             application.submit(request)
             if application.application_fee_paid:
                 # record invoice payment for licence activities. Record the
@@ -201,11 +182,33 @@ class ApplicationSuccessView(TemplateView):
                     application, invoice_ref, request)
 
             else:
-                # TODO: check if this ever occurs from the above code and
-                # provide error screen for user
-                # console.log('Invoice remains unpaid')
                 delete_session_application(request.session)
                 return redirect(reverse('external'))
+        except Exception as e:
+            print(e)
+            traceback.print_exc
+            delete_session_application(request.session)
+            return redirect(reverse('external'))
+
+        return HttpResponse(status=status.HTTP_200_OK)
+
+
+class ApplicationSuccessView(TemplateView):
+    template_name = 'wildlifecompliance/application_success.html'
+
+    def get(self, request, *args, **kwargs):
+        print("ApplicationSuccessView")
+
+        submit_success = True
+        try:
+            application = get_session_application(request.session)
+            if not ApplicationInvoice.objects.filter(application=application).exists():
+                logger.error(f"ApplicationInvoice record does not exist for application {application}")
+                return redirect(reverse('external'))
+
+            invoice_ref = ApplicationInvoice.objects.filter(application=application).order_by('invoice_datetime').last().invoice_reference
+            invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
+            
         except Exception as e:
             submit_success = False
             print(e)

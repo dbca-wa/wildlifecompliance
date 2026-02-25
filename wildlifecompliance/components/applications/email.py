@@ -5,7 +5,7 @@ from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.utils.encoding import smart_bytes
 from django.urls import reverse
 from django.conf import settings
-from ledger_api_client.ledger_models import Invoice
+from ledger_api_client.ledger_models import Invoice, EmailUserRO as EmailUser
 
 from wildlifecompliance.components.main.utils import (
     get_choice_value,
@@ -246,7 +246,7 @@ def send_application_invoice_email_notification(
     recipients = [application.submitter.email]
     msg = email.send(recipients, context=context, attachments=[
                      (filename, invoice_pdf, 'application/pdf')])
-    sender = request.user if request else settings.DEFAULT_FROM_EMAIL
+    sender = settings.DEFAULT_FROM_EMAIL
     _log_application_email(msg, application, sender=sender)
 
 
@@ -362,7 +362,7 @@ def send_activity_refund_issue_notification(
         bcc=email_copy,
     )
 
-    sender = request.user if request else settings.DEFAULT_FROM_EMAIL
+    sender = settings.DEFAULT_FROM_EMAIL
     _log_application_email(msg, application, sender=sender)
 
 
@@ -404,7 +404,7 @@ def send_amendment_refund_email_notification(
     }
     email_group = [item.email for item in group_email]
     msg = email.send(email_group, context=context)
-    sender = request.user if request else settings.DEFAULT_FROM_EMAIL
+    sender = settings.DEFAULT_FROM_EMAIL
     _log_application_email(msg, application, sender=sender)
 
 
@@ -424,7 +424,7 @@ def send_application_submit_email_notification(
     }
     email_group = [item.email for item in group_email]
     msg = email.send(email_group, context=context)
-    sender = request.user if request else settings.DEFAULT_FROM_EMAIL
+    sender = settings.DEFAULT_FROM_EMAIL
     _log_application_email(msg, application, sender=sender)
 
 
@@ -444,7 +444,7 @@ def send_amendment_submit_email_notification(
     }
     email_group = [item.email for item in group_email]
     msg = email.send(email_group, context=context)
-    sender = request.user if request else settings.DEFAULT_FROM_EMAIL
+    sender = settings.DEFAULT_FROM_EMAIL
     _log_application_email(msg, application, sender=sender)
 
 
@@ -641,7 +641,7 @@ def _log_application_email(email_message, application, sender=None):
 
     customer = application.submitter
 
-    staff = sender
+    staff = sender if isinstance(sender, EmailUser) else None
 
     kwargs = {
         'subject': subject,
