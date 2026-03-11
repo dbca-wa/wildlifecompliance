@@ -66,8 +66,10 @@ While connected to the new wildlife compliance database insert the rows from the
 
 # Step 8: Run all other migrations
 
-`python manage_wc.py migrate wildlifecompliance 0648_wildlifesystemgroupuser.py`
-`python manage_wc.py migrate`
+`python manage_wc.py migrate wildlifecompliance 0648_wildlifesystemgroupuser`   
+`python manage_wc_py wildlifecompliance.0649_alter_activitypermissiongroup_group_ptr`   
+`python manage_wc.py migrate_group_auth_from_ledger`  
+`python manage_wc.py migrate`   
 
 # Step 9: Update fauna license category row
 
