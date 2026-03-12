@@ -1,5 +1,5 @@
 # Prepare the base environment.
-FROM ubuntu:24.04 as builder_base_wls
+FROM ghcr.io/dbca-wa/docker-apps-dev:ubuntu_2510_base_python_node AS builder_base_wls
 MAINTAINER asi@dbca.wa.gov.au
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBUG=True
@@ -30,47 +30,18 @@ RUN mv /etc/apt/sourcesau.list /etc/apt/sources.list
 RUN apt-get clean
 RUN apt-get update
 RUN apt-get upgrade -y
+RUN apt-get install --no-install-recommends -y python3-gevent software-properties-common imagemagick
 
-# RUN apt-get install -yq git mercurial gcc gdal-bin libsasl2-dev libpq-dev \
-#   python python-setuptools python-dev python-pip \
-#   imagemagick poppler-utils \
-#   libldap2-dev libssl-dev wget build-essential \
-#   libmagic-dev binutils libproj-dev gunicorn tzdata \
-#   mtr libevent-dev python-gevent \
-#   cron rsyslog iproute2
-# RUN pip install --upgrade pip
-# RUN apt-get install -yq vim
-
-RUN apt-get install --no-install-recommends -y curl wget git libmagic-dev gcc \
-    binutils libproj-dev gdal-bin python3-setuptools python3-pip tzdata \
-    rsyslog gunicorn libreoffice virtualenv 
-RUN apt-get install --no-install-recommends -y libpq-dev patch
-RUN apt-get install --no-install-recommends -y postgresql-client mtr htop \
-    vim
-RUN apt-get install --no-install-recommends -y python3-gevent \
-    software-properties-common imagemagick
-
-RUN apt-get install --no-install-recommends -y npm bzip2
-# RUN add-apt-repository ppa:deadsnakes/ppa
-RUN apt-get update
-RUN apt-get install --no-install-recommends -y python3.12 python3.12-dev
-RUN apt-get install --no-install-recommends -y graphviz libgraphviz-dev pkg-config
-RUN apt-get install -yq vim
-RUN mkdir -p /etc/apt/keyrings && \
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
-    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" \
-    | tee /etc/apt/sources.list.d/nodesource.list && \
-    apt-get update && \
-    apt-get install -y nodejs
+# RUN mkdir -p /etc/apt/keyrings && \
+#     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+#     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" \
+#     | tee /etc/apt/sources.list.d/nodesource.list && \
+#     apt-get update && \
+#     apt-get install -y nodejs
 
 COPY timezone /etc/timezone
 ENV TZ=Australia/Perth
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-# Default Scripts
-RUN wget https://raw.githubusercontent.com/dbca-wa/wagov_utils/main/wagov_utils/bin/default_script_installer.sh -O /tmp/default_script_installer.sh
-RUN chmod 755 /tmp/default_script_installer.sh
-RUN /tmp/default_script_installer.sh
 
 COPY startup.sh  /
 RUN chmod 755 /startup.sh 
