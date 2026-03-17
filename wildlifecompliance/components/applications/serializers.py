@@ -823,7 +823,6 @@ class AssessmentSerializer(serializers.ModelSerializer):
     assessor_group = ActivityPermissionGroupSerializer(read_only=True)
     status = CustomChoiceField(read_only=True)
     assessors = EmailUserAppViewSerializer(many=True)
-    assigned_assessor = EmailUserSerializer()
     date_last_reminded = serializers.SerializerMethodField(read_only=True)
 
     class Meta:

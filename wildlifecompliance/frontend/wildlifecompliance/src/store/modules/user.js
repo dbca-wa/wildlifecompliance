@@ -116,7 +116,7 @@ export const userStore = {
                     // verify user is authorised for activity.
                     && (getters.hasRole('assessor', assessment.licence_activity))
                     // verify user is assigned or assessment is not allocated.
-                    && (!assessment.assigned_assessor || assessment.assigned_assessor.id===getters.current_user.id)
+                    && (!assessment.assigned_assessor || assessment.assigned_assessor===getters.current_user.id)
             });          
         },
         canRequestAmendmentFor: (state, getters, rootState, rootGetters) => (activity_id) => {

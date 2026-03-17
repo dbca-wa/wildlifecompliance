@@ -105,18 +105,11 @@
                                 <strong>Assigned Assessors</strong><br/>
                             
                                 <div v-for="activity_assessment in activeAssessments">
-                                    <div v-if="activity_assessment.assessor_group.name">
+                                    <div v-if="activity_assessment.assessor_group.name" class="col-sm-12 top-buffer-s">
                                         <div>Assessment for {{activity_assessment.assessor_group.name.split('Wildlife Compliance - Assessors:')[1]}}</div>
 
-                                        <div>
-                                            <!-- display selects when Assessor has been allocated -->
-                                            <select v-if="activity_assessment.assigned_assessor!=null" ref="assigned_assessor" class="form-control" v-model="activity_assessment.assigned_assessor.id">
-                                                <option :value="null"></option>                                                
-                                                <option v-for="member in activity_assessment.assessors" :value="member.id" v-bind:key="member.id">{{member.first_name}} {{member.last_name}}</option>
-                                            </select>
-                                            <!-- display select when no Assessor exist -->
-                                            <select v-if="activity_assessment.assigned_assessor==null" ref="assigned_assessor" class="form-control" v-model="activity_assessment.assigned_assessor_id" >
-                                                <option :value="null"></option>
+                                        <div class="form-group">
+                                            <select ref="assigned_assessor" class="form-control" v-model="activity_assessment.assigned_assessor" >
                                                 <option v-for="member in activity_assessment.assessors" :value="member.id" v-bind:key="member.id">{{member.first_name}} {{member.last_name}}</option>
                                             </select>
                                             <a @click.prevent="makeMeAssessor(activity_assessment)" class="actionBtn float-end">Assign to me</a>
@@ -437,7 +430,7 @@ export default {
             return this.isWithAssessor && this.activeAssessments.find(assessment => {
                 // Only unassigned or active assessments assigned to user.
                 return !assessment.assigned_assessor 
-                    || (assessment.assigned_assessor && assessment.assigned_assessor.id === this.current_user.id);               
+                    || (assessment.assigned_assessor && assessment.assigned_assessor === this.current_user.id);               
             });
         },
         showRequestInspectionButton: function() {
@@ -645,7 +638,7 @@ export default {
             this.setOriginalApplication(this.application);
             let request = fetch_util.fetchUrl(helpers.add_endpoint_json(
                     api_endpoints.applications, (this.application.id+'/assign_application_assessment')
-                ), JSON.stringify(data))
+                ), {method:'POST', body:JSON.stringify(data)})
             request.then((response) => {
                     this.setApplication(response);
                 }, (error) => {
@@ -660,12 +653,12 @@ export default {
         onChangeAssessor: function(assessment){
             const data = {
                 "assessment_id" : assessment.id,
-                "assessor_id": assessment.assigned_assessor==null ? assessment.assigned_assessor_id : assessment.assigned_assessor
+                "assessor_id": assessment.assigned_assessor,
             }
             this.setOriginalApplication(this.application);
             let request = fetch_util.fetchUrl(helpers.add_endpoint_json(
                     api_endpoints.applications, (this.application.id+'/assign_application_assessment')
-                ), JSON.stringify(data))
+                ), {method:'POST', body:JSON.stringify(data)})
             request.then((response) => {
                     this.setApplication(response);
                 }, (error) => {
@@ -726,7 +719,7 @@ export default {
                 $(vm.$refs.assigned_assessor).data('select2') ? $(vm.$refs.assigned_assessor).select2('destroy'): '';
             }
             $(vm.$refs.assigned_assessor).select2({
-                theme: "bootstrap",
+                theme: "bootstrap-5",
                 allowClear: true,
                 placeholder: "Select Assessor"
             }).
@@ -746,7 +739,6 @@ export default {
                 // Note: currently only one assessment active per licence activity.
                 var assessment = vm.activeAssessments[0];
                 assessment.assigned_assessor = null;
-                assessment.assigned_assessor_id = null;
                 vm.onChangeAssessor(assessment);
             });
         },

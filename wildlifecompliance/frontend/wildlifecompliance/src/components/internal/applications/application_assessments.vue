@@ -335,7 +335,7 @@ export default {
         },
         canEditAssessment: function(assessment) {
             // Check current user is assigned assessor.
-            return assessment.assigned_assessor && assessment.assigned_assessor.id===this.current_user.id
+            return assessment.assigned_assessor && assessment.assigned_assessor===this.current_user.id
         },  
         userHasRole: function(role, activity_id) {
 
