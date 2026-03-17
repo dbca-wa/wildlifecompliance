@@ -1244,10 +1244,8 @@ class BaseApplicationSerializer(serializers.ModelSerializer):
             invoices = app.invoices.all()
             invoice_str = app.get_property_cache_key(
                 'latest_invoice_ref')['latest_invoice_ref']
-            for invoice in invoices:
-                invoice_str += '&invoice={}'.format(invoice.invoice_reference)
 
-            url = '{0}/ledger/payments/invoice/payment?invoice_no={1}'.format(
+            url = '{0}/ledger/payments/oracle/payments?invoice_no={1}'.format(
                 settings.LEDGER_UI_URL,
                 invoice_str,
             )
