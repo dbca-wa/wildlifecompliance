@@ -470,16 +470,13 @@ export default {
         completeAssessment: function(){
             this.saveAssessmentData().then(() => {
                 let data = new FormData();
-
-                data.selected_assessment_tab=this.selected_activity_tab_id;
-                data.application_id=this.application.id;
                 
-                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications, {method:'POST', body:JSON.stringify(this.application.id+'/complete_assessment')}),
-                {
+                let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,this.application.id+'/complete_assessment'), {method:'POST',
+                body:JSON.stringify({
                     "selected_assessment_tab": this.selected_activity_tab_id,
-                    "application_id": this.application_id,
+                    "application_id": this.application.id,
                     "assessment_id": this.viewingAssessmentId,
-                })
+                })})
                 request.then((response) => {
                     // FIXME: $parent causing local flags to loose settings
                     // and therefore not closing. Should be ok as assessor
