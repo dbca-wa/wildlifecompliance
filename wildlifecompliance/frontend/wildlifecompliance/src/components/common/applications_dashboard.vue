@@ -332,9 +332,9 @@ export default {
             filterApplicationLodgedTo: '',
             filterApplicationSubmitter: 'All',
             filterApplicationActivity: 'All',
-            dateFormat: 'YYYY-MM-DD',
+            dateFormat: 'DD/MM/YYYY',
             datepickerOptions:{
-                format: 'YYYY-MM-DD',
+                format: 'DD/MM/YYYY',
                 showClear:true,
                 useCurrent:false,
                 keepInvalid:true,
