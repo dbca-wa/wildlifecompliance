@@ -40,6 +40,7 @@
                                     <div class="col-sm-9" v-if="condition.standard">
                                         <div style="width:70% !important">
                                             <select class="form-control" ref="standard_req" name="standard_condition" v-model="condition.standard_condition">
+                                                <option>Select Condition...</option>
                                                 <option v-for="r in conditions" :value="r.id" >{{r.short_description}}</option>
                                             </select>
                                         </div>

@@ -6838,7 +6838,7 @@ class ApplicationCondition(OrderedModel):
         if activity.processing_status == ApplicationSelectedActivity.PROCESSING_STATUS_WITH_ASSESSOR:
             # Set the source_group when added by the assessor.
             group = self.get_assessor_permission_group(user)
-            self.source_group = group.activitypermissiongroup
+            self.source_group = group
             self.save()
 
         with_officer = [
@@ -6848,7 +6848,7 @@ class ApplicationCondition(OrderedModel):
         if activity.processing_status in with_officer:
             # Set the source_group when added by the officer.
             group = self.get_officer_permission_group(user)
-            self.source_group = group.activitypermissiongroup
+            self.source_group = group
             self.save()
 
     def get_assessor_permission_group(self, user, first=True):

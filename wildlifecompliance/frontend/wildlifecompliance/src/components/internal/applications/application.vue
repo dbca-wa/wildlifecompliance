@@ -1904,7 +1904,7 @@ export default {
                     }
                     let request = await fetch_util.fetchUrl(helpers.add_endpoint_json(
                             api_endpoints.applications, (this.application.id+'/return_to_officer')
-                        ), JSON.stringify(data)).then((response) => {
+                        ), {method:"POST", body:JSON.stringify(data)}).then((response) => {
 
                         this.$router.push({name:"internal-dash",});   
 
