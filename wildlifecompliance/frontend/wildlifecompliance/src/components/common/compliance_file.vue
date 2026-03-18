@@ -136,7 +136,7 @@ export default {
                 }
                 formData.append('input_name', this.name);
                 formData.append('csrfmiddlewaretoken', this.csrf_token);
-                let res = await fetch_util.fetchUrl(this.document_action_url, {method:'POST', body:JSON.stringify(formData)})
+                let res = await fetch_util.fetchUrl(this.document_action_url, {method:'POST', body:formData})
                 if (res) {
                     this.documents = res.filedata;
                     this.commsLogId = res.comms_instance_id;
@@ -157,7 +157,7 @@ export default {
             formData.append('document_id', file.id);
             formData.append('csrfmiddlewaretoken', this.csrf_token);
             if (this.document_action_url) {
-                let res = await fetch_util.fetchUrl(this.document_action_url, {method:'POST', body:JSON.stringify(formData)})
+                let res = await fetch_util.fetchUrl(this.document_action_url, {method:'POST', body:formData})
                 this.documents = res.filedata;
                 this.commsLogId = res.comms_instance_id;
             }
@@ -175,7 +175,7 @@ export default {
             }
             formData.append('csrfmiddlewaretoken', this.csrf_token);
             if (this.document_action_url) {
-                let res = await fetch_util.fetchUrl(this.document_action_url, {method:'POST', body:JSON.stringify(formData)})
+                let res = await fetch_util.fetchUrl(this.document_action_url, {method:'POST', body:formData})
             }
             this.show_spinner = false;
         },
@@ -230,7 +230,7 @@ export default {
                 formData.append('filename', e.target.files[0].name);
                 formData.append('_file', this.uploadFile(e));
                 formData.append('csrfmiddlewaretoken', this.csrf_token);
-                let res = await fetch_util.fetchUrl(this.document_action_url, {method:'POST', body:JSON.stringify(formData)})
+                let res = await fetch_util.fetchUrl(this.document_action_url, {method:'POST', body:formData})
                 
                 this.documents = res.filedata;
                 this.commsLogId = res.comms_instance_id;
