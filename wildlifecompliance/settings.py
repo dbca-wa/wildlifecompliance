@@ -455,7 +455,7 @@ EMAIL_INSTANCE = decouple.config("EMAIL_INSTANCE", default="DEV")
 DJANGO_VITE_DEV_MODE = env("DJANGO_VITE_DEV_MODE", False)
 if DEBUG and not DJANGO_VITE_DEV_MODE:
     print("\nServer running in DEBUG mode, frontend hot module reloading is OFF. Set env var DJANGO_VITE_DEV_MODE to True to enable hot module reloading.\n")
-else:
+elif DEBUG and DJANGO_VITE_DEV_MODE:
     print("\nServer running in DEBUG mode, frontend hot module reloading is ON. Set env var DJANGO_VITE_DEV_MODE to False to disable hot module reloading.\n")
 
 logger.debug(f'DJANGO_VITE_DEV_MODE: {DJANGO_VITE_DEV_MODE}')
