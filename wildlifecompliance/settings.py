@@ -450,12 +450,13 @@ REPORTING_EMAIL = env('REPORTING_EMAIL', '').lower()
 # As it causes a permission exception when using azure network drives
 FILE_UPLOAD_PERMISSIONS = None
 
-RUNNING_DEVSERVER = len(sys.argv) > 1 and sys.argv[1] == "runserver"
 EMAIL_INSTANCE = decouple.config("EMAIL_INSTANCE", default="DEV")
 
-# Make sure this returns True when in local development
-# so you can use the vite dev server with hot module reloading
-DJANGO_VITE_DEV_MODE = RUNNING_DEVSERVER and EMAIL_INSTANCE == "DEV" and DEBUG is True  # DJANGO_VITE_DEV_MODE is preserved word.
+DJANGO_VITE_DEV_MODE = env("DJANGO_VITE_DEV_MODE", False)
+if DEBUG and not DJANGO_VITE_DEV_MODE:
+    print("\nServer running in DEBUG mode, frontend hot module reloading is OFF. Set env var DJANGO_VITE_DEV_MODE to True to enable hot module reloading.\n")
+else:
+    print("\nServer running in DEBUG mode, frontend hot module reloading is ON. Set env var DJANGO_VITE_DEV_MODE to False to disable hot module reloading.\n")
 
 logger.debug(f'DJANGO_VITE_DEV_MODE: {DJANGO_VITE_DEV_MODE}')
 
