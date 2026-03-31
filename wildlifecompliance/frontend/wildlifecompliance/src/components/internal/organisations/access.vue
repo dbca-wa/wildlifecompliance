@@ -137,6 +137,8 @@ import {
   helpers, fetch_util
 }
 from '@/utils/hooks'
+import $ from 'jquery';
+
 export default {
   name: 'OrganisationAccess',
   data() {

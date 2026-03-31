@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import $ from 'jquery';
 
 export default {
     emits: ['update-formatted-text'],

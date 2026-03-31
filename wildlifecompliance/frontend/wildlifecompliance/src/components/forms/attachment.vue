@@ -31,6 +31,8 @@ import {
 from '@/utils/hooks';
 import HelpText from './help_text.vue';
 import { mapGetters } from 'vuex';
+import $ from 'jquery';
+
 export default {
     props:{
         application_id: null,

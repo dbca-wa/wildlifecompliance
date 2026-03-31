@@ -45,6 +45,8 @@ import { api_endpoints, helpers, cache_helper } from '@/utils/hooks.js'
 
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import markerGrayLocked from "../../assets/marker-gray-locked.svg";
+import $ from 'jquery';
+
 
 export default {
   name: "map-leaflet",

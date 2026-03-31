@@ -112,6 +112,8 @@ import {
 }
 from '@/utils/hooks'
 import FormSection from "@/components/forms/section_toggle.vue";
+import $ from 'jquery';
+
 export default {
     name:'schemaMasterlistModal',
     components: {

@@ -29,6 +29,8 @@ import {
   fetch_util
 }
 from '@/utils/hooks';
+import $ from 'jquery';
+
 export default {
     name: "FileField",
     props:{

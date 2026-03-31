@@ -78,6 +78,7 @@ import markerBlueLocked from '../../../assets/marker-blue-locked.svg';
 import markerYellowLocked from '../../../assets/marker-yellow-locked.svg';
 import markerRedLocked from '../../../assets/marker-red-locked.svg';
 import markerOrangeLocked from '../../../assets/marker-orange-locked.svg';
+import $ from 'jquery';
 
 L.TileLayer.WMTS = L.TileLayer.extend({
     defaultWmtsParams: {

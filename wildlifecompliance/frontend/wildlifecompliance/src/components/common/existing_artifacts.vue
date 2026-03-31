@@ -14,6 +14,7 @@ import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import moment from 'moment';
+import $ from 'jquery';
 
 export default {
     name: "ExistingArtifacts",

@@ -383,7 +383,7 @@ import RelatedItems from "@/components/common/related_items.vue";
 import MapLocation from "../../common/map_location.vue";
 
 import hash from 'object-hash';
-
+import $ from 'jquery';
 
 export default {
   name: "ViewInspection",

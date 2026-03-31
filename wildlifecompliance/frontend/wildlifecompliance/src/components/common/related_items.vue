@@ -20,6 +20,7 @@ import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks"
 import utils from "@/components/external/utils";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import WeakLinks from '@common-components/weak_links.vue';
+import $ from 'jquery';
 
 export default {
     name: "RelatedItems",

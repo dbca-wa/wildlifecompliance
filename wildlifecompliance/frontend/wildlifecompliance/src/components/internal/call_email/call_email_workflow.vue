@@ -114,6 +114,7 @@ import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks";
 import filefield from '@common-components/compliance_file.vue';
 import { required } from '@vuelidate/validators'
+import $ from 'jquery';
 
 export default {
     name: "CallEmailWorking",

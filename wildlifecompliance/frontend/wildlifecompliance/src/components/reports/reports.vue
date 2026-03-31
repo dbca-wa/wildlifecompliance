@@ -108,6 +108,8 @@
 <script>
 //import {$,swal,bus,datetimepicker,api_endpoints,helpers,Moment,validate} from "@/utils/hooks.js"
 import {api_endpoints,helpers,fetch_util} from "@/utils/hooks.js"
+import $ from 'jquery';
+
 export default {
     name:"reports",
     data:function () {

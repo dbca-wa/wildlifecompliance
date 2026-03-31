@@ -498,6 +498,7 @@ import Inspection from '../inspection/create_inspection_modal.vue';
 import RelatedItems from "@/components/common/related_items.vue";
 import hash from 'object-hash';
 import CreateLegalCaseModal from "../legal_case/create_legal_case_modal.vue";
+import $ from 'jquery';
 
 export default {
   name: "ViewCallEmail",

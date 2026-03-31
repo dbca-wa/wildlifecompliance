@@ -121,6 +121,8 @@ import { mapActions, mapGetters } from 'vuex'
 import utils from './utils'
 import internal_utils from '@/components/internal/utils'
 import FormSection from "@/components/forms/section_toggle.vue";
+import $ from 'jquery';
+
 export default {
   data: function() {
     let vm = this;

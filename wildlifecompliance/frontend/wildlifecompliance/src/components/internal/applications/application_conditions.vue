@@ -34,6 +34,8 @@ import datatable from '@vue-utils/datatable.vue';
 import ConditionDetail from './application_add_condition.vue';
 import { mapActions, mapGetters } from 'vuex'
 import FormSection from "@/components/forms/section_toggle.vue";
+import $ from 'jquery';
+
 export default {
     name: 'InternalApplicationConditions',
     props: {

@@ -51,6 +51,7 @@ import { v4 as uuid } from 'uuid';
 import CommentBlock from './comment_block.vue';
 import HelpText from './help_text.vue';
 import HelpTextUrl from './help_text_url.vue';
+import $ from 'jquery';
 
 export default {
     props:{

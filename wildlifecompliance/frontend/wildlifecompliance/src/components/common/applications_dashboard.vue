@@ -84,6 +84,8 @@ import {
 }from '@/utils/hooks'
 import '@/scss/dashboards/application.scss';
 import FormSection from "@/components/forms/section_toggle.vue";
+import $ from 'jquery';
+
 export default {
     name: 'ApplicationTableDash',
     props: {

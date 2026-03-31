@@ -330,6 +330,7 @@ import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
 import hash from 'object-hash';
 import OffenderModal from "./offender_person_modal.vue";
+import $ from 'jquery';
 
 export default {
     name: 'ViewOffence',

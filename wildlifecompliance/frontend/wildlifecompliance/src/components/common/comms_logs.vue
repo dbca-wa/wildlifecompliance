@@ -41,6 +41,8 @@
 <script>
 import AddCommLog from './add_comm_log.vue';
 import { v4 as uuid } from 'uuid';
+import $ from 'jquery';
+
 export default {
     name: 'CommsLogSection',
     compatConfig: {

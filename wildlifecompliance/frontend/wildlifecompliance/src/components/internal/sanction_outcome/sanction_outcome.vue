@@ -464,6 +464,7 @@ import hash from 'object-hash';
 import RelatedItems from "@/components/common/related_items.vue";
 import RegistrationHolder from "@/components/common/search_person_or_organisation.vue";
 import Driver from "@/components/common/search_person_or_organisation.vue";
+import $ from 'jquery';
 
 export default {
     name: 'ViewSanctionOutcome',

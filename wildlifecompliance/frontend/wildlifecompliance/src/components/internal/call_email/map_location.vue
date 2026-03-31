@@ -91,6 +91,8 @@ import markerGrayLocked from '../../../assets/marker-gray-locked.svg';
 import markerGreenLocked from '../../../assets/marker-green-locked.svg';
 import markerRedLocked from '../../../assets/marker-red-locked.svg';
 import markerYellowLocked from '../../../assets/marker-yellow-locked.svg';
+import $ from 'jquery';
+
 
 export default {
     name: "map-leaflet",

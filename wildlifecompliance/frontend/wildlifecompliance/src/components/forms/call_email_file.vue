@@ -49,6 +49,8 @@ from '@/utils/hooks';
 import CommentBlock from './comment_block.vue';
 import HelpText from './help_text.vue';
 import { mapGetters } from 'vuex';
+import $ from 'jquery';
+
 export default {
     props:{
         call_email_id: null,
