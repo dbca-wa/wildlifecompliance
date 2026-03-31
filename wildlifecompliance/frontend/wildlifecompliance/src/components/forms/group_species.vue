@@ -29,6 +29,8 @@
 <script>
 import HelpText from './help_text.vue'
 import HelpTextUrl from './help_text_url.vue'
+import $ from 'jquery';
+
 export default {
     name:"species-group",
     props:["label", "name", "id", "help_text", "help_text_url", "isRemovable","isPreviewMode"],

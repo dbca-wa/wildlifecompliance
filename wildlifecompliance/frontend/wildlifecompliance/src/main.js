@@ -1,7 +1,7 @@
 import 'vite/modulepreload-polyfill';
-import $ from 'jquery';
-window.$ = $
-window.jQuery = $
+//import $ from 'jquery';
+//window.$ = $
+//window.jQuery = $
 import 'jquery-validation';
 import select2 from 'select2';
 select2()

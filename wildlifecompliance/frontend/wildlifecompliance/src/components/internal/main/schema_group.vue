@@ -129,6 +129,8 @@ import {
   helpers, fetch_util
 }
 from '@/utils/hooks'
+import $ from 'jquery';
+
 import FormSection from "@/components/forms/section_toggle.vue";
 export default {
     name:'schema-group',

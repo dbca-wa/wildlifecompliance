@@ -54,6 +54,7 @@ import moment from 'moment';
 import datatable from '@vue-utils/datatable.vue'
 
 import _ from 'lodash';
+import $ from 'jquery';
 
 export default {
     name: "CourtDate",

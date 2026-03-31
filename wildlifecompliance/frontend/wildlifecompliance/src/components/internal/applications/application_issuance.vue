@@ -235,6 +235,9 @@ import filefield from '@common-components/compliance_file.vue'
 import summernote from '@/components/purpose_details_summernote.vue'
 
 import FormSection from "@/components/forms/section_toggle.vue";
+import $ from 'jquery';
+
+
 export default {
     name: 'InternalApplicationIssuance',
     components: {

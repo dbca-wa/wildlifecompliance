@@ -168,6 +168,7 @@ import _ from 'lodash';
 import JournalHistory from '@/components/internal/legal_case/journal_history.vue'
 import filefield from '@common-components/compliance_file.vue';
 import CourtDate from '@common-components/court_date.vue'
+import $ from 'jquery';
 
 export default {
     name: "ViewCourtProceedings",

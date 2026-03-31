@@ -284,6 +284,7 @@ import _ from 'lodash';
 import TreeSelect from 'vue3-treeselect'
 //import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import filefield from '@common-components/compliance_file.vue';
+import $ from 'jquery';
 
 
 export default {

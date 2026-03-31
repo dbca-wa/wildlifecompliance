@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 export default {
     formatError: function(err) {
         let returnStr = '';

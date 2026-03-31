@@ -93,6 +93,7 @@ import "leaflet.locatecontrol/dist/L.Control.Locate.min.css";
 
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import markerGrayLocked from '../../../assets/marker-gray-locked.svg';
+import $ from 'jquery';
 
 export default {
   name: "map-leaflet",

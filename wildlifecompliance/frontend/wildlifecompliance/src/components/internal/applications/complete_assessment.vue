@@ -274,6 +274,8 @@ import {
     helpers, fetch_util
 }
 from '@/utils/hooks';
+import $ from 'jquery';
+
 export default {
     name: 'InternalApplicationAssessment',
     data: function() {

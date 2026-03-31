@@ -78,6 +78,8 @@ import { v4 as uuid } from 'uuid';
 import datatable from '@vue-utils/datatable.vue'
 import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
 import FormSection from "@/components/forms/section_toggle.vue";
+import $ from 'jquery';
+
 export default {
     name: 'SanctionOutcomeTableDash',
     props: {

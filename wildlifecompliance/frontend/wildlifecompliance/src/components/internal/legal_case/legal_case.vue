@@ -370,6 +370,7 @@ import BriefOfEvidence from './brief_of_evidence.vue';
 import ProsecutionBrief from './prosecution_brief.vue';
 import CourtProceedings from './court_proceedings.vue';
 import GenerateDocument from './generate_document.vue';
+import $ from 'jquery';
 
 
 export default {

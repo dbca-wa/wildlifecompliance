@@ -231,6 +231,7 @@ import SearchPersonOrganisation from './search_person_or_organisation.vue'
 import FormSection from "@/components/forms/section_toggle.vue";
 import RelatedItems from "@/components/common/related_items.vue";
 import datatable from '@vue-utils/datatable.vue'
+import $ from 'jquery';
 
 export default {
     name: "DocumentArtifactComponent",

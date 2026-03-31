@@ -86,6 +86,8 @@ import {
 } from '@/utils/hooks'
 import '@/scss/dashboards/licence.scss';
 import FormSection from "@/components/forms/section_toggle.vue";
+import $ from 'jquery';
+
 export default {
     name: 'LicenceTableDash',
     props: {

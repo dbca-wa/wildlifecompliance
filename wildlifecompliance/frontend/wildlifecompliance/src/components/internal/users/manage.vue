@@ -242,6 +242,8 @@ import IntelligenceInformation from '@common-components/intelligence_information
 import SecureBaseLink from '@common-components/securebase_link.vue';
 import utils from '../utils'
 import FormSection from "@/components/forms/section_toggle.vue";
+import $ from 'jquery';
+
 export default {
     name: 'User',
     data () {

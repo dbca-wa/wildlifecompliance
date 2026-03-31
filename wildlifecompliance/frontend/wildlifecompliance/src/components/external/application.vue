@@ -86,6 +86,8 @@ import {
   fetch_util
 }
 from '@/utils/hooks';
+import $ from 'jquery';
+
 import { handleError } from 'vue';
 export default {
   data: function() {
