@@ -824,7 +824,8 @@ class OrganisationRequest(SanitiseFileMixin):
         null=True,
         related_name='org_request_assignee', on_delete=models.CASCADE)
     identification = models.FileField(
-        upload_to='wildlifecompliance/organisation/requests/%Y/%m/%d',
+        max_length=255,
+        upload_to='wildlifecompliance/organisation/requests/',
         null=True,
         blank=True,
         storage=private_storage)
