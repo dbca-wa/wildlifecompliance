@@ -269,7 +269,10 @@ class SanitiseFileMixin(SanitiseMixin, DirtyFieldsMixin):
         if not path_to_file:
             try:
                 #we specify an empty string here so we can substitute our own (NOTE: may be worth changing how this works to just return the path)
-                path_to_file = self._meta.get_field(file_field).upload_to(self,'')
+                if isinstance(self._meta.get_field(file_field).upload_to,str):
+                    path_to_file = self._meta.get_field(file_field).upload_to
+                else:
+                    path_to_file = self._meta.get_field(file_field).upload_to(self,'')
             except Exception as e:
                 print(e)
                 path_to_file = None
@@ -295,12 +298,12 @@ class SanitiseFileMixin(SanitiseMixin, DirtyFieldsMixin):
             #auto-gen file name
             _, extension = os.path.splitext(str(file_content))
             generated_file_name = self.auto_generate_file_name(extension.replace(".",""))
-            self._file = storage.save('{}/{}'.format(path_to_file,generated_file_name), ContentFile(file_content.read()))
-        elif '_file' in self.get_dirty_fields() and self.get_dirty_fields()['_file']:
+            setattr(self, file_field, storage.save('{}/{}'.format(path_to_file,generated_file_name), ContentFile(file_content.read())))
+        elif file_field in self.get_dirty_fields() and self.get_dirty_fields()[file_field]:
             raise ValidationError("Cannot change file")
 
         #proceed with general sanitisation and save
-        super(SanitiseMixin, self).save(**kwargs)
+        super(SanitiseFileMixin, self).save(**kwargs)
 
     class Meta:
         abstract = True
