@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 from django_cron import CronJobBase, Schedule
 
-from ledger.payments.utils import oracle_parser
+from ledger_api_client.utils import oracle_parser
 
 from wildlifecompliance import settings
 
