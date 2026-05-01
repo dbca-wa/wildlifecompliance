@@ -1,5 +1,16 @@
 <template>
-<div class="container" id="externalDash">
+<div v-if="compliance_app" class="container" id="externalDash">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card bg-light p-3 mb-3">
+                <p>
+                    Welcome to the Compliance Management online system dashboard.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div v-else class="container" id="externalDash">
     <div class="row">
         <div class="col-sm-12">
             <div class="card bg-light p-3 mb-3">
@@ -44,5 +55,11 @@ export default {
         LicenceDashTable,
         ReturnDashTable,
     },
+    computed: {
+        compliance_app: async function() {
+            var preferredDashboard = await helpers.getPreferredDashboard();
+            return preferredDashboard === 'compliance_management';
+        }
+    }
 }
 </script>

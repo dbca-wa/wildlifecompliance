@@ -233,9 +233,6 @@ export default {
                                 if (!vm.is_external && full.can_action['can_reinstate']) {
                                     links += `<a href="#" reinstate-licence='${full.id}'>Reinstate</a><br/>`
                                 }
-                                if (!vm.is_external && full.can_add_purpose && !full.has_inspection_open) {
-                                    links += `<a href="#" inspection-licence='${full.id}'>Request Inspection</a><br/>`
-                                }
                             }
                             if (!vm.is_external) {
                                 links += `<a href="#" licence-history='${full.id}'>History</a><br/>`
