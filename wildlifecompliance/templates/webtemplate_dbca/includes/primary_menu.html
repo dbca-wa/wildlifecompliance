@@ -11,7 +11,7 @@
 {% is_internal as is_internal_login %}
 
 {% if request.user.is_authenticated %}
-    {% if is_compliance_management_user and not is_compliance_internal_login %}
+    {% if is_compliance_management_user and not is_compliance_internal_login and prefer_compliance_management %}
         <li><a class="nav-link" href="/internal/call_email">Call/Emails</a></li>     
         <li><a class="nav-link" href="/infringement">Infringement Notice</a></li>                       
     {% elif is_wildlifecompliance_officer and not prefer_compliance_management %}

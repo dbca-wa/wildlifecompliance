@@ -15,6 +15,8 @@ os.environ['LEDGER_PRODUCT_CUSTOM_FIELDS'] = "('ledger_description','quantity','
 os.environ['LEDGER_REFUND_TRANSACTION_CALLBACK_MODULE'] = 'wildlifecompliance:wildlifecompliance.components.applications.api.application_refund_callback'
 os.environ['LEDGER_INVOICE_TRANSACTION_CALLBACK_MODULE'] = 'wildlifecompliance:wildlifecompliance.components.applications.api.application_invoice_callback'
 
+COMPLIANCE_APP = env("COMPLIANCE_APP", False) #if False, Wildlife, if True, Compliance
+
 ROOT_URLCONF = 'wildlifecompliance.urls'
 SITE_ID = 1
 SYSTEM_MAINTENANCE_WARNING = env('SYSTEM_MAINTENANCE_WARNING', 24)  # hours

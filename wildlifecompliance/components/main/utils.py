@@ -560,57 +560,58 @@ def search_reference(reference_number):
     org_access_request_list = OrganisationRequest.objects.all()
     url_string = {}
 
-    # Application
-    result = application_list.filter(lodgement_number=reference_number)
-    if result:
-        url_string = {'url_string': '/internal/application/' + str(result[0].id)}
-        return url_string
-    # Licence
-    result = licence_list.filter(licence_number=reference_number)
-    if result and not url_string:
-        url_string = {'url_string': result[0].licence_document._file.url}
-        return url_string
-    # Returns
-    result = returns_list.filter(lodgement_number=reference_number)
-    if result and not url_string:
-        url_string = {'url_string': '/internal/return/' + str(result[0].id)}
-        return url_string
-    #import ipdb; ipdb.set_trace()
-    # Org access reqeust
-    result = org_access_request_list.filter(lodgement_number=reference_number)
-    if result and not url_string:
-        url_string = {'url_string': '/internal/organisations/access/' + str(result[0].id)}
-        return url_string
-    # CallEmail
-    result = CallEmail.objects.filter(number=reference_number)
-    if result and not url_string:
-        url_string = {'url_string': '/internal/call_email/' + str(result[0].id)}
-        return url_string
-    # Offence
-    result = Offence.objects.filter(lodgement_number=reference_number)
-    if result and not url_string:
-        url_string = {'url_string': '/internal/offence/' + str(result[0].id)}
-        return url_string
-    # Legal Case
-    result = LegalCase.objects.filter(number=reference_number)
-    if result and not url_string:
-        url_string = {'url_string': '/internal/legal_case/' + str(result[0].id)}
-        return url_string
-    # Inspection
-    result = Inspection.objects.filter(number=reference_number)
-    if result and not url_string:
-        url_string = {'url_string': '/internal/inspection/' + str(result[0].id)}
-        return url_string
-    # Sanction Outcome
-    result = SanctionOutcome.objects.filter(lodgement_number=reference_number)
-    if result and not url_string:
-        url_string = {'url_string': '/internal/sanction_outcome/' + str(result[0].id)}
-        return url_string
-    # Offence
-    result = Artifact.objects.filter(number=reference_number)
-    if result and not url_string:
-        url_string = {'url_string': '/internal/object/' + str(result[0].id)}
-        return url_string
+    if not settings.COMPLIANCE_APP:
+        # Application
+        result = application_list.filter(lodgement_number=reference_number)
+        if result:
+            url_string = {'url_string': '/internal/application/' + str(result[0].id)}
+            return url_string
+        # Licence
+        result = licence_list.filter(licence_number=reference_number)
+        if result and not url_string:
+            url_string = {'url_string': result[0].licence_document._file.url}
+            return url_string
+        # Returns
+        result = returns_list.filter(lodgement_number=reference_number)
+        if result and not url_string:
+            url_string = {'url_string': '/internal/return/' + str(result[0].id)}
+            return url_string
+        # Org access reqeust
+        result = org_access_request_list.filter(lodgement_number=reference_number)
+        if result and not url_string:
+            url_string = {'url_string': '/internal/organisations/access/' + str(result[0].id)}
+            return url_string
+    else:
+        # CallEmail
+        result = CallEmail.objects.filter(number=reference_number)
+        if result and not url_string:
+            url_string = {'url_string': '/internal/call_email/' + str(result[0].id)}
+            return url_string
+        # Offence
+        result = Offence.objects.filter(lodgement_number=reference_number)
+        if result and not url_string:
+            url_string = {'url_string': '/internal/offence/' + str(result[0].id)}
+            return url_string
+        # Legal Case
+        result = LegalCase.objects.filter(number=reference_number)
+        if result and not url_string:
+            url_string = {'url_string': '/internal/legal_case/' + str(result[0].id)}
+            return url_string
+        # Inspection
+        result = Inspection.objects.filter(number=reference_number)
+        if result and not url_string:
+            url_string = {'url_string': '/internal/inspection/' + str(result[0].id)}
+            return url_string
+        # Sanction Outcome
+        result = SanctionOutcome.objects.filter(lodgement_number=reference_number)
+        if result and not url_string:
+            url_string = {'url_string': '/internal/sanction_outcome/' + str(result[0].id)}
+            return url_string
+        # Offence
+        result = Artifact.objects.filter(number=reference_number)
+        if result and not url_string:
+            url_string = {'url_string': '/internal/object/' + str(result[0].id)}
+            return url_string
 
     if url_string:
         return url_string

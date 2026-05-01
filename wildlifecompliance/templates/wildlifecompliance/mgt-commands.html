@@ -5,15 +5,18 @@
         <H4>Hover over button to see help text.</H4>
         <form action="" method="POST">
             {% csrf_token %}
-            <br/>
-            <H2>Wildlife Compliance</H2>
-            <br/>
             {% if not prefer_compliance_management and is_internal_login %}
+            <br/>
+            <H2>Wildlife Licensing</H2>
+            <br/>
             <button style="margin-left: 25px; width:450px;" type="submit" name="script" value="verify_due_returns" title="Run command to verify returns which are due.">Run Script 'verify_due_returns'</button><br><br>
             <button style="margin-left: 25px; width:450px;" type="submit" name="script" value="verify_species" title="Run command to verify species against WACensus.">Run Script 'verify_species'</button><br><br>
             <button style="margin-left: 25px; width:450px;" type="submit" name="script" value="verify_expired_licences" title="Run command to verify expired licence purposes.">Run Script 'verify_expired_licences'</button><br><br>
             <button style="margin-left: 25px; width:450px;" type="submit" name="script" value="verify_licence_renewals" title="Run command to verify licence renewals.">Run Script 'verify_licence_renewals'</button><br><br>
             {% elif prefer_compliance_management and is_compliance_internal_login %}
+            <br/>
+            <H2>Compliance Management</H2>
+            <br/>
             <button style="margin-left: 25px; width:450px;" type="submit" name="script" value="extend_due_date_from_1st_to_2nd" title="Run command to pick up all the overdue (1st period) infringement notices and process them.">Run Script 'extend_due_date_from_1st_to_2nd'</button><br><br>
             <button style="margin-left: 25px; width:450px;" type="submit" name="script" value="send_unpaid_infringements_file" title="Run command to pick up all the overdue (2nd period) infringement notices and process them.">Run Script 'send_unpaid_infringements_file'</button><br><br>
             <button style="margin-left: 25px; width:450px;" type="submit" name="script" value="send_rego_to_dot" title="Run command to pick up all the parking infringements and process them.">Run Script 'send_rego_to_dot'</button><br><br>

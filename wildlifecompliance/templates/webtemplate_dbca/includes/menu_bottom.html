@@ -4,29 +4,10 @@
 {% is_wildlifecompliance_admin as is_wildlifecompliance_admin_login %}
 {% is_wildlifecompliance_payment_officer as is_payment_officer %}
 {% is_compliance_internal_user as is_compliance_internal_login %}
-{% prefer_compliance_management as prefer_compliance_management %}
 {% is_compliance_management_callemail_readonly_user as is_compliance_management_callemail_readonly_user %}
 
-{% if not is_compliance_management_callemail_readonly_user %}
-{% if is_compliance_internal_login and not prefer_compliance_management %}
-    <form name="update-system-preference" method="post" action="/api/users/{{request.user.id}}/update_system_preference/">
-        {% csrf_token %}
-        <input type="hidden" name="prefer_compliance_management" value="True"/>
-        <input class="dropdown-item" type="submit" class="submit" value="Show Compliance Management" />
-    </form>
-    <li role="separator" class="dropdown-divider"></li>
-{% elif is_compliance_internal_login and prefer_compliance_management %}
-    <form name="update-system-preference" method="post" action="/api/users/{{request.user.id}}/update_system_preference/">
-        {% csrf_token %}
-        <input type="hidden" name="prefer_compliance_management" value="False"/>
-        <input class="dropdown-item" type="submit" class="submit" value="Show Wildlife Licencing" />
-    </form>
-    <li role="separator" class="dropdown-divider"></li>
-{% endif %}
-{% endif %}
-
 {% if is_wildlifecompliance_admin_login %}
-    <li><a class="dropdown-item" href="/internal/schema">Manage Licence Schema</a></li>
+    <!--<li><a class="dropdown-item" href="/internal/schema">Manage Licence Schema</a></li>-->
     {% if request.user.is_superuser %}
         <li><a class="dropdown-item" href="{% url 'mgt-commands' %}">Management Commands</a></li>
     {% endif %}

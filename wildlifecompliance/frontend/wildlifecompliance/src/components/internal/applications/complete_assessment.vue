@@ -179,12 +179,7 @@
                                         <div class="col-sm-12">
                                             <button class="btn btn-primary top-buffer-s col-xs-12" @click.prevent="backToProcessing()">Back to Processing</button><br/>
                                         </div>
-                                    </div>
-                                    <div class="row" v-show="showRequestInspectionButton">
-                                        <div class="col-sm-12">
-                                            <button class="btn btn-primary top-buffer-s col-xs-12" @click.prevent="toggleRequestInspection()">Request Inspection</button><br/>
-                                        </div>
-                                    </div>   
+                                    </div>  
                                     <div class="row" v-show="showCompleteAssessmentsButton">
                                         <div class="col-sm-12">
                                             <button class="btn btn-primary top-buffer-s col-xs-12" @click.prevent="openAssessmentModal()">Complete Assessments</button><br/>

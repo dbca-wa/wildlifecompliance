@@ -138,15 +138,8 @@ def is_internal_url(request):
         internal = True
     return internal
 
-def prefer_compliance_management(request):
-    ret_value = False
-
-    if request.user.is_authenticated:
-        preference = ComplianceManagementUserPreferences.objects.get(email_user=request.user)
-        if preference.prefer_compliance_management:
-            ret_value = True
-
-    return ret_value
+def prefer_compliance_management(request=None):
+    return settings.COMPLIANCE_APP
 
 def is_wildlife_compliance_officer(request):
     wildlife_compliance_user = user_has_perm(request.user, 'wildlifecompliance.system_administrator') or request.user.is_superuser
