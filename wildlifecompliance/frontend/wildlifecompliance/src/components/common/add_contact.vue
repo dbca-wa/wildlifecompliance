@@ -72,7 +72,7 @@
 import modal from '@vue-utils/bootstrap5-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import {helpers,api_endpoints,fetch_util} from "@/utils/hooks.js"
-import $ from 'jquery';
+import $ from "@/utils/jquery-ui-setup.js"
 
 export default {
     name:'Add-Organisation-Contact',

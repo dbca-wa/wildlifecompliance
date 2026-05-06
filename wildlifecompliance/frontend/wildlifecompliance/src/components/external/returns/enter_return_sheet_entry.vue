@@ -129,7 +129,7 @@ import {
     fetch_util
 } from "@/utils/hooks.js"
 import '@/scss/forms/return_sheet.scss';
-import $ from 'jquery';
+import $ from "@/utils/jquery-ui-setup.js"
 
 export default {
     name:'externalReturnSheetEntry',
