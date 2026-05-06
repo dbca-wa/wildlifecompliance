@@ -184,7 +184,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
         
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=False, methods=['GET', ])    
     def status_choices(self, request, *args, **kwargs):
@@ -207,7 +207,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
         
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
@@ -222,7 +222,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
         
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
@@ -269,7 +269,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
             raise serializers.ValidationError(e)
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['GET', ])
     @renderer_classes((JSONRenderer,))
@@ -292,7 +292,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
         
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def check_authorised_to_update(self,request,inspection_team_allowed=False):
         instance = self.get_object()
@@ -437,7 +437,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
         
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
 
     @action(detail=True, methods=['post'])
@@ -583,7 +583,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
         
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
@@ -628,7 +628,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
         
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -652,7 +652,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -680,7 +680,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -727,7 +727,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def create(self, request, *args, **kwargs):
         try:
@@ -777,7 +777,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def update_parent(self, request, instance, *args, **kwargs):
         # Log parent actions and update status
@@ -907,8 +907,9 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
         
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
     
+        
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def create_inspection_process_comms_log_document(self, request, *args, **kwargs):
@@ -939,7 +940,7 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
 
 class InspectionTypeViewSet(viewsets.ReadOnlyModelViewSet):
