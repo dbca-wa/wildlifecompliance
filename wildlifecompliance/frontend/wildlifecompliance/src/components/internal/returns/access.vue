@@ -17,17 +17,6 @@
                         <strong>Lodged on</strong><br/>
                         {{ formatDate(returns.lodgement_date) }}
                     </div>
-                    <div class="col-sm-12 top-buffer-s">
-                        <table class="table small-table">
-                            <thead>
-                                <tr>
-                                    <th>Lodgement</th>
-                                    <th>Date</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
                 </div>
             </div>
         </div>

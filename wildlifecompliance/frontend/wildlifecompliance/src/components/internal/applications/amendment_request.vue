@@ -190,17 +190,21 @@ export default {
                         var $element = $(element);
                         $element.attr("data-original-title", "").parents('.form-group').removeClass('has-error');
                     });
-                    // destroy tooltips on valid elements
-                    $("." + this.settings.validClass).tooltip("destroy");
-                    // add or update tooltips
+                    $("." + this.settings.validClass).each(function() {
+                        $(this).next(".error-message").remove();
+                    });
+
                     for (var i = 0; i < errorList.length; i++) {
-                        var error = errorList[i];
-                        $(error.element)
-                            .tooltip({
-                                trigger: "focus"
-                            })
-                            .attr("data-original-title", error.message)
-                            .parents('.form-group').addClass('has-error');
+                        var error = errorList[i]; 
+                        const $el = $(error.element);
+                        $el.parents('.form-group').addClass('has-error');
+                        
+                        $el.next(".error-message").remove();
+                        $el.after(
+                            `<div class="error-message" style="color: red; font-size: 12px;">
+                                ${error.message}
+                             </div>`
+                        );
                     }
                 }
             });

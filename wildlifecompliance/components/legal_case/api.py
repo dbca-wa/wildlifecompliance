@@ -278,12 +278,10 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=False, methods=['GET', ])
     def court_list(self, request):
@@ -294,12 +292,10 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=False, methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
@@ -311,12 +307,10 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=False, methods=['GET', ])    
     def status_choices(self, request, *args, **kwargs):
@@ -345,12 +339,10 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
@@ -362,12 +354,10 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
@@ -379,12 +369,10 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
@@ -431,7 +419,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             raise serializers.ValidationError(e)
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def add_associated_persons(self, instance, request):
         running_sheet_person_list = request.data.get('running_sheet_person_list')
@@ -608,12 +596,10 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def save_brief_of_evidence(self, request, instance):
         try:
@@ -646,12 +632,10 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def save_prosecution_brief(self, request, instance):
         try:
@@ -684,12 +668,10 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
@@ -708,12 +690,10 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
@@ -732,12 +712,10 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
@@ -779,12 +757,10 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -817,7 +793,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     #@renderer_classes((JSONRenderer,))
@@ -883,7 +859,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -925,7 +901,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
 
     @action(detail=True, methods=['POST'])
@@ -968,7 +944,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
 
     @action(detail=True, methods=['POST'])
@@ -1003,7 +979,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -1037,7 +1013,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -1071,7 +1047,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
 
     @action(detail=True, methods=['POST'])
@@ -1100,7 +1076,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def create(self, request, *args, **kwargs):
         try:
@@ -1142,7 +1118,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def update_parent(self, request, instance, *args, **kwargs):
         # Log parent actions and update status
@@ -1246,12 +1222,10 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def process_brief_of_evidence(self, instance, request):
         boe_instance, created = BriefOfEvidence.objects.get_or_create(legal_case=instance)
@@ -1342,7 +1316,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -1384,7 +1358,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -1422,7 +1396,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -1464,7 +1438,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -1503,7 +1477,7 @@ class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
 
 class LegalCasePriorityViewSet(viewsets.ReadOnlyModelViewSet):

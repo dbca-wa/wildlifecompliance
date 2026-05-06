@@ -287,7 +287,7 @@ class RemediationActionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixi
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['GET'])
     @renderer_classes((JSONRenderer,))
@@ -335,7 +335,7 @@ class RemediationActionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixi
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -401,7 +401,7 @@ class RemediationActionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixi
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def get_queryset(self):
         if is_compliance_internal_user(self.request):
@@ -459,7 +459,7 @@ class RemediationActionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixi
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -501,7 +501,7 @@ class RemediationActionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixi
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
 
 class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
@@ -638,7 +638,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
@@ -659,7 +659,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
@@ -680,7 +680,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def check_authorised_to_update(self,request):
         print("check_authorised_to_update")
@@ -799,7 +799,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def create(self, request, *args, **kwargs):
         """
@@ -974,7 +974,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -1025,7 +1025,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=False, methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
@@ -1046,7 +1046,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -1074,7 +1074,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -1144,7 +1144,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -1187,7 +1187,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -1262,7 +1262,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
 
     @action(detail=True, methods=['POST'])
@@ -1465,7 +1465,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 )
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
@@ -1508,4 +1508,4 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
             raise serializers.ValidationError(e)
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")

@@ -335,7 +335,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             raise serializers.ValidationError(str(e))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def list(self, request, pk=None, *args, **kwargs):
         queryset = self.get_queryset()
@@ -397,12 +397,10 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     def reactivate_renew_purposes(self, request, pk=None, *args, **kwargs):
@@ -438,12 +436,10 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     def surrender_licence(self, request, pk=None, *args, **kwargs):
@@ -462,12 +458,10 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     def surrender_purposes(self, request, pk=None, *args, **kwargs):
@@ -492,12 +486,10 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     def cancel_licence(self, request, pk=None, *args, **kwargs):
@@ -519,12 +511,10 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     def cancel_purposes(self, request, pk=None, *args, **kwargs):
@@ -549,12 +539,10 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     def suspend_licence(self, request, pk=None, *args, **kwargs):
@@ -576,12 +564,10 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     def suspend_purposes(self, request, pk=None, *args, **kwargs):
@@ -610,12 +596,10 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     def reinstate_licence(self, request, pk=None, *args, **kwargs):
@@ -637,12 +621,10 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     def reinstate_purposes(self, request, pk=None, *args, **kwargs):
@@ -668,12 +650,10 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     def reissue_purposes(self, request, pk=None, *args, **kwargs):
@@ -706,12 +686,10 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     def regenerate_licence_pdf(self, request, pk=None, *args, **kwargs):
@@ -730,12 +708,10 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['GET', ])
     def get_latest_purposes_for_licence_activity_and_action(
@@ -766,7 +742,7 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=False, methods=['GET', ])
     def licence_history(self, request, *args, **kwargs):
@@ -784,12 +760,10 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
 class LicenceCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = LicenceCategory.objects.none()

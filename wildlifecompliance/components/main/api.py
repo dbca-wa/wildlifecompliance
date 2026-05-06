@@ -1322,7 +1322,7 @@ class TemporaryDocumentCollectionViewSet(viewsets.GenericViewSet, mixins.Retriev
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -1514,5 +1514,5 @@ class AllocatedGroupMembers(views.APIView):
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 

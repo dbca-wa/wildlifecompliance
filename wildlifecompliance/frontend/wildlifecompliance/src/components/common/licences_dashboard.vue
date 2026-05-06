@@ -116,7 +116,7 @@ export default {
             action_purpose_list: [],
             selected_licence_id: null,
             licence_action: '',
-            dateFormat: 'YYYY-MM-DD',
+            dateFormat: 'DD/MM/YYYY',
             datepickerOptions:{
                 format: 'YYYY-MM-DD',
                 showClear:true,

@@ -92,7 +92,7 @@ class DocumentArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=False, methods=['GET', ])    
     def document_type_choices(self, request, *args, **kwargs):
@@ -121,12 +121,10 @@ class DocumentArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def common_save(self, request_data, instance=None):
         try:
@@ -187,12 +185,10 @@ class DocumentArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     #TODO check if this is in use
     def create_officer_interviewer_email_user(self, officer_interviewer, *args, **kwargs):
@@ -230,12 +226,10 @@ class DocumentArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
                         email_user_instance = email_user_serializer.save()
 
                 return email_user_instance
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def handle_document(self, request_data, instance=None, *args, **kwargs):
         print("handle document")
@@ -251,12 +245,10 @@ class DocumentArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
                     for doc in temp_doc_collection.documents.all():
                         save_default_document_obj(instance, doc)
                     temp_doc_collection.delete()
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
 
 class PhysicalArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
@@ -292,7 +284,7 @@ class PhysicalArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @renderer_classes((JSONRenderer,))
     def update(self, request, workflow=False, *args, **kwargs):
@@ -316,12 +308,10 @@ class PhysicalArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST'])
     @renderer_classes((JSONRenderer,))
@@ -347,7 +337,7 @@ class PhysicalArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['post'])
     @renderer_classes((JSONRenderer,))
@@ -433,12 +423,10 @@ class PhysicalArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     def handle_document(self, request_data, instance=None, *args, **kwargs):
         try:
@@ -459,12 +447,10 @@ class PhysicalArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
                         for doc in temp_doc_collection.documents.all():
                             save_renderer_document_obj(instance, doc, input_name)
                         temp_doc_collection.delete()
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
 
 class ArtifactFilterBackend(DatatablesFilterBackend):
@@ -597,7 +583,7 @@ class ArtifactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
@@ -609,12 +595,10 @@ class ArtifactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
@@ -626,12 +610,10 @@ class ArtifactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
@@ -679,7 +661,7 @@ class ArtifactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             raise serializers.ValidationError(e)
         except Exception as e:
             print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError("Internal System Error")
 
     @action(detail=False, methods=['GET', ])
     def types(self, request, *args, **kwargs):

@@ -48,6 +48,7 @@ export default {
             licences_url: helpers.add_endpoint_join(api_endpoints.licences_paginated,'external_datatable_list/?format=datatables'),
             returns_url: helpers.add_endpoint_join(api_endpoints.returns_paginated,'external_datatable_list/?format=datatables'),
             empty_list: '/api/empty_list',
+            compliance_app: false,
         }
     },
     components:{
@@ -55,11 +56,9 @@ export default {
         LicenceDashTable,
         ReturnDashTable,
     },
-    computed: {
-        compliance_app: async function() {
-            var preferredDashboard = await helpers.getPreferredDashboard();
-            return preferredDashboard === 'compliance_management';
-        }
+    async mounted() {
+        const preferredDashboard = await helpers.getPreferredDashboard();
+        this.compliance_app = preferredDashboard === 'compliance_management';
     }
 }
 </script>
