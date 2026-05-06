@@ -49,7 +49,7 @@
                                             <label for="" class="col-sm-3 control-label" >Account Date of Birth</label>
                                             <div class="col-sm-6">
                                                 <div class="input-group date" ref="dob" style="width: 100%;">
-                                                    <input disabled type="date" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="user.dob">
+                                                    <input disabled type="text" class="form-control" name="dob"  v-model="user.dob">
                                                 </div>
                                             </div>
                                           </div>
@@ -69,7 +69,7 @@
                                             <label for="" class="col-sm-3 control-label" >Verified Date of Birth</label>
                                             <div class="col-sm-6">
                                                 <div class="input-group date" ref="dob" style="width: 100%;">
-                                                    <input disabled type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="user.legal_dob">
+                                                    <input disabled type="text" class="form-control" name="dob" v-model="user.legal_dob">
                                                 </div>
                                             </div>
                                           </div>
