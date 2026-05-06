@@ -121,9 +121,7 @@ class DocumentArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
@@ -187,9 +185,7 @@ class DocumentArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
@@ -230,9 +226,7 @@ class DocumentArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
                         email_user_instance = email_user_serializer.save()
 
                 return email_user_instance
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
@@ -251,9 +245,7 @@ class DocumentArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
                     for doc in temp_doc_collection.documents.all():
                         save_default_document_obj(instance, doc)
                     temp_doc_collection.delete()
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
@@ -316,9 +308,7 @@ class PhysicalArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
@@ -433,9 +423,7 @@ class PhysicalArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
@@ -459,9 +447,7 @@ class PhysicalArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, 
                         for doc in temp_doc_collection.documents.all():
                             save_renderer_document_obj(instance, doc, input_name)
                         temp_doc_collection.delete()
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
@@ -609,9 +595,7 @@ class ArtifactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
@@ -626,9 +610,7 @@ class ArtifactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
-        except ValidationError as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(repr(e.error_dict))
+        
         except Exception as e:
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
