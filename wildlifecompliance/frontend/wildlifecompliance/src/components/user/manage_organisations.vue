@@ -533,7 +533,7 @@ export default {
             data.append('identification', vm.uploadedFile);
             let request = fetch_util.fetchUrl(
                 helpers.add_endpoint_json(api_endpoints.organisation_requests,orgReq.id+'/reupload_identification_amendment_request')
-            ,{method:"PUT",body:JSON.stringify(data)},
+            ,{method:"PUT",body:data},
             {
                 emulateJSON:true
             })
