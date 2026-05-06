@@ -239,11 +239,11 @@ class Return(SanitiseMixin):
         RETURN_CUSTOMER_STATUS_DUE: 'Due',
         RETURN_CUSTOMER_STATUS_OVERDUE: 'Overdue',
         RETURN_CUSTOMER_STATUS_DRAFT: 'Current',
-        RETURN_CUSTOMER_STATUS_FUTURE: 'Future Submission',
-        RETURN_CUSTOMER_STATUS_UNDER_REVIEW: 'Under Review',
+        #RETURN_CUSTOMER_STATUS_FUTURE: 'Future Submission',
+        #RETURN_CUSTOMER_STATUS_UNDER_REVIEW: 'Under Review',
         RETURN_CUSTOMER_STATUS_ACCEPTED: 'Accepted',
         RETURN_CUSTOMER_STATUS_DISCARDED: 'Expired',
-        RETURN_CUSTOMER_STATUS_PAYMENT: 'Awaiting Payment',
+        #RETURN_CUSTOMER_STATUS_PAYMENT: 'Awaiting Payment',
         RETURN_CUSTOMER_STATUS_EXPIRED: 'Expired',
     }
 
