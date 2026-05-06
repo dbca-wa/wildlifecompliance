@@ -25,7 +25,7 @@
                             </div>
                             <div class="col-sm-12 top-buffer-s">
                                 <strong>Lodged on</strong><br/>
-                                {{ formatDate(application.lodgement_date) }}
+                                {{ formatDateNoTime(application.lodgement_date) }}
                             </div>
                             <div class="col-sm-12 top-buffer-s">
                                 <table class="table small-table">
@@ -1052,7 +1052,7 @@ export default {
     },
     methods: {
         formatDateNoTime: function(data){
-            return data ? moment(data).format('YYYY-MM-DD'): '';
+            return data ? moment(data).format('DD/MM/YYYY'): '';
         },    
         ...mapActions({
             load: 'loadApplication',
