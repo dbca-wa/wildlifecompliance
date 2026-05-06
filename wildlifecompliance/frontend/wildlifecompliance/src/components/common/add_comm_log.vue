@@ -116,7 +116,7 @@
 import bootstrapModal from '@vue-utils/bootstrap5-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import { helpers, fetch_util } from "@/utils/hooks.js"
-import $ from "@/utils/jquery-ui-setup.js"
+import $ from 'jquery';
 
 export default {
     name:'Add-Comms',

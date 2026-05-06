@@ -168,7 +168,7 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
-import $ from "@/utils/jquery-ui-setup.js"
+import $ from 'jquery'
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import {helpers,api_endpoints,fetch_util} from "@/utils/hooks.js"
