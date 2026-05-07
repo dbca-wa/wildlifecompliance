@@ -260,9 +260,9 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
             activity_purpose = activity_purpose.lower() if activity_purpose else 'all'
             if activity_purpose != 'all':
                 activity_purpose_app_ids = \
-                ApplicationSelectedActivityPurpose.objects.filter(
+                list(ApplicationSelectedActivityPurpose.objects.filter(
                     purpose_id=int(activity_purpose)
-                ).values('selected_activity__application_id')
+                ).values_list('selected_activity__application_id', flat=True))
                 queryset = queryset.filter(id__in=activity_purpose_app_ids)
 
             category_name = category_name.lower() if category_name else 'all'
@@ -323,13 +323,15 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
 
                 queryset = queryset.filter(id__in=processing_status_app_ids)
 
+
             customer_status = customer_status.lower() if customer_status else 'all'
             if customer_status != 'all':
-                customer_status_app_ids = []
-                for application in queryset:
-                    if customer_status in application.customer_status.lower():
-                        customer_status_app_ids.append(application.id)
-                queryset = queryset.filter(id__in=customer_status_app_ids)
+                #customer_status_app_ids = []
+                #for application in queryset:
+                #    if customer_status in application.customer_status.lower():
+                #        customer_status_app_ids.append(application.id)
+                #queryset = queryset.filter(id__in=customer_status_app_ids)
+                queryset = queryset.filter(customer_status=customer_status)
 
             if date_from:
                 queryset = queryset.filter(lodgement_date__gte=date_from)

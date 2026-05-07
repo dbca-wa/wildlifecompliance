@@ -214,28 +214,10 @@ export default {
             this.loadLocations();
         },
         filterLodgedFrom: function(){
-            if (!this.filterLodgedFrom){
-                /* When empty string */
-                this.loadLocations();
-            } else {
-                let result = this.datetime_pattern.exec(this.filterLodgedFrom);
-                if (result){
-                    /* When date is set */
-                    this.loadLocations();
-                }
-            }
+            this.loadLocations();
         },
         filterLodgedTo: function(){
-            if (!this.filterLodgedTo){
-                /* When empty string */
-                this.loadLocations();
-            } else {
-                let result = this.datetime_pattern.exec(this.filterLodgedTo);
-                if (result){
-                    /* When date is set */
-                    this.loadLocations();
-                }
-            }
+            this.loadLocations();
         }
     },
     computed: {
@@ -358,7 +340,7 @@ export default {
             var overlayMaps = {};
 
             let request = fetch_util.fetchUrl('/api/map_layers/')
-request.then(response => {
+            request.then(response => {
                 let layers = response.results;
                 for (var i = 0; i < layers.length; i++){
                     let l = L.tileLayer.wmts(

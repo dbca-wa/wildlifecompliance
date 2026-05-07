@@ -100,17 +100,14 @@ def is_customer(request):
 
 
 def is_internal(request):
-    if DEBUG and BASIC_AUTH:
-        return True
-    else:
-        return (
-            request.user.is_superuser or
-            is_wildlifecompliance_admin(request) or
-            is_compliance_internal_user(request) or
-            is_officer(request) or
-            is_wildlife_compliance_officer(request) or
-            is_wildlifecompliance_payment_officer(request)
-        )
+    return (
+        request.user.is_superuser or
+        is_wildlifecompliance_admin(request) or
+        is_compliance_internal_user(request) or
+        is_officer(request) or
+        is_wildlife_compliance_officer(request) or
+        is_wildlifecompliance_payment_officer(request)
+    )
 
 
 def is_officer(request):

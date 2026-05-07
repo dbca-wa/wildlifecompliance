@@ -101,7 +101,7 @@
                 statusChoices: [],
                 inspectionTypes: [],
                 
-                dateFormat: 'YYYY-MM-DD',
+                dateFormat: 'DD/MM/YYYY',
                 inspectionInitialised: false,
                 
                 canUserCreateNewInspection: false,
