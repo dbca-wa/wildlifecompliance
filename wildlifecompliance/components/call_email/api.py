@@ -199,10 +199,10 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         if filter_classification:
             q_list.append(Q(classification__exact=filter_classification))
         if filter_lodged_from:
-            date_from = datetime.strptime(filter_lodged_from, '%d/%m/%Y')
+            date_from = datetime.strptime(filter_lodged_from, '%Y-%m-%d')
             q_list.append(Q(lodged_on__gte=date_from))
         if filter_lodged_to:
-            date_to = datetime.strptime(filter_lodged_to, '%d/%m/%Y')
+            date_to = datetime.strptime(filter_lodged_to, '%Y-%m-%d')
             q_list.append(Q(lodged_on__lte=date_to))
 
         queryset = queryset.filter(reduce(operator.and_, q_list)) if len(q_list) else queryset
