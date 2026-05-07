@@ -260,9 +260,9 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
             activity_purpose = activity_purpose.lower() if activity_purpose else 'all'
             if activity_purpose != 'all':
                 activity_purpose_app_ids = \
-                ApplicationSelectedActivityPurpose.objects.filter(
+                list(ApplicationSelectedActivityPurpose.objects.filter(
                     purpose_id=int(activity_purpose)
-                ).values('selected_activity__application_id')
+                ).values_list('selected_activity__application_id', flat=True))
                 queryset = queryset.filter(id__in=activity_purpose_app_ids)
 
             category_name = category_name.lower() if category_name else 'all'

@@ -119,7 +119,7 @@ export default {
                 searchable: false // handled by filter_queryset override method - class ApplicationFilterBackend
             },
             {
-                data: "purpose_string",
+                data: "activity_purpose",
                 width: "30%",
                 mRender:function (data,type,full) {
                     let output = data.replace(/(?:\r\n|\r|\n|,)/g, '<br>');
@@ -127,7 +127,7 @@ export default {
                 },
                 orderable: false,
                 //searchable: false // handled by filter_queryset override method - class ApplicationFilterBackend
-                name: "licence_purposes__name",
+                name: "activity_purpose__name",
             },
             {
                 data: "application_type",
