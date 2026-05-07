@@ -87,7 +87,7 @@
                 status_choices: [],
                 filterLodgedFrom: '',
                 filterLodgedTo: '',
-                dateFormat: 'YYYY-MM-DD',
+                dateFormat: 'DD/MM/YYYY',
                 datepickerOptions: {
                     format: 'YYYY-MM-DD',
                     showClear: true,

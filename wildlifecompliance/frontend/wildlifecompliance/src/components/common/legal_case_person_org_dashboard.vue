@@ -34,7 +34,7 @@
                 statusChoices: [],
                 //inspectionTypes: [],
                 
-                dateFormat: 'YYYY-MM-DD',
+                dateFormat: 'DD/MM/YYYY',
                 legalCaseInitialised: false,
                 createLegalCaseBindId: '',
                 // datepickerOptions: {

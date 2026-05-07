@@ -69,7 +69,7 @@ export default {
             filterDateFrom: '',
             filterDateTo: '',
             */
-            dateFormat: 'YYYY-MM-DD',
+            dateFormat: 'DD/MM/YYYY',
             datepickerOptions:{
                 format: 'YYYY-MM-DD',
                 showClear:true,
