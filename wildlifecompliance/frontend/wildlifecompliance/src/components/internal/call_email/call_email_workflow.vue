@@ -4,6 +4,8 @@
           <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-12">
+
+                        <alert v-if="errorResponse" type="danger"><strong>{{errorResponse}}</strong></alert>
                         <div v-if="regionVisibility" class="form-group">
                           <div class="row">
                             <div class="col-sm-3">
@@ -93,17 +95,7 @@
             </div>
           </div>
             <div slot="footer">
-                <div v-if="errorResponse" class="form-group">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <strong>
-                                <span style="white-space: pre; color: red">{{ errorResponse }}</span>
-                            </strong>
-                        </div>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-default" @click="ok">Ok</button>
-                <button type="button" class="btn btn-default" @click="cancel">Cancel</button>
+                
             </div>
         </modal>
     </div>
@@ -115,6 +107,7 @@ import { api_endpoints, helpers, cache_helper, fetch_util } from "@/utils/hooks"
 import filefield from '@common-components/compliance_file.vue';
 import { required } from '@vuelidate/validators'
 import $ from 'jquery';
+import alert from '@vue-utils/alert.vue'
 
 export default {
     name: "CallEmailWorking",
@@ -151,6 +144,7 @@ export default {
     components: {
       modal,
       filefield,
+      alert
     },
     validations: function() {
         if (this.workflow_type === 'allocate_for_follow_up') {
@@ -316,15 +310,16 @@ export default {
           this.case_priority_id ? payload.append('case_priority_id', this.case_priority_id) : null;
           this.regionId ? payload.append('region_id', this.regionId) : null;
           try {
-              const res = await fetch_util.fetchUrl(post_url, {method:'POST', body:JSON.stringify(payload)});
+              const res = await fetch_util.fetchUrl(post_url, {method:'POST', body:payload});
               if (res) {
                   this.$router.push({ name: 'internal-call-email-dash' });
               }
           } catch(err) {
-              this.errorResponse = 'Error:' + err.statusText;
+              let error_message = helpers.formatError(err)
+              this.errorResponse = 'Error:' + error_message;
               await swal.fire({
                   title: 'Mandatory Field',
-                  html: helpers.formatError(err),
+                  text: error_message,
                   icon: "error",
               })
           }
