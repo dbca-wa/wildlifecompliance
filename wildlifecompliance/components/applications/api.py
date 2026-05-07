@@ -323,14 +323,15 @@ class ApplicationFilterBackend(DatatablesFilterBackend):
 
                 queryset = queryset.filter(id__in=processing_status_app_ids)
 
-            #TODO fix this...
+
             customer_status = customer_status.lower() if customer_status else 'all'
             if customer_status != 'all':
-                customer_status_app_ids = []
-                for application in queryset:
-                    if customer_status in application.customer_status.lower():
-                        customer_status_app_ids.append(application.id)
-                queryset = queryset.filter(id__in=customer_status_app_ids)
+                #customer_status_app_ids = []
+                #for application in queryset:
+                #    if customer_status in application.customer_status.lower():
+                #        customer_status_app_ids.append(application.id)
+                #queryset = queryset.filter(id__in=customer_status_app_ids)
+                queryset = queryset.filter(customer_status=customer_status)
 
             if date_from:
                 queryset = queryset.filter(lodgement_date__gte=date_from)
