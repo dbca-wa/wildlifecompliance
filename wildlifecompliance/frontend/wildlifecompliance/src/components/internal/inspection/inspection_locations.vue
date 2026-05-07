@@ -226,30 +226,10 @@ export default {
             this.loadLocations();
         },
         filterDateFrom: function(){
-            if (!this.filterDateFrom){
-                /* When empty string */
-                this.loadLocations();
-            } else {
-                //let result = this.datetime_pattern.exec(this.filterDateFrom);
-                let result = this.filterDateFrom.match(this.datetime_pattern);
-
-                if (result){
-                    /* When date is set */
-                    this.loadLocations();
-                }
-            }
+            this.loadLocations();
         },
         filterDateTo: function(){
-            if (!this.filterDateTo){
-                /* When empty string */
-                this.loadLocations();
-            } else {
-                let result = this.datetime_pattern.exec(this.filterDateTo);
-                if (result){
-                    /* When date is set */
-                    this.loadLocations();
-                }
-            }
+            this.loadLocations();
         }
     },
     computed: {

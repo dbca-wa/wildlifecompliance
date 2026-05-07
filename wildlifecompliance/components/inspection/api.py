@@ -486,10 +486,10 @@ class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins
         if filter_status:
             q_list.append(Q(status__exact=filter_status))
         if filter_date_from:
-            date_from = datetime.strptime(filter_date_from, '%d/%m/%Y')
+            date_from = datetime.strptime(filter_date_from, '%Y-%m-%d')
             q_list.append(Q(planned_for_date__gte=date_from))
         if filter_date_to:
-            date_to = datetime.strptime(filter_date_to, '%d/%m/%Y')
+            date_to = datetime.strptime(filter_date_to, '%Y-%m-%d')
             q_list.append(Q(planned_for_date__lte=date_to))
 
         logger.info(q_list)

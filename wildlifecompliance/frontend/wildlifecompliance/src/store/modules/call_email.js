@@ -400,7 +400,7 @@ export const callemailStore = {
                     }catch(err) {
                         await swal.fire({
                             title: 'Mandatory Field',
-                            html: err,
+                            html: err.message,
                             icon: "error",
                         })
                     }
