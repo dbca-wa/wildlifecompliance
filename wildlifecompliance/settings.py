@@ -195,7 +195,7 @@ LEDGER_UI_ACCOUNTS_MANAGEMENT = [
             {'last_name': {'options' : {'view': True, 'edit': False}}},
             {'legal_first_name': {'options' : {'view': True, 'edit': False}}},
             {'legal_last_name': {'options' : {'view': True, 'edit': False}}},
-            {'dob': {'options' : {'view': True, 'edit': True}}},
+            {'dob': {'options' : {'view': True, 'edit': False}}},
  
             {'identification': {'options' : {'view': True, 'edit': True}}},
 
