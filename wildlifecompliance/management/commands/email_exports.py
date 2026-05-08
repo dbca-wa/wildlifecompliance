@@ -5,7 +5,7 @@ from ledger_api_client.ledger_models import EmailUserRO
 from wildlifecompliance.helpers import is_internal_user
 from wildlifecompliance.components.main.utils import exportModelData, formatExportData
 from wildlifecompliance import settings
-from wildlifecompliance.components.emails.emails import TemplateEmailBase
+from wildlifecompliance.components.emails.emails import ExportReportEmail
 
 logger = logging.getLogger('cron_tasks')
 cron_email = logging.getLogger('cron_email')
@@ -52,11 +52,7 @@ class Command(BaseCommand):
                 attachments = []
                 attachments.append(file)
                 #email to user
-                email = TemplateEmailBase(
-                    subject='Attached: Wildlife Compliance - {} Report'.format(model.capitalize()), 
-                    html_template='wildlifecompliance/emails/report_attached.html',
-                    txt_template='wildlifecompliance/emails/report_attached.txt',
-                )
+                email = ExportReportEmail(model)
                 to_address = user.email
                 context = {"recipient":user, "model":model.capitalize()}
                 # Send email
