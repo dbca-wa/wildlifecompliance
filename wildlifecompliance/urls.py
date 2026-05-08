@@ -314,6 +314,8 @@ urlpatterns = [
     re_path(r'^private-media/', views.getPrivateFile, name='view_private_file'),
     re_path(r'infringement/', views.InfringementView.as_view(), name='wc_infringement'),
 
+    re_path(r'^email-exports/$', views.EmailExportsView.as_view(), name='email-exports'),
+
 ] + ledger_patterns + media_serv_patterns
 
 if not are_migrations_running():

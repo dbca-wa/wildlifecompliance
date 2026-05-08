@@ -1,6 +1,10 @@
 import ast
 import re
 import os
+import uuid
+import csv
+import xlsxwriter
+import datetime
 
 import pytz
 import json
@@ -20,6 +24,7 @@ from ledger_api_client.ledger_models import Invoice
 from wildlifecompliance.exceptions import BindApplicationException
 from django.core.cache import cache
 from wildlifecompliance.components.main.models import RegionGIS, DistrictGIS
+from wildlifecompliance.settings import MAX_NUM_ROWS_MODEL_EXPORT
 from django.db.models import JSONField
 from django.db.models import Q
 
@@ -921,3 +926,138 @@ def check_file(file, model_name):
 
     if not valid:
         raise ValidationError("File type/extension not supported")
+    
+
+def csvExportData(model, header, columns):
+    
+    csv_file = str(settings.BASE_DIR)+'/tmp/{}_{}_{}.csv'.format(model,uuid.uuid4(),int(datetime.datetime.now().timestamp()*100000))
+    with open(csv_file, 'w', newline='') as new_file:
+        writer = csv.writer(new_file)
+        writer.writerow(header)
+        for i in columns:
+            writer.writerow(i)
+    return csv_file
+
+def excelExportData(model, header, columns):
+    excel_file = str(settings.BASE_DIR)+'/tmp/{}_{}_{}.xlsx'.format(model,uuid.uuid4(),int(datetime.datetime.now().timestamp()*100000))
+    workbook = xlsxwriter.Workbook(excel_file) 
+    worksheet = workbook.add_worksheet("{} Report".format(model.capitalize()))
+    format = workbook.add_format()
+
+    col = 0 
+    row = 0
+
+    col_lens = [0]*len(header)
+
+    for i in header:
+        worksheet.write(row, col, str(i), format)
+        col_lens[col] = len(str(i))+2
+        worksheet.set_column(col, col, col_lens[col])
+        col += 1
+    col = 0 
+    row += 1
+    for i in columns:
+        for j in i:
+            worksheet.write(row, col, str(j), format)
+            if len(str(j)) > col_lens[col]:
+                col_lens[col] = len(str(j))+2
+                worksheet.set_column(col, col, col_lens[col])
+            col += 1
+        col = 0
+        row += 1
+
+    workbook.close() 
+
+    return excel_file
+
+
+def getApplicationExport(filters, num):
+    from wildlifecompliance.components.applications.models import Application
+
+    qs = Application.objects.order_by("-lodgement_date")
+    if filters:
+        #lodged_on_from
+        if "lodged_on_from" in filters and filters["lodged_on_from"]:
+            qs = qs.filter(lodgement_date__gte=filters["lodged_on_from"])
+        #lodged_on_to
+        if "lodged_on_to" in filters and filters["lodged_on_to"]:
+            qs = qs.filter(lodgement_date__lte=filters["lodged_on_to"])
+
+    return qs[:num]
+
+def getWildlifelicenceExport(filters, num):
+    from wildlifecompliance.components.licences.models import WildlifeLicence
+
+    qs = WildlifeLicence.objects.order_by("-issue_date").exclude(lodgement_number__startswith='WLA')
+
+    if filters:
+        #issued_from
+        if "issued_from" in filters and filters["issued_from"]:
+            qs = qs.filter(current_application__selected_activities__proposed_purposes__issue_date__gte=filters["issued_from"])
+        #issued_to
+        if "issued_to" in filters and filters["issued_to"]:
+            qs = qs.filter(current_application__selected_activities__proposed_purposes__issue_date__lte=filters["issued_to"])
+
+    return qs[:num]
+
+def exportModelData(model, filters, num_records):
+
+    if not num_records:
+        num_records = MAX_NUM_ROWS_MODEL_EXPORT
+    else:
+        num_records = min(num_records, MAX_NUM_ROWS_MODEL_EXPORT)
+
+    if model == "application":
+        return getApplicationExport(filters, num_records)
+    elif model == "wildlifelicence": #exclude waiting list
+        return getWildlifelicenceExport(filters, num_records)
+
+    else:
+        return
+
+def getApplicationExportFields(data):
+    header = ["Lodgement Number"]
+
+    columns = list(
+        data.values_list(
+            "lodgement_number",
+        )
+    )
+    
+    return header, columns
+
+def getWildlifelicenceExportFields(data):
+    header = ["Licence Number"]
+
+    columns = list(
+        data.values_list(
+            "licence_number",
+        )
+    )
+    
+    return header, columns
+
+def formatExportData(model, data, format):
+
+    if model == "application":
+        header, columns = getApplicationExportFields(data)
+    elif model == "wildlifelicence":
+        header, columns = getWildlifelicenceExportFields(data)
+    else:
+        return
+
+    if os.path.isdir(str(settings.BASE_DIR)+'/tmp/') is False:
+        os.makedirs(str(settings.BASE_DIR)+'/tmp/')
+
+    if format == "excel":
+        file_name = excelExportData(model, header, columns)
+        file_buffer = None
+        with open(file_name, 'rb') as f:
+            file_buffer = f.read()    
+        return ('Wildlife Compliance - {} Report.xlsx'.format(model.capitalize()), file_buffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    else:
+        file_name =  csvExportData(model, header, columns)
+        file_buffer = None
+        with open(file_name, 'rb') as f:
+            file_buffer = f.read()    
+        return ('Wildlife Compliance - {} Report.csv'.format(model.capitalize()), file_buffer, 'application/csv')
