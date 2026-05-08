@@ -30,7 +30,7 @@
                                 <label>{{activityList[entryActivity]['label']}}</label>
                             </div>
                             <div class="col-md-6" v-if="isAddEntry && !isStockEntry">
-                                <select class="form-control" v-model="entryActivity">
+                                <select class="form-control" v-model="entryActivity" style="appearance: auto;">
                                     <option v-for="(activity, activityId) in filteredAutoActivityList" :value="activityId">{{activity['label']}}</option>
                                 </select>
                             </div>
