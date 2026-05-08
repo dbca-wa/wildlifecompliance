@@ -26,7 +26,10 @@ from django.core.cache import cache
 from wildlifecompliance.components.main.models import RegionGIS, DistrictGIS
 from wildlifecompliance.settings import MAX_NUM_ROWS_MODEL_EXPORT
 from django.db.models import JSONField
-from django.db.models import Q
+from django.db.models import Q, Case, When, Value, CharField, F
+from django.db.models.functions import Concat, Coalesce
+
+from django.contrib.postgres.aggregates import ArrayAgg
 
 logger = logging.getLogger(__name__)
 
@@ -1016,18 +1019,30 @@ def exportModelData(model, filters, num_records):
         return
 
 def getApplicationExportFields(data):
-    header = ["Lodgement Number"]
+    #TODO actual applicant should be included here but cannot be done without appropriate accommodations due to details being on ledger
+    #I suggest including applicant name and org details in the property cache as a stopgap solution
+
+    header = ["Lodgement Number", "Category", "Activities", "Type", "Submitter ID", "Status", "Lodged On", "Payment Status"]
 
     columns = list(
-        data.values_list(
+        data.annotate(
+            activities=ArrayAgg('selected_activities__licence_activity__name', distinct=True)
+        ).values_list(
             "lodgement_number",
+            "property_cache__licence_category_name",
+            "activities",
+            "application_type",
+            "submitter_id",
+            "customer_status",
+            "lodgement_date",
+            "property_cache__payment_status",
         )
     )
-    
+
     return header, columns
 
 def getWildlifelicenceExportFields(data):
-    header = ["Licence Number"]
+    header = ["Licence Number", "Category", "Holder", "Issue Date", "Status"]
 
     columns = list(
         data.values_list(
