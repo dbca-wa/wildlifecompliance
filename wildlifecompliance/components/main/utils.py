@@ -988,7 +988,7 @@ def getApplicationExport(filters, num):
 def getWildlifelicenceExport(filters, num):
     from wildlifecompliance.components.licences.models import WildlifeLicence
 
-    qs = WildlifeLicence.objects.order_by("-issue_date").exclude(lodgement_number__startswith='WLA')
+    qs = WildlifeLicence.objects.order_by("-current_application__selected_activities__proposed_purposes__issue_date")
 
     if filters:
         #issued_from
