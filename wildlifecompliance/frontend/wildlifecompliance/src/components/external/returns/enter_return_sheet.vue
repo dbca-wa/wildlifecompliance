@@ -126,7 +126,12 @@ export default {
                    return vm.returns.sheet_activity_list[data]['label']
                 }
               },
-              { data: "doa" },
+              { data: "doa",
+                mRender: function(data, type, full) {
+                   let _date = new Date(full.doa);
+                   return _date.toLocaleDateString("en-GB")
+                }
+               },
               { data: "qty" },
               { data: "total" },
               { data: "transfer",
