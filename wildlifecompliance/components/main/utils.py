@@ -26,8 +26,7 @@ from django.core.cache import cache
 from wildlifecompliance.components.main.models import RegionGIS, DistrictGIS
 from wildlifecompliance.settings import MAX_NUM_ROWS_MODEL_EXPORT
 from django.db.models import JSONField
-from django.db.models import Q, Case, When, Value, CharField, F
-from django.db.models.functions import Concat, Coalesce
+from django.db.models import Q, Max
 
 from django.contrib.postgres.aggregates import ArrayAgg
 
@@ -1042,11 +1041,19 @@ def getApplicationExportFields(data):
     return header, columns
 
 def getWildlifelicenceExportFields(data):
-    header = ["Licence Number", "Category", "Holder", "Issue Date", "Status"]
+    header = ["Licence Number", "Category", "Submitter ID", "Issue Date", "Status"]
 
     columns = list(
-        data.values_list(
+        data.annotate(
+            issue_date=Max(
+                'current_application__selected_activities__proposed_purposes__issue_date'
+            )
+        ).values_list(
             "licence_number",
+            "licence_category__name",
+            "current_application__submitter_id",
+            "issue_date",
+            "property_cache__status"
         )
     )
     
