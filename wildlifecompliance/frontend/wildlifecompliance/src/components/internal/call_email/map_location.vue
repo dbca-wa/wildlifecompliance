@@ -79,7 +79,7 @@ import 'leaflet.locatecontrol';
 import Awesomplete from 'awesomplete';
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import helpers from "@/utils/helpers";
-
+import utils from '../utils'
 import 'awesomplete/awesomplete.css';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-measure/dist/leaflet-measure.css';
@@ -108,6 +108,7 @@ export default {
         vm.guid = helpers.guid();
 
         return {
+            map_settings: null,
             defaultCenter: defaultCentre,
             projection: null,
             map: null,
@@ -118,12 +119,12 @@ export default {
             suggest_list: [],
             feature_marker: null,
             cursor_location: null,
-            idMap: vm.guid + 'mapLeaf',
-            idLocationFieldsAddress: vm.guid + 'LocationFieldsAddress',
-            idLocationFieldsDetails: vm.guid + 'LocationFieldsDetails',
-            idSearchInput: vm.guid + 'SearchInput',
-            idBasemapSat: vm.guid + 'BasemapSat',
-            idBasemapOsm: vm.guid + 'BasemapOsm',
+            idMap: 'mapLeaf',
+            idLocationFieldsAddress:'LocationFieldsAddress',
+            idLocationFieldsDetails:'LocationFieldsDetails',
+            idSearchInput: 'SearchInput',
+            idBasemapSat: 'BasemapSat',
+            idBasemapOsm: 'BasemapOsm',
         };
     },
     computed: {
@@ -166,27 +167,10 @@ export default {
             }
         }
     },
-    mounted: async function(){
-        this.$nextTick(function() {
-            this.initMap();
-            this.setBaseLayer('osm');
-            this.initAwesomplete();
-            // if (this.call_latitude){
-            if (this.call_email.location && this.call_email.location && 
-                this.call_email.location.geometry && this.call_email.location.geometry.coordinates &&
-                this.call_email.location.geometry.coordinates.length > 0){
-                /* If there is a location loaded, add a marker to the map */
-                // this.addMarker([this.call_latitude, this.call_longitude]);
-                this.addMarker([this.call_email.location.geometry.coordinates[1], this.call_email.location.geometry.coordinates[0]]);
-                this.refreshMarkerLocation();
-                //this.reverseGeocoding(this.call_email.location.geometry.coordinates);
-            }        
-            if (this.call_email.location.properties.country){
-                this.showHideAddressDetailsFields(true, false);
-            } else {
-                this.showHideAddressDetailsFields(false, true);
-            }
-        });
+    mounted(){
+        let vm = this;
+        vm.initMap();
+        vm.initAwesomplete();
     },
     methods: {
         ...mapActions('callemailStore', {
@@ -237,13 +221,17 @@ export default {
                 }
             }
         },
-        addMarker(latLngArr){
+        addMarker(latLngArr) {
             let vm = this;
-            vm.feature_marker = L.marker({lon: latLngArr[1], lat: latLngArr[0]}, {icon: vm.icon_default}).on('click', function(ev){
-                //ev.preventDefault();
+            vm.feature_marker = L.marker(
+                { lon: latLngArr[1], lat: latLngArr[0] },
+                { icon: vm.icon_default }
+            ).on("click", function(ev) {
                 vm.feature_marker.setIcon(myIcon);
             });
             //vm.feature_marker.bindTooltip("click to lock/unlock");
+            console.log(vm.feature_marker)
+            console.log(vm.map)
             vm.feature_marker.addTo(vm.map);
             vm.setMarkerIcon();
         },
@@ -430,19 +418,33 @@ export default {
                 } 
             }
         },
-        initMap: function(){
-            this.map = L.map(this.idMap).setView([-31.9505, 115.8605], 4);
-            this.tileLayer = L.tileLayer(
-                //'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                /*{
-                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, contributiors',
-                }*/
+        async loadMapSettings(){
+            const data = await utils.fetchMapSettings();
+            this.map_settings = data;
+        },
+        async initMap(){     
+            console.log("initMap")
+            await this.loadMapSettings();
+
+            this.map = L.map(this.idMap, 
+                {
+                    zoomAnimation: false
+                }
+            ).setView([-31.9505, 115.8605], 4);
+
+            this.tileLayer = L.tileLayer.wms(
+                this.map_settings.map_server_wms_url,
+                {
+                    layers: this.map_settings.street_map_layer,
+                    tilematrixSet: 'mercator',
+                    format: 'image/png',
+                }
             );
 
-            this.tileLayerSat = L.tileLayer.wmts(
-                //'https://kmi.dpaw.wa.gov.au/geoserver/gwc/service/wmts',
+            this.tileLayerSat = L.tileLayer.wms(
+                this.map_settings.map_server_wms_url,
                 {
-                    layer: 'public:mapbox-satellite',
+                    layers: this.map_settings.satellite_map_layer,
                     tilematrixSet: 'mercator',
                     format: 'image/png',
                 }
@@ -458,6 +460,21 @@ export default {
             });
             measureControl.addTo(this.map);
             L.control.locate().addTo(this.map);
+
+            if (this.call_email.location && this.call_email.location && 
+                this.call_email.location.geometry && this.call_email.location.geometry.coordinates &&
+                this.call_email.location.geometry.coordinates.length > 0){
+                /* If there is a location loaded, add a marker to the map */
+                // this.addMarker([this.call_latitude, this.call_longitude]);
+                this.addMarker([this.call_email.location.geometry.coordinates[1], this.call_email.location.geometry.coordinates[0]]);
+                this.refreshMarkerLocation();
+                //this.reverseGeocoding(this.call_email.location.geometry.coordinates);
+            }        
+            if (this.call_email.location.properties.country){
+                this.showHideAddressDetailsFields(true, false);
+            } else {
+                this.showHideAddressDetailsFields(false, true);
+            }
         },
         /* this function stores the coordinates into the vuex, then call refresh marker function */
         relocateMarker: function(latlng){ 

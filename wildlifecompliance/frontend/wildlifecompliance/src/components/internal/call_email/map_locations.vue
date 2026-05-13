@@ -320,8 +320,6 @@ export default {
         async initMap(){
             await this.loadMapSettings();
 
-            console.log(this.map_settings)
-
             this.map = L.map('mapLeaf', 
                 {
                     zoomAnimation: false
@@ -360,7 +358,7 @@ export default {
                 let layers = response.results;
                 for (var i = 0; i < layers.length; i++){
                     let l = L.tileLayer.wms(
-                        'https://kb.dbca.wa.gov.au/geoserver/kaartdijin-boodja-public/wms',
+                        this.map_settings.map_server_wms_url,
                         {
                             layer: layers[i].layer_name.trim(),
                             tilematrixSet: 'mercator',
@@ -369,7 +367,9 @@ export default {
                     );
                     overlayMaps[layers[i].display_name] = l;
                 }
-                L.control.layers(null, overlayMaps, {position: 'topleft'}).addTo(this.map);
+                if (layers.length > 0) {
+                    L.control.layers(null, overlayMaps, {position: 'topleft'}).addTo(this.map);
+                }
             });
         },
         loadLocations(){

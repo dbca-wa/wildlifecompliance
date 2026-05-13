@@ -62,7 +62,7 @@ import 'leaflet.locatecontrol';
 import Awesomplete from 'awesomplete';
 import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-
+import utils from '../utils'
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
@@ -182,6 +182,7 @@ export default {
         vm.ajax_for_location = null;
 
         return {
+            map_settings: null,
             map: null,
             tileLayer: null, // Base layer (Open street map)
             tileLayerSat: null, // Base layer (satelllite)
@@ -318,19 +319,32 @@ export default {
         onMouseOut: function(e){
             this.cursor_location = null;
         },
-        initMap(){
-            this.map = L.map('mapLeaf').setView([-24.9505, 122.8605], 5);
-            this.tileLayer = L.tileLayer(
-                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        async loadMapSettings(){
+            const data = await utils.fetchMapSettings();
+            this.map_settings = data;
+        },
+        async initMap(){
+            await this.loadMapSettings();
+
+            this.map = L.map('mapLeaf', 
                 {
-                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, contributiors',
+                    zoomAnimation: false
+                }
+            ).setView([-24.9505, 122.8605], 5);
+            
+            this.tileLayer = L.tileLayer.wms(
+                this.map_settings.map_server_wms_url,
+                {
+                    layers: this.map_settings.street_map_layer,
+                    tilematrixSet: 'mercator',
+                    format: 'image/png',
                 }
             );
 
-            this.tileLayerSat = L.tileLayer.wmts(
-                'https://kmi.dpaw.wa.gov.au/geoserver/gwc/service/wmts',
+            this.tileLayerSat = L.tileLayer.wms(
+                this.map_settings.map_server_wms_url,
                 {
-                    layer: 'public:mapbox-satellite',
+                    layers: this.map_settings.satellite_map_layer,
                     tilematrixSet: 'mercator',
                     format: 'image/png',
                 }
@@ -350,8 +364,8 @@ export default {
 request.then(response => {
                 let layers = response.results;
                 for (var i = 0; i < layers.length; i++){
-                    let l = L.tileLayer.wmts(
-                        'https://kmi.dpaw.wa.gov.au/geoserver/gwc/service/wmts',
+                    let l = L.tileLayer.wms(
+                        this.map_settings.map_server_wms_url,
                         {
                             layer: layers[i].layer_name.trim(),
                             tilematrixSet: 'mercator',
@@ -360,7 +374,9 @@ request.then(response => {
                     );
                     overlayMaps[layers[i].display_name] = l;
                 }
-                L.control.layers(null, overlayMaps, {position: 'topleft'}).addTo(this.map);
+                if (layers.length > 0) {
+                    L.control.layers(null, overlayMaps, {position: 'topleft'}).addTo(this.map);
+                }
             });
         },
         loadLocations(){
