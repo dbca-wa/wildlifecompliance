@@ -21,7 +21,13 @@ from rest_framework_datatables.renderers import DatatablesRenderer
 
 from ledger_api_client.utils import oracle_parser
 
-from wildlifecompliance.settings import WC_PAYMENT_SYSTEM_PREFIX
+from wildlifecompliance.settings import (
+    WC_PAYMENT_SYSTEM_PREFIX,
+    MAP_SERVER_WMS_URL,
+    STREET_MAP_LAYER,
+    SATELLITE_MAP_LAYER,
+)
+
 # from wildlifecompliance.settings import SYSTEM_NAME
 from wildlifecompliance.components.call_email.models import Location
 from wildlifecompliance.components.call_email.serializers import (
@@ -61,6 +67,7 @@ from wildlifecompliance.helpers import (
     is_wildlifecompliance_payment_officer,
     is_compliance_internal_user,
 )
+from rest_framework.permissions import IsAuthenticated
 
 logger = logging.getLogger(__name__)
 # logger = logging
@@ -1516,3 +1523,15 @@ class AllocatedGroupMembers(views.APIView):
             print(traceback.print_exc())
             raise serializers.ValidationError("Internal System Error")
 
+class MapSettings(views.APIView):
+    renderer_classes = [JSONRenderer, ]
+    permission_classes=[IsAuthenticated]
+
+    def get(self, request, format=None):
+        
+        map_settings = {
+            "map_server_wms_url": MAP_SERVER_WMS_URL,
+            "street_map_layer": STREET_MAP_LAYER,
+            "satellite_map_layer": SATELLITE_MAP_LAYER,
+        }
+        return Response(map_settings)

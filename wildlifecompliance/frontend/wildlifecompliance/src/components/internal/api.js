@@ -7,5 +7,6 @@ export default {
     countries: '/api/countries',
     my_user_details: '/api/my_user_details/',
     //profiles: '/api/profiles/',
-    application_assessment:'/api/assessment/'
+    application_assessment:'/api/assessment/',
+    map_settings: '/api/map_settings',
 }

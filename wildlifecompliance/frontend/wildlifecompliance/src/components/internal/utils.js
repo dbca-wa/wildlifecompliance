@@ -113,4 +113,14 @@ export default {
             });
         });
     },
+    fetchMapSettings: function (){
+        return new Promise ((resolve,reject) => {
+            let request = fetch_util.fetchUrl(api.map_settings)
+            request.then((response) => {
+                resolve(response);
+            }).catch((error) => {
+                reject(error);
+            });
+        });
+    },
 }

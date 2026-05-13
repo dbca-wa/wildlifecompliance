@@ -55,6 +55,7 @@ import 'leaflet.markercluster';  /* This should be imported after leaflet */
 import 'leaflet.locatecontrol';
 import Awesomplete from 'awesomplete';
 import { api_endpoints, helpers, cache_helper, fetch_util } from '@/utils/hooks'
+import utils from '../utils'
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 
 import 'leaflet/dist/leaflet.css';
@@ -171,7 +172,7 @@ export default {
 
         return {
             map: null,
-            tileLayer: null, // Base layer (Open street map)
+            tileLayer: null, // Base layer (street map)
             tileLayerSat: null, // Base layer (satelllite)
             popup: null,
             opt_url : helpers.add_endpoint_json(api_endpoints.call_email, "optimised"),
@@ -189,6 +190,8 @@ export default {
             classification_types: [],
             status_choices: [],
             cursor_location: null,
+
+            map_settings: null,
         }
     },
     created: async function() {
@@ -310,20 +313,33 @@ export default {
         onMouseOut: function(e){
             this.cursor_location = null;
         },
-        initMap(){
+        async loadMapSettings(){
+            const data = await utils.fetchMapSettings();
+            this.map_settings = data;
+        },
+        async initMap(){
+            await this.loadMapSettings();
 
-            this.map = L.map('mapLeaf').setView([-24.9505, 122.8605], 5);
-            this.tileLayer = L.tileLayer(
-                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            console.log(this.map_settings)
+
+            this.map = L.map('mapLeaf', 
                 {
-                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, contributiors',
+                    zoomAnimation: false
+                }
+            ).setView([-24.9505, 122.8605], 5);
+            this.tileLayer = L.tileLayer.wms(
+                this.map_settings.map_server_wms_url,
+                {
+                    layers: this.map_settings.street_map_layer,
+                    tilematrixSet: 'mercator',
+                    format: 'image/png',
                 }
             );
 
-            this.tileLayerSat = L.tileLayer.wmts(
-                'https://kmi.dpaw.wa.gov.au/geoserver/gwc/service/wmts',
+            this.tileLayerSat = L.tileLayer.wms(
+                this.map_settings.map_server_wms_url,
                 {
-                    layer: 'public:mapbox-satellite',
+                    layers: this.map_settings.satellite_map_layer,
                     tilematrixSet: 'mercator',
                     format: 'image/png',
                 }
@@ -343,8 +359,8 @@ export default {
             request.then(response => {
                 let layers = response.results;
                 for (var i = 0; i < layers.length; i++){
-                    let l = L.tileLayer.wmts(
-                        'https://kmi.dpaw.wa.gov.au/geoserver/gwc/service/wmts',
+                    let l = L.tileLayer.wms(
+                        'https://kb.dbca.wa.gov.au/geoserver/kaartdijin-boodja-public/wms',
                         {
                             layer: layers[i].layer_name.trim(),
                             tilematrixSet: 'mercator',

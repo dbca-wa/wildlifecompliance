@@ -433,14 +433,14 @@ export default {
         initMap: function(){
             this.map = L.map(this.idMap).setView([-31.9505, 115.8605], 4);
             this.tileLayer = L.tileLayer(
-                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                {
+                //'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                /*{
                     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, contributiors',
-                }
+                }*/
             );
 
             this.tileLayerSat = L.tileLayer.wmts(
-                'https://kmi.dpaw.wa.gov.au/geoserver/gwc/service/wmts',
+                //'https://kmi.dpaw.wa.gov.au/geoserver/gwc/service/wmts',
                 {
                     layer: 'public:mapbox-satellite',
                     tilematrixSet: 'mercator',
