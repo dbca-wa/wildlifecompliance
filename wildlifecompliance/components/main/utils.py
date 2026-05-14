@@ -25,9 +25,10 @@ from wildlifecompliance.exceptions import BindApplicationException
 from django.core.cache import cache
 from wildlifecompliance.components.main.models import RegionGIS, DistrictGIS
 from wildlifecompliance.settings import MAX_NUM_ROWS_MODEL_EXPORT
-from django.db.models import JSONField
-from django.db.models import Q, Max
 
+from django.db.models import Case, When, Value, CharField, Q, Max
+from django.db.models.functions import Coalesce, Concat
+from django.db.models.fields.json import KeyTextTransform
 from django.contrib.postgres.aggregates import ArrayAgg
 
 logger = logging.getLogger(__name__)
@@ -1018,14 +1019,34 @@ def exportModelData(model, filters, num_records):
         return
 
 def getApplicationExportFields(data):
-    #TODO actual applicant should be included here but cannot be done without appropriate accommodations due to details being on ledger
-    #I suggest including applicant name and org details in the property cache as a stopgap solution
 
-    header = ["Lodgement Number", "Category", "Activities", "Type", "Submitter ID", "Status", "Lodged On", "Payment Status"]
+    header = ["Lodgement Number", "Category", "Activities", "Type", "Submitter ID", "Status", "Lodged On", "Payment Status", "Applicant"]
 
     columns = list(
         data.annotate(
             activities=ArrayAgg('selected_activities__licence_activity__name', distinct=True)
+        ).annotate(            
+            relevant_applicant=Coalesce(
+                # organisation_name
+                KeyTextTransform("organisation_name", "property_cache"),
+                # proxy full name
+                Case(
+                    When(
+                        property_cache__proxy_applicant_first_name__isnull=False,
+                        then=Concat(
+                            KeyTextTransform("proxy_applicant_first_name", "property_cache"),
+                            Value(" "),
+                            KeyTextTransform("proxy_applicant_last_name", "property_cache"),
+                            output_field=CharField(),
+                        ),
+                    ),
+                    output_field=CharField(),
+                ),
+
+                # fallback
+                Value(""),
+                output_field=CharField(),
+            )
         ).values_list(
             "lodgement_number",
             "property_cache__licence_category_name",
@@ -1035,25 +1056,49 @@ def getApplicationExportFields(data):
             "customer_status",
             "lodgement_date",
             "property_cache__payment_status",
+            "relevant_applicant"
         )
     )
 
     return header, columns
 
 def getWildlifelicenceExportFields(data):
-    header = ["Licence Number", "Category", "Submitter ID", "Issue Date", "Status"]
+    header = ["Licence Number", "Category", "Submitter ID", "Issue Date", "Status", "Holder"]
 
     columns = list(
         data.annotate(
             issue_date=Max(
                 'current_application__selected_activities__proposed_purposes__issue_date'
             )
+        ).annotate(            
+            holder=Coalesce(
+                # organisation_name
+                KeyTextTransform("organisation_name", "current_application__property_cache"),
+                # proxy full name
+                Case(
+                    When(
+                        current_application__property_cache__proxy_applicant_first_name__isnull=False,
+                        then=Concat(
+                            KeyTextTransform("proxy_applicant_first_name", "current_application__property_cache"),
+                            Value(" "),
+                            KeyTextTransform("proxy_applicant_last_name", "current_application__property_cache"),
+                            output_field=CharField(),
+                        ),
+                    ),
+                    output_field=CharField(),
+                ),
+
+                # fallback
+                Value(""),
+                output_field=CharField(),
+            )
         ).values_list(
             "licence_number",
             "licence_category__name",
             "current_application__submitter_id",
             "issue_date",
-            "property_cache__status"
+            "property_cache__status",
+            "holder",
         )
     )
     
