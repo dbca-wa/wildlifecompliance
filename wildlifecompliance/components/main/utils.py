@@ -1063,7 +1063,7 @@ def getApplicationExportFields(data):
     return header, columns
 
 def getWildlifelicenceExportFields(data):
-    header = ["Licence Number", "Category", "Submitter ID", "Issue Date", "Status"]
+    header = ["Licence Number", "Category", "Submitter ID", "Issue Date", "Status", "Holder"]
 
     columns = list(
         data.annotate(
@@ -1097,7 +1097,8 @@ def getWildlifelicenceExportFields(data):
             "licence_category__name",
             "current_application__submitter_id",
             "issue_date",
-            "property_cache__status"
+            "property_cache__status",
+            "holder",
         )
     )
     
