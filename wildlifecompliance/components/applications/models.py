@@ -496,6 +496,27 @@ class Application(RevisionedMixin):
         else:
             self.property_cache['latest_invoice_ref'] = ''
 
+        #check if property_cache has appropriate applicant value, if not, populate
+        if not(
+            "organisation_name" in self.property_cache or (
+            "proxy_applicant_first_name" in self.property_cache and "proxy_applicant_last_name" in self.property_cache
+            )
+        ):
+            #get organisation name - if not available get proxy applicant name
+            org_name = self.org_applicant.name if self.org_applicant else None
+            if not org_name:
+                proxy_applicant = self.proxy_applicant
+                if proxy_applicant:
+                    self.property_cache["proxy_applicant_first_name"] = proxy_applicant.legal_first_name if proxy_applicant.legal_first_name else proxy_applicant.first_name
+                    self.property_cache["proxy_applicant_last_name"] = proxy_applicant.legal_last_name if proxy_applicant.legal_last_name else proxy_applicant.last_name
+                else:
+                    #if neither are available, use the submitter in place of the proxy applicant
+                    if self.submitter:
+                        self.property_cache["proxy_applicant_first_name"] = self.submitter.legal_first_name if self.submitter.legal_first_name else self.submitter.first_name
+                        self.property_cache["proxy_applicant_last_name"] = self.submitter.legal_last_name if self.submitter.legal_last_name else self.submitter.last_name
+            else:
+                self.property_cache["organisation_name"] = org_name
+
         if save is True:
             self.save()
 
