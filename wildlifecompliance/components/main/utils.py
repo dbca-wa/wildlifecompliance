@@ -1070,6 +1070,28 @@ def getWildlifelicenceExportFields(data):
             issue_date=Max(
                 'current_application__selected_activities__proposed_purposes__issue_date'
             )
+        ).annotate(            
+            holder=Coalesce(
+                # organisation_name
+                KeyTextTransform("organisation_name", "current_application__property_cache"),
+                # proxy full name
+                Case(
+                    When(
+                        current_application__property_cache__proxy_applicant_first_name__isnull=False,
+                        then=Concat(
+                            KeyTextTransform("proxy_applicant_first_name", "current_application__property_cache"),
+                            Value(" "),
+                            KeyTextTransform("proxy_applicant_last_name", "current_application__property_cache"),
+                            output_field=CharField(),
+                        ),
+                    ),
+                    output_field=CharField(),
+                ),
+
+                # fallback
+                Value(""),
+                output_field=CharField(),
+            )
         ).values_list(
             "licence_number",
             "licence_category__name",

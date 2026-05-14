@@ -32,7 +32,3 @@ class Command(BaseCommand):
         #populate
         for application in applications:
             application.update_property_cache()
-
-        #licences
-        #filter by missing property cache values
-        #populate
