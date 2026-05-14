@@ -5,4 +5,4 @@
 */5 * * * * python manage_wc.py run_queue_job >> logs/run_cron_tasks.log 2>&1
 
 # Log Rotate
-1 0 * * *  /bin/log_rotate.sh  >> /app/logs/log_rotate.log 2>&1
+1 6 * * *  /bin/log_rotate.sh  >> /app/logs/log_rotate.log 2>&1
