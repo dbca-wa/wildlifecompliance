@@ -114,7 +114,7 @@ export default {
       ...baseDic
     });
     vm.guid = helpers.guid();
-
+    
     return {
       map_settings: null,
       defaultCenter: defaultCentre,
@@ -127,12 +127,12 @@ export default {
       suggest_list: [],
       feature_marker: null,
       cursor_location: null,
-      idMap: "mapLeaf",
-      idLocationFieldsAddress: "LocationFieldsAddress",
-      idLocationFieldsDetails: "LocationFieldsDetails",
-      idSearchInput: "SearchInput",
-      idBasemapSat: "BasemapSat",
-      idBasemapOsm: "BasemapOsm"
+      idMap: "modal-mapLeaf",
+      idLocationFieldsAddress: "modal-LocationFieldsAddress",
+      idLocationFieldsDetails: "modal-LocationFieldsDetails",
+      idSearchInput: "modal-SearchInput",
+      idBasemapSat: "modal-BasemapSat",
+      idBasemapOsm: "modal-BasemapOsm"
     };
   },
   computed: {
@@ -406,6 +406,7 @@ export default {
       this.setLocationAddress(properties_for_update);
     },
     setBaseLayer: function(selected_layer_name) {
+      console.log(this.mapOffence)
       if (selected_layer_name == "sat") {
         this.mapOffence.removeLayer(this.tileLayer);
         this.mapOffence.addLayer(this.tileLayerSat);

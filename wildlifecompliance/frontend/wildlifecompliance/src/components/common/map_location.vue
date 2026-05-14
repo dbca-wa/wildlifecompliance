@@ -80,7 +80,7 @@ export default {
       iconUrl: markerGrayLocked,
       ...baseDic
     });
-    vm.guid = helpers.guid();
+    vm.guid = helpers.guid(); //NOTE: guid originally used in map id values but appeared to disrupt functionality - may need to be reimplemented so making note here
 
     return {
         map_settings: null,
