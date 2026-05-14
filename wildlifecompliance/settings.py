@@ -42,6 +42,10 @@ LEDGER_TEMPLATE = "bootstrap5"
 
 WILDLIFECOMPLIANCE_EXTERNAL_URL = env('WILDLIFECOMPLIANCE_EXTERNAL_URL','External url not configured')
 
+MAP_SERVER_WMS_URL = env('MAP_SERVER_WMS_URL', 'https://kb.dbca.wa.gov.au/geoserver/kaartdijin-boodja-public/wms')
+STREET_MAP_LAYER = env('STREET_MAP_LAYER', 'kaartdijin-boodja-public:mapbox-streets-public')
+SATELLITE_MAP_LAYER = env('SATELLITE_MAP_LAYER', 'kaartdijin-boodja-public:mapbox-satellite-public')
+
 # Use git commit hash for purging cache in browser for deployment changes
 GIT_COMMIT_HASH = os.popen(
     f"cd {BASE_DIR}; git log -1 --format=%H"

@@ -42,7 +42,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-measure/dist/leaflet-measure.css";
 import "leaflet.locatecontrol/dist/L.Control.Locate.min.css";
 import { api_endpoints, helpers, cache_helper } from '@/utils/hooks.js'
-
+import utils from '../internal/utils'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import markerGrayLocked from "../../assets/marker-gray-locked.svg";
 import $ from 'jquery';
@@ -80,9 +80,10 @@ export default {
       iconUrl: markerGrayLocked,
       ...baseDic
     });
-    vm.guid = helpers.guid();
+    vm.guid = helpers.guid(); //NOTE: guid originally used in map id values but appeared to disrupt functionality - may need to be reimplemented so making note here
 
     return {
+        map_settings: null,
         marker_lng: null,
         marker_lat: null,
         defaultCenter: defaultCentre,
@@ -95,10 +96,10 @@ export default {
         suggest_list: [],
         feature_marker: null,
         cursor_location: null,
-        idMap: vm.guid + "mapLeaf",
-        idSearchInput: vm.guid + "SearchInput",
-        idBasemapSat: vm.guid + "BasemapSat",
-        idBasemapOsm: vm.guid + "BasemapOsm"
+        idMap: "mapLeaf",
+        idSearchInput: "SearchInput",
+        idBasemapSat: "BasemapSat",
+        idBasemapOsm: "BasemapOsm"
       };
     },
     watch: {
@@ -124,7 +125,6 @@ export default {
 
     //vm.$nextTick(function() {
       vm.initMap();
-      vm.setBaseLayer("osm");
       vm.initAwesomplete();
       if (vm.marker_lat && vm.marker_lng){
           /* If there is a location loaded, add a marker to the map */
@@ -283,7 +283,13 @@ export default {
             this.$emit('location-updated', {'lat': this.marker_lat, 'lng': this.marker_lng});
       }
     },
-    initMap: function() {
+    async loadMapSettings(){
+        const data = await utils.fetchMapSettings();
+        this.map_settings = data;
+    },
+    async initMap(){     
+        console.log("initMap")
+        await this.loadMapSettings();
         // Dependingn on when the coordinates are passed to this component,
         // this.marker_lat and this.marker_lng are not updated properly...
         // Therefore update them here to make sure
@@ -291,26 +297,35 @@ export default {
         this.marker_lng = this.marker_longitude;
 
         if (this.marker_lat && this.marker_lng) {
-            this.mainMap = Leaf.map(this.idMap).setView([this.marker_lat, this.marker_lng], 12);
+            this.mainMap = Leaf.map(this.idMap, 
+                {
+                    zoomAnimation: false
+                }
+            ).setView([this.marker_lat, this.marker_lng], 12);
         } else {
-            this.mainMap = Leaf.map(this.idMap).setView([-31.9505, 115.8605], 4);
+            this.mainMap = Leaf.map(this.idMap, 
+                {
+                    zoomAnimation: false
+                }
+            ).setView([-31.9505, 115.8605], 4);
         }
 
-      this.tileLayer = Leaf.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-          attribution:
-            '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, contributiors'
-        }
+      this.tileLayer = Leaf.tileLayer.wms(
+          this.map_settings.map_server_wms_url,
+          {
+              layers: this.map_settings.street_map_layer,
+              tilematrixSet: 'mercator',
+              format: 'image/png',
+          }
       );
 
-      this.tileLayerSat = Leaf.tileLayer.wmts(
-        "https://kmi.dpaw.wa.gov.au/geoserver/gwc/service/wmts",
-        {
-          layer: "public:mapbox-satellite",
-          tilematrixSet: "mercator",
-          format: "image/png"
-        }
+      this.tileLayerSat = Leaf.tileLayer.wms(
+          this.map_settings.map_server_wms_url,
+          {
+              layers: this.map_settings.satellite_map_layer,
+              tilematrixSet: 'mercator',
+              format: 'image/png',
+          }
       );
 
       this.mainMap
@@ -326,6 +341,7 @@ export default {
       });
       measureControl.addTo(this.mainMap);
       Leaf.control.locate().addTo(this.mainMap);
+      this.setBaseLayer("osm");
     },
     onMouseMove: function(e) {
       let vm = this;

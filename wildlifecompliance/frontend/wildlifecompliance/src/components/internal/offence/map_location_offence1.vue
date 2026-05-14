@@ -85,7 +85,7 @@ import "leaflet.locatecontrol";
 import Awesomplete from "awesomplete";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { api_endpoints, helpers, cache_helper } from '@/utils/hooks.js'
-
+import utils from '../utils'
 import "awesomplete/awesomplete.css";
 import "leaflet/dist/leaflet.css";
 import "leaflet-measure/dist/leaflet-measure.css";
@@ -114,8 +114,9 @@ export default {
       ...baseDic
     });
     vm.guid = helpers.guid();
-
+    
     return {
+      map_settings: null,
       defaultCenter: defaultCentre,
       projection: null,
       mapOffence: null,
@@ -126,12 +127,12 @@ export default {
       suggest_list: [],
       feature_marker: null,
       cursor_location: null,
-      idMap: vm.guid + "mapLeaf",
-      idLocationFieldsAddress: vm.guid + "LocationFieldsAddress",
-      idLocationFieldsDetails: vm.guid + "LocationFieldsDetails",
-      idSearchInput: vm.guid + "SearchInput",
-      idBasemapSat: vm.guid + "BasemapSat",
-      idBasemapOsm: vm.guid + "BasemapOsm"
+      idMap: "modal-mapLeaf",
+      idLocationFieldsAddress: "modal-LocationFieldsAddress",
+      idLocationFieldsDetails: "modal-LocationFieldsDetails",
+      idSearchInput: "modal-SearchInput",
+      idBasemapSat: "modal-BasemapSat",
+      idBasemapOsm: "modal-BasemapOsm"
     };
   },
   computed: {
@@ -164,11 +165,10 @@ export default {
   },
   mounted: function() {
     let vm = this;
-
+    vm.initMap();
+    vm.initAwesomplete();
     vm.$nextTick(function() {
-      vm.initMap();
-      vm.setBaseLayer("osm");
-      vm.initAwesomplete();
+      
       if (vm.offence.location && vm.offence.location &&
           vm.offence.location.geometry && vm.offence.location.geometry.coordinates &&
           vm.offence.location.geometry.coordinates.length > 0){
@@ -406,6 +406,7 @@ export default {
       this.setLocationAddress(properties_for_update);
     },
     setBaseLayer: function(selected_layer_name) {
+      console.log(this.mapOffence)
       if (selected_layer_name == "sat") {
         this.mapOffence.removeLayer(this.tileLayer);
         this.mapOffence.addLayer(this.tileLayerSat);
@@ -446,23 +447,37 @@ export default {
         }
       }
     },
-    initMap: function() {
-      this.mapOffence = Leaf.map(this.idMap).setView([-31.9505, 115.8605], 4);
-      this.tileLayer = Leaf.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    async loadMapSettings(){
+      const data = await utils.fetchMapSettings();
+      this.map_settings = data;
+    },
+    async initMap(){     
+      console.log("initMap")
+
+      await this.loadMapSettings();
+
+      this.mapOffence = Leaf.map(this.idMap, 
         {
-          attribution:
-            '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, contributiors'
+            zoomAnimation: false
         }
+      ).setView([-31.9505, 115.8605], 4);
+
+      this.tileLayer = Leaf.tileLayer.wms(
+          this.map_settings.map_server_wms_url,
+          {
+              layers: this.map_settings.street_map_layer,
+              tilematrixSet: 'mercator',
+              format: 'image/png',
+          }
       );
 
-      this.tileLayerSat = Leaf.tileLayer.wmts(
-        "https://kmi.dpaw.wa.gov.au/geoserver/gwc/service/wmts",
-        {
-          layer: "public:mapbox-satellite",
-          tilematrixSet: "mercator",
-          format: "image/png"
-        }
+      this.tileLayerSat = Leaf.tileLayer.wms(
+          this.map_settings.map_server_wms_url,
+          {
+              layers: this.map_settings.satellite_map_layer,
+              tilematrixSet: 'mercator',
+              format: 'image/png',
+          }
       );
 
       this.mapOffence
@@ -478,10 +493,7 @@ export default {
       });
       measureControl.addTo(this.mapOffence);
       Leaf.control.locate().addTo(this.mapOffence);
-      // this.mapOffence.flyTo({lat: 30, lng: 135}, 12,{
-      //     animate: true,
-      //     duration: 1.5
-      // });
+      this.setBaseLayer("osm");
     },
     /* this function stores the coordinates into the vuex, then call refresh marker function */
     relocateMarker: function(latlng) {
