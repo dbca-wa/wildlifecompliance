@@ -26,7 +26,7 @@ from django.core.cache import cache
 from wildlifecompliance.components.main.models import RegionGIS, DistrictGIS
 from wildlifecompliance.settings import MAX_NUM_ROWS_MODEL_EXPORT
 
-from django.db.models import Case, When, Value, CharField, Q, Max
+from django.db.models import Case, When, Value, CharField, Q, Max, F
 from django.db.models.functions import Coalesce, Concat
 from django.db.models.fields.json import KeyTextTransform
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -1006,7 +1006,7 @@ def getWildlifelicenceExport(filters, num):
 def getReturnExport(filters, num):
     from wildlifecompliance.components.returns.models import Return
 
-    qs = WildlifeLicence.objects.order_by("-due_date")
+    qs = Return.objects.order_by("-due_date")
 
     if filters:
         #due_from
@@ -1041,6 +1041,10 @@ def exportModelData(model, filters, num_records):
         return getApplicationExport(filters, num_records)
     elif model == "wildlifelicence":
         return getWildlifelicenceExport(filters, num_records)
+    elif model == "return":
+        return getReturnExport(filters, num_records)
+    elif model == "organisationrequest":
+        return getOrganisationRequestExport(filters, num_records)
 
     else:
         return
@@ -1131,12 +1135,73 @@ def getWildlifelicenceExportFields(data):
     
     return header, columns
 
+def getReturnExportFields(data):
+    header = ["Number", "Due Date", "Status", "Licence", "Licence Holder", "Condition"]
+
+    columns = list(
+        data.annotate(            
+            holder=Coalesce(
+                # organisation_name
+                KeyTextTransform("organisation_name", "licence__current_application__property_cache"),
+                # proxy full name
+                Case(
+                    When(
+                        licence__current_application__property_cache__proxy_applicant_first_name__isnull=False,
+                        then=Concat(
+                            KeyTextTransform("proxy_applicant_first_name", "licence__current_application__property_cache"),
+                            Value(" "),
+                            KeyTextTransform("proxy_applicant_last_name", "licence__current_application__property_cache"),
+                            output_field=CharField(),
+                        ),
+                    ),
+                    output_field=CharField(),
+                ),
+
+                # fallback
+                Value(""),
+                output_field=CharField(),
+            )
+        ).annotate(
+            condition_text=Case(
+                When(condition__standard=True, then=F('condition__standard_condition__text')),
+                When(condition__is_default=True, then=F('condition__default_condition__standard_condition__text')),
+                default=F('condition__free_condition'),
+                output_field=CharField(),
+            )
+        )
+        .values_list(
+            "lodgement_number",
+            "due_date",
+            "processing_status",
+            "licence__licence_number",
+            "holder",
+            "condition_text"
+        )
+    )
+    
+    return header, columns
+
+def getOrganisationRequestExportFields(data):
+    header = []
+
+    columns = list(
+        data.values_list(
+
+        )
+    )
+    
+    return header, columns
+
 def formatExportData(model, data, format):
 
     if model == "application":
         header, columns = getApplicationExportFields(data)
     elif model == "wildlifelicence":
         header, columns = getWildlifelicenceExportFields(data)
+    elif model == "return":
+        header, columns = getReturnExportFields(data)
+    elif model == "organisationrequest":
+        header, columns = getOrganisationRequestExportFields(data)
     else:
         return
 
