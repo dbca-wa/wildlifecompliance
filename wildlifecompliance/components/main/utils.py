@@ -1032,6 +1032,20 @@ def getOrganisationRequestExport(filters, num):
 
     return qs[:num]
 
+def getCallEmailExport(filters, num):
+    from wildlifecompliance.components.call_email.models import CallEmail
+
+    qs = CallEmail.objects.order_by("-lodged_on")
+    if filters:
+        #lodged_on_from
+        if "lodged_on_from" in filters and filters["lodged_on_from"]:
+            qs = qs.filter(lodged_on__gte=filters["lodged_on_from"])
+        #lodged_on_to
+        if "lodged_on_to" in filters and filters["lodged_on_to"]:
+            qs = qs.filter(lodged_on__lte=filters["lodged_on_to"])
+
+    return qs[:num]
+
 def exportModelData(model, filters, num_records):
 
     if not num_records:
@@ -1047,7 +1061,8 @@ def exportModelData(model, filters, num_records):
         return getReturnExport(filters, num_records)
     elif model == "organisationrequest":
         return getOrganisationRequestExport(filters, num_records)
-
+    elif model == "callemail":
+        return getCallEmailExport(filters, num_records)
     else:
         return
 
@@ -1199,6 +1214,21 @@ def getOrganisationRequestExportFields(data):
     
     return header, columns
 
+def getCallEmailExportFields(data):
+    header = ["Number", "Status", "Classification", "Lodged On", "Caller"]
+
+    columns = list(
+        data.values_list(
+            "number",
+            "status",
+            "classification__name",
+            "lodged_on",
+            "caller",
+        )
+    )
+    
+    return header, columns
+
 def formatExportData(model, data, format):
 
     if model == "application":
@@ -1209,6 +1239,8 @@ def formatExportData(model, data, format):
         header, columns = getReturnExportFields(data)
     elif model == "organisationrequest":
         header, columns = getOrganisationRequestExportFields(data)
+    elif model == "callemail":
+        header, columns = getCallEmailExportFields(data)
     else:
         return
 
