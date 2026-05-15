@@ -1030,6 +1030,8 @@ def getOrganisationRequestExport(filters, num):
         if "lodged_on_to" in filters and filters["lodged_on_to"]:
             qs = qs.filter(lodgement_date__lte=filters["lodged_on_to"])
 
+    return qs[:num]
+
 def exportModelData(model, filters, num_records):
 
     if not num_records:
@@ -1168,8 +1170,7 @@ def getReturnExportFields(data):
                 default=F('condition__free_condition'),
                 output_field=CharField(),
             )
-        )
-        .values_list(
+        ).values_list(
             "lodgement_number",
             "due_date",
             "processing_status",
@@ -1182,11 +1183,17 @@ def getReturnExportFields(data):
     return header, columns
 
 def getOrganisationRequestExportFields(data):
-    header = []
+    header = ["Request Number", "Organisation Name", "ABN", "Applicant ID", "Applicant Role", "Status", "Lodged On"]
 
     columns = list(
         data.values_list(
-
+            "lodgement_number",
+            "name",
+            "abn",
+            "requester_id",
+            "role",
+            "status",
+            "lodgement_date"
         )
     )
     
