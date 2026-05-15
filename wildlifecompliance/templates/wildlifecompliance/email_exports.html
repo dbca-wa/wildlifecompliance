@@ -49,6 +49,7 @@
                         <select id="report_select" onchange="selectReport()" class="form-control">
                             <option value="application_report">Applications</option>
                             <option value="wildlifelicence_report">Wildlife Licences</option>
+                            <option value="organisationrequest_report">Returns</option>
                         </select>
                     </div>
                 </div>
@@ -121,6 +122,71 @@
             </div>
         </form>
         
+        <form class="report_form" style="display:None" id="return_report" method="POST" onsubmit="submitReport('return_report')">
+            <div class="panel panel-default">
+                <div class="panel-header">
+                    <h3 class="panel-title">Returns Report</h3>
+                </div>
+                <div class="panel-body collapse show">
+                    {% csrf_token %}
+                    <div class="row">
+                        <label class="col-sm-3 control-label">Due From</label>
+                        <div class="col-sm-3">
+                        <input class="return_field form-control" type="date" id="return_due_from" name="due_from">
+                        </div>
+                        <label class="col-sm-3 control-label">Due To</label>
+                        <div class="col-sm-3">
+                        <input class="return_field form-control" type="date" id="return_due_to" name="due_to">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                        <button class="btn btn-primary"
+                            id="export_return" 
+                            type="submit" 
+                            name="export_model" 
+                            value="return" 
+                            title="Email Returns Report">
+                            Email Returns Report
+                        </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <form class="report_form" style="display:None" id="organisationrequest_report" method="POST" onsubmit="submitReport('organisationrequest_report')">
+            <div class="panel panel-default">
+                <div class="panel-header">
+                    <h3 class="panel-title">Organisation Requests Report</h3>
+                </div>
+                <div class="panel-body collapse show">
+                    {% csrf_token %}
+                    <div class="row">
+                        <label class="col-sm-3 control-label">Lodged On From</label>
+                        <div class="col-sm-3">
+                        <input class="organisationrequest_field form-control" type="date" id="organisationrequest_lodged_on_from" name="lodged_on_from">
+                        </div>
+                        <label class="col-sm-3 control-label">Lodged On To</label>
+                        <div class="col-sm-3">
+                        <input class="organisationrequest_field form-control" type="date" id="organisationrequest_lodged_on_to" name="lodged_on_to">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                        <button class="btn btn-primary"
+                            id="export_organisationrequest" 
+                            type="submit" 
+                            name="export_model" 
+                            value="organisationrequest" 
+                            title="Email Organisation Requests Report">
+                            Email Organisation Requests Report
+                        </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 
     <script>
