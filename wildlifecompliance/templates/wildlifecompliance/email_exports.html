@@ -52,6 +52,7 @@
                             <option value="return_report">Returns</option>
                             <option value="organisationrequest_report">Organisation Requests</option>
                             <option value="callemail_report">Call/Emails</option>
+                            <option value="inspection_report">Inspections</option>
                         </select>
                     </div>
                 </div>
@@ -216,6 +217,39 @@
                             value="callemail" 
                             title="Email Call/Emails Report">
                             Email Call/Emails Report
+                        </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <form class="report_form" style="display:None" id="inspection_report" method="POST" onsubmit="submitReport('inspection_report')">
+            <div class="panel panel-default">
+                <div class="panel-header">
+                    <h3 class="panel-title">Inspections Report</h3>
+                </div>
+                <div class="panel-body collapse show">
+                    {% csrf_token %}
+                    <div class="row">
+                        <label class="col-sm-3 control-label">Planned From</label>
+                        <div class="col-sm-3">
+                        <input class="inspection_field form-control" type="date" id="inspection_planned_from" name="planned_from">
+                        </div>
+                        <label class="col-sm-3 control-label">Planned To</label>
+                        <div class="col-sm-3">
+                        <input class="inspection_field form-control" type="date" id="inspection_planned_to" name="planned_to">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                        <button class="btn btn-primary"
+                            id="export_inspection" 
+                            type="submit" 
+                            name="export_model" 
+                            value="inspection" 
+                            title="Email Inspections Report">
+                            Email Inspections Report
                         </button>
                         </div>
                     </div>

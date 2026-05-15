@@ -1046,6 +1046,34 @@ def getCallEmailExport(filters, num):
 
     return qs[:num]
 
+def getInspectionExport(filters, num):
+    from wildlifecompliance.components.inspection.models import Inspection
+
+    qs = Inspection.objects.order_by("-planned_for_date")
+    if filters:
+        #planned_from
+        if "planned_from" in filters and filters["planned_from"]:
+            qs = qs.filter(planned_for_date__gte=filters["planned_from"])
+        #planned_to
+        if "planned_to" in filters and filters["planned_from"]:
+            qs = qs.filter(planned_for_date__lte=filters["planned_from"])
+
+    return qs[:num]
+
+def getOffenceExport(filters, num):
+    from wildlifecompliance.components.offence.models import Offence
+
+    qs = Offence.objects.order_by("-occurrence_from_to")
+    if filters:
+        #date_from
+        if "date_from" in filters and filters["date_from"]:
+            qs = qs.filter(occurrence_from_to__gte=filters["date_from"])
+        #date_to
+        if "date_to" in filters and filters["date_to"]:
+            qs = qs.filter(occurrence_from_to__lte=filters["date_to"])
+
+    return qs[:num]
+
 def exportModelData(model, filters, num_records):
 
     if not num_records:
@@ -1063,6 +1091,10 @@ def exportModelData(model, filters, num_records):
         return getOrganisationRequestExport(filters, num_records)
     elif model == "callemail":
         return getCallEmailExport(filters, num_records)
+    elif model == "inspection":
+        return getInspectionExport(filters, num_records)
+    elif model == "offence":
+        return getOffenceExport(filters, num_records)
     else:
         return
 
@@ -1229,6 +1261,46 @@ def getCallEmailExportFields(data):
     
     return header, columns
 
+def getInspectionExportFields(data):
+    header = ["Number", "Title", "Inspection Type", "Status", "Planned for", "Team lead ID"]
+
+    columns = list(
+        data.values_list(
+            "number",
+            "title",
+            "inspection_type__inspection_type",
+            "status",
+            "planned_for_date",
+            "inspection_team_lead_id"
+        )
+    )
+    
+    return header, columns
+
+def getOffenceExportFields(data):
+    header = ["Number", "Identifier", "Date", "Offender(s)", "Status"]
+
+    columns = list(
+        data.annotate(
+            offenders=ArrayAgg(
+                Concat(
+                    'offender__person__first_name',
+                    Value(' '),
+                    'offender__person__last_name'
+                ),
+                distinct=True
+            )
+        ).values_list(
+            "lodgement_number",
+            "identifier",
+            "occurrence_from_to",
+            "offenders",
+            "status"
+        )
+    )
+    
+    return header, columns
+
 def formatExportData(model, data, format):
 
     if model == "application":
@@ -1241,6 +1313,10 @@ def formatExportData(model, data, format):
         header, columns = getOrganisationRequestExportFields(data)
     elif model == "callemail":
         header, columns = getCallEmailExportFields(data)
+    elif model == "inspection":
+        header, columns = getInspectionExportFields(data)
+    elif model == "offence":
+        header, columns = getOffenceExportFields(data)
     else:
         return
 
