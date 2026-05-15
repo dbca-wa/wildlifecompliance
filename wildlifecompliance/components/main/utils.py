@@ -1003,6 +1003,33 @@ def getWildlifelicenceExport(filters, num):
 
     return qs[:num]
 
+def getReturnExport(filters, num):
+    from wildlifecompliance.components.returns.models import Return
+
+    qs = WildlifeLicence.objects.order_by("-due_date")
+
+    if filters:
+        #due_from
+        if "due_from" in filters and filters["due_from"]:
+            qs = qs.filter(due_date=filters["due_from"])
+        #due_to
+        if "due_to" in filters and filters["due_to"]:
+            qs = qs.filter(due_date=filters["due_to"])
+
+    return qs[:num]
+
+def getOrganisationRequestExport(filters, num):
+    from wildlifecompliance.components.organisations.models import OrganisationRequest
+
+    qs = OrganisationRequest.objects.order_by("-lodgement_date")
+    if filters:
+        #lodged_on_from
+        if "lodged_on_from" in filters and filters["lodged_on_from"]:
+            qs = qs.filter(lodgement_date__gte=filters["lodged_on_from"])
+        #lodged_on_to
+        if "lodged_on_to" in filters and filters["lodged_on_to"]:
+            qs = qs.filter(lodgement_date__lte=filters["lodged_on_to"])
+
 def exportModelData(model, filters, num_records):
 
     if not num_records:
@@ -1012,7 +1039,7 @@ def exportModelData(model, filters, num_records):
 
     if model == "application":
         return getApplicationExport(filters, num_records)
-    elif model == "wildlifelicence": #exclude waiting list
+    elif model == "wildlifelicence":
         return getWildlifelicenceExport(filters, num_records)
 
     else:
