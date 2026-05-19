@@ -104,18 +104,18 @@ class OffenceFilterBackend(DatatablesFilterBackend):
         date_from = request.GET.get('date_from',)
         if date_from:
             date_from = str(request.GET.get('date_from',)).lower()
-            date_from = datetime.strptime(date_from, '%d/%m/%Y')
+            date_from = datetime.strptime(date_from, '%Y-%m-%d')
             date_from = timezone.localize(date_from)
             q_objects &= Q(occurrence_datetime_from__gte=date_from)
-            q_objects &= Q(occurrence_datetime_to__gte=date_from)
+            #q_objects &= Q(occurrence_datetime_to__gte=date_from)
 
         date_to = request.GET.get('date_to',)
         if date_to:
             date_to = str(request.GET.get('date_to',)).lower()
-            date_to = datetime.strptime(date_to, '%d/%m/%Y')
+            date_to = datetime.strptime(date_to, '%Y-%m-%d')
             date_to = timezone.localize(date_to)
             q_objects &= Q(occurrence_datetime_from__lte=date_to)
-            q_objects &= Q(occurrence_datetime_to__lte=date_to)
+            #q_objects &= Q(occurrence_datetime_to__lte=date_to)
 
         # perform filters
         queryset = queryset.filter(q_objects)

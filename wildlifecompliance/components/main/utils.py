@@ -26,8 +26,8 @@ from django.core.cache import cache
 from wildlifecompliance.components.main.models import RegionGIS, DistrictGIS
 from wildlifecompliance.settings import MAX_NUM_ROWS_MODEL_EXPORT
 
-from django.db.models import Case, When, Value, CharField, Q, Max
-from django.db.models.functions import Coalesce, Concat
+from django.db.models import Case, When, Value, CharField, Q, Max, F
+from django.db.models.functions import Coalesce, Concat, Cast
 from django.db.models.fields.json import KeyTextTransform
 from django.contrib.postgres.aggregates import ArrayAgg
 
@@ -1003,6 +1003,119 @@ def getWildlifelicenceExport(filters, num):
 
     return qs[:num]
 
+def getReturnExport(filters, num):
+    from wildlifecompliance.components.returns.models import Return
+
+    qs = Return.objects.order_by("-due_date")
+
+    if filters:
+        #due_from
+        if "due_from" in filters and filters["due_from"]:
+            qs = qs.filter(due_date=filters["due_from"])
+        #due_to
+        if "due_to" in filters and filters["due_to"]:
+            qs = qs.filter(due_date=filters["due_to"])
+
+    return qs[:num]
+
+def getOrganisationRequestExport(filters, num):
+    from wildlifecompliance.components.organisations.models import OrganisationRequest
+
+    qs = OrganisationRequest.objects.order_by("-lodgement_date")
+    if filters:
+        #lodged_on_from
+        if "lodged_on_from" in filters and filters["lodged_on_from"]:
+            qs = qs.filter(lodgement_date__gte=filters["lodged_on_from"])
+        #lodged_on_to
+        if "lodged_on_to" in filters and filters["lodged_on_to"]:
+            qs = qs.filter(lodgement_date__lte=filters["lodged_on_to"])
+
+    return qs[:num]
+
+def getCallEmailExport(filters, num):
+    from wildlifecompliance.components.call_email.models import CallEmail
+
+    qs = CallEmail.objects.order_by("-lodged_on")
+    if filters:
+        #lodged_on_from
+        if "lodged_on_from" in filters and filters["lodged_on_from"]:
+            qs = qs.filter(lodged_on__gte=filters["lodged_on_from"])
+        #lodged_on_to
+        if "lodged_on_to" in filters and filters["lodged_on_to"]:
+            qs = qs.filter(lodged_on__lte=filters["lodged_on_to"])
+
+    return qs[:num]
+
+def getInspectionExport(filters, num):
+    from wildlifecompliance.components.inspection.models import Inspection
+
+    qs = Inspection.objects.order_by("-planned_for_date")
+    if filters:
+        #planned_from
+        if "planned_from" in filters and filters["planned_from"]:
+            qs = qs.filter(planned_for_date__gte=filters["planned_from"])
+        #planned_to
+        if "planned_to" in filters and filters["planned_from"]:
+            qs = qs.filter(planned_for_date__lte=filters["planned_from"])
+
+    return qs[:num]
+
+def getOffenceExport(filters, num):
+    from wildlifecompliance.components.offence.models import Offence
+
+    qs = Offence.objects.order_by("-occurrence_datetime_from")
+    if filters:
+        #occurred_from
+        if "date_from" in filters and filters["occurred_from"]:
+            qs = qs.filter(occurrence_datetime_from__gte=filters["occurred_from"])
+        #occurred_to
+        if "date_to" in filters and filters["occurred_to"]:
+            qs = qs.filter(occurrence_datetime_from__lte=filters["occurred_to"])
+
+    return qs[:num]
+
+def getObjectExport(filters, num):
+    from wildlifecompliance.components.artifact.models import Artifact
+
+    qs = Artifact.objects.order_by("-artifact_date")
+    if filters:
+        #date_from
+        if "date_from" in filters and filters["date_from"]:
+            qs = qs.filter(artifact_date__gte=filters["date_from"])
+        #date_to
+        if "date_to" in filters and filters["date_to"]:
+            qs = qs.filter(artifact_date__lte=filters["date_to"])
+
+    return qs[:num]
+
+def getSanctionOutcomeExport(filters, num):
+    from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome
+
+    qs = SanctionOutcome.objects.order_by("-date_of_issue")
+    if filters:
+        #issued_from
+        if "issued_from" in filters and filters["issued_from"]:
+            qs = qs.filter(date_of_issue__gte=filters["issued_from"])
+        #issued_to
+        if "issued_to" in filters and filters["issued_to"]:
+            qs = qs.filter(date_of_issue__lte=filters["issued_to"])
+
+    return qs[:num]
+
+def getCaseExport(filters, num):
+    from wildlifecompliance.components.legal_case.models import LegalCase
+
+    qs = LegalCase.objects.order_by("-case_created_date")
+    if filters:
+        #created_from
+        if "created_from" in filters and filters["created_from"]:
+            qs = qs.filter(case_created_date__gte=filters["created_from"])
+        #created_to
+        if "created_to" in filters and filters["created_to"]:
+            qs = qs.filter(case_created_date__lte=filters["created_to"])
+
+    return qs[:num]
+
 def exportModelData(model, filters, num_records):
 
     if not num_records:
@@ -1012,9 +1125,24 @@ def exportModelData(model, filters, num_records):
 
     if model == "application":
         return getApplicationExport(filters, num_records)
-    elif model == "wildlifelicence": #exclude waiting list
+    elif model == "wildlifelicence":
         return getWildlifelicenceExport(filters, num_records)
-
+    elif model == "return":
+        return getReturnExport(filters, num_records)
+    elif model == "organisationrequest":
+        return getOrganisationRequestExport(filters, num_records)
+    elif model == "callemail":
+        return getCallEmailExport(filters, num_records)
+    elif model == "inspection":
+        return getInspectionExport(filters, num_records)
+    elif model == "offence":
+        return getOffenceExport(filters, num_records)
+    elif model == "object":
+        return getObjectExport(filters, num_records)
+    elif model == "sanctionoutcome":
+        return getSanctionOutcomeExport(filters, num_records)
+    elif model == "case":
+        return getCaseExport(filters, num_records)
     else:
         return
 
@@ -1104,12 +1232,216 @@ def getWildlifelicenceExportFields(data):
     
     return header, columns
 
+def getReturnExportFields(data):
+    header = ["Number", "Due Date", "Status", "Licence", "Licence Holder", "Condition"]
+
+    columns = list(
+        data.annotate(            
+            holder=Coalesce(
+                # organisation_name
+                KeyTextTransform("organisation_name", "licence__current_application__property_cache"),
+                # proxy full name
+                Case(
+                    When(
+                        licence__current_application__property_cache__proxy_applicant_first_name__isnull=False,
+                        then=Concat(
+                            KeyTextTransform("proxy_applicant_first_name", "licence__current_application__property_cache"),
+                            Value(" "),
+                            KeyTextTransform("proxy_applicant_last_name", "licence__current_application__property_cache"),
+                            output_field=CharField(),
+                        ),
+                    ),
+                    output_field=CharField(),
+                ),
+
+                # fallback
+                Value(""),
+                output_field=CharField(),
+            )
+        ).annotate(
+            condition_text=Case(
+                When(condition__standard=True, then=F('condition__standard_condition__text')),
+                When(condition__is_default=True, then=F('condition__default_condition__standard_condition__text')),
+                default=F('condition__free_condition'),
+                output_field=CharField(),
+            )
+        ).values_list(
+            "lodgement_number",
+            "due_date",
+            "processing_status",
+            "licence__licence_number",
+            "holder",
+            "condition_text"
+        )
+    )
+    
+    return header, columns
+
+def getOrganisationRequestExportFields(data):
+    header = ["Request Number", "Organisation Name", "ABN", "Applicant ID", "Applicant Role", "Status", "Lodged On"]
+
+    columns = list(
+        data.values_list(
+            "lodgement_number",
+            "name",
+            "abn",
+            "requester_id",
+            "role",
+            "status",
+            "lodgement_date"
+        )
+    )
+    
+    return header, columns
+
+def getCallEmailExportFields(data):
+    header = ["Number", "Status", "Classification", "Lodged On", "Caller"]
+
+    columns = list(
+        data.values_list(
+            "number",
+            "status",
+            "classification__name",
+            "lodged_on",
+            "caller",
+        )
+    )
+    
+    return header, columns
+
+def getInspectionExportFields(data):
+    header = ["Number", "Title", "Inspection Type", "Status", "Planned for", "Team lead ID"]
+
+    columns = list(
+        data.values_list(
+            "number",
+            "title",
+            "inspection_type__inspection_type",
+            "status",
+            "planned_for_date",
+            "inspection_team_lead_id"
+        )
+    )
+    
+    return header, columns
+
+def getOffenceExportFields(data):
+    header = ["Number", "Identifier", "Date", "Offender(s)", "Status"]
+
+    columns = list(
+        data.annotate(
+            offenders=ArrayAgg(
+                Concat(
+                    'offender__person__first_name',
+                    Value(' '),
+                    'offender__person__last_name'
+                ),
+                distinct=True
+            )
+        ).values_list(
+            "lodgement_number",
+            "identifier",
+            "occurrence_datetime_from",
+            "offenders",
+            "status"
+        )
+    )
+    
+    return header, columns
+
+def getObjectExportFields(data):
+    header = ["Number", "Identifier", "Date", "Status"]
+
+    columns = list(
+        data.values_list(
+            "number",
+            "identifier",
+            "artifact_date",
+            "status"
+        )
+    )
+    
+    return header, columns
+
+def getSanctionOutcomeExportFields(data):
+    header = ["Number", "Type", "Identifier", "Issue Date", "Due Date", "Offender", "Status", "Payment Status"]
+
+    columns = list(
+        data.annotate(
+            due_dates_array=ArrayAgg(
+                Case(
+                    When(
+                        due_dates__due_date_term_currently_applied='1st',
+                        then=Cast(F('due_dates__due_date_1st'), CharField())
+                    ),
+                    When(
+                        due_dates__due_date_term_currently_applied='2nd',
+                        then=Cast(F('due_dates__due_date_1st'), CharField())
+                    ),
+                    When(
+                        due_dates__due_date_term_currently_applied='overdue',
+                        then=Value('overdue')
+                    ),
+                    output_field=CharField()
+                )
+            )
+        ).annotate(
+            offender_name=Concat(
+                'offender__person__first_name',
+                Value(' '),
+                'offender__person__last_name'
+            )
+        ).values_list(
+            "lodgement_number",
+            "type",
+            "identifier",
+            "date_of_issue",
+            "due_dates_array",
+            "offender_name",
+            "status",
+            "payment_status",
+        )
+    )
+    
+    return header, columns
+
+def getCaseExportFields(data):
+    header = ["Number", "Title", "Status", "Created Date", "Assigned To ID"]
+
+    columns = list(
+        data.values_list(
+            "number",
+            "title",
+            "status",
+            "case_created_date",
+            "assigned_to_id",
+        )
+    )
+    
+    return header, columns
+
 def formatExportData(model, data, format):
 
     if model == "application":
         header, columns = getApplicationExportFields(data)
     elif model == "wildlifelicence":
         header, columns = getWildlifelicenceExportFields(data)
+    elif model == "return":
+        header, columns = getReturnExportFields(data)
+    elif model == "organisationrequest":
+        header, columns = getOrganisationRequestExportFields(data)
+    elif model == "callemail":
+        header, columns = getCallEmailExportFields(data)
+    elif model == "inspection":
+        header, columns = getInspectionExportFields(data)
+    elif model == "offence":
+        header, columns = getOffenceExportFields(data)
+    elif model == "object":
+        header, columns = getObjectExportFields(data)
+    elif model == "sanctionoutcome":
+        header, columns = getSanctionOutcomeExportFields(data)
+    elif model == "case":
+        header, columns = getCaseExportFields(data)
     else:
         return
 
