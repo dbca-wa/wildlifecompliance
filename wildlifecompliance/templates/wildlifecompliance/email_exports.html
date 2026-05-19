@@ -53,6 +53,7 @@
                             <option value="organisationrequest_report">Organisation Requests</option>
                             <option value="callemail_report">Call/Emails</option>
                             <option value="inspection_report">Inspections</option>
+                            <option value="offence_report">Offences</option>
                         </select>
                     </div>
                 </div>
@@ -256,6 +257,41 @@
                 </div>
             </div>
         </form>
+
+        
+        <form class="report_form" style="display:None" id="offence_report" method="POST" onsubmit="submitReport('offence_report')">
+            <div class="panel panel-default">
+                <div class="panel-header">
+                    <h3 class="panel-title">Offences Report</h3>
+                </div>
+                <div class="panel-body collapse show">
+                    {% csrf_token %}
+                    <div class="row">
+                        <label class="col-sm-3 control-label">Occurred From</label>
+                        <div class="col-sm-3">
+                        <input class="offence_field form-control" type="date" id="offence_occurred_from" name="occurred_from">
+                        </div>
+                        <label class="col-sm-3 control-label">Occurred To</label>
+                        <div class="col-sm-3">
+                        <input class="offence_field form-control" type="date" id="offence_occurred_to" name="occurred_to">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                        <button class="btn btn-primary"
+                            id="export_offence" 
+                            type="submit" 
+                            name="export_model" 
+                            value="offence" 
+                            title="Email Offences Report">
+                            Email Offences Report
+                        </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
 
     </div>
 

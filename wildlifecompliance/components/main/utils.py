@@ -1063,14 +1063,14 @@ def getInspectionExport(filters, num):
 def getOffenceExport(filters, num):
     from wildlifecompliance.components.offence.models import Offence
 
-    qs = Offence.objects.order_by("-occurrence_from_to")
+    qs = Offence.objects.order_by("-occurrence_datetime_from")
     if filters:
         #date_from
         if "date_from" in filters and filters["date_from"]:
-            qs = qs.filter(occurrence_from_to__gte=filters["date_from"])
+            qs = qs.filter(occurrence_datetime_from__gte=filters["date_from"])
         #date_to
         if "date_to" in filters and filters["date_to"]:
-            qs = qs.filter(occurrence_from_to__lte=filters["date_to"])
+            qs = qs.filter(occurrence_datetime_from__lte=filters["date_to"])
 
     return qs[:num]
 
@@ -1293,7 +1293,7 @@ def getOffenceExportFields(data):
         ).values_list(
             "lodgement_number",
             "identifier",
-            "occurrence_from_to",
+            "occurrence_datetime_from",
             "offenders",
             "status"
         )
