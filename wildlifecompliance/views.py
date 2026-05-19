@@ -302,6 +302,7 @@ class EmailExportsView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context=super().get_context_data(**kwargs)
+        context.update({"prefer_compliance_management": settings.COMPLIANCE_APP})
         return context
 
     def get(self, request, *args, **kwargs):

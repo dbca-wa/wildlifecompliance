@@ -47,22 +47,26 @@
                     <label class="col-sm-3 control-label">Report Type</label>
                     <div class="col-sm-6">
                         <select id="report_select" onchange="selectReport()" class="form-control">
+                            {% if not prefer_compliance_management %}
                             <option value="application_report">Applications</option>
                             <option value="wildlifelicence_report">Wildlife Licences</option>
                             <option value="return_report">Returns</option>
                             <option value="organisationrequest_report">Organisation Requests</option>
+                            {% else %}
                             <option value="callemail_report">Call/Emails</option>
                             <option value="inspection_report">Inspections</option>
                             <option value="offence_report">Offences</option>
                             <option value="object_report">Objects</option>
                             <option value="sanctionoutcome_report">Sanction Outcomes</option>
                             <option value="case_report">Cases</option>
+                            {% endif %}
                         </select>
                     </div>
                 </div>
             </div>
         </div>
 
+        {% if not prefer_compliance_management %}
         <form class="report_form" id="application_report" method="POST" onsubmit="submitReport('application_report')">
             <div class="panel panel-default">
                 <div class="panel-header">
@@ -194,8 +198,8 @@
                 </div>
             </div>
         </form>
-
-        <form class="report_form" style="display:None" id="callemail_report" method="POST" onsubmit="submitReport('callemail_report')">
+        {% else %}
+        <form class="report_form" id="callemail_report" method="POST" onsubmit="submitReport('callemail_report')">
             <div class="panel panel-default">
                 <div class="panel-header">
                     <h3 class="panel-title">Call/Emails Report</h3>
@@ -260,8 +264,7 @@
                 </div>
             </div>
         </form>
-
-        
+       
         <form class="report_form" style="display:None" id="offence_report" method="POST" onsubmit="submitReport('offence_report')">
             <div class="panel panel-default">
                 <div class="panel-header">
@@ -393,7 +396,7 @@
                 </div>
             </div>
         </form>
-
+        {% endif %}
     </div>
 
     <script>
