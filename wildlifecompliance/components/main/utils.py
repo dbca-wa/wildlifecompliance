@@ -27,7 +27,7 @@ from wildlifecompliance.components.main.models import RegionGIS, DistrictGIS
 from wildlifecompliance.settings import MAX_NUM_ROWS_MODEL_EXPORT
 
 from django.db.models import Case, When, Value, CharField, Q, Max, F
-from django.db.models.functions import Coalesce, Concat
+from django.db.models.functions import Coalesce, Concat, Cast
 from django.db.models.fields.json import KeyTextTransform
 from django.contrib.postgres.aggregates import ArrayAgg
 
@@ -1065,12 +1065,54 @@ def getOffenceExport(filters, num):
 
     qs = Offence.objects.order_by("-occurrence_datetime_from")
     if filters:
+        #occurred_from
+        if "date_from" in filters and filters["occurred_from"]:
+            qs = qs.filter(occurrence_datetime_from__gte=filters["occurred_from"])
+        #occurred_to
+        if "date_to" in filters and filters["occurred_to"]:
+            qs = qs.filter(occurrence_datetime_from__lte=filters["occurred_to"])
+
+    return qs[:num]
+
+def getObjectExport(filters, num):
+    from wildlifecompliance.components.artifact.models import Artifact
+
+    qs = Artifact.objects.order_by("-artifact_date")
+    if filters:
         #date_from
         if "date_from" in filters and filters["date_from"]:
-            qs = qs.filter(occurrence_datetime_from__gte=filters["date_from"])
+            qs = qs.filter(artifact_date__gte=filters["date_from"])
         #date_to
         if "date_to" in filters and filters["date_to"]:
-            qs = qs.filter(occurrence_datetime_from__lte=filters["date_to"])
+            qs = qs.filter(artifact_date__lte=filters["date_to"])
+
+    return qs[:num]
+
+def getSanctionOutcomeExport(filters, num):
+    from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome
+
+    qs = SanctionOutcome.objects.order_by("-date_of_issue")
+    if filters:
+        #issued_from
+        if "issued_from" in filters and filters["issued_from"]:
+            qs = qs.filter(date_of_issue__gte=filters["issued_from"])
+        #issued_to
+        if "issued_to" in filters and filters["issued_to"]:
+            qs = qs.filter(date_of_issue__lte=filters["issued_to"])
+
+    return qs[:num]
+
+def getCaseExport(filters, num):
+    from wildlifecompliance.components.legal_case.models import LegalCase
+
+    qs = LegalCase.objects.order_by("-case_created_date")
+    if filters:
+        #created_from
+        if "created_from" in filters and filters["created_from"]:
+            qs = qs.filter(case_created_date__gte=filters["created_from"])
+        #created_to
+        if "created_to" in filters and filters["created_to"]:
+            qs = qs.filter(case_created_date__lte=filters["created_to"])
 
     return qs[:num]
 
@@ -1095,6 +1137,12 @@ def exportModelData(model, filters, num_records):
         return getInspectionExport(filters, num_records)
     elif model == "offence":
         return getOffenceExport(filters, num_records)
+    elif model == "object":
+        return getObjectExport(filters, num_records)
+    elif model == "sanctionoutcome":
+        return getSanctionOutcomeExport(filters, num_records)
+    elif model == "case":
+        return getCaseExport(filters, num_records)
     else:
         return
 
@@ -1301,6 +1349,77 @@ def getOffenceExportFields(data):
     
     return header, columns
 
+def getObjectExportFields(data):
+    header = ["Number", "Identifier", "Date", "Status"]
+
+    columns = list(
+        data.values_list(
+            "number",
+            "identifier",
+            "artifact_date",
+            "status"
+        )
+    )
+    
+    return header, columns
+
+def getSanctionOutcomeExportFields(data):
+    header = ["Number", "Type", "Identifier", "Issue Date", "Due Date", "Offender", "Status", "Payment Status"]
+
+    columns = list(
+        data.annotate(
+            due_dates_array=ArrayAgg(
+                Case(
+                    When(
+                        due_dates__due_date_term_currently_applied='1st',
+                        then=Cast(F('due_dates__due_date_1st'), CharField())
+                    ),
+                    When(
+                        due_dates__due_date_term_currently_applied='2nd',
+                        then=Cast(F('due_dates__due_date_1st'), CharField())
+                    ),
+                    When(
+                        due_dates__due_date_term_currently_applied='overdue',
+                        then=Value('overdue')
+                    ),
+                    output_field=CharField()
+                )
+            )
+        ).annotate(
+            offender_name=Concat(
+                'offender__person__first_name',
+                Value(' '),
+                'offender__person__last_name'
+            )
+        ).values_list(
+            "lodgement_number",
+            "type",
+            "identifier",
+            "date_of_issue",
+            "due_dates_array",
+            "offender_name",
+            "status",
+            "payment_status",
+        )
+    )
+    
+    return header, columns
+
+def getCaseExportFields(data):
+    header = ["Number", "Title", "Status", "Created Date", "Assigned To ID"]
+
+    columns = list(
+        data.values_list(
+            "number",
+            "title",
+            "status",
+            "case_created_date",
+            "assigned_to_id",
+        )
+    )
+    
+    return header, columns
+
 def formatExportData(model, data, format):
 
     if model == "application":
@@ -1317,6 +1436,12 @@ def formatExportData(model, data, format):
         header, columns = getInspectionExportFields(data)
     elif model == "offence":
         header, columns = getOffenceExportFields(data)
+    elif model == "object":
+        header, columns = getObjectExportFields(data)
+    elif model == "sanctionoutcome":
+        header, columns = getSanctionOutcomeExportFields(data)
+    elif model == "case":
+        header, columns = getCaseExportFields(data)
     else:
         return
 

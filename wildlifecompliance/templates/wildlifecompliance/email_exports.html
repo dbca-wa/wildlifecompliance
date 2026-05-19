@@ -54,6 +54,9 @@
                             <option value="callemail_report">Call/Emails</option>
                             <option value="inspection_report">Inspections</option>
                             <option value="offence_report">Offences</option>
+                            <option value="object_report">Objects</option>
+                            <option value="sanctionoutcome_report">Sanction Outcomes</option>
+                            <option value="case_report">Cases</option>
                         </select>
                     </div>
                 </div>
@@ -291,7 +294,105 @@
                 </div>
             </div>
         </form>
+        
+        <form class="report_form" style="display:None" id="object_report" method="POST" onsubmit="submitReport('object_report')">
+            <div class="panel panel-default">
+                <div class="panel-header">
+                    <h3 class="panel-title">Objects Report</h3>
+                </div>
+                <div class="panel-body collapse show">
+                    {% csrf_token %}
+                    <div class="row">
+                        <label class="col-sm-3 control-label">Date From</label>
+                        <div class="col-sm-3">
+                        <input class="object_field form-control" type="date" id="object_date_from" name="date_from">
+                        </div>
+                        <label class="col-sm-3 control-label">Date To</label>
+                        <div class="col-sm-3">
+                        <input class="object_field form-control" type="date" id="object_date_to" name="date_to">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                        <button class="btn btn-primary"
+                            id="export_object" 
+                            type="submit" 
+                            name="export_model" 
+                            value="object" 
+                            title="Email Objects Report">
+                            Email Objects Report
+                        </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
 
+        <form class="report_form" style="display:None" id="sanctionoutcome_report" method="POST" onsubmit="submitReport('sanctionoutcome_report')">
+            <div class="panel panel-default">
+                <div class="panel-header">
+                    <h3 class="panel-title">Sanction Outcomes Report</h3>
+                </div>
+                <div class="panel-body collapse show">
+                    {% csrf_token %}
+                    <div class="row">
+                        <label class="col-sm-3 control-label">Issued From</label>
+                        <div class="col-sm-3">
+                        <input class="sanctionoutcome_field form-control" type="date" id="sanctionoutcome_issued_from" name="issued_from">
+                        </div>
+                        <label class="col-sm-3 control-label">Issued To</label>
+                        <div class="col-sm-3">
+                        <input class="sanctionoutcome_field form-control" type="date" id="sanctionoutcome_issued_to" name="issued_to">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                        <button class="btn btn-primary"
+                            id="export_sanctionoutcome" 
+                            type="submit" 
+                            name="export_model" 
+                            value="sanctionoutcome" 
+                            title="Email Sanction Outcomes Report">
+                            Email Sanction Outcomes Report
+                        </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <form class="report_form" style="display:None" id="case_report" method="POST" onsubmit="submitReport('case_report')">
+            <div class="panel panel-default">
+                <div class="panel-header">
+                    <h3 class="panel-title">Cases Report</h3>
+                </div>
+                <div class="panel-body collapse show">
+                    {% csrf_token %}
+                    <div class="row">
+                        <label class="col-sm-3 control-label">Created From</label>
+                        <div class="col-sm-3">
+                        <input class="case_field form-control" type="date" id="case_created_from" name="created_from">
+                        </div>
+                        <label class="col-sm-3 control-label">Created To</label>
+                        <div class="col-sm-3">
+                        <input class="case_field form-control" type="date" id="case_created_to" name="created_to">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                        <button class="btn btn-primary"
+                            id="export_case" 
+                            type="submit" 
+                            name="export_model" 
+                            value="case" 
+                            title="Email Cases Report">
+                            Email Cases Report
+                        </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
 
     </div>
 
