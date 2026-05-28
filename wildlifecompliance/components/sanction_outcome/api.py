@@ -179,7 +179,7 @@ class SanctionOutcomePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         if is_compliance_internal_user(self.request):
             return SanctionOutcome.objects.all()
         elif user.is_authenticated:
-            return SanctionOutcome.objects_for_external.filter(offender__person=user)
+            return SanctionOutcome.objects_for_external.filter(offender__person__email=user.email)
         return SanctionOutcome.objects.none()
 
     @action(detail=False, methods=['GET', ])
@@ -198,7 +198,7 @@ class SanctionOutcomePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
         This function is called from the external dashboard page by external user
         """
         queryset = SanctionOutcome.objects_for_external.filter(
-            (Q(offender__person=request.user) & Q(offender__removed=False) & Q(registration_holder__isnull=True) & Q(driver__isnull=True)) |
+            (Q(offender__person__email=request.user.email) & Q(offender__removed=False) & Q(registration_holder__isnull=True) & Q(driver__isnull=True)) |
             (Q(offender__isnull=True) & Q(registration_holder=request.user) & Q(driver__isnull=True)) |
             (Q(offender__isnull=True) & Q(driver=request.user))
         )
@@ -408,11 +408,10 @@ class RemediationActionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixi
             return RemediationAction.objects.all()
         elif self.user.is_authenticated:
             return RemediationAction.objects_for_external.filter(
-                (Q(sanction_outcome__offender__person=self.request.user) & Q(sanction_outcome__registration_holder__isnull=True) & Q(sanction_outcome__driver__isnull=True)) |
+                (Q(sanction_outcome__offender__person__email=self.request.user.email) & Q(sanction_outcome__registration_holder__isnull=True) & Q(sanction_outcome__driver__isnull=True)) |
                 (Q(sanction_outcome__offender__isnull=True) & Q(sanction_outcome__registration_holder=self.request.user) & Q(sanction_outcome__driver__isnull=True)) |
                 (Q(sanction_outcome__offender__isnull=True) & Q(sanction_outcome__driver=self.request.user))
             )
-            # return RemediationAction.objects_for_external.filter(sanction_outcome__offender__person=self.request.user)
         return RemediationAction.objects.none()
 
     def retrieve(self, request, *args, **kwargs):
@@ -516,7 +515,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
 
             sanction_outcome = SanctionOutcome.objects_for_external.get(
                 (
-                    (Q(offender__person=request.user) & Q(registration_holder__isnull=True) & Q(driver__isnull=True)) |
+                    (Q(offender__person__email=request.user.email) & Q(registration_holder__isnull=True) & Q(driver__isnull=True)) |
                     (Q(offender__isnull=True) & Q(registration_holder=request.user) & Q(driver__isnull=True)) |
                     (Q(offender__isnull=True) & Q(driver=request.user))
                 )
@@ -553,7 +552,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
             return SanctionOutcome.objects.all()
         elif is_customer(self.request):
             return SanctionOutcome.objects_for_external.filter(
-                (Q(offender__person=self.request.user) & Q(registration_holder__isnull=True) & Q(driver__isnull=True)) |
+                (Q(offender__person__email=self.request.user.email) & Q(registration_holder__isnull=True) & Q(driver__isnull=True)) |
                 (Q(offender__isnull=True) & Q(registration_holder=self.request.user) & Q(driver__isnull=True)) |
                 (Q(offender__isnull=True) & Q(driver=self.request.user))
             )
