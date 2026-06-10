@@ -116,6 +116,7 @@ INSTALLED_APPS += [
     'ledger_api_client',
     'webtemplate_dbca',
     'django_vite',
+    'wagov_utils.components.sri_utils',
 ]
 
 CKEDITOR_BASEPATH = '/static/ckeditor/ckeditor/'
