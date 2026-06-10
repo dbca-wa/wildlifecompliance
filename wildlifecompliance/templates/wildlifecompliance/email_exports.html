@@ -12,13 +12,13 @@
         }
     </style>
     <div class="container">
-        <div class="panel panel-default">
-            <div class="panel-header">
-                <h3 class="panel-title">
+        <div class="card card-default">
+            <div class="card-header h4 fw-bold p-4">
+                <h3>
                     Reports
                 </h3>
             </div>
-            <div class="panel-body collapse show">
+            <div class="card-body collapse show">
                 <div class="row form-group">
                     <div class="col-sm-12">
                     {% if message %}
@@ -65,14 +65,14 @@
                 </div>
             </div>
         </div>
-
+        </br></br>
         {% if not prefer_compliance_management %}
         <form class="report_form" id="application_report" method="POST" onsubmit="submitReport('application_report')">
-            <div class="panel panel-default">
-                <div class="panel-header">
-                    <h3 class="panel-title">Application Report</h3>
+            <div class="card card-default">
+                <div class="card-header h4 fw-bold p-4">
+                    <h3>Application Report</h3>
                 </div>
-                <div class="panel-body collapse show">
+                <div class="card-body collapse show">
                     {% csrf_token %}
                     <div class="row">
                         <label class="col-sm-3 control-label">Lodged From</label>
@@ -101,11 +101,11 @@
         </form>
 
         <form class="report_form" style="display:None" id="wildlifelicence_report" method="POST" onsubmit="submitReport('wildlifelicence_report')">
-            <div class="panel panel-default">
-                <div class="panel-header">
-                    <h3 class="panel-title">Wildlife Licence Report</h3>
+            <div class="card card-default">
+                <div class="card-header h4 fw-bold p-4">
+                    <h3>Wildlife Licence Report</h3>
                 </div>
-                <div class="panel-body collapse show">
+                <div class="card-body collapse show">
                     {% csrf_token %}
                     <div class="row">
                         <label class="col-sm-3 control-label">Issued From</label>
@@ -134,11 +134,11 @@
         </form>
         
         <form class="report_form" style="display:None" id="return_report" method="POST" onsubmit="submitReport('return_report')">
-            <div class="panel panel-default">
-                <div class="panel-header">
-                    <h3 class="panel-title">Returns Report</h3>
+            <div class="card card-default">
+                <div class="card-header h4 fw-bold p-4">
+                    <h3>Returns Report</h3>
                 </div>
-                <div class="panel-body collapse show">
+                <div class="card-body collapse show">
                     {% csrf_token %}
                     <div class="row">
                         <label class="col-sm-3 control-label">Due From</label>
@@ -167,11 +167,11 @@
         </form>
 
         <form class="report_form" style="display:None" id="organisationrequest_report" method="POST" onsubmit="submitReport('organisationrequest_report')">
-            <div class="panel panel-default">
-                <div class="panel-header">
-                    <h3 class="panel-title">Organisation Requests Report</h3>
+            <div class="card card-default">
+                <div class="card-header h4 fw-bold p-4">
+                    <h3>Organisation Requests Report</h3>
                 </div>
-                <div class="panel-body collapse show">
+                <div class="card-body collapse show">
                     {% csrf_token %}
                     <div class="row">
                         <label class="col-sm-3 control-label">Lodged On From</label>
@@ -200,11 +200,11 @@
         </form>
         {% else %}
         <form class="report_form" id="callemail_report" method="POST" onsubmit="submitReport('callemail_report')">
-            <div class="panel panel-default">
-                <div class="panel-header">
-                    <h3 class="panel-title">Call/Emails Report</h3>
+            <div class="card card-default">
+                <div class="card-header h4 fw-bold p-4">
+                    <h3>Call/Emails Report</h3>
                 </div>
-                <div class="panel-body collapse show">
+                <div class="card-body collapse show">
                     {% csrf_token %}
                     <div class="row">
                         <label class="col-sm-3 control-label">Lodged On From</label>
@@ -233,11 +233,11 @@
         </form>
 
         <form class="report_form" style="display:None" id="inspection_report" method="POST" onsubmit="submitReport('inspection_report')">
-            <div class="panel panel-default">
-                <div class="panel-header">
-                    <h3 class="panel-title">Inspections Report</h3>
+            <div class="card card-default">
+                <div class="card-header h4 fw-bold p-4">
+                    <h3>Inspections Report</h3>
                 </div>
-                <div class="panel-body collapse show">
+                <div class="card-body collapse show">
                     {% csrf_token %}
                     <div class="row">
                         <label class="col-sm-3 control-label">Planned From</label>
@@ -266,11 +266,11 @@
         </form>
        
         <form class="report_form" style="display:None" id="offence_report" method="POST" onsubmit="submitReport('offence_report')">
-            <div class="panel panel-default">
-                <div class="panel-header">
-                    <h3 class="panel-title">Offences Report</h3>
+            <div class="card card-default">
+                <div class="card-header h4 fw-bold p-4">
+                    <h3>Offences Report</h3>
                 </div>
-                <div class="panel-body collapse show">
+                <div class="card-body collapse show">
                     {% csrf_token %}
                     <div class="row">
                         <label class="col-sm-3 control-label">Occurred From</label>
@@ -299,11 +299,11 @@
         </form>
         
         <form class="report_form" style="display:None" id="object_report" method="POST" onsubmit="submitReport('object_report')">
-            <div class="panel panel-default">
-                <div class="panel-header">
-                    <h3 class="panel-title">Objects Report</h3>
+            <div class="card card-default">
+                <div class="card-header h4 fw-bold p-4">
+                    <h3>Objects Report</h3>
                 </div>
-                <div class="panel-body collapse show">
+                <div class="card-body collapse show">
                     {% csrf_token %}
                     <div class="row">
                         <label class="col-sm-3 control-label">Date From</label>
@@ -332,11 +332,11 @@
         </form>
 
         <form class="report_form" style="display:None" id="sanctionoutcome_report" method="POST" onsubmit="submitReport('sanctionoutcome_report')">
-            <div class="panel panel-default">
-                <div class="panel-header">
-                    <h3 class="panel-title">Sanction Outcomes Report</h3>
+            <div class="card card-default">
+                <div class="card-header h4 fw-bold p-4">
+                    <h3>Sanction Outcomes Report</h3>
                 </div>
-                <div class="panel-body collapse show">
+                <div class="card-body collapse show">
                     {% csrf_token %}
                     <div class="row">
                         <label class="col-sm-3 control-label">Issued From</label>
@@ -365,11 +365,11 @@
         </form>
 
         <form class="report_form" style="display:None" id="case_report" method="POST" onsubmit="submitReport('case_report')">
-            <div class="panel panel-default">
-                <div class="panel-header">
-                    <h3 class="panel-title">Cases Report</h3>
+            <div class="card card-default">
+                <div class="card-header h4 fw-bold p-4">
+                    <h3>Cases Report</h3>
                 </div>
-                <div class="panel-body collapse show">
+                <div class="card-body collapse show">
                     {% csrf_token %}
                     <div class="row">
                         <label class="col-sm-3 control-label">Created From</label>
