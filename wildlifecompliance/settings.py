@@ -16,6 +16,7 @@ os.environ['LEDGER_REFUND_TRANSACTION_CALLBACK_MODULE'] = 'wildlifecompliance:wi
 os.environ['LEDGER_INVOICE_TRANSACTION_CALLBACK_MODULE'] = 'wildlifecompliance:wildlifecompliance.components.applications.api.application_invoice_callback'
 
 COMPLIANCE_APP = env("COMPLIANCE_APP", False) #if False, Wildlife, if True, Compliance
+COMPLIANCE_URL = env("COMPLIANCE_URL", "") #used to link to compliance app
 
 ROOT_URLCONF = 'wildlifecompliance.urls'
 SITE_ID = 1
@@ -116,6 +117,7 @@ INSTALLED_APPS += [
     'ledger_api_client',
     'webtemplate_dbca',
     'django_vite',
+    'wagov_utils.components.sri_utils',
 ]
 
 CKEDITOR_BASEPATH = '/static/ckeditor/ckeditor/'

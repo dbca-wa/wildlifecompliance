@@ -45,4 +45,5 @@ def wildlifecompliance_processor(request):
         'checkouthash' : checkouthash,
         'GIT_COMMIT_HASH' : settings.GIT_COMMIT_HASH,
         "vue3_entry_script": settings.VUE3_ENTRY_SCRIPT,
+        "compliance_url": settings.COMPLIANCE_URL,
     }
