@@ -185,12 +185,12 @@
                     <IssueLicence :application="application" :licence_activity_tab="selected_activity_tab_id" :applicantType="applicantType" @action-tab="actionTabListener" />
                 </div>
 
-                <ApplicationAssessments @action-tab="actionTabListener" v-if="isSendingToAssessor || showingConditions" />
+                <ApplicationAssessments @action-tab="actionTabListener" v-if="isSendingToAssessor || showingConditions" @select-tab="selectTab"/>
 
                 <div v-if="applicationDetailsVisible && showingApplication">
                     <div>
                     <ul class="nav nav-pills mb-3" id="tabs-main" data-tabs="tabs">
-                        <li class="nav-item active"><a ref="applicantTab" class="nav-link" data-bs-toggle="pill" v-on:click="selectApplicantTab()" :href="'#'+applicantTab">Applicant</a></li>
+                        <li class="nav-item active"><a ref="applicantTab" class="nav-link" data-bs-toggle="pill" :href="'#'+applicantTab">Applicant</a></li>
                         <!-- <li class="nav-item"><a ref="applicationTab" class="nav-link" data-toggle="pill" :href="'#'+applicationTab">Application</a></li> -->
                         <li class="nav-item" v-for="(activity, index) in allCurrentActivities">
                             <a :class="{'nav-link amendment-highlight': application.has_amendment}" class="nav-link"
@@ -1064,6 +1064,7 @@ export default {
             'setActivityTabWorkflowState',
         ]),
         selectTab: function(component) {
+            console.log("selectTab")
             this.section_tab_id = component.id;
             this.setActivityTab({id: component.id, name: component.label});
             this.showingApplicant = false;
@@ -1071,6 +1072,7 @@ export default {
             this.actionActivityTab(this.selectedActivity)
         },
         selectApplicantTab: function() {
+            console.log("selectApplicantTab")
             this.showingApplicant = true;
         },
         userHasRole: function(role, activity_id) {
@@ -2021,10 +2023,10 @@ export default {
                         this.isSendingToAssessor = false;
                         this.showingConditions = false;
                     }
-                    if (!this.showingApplication) {
+                    /*if (!this.showingApplication) {
 
                         this.toggleApplication({show: true})
-                    }
+                    }*/
                 }
                 if (workflow.processing_status.name === 'With Assessor') {
 
@@ -2044,7 +2046,7 @@ export default {
                     }
                 } 
             }
-            this.initFirstTab();
+            //this.initFirstTab();
             this.hasActionedActivityTab=true;
             this.hasActionedConditionLink=false;
             this.hasActionedApplicationLink=false;

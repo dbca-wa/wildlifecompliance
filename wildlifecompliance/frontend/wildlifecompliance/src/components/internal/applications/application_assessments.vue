@@ -47,8 +47,8 @@
             <div v-if="applicationDetailsVisible">
                 <ul id="tabs-main" class="nav nav-pills mb-3">
                     <li class="nav-item"><a class="nav-link" data-toggle="pill" v-on:click="selectApplicantTab()">Applicant</a></li>
-                    <li class="nav-item" v-for="(item1,index) in applicationActivities" :class="setAssessorTab(index)" @click.prevent="clearSendToAssessorForm(item1)">
-                        <a class="nav-link" v-if="isActivityVisible(item1.id)" data-toggle="pill" :data-target="`#${item1.id}`">{{item1.name}}</a>
+                    <li class="nav-item" v-for="(item1,index) in applicationActivities" @click.prevent="clearSendToAssessorForm(item1)">
+                        <a class="nav-link" :class="setAssessorTab(index,item1.id)" v-if="isActivityVisible(item1.id)" v-on:click="selectTab(item1)" data-toggle="pill" :data-target="`#${item1.id}`">{{item1.name}}</a>
                     </li>
                 </ul>
             </div>
@@ -450,6 +450,7 @@ export default {
             }
         },
         selectApplicantTab: function() {
+            console.log("selectApplicantTab")
             this.$emit('action-tab', {tab: 'Applicant'})
         },
         clearSendToAssessorForm(item){
@@ -463,8 +464,12 @@ export default {
         hasActivityStatus: function(status_list, status_count=1, required_role=null) {
             return this.checkActivityStatus(status_list, status_count, required_role);
         },
-        setAssessorTab(_index){
-            return _index === 0 ? 'active' : '';
+        selectTab: function(component) {
+            console.log("select-tab")
+            this.$emit('select-tab', component); 
+        },
+        setAssessorTab(_index,id){
+            return id === this.selectedActivity.id ? 'active' : '';
         },
         refreshAssessorDatatables: function(){
             this.$refs.assessorDatatable.vmDataTable.ajax.reload();
@@ -595,7 +600,7 @@ export default {
         },
         eventListeners: function(){
             let vm = this;
-            this.initFirstTab();
+            //this.initFirstTab();
             // Listeners for Send to Assessor datatable actions
             if (!this.$refs.assessorDatatable) {
                 return false;
