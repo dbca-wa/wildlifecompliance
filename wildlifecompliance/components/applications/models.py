@@ -6834,7 +6834,7 @@ class ApplicationCondition(OrderedModel):
     def condition(self):
         if self.standard:
             return self.standard_condition.short_description
-        elif self.is_default:
+        elif self.is_default and self.default_condition and self.default_condition.standard_condition:
             return self.default_condition.standard_condition.short_description
         else:
             return self.free_condition
