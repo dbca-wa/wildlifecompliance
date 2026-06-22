@@ -272,7 +272,8 @@ export default {
                     due_date: '',
                     free_condition: '',
                     recurrence_pattern: 'weekly',
-                    application: this.application.id
+                    application: this.application.id,
+                    licence_purpose: '',
                 };
             }
             this.$refs.condition_detail.showDueDate = showDueDate

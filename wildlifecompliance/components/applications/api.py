@@ -2296,6 +2296,9 @@ class ApplicationConditionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             return Response("user not authorised to create application conditions",
             status=status.HTTP_401_UNAUTHORIZED)
         
+        if not "licence_purpose" in request.data or not request.data["licence_purpose"]:
+            raise serializers.ValidationError("Licence Purpose not Selected")
+
         try:
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -2311,12 +2314,7 @@ class ApplicationConditionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
                     request
                 )
             return Response(serializer.data)
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        
         except Exception as e:
-            print(traceback.print_exc())
             raise serializers.ValidationError("Internal System Error")
 
     @action(detail=True, methods=['GET', ])

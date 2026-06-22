@@ -26,6 +26,7 @@
                                     <div class="col-sm-9" >
                                         <div style="width:70% !important">
                                             <select class="form-control" ref="select_purpose" name="purpose" v-model="condition.licence_purpose" >
+                                                <option disabled value="">Select Purpose...</option>
                                                 <option v-for="p in purposes" :value="p.id" >{{p.short_name}}</option>
                                             </select>
                                         </div>
@@ -393,35 +394,13 @@ export default {
                 vm.condition.standard_condition = selected.val();
             });
        },
-       setPurposeSelector: function () {
-            let vm = this;
-
-            $(vm.$refs.select_purpose).select2({
-                "theme": "bootstrap-5",
-                allowClear: true,
-                placeholder:"Select Purpose...",
-                dropdownParent: $(
-                    'div#applicationConditionDetail .modal-body'
-                ),
-            }).
-            on("select2:select",function (e) {
-                var selected = $(e.currentTarget);
-                vm.condition.licence_purpose = selected.val();
-            }).
-            on("select2:unselect",function (e) {
-                var selected = $(e.currentTarget);
-                vm.condition.licence_purpose = selected.val();
-            });
-       },
        eventListeners:function () {
             let vm = this;
             vm.setConditionSelector();
-            vm.setPurposeSelector();
        }
    },
    updated:function () {
        let vm = this;
-       vm.setPurposeSelector();
        vm.setConditionSelector();
        if (vm.condition.free_condition || vm.condition.due_date){
             vm.showDueDate=true;
