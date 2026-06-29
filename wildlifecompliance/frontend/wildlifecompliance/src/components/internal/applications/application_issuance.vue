@@ -5,7 +5,7 @@
                     <ul class="nav nav-pills mb-3" id="tabs-main" data-tabs="tabs">
                         <li class="nav-item"><a class="nav-link" data-toggle="pill" v-on:click="selectApplicantTab()">Applicant</a></li>
                         <li class="nav-item" v-for="(activity, index) in visibleLicenceActivities" v-bind:key="`issue_activity_tab_${index}`">
-                            <a class="nav-link" data-toggle="pill" v-on:click="selectTab(activity)">{{activity.name}}</a>
+                            <a class="nav-link" :class="setTab(activity.id)" data-toggle="pill" v-on:click="selectTab(activity)">{{activity.name}}</a>
                         </li>
                     </ul>
                     </div>
@@ -432,9 +432,11 @@ export default {
             'finalDecisionData',
             'setApplicationWorkflowState',
         ]),
+        setTab(id){
+            return id === this.selected_activity_tab_id ? 'active' : '';
+        },
         selectTab: function(component) {
-            this.setActivityTab({id: component.id, name: component.name});
-            this.$emit('action-tab', {tab: component})
+            this.$emit('select-tab', component); 
         },
         selectApplicantTab: function() {
             this.$emit('action-tab', {tab: 'IssueApplicant'})
