@@ -182,7 +182,7 @@
         <div class="col-md-8">
             <div class="row">
                 <div v-if="canIssueDecline && isofficerfinalisation">
-                    <IssueLicence :application="application" :licence_activity_tab="selected_activity_tab_id" :applicantType="applicantType" @action-tab="actionTabListener" />
+                    <IssueLicence :application="application" :licence_activity_tab="selected_activity_tab_id" :applicantType="applicantType" @action-tab="actionTabListener" @select-tab="selectTab"/>
                 </div>
 
                 <ApplicationAssessments @action-tab="actionTabListener" v-if="isSendingToAssessor || showingConditions" @select-tab="selectTab"/>
@@ -1165,7 +1165,7 @@ export default {
                 this.isSendingToAssessor=false;
             }
 
-            setTimeout(() => {
+            /*setTimeout(() => {
                 let main_tabs = $('#tabs-main li')
                 let tabno = 0;
                 for(let i=0; i<main_tabs.length; i++){
@@ -1178,7 +1178,7 @@ export default {
                     selected.click();
                 }
                 this.initFirstTab();
-            }, 50);
+            }, 50);*/
 
         },
         acceptIdRequest: async function() {
@@ -1398,6 +1398,8 @@ export default {
             }, 50);
         },
         toggleApplication: function({show=false, showFinalised=false}){
+
+            
             this.showingApplication = show;
             if(this.isSendingToAssessor){
                 this.isSendingToAssessor = !show;
@@ -1415,8 +1417,10 @@ export default {
                 this.approvingApplication = true;
                 // this.isofficerfinalisation = !show;
             }
+            
+
             this.toggleFinalisedTabs(showFinalised);
-            setTimeout(() => {
+            /*setTimeout(() => {
                 // const firstTab = $('#tabs-main li a')[0];
                 let main_tabs = $('#tabs-main li')
                 let tabno = 0;
@@ -1430,7 +1434,7 @@ export default {
                     selected.click();
                 }
                 this.initFirstTab();
-            }, 50);
+            }, 50);*/
             !showFinalised && this.load({ url: `/api/application/${this.application.id}/internal_application.json` });
         },
         toggleConditions: async function({show=false, showFinalised=false}){
@@ -1922,6 +1926,8 @@ export default {
             }
         },
         actionActivityTab: function(workflow) {
+            console.log("actionActivityTab")
+            console.log(workflow)
             const self = this;
             $("[data-target!=''][data-target]").off("click").on("click", function (e) {
                 self.setActivityTab({
@@ -1933,7 +1939,7 @@ export default {
             this.notOfficerWorkflow=false;
 
             if (['Applicant','IssueApplicant'].includes(workflow)) {
-
+                console.log("['Applicant','IssueApplicant'].includes(workflow)")
                 if(!this.showingApplicant){
 
                     this.approvingApplication=false;
@@ -1945,7 +1951,8 @@ export default {
                 }
 
             } else {
-
+                console.log(workflow.processing_status.name)
+                console.log(this.isFinalised)
                 this.showingApplicant=false;
 
                 if (this.isFinalised) {
@@ -2023,10 +2030,10 @@ export default {
                         this.isSendingToAssessor = false;
                         this.showingConditions = false;
                     }
-                    /*if (!this.showingApplication) {
+                    if (!this.showingApplication) {
 
                         this.toggleApplication({show: true})
-                    }*/
+                    }
                 }
                 if (workflow.processing_status.name === 'With Assessor') {
 
