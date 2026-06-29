@@ -30,14 +30,14 @@ RUN mv /etc/apt/sourcesau.list /etc/apt/sources.list
 RUN apt-get clean
 RUN apt-get update
 RUN apt-get upgrade -y
-RUN apt-get install --no-install-recommends -y python3-gevent software-properties-common imagemagick
+RUN apt-get install --no-install-recommends -y python3-gevent software-properties-common imagemagick curl
 
-# RUN mkdir -p /etc/apt/keyrings && \
-#     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
-#     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" \
-#     | tee /etc/apt/sources.list.d/nodesource.list && \
-#     apt-get update && \
-#     apt-get install -y nodejs
+RUN mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" \
+    | tee /etc/apt/sources.list.d/nodesource.list && \
+    apt-get update && \
+    apt-get install -y nodejs
 
 COPY timezone /etc/timezone
 ENV TZ=Australia/Perth
@@ -54,8 +54,9 @@ RUN chown -R oim.oim /app
 FROM builder_base_wls as python_libs_wls
 WORKDIR /app
 USER oim
-RUN virtualenv /app/venv
-ENV PATH=/app/venv/bin:$PATH
+ENV VIRTUAL_ENV=/app/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH=$VIRTUAL_ENV/bin:$PATH
 RUN git config --global --add safe.directory /app
 COPY --chown=oim:oim requirements.txt ./
 RUN pip install --upgrade pip
@@ -69,13 +70,6 @@ COPY  --chown=oim:oim gunicorn.ini manage_wc.py ./
 #COPY timezone /etc/timezone
 RUN touch /app/.env
 #COPY --chown=oim:oim.git ./.git
-
-RUN mkdir -p /etc/apt/keyrings && \
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
-    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" \
-    | tee /etc/apt/sources.list.d/nodesource.list && \
-    apt-get update && \
-    apt-get install -y nodejs
 
 COPY --chown=oim:oim wildlifecompliance ./wildlifecompliance
 RUN cd /app/wildlifecompliance/frontend/wildlifecompliance; npm install
