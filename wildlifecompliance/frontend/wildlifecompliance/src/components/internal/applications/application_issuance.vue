@@ -436,9 +436,11 @@ export default {
             return id === this.selected_activity_tab_id ? 'active' : '';
         },
         selectTab: function(component) {
+            console.log("selectTab from application_issuance")
             this.$emit('select-tab', component); 
         },
         selectApplicantTab: function() {
+            console.log("selectApplicantTab from application_issuance")
             this.$emit('action-tab', {tab: 'IssueApplicant'})
         },
         updateFormattedText: function(object) {

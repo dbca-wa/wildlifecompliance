@@ -5,7 +5,7 @@
             <modal
                 transition="modal fade"
                 @cancel="close()"
-                okDisabled="true"
+                :okDisabled="true"
                 okText=""
                 title="Assessment Record" large>
                 <div class="container-fluid">
@@ -450,7 +450,7 @@ export default {
             }
         },
         selectApplicantTab: function() {
-            console.log("selectApplicantTab")
+            console.log("selectApplicantTab from application_assessments")
             this.$emit('action-tab', {tab: 'Applicant'})
         },
         clearSendToAssessorForm(item){
@@ -465,7 +465,7 @@ export default {
             return this.checkActivityStatus(status_list, status_count, required_role);
         },
         selectTab: function(component) {
-            console.log("select-tab")
+            console.log("selectTab from application_assessments")
             this.$emit('select-tab', component); 
         },
         setAssessorTab(_index,id){

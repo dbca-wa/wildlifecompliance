@@ -1,6 +1,6 @@
 <template lang="html">
     <div id="proposedIssuanceLicence">
-        <modal ref="proposedIssuanceLicenceModal" scrollable="true" transition="modal fade" @ok="ok()" @cancel="cancel()" :title="title" large okText="Propose Issue">
+        <modal ref="proposedIssuanceLicenceModal" transition="modal fade" @ok="ok()" @cancel="cancel()" :title="title" large okText="Propose Issue">
             <div class="container-fluid">
                 <div class="row">
                     <form class="form-horizontal" name="licenceForm">
