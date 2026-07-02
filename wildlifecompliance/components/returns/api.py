@@ -323,7 +323,12 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         logger.debug('ReturnViewSet.sheet_details() - start')
         return_id = self.request.query_params.get('return_id')
         species_id = self.request.query_params.get('species_id')
-        instance = Return.objects.get(id=return_id)
+
+        queryset = self.get_queryset()
+        try:
+            instance = queryset.get(id=return_id)
+        except:
+            raise serializers.ValidationError("Sheet details not available")
         sheet = ReturnService.set_species_for(instance, species_id)
         logger.debug('ReturnViewSet.sheet_details() - end')
 
