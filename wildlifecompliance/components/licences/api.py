@@ -775,7 +775,13 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             licence_history_id = request.query_params['licence_history_id']
 
             if licence_history_id != '0':
-                instance = WildlifeLicence.objects.get(id=licence_history_id)
+
+                queryset = self.get_queryset()
+                try:
+                    instance = queryset.get(id=licence_history_id)
+                except:
+                    raise serializers.ValidationError("Licence History not available")
+                
                 qs = instance.get_document_history()
 
             serializer = LicenceDocumentHistorySerializer(qs, many=True)
