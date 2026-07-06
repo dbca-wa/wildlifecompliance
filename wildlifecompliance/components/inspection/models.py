@@ -3,7 +3,7 @@ import logging
 from django.db import models
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields.jsonb import JSONField
-from django.db.models import Max
+from django.db.models import Q
 from django.utils.encoding import python_2_unicode_compatible
 from ledger.accounts.models import EmailUser, RevisionedMixin
 from ledger.licence.models import LicenceType
@@ -16,9 +16,14 @@ from wildlifecompliance.components.main.models import (
         Document,
         )
 from wildlifecompliance.components.main.related_item import can_close_record
-#from wildlifecompliance.components.users.models import CompliancePermissionGroup
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.main.models import Region, District
 from django.core.exceptions import ValidationError
+from django.conf import settings
+
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
 
 logger = logging.getLogger(__name__)
 
@@ -131,11 +136,11 @@ class Inspection(RevisionedMixin):
         related_name='inspection_assigned_to',
         null=True
         )
-    #allocated_group = models.ForeignKey(
-    #    CompliancePermissionGroup,
-    #    related_name='inspection_allocated_group', 
-    #    null=True
-    #    )
+    allocated_group = models.ForeignKey(
+       ComplianceManagementSystemGroup,
+       related_name='inspection_allocated_group', 
+       null=True
+       )
     inspection_team = models.ManyToManyField(
         EmailUser,
         # related_name='inspection_team',
@@ -151,16 +156,16 @@ class Inspection(RevisionedMixin):
             related_name='inspection_inspection_type',
             null=True
             )
-    #region = models.ForeignKey(
-    #    Region, 
-    #    related_name='inspection_region', 
-    #    null=True
-    #)
-    #district = models.ForeignKey(
-    #    District, 
-    #    related_name='inspection_district', 
-    #    null=True
-    #)
+    region = models.ForeignKey(
+       Region, 
+       related_name='inspection_region', 
+       null=True
+    )
+    district = models.ForeignKey(
+       District, 
+       related_name='inspection_district', 
+       null=True
+    )
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -191,6 +196,20 @@ class Inspection(RevisionedMixin):
         """ returns a queryset of form data records attached to Inspection (shortcut to InspectionFormDataRecord related_name). """
         return self.form_data_records.all()
 
+    @property
+    def allowed_groups(self):
+        if not self.allocated_group:
+            return []
+        groups = [self.allocated_group.id]
+        if not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED:
+            groups = groups + list(ComplianceManagementSystemGroup.objects.filter(name=self.allocated_group.name).values_list('id',flat=True))
+        elif settings.SUPER_AUTH_GROUPS_ENABLED:
+            queryset = ComplianceManagementSystemGroup.objects
+            groups = groups + list(ComplianceManagementSystemGroup.objects.filter(
+                (Q(name=self.allocated_group.name) & Q(region=None)) | 
+                (Q(name=self.allocated_group.name) & Q(region=self.allocated_group.region) & Q(district=None))).values_list('id',flat=True))
+        return list(set(groups))
+
     #def log_user_action(self, action, request):
      #   return InspectionUserAction.log_action(self, action, request.user)
     def log_user_action(self, action, request=None):
@@ -216,6 +235,7 @@ class Inspection(RevisionedMixin):
 
     def send_to_manager(self, request):
         self.status = self.STATUS_AWAIT_ENDORSEMENT
+        self.allocated_group = self.get_compliance_permission_group(self.region,self.district,self.status)
         self.log_user_action(
             InspectionUserAction.ACTION_SEND_TO_MANAGER.format(self.number), 
             request)
@@ -223,6 +243,7 @@ class Inspection(RevisionedMixin):
 
     def request_amendment(self, request):
         self.status = self.STATUS_OPEN
+        self.allocated_group = self.get_compliance_permission_group(self.region,self.district,self.status)
         self.log_user_action(
             InspectionUserAction.ACTION_REQUEST_AMENDMENT.format(self.number), 
             request)
@@ -230,6 +251,7 @@ class Inspection(RevisionedMixin):
 
     def endorse(self, request):
         self.status = self.STATUS_CLOSED
+        self.allocated_group = self.get_compliance_permission_group(self.region,self.district,self.status)
         self.log_user_action(
             InspectionUserAction.ACTION_ENDORSEMENT.format(self.number, request.user), 
             request)
@@ -248,6 +270,7 @@ class Inspection(RevisionedMixin):
             self.log_user_action(
                     InspectionUserAction.ACTION_PENDING_CLOSURE.format(self.number), 
                     request)
+        self.allocated_group = self.get_compliance_permission_group(self.region,self.district,self.status)
         self.save()
         # Call close() on any parent with pending_closure status
         if parents and self.status == 'closed':
@@ -255,18 +278,40 @@ class Inspection(RevisionedMixin):
                 if parent.status == 'pending_closure':
                     parent.close(request)
 
+    @staticmethod
+    def get_compliance_permission_group(region, district, status):
+        codename = 'inspection_officer'
+        if status == Inspection.STATUS_OPEN:
+            codename = 'inspection_officer'
+            per_district = True
+        elif status == Inspection.STATUS_AWAIT_ENDORSEMENT:
+            codename = 'manager'
+            per_district = True
+        elif status == Inspection.STATUS_CLOSED or \
+            status == Inspection.STATUS_PENDING_CLOSURE or \
+            status == Inspection.STATUS_DISCARDED:
+            codename = '---'
+            per_district = False
+
+        if per_district:
+            groups = ComplianceManagementSystemGroup.objects.filter(region=region, district=district, name=codename)
+        else:
+            groups = ComplianceManagementSystemGroup.objects.filter(name=codename)
+
+        return groups.first()
+
 class InspectionReportDocument(Document):
     log_entry = models.ForeignKey(
         'Inspection',
         related_name='report')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
 
 
 class InspectionTypeApprovalDocument(Document):
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -276,7 +321,7 @@ class InspectionCommsLogDocument(Document):
     log_entry = models.ForeignKey(
         'InspectionCommsLogEntry',
         related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -331,7 +376,7 @@ class InspectionUserAction(models.Model):
 
 class InspectionDocument(Document):
     inspection = models.ForeignKey('Inspection', related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)

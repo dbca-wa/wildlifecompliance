@@ -10,7 +10,6 @@ from django.db.models import Q, Min, Max
 from django.db import transaction
 from django.http import HttpResponse
 from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from wildlifecompliance import settings
@@ -18,7 +17,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from rest_framework import viewsets, serializers, status, generics, views, filters
+from rest_framework import viewsets, serializers, status, generics, views, filters, mixins
 import rest_framework.exceptions as rest_exceptions
 from rest_framework.decorators import (
     detail_route,
@@ -40,7 +39,7 @@ from datetime import datetime, timedelta, date
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from wildlifecompliance.components.main.api import save_location
-from wildlifecompliance.components.main.models import TemporaryDocumentCollection
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup,TemporaryDocumentCollection, ComplianceManagementSystemGroupPermission
 from wildlifecompliance.components.main.process_document import (
         process_generic_document, 
         save_comms_log_document_obj
@@ -50,7 +49,7 @@ from wildlifecompliance.components.users.serializers import (
     UserAddressSerializer,
     ComplianceUserDetailsSerializer,
 )
-from wildlifecompliance.helpers import is_customer, is_internal
+from wildlifecompliance.helpers import is_customer, is_internal, is_compliance_internal_user
 from wildlifecompliance.components.inspection.models import (
     Inspection,
     InspectionUserAction,
@@ -84,6 +83,10 @@ from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 from rest_framework_datatables.filters import DatatablesFilterBackend
 from rest_framework_datatables.renderers import DatatablesRenderer
 
+from wildlifecompliance.components.main.utils import (
+    get_full_name
+)
+
 from wildlifecompliance.components.inspection.email import (
     send_mail)
 
@@ -115,7 +118,7 @@ class InspectionFilterBackend(DatatablesFilterBackend):
                     or search_text in (planned_for_str.lower() if planned_for_str else '')
                     or search_text in (inspection.title.lower() if inspection.title else '')
                     or search_text in (
-                        inspection.assigned_to.first_name.lower() + ' ' + inspection.assigned_to.last_name.lower()
+                        get_full_name(inspection.assigned_to).lower()
                         if inspection.assigned_to else ''
                         )
                     ):
@@ -181,17 +184,17 @@ class InspectionFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class InspectionRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-        return super(InspectionRenderer, self).render(data, accepted_media_type, renderer_context)
+#class InspectionRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
+#        return super(InspectionRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class InspectionPaginatedViewSet(viewsets.ModelViewSet):
+class InspectionPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (InspectionFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (InspectionRenderer,)
+    #renderer_classes = (InspectionRenderer,)
     queryset = Inspection.objects.none()
     serializer_class = InspectionDatatableSerializer
     page_size = 10
@@ -199,30 +202,28 @@ class InspectionPaginatedViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # import ipdb; ipdb.set_trace()
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request):
             return Inspection.objects.all()
         return Inspection.objects.none()
 
     @list_route(methods=['GET', ])
     def get_paginated_datatable(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = InspectionDatatableSerializer(
             result_page, many=True, context={'request': request})
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class InspectionViewSet(viewsets.ModelViewSet):
-    queryset = Inspection.objects.all()
+class InspectionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
+    queryset = Inspection.objects.none()
     serializer_class = InspectionSerializer
 
     def get_queryset(self):
         # import ipdb; ipdb.set_trace()
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request):
             return Inspection.objects.all()
         return Inspection.objects.none()
 
@@ -353,11 +354,85 @@ class InspectionViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
+    def check_authorised_to_update(self,request,inspection_team_allowed=False):
+        print("check_authorised_to_update")
+        instance = self.get_object()
+        user = self.request.user
+        user_auth_groups = ComplianceManagementSystemGroupPermission.objects.filter(emailuser=user)
+
+        if instance.assigned_to_id == user.id and user_auth_groups.filter(group__id__in=instance.allowed_groups).exists():
+            return True
+        elif inspection_team_allowed:
+            return (user in instance.inspection_team.all() or user == instance.inspection_team_lead)
+        else:
+            return False
+        
+    def check_authorised_to_create(self,request):
+        print("check_authorised_to_create")
+
+        region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+        district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+        user = self.request.user
+        #check that request user is an (inspection) officer or manager in the specified region and district
+        if settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and settings.SUPER_AUTH_GROUPS_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+            Q(emailuser=user) & 
+            (Q(group__region_id=region_id) | Q(group__region_id=None))
+            ).filter(
+                Q(group__name=settings.GROUP_INSPECTION_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+        elif settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+            emailuser=user, 
+            group__region_id=region_id, 
+            group__district_id=district_id
+            ).filter(
+                Q(group__name=settings.GROUP_INSPECTION_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+        elif not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+                Q(emailuser=user) & 
+                (Q(group__name=settings.GROUP_INSPECTION_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER))).exists():
+            return False
+
+        assigned_to_id = None if not request.data.get('assigned_to_id') else request.data.get('assigned_to_id')
+
+        if settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and settings.SUPER_AUTH_GROUPS_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+            Q(emailuser=assigned_to_id) & 
+            (Q(group__region_id=region_id) | Q(group__region_id=None))
+            ).filter(
+                Q(group__name=settings.GROUP_INSPECTION_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            raise serializers.ValidationError(str("Specified user does not belong to appropriate authorisation group for the specified region/district"))
+        elif settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+            emailuser=assigned_to_id, 
+            group__region_id=region_id, 
+            group__district_id=district_id
+            ).filter(
+                Q(group__name=settings.GROUP_INSPECTION_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            raise serializers.ValidationError(str("Specified user does not belong to appropriate authorisation group for the specified region/district"))
+        elif not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+                Q(emailuser=assigned_to_id) & 
+                (Q(group__name=settings.GROUP_INSPECTION_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER))).exists():
+            raise serializers.ValidationError(str("Specified user does not belong to appropriate authorisation group for the specified region/district"))
+        
+        return True
+
     @detail_route(methods=['POST', ])
     @renderer_classes((JSONRenderer,))
-    def modify_inspection_team(self, request, instance=None, workflow=False, user_id=None, *args, **kwargs):
+    def modify_inspection_team(self, request, instance=None, workflow=False, user_id=None, new=False, *args, **kwargs):
         try:
             with transaction.atomic():
+
+                if not new: #we do not need to check this for newly created inspections as it has already been checked
+                    #check if user authorised to update - must be in allocated group and assigned
+                    if not self.check_authorised_to_update(request):
+                        return Response(
+                            status=status.HTTP_401_UNAUTHORIZED,
+                        )
+                
                 if not instance:
                     instance = self.get_object()
                 if workflow:
@@ -456,6 +531,16 @@ class InspectionViewSet(viewsets.ModelViewSet):
 
 
     @list_route(methods=['GET', ])
+    def can_user_create(self, request, *args, **kwargs):
+
+       # Find groups which has permissions determined above
+       allowed_groups = ComplianceManagementSystemGroup.objects.filter(Q(name=settings.GROUP_INSPECTION_OFFICER)|Q(name=settings.GROUP_MANAGER))
+       for allowed_group in allowed_groups:
+           if request.user in allowed_group.get_members():
+               return Response(True)
+       return Response(False)
+
+    @list_route(methods=['GET', ])
     def optimised(self, request, *args, **kwargs):
         queryset = self.get_queryset().exclude(location__isnull=True)
 
@@ -491,6 +576,13 @@ class InspectionViewSet(viewsets.ModelViewSet):
     #def inspection_save(self, request, workflow=False, *args, **kwargs):
     def update(self, request, workflow=False, *args, **kwargs):
         try:
+
+            #check if user authorised to update - must be in allocated group and assigned OR on inspection team
+            if not self.check_authorised_to_update(request, True):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+            
             with transaction.atomic():
                 # 1. Save Location
                 if (
@@ -663,6 +755,15 @@ class InspectionViewSet(viewsets.ModelViewSet):
     def process_inspection_report_document(self, request, *args, **kwargs):
         print("process_inspection_report_document")
         try:
+            #if the action is anything other than list, check auth
+            action = request.data.get('action')
+            if action != 'list':
+                #in-group and assigned OR on inspection team
+                if not self.check_authorised_to_update(request, True):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+                
             instance = self.get_object()
             returned_data = process_generic_document(
                 request, 
@@ -698,6 +799,13 @@ class InspectionViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         try:
+
+            #to create make sure user is in appropriate group (inspection officer or manager in region)
+            if not self.check_authorised_to_create(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             with transaction.atomic():
                 # 1. Save Location
                 if (
@@ -759,6 +867,12 @@ class InspectionViewSet(viewsets.ModelViewSet):
                 # email recipient
                 #recipient_id = None
 
+                if not create_inspection:
+                    if not self.check_authorised_to_update(request):
+                        return Response(
+                            status=status.HTTP_401_UNAUTHORIZED,
+                        )
+
                 if not instance:
                     instance = self.get_object()
 
@@ -794,7 +908,7 @@ class InspectionViewSet(viewsets.ModelViewSet):
                     instance.district_id = None if not request.data.get('district_id') else request.data.get('district_id')
                     instance.assigned_to_id = None if not request.data.get('assigned_to_id') else request.data.get('assigned_to_id')
                     instance.inspection_type_id = None if not request.data.get('inspection_type_id') else request.data.get('inspection_type_id')
-                    instance.allocated_group_id = None if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
+                    #instance.allocated_group_id = None if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
                     instance.call_email_id = None if not request.data.get('call_email_id') else request.data.get('call_email_id')
                     instance.legal_case_id = None if not request.data.get('legal_case_id') else request.data.get('legal_case_id')
                     instance.details = None if not request.data.get('details') else request.data.get('details')
@@ -802,14 +916,19 @@ class InspectionViewSet(viewsets.ModelViewSet):
                  #   instance.assigned_to_id = None if not request.data.get('assigned_to_id') else request.data.get('assigned_to_id')
                 else:
                     instance.assigned_to_id = None
-                    instance.allocated_group_id = None if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
+                    #instance.allocated_group_id = None if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
                     #recipient_id = instance.inspection_team_lead_id
 
+                allocated_group = instance.get_compliance_permission_group(instance.region,instance.district,instance.status)
+                if not allocated_group and not instance.status in [Inspection.STATUS_CLOSED,
+                    Inspection.STATUS_PENDING_CLOSURE,Inspection.STATUS_DISCARDED]:
+                    raise serializers.ValidationError("No allocated group for specified region/district")
+                instance.allocated_group = allocated_group
                 instance.save()
                 
                 # Needed for create inspection
                 if create_inspection:
-                    instance = self.modify_inspection_team(request, instance, workflow=True, user_id=instance.assigned_to_id)
+                    instance = self.modify_inspection_team(request, instance, workflow=True, new=True, user_id=instance.assigned_to_id)
 
                 # send email
                 if workflow_type == 'send_to_manager':
@@ -893,13 +1012,13 @@ class InspectionViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class InspectionTypeViewSet(viewsets.ModelViewSet):
-   queryset = InspectionType.objects.all()
+class InspectionTypeViewSet(viewsets.ReadOnlyModelViewSet):
+   queryset = InspectionType.objects.none()
    serializer_class = InspectionTypeSerializer
 
    def get_queryset(self):
        # user = self.request.user
-       if is_internal(self.request):
+       if is_compliance_internal_user(self.request):
            return InspectionType.objects.all()
        return InspectionType.objects.none()
 

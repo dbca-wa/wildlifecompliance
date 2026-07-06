@@ -13,7 +13,9 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from rest_framework import viewsets, serializers, status, generics, views
+from django.db.models import Value
+from django.db.models.functions import Concat
+from rest_framework import viewsets, serializers, status, generics, views, mixins
 from rest_framework.decorators import detail_route, list_route, renderer_classes
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
@@ -25,7 +27,7 @@ from django.core.cache import cache
 from ledger.accounts.models import EmailUser, OrganisationAddress, Organisation as ledger_organisation
 from ledger.address.models import Country
 from datetime import datetime, timedelta, date
-from wildlifecompliance.helpers import is_customer, is_internal
+from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
 from wildlifecompliance.components.organisations.models import (
     Organisation,
     OrganisationContact,
@@ -94,6 +96,10 @@ class OrganisationFilterBackend(DatatablesFilterBackend):
 
         total_count = queryset.count()
         search_text = request.GET.get('search[value]')
+        organisation_name = request.GET.get('organisation')
+        applicant = request.GET.get('applicant')
+        role = request.GET.get('role')
+        status = request.GET.get('status')
 
         if queryset.model is Organisation:
             # search_text filter, join all custom search columns
@@ -116,12 +122,34 @@ class OrganisationFilterBackend(DatatablesFilterBackend):
                 search_text = search_text.lower()
                 # join queries for the search_text search
                 search_text_org_request_ids = []
+                search_text_org_request_ids = OrganisationRequest.objects.filter(
+                Q(requester__first_name__icontains=search_text) |
+                Q(requester__last_name__icontains=search_text) |
+                Q(assigned_officer__first_name__icontains=search_text) |
+                Q(assigned_officer__last_name__icontains=search_text)
+                ).values('id')
                 # for organisation_request in queryset:
                 #     if search_text in organisation_request.address_string.lower():
                 #         search_text_org_request_ids.append(organisation_request.id)
                 # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
                 # (otherwise they will filter on top of each other)
                 queryset = queryset.filter(id__in=search_text_org_request_ids).distinct() | super_queryset
+
+            # apply user selected filters
+            organisation_name = organisation_name.lower() if organisation_name else 'all'
+            if organisation_name != 'all':
+                queryset = queryset.filter(name__iexact=organisation_name)
+            applicant = applicant.lower() if applicant else 'all'
+            if applicant != 'all':
+                queryset = queryset.annotate(applicant_name=Concat('requester__first_name',
+                    Value(' '),'requester__last_name')).filter(applicant_name__iexact=applicant)
+            role = role.lower() if role else 'all'
+            if role != 'all':
+                queryset = queryset.filter(role__iexact=role)
+            
+            status = status.lower().replace(" ","_") if status else 'all'
+            if status != 'all':
+                queryset = queryset.filter(status__iexact=status)
 
         # override queryset ordering, required because the ordering is usually handled
         # in the super call, but is then clobbered by the custom queryset joining above
@@ -137,48 +165,49 @@ class OrganisationFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class OrganisationRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-        return super(OrganisationRenderer, self).render(data, accepted_media_type, renderer_context)
+#class OrganisationRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
+#        return super(OrganisationRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class OrganisationPaginatedViewSet(viewsets.ModelViewSet):
+class OrganisationPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (OrganisationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (OrganisationRenderer,)
+    #renderer_classes = (OrganisationRenderer,)
     queryset = Organisation.objects.none()
     serializer_class = DTOrganisationSerializer
     page_size = 10
 
     def get_queryset(self):
-        if is_internal(self.request):
-            return Organisation.objects.all()
-        elif is_customer(self.request):
-            return Organisation.objects.none()
+        if is_wildlife_compliance_officer(self.request):
+            return Organisation.objects.all() #TODO auth group
+        #elif is_customer(self.request):
+        #    return Organisation.objects.none()
         return Organisation.objects.none()
 
     @list_route(methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = DTOrganisationSerializer
         queryset = self.get_queryset()
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTOrganisationSerializer(result_page, context={'request': request}, many=True)
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class OrganisationViewSet(viewsets.ModelViewSet):
-    queryset = Organisation.objects.all()
+class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    queryset = Organisation.objects.none()
     serializer_class = OrganisationSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
-            return Organisation.objects.all()
-        elif is_customer(self.request):
+        if is_wildlife_compliance_officer(self.request):
+            return Organisation.objects.all() 
+        elif user.is_authenticated():
+            #org_contacts = OrganisationContact.objects.filter(is_admin=True).filter(email=user.email)
+            #user_admin_orgs = [org.organisation.id for org in org_contacts]
+            #return Organisation.objects.filter(id__in=user_admin_orgs)
             return user.wildlifecompliance_organisations.all()
         return Organisation.objects.none()
 
@@ -663,11 +692,11 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
     @list_route(methods=['POST', ])
-    def existance(self, request, *args, **kwargs):
+    def existence(self, request, *args, **kwargs):
         try:
             serializer = OrganisationCheckSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            data = Organisation.existance(serializer.validated_data['abn'])
+            data = Organisation.existence(serializer.validated_data['abn'])
             # Check request user cannot be relinked to org.
             data.update([('user', request.user.id)])
             data.update([('abn', request.data['abn'])])
@@ -771,41 +800,39 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class OrganisationRequestsPaginatedViewSet(viewsets.ModelViewSet):
+class OrganisationRequestsPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (OrganisationFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (OrganisationRenderer,)
+    #renderer_classes = (OrganisationRenderer,)
     queryset = OrganisationRequest.objects.none()
     serializer_class = OrganisationRequestDTSerializer
     page_size = 10
 
     def get_queryset(self):
-        if is_internal(self.request):
+        if is_wildlife_compliance_officer(self.request):
             return OrganisationRequest.objects.all()
-        elif is_customer(self.request):
-            return OrganisationRequest.objects.none()
+        #elif is_customer(self.request):
+        #    return OrganisationRequest.objects.none()
         return OrganisationRequest.objects.none()
 
     @list_route(methods=['GET', ])
     def datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = OrganisationRequestDTSerializer
         queryset = self.get_queryset()
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = OrganisationRequestDTSerializer(result_page, context={'request': request}, many=True)
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class OrganisationRequestsViewSet(viewsets.ModelViewSet):
-    queryset = OrganisationRequest.objects.all()
+class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    queryset = OrganisationRequest.objects.none()
     serializer_class = OrganisationRequestSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
-            return OrganisationRequest.objects.all()
-        elif is_customer(self.request):
+        if is_wildlife_compliance_officer(self.request):
+            return OrganisationRequest.objects.all() 
+        elif user.is_authenticated():
             return user.organisationrequest_set.all()
         return OrganisationRequest.objects.none()
 
@@ -848,8 +875,7 @@ class OrganisationRequestsViewSet(viewsets.ModelViewSet):
     @list_route(methods=['GET', ])
     def get_pending_requests(self, request, *args, **kwargs):
         try:
-            qs = self.get_queryset().filter(requester=request.user,
-                                            status=OrganisationRequest.ORG_REQUEST_STATUS_WITH_ASSESSOR)
+            qs = self.get_queryset().filter(requester=request.user, status=OrganisationRequest.ORG_REQUEST_STATUS_WITH_ASSESSOR)
             serializer = OrganisationRequestDTSerializer(qs, many=True, context={'request': request})
             return Response(serializer.data)
         except serializers.ValidationError:
@@ -882,6 +908,8 @@ class OrganisationRequestsViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['GET', ])
     def assign_to_me(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to assign organisation request")
             instance = self.get_object()
             user = request.user
             if not request.user.has_perm('wildlifecompliance.organisation_access_request'):
@@ -904,6 +932,9 @@ class OrganisationRequestsViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['POST', ])
     def assign_officer(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to assign organisation request")
+
             instance = self.get_object()
             user_id = request.data.get('officer_id', None)
             user = None
@@ -917,6 +948,7 @@ class OrganisationRequestsViewSet(viewsets.ModelViewSet):
             if not request.user.has_perm('wildlifecompliance.organisation_access_request'):
                 raise serializers.ValidationError(
                     'You do not have permission to process organisation access requests')
+
             instance.assign_officer(user, request)
             serializer = OrganisationRequestSerializer(
                 instance, context={'request': request})
@@ -934,6 +966,9 @@ class OrganisationRequestsViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['GET', ])
     def unassign_officer(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to unassign organisation request")
+
             instance = self.get_object()
             instance.unassign_officer(request)
             serializer = OrganisationRequestSerializer(
@@ -952,6 +987,9 @@ class OrganisationRequestsViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['GET', ])
     def accept(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to accept organisation request")
+            
             instance = self.get_object()
             instance.accept(request)
             serializer = OrganisationRequestSerializer(
@@ -970,6 +1008,9 @@ class OrganisationRequestsViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['GET', ])
     def amendment_request(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to create amendemnt request for organisation request")
+            
             instance = self.get_object()
             instance.amendment_request(request)
             serializer = OrganisationRequestSerializer(
@@ -988,7 +1029,7 @@ class OrganisationRequestsViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['PUT', ])
     def reupload_identification_amendment_request(
             self, request, *args, **kwargs):
-        try:
+        try:            
             instance = self.get_object()
             instance.reupload_identification_amendment_request(request)
             serializer = OrganisationRequestSerializer(
@@ -1007,6 +1048,9 @@ class OrganisationRequestsViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['GET', ])
     def decline(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to decline organisation request")
+            
             instance = self.get_object()
             instance.decline(request)
             serializer = OrganisationRequestSerializer(
@@ -1063,7 +1107,7 @@ class OrganisationRequestsViewSet(viewsets.ModelViewSet):
             serializer.validated_data['requester'] = request.user
             if request.data['role'] == OrganisationRequest.ORG_REQUEST_ROLE_CONSULTANT:
                 # Check if consultant can be relinked to org.
-                data = Organisation.existance(request.data['abn'])
+                data = Organisation.existence(request.data['abn'])
                 data.update([('user', request.user.id)])
                 data.update([('abn', request.data['abn'])])
                 existing_org = OrganisationCheckExistSerializer(data=data)
@@ -1092,7 +1136,7 @@ class OrganisationAccessGroupMembers(views.APIView):
 
     def get(self, request, format=None):
         members = []
-        if is_internal(request):
+        if is_wildlife_compliance_officer(request):
             groups = ActivityPermissionGroup.objects.filter(
                 permissions__codename__in=[
                     'organisation_access_request',
@@ -1105,42 +1149,81 @@ class OrganisationAccessGroupMembers(views.APIView):
         return Response(members)
 
 
-class OrganisationContactViewSet(viewsets.ModelViewSet):
+class OrganisationContactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     serializer_class = OrganisationContactSerializer
-    queryset = OrganisationContact.objects.all()
+    queryset = OrganisationContact.objects.none()
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_wildlife_compliance_officer(self.request):
             return OrganisationContact.objects.all()
-        elif is_customer(self.request):
-            user_orgs = [
-                org.id for org in user.wildlifecompliance_organisations.all()]
-            return OrganisationContact.objects.filter(
-                Q(organisation_id__in=user_orgs))
+        elif user.is_authenticated():
+
+            org_contacts = OrganisationContact.objects.filter(is_admin=True).filter(email=user.email)
+            user_admin_orgs = [org.organisation.id for org in org_contacts]
+            return OrganisationContact.objects.filter(Q(organisation_id__in=user_admin_orgs) | Q(email=user.email))
+
         return OrganisationContact.objects.none()
+    
+    @detail_route(methods=['DELETE', ])
+    def delete(self, request, *args, **kwargs):
+        # only allowed to remove organisation contacts if their status is in draft
+        try:
+            instance = self.get_object()
+            with transaction.atomic():
+                if instance.user_status == 'draft':
+                    instance.delete()
+                else:
+                    return Response("Cannot delete this organisation contact.")
+
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(repr(e.error_dict))
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
 
 
-class MyOrganisationsViewSet(viewsets.ModelViewSet):
-    queryset = Organisation.objects.all()
+class MyOrganisationsViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Organisation.objects.none()
     serializer_class = MyOrganisationsSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_wildlife_compliance_officer(self.request):
             return Organisation.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             return user.wildlifecompliance_organisations.all()
         return Organisation.objects.none()
 
-
-class OrganisationComplianceManagementViewSet(viewsets.ModelViewSet):
-    queryset = Organisation.objects.all()
+class OrganisationComplianceManagementViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    queryset = Organisation.objects.none()
     serializer_class = ComplianceManagementOrganisationSerializer
     
+    def get_queryset(self):
+        user = self.request.user
+        if is_wildlife_compliance_officer(self.request):
+            return Organisation.objects.all()
+        elif user.is_authenticated():
+            return user.wildlifecompliance_organisations.all()
+        return Organisation.objects.none()
+
+    #TODO: consider removing - it does appear to be in use
     def create(self, request, *args, **kwargs):
         print("create org")
         print(request.data)
+
+        #auth, in case it is used
+        if not is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to create",
+            status=status.HTTP_401_UNAUTHORIZED)
+
         try:
             with transaction.atomic():
                 abn = request.data.get('abn')
@@ -1174,7 +1257,8 @@ class OrganisationComplianceManagementViewSet(viewsets.ModelViewSet):
                         saved_address = address_serializer.save()
                         print("address saved") 
                 # WC only cares about the postal address
-                saved_address = update_or_create_postal_address(address, ledger_org)
+                #saved_address = update_or_create_postal_address(address, ledger_org)
+                saved_address = self.update_postal_address(address, ledger_org) #NOTE: this would have been broken for some time
                 ledger_org_data = {'name': request.data.get('name'),
                         'abn': request.data.get('abn'),
                         'postal_address_id': saved_address.id
@@ -1220,7 +1304,7 @@ class OrganisationComplianceManagementViewSet(viewsets.ModelViewSet):
             address = request.data.get('address')
             if address:
                 address_serializer = ComplianceManagementSaveOrganisationAddressSerializer(
-                        instance=ledger_org_address, 
+                        instance=postal_address, 
                         data=address)
                 address_serializer.is_valid(raise_exception=True)
                 if address_serializer.is_valid:

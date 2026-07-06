@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.db.models import Q
 from django.db import transaction
 from django.core.exceptions import ValidationError
-from rest_framework import viewsets, serializers, status, views
+from rest_framework import viewsets, serializers, status, views, mixins
 from rest_framework.decorators import (
     detail_route,
     list_route,
@@ -19,7 +19,7 @@ from rest_framework_datatables.renderers import DatatablesRenderer
 
 from ledger.checkout.utils import calculate_excl_gst
 
-from wildlifecompliance.helpers import is_customer, is_internal
+from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
 from wildlifecompliance.components.returns.utils import (
     SpreadSheet,
     checkout,
@@ -55,9 +55,12 @@ from wildlifecompliance.components.returns.services import (
     ReturnData,
 )
 
-logger = logging.getLogger(__name__)
-# logger = logging
+from wildlifecompliance.components.main.utils import (
+    get_first_name,
+    get_last_name,
+)
 
+logger = logging.getLogger(__name__)
 
 class ReturnFilterBackend(DatatablesFilterBackend):
     """
@@ -88,29 +91,18 @@ class ReturnFilterBackend(DatatablesFilterBackend):
             if date_from:
                 date_from = datetime.strptime(
                     date_from, '%Y-%m-%d') + timedelta(days=1)
-                queryset = queryset.filter(lodgement_date__gte=date_from)
+                queryset = queryset.filter(due_date__gte=date_from)
             if date_to:
                 date_to = datetime.strptime(
                     date_to, '%Y-%m-%d') + timedelta(days=1)
-                queryset = queryset.filter(lodgement_date__lte=date_to)
+                queryset = queryset.filter(due_date__lte=date_to)
 
         return queryset
 
 
-class ReturnRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and \
-                hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = \
-                renderer_context['view']._datatables_total_count
-        return super(ReturnRenderer, self).render(
-            data, accepted_media_type, renderer_context)
-
-
-class ReturnPaginatedViewSet(viewsets.ModelViewSet):
+class ReturnPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (ReturnFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (ReturnRenderer,)
     queryset = Return.objects.none()
     serializer_class = DTExternalReturnSerializer
     page_size = 10
@@ -118,10 +110,10 @@ class ReturnPaginatedViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
-        if is_internal(self.request):
+        if is_wildlife_compliance_officer(self.request):
             return Return.objects.all()
 
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_licences = [wildlifelicence.id for wildlifelicence in WildlifeLicence.objects.filter(
@@ -131,8 +123,6 @@ class ReturnPaginatedViewSet(viewsets.ModelViewSet):
             
             external_qs = Return.objects.filter(
                 Q(licence_id__in=user_licences)
-            ).exclude(
-                processing_status=Return.RETURN_PROCESSING_STATUS_DISCARDED
             ).distinct()
 
             return external_qs
@@ -141,7 +131,6 @@ class ReturnPaginatedViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['GET', ])
     def user_datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = ReturnSerializer
         queryset = self.get_queryset()
         # Filter by org
         org_id = request.GET.get('org_id', None)
@@ -164,7 +153,6 @@ class ReturnPaginatedViewSet(viewsets.ModelViewSet):
             )
             queryset = queryset.filter(application__in=applications)
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTInternalReturnSerializer(
             result_page, context={'request': request}, many=True)
@@ -172,7 +160,6 @@ class ReturnPaginatedViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['GET', ])
     def external_datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = ReturnSerializer
         queryset = self.get_queryset()
         # Filter by org
         org_id = request.GET.get('org_id', None)
@@ -194,22 +181,21 @@ class ReturnPaginatedViewSet(viewsets.ModelViewSet):
                 Q(submitter=user_id)
             )
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTExternalReturnSerializer(
             result_page, context={'request': request}, many=True)
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
+class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     serializer_class = ReturnSerializer
-    queryset = Return.objects.all()
+    queryset = Return.objects.none()
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_wildlife_compliance_officer(self.request):
             return Return.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_licences = [wildlifelicence.id for wildlifelicence in WildlifeLicence.objects.filter(
@@ -218,6 +204,25 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(current_application__submitter=user))]
             return Return.objects.filter(Q(licence_id__in=user_licences))
         return Return.objects.none()
+    
+    def get_serializer_class(self):
+        try:
+            return_obj = self.get_object()
+            return ReturnSerializer
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            if hasattr(e,'error_dict'):
+                raise serializers.ValidationError(repr(e.error_dict))
+            else:
+                if hasattr(e,'message'):
+                    raise serializers.ValidationError(e.message)
+        except AssertionError as e:
+            raise serializers.ValidationError(str(e))
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -249,11 +254,12 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(methods=['POST', ])
     def accept(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to accept return")
+
             logger.debug('ReturnViewSet.accept() - start')
             instance = self.get_object()
-            # instance.accept(request)
             ReturnService.accept_return_request(request, instance)
-            # serializer = self.get_serializer(instance)
             logger.debug('ReturnViewSet.accept() - end')
 
             return Response(
@@ -317,7 +323,12 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
         logger.debug('ReturnViewSet.sheet_details() - start')
         return_id = self.request.query_params.get('return_id')
         species_id = self.request.query_params.get('species_id')
-        instance = Return.objects.get(id=return_id)
+
+        queryset = self.get_queryset()
+        try:
+            instance = queryset.get(id=return_id)
+        except:
+            raise serializers.ValidationError("Sheet details not available")
         sheet = ReturnService.set_species_for(instance, species_id)
         logger.debug('ReturnViewSet.sheet_details() - end')
 
@@ -327,13 +338,6 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
     def sheet_check_transfer(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-
-            # if not instance.sheet.is_valid_transfer(request):
-            #     raise ValidationError({'err': 'Transfer not valid.'})
-
-            # if valid store updated table??
-            # ReturnService.store_request_details_for(instance, request)
-
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
         except serializers.ValidationError:
@@ -353,8 +357,8 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
             product_lines = []
 
             return_submission = u'Return submitted by {0} {1} confirmation {2}\
-                '.format(instance.submitter.first_name,
-                         instance.submitter.last_name,
+                '.format(get_first_name(instance.submitter),
+                         get_last_name(instance.submitter),
                          instance.lodgement_number)
             # place return and its table in the session for storing.
             set_session_return(request.session, instance)
@@ -402,8 +406,8 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
             product_lines = []
 
             return_submission = u'Return submitted by {0} {1} confirmation {2}\
-                '.format(instance.submitter.first_name,
-                         instance.submitter.last_name,
+                '.format(get_first_name(instance.submitter),
+                         get_last_name(instance.submitter),
                          instance.lodgement_number)
             set_session_return(request.session, instance)
             product_lines = ReturnService.get_product_lines(instance)
@@ -418,7 +422,6 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             print(traceback.print_exc())
@@ -431,6 +434,7 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
             instance = self.get_object()
 
             with transaction.atomic():
+                print("saving return")
                 ReturnService.store_request_details_for(instance, request)
                 instance.save()
                 serializer = self.get_serializer(instance)
@@ -475,7 +479,6 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             delete_session_return(request.session)
@@ -505,7 +508,6 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
             if hasattr(e, 'error_dict'):
                 raise serializers.ValidationError(repr(e.error_dict))
             else:
-                # raise serializers.ValidationError(repr(e[0].encode('utf-8')))
                 raise serializers.ValidationError(repr(e[0]))
         except Exception as e:
             delete_session_return(request.session)
@@ -515,6 +517,8 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(methods=['POST', ])
     def discard(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to discard return")
             instance = self.get_object()
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
@@ -532,8 +536,6 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
     def estimate_price(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            # return_id = request.data.get('return_id')
-
             return Response({'fees': ReturnService.calculate_fees(instance)})
 
         except serializers.ValidationError:
@@ -549,6 +551,8 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(methods=['POST', ])
     def assign_to_me(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to assign return")
             instance = self.get_object()
             user = request.user
 
@@ -574,6 +578,8 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
     def assign_officer(self, request, *args, **kwargs):
         from ledger.accounts.models import EmailUser
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to assign return")
             instance = self.get_object()
             user_id = request.data.get('officer_id', None)
             user = None
@@ -617,6 +623,8 @@ class ReturnViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(methods=['POST', ])
     def unassign_officer(self, request, *args, **kwargs):
         try:
+            if not is_wildlife_compliance_officer(self.request):
+                return Response("user not authorised to assign return")
             instance = self.get_object()
 
             ReturnService.unassign_officer_request(request, instance)
@@ -724,7 +732,7 @@ class ReturnTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ReturnType.objects.none()
 
     def get_queryset(self):
-        if is_internal(self.request):
+        if is_wildlife_compliance_officer(self.request):
             return ReturnType.objects.all()
         return ReturnType.objects.none()
 
@@ -734,15 +742,15 @@ class ReturnTypeViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class ReturnAmendmentRequestViewSet(viewsets.ModelViewSet):
-    queryset = ReturnRequest.objects.all()
+class ReturnAmendmentRequestViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    queryset = ReturnRequest.objects.none()
     serializer_class = ReturnRequestSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_wildlife_compliance_officer(self.request):
             return ReturnRequest.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             user_applications = [application.id for application in Application.objects.filter(
@@ -754,6 +762,11 @@ class ReturnAmendmentRequestViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         # DRAFT = Return.RETURN_PROCESSING_STATUS_DRAFT
         DUE = Return.RETURN_PROCESSING_STATUS_DUE
+
+        if not is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to create",
+            status=status.HTTP_401_UNAUTHORIZED)
+
         try:
 
             with transaction.atomic():

@@ -13,8 +13,22 @@
                     </h3>
                 </div>
                 <div class="panel-body collapse in" :id="kBody">
-                    <div class="row">
-                        <div class="form-group">
+                    <div class="form-group">
+                        <div class="row">   
+                            <div class="form-check form-check-inline col-md-3">
+                            <input type="radio" value="starts_with" v-model="search_option"/> 
+                            <label class="form-check-label">Starts with</label>
+                            </div>
+                            <div class="form-check form-check-inline col-md-3">
+                            <input type="radio" value="ends_with" v-model="search_option"/> 
+                            <label class="form-check-label">Ends with</label>
+                            </div>
+                            <div class="form-check form-check-inline col-md-3">
+                            <input type="radio" value="contains" v-model="search_option"/> 
+                            <label class="form-check-label">Contains</label>
+                            </div>
+                        </div>
+                        <div class="row">
                             <!--label for="person_lookup" class="col-sm-3 control-label">Search</label-->
                             <div class="col-sm-6">
                                 <select 
@@ -33,7 +47,7 @@
                                 />
                             </div>
                         </div>
-                      </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -90,8 +104,10 @@
                     <div class="row">
                       <div class="col-lg-12">
                         <div>
-                          <input :disabled="!hasSearchKeywords" type="button" @click.prevent="searchKeyword" class="btn btn-primary" style="margin-bottom: 5px"value="Search"/>
-                          <input type="reset" @click.prevent="clearKeywordSearch" class="btn btn-primary" style="margin-bottom: 5px"value="Clear"/>
+                          <button  v-if="searching" type="button" class="btn btn-primary" style="margin-bottom: 5px" value="Search" disabled>
+                            Search<i class="fa fa-circle-o-notch fa-spin fa-fw"></i></button>
+                          <input v-else type="button" @click.prevent="searchKeyword" class="btn btn-primary" style="margin-bottom: 5px" value="Search" :disabled="!hasSearchKeywords"/>
+                          <input type="reset" @click.prevent="clearKeywordSearch" class="btn btn-primary" style="margin-bottom: 5px" value="Clear"/>
                         </div>
                       </div>
                     </div>
@@ -182,6 +198,7 @@ export default {
             cBody: 'cBody' + vm._uid,
             kBody: 'kBody' + vm._uid,
             loading: [],
+            search_option: "starts_with",
             searchKeywords: [],
             hasSearchKeywords: false,
             selected_organisation:'',
@@ -191,6 +208,7 @@ export default {
             searchReturn: false,
             referenceWord: '',
             keyWord: null,
+            searching:false,
             results: [],
             errors: false,
             errorString: '',
@@ -253,16 +271,16 @@ export default {
         UserDashTable,
         OrganisationDashTable
     },
-    beforeRouteEnter:function(to,from,next){
-        let initialisers = [
-            utils.fetchOrganisations(),
-        ]
-        Promise.all(initialisers).then(data => {
-            next(vm => {
-                vm.organisations = data[0].results;
-            });
-        });
-    },
+    //beforeRouteEnter:function(to,from,next){
+        //let initialisers = [
+        //    utils.fetchOrganisations(),
+        //]
+        //Promise.all(initialisers).then(data => {
+        //    next(vm => {
+        //        vm.organisations = data[0].results;
+        //    });
+        //});
+    //},
     computed: {
         isLoading: function () {
             return this.loading.length == 0;
@@ -306,6 +324,7 @@ export default {
                         console.log(params)
                         var query = {
                             term: params.term,
+                            option: vm.search_option,
                             type: 'public',
                         }
                         return query;
@@ -400,6 +419,7 @@ export default {
           let vm = this;
           if(this.searchKeywords.length > 0)
           {
+            vm.searching=true;
             vm.$http.post('/api/search_keywords.json',{
               searchKeywords: vm.searchKeywords,
               searchApplication: vm.searchApplication,
@@ -411,9 +431,11 @@ export default {
               vm.$refs.keyword_search_datatable.vmDataTable.clear()
               vm.$refs.keyword_search_datatable.vmDataTable.rows.add(vm.results);
               vm.$refs.keyword_search_datatable.vmDataTable.draw();
+              vm.searching=false;
             },
             err => {
               console.log(err);
+              vm.searching=false;
             });
           }
         },

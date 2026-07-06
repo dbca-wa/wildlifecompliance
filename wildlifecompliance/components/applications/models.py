@@ -29,7 +29,10 @@ from ledger.payments.invoice.models import Invoice
 from wildlifecompliance.components.main.utils import (
     checkout, set_session_application,
     delete_session_application,
-    flush_checkout_session
+    flush_checkout_session,
+    get_dob,
+    get_first_name,
+    get_last_name,
 )
 
 from wildlifecompliance.components.inspection.models import Inspection
@@ -80,6 +83,10 @@ from wildlifecompliance.components.licences.models import (
 from wildlifecompliance.components.main.models import (
     TemporaryDocumentCollection
 )
+
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
 logger = logging.getLogger(__name__)
 # logger = logging
 
@@ -181,7 +188,7 @@ class ActivityPermissionGroup(Group):
 
 class ApplicationDocument(Document):
     application = models.ForeignKey('Application', related_name='documents')
-    _file = models.FileField(upload_to=update_application_doc_filename)
+    _file = models.FileField(upload_to=update_application_doc_filename, storage=private_storage)
     input_name = models.CharField(max_length=255, null=True, blank=True)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
@@ -483,12 +490,14 @@ class Application(RevisionedMixin):
             return self.org_applicant.organisation.name
         elif self.proxy_applicant:
             return "{} {}".format(
-                self.proxy_applicant.first_name,
-                self.proxy_applicant.last_name)
+                get_first_name(self.proxy_applicant),
+                get_last_name(self.proxy_applicant),
+            )
         else:
             return "{} {}".format(
-                self.submitter.first_name,
-                self.submitter.last_name)
+                get_first_name(self.submitter),
+                get_last_name(self.submitter),
+            )
 
     @property
     def applicant_details(self):
@@ -499,13 +508,13 @@ class Application(RevisionedMixin):
                 self.org_applicant.address)
         elif self.proxy_applicant:
             return "{} {}\n{}".format(
-                self.proxy_applicant.first_name,
-                self.proxy_applicant.last_name,
+                get_first_name(self.proxy_applicant),
+                get_last_name(self.proxy_applicant),
                 self.proxy_applicant.addresses.all().first())
         else:
             return "{} {}\n{}".format(
-                self.submitter.first_name,
-                self.submitter.last_name,
+                get_first_name(self.submitter),
+                get_last_name(self.submitter),
                 self.submitter.addresses.all().first())
 
     @property
@@ -1465,6 +1474,7 @@ class Application(RevisionedMixin):
         from wildlifecompliance.components.licences.models import LicenceActivity
 
         with transaction.atomic():
+            #import ipdb; ipdb.set_trace()
             requires_refund = self.requires_refund_at_submit()
             if self.can_user_edit:
                 if not self.application_fee_paid and not requires_refund \
@@ -3174,6 +3184,9 @@ class Application(RevisionedMixin):
         from wildlifecompliance.components.returns.services import (
             ReturnService,
         )
+        from wildlifecompliance.components.returns.models import (
+            Return,
+        )
 
         logger.debug('Application.issue_activity() - start')
 
@@ -3191,9 +3204,6 @@ class Application(RevisionedMixin):
             raise Exception("Cannot issue activity: licence not found!")
 
         latest_application_in_function = self
-        # all_purpose_ids = self.licence_purposes.all(
-        #     # All licence purpose ids on this application.
-        # ).values_list('id', flat=True)
 
         # All active license purposes on this application.
         all_purpose = self.get_proposed_purposes()
@@ -3208,20 +3218,7 @@ class Application(RevisionedMixin):
                 replace_activity
             ]
 
-        # with transaction.atomic():
-        # try:
         for existing_activity in licence_latest_activities_for_licence_activity_id:
-
-            # compare each activity's purposes and find the difference 
-            # from the selected_purposes of the new application.
-
-            # selected_lic_id = selected_activity.licence_activity_id
-            # issued_purposes = all_purpose_ids.filter(
-            #     licence_activity_id=selected_lic_id
-            # )
-
-            # existing_purposes = \
-            #     existing_activity.purposes.values_list('id', flat=True)
 
             # All active license purposes on the current Activity.
             # NOTE: using latest version of licence purpose only.
@@ -3262,11 +3259,6 @@ class Application(RevisionedMixin):
                 Application.APPLICATION_TYPE_ACTIVITY,
             ]:
                 common_purpose_ids = None
-
-            # No relevant purposes were selected for action for this
-            # existing activity, do nothing
-            if not common_purpose_ids:
-                pass
 
             # If there are no remaining purposes in the
             # existing_activity(i.e. this issued activity replaces them
@@ -3347,7 +3339,9 @@ class Application(RevisionedMixin):
         selected_activity.processing_status = ACCEPTED
         selected_activity.activity_status = CURRENT
 
-        if not selected_activity.get_expiry_date() == None:
+        #prevent new return rows if this is a reissue - i.e. if the license/activity already has a corresponding returns table
+        return_exists = Return.objects.filter(licence=parent_licence, condition__licence_activity_id=selected_activity.licence_activity_id, application=self).exists()
+        if not selected_activity.get_expiry_date() == None and not return_exists:
             ReturnService.generate_return_request(
                 request, parent_licence, selected_activity
             )
@@ -4002,13 +3996,16 @@ class Application(RevisionedMixin):
         proxy_details = Application.get_request_user_proxy_details(request)
         proxy_id = proxy_details.get('proxy_id')
         organisation_id = proxy_details.get('organisation_id')
-        return Application.objects.filter(
-            Q(org_applicant_id=organisation_id) if organisation_id
-            else (
-                Q(submitter=proxy_id) | Q(proxy_applicant=proxy_id)
-            ) if proxy_id
-            else Q(submitter=request.user, proxy_applicant=None, org_applicant=None)
-        )
+        if request.user.is_authenticated():
+            return Application.objects.filter(
+                Q(org_applicant_id=organisation_id) if organisation_id
+                else (
+                    Q(submitter=proxy_id) | Q(proxy_applicant=proxy_id)
+                ) if proxy_id
+                else Q(submitter=request.user, proxy_applicant=None, org_applicant=None)
+            )
+        else:
+            return Application.objects.none()
 
 
 class ApplicationInvoice(models.Model):
@@ -4073,7 +4070,7 @@ class ApplicationLogDocument(Document):
     log_entry = models.ForeignKey(
         'ApplicationLogEntry',
         related_name='documents')
-    _file = models.FileField(upload_to=update_application_comms_log_filename)
+    _file = models.FileField(upload_to=update_application_comms_log_filename, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -5563,7 +5560,7 @@ class ApplicationSelectedActivity(models.Model):
                 '%Y-%m-%d'
             )
 
-            is_reissued = False if idtime == o_dtime else True
+            is_reissued = False if i_dtime == o_dtime else True
 
         except BaseException as e:
             logger.error('ASA.is_reissued(): {0}'.format(e))
@@ -5995,12 +5992,13 @@ class ApplicationSelectedActivity(models.Model):
 
                     document.name = str(attachment.name)
 
+                    #TODO look in to this - does not appear to work and may need review
                     if document._file and os.path.isfile(document._file.path):
                         os.remove(document._file.path)
                     document.application_id = self.application_id
                     document.selected_activity_id = self.licence_activity_id
 
-                    path = default_storage.save(
+                    path = private_storage.save(
                       'wildlifecompliance/applications/{}/documents/{}'.format(
                           self.application_id), ContentFile(
                           attachment._file.read()))
@@ -6555,7 +6553,7 @@ class ApplicationSelectedActivityPurpose(models.Model):
                 '%Y-%m-%d'
             )
 
-            is_reissued = False if idtime == o_dtime else True
+            is_reissued = False if i_dtime == o_dtime else True
 
         except BaseException as e:
             print(e)
@@ -6850,13 +6848,13 @@ class ApplicationSelectedActivityPurpose(models.Model):
 
 
 class IssuanceDocument(Document):
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
     selected_activity = models.ForeignKey(
         'ApplicationSelectedActivity',
         related_name='issuance_documents')
-
+    
     class Meta:
         app_label = 'wildlifecompliance'
 

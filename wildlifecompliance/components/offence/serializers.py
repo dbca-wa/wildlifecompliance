@@ -5,7 +5,7 @@ import pytz
 from django.db.models import Q
 from ledger.settings_base import TIME_ZONE
 from rest_framework import serializers
-
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroupPermission
 from wildlifecompliance.components.main.serializers import CommunicationLogEntrySerializer
 from wildlifecompliance.components.organisations.models import Organisation
 from wildlifecompliance.components.call_email.serializers import LocationSerializer, EmailUserSerializer, \
@@ -85,7 +85,7 @@ def get_user_action(self, obj):
     elif user_id == obj.assigned_to_id:
         returned_url = process_url
     elif obj.allocated_group and not obj.assigned_to_id:
-        if user_id in [member.id for member in obj.allocated_group.members]:
+        if user_id in [member.id for member in obj.allocated_group.get_members()]:
             returned_url = process_url
 
     if not returned_url:
@@ -146,7 +146,7 @@ class OffenceSerializer(serializers.ModelSerializer):
     location = LocationSerializer(read_only=True)
     alleged_offences = serializers.SerializerMethodField()
     offenders = serializers.SerializerMethodField()
-    allocated_group = serializers.SerializerMethodField()
+    #allocated_group = serializers.SerializerMethodField()
     user_in_group = serializers.SerializerMethodField()
     can_user_action = serializers.SerializerMethodField()
     # can_user_edit = serializers.SerializerMethodField()
@@ -154,6 +154,9 @@ class OffenceSerializer(serializers.ModelSerializer):
     related_items = serializers.SerializerMethodField()
     in_editable_status = serializers.SerializerMethodField()
     user_action = serializers.SerializerMethodField()
+    region_id = serializers.SerializerMethodField()
+    district_id = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Offence
@@ -168,7 +171,8 @@ class OffenceSerializer(serializers.ModelSerializer):
             'district_id',
             'assigned_to_id',
             'allocated_group',
-            'allocated_group_id',
+            'allowed_groups',
+            #'allocated_group_id',
             'user_in_group',
             'can_user_action',
             # 'can_user_edit',
@@ -250,12 +254,13 @@ class OffenceSerializer(serializers.ModelSerializer):
 
     def get_user_in_group(self, obj):
         user_id = self.context.get('request', {}).user.id
-
+        return_val = False
         if obj.allocated_group:
-            for member in obj.allocated_group.members:
-                if user_id == member.id:
-                    return True
-        return False
+           #for member in obj.allocated_group.get_members():
+           #    if user_id == member.id:
+           #       return_val = True
+           return_val = ComplianceManagementSystemGroupPermission.objects.filter(emailuser__id=user_id).filter(group__id__in=obj.allowed_groups).exists()
+        return return_val
 
     # def get_can_user_edit(self, obj):
     #     can_edit = False
@@ -269,11 +274,11 @@ class OffenceSerializer(serializers.ModelSerializer):
         # when user is assigned to the target object or
         # when user is a member of the allocated group and no one is assigned to the target object
         user_id = self.context.get('request', {}).user.id
-        if user_id == obj.assigned_to_id:
+        if obj.allocated_group and user_id == obj.assigned_to_id and self.get_user_in_group(obj):
             return True
-        elif obj.allocated_group and not obj.assigned_to_id:
-            if user_id in [member.id for member in obj.allocated_group.members]:
-                return True
+        #elif obj.allocated_group and not obj.assigned_to_id:
+        #    if user_id in [member.id for member in obj.allocated_group.get_members()]:
+        #        return True
 
         return False
 
@@ -286,7 +291,12 @@ class OffenceSerializer(serializers.ModelSerializer):
 
     def get_related_items(self, obj):
         return get_related_items(obj)
+    
+    def get_region_id(self, obj):
+        return obj.region_id
 
+    def get_district_id(self, obj):
+        return obj.district_id
 
 class UpdateAllegedCommittedOffenceSerializer(serializers.ModelSerializer):
 

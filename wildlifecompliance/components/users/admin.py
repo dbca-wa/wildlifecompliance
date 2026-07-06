@@ -34,4 +34,6 @@ from reversion.admin import VersionAdmin
 
 @admin.register(models.ComplianceManagementUserPreferences)
 class ComplianceManagementUserPreferencesAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields=('email_user',)
+    list_filter = ('prefer_compliance_management',)
+

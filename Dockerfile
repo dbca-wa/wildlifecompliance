@@ -1,13 +1,19 @@
-# Prepare the base environment.
-FROM ubuntu:20.04 as builder_base_wls
+ARG IMAGE_TAG
+ARG IMAGE_NAME
+FROM ubuntu:22.04 as builder_base_wls
+ARG IMAGE_TAG
+ARG IMAGE_NAME
+RUN echo "Building version: $IMAGE_TAG for $IMAGE_NAME"
+ENV CONTAINER_IMAGE_TAG=${IMAGE_TAG}
+ENV CONTAINER_IMAGE_NAME=${IMAGE_NAME}
 MAINTAINER asi@dbca.wa.gov.au
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBUG=True
 ENV TZ=Australia/Perth
 ENV EMAIL_HOST="smtp.corporateict.domain"
 ENV DEFAULT_FROM_EMAIL='no-reply@dbca.wa.gov.au'
-ENV NOTIFICATION_EMAIL='jawaid.mushtaq@dbca.wa.gov.au'
-ENV NON_PROD_EMAIL='brendan.blackford@dbca.wa.gov.au, walter.genuit@dbca.wa.gov.au, katsufumi.shibata@dbca.wa.gov.au, mohammed.ahmed@dbca.wa.gov.au, test_licensing@dpaw.wa.gov.au, jawaid.mushtaq@dbca.wa.gov.au, shayne.sharpe@dbca.wa.gov.au'
+ENV NOTIFICATION_EMAIL='no-reply@dbca.wa.gov.au'
+ENV NON_PROD_EMAIL='no-reply@dbca.wa.gov.au'
 ENV PRODUCTION_EMAIL=False
 ENV EMAIL_INSTANCE='DEV'
 ENV SECRET_KEY="ThisisNotRealKey"
@@ -42,13 +48,14 @@ RUN apt-get install --no-install-recommends -y wget git libmagic-dev gcc \
 RUN apt-get install --no-install-recommends -y libpq-dev patch
 RUN apt-get install --no-install-recommends -y postgresql-client mtr htop \
     vim
-RUN apt-get install --no-install-recommends -y python3-gevent \
-    software-properties-common imagemagick
-
+RUN apt-get install --no-install-recommends -y software-properties-common imagemagick
+#python3-gevent \
+    
 RUN apt-get install --no-install-recommends -y npm bzip2
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt-get update
 RUN apt-get install --no-install-recommends -y python3.7 python3.7-dev python3.7-distutils
+RUN apt-get install --no-install-recommends -y graphviz libgraphviz-dev pkg-config
 
 RUN ln -s /usr/bin/python3.7 /usr/bin/python 
     # ln -s /usr/bin/pip3 /usr/bin/pip
@@ -61,11 +68,12 @@ WORKDIR /app
 COPY requirements.txt ./
 #COPY git_history_recent ./
 RUN touch /app/rand_hash
-RUN python3.7 -m pip install --no-cache-dir -r requirements.txt \
+RUN python3.7 -m pip install --no-cache-dir -r requirements.txt
   # Update the Django <1.11 bug in django/contrib/gis/geos/libgeos.py
   # Reference: https://stackoverflow.com/questions/18643998/geodjango-geosexception-error
   # && sed -i -e "s/ver = geos_version().decode()/ver = geos_version().decode().split(' ')[0]/" /usr/local/lib/python2.7/dist-packages/django/contrib/gis/geos/libgeos.py \
-  && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/*
+  # && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/*
+RUN apt-get clean
 
 COPY libgeos.py.patch /app/
 RUN patch /usr/local/lib/python3.7/dist-packages/django/contrib/gis/geos/libgeos.py /app/libgeos.py.patch
@@ -98,7 +106,7 @@ RUN chmod 777 /app/tmp/
 COPY cron /etc/cron.d/dockercron
 COPY startup.sh /
 # Cron start
-RUN service rsyslog start
+#RUN service rsyslog start
 RUN chmod 0644 /etc/cron.d/dockercron
 RUN crontab /etc/cron.d/dockercron
 RUN touch /var/log/cron.log
@@ -108,6 +116,10 @@ RUN chmod 755 /startup.sh
 
 # IPYTHONDIR - Will allow shell_plus (in Docker) to remember history between sessions
 RUN export IPYTHONDIR=/app/logs/.ipython/
+
+# Health checks for kubernetes 
+RUN wget https://raw.githubusercontent.com/dbca-wa/wagov_utils/main/wagov_utils/bin/health_check.sh -O /bin/health_check.sh
+RUN chmod 755 /bin/health_check.sh
 
 EXPOSE 8080
 HEALTHCHECK --interval=1m --timeout=5s --start-period=10s --retries=3 CMD ["wget", "-q", "-O", "-", "http://localhost:8080/"]

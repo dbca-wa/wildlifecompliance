@@ -183,6 +183,7 @@ export const inspectionStore = {
         async saveInspection({ dispatch, state, rootGetters }, { create, internal }) {
             let inspectionId = null;
             let savedInspection = null;
+            var error = false;
             try {
                 let payload = new Object();
                 Object.assign(payload, state.inspection);
@@ -221,6 +222,7 @@ export const inspectionStore = {
                 inspectionId = savedInspection.body.id;
 
             } catch (err) {
+                error = true;
                 console.log(err);
                 if (internal) {
                     // return "There was an error saving the record";
@@ -230,16 +232,17 @@ export const inspectionStore = {
                 }
                 //return window.location.href = "/internal/inspection/";
                 //console.log(savedInspection);
+            } finally {
+                // internal arg used when file upload triggers record creation
+                if (internal && !error) {
+                    console.log("modal file create")
+                }
+                // update inspection
+                else if (!create && !error) {
+                    await swal("Saved", "The record has been saved", "success");
+                }
+                return savedInspection;
             }
-            // internal arg used when file upload triggers record creation
-            if (internal) {
-                console.log("modal file create")
-            }
-            // update inspection
-            else if (!create) {
-                await swal("Saved", "The record has been saved", "success");
-            }
-            return savedInspection;
         },
         
         setInspection({ commit, }, inspection) {

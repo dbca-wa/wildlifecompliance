@@ -180,11 +180,11 @@ export const applicationStore = {
                     dispatch('setOriginalApplication', res.body);
                     dispatch('setApplication', res.body);
                     dispatch('setApplication', {
-                        ...state.application,
-                        application_fee: res.body.adjusted_paid_amount.application_fee,
-                        licence_fee: res.body.adjusted_paid_amount.licence_fee,
-                        update_fee: false,
-                        assess: false,
+                       ...state.application,
+                       application_fee: res.body.adjusted_paid_amount.application_fee,
+                       licence_fee: res.body.adjusted_paid_amount.licence_fee,
+                       update_fee: false,
+                       assess: false,
                     });
                     for(let form_data_record of res.body.data) {
                         dispatch('setFormValue', {
@@ -216,14 +216,14 @@ export const applicationStore = {
         },
         revertApplication({ dispatch, commit, state }) {
             commit(UPDATE_APPLICATION, state.original_application);
-            dispatch('refreshAddresses');
+            //dispatch('refreshAddresses'); 
         },
         setOriginalApplication({ commit }, application) {
             commit(UPDATE_ORIGINAL_APPLICATION, application);
         },
         setApplication({ dispatch, commit }, application) {
             commit(UPDATE_APPLICATION, application);
-            dispatch('refreshAddresses');
+            //dispatch('refreshAddresses'); this would cause the organisation/proxy address to be removed from json response body, so has been commented out for now
         },
         refreshApplicationFees({ dispatch, state, getters, rootGetters }) {
             Vue.http.post('/api/application/estimate_price/', {

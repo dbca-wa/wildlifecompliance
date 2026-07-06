@@ -1,15 +1,13 @@
 <template lang="html">
     <div>
         <div class="form-group">
-            <label :id="id">{{ label }}</label>
+            <label :id="id" style="white-space: pre-line;">{{label}} <HelpTextUrl :help_text_url="help_text_url" /></label>
 
             <template v-if="help_text">
                 <HelpText :help_text="help_text" />
             </template>
 
-            <template v-if="help_text_url">
-                <HelpText :help_text_url="help_text_url" />
-            </template>
+            
      
             <template v-if="readonly">
                 <select v-if="!isMultiple" disabled ref="selectB" :id="selectid" :name="name" class="form-control" :data-conditions="cons" style="width:100%">

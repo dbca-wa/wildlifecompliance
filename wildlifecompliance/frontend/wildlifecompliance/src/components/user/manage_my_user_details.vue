@@ -30,15 +30,27 @@
                   <div class="panel-body collapse in" :id="pBody">
                       <form class="form-horizontal" name="personal_form" method="post">
                           <div class="form-group">
-                            <label for="" class="col-sm-3 control-label">Given name(s)</label>
+                            <label for="" class="col-sm-3 control-label"></label>
                             <div class="col-sm-6">
-                                <input type="text" class="form-control" name="first_name" placeholder="" v-model="current_user.first_name">
+                            <b>To update your account name please <a :href="current_user.sso_setting_url+'/sso/setting?back='+current_url">click here</a>:</b>
                             </div>
                           </div>
                           <div class="form-group">
-                            <label for="" class="col-sm-3 control-label" >Surname</label>
+                            <label for="" class="col-sm-3 control-label"></label>
                             <div class="col-sm-6">
-                                <input type="text" class="form-control" name="last_name" placeholder="" v-model="current_user.last_name">
+                            <i>Changes will not update until your next login.</i>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="" class="col-sm-3 control-label">Account Given name(s)</label>
+                            <div class="col-sm-6">
+                                <input disabled type="text" class="form-control" name="first_name" placeholder="" v-model="current_user.first_name">
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="" class="col-sm-3 control-label" >Account Surname</label>
+                            <div class="col-sm-6">
+                                <input disabled type="text" class="form-control" name="last_name" placeholder="" v-model="current_user.last_name">
                             </div>
                           </div>
                           <div class="form-group">
@@ -46,7 +58,8 @@
                             <div class="col-sm-6">
                                 <!-- <input type="date" class="form-control" name="dob" placeholder="" max="2100-12-31" v-model="current_user.dob"> -->
                                 <div class="input-group date" ref="dob" style="width: 100%;">
-                                    <input type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="current_user.dob">
+                                    <input v-if="!canUpdateDOB" disabled type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="current_user.legal_dob">
+                                    <input v-else type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="current_user.dob">
                                     <span class="input-group-addon">
                                         <span class="glyphicon glyphicon-calendar"></span>
                                     </span>
@@ -54,7 +67,19 @@
                             </div>
                           </div>
                           <div class="form-group">
-                            <div class="col-sm-12">
+                            <label for="" class="col-sm-3 control-label">Verified Given name(s)</label>
+                            <div class="col-sm-6">
+                                <input disabled type="text" class="form-control" name="legal_first_name" placeholder="" v-model="current_user.legal_first_name">
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="" class="col-sm-3 control-label" >Verified Surname</label>
+                            <div class="col-sm-6">
+                                <input disabled type="text" class="form-control" name="legal_last_name" placeholder="" v-model="current_user.legal_last_name">
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <div v-if="canUpdateDOB" class="col-sm-12">
                                 <button v-if="!updatingPersonal" class="pull-right btn btn-primary" @click.prevent="updatePersonal()">Update</button>
                                 <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
                             </div>
@@ -415,6 +440,9 @@ export default {
                 first_name: '',
                 last_name: '',
                 dob: '',
+                legal_first_name: '',
+                legal_last_name: '',
+                legal_dob: '',
                 wildlifecompliance_organisations:[],
                 residential_address : {}
             },
@@ -482,6 +510,12 @@ export default {
   
     },
     computed: {
+        current_url: function() {
+            return window.location.href;
+        },
+        canUpdateDOB: function() {
+            return (this.current_user.legal_dob === null || this.current_user.legal_dob === "")
+        },
         hasOrgs: function() {
             return this.current_user.wildlifecompliance_organisations && this.current_user.wildlifecompliance_organisations.length > 0 ? true: false;
         },
@@ -503,7 +537,9 @@ export default {
             if (this.current_user.is_compliance_management_approved_external_user) {
                 return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details;
             } else {
-                return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details && this.current_user.identification2;
+                //return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details && this.current_user.identification2 && this.current_user.identification2 != null;
+                return this.current_user.contact_details && this.current_user.personal_details && this.current_user.address_details;
+
             }
         },
     },
@@ -623,6 +659,7 @@ export default {
                     }).then(() => {
                         vm.updatingPersonal = false;
                         vm.current_user.personal_details = true;
+                        vm.current_user.personal_details = true;
                         if (vm.completedProfile) {
                             vm.$http.get(api_endpoints.user_profile_completed).then((response) => {
                             },(error) => {
@@ -732,7 +769,7 @@ export default {
                     return;
                 }
             }
-            vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,'existance'),JSON.stringify(this.newOrg),{
+            vm.$http.post(helpers.add_endpoint_json(api_endpoints.organisations,'existence'),JSON.stringify(this.newOrg),{
                 emulateJSON:true
             }).then((response) => {
                 this.newOrg.exists = response.body.exists;

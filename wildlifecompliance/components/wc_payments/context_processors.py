@@ -29,7 +29,8 @@ def commercialoperator_url(request):
         'SYSTEM_NAME' : settings.SYSTEM_NAME,
         'IS_OFFICER' : is_officer,
         'IS_ADMIN' : is_admin,
-        'IS_CUSTOMER' : is_customer
+        'IS_CUSTOMER' : is_customer,
+        'BASE_URL' : settings.SITE_URL,
         }
 
 

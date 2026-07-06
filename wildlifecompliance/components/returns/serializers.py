@@ -20,6 +20,10 @@ from wildlifecompliance.components.applications.models import (
 from wildlifecompliance.components.licences.models import LicenceActivity
 from rest_framework import serializers
 
+from wildlifecompliance.components.main.utils import (
+    get_first_name,
+    get_last_name,
+)
 
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
@@ -61,13 +65,17 @@ class ReturnConditionSerializer(serializers.ModelSerializer):
             'condition',
             'licence_activity',
             'return_type',)
-        readonly_fields = ('order', 'condition')
+        read_only_fields = ('order', 'condition')
 
     def get_due_date(self, obj):
         return obj.due_date.strftime('%d/%m/%Y') if obj.due_date else ''
 
 
 class EmailUserSerializer(serializers.ModelSerializer):
+
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
+
     class Meta:
         model = EmailUser
         fields = (
@@ -77,6 +85,12 @@ class EmailUserSerializer(serializers.ModelSerializer):
             'last_name',
             'title',
             'organisation')
+        
+    def get_first_name(self, obj):
+        return get_first_name(obj)
+    
+    def get_last_name(self, obj):
+        return get_last_name(obj)
 
 
 class ReturnSerializer(serializers.ModelSerializer):
@@ -307,7 +321,8 @@ class ReturnSerializer(serializers.ModelSerializer):
         ).order_by('-id').first()
         requests.append(request)
 
-        return ReturnRequestSerializer(requests, many=True).data
+        if request != None:
+            return ReturnRequestSerializer(requests, many=True).data
 
     def get_is_draft(self, _return):
         '''

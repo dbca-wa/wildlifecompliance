@@ -109,7 +109,7 @@ export default {
                         return this.canAssignOfficerFor(activity.id) && ok;
                     }
             );
-            return this.noActiveLicense ? this.licence_type_data.activity : visible_ids;
+            return visible_ids;
         },
         ok:function () {
             let vm =this;

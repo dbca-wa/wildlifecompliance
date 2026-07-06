@@ -42,7 +42,7 @@
                                 <div class="col-sm-7">
                                   <select class="form-control col-sm-9" v-on:change.prevent="sanction_outcome.region_id=$event.target.value; updateDistricts('updatefromUI')" v-bind:value="sanction_outcome.region_id">
                                     <option  v-for="option in regions" :value="option.id" v-bind:key="option.id">
-                                      {{ option.display_name }}
+                                      {{ option.name }}
                                     </option>
                                   </select>
                                 </div>
@@ -54,8 +54,8 @@
                                 </div>
                                 <div class="col-sm-7">
                                   <select class="form-control" v-model="sanction_outcome.district_id">
-                                    <option  v-for="option in availableDistricts" :value="option.id" v-bind:key="option.id">
-                                      {{ option.display_name }}
+                                    <option  v-for="option in availableDistricts" :value="option.district_id" v-bind:key="option.district_id">
+                                      {{ option.district_name }}
                                     </option>
                                   </select>
                                 </div>
@@ -294,7 +294,7 @@ export default {
         isModalOpen: false,
         processingDetails: false,
 
-        regionDistricts: [],
+        // regionDistricts: [],
         regions: [], // this is the list of options
         availableDistricts: [], // this is generated from the regionDistricts[] above
         documentActionUrl: null,
@@ -758,21 +758,15 @@ export default {
           }
 
           this.availableDistricts = []; // This is a list of options for district
-          for (let record of this.regionDistricts) {
-            if (this.sanction_outcome.region_id == record.id) {
-              for (let district_id of record.districts) {
-                for (let district_record of this.regionDistricts) {
-                  if (district_record.id == district_id) {
-                    this.availableDistricts.push(district_record);
-                  }
-                }
-              }
+          for (let region of this.regions) {
+            if (region.id == this.offence.region_id) {
+            this.availableDistricts = region.districts
             }
           }
 
           this.availableDistricts.splice(0, 0, {
-            id: "",
-            display_name: "",
+            district_id: "",
+            district_name: "",
             district: "",
             districts: [],
             region: null
@@ -873,23 +867,23 @@ export default {
         constructRegionsAndDistricts: async function() {
           let returned_regions = await cache_helper.getSetCacheList(
             "Regions",
-            "/api/region_district/get_regions/"
-          );
+            "/api/regions/"
+        );
           Object.assign(this.regions, returned_regions);
           // blank entry allows user to clear selection
           this.regions.splice(0, 0, {
             id: "",
-            display_name: "",
+            name: "",
             district: "",
             districts: [],
             region: null
           });
           // regionDistricts
-          let returned_region_districts = await cache_helper.getSetCacheList(
-            "RegionDistricts",
-            api_endpoints.region_district
-          );
-          Object.assign(this.regionDistricts, returned_region_districts);
+          // let returned_region_districts = await cache_helper.getSetCacheList(
+          //   "RegionDistricts",
+          //   api_endpoints.region_district
+          // );
+          // Object.assign(this.regionDistricts, returned_region_districts);
         },
         sendData: async function() {
             let vm = this;

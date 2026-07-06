@@ -27,7 +27,7 @@ class ReferrerAdmin(admin.ModelAdmin):
 
 @admin.register(models.CallEmail)
 class CallEmailAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('location', 'classification', 'call_type', 'wildcare_species_type', 'wildcare_species_sub_type', 'assigned_to', 'volunteer', 'report_type', 'email_user', 'allocated_group')
 
 
 #@admin.register(models.Classification)
@@ -44,8 +44,10 @@ class WildcareSpeciesTypeAdmin(admin.ModelAdmin):
     list_display = ['species_name', 'call_type']
     exclude = ['show_species_name_textbox',]
     form = forms.WildcareSpeciesTypeAdminForm
+    raw_id_fields = ('call_type',)
 
 @admin.register(models.WildcareSpeciesSubType)
 class WildcareSpeciesSubTypeAdmin(admin.ModelAdmin):
     list_display = ['species_sub_name', 'wildcare_species_type']
+    raw_id_fields = ('wildcare_species_type',)
 

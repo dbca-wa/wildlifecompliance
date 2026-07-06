@@ -293,6 +293,7 @@ export const legalCaseStore = {
         }) {
             let legalCaseId = null;
             let savedLegalCase = null;
+            var error = false;
             try {
                 let payload = new Object();
                 Object.assign(payload, state.legal_case);
@@ -363,6 +364,7 @@ export const legalCaseStore = {
                 delete state.legal_case.court_proceedings.journal_entries_transform
 
             } catch (err) {
+                error = true;
                 console.log(err);
                 if (internal) {
                     // return "There was an error saving the record";
@@ -370,14 +372,15 @@ export const legalCaseStore = {
                 } else {
                     await swal("Error", "There was an error saving the record", "error");
                 }
-            }
-            // internal arg used when file upload triggers record creation
-            if (internal) {
-                // pass
-            }
-            // update legal_case
-            else if (!create && !internal) {
-                await swal("Saved", "The record has been saved", "success");
+            } finally {
+                // internal arg used when file upload triggers record creation
+                if (internal) {
+                    // pass
+                }
+                // update legal_case
+                else if (!create && !internal && !error) {
+                    await swal("Saved", "The record has been saved", "success");
+                }
             }
         },
         setLegalCase({ commit, }, legal_case) {

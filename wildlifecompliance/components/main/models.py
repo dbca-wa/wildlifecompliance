@@ -11,10 +11,14 @@ from django.utils.encoding import python_2_unicode_compatible
 from ledger.accounts.models import EmailUser
 import os
 from django.utils.translation import ugettext_lazy as _
-
+from django.db.models import Q
 from wildlifecompliance.components.section_regulation.models import Act
 from wildlifecompliance.settings import SO_TYPE_CHOICES
 from smart_selects.db_fields import ChainedForeignKey
+
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
 
 logger = logging.getLogger(__name__)
 
@@ -225,7 +229,7 @@ class TemporaryDocument(Document):
     temp_document_collection = models.ForeignKey(
         TemporaryDocumentCollection,
         related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     # input_name = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
@@ -276,7 +280,7 @@ def update_sanction_outcome_word_filename(instance, filename):
 class SanctionOutcomeWordTemplate(models.Model):
     sanction_outcome_type = models.CharField(max_length=30, choices=SO_TYPE_CHOICES, blank=True,)
     act = models.CharField(max_length=30, choices=Act.NAME_CHOICES, blank=True,)
-    _file = models.FileField(upload_to=update_sanction_outcome_word_filename, max_length=255)
+    _file = models.FileField(upload_to=update_sanction_outcome_word_filename, max_length=255, storage=private_storage)
     uploaded_date = models.DateTimeField(auto_now_add=True, editable=False)
     description = models.TextField(blank=True, verbose_name='description', help_text='')
 
@@ -344,7 +348,7 @@ class ComplianceManagementSystemGroup(models.Model):
         return "{}, {}, {}".format(self.get_name_display(), self.region, self.district)
 
     def get_members(self):
-        return [perm.emailuser for perm in self.compliancemanagementsystemgrouppermission_set.all()]
+        return [perm.emailuser for perm in self.compliancemanagementsystemgrouppermission_set.exclude(emailuser=None)]
 
     def add_member(self, user):
         ComplianceManagementSystemGroupPermission.objects.create(group=self,emailuser=user)
@@ -360,20 +364,51 @@ class ComplianceManagementSystemGroupPermission(models.Model):
 
     def __str__(self):
         return str(self.group)
-
+    
+class GroupNotFoundError(Exception):
+    pass
 
 def get_group_members(workflow_type, region_id=None, district_id=None):
-    if workflow_type == 'forward_to_regions':
-        #return CallEmailTriageGroup.objects.get(region_id=region_id, district_id=district_id).members
-        return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_CALL_EMAIL_TRIAGE, region_id=region_id, district_id=district_id).get_members()
-    elif workflow_type == 'forward_to_wildlife_protection_branch':
-        return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_CALL_EMAIL_TRIAGE, region=Region.objects.get(head_office=True)).get_members()
-    #elif workflow_type == 'allocate_for_follow_up':
-    #    return OfficerGroup.objects.get(region_id=region_id, district_id=district_id).members
-    #elif workflow_type == 'allocate_for_inspection':
-    #    return OfficerGroup.objects.get(region_id=region_id, district_id=district_id).members
-    #elif workflow_type == 'allocate_for_case':
-    #    return OfficerGroup.objects.get(region_id=region_id, district_id=district_id).members
+    try:
+        
+        if workflow_type == 'forward_to_regions':
+            return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_CALL_EMAIL_TRIAGE, region_id=region_id, district_id=district_id).get_members()
+        elif workflow_type == 'forward_to_wildlife_protection_branch':
+            return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_CALL_EMAIL_TRIAGE, region=Region.objects.get(head_office=True)).get_members()
+        #for any allocations for case/inspection creation, only allow group members regardless of settings
+        elif (workflow_type == 'allocate_for_follow_up' or workflow_type == 'allocate_for_case'):
+            return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id).get_members()
+        elif workflow_type == 'allocate_for_inspection':
+            return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_INSPECTION_OFFICER, region_id=region_id, district_id=district_id).get_members()
+        else:
+            if not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED:
+                if (workflow_type == 'allocate_for_follow_up' or workflow_type == 'allocate_for_case'):
+                    id_list = ComplianceManagementSystemGroup.objects.filter(name=settings.GROUP_OFFICER).values_list("id",flat=True)
+                    return EmailUser.objects.filter(id__in=ComplianceManagementSystemGroupPermission.objects.filter(group__id__in=id_list).values_list("emailuser",flat=True))
+                elif workflow_type == 'allocate_for_inspection':
+                    id_list = ComplianceManagementSystemGroup.objects.filter(name=settings.GROUP_INSPECTION_OFFICER).values_list("id",flat=True)
+                    return EmailUser.objects.filter(id__in=ComplianceManagementSystemGroupPermission.objects.filter(group__id__in=id_list).values_list("emailuser",flat=True))
+            elif settings.SUPER_AUTH_GROUPS_ENABLED:
+                if (workflow_type == 'allocate_for_follow_up' or workflow_type == 'allocate_for_case'):
+                    id_list = ComplianceManagementSystemGroup.objects.filter(
+                        Q(name=settings.GROUP_OFFICER) &
+                        (Q(region_id=region_id) | Q(region_id=None))
+                    ).values_list("id",flat=True)
+                    return EmailUser.objects.filter(id__in=ComplianceManagementSystemGroupPermission.objects.filter(group__id__in=id_list).values_list("emailuser",flat=True))
+                elif workflow_type == 'allocate_for_inspection':
+                    id_list = ComplianceManagementSystemGroup.objects.filter(
+                        Q(name=settings.GROUP_INSPECTION_OFFICER) &
+                        (Q(region_id=region_id) | Q(region_id=None))
+                    ).values_list("id",flat=True)
+                    return EmailUser.objects.filter(id__in=ComplianceManagementSystemGroupPermission.objects.filter(group__id__in=id_list).values_list("emailuser",flat=True))
+            #else:
+            #    if (workflow_type == 'allocate_for_follow_up' or workflow_type == 'allocate_for_case'):
+            #        return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id).get_members()
+            #    elif workflow_type == 'allocate_for_inspection':
+            #        return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_INSPECTION_OFFICER, region_id=region_id, district_id=district_id).get_members()
+    except ComplianceManagementSystemGroup.DoesNotExist:
+        #raise GroupNotFoundError(f"Error: Group not found \n Please generate a group for the selected Region and District in admin settings")
+        return EmailUser.objects.none()
 
 
 import reversion

@@ -7,6 +7,9 @@ from django.contrib.postgres.fields.jsonb import JSONField
 from django.utils import timezone
 from ledger.accounts.models import EmailUser, RevisionedMixin
 from ledger.payments.invoice.models import Invoice
+from rest_framework import serializers
+
+from wildlifecompliance.helpers import is_internal
 from wildlifecompliance.components.applications.models import (
     ApplicationCondition,
     Application,
@@ -22,6 +25,10 @@ from wildlifecompliance.components.returns.email import (
 
 import logging
 import reversion
+
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
 
 logger = logging.getLogger(__name__)
 
@@ -205,12 +212,12 @@ class Return(models.Model):
     PROCESSING_STATUS_CHOICES = (
         (RETURN_PROCESSING_STATUS_DUE, 'Due'),
         (RETURN_PROCESSING_STATUS_OVERDUE, 'Overdue'),
-        (RETURN_PROCESSING_STATUS_DRAFT, 'Draft'),
+        (RETURN_PROCESSING_STATUS_DRAFT, 'Current'),
         (RETURN_PROCESSING_STATUS_FUTURE, 'Future'),
         (RETURN_PROCESSING_STATUS_WITH_CURATOR, 'With Curator'),
         (RETURN_PROCESSING_STATUS_ACCEPTED, 'Accepted'),
         (RETURN_PROCESSING_STATUS_PAYMENT, 'Awaiting Payment'),
-        (RETURN_PROCESSING_STATUS_DISCARDED, 'Discarded'),
+        (RETURN_PROCESSING_STATUS_DISCARDED, 'Expired'),
         (RETURN_PROCESSING_STATUS_EXPIRED, 'Expired'),
     )
 
@@ -228,11 +235,11 @@ class Return(models.Model):
     CUSTOMER_DISPLAYABLE_STATE = {
         RETURN_CUSTOMER_STATUS_DUE: 'Due',
         RETURN_CUSTOMER_STATUS_OVERDUE: 'Overdue',
-        RETURN_CUSTOMER_STATUS_DRAFT: 'Draft',
+        RETURN_CUSTOMER_STATUS_DRAFT: 'Current',
         RETURN_CUSTOMER_STATUS_FUTURE: 'Future Submission',
         RETURN_CUSTOMER_STATUS_UNDER_REVIEW: 'Under Review',
         RETURN_CUSTOMER_STATUS_ACCEPTED: 'Accepted',
-        RETURN_CUSTOMER_STATUS_DISCARDED: 'Discarded',
+        RETURN_CUSTOMER_STATUS_DISCARDED: 'Expired',
         RETURN_CUSTOMER_STATUS_PAYMENT: 'Awaiting Payment',
         RETURN_CUSTOMER_STATUS_EXPIRED: 'Expired',
     }
@@ -635,13 +642,46 @@ class Return(models.Model):
             return_table, created = ReturnTable.objects.get_or_create(
                 name=table_name, ret=self)
             return_table.save()
-            # delete any existing rows as they will all be recreated
-            return_table.returnrow_set.all().delete()
+
+            #get all rows from db
+            existing_rows = return_table.returnrow_set.all()
+
+            #get rows from request
             return_rows = [
                 ReturnRow(
                     return_table=return_table,
                     data=row) for row in table_rows]
 
+            #identify new rows from data
+            new_indexes = []
+            new_dict = {}
+            for i in table_rows:
+                if 'rowId' in i and 'date' in i:
+                    new_indexes.append("{}__{}".format(i['rowId'],i['date']))
+                    new_dict["{}__{}".format(i['rowId'],i['date'])] = i
+
+            #identify existing rows (via date and row id)
+            existing_indexes = []
+            existing_dict = {}
+            for i in existing_rows:
+                if i.data and 'rowId' in i.data and 'date' in i.data:
+                    existing_indexes.append("{}__{}".format(i.data['rowId'],i.data['date']))
+                    existing_dict["{}__{}".format(i.data['rowId'],i.data['date'])] = i.data
+
+            #raise error if an existing row is missing
+            for i in existing_indexes:
+                if not i in new_indexes:
+                    raise serializers.ValidationError("Return Table missing previously existing rows.")
+
+            #raise error if an existing row is set to change and the user is not internal
+            if not is_internal(request):
+                for i in new_indexes:
+                    if i in existing_dict:
+                        if new_dict[i] != existing_dict[i]:
+                            raise serializers.ValidationError("User not authorised to edit existing return rows.")
+
+            # delete any existing rows as they will all be recreated
+            existing_rows.delete()
             ReturnRow.objects.bulk_create(return_rows)
 
             # log transaction
@@ -907,7 +947,7 @@ class ReturnLogEntry(CommunicationsLogEntry):
 
 class ReturnLogDocument(Document):
     log_entry = models.ForeignKey('ReturnLogEntry', related_name='documents')
-    _file = models.FileField(upload_to=update_returns_comms_log_filename)
+    _file = models.FileField(upload_to=update_returns_comms_log_filename, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -948,6 +988,12 @@ class ReturnInvoice(models.Model):
             pass
         return False
 
+class ReturnReportHash(models.Model):
+
+    report_hash = models.CharField(max_length=64, unique=True)
+
+    class Meta:
+        app_label = 'wildlifecompliance'
 
 '''
 NOTE: REGISTER MODELS FOR REVERSION HERE.

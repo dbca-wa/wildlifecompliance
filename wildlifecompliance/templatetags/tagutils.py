@@ -12,3 +12,7 @@ def get_instance_type():
 def RAND_HASH():
     return settings.RAND_HASH
 
+@register.simple_tag()
+def COMPLIANCE_LINKS_ENABLED():
+    return settings.COMPLIANCE_LINKS_ENABLED
+

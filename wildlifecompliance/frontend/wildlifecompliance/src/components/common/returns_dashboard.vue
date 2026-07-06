@@ -186,16 +186,21 @@ export default {
             table.column(2).search(value).draw();
         },
         filterDueDateFrom: function(value){
-            this.dateSearch()
-            this.filterReturnStatus = 'All'
+            //this.dateSearch()
+            //this.filterReturnStatus = 'All'
+            this.visibleDatatable.vmDataTable.draw();
         },
         filterDueDateTo: function(value){
-            this.dateSearch()
+            //this.dateSearch()
+            this.visibleDatatable.vmDataTable.draw();
         },
     },
     computed: {
         is_external: function(){
             return this.level == 'external';
+        },
+        visibleDatatable: function() {
+            return this.$refs.return_datatable;
         },
     },
     methods:{

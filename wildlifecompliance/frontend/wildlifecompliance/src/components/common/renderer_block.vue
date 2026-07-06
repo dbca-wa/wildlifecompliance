@@ -169,18 +169,19 @@
 
         <LabelBlock v-if="component.type === 'label'"
             :value="component.label"
-            :id="element_id()"/>
+            :id="element_id()"
+            :help_text_url="help_text_url"/>
 
         <div class="form-group" v-if="component.type === 'radiobuttons'">
-            <label :id="element_id()" class="inline">{{component.label}}</label>
-                <HelpText :help_text="help_text"/>
-                <HelpTextUrl :help_text_url="help_text_url"/>
+            <label :id="element_id()" class="inline" style="white-space: pre-line;">{{component.label}} <HelpTextUrl :help_text_url="help_text_url"/></label>
+                
+                 <!-- <HelpText :help_text="help_text"/> -->
+                
                 <CommentBlock 
                     :label="component.label"
                     :name="component_name"
                     :field_data="value"
-                    />
-
+                    /> 
                 <Radio v-for="(option, index) in component.options"
                     :name="component_name"
                     :label="option.label"
@@ -192,7 +193,6 @@
                     :conditions="component.conditions"
                     :readonly="is_readonly"
                     v-bind:key="`radio_${component_name}_${index}`"/>
- 
                 <Conditions
                     :conditions="component.conditions"
                     :name="component_name"
@@ -251,7 +251,8 @@
             :docsUrl="documents_url"
             :application_id="application_id"
             :isRequired="component.isRequired"
-            :help_text_url="help_text_url"/>
+            :help_text_url="help_text_url"
+            :isTableField="isTableField"/>
 
         <DateField v-if="component.type === 'date'"
             :name="component_name"
@@ -261,7 +262,8 @@
             :readonly="is_readonly"
             :help_text="help_text"
             :isRequired="component.isRequired"
-            :help_text_url="help_text_url"/>
+            :help_text_url="help_text_url"
+            :isTableField="isTableField" />
 
         <GridBlock v-if="component.type === 'grid'"
             :name="component.name"
@@ -390,6 +392,10 @@ const RendererBlock = {
       instance: {
           type: String,
           default: null
+      },
+      isTableField:{
+        type: Boolean,
+        required: false
       }
   },
   computed: {

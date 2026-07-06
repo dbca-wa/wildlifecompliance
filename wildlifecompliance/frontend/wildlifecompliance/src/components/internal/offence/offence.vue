@@ -20,28 +20,14 @@
                                     {{ statusDisplay }}<br/>
                                 </div>
                             </div>
-
-                            <div v-if="offence.allocated_group" class="form-group">
-                            <div class="row">
-                                <div class="col-sm-12 top-buffer-s">
-                                <strong>Currently assigned to</strong><br/>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <select :disabled="!offence.user_in_group" class="form-control" v-model="offence.assigned_to_id" @change="updateAssignedToId()">
-                                        <option  v-for="option in offence.allocated_group" :value="option.id" v-bind:key="option.id">
-                                        {{ option.full_name }}
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                            </div>
-                            <div v-if="offence.user_in_group">
-                                <a @click="updateAssignedToId('current_user')" class="btn pull-right">
-                                    Assign to me
-                                </a>
-                            </div>
+                            <Assignment 
+                            :key="assignmentKey" 
+                            @update-assigned-to-id="updateAssignedToId" 
+                            :user_is_assignee="offence.user_is_assignee"
+                            :allowed_group_ids="offence.allowed_groups"
+                            :user_in_group="offence.user_in_group" 
+                            :assigned_to_id="offence.assigned_to_id" 
+                            :assign_url="assign_url"/>
                         </div>
                     </div>
                 </div>
@@ -321,6 +307,7 @@
 <script>
 import Vue from "vue";
 import FormSection from "@/components/forms/section_toggle.vue";
+import Assignment from "../assignment.vue";
 import datatable from '@vue-utils/datatable.vue'
 import utils from "../utils";
 import { api_endpoints, helpers, cache_helper } from "@/utils/hooks";
@@ -428,6 +415,11 @@ export default {
                 api_endpoints.offence,
                 this.$route.params.offence_id + "/action_log"
             ),
+            assign_url: helpers.add_endpoint_join(
+                api_endpoints.offence,
+                this.$route.params.offence_id + '/update_assigned_to_id/'
+            ),
+            assignmentKey: 0,
             dtHeadersOffender: [
                 "id",
                 "Individual/Organisation",
@@ -622,6 +614,7 @@ export default {
         RelatedItems,
         SanctionOutcome,
         FileField,
+        Assignment,
     },
     computed: {
         ...mapGetters('offenceStore', {
@@ -726,6 +719,7 @@ export default {
         ...mapActions('offenceStore', {
             loadOffenceVuex: 'loadOffence',
             saveOffence: 'saveOffence',
+            setOffence: 'setOffence',
             setAssignedToId: 'setAssignedToId',
             setCanUserAction: 'setCanUserAction',
             setRelatedItems: 'setRelatedItems',
@@ -865,25 +859,14 @@ export default {
             }
             await swal("Error", errorText, "error");
         },
-        updateAssignedToId: async function (user) {
-            let url = helpers.add_endpoint_join(api_endpoints.offence, this.offence.id + '/update_assigned_to_id/');
-            let payload = null;
-            if (user === 'current_user' && this.offence.user_in_group) {
-                payload = {'current_user': true};
-            } else if (user === 'blank') {
-                payload = {'blank': true};
-            } else {
-                payload = { 'assigned_to_id': this.offence.assigned_to_id };
-            }
-            let res = await Vue.http.post(
-                url,
-                payload
-            );
-            this.setAssignedToId(res.body.assigned_to_id);
-            this.setCanUserAction(res.body.can_user_action);
+        updateAssignedToId: async function (body) {
+            //this.setAssignedToId(body.assigned_to_id);
+            //this.setCanUserAction(body.can_user_action);
+            this.setOffence(body);
             this.constructOffendersTable();
             this.constructAllegedOffencesTable();
             this.updateObjectHash();
+            this.assignmentKey += 1;
         },
         openSanctionOutcome: async function() {
             try {

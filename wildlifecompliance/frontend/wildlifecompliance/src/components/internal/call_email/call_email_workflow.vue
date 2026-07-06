@@ -420,13 +420,13 @@ export default {
               id: "", 
               name: "",
             });
-    },
-    mounted: function() {
-        this.form = document.forms.forwardForm;
         this.$nextTick(async() => {
             this.addEventListeners();
             await this.updateAllocatedGroup();
         });
+    },
+    mounted: function() {
+        this.form = document.forms.forwardForm;
     }
 };
 </script>

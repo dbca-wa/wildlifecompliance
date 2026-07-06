@@ -46,34 +46,57 @@
                                   <div class="panel-body collapse in" :id="pdBody">
                                       <form class="form-horizontal" name="personal_form" method="post">
                                           <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Given Name(s)</label>
+                                            <label for="" class="col-sm-3 control-label">Account Given Name(s)</label>
                                             <div class="col-sm-6">
-                                                <input type="text" class="form-control" name="first_name" placeholder="" v-model="user.first_name">
+                                                <input disabled type="text" class="form-control" name="first_name" placeholder="" v-model="user.first_name">
                                             </div>
                                           </div>
                                           <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label">Last Name</label>
+                                            <label for="" class="col-sm-3 control-label">Account Last Name</label>
                                             <div class="col-sm-6">
-                                                <input type="text" class="form-control" name="last_name" placeholder="" v-model="user.last_name">
+                                                <input disabled type="text" class="form-control" name="last_name" placeholder="" v-model="user.last_name">
                                             </div>
                                           </div>
                                           <div class="form-group">
-                                            <label for="" class="col-sm-3 control-label" >Date of Birth</label>
+                                            <label for="" class="col-sm-3 control-label" >Account Date of Birth</label>
                                             <div class="col-sm-6">
                                                 <div class="input-group date" ref="dob" style="width: 100%;">
-                                                    <input type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="user.dob">
-                                                    <span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>
+                                                    <input disabled type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="user.dob">
                                                 </div>
                                             </div>
                                           </div>
                                           <div class="form-group">
+                                            <label for="" class="col-sm-3 control-label">Verified Given Name(s)</label>
+                                            <div class="col-sm-6">
+                                                <input disabled type="text" class="form-control" name="first_name" placeholder="" v-model="user.legal_first_name">
+                                            </div>
+                                          </div>
+                                          <div class="form-group">
+                                            <label for="" class="col-sm-3 control-label">Verified Last Name</label>
+                                            <div class="col-sm-6">
+                                                <input disabled type="text" class="form-control" name="last_name" placeholder="" v-model="user.legal_last_name">
+                                            </div>
+                                          </div>
+                                          <div class="form-group">
+                                            <label for="" class="col-sm-3 control-label" >Verified Date of Birth</label>
+                                            <div class="col-sm-6">
+                                                <div class="input-group date" ref="dob" style="width: 100%;">
+                                                    <input disabled type="text" class="form-control" name="dob" placeholder="DD/MM/YYYY" v-model="user.legal_dob">
+                                                </div>
+                                            </div>
+                                          </div>
+                                          <div class="form-group">
+                                            <label for="" class="col-sm-3 control-label"></label>
+                                            <div class="col-sm-6">
+                                            <b>To update this account please <a class="btn btn-primary" target="_blank" :href="user.acc_mgmt_url">click here</a></b>
+                                            </div>
+                                          </div>
+                                          <!--<div class="form-group">
                                             <div class="col-sm-12">
                                                 <button v-if="!updatingPersonal" class="pull-right btn btn-primary" @click.prevent="updatePersonal()">Update</button>
                                                 <button v-else disabled class="pull-right btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Updating</button>
                                             </div>
-                                          </div>
+                                          </div>-->
                                        </form>
                                   </div>
                                 </div>
@@ -323,9 +346,9 @@ export default {
             activate_tables: false,
             comms_url: helpers.add_endpoint_json(api_endpoints.users,vm.$route.params.user_id+'/comms_log'),
             logs_url: helpers.add_endpoint_json(api_endpoints.users,vm.$route.params.user_id+'/action_log'),
-            applications_url: api_endpoints.applications_paginated+'internal_datatable_list?user_id='+vm.$route.params.user_id,
-            licences_url: api_endpoints.licences_paginated+'internal_datatable_list?user_id='+vm.$route.params.user_id,
-            returns_url: api_endpoints.returns_paginated+'user_datatable_list?user_id='+vm.$route.params.user_id,
+            applications_url: api_endpoints.applications_paginated+'internal_datatable_list?format=datatables&user_id='+vm.$route.params.user_id,
+            licences_url: api_endpoints.licences_paginated+'internal_datatable_list?format=datatables&user_id='+vm.$route.params.user_id,
+            returns_url: api_endpoints.returns_paginated+'user_datatable_list?format=datatables&user_id='+vm.$route.params.user_id,
             orgRequest_pending: [],
             datepickerOptions:{
                 format: 'DD/MM/YYYY',

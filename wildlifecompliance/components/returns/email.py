@@ -49,6 +49,10 @@ class ReturnInvoiceNotificationEmail(TemplateEmailBase):
     txt_template = \
         'wildlifecompliance/emails/send_return_invoice_notification.txt'
 
+class ReturnInvoiceNotificationEmail(TemplateEmailBase):
+    subject = 'Attached: Return Totals Report'
+    html_template = 'wildlifecompliance/emails/send_return_count_report.html'
+    txt_template = 'wildlifecompliance/emails/send_return_count_report.txt'
 
 def send_return_accept_email_notification(return_obj, request):
     email = ReturnAcceptNotificationEmail()

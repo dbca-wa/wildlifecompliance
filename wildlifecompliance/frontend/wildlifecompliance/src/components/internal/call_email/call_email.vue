@@ -104,7 +104,7 @@
                           </div>
                         </div>
                         <!-- Following 3 actions are temporarily commented out  -->
-                        <!--div v-if="statusId ==='open' && canUserAction" class="row action-button">
+                        <div v-if="statusId ==='open' && canUserAction" class="row action-button">
                           <div class="col-sm-12">
                                 <a ref="allocateForFollowUp" @click="addWorkflow('allocate_for_follow_up')" class="btn btn-primary btn-block" >
                                   Allocate for Follow Up
@@ -124,7 +124,7 @@
                                   Allocate for Case
                                 </a>
                           </div>
-                        </div-->
+                        </div>
                         <div v-if="closeButtonVisibility && canUserAction" class="row action-button">
                           <div class="col-sm-12">
                                 <a ref="close" @click="addWorkflow('close')" class="btn btn-primary btn-block">
@@ -616,7 +616,7 @@ export default {
       referrersSelected: [],
       //allocated_group: [],
       current_schema: [],
-      regionDistricts: [],
+      // regionDistricts: [],
       reportAdviceUrl: '',
       sectionLabel: "Details",
       sectionIndex: 1,
@@ -1274,11 +1274,11 @@ export default {
     }
 
     // regionDistricts
-    let returned_region_districts = await cache_helper.getSetCacheList(
-      'RegionDistricts', 
-      api_endpoints.region_district
-      );
-    Object.assign(this.regionDistricts, returned_region_districts);
+    // let returned_region_districts = await cache_helper.getSetCacheList(
+    //   'RegionDistricts', 
+    //   api_endpoints.region_district
+    //   );
+    // Object.assign(this.regionDistricts, returned_region_districts);
     
     // Apply current timestamp to date and time of call
     if (!this.call_email.date_of_call && this.call_email.can_user_edit_form) {

@@ -1,12 +1,12 @@
 import traceback
 from django.db.models import Q
 from django.core.exceptions import ValidationError
-from rest_framework import viewsets, serializers
+from rest_framework import viewsets, serializers, mixins
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
 from datetime import datetime, timedelta
 import pytz
-from wildlifecompliance.helpers import is_customer, is_internal
+from wildlifecompliance.helpers import is_customer, is_internal, is_wildlife_compliance_officer
 from wildlifecompliance.components.licences.services import LicenceService
 from wildlifecompliance.components.licences.models import (
     WildlifeLicence,
@@ -30,6 +30,8 @@ from wildlifecompliance.components.applications.models import (
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 from rest_framework_datatables.filters import DatatablesFilterBackend
 from rest_framework_datatables.renderers import DatatablesRenderer
+from django.db.models import CharField, Value, Case, When
+from django.db.models.functions import Concat
 
 
 class LicenceFilterBackend(DatatablesFilterBackend):
@@ -52,75 +54,133 @@ class LicenceFilterBackend(DatatablesFilterBackend):
             # search_text filter, join all custom search columns
             # where ('searchable: false' in the datatable definition)
             if search_text:
-                search_text = search_text.lower()
+                search_text = search_text.lower().strip()
                 # join queries for the search_text search
                 search_text_licence_ids = []
-                for wildlifelicence in queryset:
-                    if (search_text in wildlifelicence.current_application.licence_category.lower()
-                        or search_text in wildlifelicence.current_application.applicant.lower()
-                    ):
-                        search_text_licence_ids.append(wildlifelicence.id)
-                    # if applicant is not an organisation, also search against the user's email address
-                    if (wildlifelicence.current_application.applicant_type == Application.APPLICANT_TYPE_PROXY and
-                        search_text in wildlifelicence.current_application.proxy_applicant.email.lower()):
-                            search_text_licence_ids.append(wildlifelicence.id)
-                    if (wildlifelicence.current_application.applicant_type == Application.APPLICANT_TYPE_SUBMITTER and
-                        search_text in wildlifelicence.current_application.submitter.email.lower()):
-                            search_text_licence_ids.append(wildlifelicence.id)
-                # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
-                # (otherwise they will filter on top of each other)
+                search_text_licence_ids = WildlifeLicence.objects.annotate(
+                    applicant_name=Case(
+                        When(
+                            current_application__proxy_applicant__isnull=False,
+                            then=Concat(
+                                'current_application__proxy_applicant__first_name',
+                                Value(' '),
+                                'current_application__proxy_applicant__last_name',
+                                Value(''),
+                            )
+                        ),
+                        default=Concat(
+                            'current_application__submitter__first_name',
+                            Value(' '),
+                            'current_application__submitter__last_name',
+                            Value(''),
+                        ),
+                        output_field=CharField(),
+                    )
+                ).filter(
+                Q(applicant_name__icontains=search_text) |
+                Q(current_application__submitter__email__icontains=search_text) |
+                Q(current_application__submitter__first_name__icontains=search_text) |
+                Q(current_application__submitter__first_name__icontains=search_text) |
+                Q(current_application__proxy_applicant__email__icontains=search_text) |
+                Q(current_application__proxy_applicant__first_name__icontains=search_text) |
+                Q(current_application__proxy_applicant__last_name__icontains=search_text) |
+                Q(current_application__org_applicant__organisation__name__icontains=search_text)
+                ).values('id')
+
+                # # use pipe to join both custom and built-in DRF datatables querysets (returned by super call above)
+                # # (otherwise they will filter on top of each other)
                 queryset = queryset.filter(id__in=search_text_licence_ids).distinct() | super_queryset
 
             # apply user selected filters
             category_name = category_name.lower() if category_name else 'all'
             if category_name != 'all':
-                category_name_licence_ids = []
-                for wildlifelicence in queryset:
-                    if category_name in wildlifelicence.current_application.licence_category_name.lower():
-                        category_name_licence_ids.append(wildlifelicence.id)
-                queryset = queryset.filter(id__in=category_name_licence_ids)
+                #category_name_licence_ids = []
+                #for wildlifelicence in queryset:
+                #    if category_name in wildlifelicence.current_application.licence_category_name.lower():
+                #        category_name_licence_ids.append(wildlifelicence.id)
+                #queryset = queryset.filter(id__in=category_name_licence_ids)
+                queryset = queryset.filter(licence_category__name__iexact=category_name)
+
+            #TODO: prior to fix the date filters did not work due to an uncaught nonetype error (fixed in the commented code)
+            #however, even when fixed the filter a) excluded surrendered licences and b) took far too long (recorded for as long as 5 minutes!)
+            #the current implementation does not exclude surrendered records and loads in <1s
+            #however, the displayed issue date does not always match what is filtered in some cases - what is displayed/filtered will need review
             if date_from:
-                date_from_licence_ids = []
-                for wildlifelicence in queryset:
-                    # Order the queryset 'from' by issue date licence purpose.
-                    # if (pytz.timezone('utc').localize(datetime.strptime(date_from, '%Y-%m-%d'))
-                    #         <= wildlifelicence.current_activities.order_by('-issue_date').first().issue_date):
-                    #             date_from_licence_ids.append(wildlifelicence.id)
-                    _date_from = pytz.timezone('utc').localize(
+                _date_from = pytz.timezone('utc').localize(
                         datetime.strptime(date_from, '%Y-%m-%d'))
-
-                    _issue_date = wildlifelicence.current_activities.first(
-                        ).get_issue_date()
-
-                    if _date_from <= _issue_date:
-                        date_from_licence_ids.append(wildlifelicence.id)
-
-                queryset = queryset.filter(id__in=date_from_licence_ids)
+                queryset = queryset.filter(current_application__selected_activities__proposed_purposes__issue_date__gte=_date_from)                   
+                #date_from_licence_ids = []
+                #for wildlifelicence in queryset:
+                #    print("licence activities")
+                #    print(wildlifelicence.current_application)
+                #    # Order the queryset 'from' by issue date licence purpose.
+                #    # if (pytz.timezone('utc').localize(datetime.strptime(date_from, '%Y-%m-%d'))
+                #    #         <= wildlifelicence.current_activities.order_by('-issue_date').first().issue_date):
+                #    #             date_from_licence_ids.append(wildlifelicence.id)
+                #    _date_from = pytz.timezone('utc').localize(
+                #        datetime.strptime(date_from, '%Y-%m-%d'))
+                #    
+                #    if (wildlifelicence.current_activities.count()):
+                #        _issue_date = wildlifelicence.current_activities.first(
+                #            ).get_issue_date()
+#
+                #        if _issue_date and _date_from <= _issue_date:
+                #            date_from_licence_ids.append(wildlifelicence.id)
+#
+                #queryset = queryset.filter(id__in=date_from_licence_ids)
+                
             if date_to:
-                date_to_licence_ids = []
-                for wildlifelicence in queryset:
-                    # Order the queryset 'to' by issue date on licence purpose.
-                    # if (pytz.timezone('utc').localize(datetime.strptime(date_to, '%Y-%m-%d')) + timedelta(days=1)
-                    #         >= wildlifelicence.current_activities.order_by('-issue_date').first().issue_date):
-                    #             date_to_licence_ids.append(wildlifelicence.id)
-                    _date_to = pytz.timezone('utc').localize(
+
+                _date_to = pytz.timezone('utc').localize(
                         datetime.strptime(date_to, '%Y-%m-%d')
                         ) + timedelta(days=1)
-
-                    _issue_date = wildlifelicence.current_activities.first(
-                         ).get_issue_date()
-
-                    if _date_to >= _issue_date:
-                        date_to_licence_ids.append(wildlifelicence.id)
-
-                queryset = queryset.filter(id__in=date_to_licence_ids)
+                queryset = queryset.filter(current_application__selected_activities__proposed_purposes__issue_date__lte=_date_to)   
+                #date_to_licence_ids = []
+                #for wildlifelicence in queryset:
+                #    # Order the queryset 'to' by issue date on licence purpose.
+                #    # if (pytz.timezone('utc').localize(datetime.strptime(date_to, '%Y-%m-%d')) + timedelta(days=1)
+                #    #         >= wildlifelicence.current_activities.order_by('-issue_date').first().issue_date):
+                #    #             date_to_licence_ids.append(wildlifelicence.id)
+                #    _date_to = pytz.timezone('utc').localize(
+                #        datetime.strptime(date_to, '%Y-%m-%d')
+                #        ) + timedelta(days=1)
+#
+                #    if (wildlifelicence.current_activities.count()):
+                #        _issue_date = wildlifelicence.current_activities.first(
+                #            ).get_issue_date()
+#
+                #        if _issue_date and _date_to >= _issue_date:
+                #            date_to_licence_ids.append(wildlifelicence.id)
+#
+                #queryset = queryset.filter(id__in=date_to_licence_ids)
             holder = holder.lower() if holder else 'all'
             if holder != 'all':
-                holder_licence_ids = []
-                for wildlifelicence in queryset:
-                    if holder in wildlifelicence.current_application.applicant.lower():
-                        holder_licence_ids.append(wildlifelicence.id)
-                queryset = queryset.filter(id__in=holder_licence_ids)
+                #holder_licence_ids = []
+                #for wildlifelicence in queryset:
+                #    if holder in wildlifelicence.current_application.applicant.lower():
+                #        holder_licence_ids.append(wildlifelicence.id)
+                #queryset = queryset.filter(id__in=holder_licence_ids)
+                queryset = queryset.annotate(
+                    applicant_name=Case(
+                        When(
+                            current_application__proxy_applicant__isnull=False,
+                            then=Concat(
+                                'current_application__proxy_applicant__first_name',
+                                Value(' '),
+                                'current_application__proxy_applicant__last_name',
+                                Value(''),
+                            )
+                        ),
+                        default=Concat(
+                            'current_application__submitter__first_name',
+                            Value(' '),
+                            'current_application__submitter__last_name',
+                            Value(''),
+                        ),
+                        output_field=CharField(),
+                    )
+                ).filter(Q(applicant_name__iexact=holder)
+                |Q(current_application__org_applicant__organisation__name__iexact=holder))
 
         # override queryset ordering, required because the ordering is usually handled
         # in the super call, but is then clobbered by the custom queryset joining above
@@ -143,10 +203,10 @@ class LicenceRenderer(DatatablesRenderer):
         return super(LicenceRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class LicencePaginatedViewSet(viewsets.ModelViewSet):
+class LicencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (LicenceFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (LicenceRenderer,)
+    #renderer_classes = (LicenceRenderer,)
     queryset = WildlifeLicence.objects.none()
     serializer_class = DTExternalWildlifeLicenceSerializer
     page_size = 10
@@ -159,11 +219,11 @@ class LicencePaginatedViewSet(viewsets.ModelViewSet):
             processing_status__in=[
                 ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED,
                 ApplicationSelectedActivity.PROCESSING_STATUS_OFFICER_FINALISATION])
-        if is_internal(self.request):
+        if is_wildlife_compliance_officer(self.request):
             return WildlifeLicence.objects.filter(
                 current_application__in=asa_accepted.values_list(
                     'application_id', flat=True))
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             return WildlifeLicence.objects.filter(
@@ -175,7 +235,6 @@ class LicencePaginatedViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['GET', ])
     def internal_datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = DTInternalWildlifeLicenceSerializer
         queryset = self.get_queryset()
         # Filter by org
         org_id = request.GET.get('org_id', None)
@@ -197,14 +256,12 @@ class LicencePaginatedViewSet(viewsets.ModelViewSet):
                 Q(current_application__submitter=user_id)
             )
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTInternalWildlifeLicenceSerializer(result_page, context={'request': request}, many=True)
         return self.paginator.get_paginated_response(serializer.data)
 
     @list_route(methods=['GET', ])
     def external_datatable_list(self, request, *args, **kwargs):
-        self.serializer_class = DTExternalWildlifeLicenceSerializer
         # Filter for WildlifeLicence objects that have a current application linked with an
         # ApplicationSelectedActivity that has been ACCEPTED
         user_orgs = [
@@ -232,14 +289,13 @@ class LicencePaginatedViewSet(viewsets.ModelViewSet):
         if submitter_id:
             queryset = queryset.filter(current_application__submitter_id=submitter_id)
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTExternalWildlifeLicenceSerializer(result_page, context={'request': request}, many=True)
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class LicenceViewSet(viewsets.ModelViewSet):
-    queryset = WildlifeLicence.objects.all()
+class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    queryset = WildlifeLicence.objects.none()
     serializer_class = DTExternalWildlifeLicenceSerializer
 
     def get_queryset(self):
@@ -248,10 +304,10 @@ class LicenceViewSet(viewsets.ModelViewSet):
         # ApplicationSelectedActivity that has been ACCEPTED
         asa_accepted = ApplicationSelectedActivity.objects.filter(
             processing_status=ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED)
-        if is_internal(self.request):
+        if is_wildlife_compliance_officer(self.request):
             return WildlifeLicence.objects.filter(
                 current_application__in=asa_accepted.values_list('application_id', flat=True))
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             user_orgs = [
                 org.id for org in user.wildlifecompliance_organisations.all()]
             return WildlifeLicence.objects.filter(
@@ -260,6 +316,26 @@ class LicenceViewSet(viewsets.ModelViewSet):
                 Q(current_application__submitter=user)
             ).filter(current_application__in=asa_accepted.values_list('application_id', flat=True))
         return WildlifeLicence.objects.none()
+    
+    #TODO:  this method and others like it should be reviewed - the error handling should be more graceful
+    def get_serializer_class(self):
+        try:
+            licence = self.get_object()
+            return DTExternalWildlifeLicenceSerializer
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        except ValidationError as e:
+            if hasattr(e,'error_dict'):
+                raise serializers.ValidationError(repr(e.error_dict))
+            else:
+                if hasattr(e,'message'):
+                    raise serializers.ValidationError(e.message)
+        except AssertionError as e:
+            raise serializers.ValidationError(str(e))
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError(str(e))
 
     def list(self, request, pk=None, *args, **kwargs):
         queryset = self.get_queryset()
@@ -301,6 +377,7 @@ class LicenceViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    #TODO should external users be able to request an inspection on their own licence? Not a high risk, but odd
     @detail_route(methods=['POST', ])
     def add_licence_inspection(self, request, pk=None, *args, **kwargs):
         try:
@@ -698,7 +775,13 @@ class LicenceViewSet(viewsets.ModelViewSet):
             licence_history_id = request.query_params['licence_history_id']
 
             if licence_history_id != '0':
-                instance = WildlifeLicence.objects.get(id=licence_history_id)
+
+                queryset = self.get_queryset()
+                try:
+                    instance = queryset.get(id=licence_history_id)
+                except:
+                    raise serializers.ValidationError("Licence History not available")
+                
                 qs = instance.get_document_history()
 
             serializer = LicenceDocumentHistorySerializer(qs, many=True)
@@ -714,17 +797,29 @@ class LicenceViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-class LicenceCategoryViewSet(viewsets.ModelViewSet):
-    queryset = LicenceCategory.objects.all()
+class LicenceCategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = LicenceCategory.objects.none()
     serializer_class = LicenceCategorySerializer
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated():
+            return LicenceCategory.objects.all()
+        return LicenceCategory.objects.none()
 
-class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ModelViewSet):
+
+class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ReadOnlyModelViewSet):
     # Filters to only return purposes that are
     # available for selection when applying for
     # a new application
-    queryset = LicenceCategory.objects.all()
+    queryset = LicenceCategory.objects.none()
     serializer_class = LicenceCategorySerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated():
+            return LicenceCategory.objects.all()
+        return LicenceCategory.objects.none()
 
     def list(self, request, *args, **kwargs):
         """

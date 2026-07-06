@@ -422,6 +422,7 @@ export const callemailStore = {
                 //return window.location.href = "/internal/call_email/";
             }
             if (crud === 'duplicate') {
+                console.log("hello???")
                 return window.location.href = "/internal/call_email/" + callId;
             }
             else if (crud !== 'create') {

@@ -10,6 +10,14 @@
                         </li>
                     </ul>
                 </div>
+                <div id="error" v-if="incorrect_entry.length > 0" style="margin: 10px; padding: 5px; color: red; border:1px solid red;">
+                    <b>Error in Quantity</b>
+                    <ul>
+                        <li v-for="error in incorrect_entry">
+                            {{ error.message }}
+                        </li>
+                    </ul>
+                </div>
                 <div class="row">
                 <form class="form-horizontal" name="sheetEntryForm">
                     <alert :show.sync="showError" type="danger"><strong>{{errorString}}</strong></alert>
@@ -36,7 +44,7 @@
                             </div>
                             <div class="col-md-6">
                               <div class="input-group date" ref="activityDateToPicker" name="activityDateToPicker" required="true">
-                                  <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="entryActivityDate">
+                                  <input type="text" class="form-control" placeholder="DD/MM/YYYY" v-model="entryActivityDate" id="entryActivityDate">
                                   <span class="input-group-addon">
                                       <span class="glyphicon glyphicon-calendar"></span>
                                   </span>
@@ -48,7 +56,7 @@
                                 <label class="control-label pull-left" >Quantity:</label>
                             </div>
                             <div class="col-md-3">
-                                <input type='text' v-model='entryQty' >
+                                <input type='number' v-model='entryQty' >
                             </div>
                         </div>
                         <div class="row">
@@ -170,6 +178,7 @@ export default {
             allowInputToggle:true
         },
         missing_fields: [],
+        incorrect_entry: [],
       }
     },
     watch: {
@@ -242,8 +251,10 @@ export default {
         const self = this;
 
         let is_valid = await this.validateMissingFields();
+        let is_correct = await this.validateUserEntries();
 
-        if (!is_valid){
+
+        if (!is_valid | !is_correct){
           return
         }
 
@@ -325,6 +336,13 @@ export default {
           const missing_field = {
             label: 'Activity Date',
             name: 'activityDateToPicker',
+          }
+          this.missing_fields.push(missing_field)
+          is_valid = false;
+        }
+        if (this.entryActivity === '0') {
+          const missing_field = {
+            label: 'Activity',
           }
           this.missing_fields.push(missing_field)
           is_valid = false;
@@ -470,8 +488,11 @@ export default {
 
               if (this.isStock(self.entryActivity)) { // Initial Stock entries aggregate from Current Stock.
                   rows[i].total = parseInt(rows[i].total) + (parseInt(self.entryQty) - parseInt(self.currentStock));
-              } else {
+              } else if (self.entryActivity.includes('in') ) {
                   rows[i].total = parseInt(rows[i].total) + (parseInt(self.entryQty) - parseInt(self.initialQty))
+              }
+              else if (self.entryActivity.includes('out')) {
+                  rows[i].total = parseInt(rows[i].total) - (parseInt(self.entryQty) - parseInt(self.initialQty))
               }
           }
         }
@@ -519,20 +540,43 @@ export default {
                 }
             });
        },
+       validateUserEntries: async function(){
+        let is_correct = true
+
+        this.incorrect_entry.length = 0;
+        await this.highlightMissingFields();
+
+        if (this.entryQty < 0) {
+          const incorrect_entry = {
+            label: 'Re-enter Quantity',
+            message: 'Please enter a positive number for Quantity.',
+          }
+          this.incorrect_entry.push(incorrect_entry)
+          is_correct = false;
+        }
+        if (this.entryActivity.includes('out') && (parseInt(this.currentStock) - parseInt(this.entryQty)) < 0) {
+          const incorrect_entry = {
+            label: 'Incorrect Quantity',
+            message: 'Please enter Quantity less than or equal to Current Stock.'
+          }
+          this.incorrect_entry.push(incorrect_entry)
+          is_correct = false;
+        }
+        this.highlightMissingFields();
+        var top = ($('#error').offset() || { "top": NaN }).top;
+        $('html, body').animate({
+            scrollTop: top
+        }, 1);        
+
+        return is_correct;
+      }, 
       //Initialise Date Picker
       initDatePicker: function() {
         const vm = this;
         $(vm.$refs.activityDateToPicker).datetimepicker(vm.datepickerOptions);
-        $(vm.$refs.activityDateToPicker).on('dp.change', function(e){
-            if ($(vm.$refs.activityDateToPicker).data('DateTimePicker') && $(vm.$refs.activityDateToPicker).data('DateTimePicker').date()) {
-                vm.entryActivityDate =  e.date.format('DD/MM/YYYY');
-            }
-            else if ($(vm.$refs.activityDateToPicker).data('date') === "") {
-                vm.entryActivityDate = "";
-            }
+        $('#entryActivityDate').blur(function(e){
+            vm.entryActivityDate =  $(this).val();
           });
-
-
       }
     },
     mounted: function() {

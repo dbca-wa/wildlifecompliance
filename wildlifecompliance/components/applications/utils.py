@@ -616,3 +616,22 @@ class ActivitySchemaUtil(object):
         iterate_children(schema_group)
 
         return schema_group
+
+def get_application_applicant_address(application):
+
+    try:
+        if application.applicant_type \
+                == application.APPLICANT_TYPE_ORGANISATION:
+            address = application.org_applicant.address
+        elif application.applicant_type == application.APPLICANT_TYPE_PROXY:
+            address = application.proxy_applicant.residential_address
+        else:
+            # applic.applicant_type == application.APPLICANT_TYPE_SUBMITTER
+            address = application.submitter.residential_address
+
+        if address:
+            return True
+        else:
+            return False
+    except:
+        return False

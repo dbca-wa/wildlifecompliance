@@ -49,6 +49,24 @@
 
         <!-- End template for Return Tab -->
 
+        <div v-show="showSaveAndContinueButton" class="row" style="margin-bottom:50px;">
+            <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <p class="pull-right" style="margin-top:5px;">
+                            <button v-if="spinner_exit" style="width:150px;" disabled class="btn btn-primary btn-md"><i class="fa fa-spin fa-spinner"></i>&nbsp;Saving</button>
+                            <button v-else-if="!spinner_exit && disable_exit" style="width:150px;" disabled class="btn btn-primary btn-md" name="save_exit">Save and Exit</button>
+                            <button v-else style="width:150px;" class="btn btn-primary btn-md" @click.prevent="saveandcontinue(false)" name="save_exit">Save and Exit</button>
+
+                            <button v-if="spinner_continue" style="width:150px;"  disabled class="btn btn-primary btn-md"><i class="fa fa-spin fa-spinner"></i>&nbsp;Saving</button>
+                            <button v-else-if="!spinner_continue && disable_continue" disabled style="width:150px;" class="btn btn-primary btn-md" name="save_continue">Save and Continue</button>
+                            <button v-else style="width:150px;" class="btn btn-primary btn-md" @click.prevent="saveandcontinue(true)" name="save_continue">Save and Continue</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div v-show="showSaveButton" class="row" style="margin-bottom:50px;">
             <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
                 <div class="navbar-inner">
@@ -98,6 +116,11 @@ export default {
         assignTo: false,
         loading: [],
         spinner: false,
+        spinner_exit: false,
+        spinner_continue: false,
+        disable_exit: false,
+        disable_continue: false,
+    
         DATE_TIME_FORMAT: 'DD/MM/YYYY HH:mm:ss',
         members: [],
 
@@ -120,12 +143,16 @@ export default {
         'isReturnsLoaded',
         'returns',
         'is_external',
+        'species_cache',
     ]),
     showSpinner: function() {
         return this.spinner
     },
     showSaveButton: function() {
         return !this.returns.is_draft && this.returns.can_be_processed && this.returns.user_in_officers;
+    },
+    showSaveAndContinueButton: function() {
+        return this.returns.is_draft && this.returns.user_in_officers;
     },
   },
   methods: {
@@ -156,6 +183,71 @@ export default {
         
         },(error)=>{
             this.spinner = false
+            console.log(error);
+            swal('Error',
+                'There was an error saving your return details.<br/>' + error.body,
+                'error'
+            )
+        });
+    },
+    saveandcontinue: async function(andContinue) {
+      this.is_saving = true
+      this.disable_submit = true;
+      this.disable_exit = true;
+      this.disable_continue = true;
+      this.spinner_exit = !andContinue;
+      this.spinner_continue = andContinue;
+      this.form=document.forms.internal_returns_form;
+      var data = new FormData(this.form);
+      // cache only used in Returns sheets
+      for (const speciesID in this.species_cache) { // Running Sheet Cache
+        let speciesJSON = []
+        for (let i=0;i<this.species_cache[speciesID].length;i++){
+          speciesJSON[i] = this.species_cache[speciesID][i]
+        }
+        data.append(speciesID, JSON.stringify(speciesJSON))
+      };
+      var speciesJSON = []
+      let cnt = 0;
+      for (const speciesID in this.species_transfer) { // Running Sheet Transfers
+        Object.keys(this.species_transfer[speciesID]).forEach(function(key) {
+          speciesJSON[cnt] = JSON.stringify(this.species_transfer[speciesID][key])
+          cnt++;
+        });
+        data.append('transfer', speciesJSON)
+      }
+      await this.$http.post(helpers.add_endpoint_json(api_endpoints.returns,this.returns.id+'/save'),data,{
+            emulateJSON:true,
+        }).then((response)=>{
+            let species_id = this.returns.sheet_species;
+            this.setReturns(response.body);
+            this.returns.sheet_species = species_id;
+            this.returns.species = species_id;
+            this.is_saving = false
+            this.disable_submit = false;
+            this.disable_exit = false;
+            this.disable_continue = false;
+            this.spinner_exit = false;
+            this.spinner_continue = false;
+            if (andContinue) { 
+
+            swal( 'Save', 
+                    'Return Details Saved', 
+                    'success'
+            )
+
+            } else { // route back to main dashboard
+
+            this.$router.push({name:"internal-returns-dash",});
+
+            }
+        },(error)=>{
+            this.is_saving = false
+            this.disable_submit = false;
+            this.disable_exit = false;
+            this.disable_continue = false;
+            this.spinner_exit = false;
+            this.spinner_continue = false;
             console.log(error);
             swal('Error',
                 'There was an error saving your return details.<br/>' + error.body,

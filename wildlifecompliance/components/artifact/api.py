@@ -9,7 +9,6 @@ from django.db.models import Q, Min, Max
 from django.db import transaction
 from django.http import HttpResponse
 from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from wildlifecompliance import settings
@@ -17,7 +16,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from rest_framework import viewsets, serializers, status, generics, views, filters
+from rest_framework import viewsets, serializers, status, generics, views, filters, mixins
 import rest_framework.exceptions as rest_exceptions
 from rest_framework.decorators import (
     detail_route,
@@ -51,7 +50,7 @@ from wildlifecompliance.components.users.serializers import (
     UserAddressSerializer,
     ComplianceUserDetailsSerializer,
 )
-from wildlifecompliance.helpers import is_customer, is_internal
+from wildlifecompliance.helpers import is_customer, is_internal, is_compliance_internal_user
 from wildlifecompliance.components.artifact.models import (
         Artifact,
         DocumentArtifact,
@@ -90,18 +89,25 @@ from wildlifecompliance.components.legal_case.models import LegalCase
 from reversion.models import Version
 
 
-class DocumentArtifactViewSet(viewsets.ModelViewSet):
-    queryset = DocumentArtifact.objects.all()
+class DocumentArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
+    queryset = DocumentArtifact.objects.none()
     serializer_class = DocumentArtifactSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request):
             return DocumentArtifact.objects.all()
         return DocumentArtifact.objects.none()
 
     def create(self, request, *args, **kwargs):
         try:
+
+            if not is_compliance_internal_user(self.request):
+                return Response(
+                    "user not authorised to create artifact",
+                    status=status.HTTP_401_UNAUTHORIZED,
+                    )
+            
             with transaction.atomic():
                 request_data = request.data
                 instance, headers = self.common_save(request_data)
@@ -331,13 +337,13 @@ class DocumentArtifactViewSet(viewsets.ModelViewSet):
     #        raise serializers.ValidationError(str(e))
 
 
-class PhysicalArtifactViewSet(viewsets.ModelViewSet):
-    queryset = PhysicalArtifact.objects.all()
+class PhysicalArtifactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
+    queryset = PhysicalArtifact.objects.none()
     serializer_class = PhysicalArtifactSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request):
             return PhysicalArtifact.objects.all()
         return PhysicalArtifact.objects.none()
 
@@ -636,7 +642,7 @@ class ArtifactFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class ArtifactPaginatedViewSet(viewsets.ModelViewSet):
+class ArtifactPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (ArtifactFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     queryset = Artifact.objects.none()
@@ -645,7 +651,7 @@ class ArtifactPaginatedViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request):
             qs = None
             # Get object type document_artifact or physical_artifact
             object_type = self.request.GET.get('object_type', '')
@@ -663,21 +669,20 @@ class ArtifactPaginatedViewSet(viewsets.ModelViewSet):
 
         queryset = self.get_queryset()
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = ArtifactPaginatedSerializer(result_page, many=True, context={'request': request})
         ret = self.paginator.get_paginated_response(serializer.data)
         return ret
 
 
-class ArtifactViewSet(viewsets.ModelViewSet):
-    queryset = Artifact.objects.all()
+class ArtifactViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    queryset = Artifact.objects.none()
     serializer_class = ArtifactSerializer
 
     def get_queryset(self):
         # import ipdb; ipdb.set_trace()
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request):
             return Artifact.objects.all()
         return Artifact.objects.none()
 
@@ -871,13 +876,13 @@ class ArtifactViewSet(viewsets.ModelViewSet):
    #        print(traceback.print_exc())
    #        raise serializers.ValidationError(str(e))
 
-class PhysicalArtifactTypeViewSet(viewsets.ModelViewSet):
-   queryset = PhysicalArtifactType.objects.all()
+class PhysicalArtifactTypeViewSet(viewsets.ReadOnlyModelViewSet):
+   queryset = PhysicalArtifactType.objects.none()
    serializer_class = PhysicalArtifactTypeSerializer
 
    def get_queryset(self):
        # user = self.request.user
-       if is_internal(self.request):
+       if is_compliance_internal_user(self.request):
            return PhysicalArtifactType.objects.all()
        return PhysicalArtifactType.objects.none()
 
@@ -902,13 +907,13 @@ class PhysicalArtifactTypeViewSet(viewsets.ModelViewSet):
            raise serializers.ValidationError(str(e))
 
 
-class PhysicalArtifactDisposalMethodViewSet(viewsets.ModelViewSet):
-   queryset = PhysicalArtifactDisposalMethod.objects.all()
+class PhysicalArtifactDisposalMethodViewSet(viewsets.ReadOnlyModelViewSet):
+   queryset = PhysicalArtifactDisposalMethod.objects.none()
    serializer_class = PhysicalArtifactDisposalMethodSerializer
 
    def get_queryset(self):
        # user = self.request.user
-       if is_internal(self.request):
+       if is_compliance_internal_user(self.request):
            return PhysicalArtifactDisposalMethod.objects.all()
        return PhysicalArtifactDisposalMethod.objects.none()
 

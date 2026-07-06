@@ -28,6 +28,10 @@ from wildlifecompliance.components.main.models import (
     Document
 )
 
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
+
 logger = logging.getLogger(__name__)
 # logger = logging
 
@@ -38,7 +42,7 @@ def update_licence_doc_filename(instance, filename):
 
 
 class LicenceDocument(Document):
-    _file = models.FileField(upload_to=update_licence_doc_filename)
+    _file = models.FileField(upload_to=update_licence_doc_filename, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -1685,6 +1689,12 @@ class MasterlistQuestion(models.Model):
         # ANSWER_TYPE_MULTI,
         ANSWER_TYPE_RADIO,
     ]
+    ANSWER_TYPE_OPTIONS_NEW = [
+        ANSWER_TYPE_CHECKBOX,
+        ANSWER_TYPE_SELECT,
+        ANSWER_TYPE_MULTI,
+        ANSWER_TYPE_RADIO,
+    ]
     ANSWER_TYPE_HEADERS = [
         ANSWER_TYPE_TABLE,
     ]
@@ -1709,6 +1719,7 @@ class MasterlistQuestion(models.Model):
         choices=ANSWER_TYPE_CHOICES,
         default=ANSWER_TYPE_CHOICES[0][0],
     )
+    help_text_url = models.CharField(max_length=200, null=True, blank=True)
     property_cache = JSONField(null=True, blank=True, default={})
 
     class Meta:
@@ -1856,6 +1867,7 @@ class MasterlistQuestion(models.Model):
                         header = {
                             'label': h['label'],
                             'value': h['value'],
+                            'colSize': h.get('colSize', None)
                         }
                         headers.append(header)
                     return headers

@@ -22,6 +22,10 @@ from wildlifecompliance.components.main.related_item import can_close_record
 #from wildlifecompliance.components.users.models import CompliancePermissionGroup
 from wildlifecompliance.components.main.models import Region, District
 
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
+
 logger = logging.getLogger(__name__)
 
 def update_compliance_doc_filename(instance, filename):
@@ -464,9 +468,7 @@ class CallEmail(RevisionedMixin):
     def allocate_for_follow_up(self, request):
         region_id = None if not request.data.get('region_id') else request.data.get('region_id')
         district_id = None if not request.data.get('district_id') else request.data.get('district_id')
-        if district_id:
-            region_id = None
-        self.allocated_group = OfficerGroup.objects.get(region_id=region_id, district_id=district_id)
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id)
         self.status = self.STATUS_OPEN_FOLLOWUP
         self.log_user_action(
                 CallEmailUserAction.ACTION_ALLOCATE_FOR_FOLLOWUP.format(self.number),
@@ -476,9 +478,7 @@ class CallEmail(RevisionedMixin):
     def allocate_for_inspection(self, request):
         region_id = None if not request.data.get('region_id') else request.data.get('region_id')
         district_id = None if not request.data.get('district_id') else request.data.get('district_id')
-        if district_id:
-            region_id = None
-        self.allocated_group = OfficerGroup.objects.get(region_id=region_id, district_id=district_id)
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id)
         self.status = self.STATUS_OPEN_INSPECTION
         self.log_user_action(
                 CallEmailUserAction.ACTION_ALLOCATE_FOR_INSPECTION.format(self.number),
@@ -488,9 +488,7 @@ class CallEmail(RevisionedMixin):
     def allocate_for_case(self, request):
         region_id = None if not request.data.get('region_id') else request.data.get('region_id')
         district_id = None if not request.data.get('district_id') else request.data.get('district_id')
-        if district_id:
-            region_id = None
-        self.allocated_group = OfficerGroup.objects.get(region_id=region_id, district_id=district_id)
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id)
         self.status = self.STATUS_OPEN_CASE
         self.log_user_action(
                 CallEmailUserAction.ACTION_ALLOCATE_FOR_CASE.format(self.number),
@@ -656,7 +654,7 @@ class ComplianceFormDataRecord(models.Model):
 class CallEmailDocument(Document):
     call_email = models.ForeignKey('CallEmail', related_name='documents')
     #_file = models.FileField(max_length=255, upload_to=update_call_email_doc_filename)
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
@@ -684,7 +682,7 @@ class CallEmailLogDocument(Document):
     #input_name = models.CharField(max_length=255, blank=True, null=True)
     #version_comment = models.CharField(max_length=255, blank=True, null=True)
     #_file = models.FileField(max_length=255, upload_to=update_call_email_comms_log_filename)
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'

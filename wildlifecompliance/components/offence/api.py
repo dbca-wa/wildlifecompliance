@@ -4,6 +4,7 @@ import traceback
 from datetime import datetime
 
 import pytz
+from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
@@ -11,7 +12,7 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.db.models import Q
 from ledger.settings_base import TIME_ZONE
-from rest_framework import viewsets, filters, serializers, status
+from rest_framework import viewsets, filters, serializers, status, mixins
 from rest_framework.decorators import detail_route, list_route, renderer_classes
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -42,8 +43,8 @@ from wildlifecompliance.components.offence.serializers import (
     UpdateAllegedCommittedOffenceSerializer)
 from wildlifecompliance.components.section_regulation.serializers import SectionRegulationSerializer
 from wildlifecompliance.components.sanction_outcome.models import SanctionOutcome, AllegedCommittedOffence
-#from wildlifecompliance.components.users.models import CompliancePermissionGroup
-from wildlifecompliance.helpers import is_internal
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup, ComplianceManagementSystemGroupPermission
+from wildlifecompliance.helpers import is_internal, is_customer, is_compliance_internal_user, is_wildlife_compliance_officer
 
 
 class OffenceFilterBackend(DatatablesFilterBackend):
@@ -68,27 +69,29 @@ class OffenceFilterBackend(DatatablesFilterBackend):
                          Q(offender__organisation__organisation__abn__icontains=search_text) | \
                          Q(offender__organisation__organisation__trading_name__icontains=search_text)
 
-        type = request.GET.get('type',).lower()
+        type = str(request.GET.get('type',)).lower()
         if type and type != 'all':
             # q_objects &= Q(type=type)
             offence_ids = SanctionOutcome.objects.filter(type=type).values_list('offence__id', flat=True).distinct()
             q_objects &= Q(id__in=offence_ids)
 
-        status = request.GET.get('status',).lower()
+        status = str(request.GET.get('status',)).lower()
         if status and status != 'all':
             q_objects &= Q(status=status)
 
         timezone = pytz.timezone(TIME_ZONE)
 
-        date_from = request.GET.get('date_from',).lower()
+        date_from = request.GET.get('date_from',)
         if date_from:
+            date_from = str(request.GET.get('date_from',)).lower()
             date_from = datetime.strptime(date_from, '%d/%m/%Y')
             date_from = timezone.localize(date_from)
             q_objects &= Q(occurrence_datetime_from__gte=date_from)
             q_objects &= Q(occurrence_datetime_to__gte=date_from)
 
-        date_to = request.GET.get('date_to',).lower()
+        date_to = request.GET.get('date_to',)
         if date_to:
+            date_to = str(request.GET.get('date_to',)).lower()
             date_to = datetime.strptime(date_to, '%d/%m/%Y')
             date_to = timezone.localize(date_to)
             q_objects &= Q(occurrence_datetime_from__lte=date_to)
@@ -123,7 +126,7 @@ class OffenceFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class OffencePaginatedViewSet(viewsets.ModelViewSet):
+class OffencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (OffenceFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
     queryset = Offence.objects.none()
@@ -132,23 +135,21 @@ class OffencePaginatedViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request):
             return Offence.objects.all()
         return Offence.objects.none()
 
     @list_route(methods=['GET', ])
     def get_paginated_datatable(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = OffenceDatatableSerializer(result_page, many=True, context={'request': request})
         ret = self.paginator.get_paginated_response(serializer.data)
         return ret
 
 
-class OffenceViewSet(viewsets.ModelViewSet):
+class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
     queryset = Offence.objects.all()
     serializer_class = OffenceSerializer
 
@@ -157,7 +158,7 @@ class OffenceViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request):
             return Offence.objects.all()
         return Offence.objects.none()
 
@@ -187,6 +188,12 @@ class OffenceViewSet(viewsets.ModelViewSet):
     def workflow_action(self, request, instance=None, *args, **kwargs):
         try:
             with transaction.atomic():
+
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+
                 if not instance:
                     instance = self.get_object()
 
@@ -233,19 +240,16 @@ class OffenceViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-    #@list_route(methods=['GET', ])
-    #def can_user_create(self, request, *args, **kwargs):
-    #    # Determine permissions which allow the holder to create new offence
-    #    codename_who_can_create = 'officer'
-    #    compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
-    #    permissions = Permission.objects.filter(codename=codename_who_can_create, content_type_id=compliance_content_type.id)
+    @list_route(methods=['GET', ])
+    def can_user_create(self, request, *args, **kwargs):
+    #TODO: Check logic with the business
 
-    #    # Find groups which has permissions determined above
-    #    allowed_groups = CompliancePermissionGroup.objects.filter(permissions__in=permissions)
-    #    for allowed_group in allowed_groups.all():
-    #        if request.user in allowed_group.members:
-    #            return Response(True)
-    #    return Response(False)
+       # Find groups which has permissions determined above
+       allowed_groups = ComplianceManagementSystemGroup.objects.filter(Q(name=settings.GROUP_OFFICER)|Q(name=settings.GROUP_MANAGER))
+       for allowed_group in allowed_groups:
+           if request.user in allowed_group.get_members():
+               return Response(True)
+       return Response(False)
 
     @list_route(methods=['GET', ])
     def optimised(self, request, *args, **kwargs):
@@ -345,6 +349,45 @@ class OffenceViewSet(viewsets.ModelViewSet):
         serializer = OffenceSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
+    def check_authorised_to_update(self,request):
+        print("check_authorised_to_update")
+        instance = self.get_object()
+        user = self.request.user
+        user_auth_groups = ComplianceManagementSystemGroupPermission.objects.filter(emailuser=user)
+
+        return instance.assigned_to_id == user.id and user_auth_groups.filter(group__id__in=instance.allowed_groups).exists()
+        
+    def check_authorised_to_create(self,request):
+        print("check_authorised_to_create")
+
+        region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+        district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+        user = self.request.user
+        #check that request user is an officer or manager in the specified region and district
+        if settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and settings.SUPER_AUTH_GROUPS_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+            Q(emailuser=user) & 
+            (Q(group__region_id=region_id) | Q(group__region_id=None))
+            ).filter(
+                Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+        elif settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+            emailuser=user, 
+            group__region_id=region_id, 
+            group__district_id=district_id
+            ).filter(
+                Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+        elif not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+                Q(emailuser=user) & 
+                (Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER))).exists():
+            return False
+
+        return True
+
+
     def update_parent(self, request, instance, *args, **kwargs):
         # Log parent actions and update status, if required
         # If CallEmail
@@ -366,6 +409,13 @@ class OffenceViewSet(viewsets.ModelViewSet):
     # @renderer_classes((JSONRenderer,))
     def update(self, request, *args, **kwargs):
         try:
+
+            #check if user authorised to update - must be in allocated group and assigned
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             with transaction.atomic():
                 instance = self.get_object()
                 request_data = request.data
@@ -497,6 +547,12 @@ class OffenceViewSet(viewsets.ModelViewSet):
     # def offence_save(self, request, *args, **kwargs):
     def create(self, request, *args, **kwargs):
         try:
+            #to create make sure user is in appropriate group (officer or manager in region)
+            if not self.check_authorised_to_create(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             with transaction.atomic():
                 request_data = request.data
 
@@ -520,7 +576,9 @@ class OffenceViewSet(viewsets.ModelViewSet):
                 saved_offence_instance = serializer.save()  # Here, relations between this offence and location, and this offence and call_email/inspection are created
 
                 # 2.1. Determine allocated group and save it
-                new_group = Offence.get_compliance_permission_group(saved_offence_instance.regionDistrictId)
+                new_group = Offence.get_allocated_group(region_id= saved_offence_instance.region_id, district_id= saved_offence_instance.district_id)
+                if not new_group:
+                    raise serializers.ValidationError("No allocated group for specified region/district")
                 saved_offence_instance.allocated_group = new_group
                 saved_offence_instance.assigned_to = None
                 saved_offence_instance.responsible_officer = request.user
@@ -694,16 +752,30 @@ class OffenceViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-class SearchSectionRegulation(viewsets.ModelViewSet):
-    queryset = SectionRegulation.objects.all()
+
+class SearchSectionRegulation(viewsets.ReadOnlyModelViewSet):
+    queryset = SectionRegulation.objects.none()
     serializer_class = SectionRegulationSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('act__name', 'name', 'offence_text',)
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated():
+            return SectionRegulation.objects.all()
+        return SectionRegulation.objects.none()
 
-class SearchOrganisation(viewsets.ModelViewSet):
-    queryset = Organisation.objects.all()
+
+class SearchOrganisation(viewsets.ReadOnlyModelViewSet):
+    queryset = Organisation.objects.none()
     serializer_class = OrganisationSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('organisation__abn', 'organisation__name',)
 
+    def get_queryset(self):
+        user = self.request.user
+        if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
+            return Organisation.objects.all()
+        elif user.is_authenticated():
+            return user.wildlifecompliance_organisations.all()
+        return Organisation.objects.none()

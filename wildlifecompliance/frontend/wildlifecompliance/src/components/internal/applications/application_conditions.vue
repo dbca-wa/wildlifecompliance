@@ -370,7 +370,7 @@ export default {
             let vm = this;
             e.preventDefault();
             var tr = $(e.target).parents('tr');
-            if (await vm.moveRow(tr, 'up')){
+            if (await vm.moveRow(tr, 'up', $(e.target).parent().data('id'))){
                 await vm.sendDirection($(e.target).parent().data('id'),'up');
             }
         },
@@ -379,14 +379,26 @@ export default {
             e.preventDefault();
             let vm = this;
             var tr = $(e.target).parents('tr');
-            if (await vm.moveRow(tr, 'down')){
+            if (await vm.moveRow(tr, 'down', $(e.target).parent().data('id'))){
                 await vm.sendDirection($(e.target).parent().data('id'),'down');
             }
         },
-        async moveRow(row, direction) {
+        async moveRow(row, direction, id) {
             // Move up or down (depending...)
             const table = this.$refs.conditions_datatable.vmDataTable;
-            let index = row[0].sectionRowIndex - 1;
+
+            let data = table.data()
+            let index = -1
+            for (let i=0; i<data.length; i++){
+                if (data[i].id == id) {
+                    if ((direction === 'down' && i+1 === table.data().length) || direction === 'up' && i === 0) {
+                        return false
+                    }
+                    index = i;
+                    break;
+                }
+            }
+            
             let order = -1;
             if (direction === 'down') {
               order = 1;

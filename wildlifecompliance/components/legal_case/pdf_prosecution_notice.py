@@ -25,6 +25,10 @@ from django.conf import settings
 from ledger.accounts.models import Document
 from ledger.checkout.utils import calculate_excl_gst
 
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
+
 from wildlifecompliance.components.main.pdf_utils import OffsetTable, get_font_str
 
 PAGE_MARGIN = 5 * mm
@@ -454,7 +458,7 @@ def create_prosecution_notice_pdf_bytes(filename, legal_case):
 
         # START: Save the pdf file to the database
         document = legal_case.documents.create(name=filename)
-        path = default_storage.save('wildlifecompliance/{}/{}/documents/{}'.format(legal_case._meta.model_name, legal_case.id, filename), invoice_buffer)
+        path = private_storage.save('wildlifecompliance/{}/{}/documents/{}'.format(legal_case._meta.model_name, legal_case.id, filename), invoice_buffer)
         document._file = path
         document.save()
         # END: Save

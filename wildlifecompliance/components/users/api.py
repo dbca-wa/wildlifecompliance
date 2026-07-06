@@ -1,14 +1,16 @@
 import re
 import traceback
-from django.db.models import Q
+import pathlib
+from django.db.models import Q, Value
+from django.db.models.functions import Concat
 from django.db import transaction
 from django.http import HttpResponse
 from django.core.exceptions import ValidationError
-from rest_framework import viewsets, serializers, views, status
+from rest_framework import viewsets, serializers, views, status, mixins
 #from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from ledger.accounts.models import EmailUser, Address, Profile, EmailIdentity, EmailUserAction
+from ledger.accounts.models import EmailUser, Address, Profile, EmailIdentity, EmailUserAction, PrivateDocument
 from django.contrib.auth.models import Permission, ContentType
 from datetime import datetime
 from django_countries import countries
@@ -27,6 +29,7 @@ from wildlifecompliance.helpers import (
         is_customer, is_internal, is_compliance_management_callemail_readonly_user,
         is_compliance_management_volunteer, is_compliance_management_readonly_user, 
         is_compliance_management_callemail_readonly_user, prefer_compliance_management,
+        is_wildlife_compliance_officer, is_compliance_internal_user,
         )
 from wildlifecompliance.components.users.serializers import (
     UserSerializer,
@@ -64,6 +67,11 @@ from rest_framework.decorators import (
     renderer_classes,
     parser_classes,
     api_view
+)
+from wildlifecompliance.components.main.utils import (
+    get_first_name,
+    get_last_name,
+    get_dob,
 )
 from django.core.cache import cache
 from wildlifecompliance.components.main.process_document import process_generic_document
@@ -157,15 +165,15 @@ class UserProfileCompleted(views.APIView):
         return HttpResponse('OK')
 
 
-class ProfileViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
+class ProfileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    queryset = Profile.objects.none()
     serializer_class = UserProfileSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
             return Profile.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             return Profile.objects.filter(user=user)
         return Profile.objects.none()
 
@@ -189,14 +197,15 @@ class ProfileViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class MyProfilesViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
+class MyProfilesViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    queryset = Profile.objects.none()
     serializer_class = UserProfileSerializer
 
     def get_queryset(self):
-        queryset = self.queryset
-        query_set = queryset.filter(user=self.request.user)
-        return query_set
+        user = self.request.user
+        if user.is_authenticated():
+            return Profile.objects.filter(user=self.request.user)
+        return Profile.objects.none()
 
 
 class UserFilterBackend(DatatablesFilterBackend):
@@ -222,23 +231,23 @@ class UserFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class UserRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-        return super(UserRenderer, self).render(data, accepted_media_type, renderer_context)
+#class UserRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
+#        return super(UserRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class UserPaginatedViewSet(viewsets.ModelViewSet):
+class UserPaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (UserFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (UserRenderer,)
+    #renderer_classes = (UserRenderer,)
     queryset = EmailUser.objects.none()
     serializer_class = DTUserSerializer
     page_size = 10
 
     def get_queryset(self):
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
             return EmailUser.objects.all()
         return EmailUser.objects.none()
 
@@ -247,14 +256,13 @@ class UserPaginatedViewSet(viewsets.ModelViewSet):
         self.serializer_class = DTUserSerializer
         queryset = self.get_queryset()
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = DTUserSerializer(result_page, context={'request': request}, many=True)
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = EmailUser.objects.all()
+class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    queryset = EmailUser.objects.none()
     serializer_class = UserSerializer
 
     def get_queryset(self):
@@ -266,9 +274,9 @@ class UserViewSet(viewsets.ModelViewSet):
                 - email
         """
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
             queryset = EmailUser.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             queryset = EmailUser.objects.filter(id=user.id)
         else:
             queryset = EmailUser.objects.none()
@@ -403,6 +411,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @detail_route(methods=['POST', ])
     def update_personal(self, request, *args, **kwargs):
+        print("update personal")
         try:
             instance = self.get_object()
             serializer = PersonalSerializer(instance, data=request.data)
@@ -412,8 +421,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 instance.log_user_action(
                     EmailUserAction.ACTION_PERSONAL_DETAILS_UPDATE.format(
                         '{} {} ({})'.format(
-                            instance.first_name,
-                            instance.last_name,
+                            get_first_name(instance),
+                            get_last_name(instance),
                             instance.email)),
                     request)
             serializer = UserSerializer(instance)
@@ -439,8 +448,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 instance.log_user_action(
                     EmailUserAction.ACTION_CONTACT_DETAILS_UPDATE.format(
                         '{} {} ({})'.format(
-                            instance.first_name,
-                            instance.last_name,
+                            get_first_name(instance),
+                            get_last_name(instance),
                             instance.email)),
                     request)
 
@@ -459,30 +468,84 @@ class UserViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
+    # @detail_route(methods=['POST', ])
+    # def update_address(self, request, *args, **kwargs):
+    #     try:
+    #         instance = self.get_object()
+    #         serializer = UserAddressSerializer(data=request.data)
+    #         serializer.is_valid(raise_exception=True)
+    #         address, created = Address.objects.get_or_create(
+    #             # line1=serializer.validated_data['line1'],
+    #             locality=serializer.validated_data['locality'],
+    #             state=serializer.validated_data['state'],
+    #             country=serializer.validated_data['country'],
+    #             postcode=serializer.validated_data['postcode'],
+    #             user=instance
+    #         )
+    #         address.line1 = serializer.validated_data['line1']
+    #         instance.residential_address = address
+    #         with transaction.atomic():
+    #             address.save()
+    #             instance.save()
+    #             instance.log_user_action(
+    #                 EmailUserAction.ACTION_POSTAL_ADDRESS_UPDATE.format(
+    #                     '{} {} ({})'.format(
+    #                         instance.first_name,
+    #                         instance.last_name,
+    #                         instance.email)),
+    #                 request)
+    #         serializer = FirstTimeUserSerializer(
+    #             instance, context={'request': request}
+    #         )
+    #         return Response(serializer.data)
+    #     except serializers.ValidationError:
+    #         print(traceback.print_exc())
+    #         raise
+    #     except ValidationError as e:
+    #         print(traceback.print_exc())
+    #         raise serializers.ValidationError(repr(e.error_dict))
+    #     except Exception as e:
+    #         print(traceback.print_exc())
+    #         raise serializers.ValidationError(str(e))
+
     @detail_route(methods=['POST', ])
     def update_address(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
             serializer = UserAddressSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            address, created = Address.objects.get_or_create(
-                # line1=serializer.validated_data['line1'],
-                locality=serializer.validated_data['locality'],
-                state=serializer.validated_data['state'],
-                country=serializer.validated_data['country'],
-                postcode=serializer.validated_data['postcode'],
-                user=instance
-            )
-            address.line1 = serializer.validated_data['line1']
-            instance.residential_address = address
-            with transaction.atomic():
+            if instance.residential_address:
+                address = Address.objects.filter(id=instance.residential_address.id)
+                total_addresses=address.count()
+                if total_addresses > 0:
+                    residential_address = Address.objects.get(id=address[0].id) 
+                    residential_address.locality=serializer.validated_data['locality']
+                    residential_address.state=serializer.validated_data['state']
+                    residential_address.country=serializer.validated_data['country']
+                    residential_address.postcode=serializer.validated_data['postcode']
+                    residential_address.line1=serializer.validated_data['line1']
+                    residential_address.save()
+                    instance.residential_address= residential_address
+            else:
+                address=Address.objects.create(
+                    line1=serializer.validated_data['line1'],
+                    locality=serializer.validated_data['locality'],
+                    state=serializer.validated_data['state'],
+                    country=serializer.validated_data['country'],
+                    postcode=serializer.validated_data['postcode'],
+                    user=instance
+                )
                 address.save()
+                instance.residential_address = address
+                instance.save()
+            with transaction.atomic():
+                # address.save()
                 instance.save()
                 instance.log_user_action(
                     EmailUserAction.ACTION_POSTAL_ADDRESS_UPDATE.format(
                         '{} {} ({})'.format(
-                            instance.first_name,
-                            instance.last_name,
+                            get_first_name(instance),
+                            get_last_name(instance),
                             instance.email)),
                     request)
             serializer = FirstTimeUserSerializer(
@@ -509,12 +572,23 @@ class UserViewSet(viewsets.ModelViewSet):
             SecureBaseUtils.timestamp_id_request(request)
             instance.upload_identification2(request)
             with transaction.atomic():
+                private_doc = instance.identification2
+                private_doc.file_group = 1
+                private_doc.name = pathlib.Path(request.data.dict()['identification2'].name).name
+                private_doc.extension = pathlib.Path(
+                    request.data.dict()['identification2'].name
+                    ).suffix if (len(
+                        pathlib.Path(
+                            request.data.dict()['identification2'].name
+                        ).suffix) <= PrivateDocument._meta.get_field('extension').max_length
+                    ) else ""
+                private_doc.save()
                 instance.save()
                 instance.log_user_action(
                     EmailUserAction.ACTION_ID_UPDATE.format(
                         '{} {} ({})'.format(
-                            instance.first_name,
-                            instance.last_name,
+                            get_first_name(instance),
+                            get_last_name(instance),
                             instance.email)),
                     request)
                 # For any of the submitter's applications that have requested ID update,
@@ -582,6 +656,11 @@ class UserViewSet(viewsets.ModelViewSet):
     @list_route(methods=['POST', ])
     def create_new_person(self, request, *args, **kwargs):
         print("create_new_person")
+
+        if not is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to create new person",
+            status=status.HTTP_401_UNAUTHORIZED)
+
         with transaction.atomic():
             try:
                 email_user_id_requested = request.data.get('id', {})
@@ -645,7 +724,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(
             email_user_serializer.data,
             status=status.HTTP_201_CREATED,
-            headers=self.get_success_headers(email_user_serializer.data)
+            #headers=self.get_success_headers(email_user_serializer.data)
         )
 
     @detail_route(methods=['POST', ])
@@ -675,10 +754,10 @@ class UserViewSet(viewsets.ModelViewSet):
                 print(traceback.print_exc())
                 raise serializers.ValidationError(str(e))
 
-class ComplianceManagementUserViewSet(viewsets.ModelViewSet):
-    queryset = EmailUser.objects.all()
+class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.CreateModelMixin):
+    queryset = EmailUser.objects.none()
     serializer_class = UserSerializer
-    renderer_classes = [JSONRenderer, ]
+    #renderer_classes = [JSONRenderer, ]
 
     def get_queryset(self):
         """
@@ -689,12 +768,12 @@ class ComplianceManagementUserViewSet(viewsets.ModelViewSet):
                 - email
         """
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request):
             queryset = EmailUser.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             queryset = EmailUser.objects.filter(id=user.id)
-        else:
-            queryset = EmailUser.objects.none()
+        #else:
+        #    queryset = EmailUser.objects.none()
         first_name = self.request.query_params.get('first_name', None)
         last_name = self.request.query_params.get('last_name', None)
         dob = self.request.query_params.get('dob', None)
@@ -712,6 +791,11 @@ class ComplianceManagementUserViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         print("cm user create")
         print(request.data)
+        
+        if not is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
+            return Response("user not authorised to create new person",
+            status=status.HTTP_401_UNAUTHORIZED)
+        
         with transaction.atomic():
             try:
                 request_data = request.data
@@ -822,8 +906,8 @@ class ComplianceManagementUserViewSet(viewsets.ModelViewSet):
                 raise serializers.ValidationError(str(e))
 
 
-class EmailIdentityViewSet(viewsets.ModelViewSet):
-    queryset = EmailIdentity.objects.all()
+class EmailIdentityViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = EmailIdentity.objects.none()
     serializer_class = EmailIdentitySerializer
 
     def get_queryset(self):
@@ -832,9 +916,9 @@ class EmailIdentityViewSet(viewsets.ModelViewSet):
                 - email
         """
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request):
             queryset = EmailIdentity.objects.all()
-        elif is_customer(self.request):
+        elif user.is_authenticated():
             queryset = user.emailidentity_set.all()
         else:
             queryset = EmailIdentity.objects.none()
@@ -1029,22 +1113,59 @@ class EmailIdentityViewSet(viewsets.ModelViewSet):
 #            raise serializers.ValidationError(str(e))
 
 class GetPersonOrg(views.APIView):
-    renderer_classes = [JSONRenderer,]
+    #renderer_classes = [JSONRenderer,]
 
     def get(self, request, format=None):
+
+        if not (is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request)):
+            return Response()
+
         search_term = request.GET.get('term', '')
+        search_option = request.GET.get('option', 'contains')
         if search_term:
+
             data_transform = []
-            user_data = EmailUser.objects.filter(
-                Q(first_name__icontains=search_term) |
-                Q(last_name__icontains=search_term) |
-                Q(email__icontains=search_term)
-            )[:10]
+            user_data = []
+            if search_option == 'contains':            
+                user_data = EmailUser.objects.annotate(
+                    search_name=Concat('first_name', Value(' '), 'last_name')
+                ).annotate(
+                    legal_search_name=Concat('legal_first_name', Value(' '), 'legal_last_name')
+                ).filter(
+                    Q(search_name__icontains=search_term) |
+                    Q(legal_search_name__icontains=search_term) |
+                    Q(email__icontains=search_term)
+                )[:40]
+
+            if search_option == 'starts_with':            
+                user_data = EmailUser.objects.annotate(
+                    search_name=Concat('first_name', Value(' '), 'last_name')
+                ).annotate(
+                    legal_search_name=Concat('legal_first_name', Value(' '), 'legal_last_name')
+                ).filter(
+                    Q(search_name__istartswith=search_term) |
+                    Q(legal_search_name__istartswith=search_term) |
+                    Q(email__istartswith=search_term)
+                )[:40]
+
+            if search_option == 'ends_with':            
+                user_data = EmailUser.objects.annotate(
+                    search_name=Concat('first_name', Value(' '), 'last_name')
+                ).annotate(
+                    legal_search_name=Concat('legal_first_name', Value(' '), 'legal_last_name')
+                ).filter(
+                    Q(search_name__iendswith=search_term) |
+                    Q(legal_search_name__iendswith=search_term) |
+                    Q(email__iendswith=search_term)
+                )[:40]
+
             for email_user in user_data:
                 if email_user.dob:
-                    text = '{} {} (DOB: {})'.format(email_user.first_name, email_user.last_name, email_user.dob)
+                    text = '{} {} (DOB: {})'.format(get_first_name(email_user),
+                            get_last_name(email_user), get_dob(email_user).strftime('%d/%m/%Y'))
                 else:
-                    text = '{} {}'.format(email_user.first_name, email_user.last_name)
+                    text = '{} {}'.format(get_first_name(email_user),
+                            get_last_name(email_user))
 
                 #serializer = EmailUserAppViewSerializer(email_user)
                 #email_user_data = serializer.data
@@ -1075,6 +1196,10 @@ class StaffMemberLookup(views.APIView):
     renderer_classes = [JSONRenderer,]
 
     def get(self, request, format=None):
+
+        if not (is_compliance_internal_user(self.request) or is_wildlife_compliance_officer(self.request)):
+            return Response()
+
         search_term = request.GET.get('term', '')
         if search_term:
             data_transform = []
@@ -1085,9 +1210,11 @@ class StaffMemberLookup(views.APIView):
             )[:10]
             for email_user in user_data:
                 if email_user.dob:
-                    text = '{} {} (DOB: {})'.format(email_user.first_name, email_user.last_name, email_user.dob)
+                    text = '{} {} (DOB: {})'.format(get_first_name(email_user),
+                            get_last_name(email_user), get_dob(email_user).strftime('%d/%m/%Y'))
                 else:
-                    text = '{} {}'.format(email_user.first_name, email_user.last_name)
+                    text = '{} {}'.format(get_first_name(email_user),
+                            get_last_name(email_user))
 
                 email_user_data = {}
                 email_user_data['text'] = text

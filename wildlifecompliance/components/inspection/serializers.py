@@ -3,6 +3,7 @@ import traceback
 from rest_framework.fields import CharField
 from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeometryField
 
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroupPermission
 from ledger.accounts.models import EmailUser, Address
 from wildlifecompliance.components.call_email.serializers import LocationSerializer, LocationSerializerOptimized
 from wildlifecompliance.components.inspection.models import (
@@ -12,6 +13,8 @@ from wildlifecompliance.components.inspection.models import (
     InspectionType,
     InspectionFormDataRecord,
     )
+from django.db.models import Q
+from django.conf import settings
 from wildlifecompliance.components.main.related_item import get_related_items
 from wildlifecompliance.components.main.serializers import CommunicationLogEntrySerializer
 from wildlifecompliance.components.users.serializers import (
@@ -29,7 +32,9 @@ from wildlifecompliance.components.users.serializers import (
 )
 from wildlifecompliance.components.offence.serializers import OrganisationSerializer
 from django.contrib.auth.models import Permission, ContentType
-
+from wildlifecompliance.components.main.utils import (
+    get_full_name
+)
 
 class InspectionTypeSerializer(serializers.ModelSerializer):
    class Meta:
@@ -55,11 +60,7 @@ class IndividualSerializer(serializers.ModelSerializer):
         )
 
     def get_full_name(self, obj):
-        if obj.first_name:
-            return obj.first_name + ' ' + obj.last_name
-        else:
-            return obj.last_name
-
+        return get_full_name(obj)
 
 class EmailUserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
@@ -75,10 +76,7 @@ class EmailUserSerializer(serializers.ModelSerializer):
         )
 
     def get_full_name(self, obj):
-        if obj.first_name:
-            return obj.first_name + ' ' + obj.last_name
-        else:
-            return obj.last_name
+        return get_full_name(obj)
 
     def get_member_role(self, obj):
         inspection_team_lead_id = self.context.get('inspection_team_lead_id')
@@ -128,7 +126,6 @@ class InspectionFormDataRecordSerializer(serializers.ModelSerializer):
         )
 
 class InspectionSerializer(serializers.ModelSerializer):
-    allocated_group = serializers.SerializerMethodField()
     inspection_team = serializers.SerializerMethodField()
     all_officers = serializers.SerializerMethodField()
     user_in_group = serializers.SerializerMethodField()
@@ -157,7 +154,7 @@ class InspectionSerializer(serializers.ModelSerializer):
                 'party_inspected',
                 'assigned_to_id',
                 'allocated_group',
-                'allocated_group_id',
+                'allowed_groups',
                 'user_in_group',
                 'can_user_action',
                 'user_is_assignee',
@@ -174,8 +171,8 @@ class InspectionSerializer(serializers.ModelSerializer):
                 'legal_case_id',
                 'inspection_report',
                 'schema',
-                'region_id',
-                'district_id',
+                'region',
+                'district',
                 'data',
                 'all_officers',
                 'location',
@@ -195,26 +192,27 @@ class InspectionSerializer(serializers.ModelSerializer):
             for member in obj.inspection_team.all():
                 if user_id == member.id:
                     return_val = True
-        elif obj.allocated_group:
-           for member in obj.allocated_group.members:
-               if user_id == member.id:
-                  return_val = True
+        if not return_val and obj.allocated_group:
+           #for member in obj.allocated_group.get_members():
+           #    if user_id == member.id:
+           #       return_val = True
+           return_val = ComplianceManagementSystemGroupPermission.objects.filter(emailuser__id=user_id).filter(group__id__in=obj.allowed_groups).exists()
         return return_val
 
     def get_can_user_action(self, obj):
         return_val = False
         user_id = self.context.get('request', {}).user.id
 
-        if user_id == obj.assigned_to_id:
+        if obj.allocated_group and user_id == obj.assigned_to_id and self.get_user_in_group(obj):
             return_val = True
-        if obj.status == 'open' and obj.inspection_team and not obj.assigned_to_id:
+        if obj.status == 'open' and obj.inspection_team: # and not obj.assigned_to_id:
             for member in obj.inspection_team.all():
                 if user_id == member.id:
                     return_val = True
-        elif obj.allocated_group and not obj.assigned_to_id:
-           for member in obj.allocated_group.members:
-               if user_id == member.id:
-                  return_val = True
+        #elif obj.allocated_group and not obj.assigned_to_id:
+        #   for member in obj.allocated_group.get_members():
+        #       if user_id == member.id:
+        #          return_val = True
         return return_val
 
     def get_user_is_assignee(self, obj):
@@ -261,7 +259,28 @@ class InspectionSerializer(serializers.ModelSerializer):
         #return allocated_group
 
     def get_all_officers(self, obj):
-        return []
+
+        #allowing all officer types and managers
+        group_users = list(ComplianceManagementSystemGroupPermission.objects.filter(
+            Q(group__name=settings.GROUP_OFFICER) |
+            Q(group__name=settings.GROUP_INSPECTION_OFFICER) |
+            Q(group__name=settings.GROUP_MANAGER)
+        ).distinct("emailuser").order_by("emailuser").values_list("emailuser__id",flat=True))
+
+        all_officers = EmailUser.objects.filter(id__in=group_users)
+
+        serialized_officers = IndividualSerializer(all_officers, many=True)
+        returned_data = serialized_officers.data
+
+        blank_field = [{
+            'dob': '',
+            'email': '',
+            'full_name': '',
+            'id': None,
+            }]
+        returned_data.insert(0, blank_field)
+
+        return returned_data
         #all_officer_objs = []
         #compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
         #permission = Permission.objects.filter(codename='officer').filter(content_type_id=compliance_content_type.id).first()
@@ -287,6 +306,12 @@ class InspectionSerializer(serializers.ModelSerializer):
 
     def get_inspection_report(self, obj):
         return [[r.name, r._file.url] for r in obj.report.all()]
+    
+    # def get_region_id(self, obj):
+    #     return obj.region_id
+    
+    # def get_district_id(self, obj):
+    #     return obj.district_id
 
 class SaveInspectionSerializer(serializers.ModelSerializer):
     assigned_to_id = serializers.IntegerField(
@@ -412,7 +437,7 @@ class InspectionDatatableSerializer(serializers.ModelSerializer):
                     returned_url = process_url
         elif (obj.allocated_group
                 and not obj.assigned_to_id):
-            for member in obj.allocated_group.members:
+            for member in obj.allocated_group.get_members():
                 if user_id == member.id:
                     returned_url = process_url
 

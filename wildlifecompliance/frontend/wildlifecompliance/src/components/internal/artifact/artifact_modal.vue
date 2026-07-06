@@ -132,22 +132,15 @@ export default {
       updateDistricts: function() {
         // this.district_id = null;
         this.availableDistricts = [];
-        for (let record of this.regionDistricts) {
-          if (this.region_id === record.id) {
-            for (let district of record.districts) {
-              for (let district_record of this.regionDistricts) {
-                if (district_record.id === district) {
-                  this.availableDistricts.push(district_record)
-                }
-              }
-            }
+        for (let region of this.regions) {
+          if (this.region_id === region.id) {
+            this.availableDistricts=region.districts
           }
         }
-        console.log(this.availableDistricts);
         this.availableDistricts.splice(0, 0, 
         {
-          id: "", 
-          display_name: "",
+          district_id: "", 
+          district_name: "",
           district: "",
           districts: [],
           region: null,
@@ -281,23 +274,25 @@ export default {
     },
     created: async function() {
         // regions
-        let returned_regions = await cache_helper.getSetCacheList('Regions', '/api/region_district/get_regions/');
-        Object.assign(this.regions, returned_regions);
+        let returned_regions = await cache_helper.getSetCacheList(
+            "Regions",
+            "/api/regions/"
+        );        Object.assign(this.regions, returned_regions);
         // blank entry allows user to clear selection
         this.regions.splice(0, 0, 
             {
               id: "", 
-              display_name: "",
+              name: "",
               district: "",
               districts: [],
               region: null,
             });
         // regionDistricts
-        let returned_region_districts = await cache_helper.getSetCacheList(
-            'RegionDistricts', 
-            api_endpoints.region_district
-            );
-        Object.assign(this.regionDistricts, returned_region_districts);
+        // let returned_region_districts = await cache_helper.getSetCacheList(
+        //     'RegionDistricts', 
+        //     api_endpoints.region_district
+        //     );
+        // Object.assign(this.regionDistricts, returned_region_districts);
 
         // inspection_types
         let returned_legal_case_priorities = await cache_helper.getSetCacheList(

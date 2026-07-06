@@ -1,10 +1,11 @@
 import datetime
 
+from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.signals import post_save
-
+from django.db.models import Q
 from ledger.accounts.models import RevisionedMixin, EmailUser
 from wildlifecompliance.components.call_email.models import Location, CallEmail
 from wildlifecompliance.components.legal_case.models import LegalCase
@@ -12,9 +13,17 @@ from wildlifecompliance.components.inspection.models import Inspection
 from wildlifecompliance.components.main.models import Document, CommunicationsLogEntry, Region, District
 from wildlifecompliance.components.main.related_item import can_close_record
 from wildlifecompliance.components.section_regulation.models import SectionRegulation
-#from wildlifecompliance.components.users.models import CompliancePermissionGroup
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.organisations.models import Organisation
 
+from wildlifecompliance.components.main.utils import (
+    get_first_name,
+    get_last_name,
+)
+
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
 
 class Offence(RevisionedMixin):
     WORKFLOW_CREATE = 'create'
@@ -85,13 +94,13 @@ class Offence(RevisionedMixin):
         related_name='offence_assigned_to',
         null=True
     )
-    #allocated_group = models.ForeignKey(
-    #    CompliancePermissionGroup,
-    #    related_name='offence_allocated_group',
-    #    null=True
-    #)
-    #region = models.ForeignKey(Region, related_name='offence_region', null=True,)
-    #district = models.ForeignKey(District, related_name='offence_district', null=True,)
+    allocated_group = models.ForeignKey(
+       ComplianceManagementSystemGroup,
+       related_name='offence_allocated_group',
+       null=True
+    )
+    region = models.ForeignKey(Region, related_name='offence_region', null=True,)
+    district = models.ForeignKey(District, related_name='offence_district', null=True,)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -121,25 +130,37 @@ class Offence(RevisionedMixin):
         #return '{}'.format(self.identifier)
         return self.lodgement_number
 
+    @property
+    def allowed_groups(self):
+        if not self.allocated_group:
+            return []
+        groups = [self.allocated_group.id]
+        if not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED:
+            groups = groups + list(ComplianceManagementSystemGroup.objects.filter(name=self.allocated_group.name).values_list('id',flat=True))
+        elif settings.SUPER_AUTH_GROUPS_ENABLED:
+            queryset = ComplianceManagementSystemGroup.objects
+            groups = groups + list(ComplianceManagementSystemGroup.objects.filter(
+                (Q(name=self.allocated_group.name) & Q(region=None)) | 
+                (Q(name=self.allocated_group.name) & Q(region=self.allocated_group.region) & Q(district=None))).values_list('id',flat=True))
+        return list(set(groups))
+
     @staticmethod
     # Rewrite for Region District models
-    def get_compliance_permission_group(regionDistrictId):
+    def get_allocated_group(region_id, district_id):
         #region_district = RegionDistrict.objects.filter(id=regionDistrictId)
 
         # 2. Determine which permission(s) is going to be applied
-        compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
-        codename = 'officer'
-        per_district = True
+        # compliance_content_type = ContentType.objects.get(model="compliancepermissiongroup")
+        # codename = 'officer'
+        # per_district = True
 
-        permissions = Permission.objects.filter(codename=codename, content_type_id=compliance_content_type.id)
+        # permissions = Permission.objects.filter(codename=codename, content_type_id=compliance_content_type.id)
 
         # 3. Find groups which has the permission(s) determined above in the regionDistrict.
-        if per_district:
-            groups = CompliancePermissionGroup.objects.filter(region_district__in=region_district, permissions__in=permissions)
-        else:
-            groups = CompliancePermissionGroup.objects.filter(permissions__in=permissions)
-
-        return groups.first()
+        try:
+            return ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_OFFICER, region_id=region_id, district_id=district_id)
+        except:
+            return None
 
     @property
     # Rewrite for Region District models
@@ -188,7 +209,7 @@ def update_offence_doc_filename(instance, filename):
 
 class OffenceDocument(Document):
     offence = models.ForeignKey(Offence, related_name='documents')
-    _file = models.FileField(max_length=255, upload_to=update_offence_doc_filename)
+    _file = models.FileField(max_length=255, upload_to=update_offence_doc_filename, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -269,7 +290,7 @@ class Offender(models.Model):
 
     def __str__(self):
         if self.person:
-            return 'First name: {}, Last name: {}'.format(self.person.first_name, self.person.last_name)
+            return 'First name: {}, Last name: {}'.format(get_first_name(self.person), get_last_name(self.person))
         else:
             return '---'
 
@@ -306,7 +327,7 @@ class OffenceUserAction(models.Model):
 
 class OffenceCommsLogDocument(Document):
     log_entry = models.ForeignKey('OffenceCommsLogEntry', related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'

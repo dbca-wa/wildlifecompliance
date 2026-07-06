@@ -1,15 +1,13 @@
 <template lang="html">
     <div>
         <div class="form-group">
-            <label :id="id">{{ label }}</label>
+            <label :id="id" style="white-space: pre-line;">{{ label }} <HelpTextUrl :help_text_url="help_text_url" /></label>
             
             <template v-if="help_text">
                 <HelpText :help_text="help_text" />
             </template>
 
-            <template v-if="help_text_url">
-                <HelpTextUrl :help_text_url="help_text_url" />
-            </template>
+           
 
             <CommentBlock 
                 :label="label"
@@ -17,8 +15,11 @@
                 :field_data="field_data"
                 />
 
-            <div class='input-group date'>
-                <input type="text" :readonly="readonly" :name="name" class="form-control" placeholder="DD/MM/YYYY" v-model="value" :required="isRequired"/>
+            <div v-if="isTableField" class='date date-class'>
+                <input type="text" :readonly="readonly" :name="name" class="form-control" placeholder="DD/MM/YYYY" v-model="value" :required="isRequired" :title="value"/>
+            </div>
+            <div v-else class='input-group date'>
+                <input type="text" :readonly="readonly" :name="name" class="form-control" placeholder="DD/MM/YYYY" v-model="value" :required="isRequired" :title="value"/>
                 <span class="input-group-addon">
                     <span class="glyphicon glyphicon-calendar"></span>
                 </span>
@@ -36,7 +37,7 @@ import HelpText from './help_text.vue';
 import HelpTextUrl from './help_text_url.vue';
 import { mapGetters } from 'vuex';
 export default {
-    props: ["name", "label", "id", "readonly", "help_text", "field_data", "conditions", "handleChange", "isRequired", "help_text_url"],
+    props: ["name", "label", "id", "readonly", "help_text", "field_data", "conditions", "handleChange", "isRequired", "help_text_url", "isTableField"],
     data(){
         return {
         }
@@ -88,4 +89,7 @@ export default {
     input {
         box-shadow:none;
     }
+.date-class {
+    margin-top: -20px;
+}
 </style>

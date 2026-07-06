@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
 import logging
+from wildlifecompliance import settings
 from django.db import models
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields.jsonb import JSONField
-from django.db.models import Max
+from django.db.models import Q, Max
 from django.utils.encoding import python_2_unicode_compatible
 from ledger.accounts.models import EmailUser, RevisionedMixin
 from ledger.licence.models import LicenceType
@@ -17,12 +18,16 @@ from wildlifecompliance.components.main.models import (
         Document,
         )
 from wildlifecompliance.components.main.related_item import can_close_legal_case
-#from wildlifecompliance.components.users.models import CompliancePermissionGroup
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from wildlifecompliance.components.users.models import Region, District
 from django.core.exceptions import ValidationError
 from treebeard.mp_tree import MP_Node
 from datetime import datetime, timedelta, date
 from django.utils import timezone
+
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+private_storage = FileSystemStorage(location=settings.BASE_DIR+"/private-media/", base_url='/private-media/')
 
 logger = logging.getLogger(__name__)
 
@@ -121,21 +126,21 @@ class LegalCase(RevisionedMixin):
         related_name='legal_case_assigned_to',
         null=True
         )
-    #allocated_group = models.ForeignKey(
-    #    CompliancePermissionGroup,
-    #    related_name='legal_case_allocated_group', 
-    #    null=True
-    #    )
-    #region = models.ForeignKey(
-    #    Region, 
-    #    related_name='legal_case_region', 
-    #    null=True
-    #)
-    #district = models.ForeignKey(
-    #    District, 
-    #    related_name='legal_case_district', 
-    #    null=True
-    #)
+    allocated_group = models.ForeignKey(
+       ComplianceManagementSystemGroup,
+       related_name='legal_case_allocated_group', 
+       null=True
+       )
+    region = models.ForeignKey(
+       Region, 
+       related_name='legal_case_region', 
+       null=True
+    )
+    district = models.ForeignKey(
+       District, 
+       related_name='legal_case_district', 
+       null=True
+    )
     legal_case_priority = models.ForeignKey(
             LegalCasePriority,
             null=True
@@ -181,6 +186,20 @@ class LegalCase(RevisionedMixin):
     def get_related_items_descriptor(self):
         #return '{0}, {1}'.format(self.title, self.details)
         return self.title
+    
+    @property
+    def allowed_groups(self):
+        if not self.allocated_group:
+            return []
+        groups = [self.allocated_group.id]
+        if not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED:
+            groups = groups + list(ComplianceManagementSystemGroup.objects.filter(name=self.allocated_group.name).values_list('id',flat=True))
+        elif settings.SUPER_AUTH_GROUPS_ENABLED:
+            queryset = ComplianceManagementSystemGroup.objects
+            groups = groups + list(ComplianceManagementSystemGroup.objects.filter(
+                (Q(name=self.allocated_group.name) & Q(region=None)) | 
+                (Q(name=self.allocated_group.name) & Q(region=self.allocated_group.region) & Q(district=None))).values_list('id',flat=True))
+        return list(set(groups))
 
     def close(self, request=None):
         close_record, parents = can_close_legal_case(self, request)
@@ -207,6 +226,9 @@ class LegalCase(RevisionedMixin):
         self.log_user_action(
             LegalCaseUserAction.ACTION_STATUS_BRIEF_OF_EVIDENCE.format(self.number), 
             request)
+        
+        #set allocated_group
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(district=self.district, region=self.region, name=settings.GROUP_OFFICER)
         self.save()
 
     def set_status_generate_prosecution_brief(self, request):
@@ -215,6 +237,9 @@ class LegalCase(RevisionedMixin):
         self.log_user_action(
             LegalCaseUserAction.ACTION_GENERATE_PROSECUTION_BRIEF.format(self.number), 
             request)
+        
+        #set allocated_group
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_COORDINATOR)
         self.save()
 
     def send_to_prosecution_coordinator(self, request):
@@ -224,7 +249,7 @@ class LegalCase(RevisionedMixin):
             LegalCaseUserAction.ACTION_STATUS_WITH_PROSECUTION_COORDINATOR.format(self.number), 
             request)
         # set allocated group to 
-        self.allocated_group = CompliancePermissionGroup.objects.get(permissions__codename="prosecution_coordinator")
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_COORDINATOR)
         self.save()
 
     def back_to_prosecution_coordinator(self, request):
@@ -234,7 +259,7 @@ class LegalCase(RevisionedMixin):
             LegalCaseUserAction.ACTION_STATUS_WITH_PROSECUTION_COORDINATOR_PROSECUTION_BRIEF.format(self.number), 
             request)
         # set allocated group to 
-        self.allocated_group = CompliancePermissionGroup.objects.get(permissions__codename="prosecution_coordinator")
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_COORDINATOR)
         self.save()
 
     def send_to_prosecution_council(self, request):
@@ -244,7 +269,7 @@ class LegalCase(RevisionedMixin):
             LegalCaseUserAction.ACTION_STATUS_WITH_PROSECUTION_COUNCIL.format(self.number), 
             request)
         # set allocated group to 
-        self.allocated_group = CompliancePermissionGroup.objects.get(permissions__codename="prosecution_council")
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_COUNCIL)
         self.save()
 
     def approve_for_court(self, request):
@@ -254,7 +279,8 @@ class LegalCase(RevisionedMixin):
             LegalCaseUserAction.ACTION_APPROVE_FOR_COURT.format(self.number), 
             request)
         # set allocated group to 
-        self.allocated_group = CompliancePermissionGroup.objects.get(permissions__codename="prosecution_council")
+        #TODO: should there be a specific court PC group?
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_COORDINATOR)
         self.save()
 
     def send_to_prosecution_manager(self, request):
@@ -264,7 +290,7 @@ class LegalCase(RevisionedMixin):
             LegalCaseUserAction.ACTION_STATUS_WITH_PROSECUTION_MANAGER.format(self.number), 
             request)
         # set allocated group to 
-        self.allocated_group = CompliancePermissionGroup.objects.get(permissions__codename="prosecution_manager")
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_PROSECUTION_MANAGER)
         self.save()
 
     def send_to_manager(self, request):
@@ -276,16 +302,22 @@ class LegalCase(RevisionedMixin):
         # set allocated group to 
         #region_district_id = self.district_id if self.district_id else self.region_id
         #region_district = Region.objects.get(id=region_district_id)
-        region_district = self.allocated_group.region_district
-        if type(region_district) is District:
-            self.allocated_group = CompliancePermissionGroup.district_groups.get(district=region_district, permissions__codename="manager")
-        elif type(region_district) is Region:
-            self.allocated_group = CompliancePermissionGroup.district_groups.get(region=region_district, permissions__codename="manager")
+        #region_district = self.allocated_group.region_district
+        region = self.allocated_group.region
+        district = self.allocated_group.district
+
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(name=settings.GROUP_MANAGER,district=district,region=region)
+
+        #if type(region_district) is District:
+        #    self.allocated_group = CompliancePermissionGroup.district_groups.get(district=region_district, permissions__codename="manager")
+        #elif type(region_district) is Region:
+        #    self.allocated_group = CompliancePermissionGroup.district_groups.get(region=region_district, permissions__codename="manager")
         #self.allocated_group = CompliancePermissionGroup.objects.get(region_district=region_district, permissions__codename="manager")
         self.save()
 
     def back_to_case(self, request):
         self.assigned_to = None
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(district=self.district, region=self.region, name=settings.GROUP_OFFICER)
         self.status = self.STATUS_OPEN
         self.log_user_action(
             LegalCaseUserAction.ACTION_BACK_TO_CASE.format(self.number), 
@@ -302,11 +334,8 @@ class LegalCase(RevisionedMixin):
         #region_district_id = self.district_id if self.district_id else self.region_id
         #region_district = RegionDistrict.objects.get(id=region_district_id)
         #self.allocated_group = CompliancePermissionGroup.objects.get(region_district=region_district, permissions__codename="officer")
-        region_district = self.allocated_group.region_district
-        if type(region_district) is District:
-            self.allocated_group = CompliancePermissionGroup.district_groups.get(district=region_district, permissions__codename="officer")
-        elif type(region_district) is Region:
-            self.allocated_group = CompliancePermissionGroup.district_groups.get(region=region_district, permissions__codename="officer")
+        #region_district = self.allocated_group.region_district
+        self.allocated_group = ComplianceManagementSystemGroup.objects.get(district=self.district, region=self.region, name=settings.GROUP_OFFICER)
         self.save()
 
 
@@ -526,7 +555,7 @@ class LegalCaseCommsLogDocument(Document):
     log_entry = models.ForeignKey(
         LegalCaseCommsLogEntry,
         related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -572,7 +601,7 @@ class LegalCaseUserAction(models.Model):
 
 class LegalCaseDocument(Document):
     legal_case = models.ForeignKey(LegalCase, related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
@@ -588,7 +617,7 @@ class LegalCaseDocument(Document):
 
 class ProsecutionNoticeDocument(Document):
     legal_case = models.ForeignKey(LegalCase, related_name='prosecution_notices')
-    _file = models.FileField(max_length=255,)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -598,7 +627,7 @@ class ProsecutionNoticeDocument(Document):
 
 class CourtHearingNoticeDocument(Document):
     legal_case = models.ForeignKey(LegalCase, related_name='court_hearing_notices')
-    _file = models.FileField(max_length=255,)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -608,7 +637,7 @@ class CourtHearingNoticeDocument(Document):
 
 class BriefOfEvidenceDocument(Document):
     brief_of_evidence = models.ForeignKey(BriefOfEvidence, related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
@@ -622,7 +651,7 @@ class BriefOfEvidenceDocument(Document):
 
 class ProsecutionBriefDocument(Document):
     prosecution_brief = models.ForeignKey(ProsecutionBrief, related_name='documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
     input_name = models.CharField(max_length=255, blank=True, null=True)
     # after initial submit prevent document from being deleted
     can_delete = models.BooleanField(default=True)
@@ -637,7 +666,7 @@ class ProsecutionBriefDocument(Document):
 
 class LegalCaseGeneratedDocument(Document):
     legal_case = models.ForeignKey(LegalCase, related_name='generated_documents')
-    _file = models.FileField(max_length=255)
+    _file = models.FileField(max_length=255, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'
@@ -651,7 +680,7 @@ def update_court_outcome_doc_filename(instance, filename):
 
 class CourtOutcomeDocument(Document):
     court_proceedings = models.ForeignKey(CourtProceedings, related_name='court_outcome_documents')
-    _file = models.FileField(max_length=255, upload_to=update_court_outcome_doc_filename)
+    _file = models.FileField(max_length=255, upload_to=update_court_outcome_doc_filename, storage=private_storage)
 
     class Meta:
         app_label = 'wildlifecompliance'

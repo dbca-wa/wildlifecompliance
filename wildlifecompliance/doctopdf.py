@@ -4,7 +4,11 @@ from django.conf import settings
 from docxtpl import DocxTemplate
 from wildlifecompliance.components.main.models import SanctionOutcomeWordTemplate
 from wildlifecompliance.components.sanction_outcome.models import AllegedCommittedOffence
-
+from wildlifecompliance.components.main.utils import (
+    get_dob,
+    get_first_name,
+    get_last_name,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +38,9 @@ def retrieve_context(sanction_outcome):
     except:
         raise Exception('No offender found for the Sanction Outcome: {}'.format(sanction_outcome.lodgement_number))
 
-    offender_family_name = offender.last_name if offender.last_name else ''
-    offender_given_name = offender.first_name if offender.first_name else ''
-    offender_dob = offender.dob.strftime('%d/%m/%Y') if offender.dob else ''
+    offender_family_name = get_last_name(offender)
+    offender_given_name = get_first_name(offender)
+    offender_dob = get_dob(offender).strftime('%d/%m/%Y')
     offender_postcode = offender.residential_address.postcode if offender.residential_address else ''
     offender_residential_address = offender.residential_address if offender.residential_address else ''
     offender_email = offender.email if offender.email else ''

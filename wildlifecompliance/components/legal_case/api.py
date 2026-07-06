@@ -5,11 +5,11 @@ import traceback
 import os
 import base64
 import geojson
+
 from django.db.models import Q, Min, Max
 from django.db import transaction
 from django.http import HttpResponse
 from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from wildlifecompliance import settings
@@ -17,7 +17,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from rest_framework import viewsets, serializers, status, generics, views, filters
+from rest_framework import viewsets, serializers, status, generics, views, filters, mixins
 import rest_framework.exceptions as rest_exceptions
 from rest_framework.decorators import (
     detail_route,
@@ -39,7 +39,7 @@ from datetime import datetime, timedelta, date
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from wildlifecompliance.components.main.api import save_location
-from wildlifecompliance.components.main.models import TemporaryDocumentCollection
+from wildlifecompliance.components.main.models import TemporaryDocumentCollection, ComplianceManagementSystemGroupPermission
 from wildlifecompliance.components.main.process_document import (
         process_generic_document, 
         save_comms_log_document_obj
@@ -49,7 +49,7 @@ from wildlifecompliance.components.users.serializers import (
     UserAddressSerializer,
     ComplianceUserDetailsSerializer,
 )
-from wildlifecompliance.helpers import is_customer, is_internal
+from wildlifecompliance.helpers import is_customer, is_internal, is_compliance_internal_user
 from wildlifecompliance.components.legal_case.models import (
     LegalCase,
     LegalCaseUserAction,
@@ -101,6 +101,7 @@ from wildlifecompliance.components.legal_case.serializers import (
 from wildlifecompliance.components.organisations.models import (
     Organisation,    
 )
+from wildlifecompliance.components.main.models import ComplianceManagementSystemGroup
 from django.contrib.auth.models import Permission, ContentType
 
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
@@ -125,7 +126,9 @@ from wildlifecompliance.components.artifact.utils import (
         update_pb_document_artifacts_ticked,
         copy_brief_of_evidence_artifacts_to_prosecution_brief,
         )
-
+from wildlifecompliance.components.main.utils import (
+    get_full_name
+)
 
 #class FakeRequest():
  #   def __init__(self, data):
@@ -155,7 +158,7 @@ class LegalCaseFilterBackend(DatatablesFilterBackend):
                     or search_text in (case_created_date_str.lower() if case_created_date_str else '')
                     or search_text in (legal_case.title.lower() if legal_case.title else '')
                     or search_text in (
-                        legal_case.assigned_to.first_name.lower() + ' ' + legal_case.assigned_to.last_name.lower()
+                        get_full_name(legal_case.assigned_to).lower()
                         if legal_case.assigned_to else ''
                         )
                     ):
@@ -202,24 +205,24 @@ class LegalCaseFilterBackend(DatatablesFilterBackend):
         return queryset
 
 
-class LegalCaseRenderer(DatatablesRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
-            data['recordsTotal'] = renderer_context['view']._datatables_total_count
-        return super(LegalCaseRenderer, self).render(data, accepted_media_type, renderer_context)
+#class LegalCaseRenderer(DatatablesRenderer):
+#    def render(self, data, accepted_media_type=None, renderer_context=None):
+#        if 'view' in renderer_context and hasattr(renderer_context['view'], '_datatables_total_count'):
+#            data['recordsTotal'] = renderer_context['view']._datatables_total_count
+#        return super(LegalCaseRenderer, self).render(data, accepted_media_type, renderer_context)
 
 
-class LegalCasePaginatedViewSet(viewsets.ModelViewSet):
+class LegalCasePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (LegalCaseFilterBackend,)
     pagination_class = DatatablesPageNumberPagination
-    renderer_classes = (LegalCaseRenderer,)
+    #renderer_classes = (LegalCaseRenderer,)
     queryset = LegalCase.objects.none()
     serializer_class = LegalCaseDatatableSerializer
     page_size = 10
     
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request):
             return LegalCase.objects.all()
         return LegalCase.objects.none()
 
@@ -228,7 +231,6 @@ class LegalCasePaginatedViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
 
         queryset = self.filter_queryset(queryset)
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = LegalCaseDatatableSerializer(
             result_page, many=True, context={'request': request})
@@ -243,23 +245,20 @@ class LegalCasePaginatedViewSet(viewsets.ModelViewSet):
         person = None
         if entity_type == 'person':
             person = EmailUser.objects.get(id=entity_id)
-
-        #queryset = self.filter_queryset(queryset)
         queryset = person.legal_case_associated_persons.all()
-        self.paginator.page_size = queryset.count()
         result_page = self.paginator.paginate_queryset(queryset, request)
         serializer = LegalCaseDatatableSerializer(
             result_page, many=True, context={'request': request})
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class LegalCaseViewSet(viewsets.ModelViewSet):
-    queryset = LegalCase.objects.all()
+class LegalCaseViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
+    queryset = LegalCase.objects.none()
     serializer_class = BaseLegalCaseSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if is_internal(self.request):
+        if is_compliance_internal_user(self.request):
             return LegalCase.objects.all()
         return LegalCase.objects.none()
 
@@ -339,7 +338,7 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     def status_choices(self, request, *args, **kwargs):
         res_obj = [] 
         for choice in LegalCase.STATUS_CHOICES:
-            res_obj.append({'id': choice[0], 'display': choice[1]});
+            res_obj.append({'id': choice[0], 'display': choice[1]})
         res_json = json.dumps(res_obj)
         return HttpResponse(res_json, content_type='application/json')
 
@@ -453,9 +452,73 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
                         instance.associated_persons.add(email_user)
                         instance.save()
 
+    def check_authorised_to_update(self,request):
+        instance = self.get_object()
+        user = self.request.user
+        user_auth_groups = ComplianceManagementSystemGroupPermission.objects.filter(emailuser=user)
+
+        return instance.assigned_to_id == user.id and user_auth_groups.filter(group__id__in=instance.allowed_groups).exists()        
+    
+    def check_authorised_to_create(self,request):
+        region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+        district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+        user = self.request.user
+        #check that request user is an officer or manager in the specified region and district
+        if settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and settings.SUPER_AUTH_GROUPS_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+            Q(emailuser=user) & 
+            (Q(group__region_id=region_id) | Q(group__region_id=None))
+            ).filter(
+                Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+        elif settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+            emailuser=user, 
+            group__region_id=region_id, 
+            group__district_id=district_id
+            ).filter(
+                Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            return False
+        elif not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+                Q(emailuser=user) & 
+                (Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER))).exists():
+            return False
+
+        assigned_to_id = None if not request.data.get('assigned_to_id') else request.data.get('assigned_to_id')
+
+        if settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and settings.SUPER_AUTH_GROUPS_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+            Q(emailuser=assigned_to_id) & 
+            (Q(group__region_id=region_id) | Q(group__region_id=None))
+            ).filter(
+                Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            raise serializers.ValidationError(str("Specified user does not belong to appropriate authorisation group for the specified region/district"))
+        elif settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+            emailuser=assigned_to_id, 
+            group__region_id=region_id, 
+            group__district_id=district_id
+            ).filter(
+                Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER)).exists():
+            raise serializers.ValidationError(str("Specified user does not belong to appropriate authorisation group for the specified region/district"))
+        elif not settings.AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED and not ComplianceManagementSystemGroupPermission.objects.filter(
+                Q(emailuser=assigned_to_id) & 
+                (Q(group__name=settings.GROUP_OFFICER) | 
+                Q(group__name=settings.GROUP_MANAGER))).exists():
+            raise serializers.ValidationError(str("Specified user does not belong to appropriate authorisation group for the specified region/district"))
+
+        return True
+
     @renderer_classes((JSONRenderer,))
     def update(self, request, workflow=False, *args, **kwargs):
         try:
+
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             with transaction.atomic():
                 instance = self.get_object()
                 # Running Sheet
@@ -743,6 +806,15 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def process_brief_of_evidence_document(self, request, *args, **kwargs):
         try:
+
+            #if the action is anything other than list, check auth
+            action = request.data.get('action')
+            if action != 'list':
+                #in-group and assigned OR on inspection team
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
             instance = self.get_object()
             if hasattr(instance, 'brief_of_evidence'):
                 returned_data = process_generic_document(request, instance.brief_of_evidence)
@@ -833,6 +905,16 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def process_court_hearing_notice_document(self, request, *args, **kwargs):
         try:
+
+            #if the action is anything other than list, check auth
+            action = request.data.get('action')
+            if action != 'list':
+                #in-group and assigned OR on inspection team
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+
             instance = self.get_object()
             # process docs
             returned_data = process_generic_document(request, instance, 'court_hearing_notice')
@@ -866,6 +948,16 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def process_prosecution_notice_document(self, request, *args, **kwargs):
         try:
+
+            #if the action is anything other than list, check auth
+            action = request.data.get('action')
+            if action != 'list':
+                #in-group and assigned OR on inspection team
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+
             instance = self.get_object()
             # process docs
             returned_data = process_generic_document(request, instance, 'prosecution_notice')
@@ -899,6 +991,16 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def process_prosecution_brief_document(self, request, *args, **kwargs):
         try:
+
+            #if the action is anything other than list, check auth
+            action = request.data.get('action')
+            if action != 'list':
+                #in-group and assigned OR on inspection team
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+
             instance = self.get_object()
             if hasattr(instance, 'prosecution_brief'):
                 returned_data = process_generic_document(request, instance.prosecution_brief)
@@ -923,6 +1025,16 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def process_default_document(self, request, *args, **kwargs):
         try:
+
+            #if the action is anything other than list, check auth
+            action = request.data.get('action')
+            if action != 'list':
+                #in-group and assigned OR on inspection team
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+
             instance = self.get_object()
             returned_data = process_generic_document(request, instance)
             if returned_data:
@@ -947,6 +1059,16 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def process_court_outcome_document(self, request, *args, **kwargs):
         try:
+
+            #if the action is anything other than list, check auth
+            action = request.data.get('action')
+            if action != 'list':
+                #in-group and assigned OR on inspection team
+                if not self.check_authorised_to_update(request):
+                    return Response(
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+
             instance = self.get_object()
             returned_data = process_generic_document(request, instance, document_type='court_outcome')
             if returned_data:
@@ -998,6 +1120,13 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         try:
+
+            #to create make sure user is in appropriate group (officer or manager in region)
+            if not self.check_authorised_to_create(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+            
             with transaction.atomic():
                 serializer = SaveLegalCaseSerializer(
                         data=request.data, 
@@ -1048,6 +1177,11 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
             with transaction.atomic():
                 # email recipient
                 #recipient_id = None
+                if not create_legal_case:
+                    if not self.check_authorised_to_update(request):
+                        return Response(
+                            status=status.HTTP_401_UNAUTHORIZED,
+                        )
 
                 if not instance:
                     instance = self.get_object()
@@ -1066,6 +1200,14 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
                             for doc in temp_doc_collection.documents.all():
                                 save_comms_log_document_obj(instance, workflow_entry, doc)
                             temp_doc_collection.delete()
+
+                try:
+                    region_id = None if not request.data.get('region_id') else request.data.get('region_id')
+                    district_id = None if not request.data.get('district_id') else request.data.get('district_id')
+                    allocated_group = ComplianceManagementSystemGroup.objects.get(district_id=district_id, region_id=region_id, name=settings.GROUP_OFFICER)
+                except Exception as e:
+                    error_str = "No " + settings.GROUP_OFFICER + " group exists for provided region/district"
+                    raise serializers.ValidationError(error_str)
 
                 ## Set Inspection status depending on workflow type
                 workflow_type = request.data.get('workflow_type')
@@ -1098,7 +1240,7 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
                     instance.district_id = None if not request.data.get('district_id') else request.data.get('district_id')
                     instance.assigned_to_id = None if not request.data.get('assigned_to_id') else request.data.get('assigned_to_id')
                     instance.legal_case_priority_id = None if not request.data.get('legal_case_priority_id') else request.data.get('legal_case_priority_id')
-                    instance.allocated_group_id = None if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
+                    instance.allocated_group = allocated_group if not request.data.get('allocated_group_id') else request.data.get('allocated_group_id')
                     instance.call_email_id = None if not request.data.get('call_email_id') else request.data.get('call_email_id')
                     instance.details = None if not request.data.get('details') else request.data.get('details')
 
@@ -1222,6 +1364,12 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def delete_reinstate_journal_entry(self, request, *args, **kwargs):
         try:
+
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             instance = self.get_object()
             journal_entry_id = request.data.get("journal_entry_id")
             deleted = request.data.get("deleted")
@@ -1258,6 +1406,12 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def create_journal_entry(self, request, *args, **kwargs):
         try:
+
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             instance = self.get_object()
             request_data = {
                             "court_proceedings_id": request.data.get('court_proceedings_id'),
@@ -1286,11 +1440,16 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise serializers.ValidationError(str(e))
 
-###########
     @detail_route(methods=['POST'])
     @renderer_classes((JSONRenderer,))
     def delete_reinstate_running_sheet_entry(self, request, *args, **kwargs):
         try:
+
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+            
             instance = self.get_object()
             running_sheet_id = request.data.get("running_sheet_id")
             deleted = request.data.get("deleted")
@@ -1327,6 +1486,12 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
     @renderer_classes((JSONRenderer,))
     def create_running_sheet_entry(self, request, *args, **kwargs):
         try:
+
+            if not self.check_authorised_to_update(request):
+                return Response(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             instance = self.get_object()
             request_data = {
                             "legal_case_id": instance.id,
@@ -1357,13 +1522,13 @@ class LegalCaseViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
 
-class LegalCasePriorityViewSet(viewsets.ModelViewSet):
-   queryset = LegalCasePriority.objects.all()
+class LegalCasePriorityViewSet(viewsets.ReadOnlyModelViewSet):
+   queryset = LegalCasePriority.objects.none()
    serializer_class = LegalCasePrioritySerializer
 
    def get_queryset(self):
        # user = self.request.user
-       if is_internal(self.request):
+       if is_compliance_internal_user(self.request):
            return LegalCasePriority.objects.all()
        return LegalCasePriority.objects.none()
 

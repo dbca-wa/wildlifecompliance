@@ -6,11 +6,11 @@
                 <input v-if="!readonly" :onclick="isClickable" ref="Checkbox" :name="name" type="checkbox" :class="group" data-parsley-required :data-conditions="options" @change="handleChange" :checked="isChecked" :required="isRequired"/>
                 <input v-if="readonly" disabled :onclick="isClickable" ref="Checkbox" :name="name" type="checkbox" :class="group" data-parsley-required :data-conditions="options" @change="handleChange" :checked="isChecked" :required="isRequired"/>
                 {{ label }}
-                <template v-if="help_text">
-                  <HelpText :help_text="help_text" />
-                </template>
                 <template v-if="help_text_url">
                   <HelpTextUrl :help_text_url="help_text_url" />
+                </template>
+                <template v-if="help_text">
+                  <HelpText :help_text="help_text" />
                 </template>
 
             </div>

@@ -207,6 +207,7 @@ class SchemaMasterlistSerializer(serializers.ModelSerializer):
                     {
                         'label': h['label'],
                         'value': h['value'],
+                        'colSize': h.get('colSize', None)
 
                     } for h in header_list
                 ]
@@ -253,6 +254,7 @@ class DTSchemaMasterlistSerializer(SchemaMasterlistSerializer):
             'options',
             'headers',
             'expanders',
+            'help_text_url'
         )
         # the serverSide functionality of datatables is such that only columns
         # that have field 'data' defined are requested from the serializer. Use
@@ -267,7 +269,7 @@ class DTSchemaMasterlistSerializer(SchemaMasterlistSerializer):
 
     def get_headers(self, obj):
         headers = obj.get_headers()
-        data = [{'value': h['value'], 'label': h['label']} for h in headers]
+        data = [{'value': h['value'], 'label': h['label'], 'colSize': h.get('colSize', None)} for h in headers]
         return data
 
     def get_expanders(self, obj):

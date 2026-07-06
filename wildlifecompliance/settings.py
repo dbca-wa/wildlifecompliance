@@ -18,7 +18,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_wc')
 SHOW_DEBUG_TOOLBAR = env('SHOW_DEBUG_TOOLBAR', False)
 APPEND_SOURCE_TO_RICHTEXT_ADMIN = env('APPEND_SOURCE_TO_RICHTEXT_ADMIN', False)
 FILE_UPLOAD_MAX_MEMORY_SIZE = env('FILE_UPLOAD_MAX_MEMORY_SIZE', 2621440) # 2.5MB --> Django Default
+STOP_SQL_LOG = env('STOP_SQL_LOG', False)
+SHOW_ROOT_API = env('SHOW_ROOT_API', False)
 
+LEDGER_UI_URL=env('LEDGER_UI_URL','')
+
+SSO_SETTING_URL=env('SSO_SETTING_URL','')
 
 if SHOW_DEBUG_TOOLBAR:
 #    def get_ip():
@@ -75,6 +80,7 @@ INSTALLED_APPS += [
     'rest_framework_datatables',
     'smart_selects',
     'ckeditor',
+    'appmonitor_client',
 ]
 
 CKEDITOR_BASEPATH = '/static/ckeditor/ckeditor/'
@@ -155,6 +161,11 @@ TEMPLATES[0]['DIRS'].append(
         'components',
         'emails',
         'templates'))
+
+TEMPLATES[0]["OPTIONS"]["context_processors"].append(
+    "wildlifecompliance.context_processors.authorised_index"
+)
+
 del BOOTSTRAP3['css_url']
 #BOOTSTRAP3 = {
 #    'jquery_url': '//static.dbca.wa.gov.au/static/libs/jquery/2.2.1/jquery.min.js',
@@ -219,7 +230,23 @@ LOGGING['loggers']['securebase_manager'] = {
 #     'handlers': ['compliancemanagement'],
 #     'level': 'INFO'
 # }
-print(BASE_DIR)
+if not STOP_SQL_LOG:
+    LOGGING['handlers']['console'] = {
+        'level': 'DEBUG',
+        'class': 'logging.handlers.RotatingFileHandler',
+        'filename': os.path.join(
+            BASE_DIR,
+            'logs',
+            'sql.log'),
+        'formatter': 'verbose',
+        'maxBytes': 5242880   
+    }
+    LOGGING['loggers']['django.db.backends'] = {
+        'handlers': ['console'],
+        'level': 'DEBUG'
+    }
+
+
 STATICFILES_DIRS.append(
     os.path.join(
         os.path.join(
@@ -254,6 +281,7 @@ WC_PAYMENT_SYSTEM_PREFIX = env('PAYMENT_SYSTEM_PREFIX', WC_PAYMENT_SYSTEM_ID.rep
 PS_PAYMENT_SYSTEM_ID = WC_PAYMENT_SYSTEM_ID
 WC_PAYMENT_SYSTEM_URL_PDF = env('WC_PAYMENT_SYSTEM_URL_PDF', '/ledger/payments/invoice-pdf/')
 WC_PAYMENT_SYSTEM_URL_INV = env('WC_PAYMENT_SYSTEM_URL_INV', '/ledger/payments/invoice/')
+WC_PAY_INFR_URL = env('WC_PAY_INFR_URL','https://www.google.com')
 
 COLS_ADMIN_GROUP = env('COLS_ADMIN_GROUP', 'COLS Admin')
 if not VALID_SYSTEMS:
@@ -282,6 +310,9 @@ RENEWAL_PERIOD_DAYS = env('RENEWAL_PERIOD_DAYS', 30)
 GEOCODING_ADDRESS_SEARCH_TOKEN = env('GEOCODING_ADDRESS_SEARCH_TOKEN', 'ACCESS_TOKEN_NOT_FOUND')
 DOT_EMAIL_ADDRESS = env('DOT_EMAIL_ADDRESS')
 
+SUPER_AUTH_GROUPS_ENABLED = env('SUPER_AUTH_GROUPS_ENABLED',False) #allows officers (or equivalent group type) without specified region access all regions, and officers without specified district to access all districts within a specified region
+AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED = env('AUTH_GROUP_REGION_DISTRICT_LOCK_ENABLED',False) #restricts officers (or equivalent group type) to only their specified region/district (with exceptions if SUPER_AUTH_GROUPS_ENABLED)
+
 # Details for Threathened Species and Communities server.
 TSC_URL = env('TSC_URL', 'https://tsc.dbca.wa.gov.au')
 TSC_AUTH = env('TSC_AUTH', 'NO_AUTH')
@@ -309,6 +340,7 @@ HTTP_HOST_FOR_TEST = env('HTTP_HOST_FOR_TEST', 'localhost:8123')
 
 GROUP_CALL_EMAIL_TRIAGE = "call_email_triage"
 GROUP_OFFICER = "officer"
+GROUP_INSPECTION_OFFICER = "inspection_officer"
 GROUP_MANAGER = "manager"
 GROUP_VOLUNTEER = "volunteer"
 GROUP_INFRINGEMENT_NOTICE_COORDINATOR = "infringement_notice_coordinator"
@@ -323,6 +355,7 @@ GROUP_LICENSING_ADMIN = "licensing_admin"
 GROUP_NAME_CHOICES = (
     (GROUP_CALL_EMAIL_TRIAGE, "Call Email Triage"),
     (GROUP_OFFICER, "Officer"),
+    (GROUP_INSPECTION_OFFICER, "Inspection Officer"),
     (GROUP_MANAGER, "Manager"),
     (GROUP_VOLUNTEER, "Volunteer"),
     (GROUP_INFRINGEMENT_NOTICE_COORDINATOR, "Infringement Notice Coordinator"),
@@ -336,8 +369,17 @@ GROUP_NAME_CHOICES = (
     (GROUP_LICENSING_ADMIN, "Licensing Admin"),
 )
 
+GROUP_WILDLIFE_COMPLIANCE_OFFICERS = "Wildlife Compliance Officers"
+GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS = "Wildlife Compliance - Payment Officers"
+
 AUTH_GROUP_COMPLIANCE_BUSINESS_ADMIN = 'Wildlife Compliance - Compliance Business Admin'
 CUSTOM_AUTH_GROUPS = [
     AUTH_GROUP_COMPLIANCE_BUSINESS_ADMIN,
     ]
 CALL_EMAIL_AVAILABLE_STATUS_VALUES = ['draft','open','closed']
+VERSION_NO="1.0.1"
+
+COMPLIANCE_LINKS_ENABLED = env('COMPLIANCE_LINKS_ENABLED', False)
+
+
+REPORTING_EMAIL = env('REPORTING_EMAIL', '').lower()

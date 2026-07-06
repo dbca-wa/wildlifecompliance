@@ -1,56 +1,61 @@
 <template lang="html">
     <div class="form-group">
-        <label :id="id" for="label" class="expander-label">{{ label }}</label>
+        <label :id="id" for="label" class="expander-label" style="white-space: pre-line;">{{ label }} <HelpTextUrl :help_text_url="help_text_url" /></label>
+
         <template v-if="help_text">
             <HelpText :help_text="help_text" />
         </template>
 
-        <template v-if="help_text_url">
+        <!-- <template v-if="help_text_url">
             <HelpTextUrl :help_text_url="help_text_url" />
-        </template>
+        </template> -->
+        
 
         <CommentBlock 
             :label="label"
             :name="name"
             :field_data="field_data"
             />
-
-        <div class="row header-titles-row">
-            <div :class="`col-xs-${Math.floor(12 / component.header.length)}`"
-                v-for="(header, index) in component.header"
-                v-bind:key="`expander_header_${component.name}_${index}`">
-                    {{ header.label }}
-            </div>
-        </div>
-        <div class="expander-table" v-for="(table, tableIdx) in expanderTables">
-            <div class="row header-row">
-                <div :class="`col-xs-${Math.floor(12 / component.header.length)}`"
-                    v-for="(header, index) in component.header"
+        <div :class="tableClass"> 
+            <div class="row header-titles-row">
+            
+                <div v-for="(header, index) in component.header"
+                    :class="`col-xs-${getColXSValue(header.colSize)} truncate-text`"
                     v-bind:key="`expander_header_${component.name}_${index}`">
-                        <span v-if="index===0 && component.expander && component.expander.length>0" :class="`expand-icon ${isExpanded(table) ? 'collapse' : ''}`"
-                            v-on:click="toggleTableVisibility(table)"></span>
-
-                        <span class="header-contents">
-                            <renderer-block
-                            :component="removeLabel(header)"
-                            :json_data="value"
-                            :instance="table"
-                            v-bind:key="`expander_header_contents_${component.name}_${index}`"
-                            />
-                        </span>
-                        <a v-if="tableIdx && index == component.header.length-1 && !readonly" class="delete-icon fa fa-trash-o" title="Delete row"
-                            @click.prevent="removeTable(table)"></a>
+                        {{ header.label }}
                 </div>
             </div>
-            <div :class="{'hidden': !isExpanded(table)}">
-                <div class="row expander-row" v-for="(subcomponent, index) in component.expander" v-bind:key="`expander_row_${component.name}_${index}`">
-                    <div class="col-xs-12">
-                        <renderer-block
-                            :component="subcomponent"
-                            :json_data="value"
-                            :instance="table"
-                            v-bind:key="`expander_contents_${component.name}_${index}`"
-                            />
+            <div class="expander-table" v-for="(table, tableIdx) in expanderTables">
+                <div class="row header-row">
+                    <div v-for="(header, index) in component.header"
+                        :class="`col-xs-${getColXSValue(header.colSize)}`"
+                        v-bind:key="`expander_header_${component.name}_${index}`">
+                            <span v-if="index===0 && component.expander && component.expander.length>0" :class="`expand-icon ${isExpanded(table) ? 'collapse' : ''}`"
+                                v-on:click="toggleTableVisibility(table)"></span>
+
+                            <span class="header-contents" :title="value.toString()">
+                                <renderer-block
+                                :component="removeLabel(header)"
+                                :json_data="value"
+                                :instance="table"
+                                :isTableField="true"
+                                v-bind:key="`expander_header_contents_${component.name}_${index}`"
+                                />
+                            </span>
+                            <a v-if="tableIdx && index == component.header.length-1 && !readonly" class="delete-icon fa fa-trash-o" title="Delete row"
+                                @click.prevent="removeTable(table)"></a>
+                    </div>
+                </div>
+                <div :class="{'hidden': !isExpanded(table)}">
+                    <div class="row expander-row" v-for="(subcomponent, index) in component.expander" v-bind:key="`expander_row_${component.name}_${index}`">
+                        <div class="col-xs-12">
+                            <renderer-block
+                                :component="subcomponent"
+                                :json_data="value"
+                                :instance="table"
+                                v-bind:key="`expander_contents_${component.name}_${index}`"
+                                />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -156,6 +161,14 @@ const ExpanderTable = {
             delete newHeader['label'];
             return newHeader;
         },
+        getColXSValue: function (colSize){
+            const fixedValue = this.component.header.length > 4 ? 2 : Math.floor(12 / this.component.header.length);
+            const hasNullSize = this.component.header.some(obj => obj.colSize ? obj.colSize === null : true);
+            if(hasNullSize){
+                return fixedValue;
+            }
+            return colSize;
+        },
     },
     computed:{
         ...mapGetters([
@@ -187,8 +200,31 @@ const ExpanderTable = {
         showExpanderIcon: function() {
             return false
         },
+        tableClass: function(){
+            const class_name = this.component.header.length > 6 ? "horizontal-scrollable" : "no-scroll-background";
+            return class_name;
+        }
     }
 }
 
 export default ExpanderTable;
 </script>
+<style>
+.no-scroll-background {
+    background-color: #efefef;
+}
+.horizontal-scrollable {
+    overflow-x: auto;
+    white-space: nowrap;
+    background-color: #efefef;
+}
+.horizontal-scrollable > .row > .col-xs-2 {
+    display: inline-block;
+    float: none;
+}
+.horizontal-scrollable > .expander-table> .row > .col-xs-2 {
+    display: inline-block;
+    float: none;
+}
+
+</style>

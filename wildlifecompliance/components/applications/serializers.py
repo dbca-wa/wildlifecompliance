@@ -43,6 +43,12 @@ from wildlifecompliance.components.users.serializers import (
 from wildlifecompliance.components.main.fields import CustomChoiceField
 from wildlifecompliance.management.permissions_manager import PermissionUser
 
+from wildlifecompliance.components.main.utils import (
+    get_dob,
+    get_first_name,
+    get_last_name,
+)
+
 from rest_framework import serializers
 
 logger = logging.getLogger(__name__)
@@ -50,6 +56,10 @@ logger = logging.getLogger(__name__)
 
 
 class EmailUserSerializer(serializers.ModelSerializer):
+
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
+
     class Meta:
         model = EmailUser
         fields = (
@@ -59,6 +69,12 @@ class EmailUserSerializer(serializers.ModelSerializer):
             'last_name',
             'title',
             'organisation')
+        
+    def get_first_name(self, obj):
+        return get_first_name(obj)
+    
+    def get_last_name(self, obj):
+        return get_last_name(obj)
 
 
 class LicenceCategorySerializer(serializers.ModelSerializer):
@@ -358,13 +374,13 @@ class ApplicationSelectedActivitySerializer(serializers.ModelSerializer):
         with_approver = ['with_officer_finalisation']
         if obj.processing_status in with_officer and obj.assigned_officer:
             name = '{0} {1}'.format(
-                obj.assigned_officer.first_name,
-                obj.assigned_officer.last_name
+                get_first_name(obj.assigned_officer),
+                get_last_name(obj.assigned_officer),
             )
         elif obj.processing_status in with_approver and obj.assigned_approver:
             name = '{0} {1}'.format(
-                obj.assigned_approver.first_name,
-                obj.assigned_approver.last_name
+                get_first_name(obj.assigned_approver),
+                get_last_name(obj.assigned_approver)
             )
         else:
             name = ''
@@ -470,6 +486,7 @@ class DTExternalApplicationSelectedActivitySerializer(
     payment_status = serializers.SerializerMethodField()
     invoice_url = serializers.SerializerMethodField()
     # payment_url = serializers.SerializerMethodField()
+    activity_purpose_names_status = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = ApplicationSelectedActivity
@@ -487,6 +504,7 @@ class DTExternalApplicationSelectedActivitySerializer(
             'can_pay_licence_fee',
             'invoice_url',      # only load in expander
             # 'payment_url',    # only load in expander
+            'activity_purpose_names_status',
         )
         # the serverSide functionality of datatables is such that only columns
         # that have field 'data' defined are requested from the serializer. Use
@@ -538,6 +556,31 @@ class DTExternalApplicationSelectedActivitySerializer(
 
         return url
 
+    def get_activity_purpose_names_status(self, obj):
+        logger.debug('SelectedActivitySerializer.purpose_names() - start')
+        # purposes = [
+        #     p.purpose for p in obj.proposed_purposes.all()
+        # ]
+        purpose_names_qs=[]
+        purpose_status_qs=[]
+        for p in obj.proposed_purposes.all():
+            purpose_names_qs.append(p.purpose.name)
+            purpose_status_qs.append(p.get_processing_status_display())
+
+
+        if obj.proposed_action \
+                == ApplicationSelectedActivity.PROPOSED_ACTION_DEFAULT:
+            purpose_names_qs=[]
+            purpose_status_qs=[]
+            purposes = obj.purposes
+            for p in purposes.all():
+                purpose_names_qs.append(p.name)
+                purpose_status_qs.append('')
+
+        result={'name_string': ','.join(purpose_names_qs), 'status_string': ','.join(purpose_status_qs)}
+        #purpose_names = ','.join([p.name for p in purposes])
+        logger.debug('SelectedActivitySerializer.purpose_names() - end')
+        return result
 
 class DTInternalApplicationSelectedActivitySerializer(
             serializers.ModelSerializer):
@@ -638,13 +681,13 @@ class DTInternalApplicationSelectedActivitySerializer(
         with_approver = ['with_officer_finalisation']
         if obj.processing_status in with_officer and obj.assigned_officer:
             name = '{0} {1}'.format(
-                obj.assigned_officer.first_name,
-                obj.assigned_officer.last_name
+                get_first_name(obj.assigned_officer),
+                get_last_name(obj.assigned_officer)
             )
         elif obj.processing_status in with_approver and obj.assigned_approver:
             name = '{0} {1}'.format(
-                obj.assigned_approver.first_name,
-                obj.assigned_approver.last_name
+                get_first_name(obj.assigned_approver),
+                get_last_name(obj.assigned_approver)
             )
         else:
             name = ''
@@ -725,6 +768,8 @@ class EmailUserAppViewSerializer(serializers.ModelSerializer):
     # identification = IdentificationSerializer()
     identification2 = Identification2Serializer()
     dob = serializers.SerializerMethodField(read_only=True)
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
 
     class Meta:
         model = EmailUser
@@ -742,12 +787,16 @@ class EmailUserAppViewSerializer(serializers.ModelSerializer):
                   'mobile_number',)
 
     def get_dob(self, obj):
-
-        formatted_date = obj.dob.strftime(
+        formatted_date = get_dob(obj)
+        return formatted_date.strftime(
             '%d/%m/%Y'
-        ) if obj.dob else None
-
-        return formatted_date
+        ) if formatted_date else None
+    
+    def get_first_name(self, obj):
+        return get_first_name(obj)
+    
+    def get_last_name(self, obj):
+        return get_last_name(obj)
 
 
 class ActivitySerializer(serializers.ModelSerializer):
@@ -1001,7 +1050,7 @@ class BaseApplicationSerializer(serializers.ModelSerializer):
         return self.context['request'].user.is_superuser
 
     def get_documents_url(self, obj):
-        return '/media/applications/{}/documents/'.format(obj.id)
+        return '/private-media/applications/{}/documents/'.format(obj.id)
 
     def get_readonly(self, obj):
         return False
@@ -1696,7 +1745,7 @@ class InternalApplicationSerializer(BaseApplicationSerializer):
     user_roles = serializers.SerializerMethodField(read_only=True)
     assessments = AssessmentSerializer(many=True)
     licence_approvers = EmailUserAppViewSerializer(many=True)
-    permit = serializers.CharField(source='licence_document._file.url')
+    permit = serializers.SerializerMethodField()
     total_paid_amount = serializers.SerializerMethodField()
     adjusted_paid_amount = serializers.SerializerMethodField()
     is_return_check_accept = serializers.SerializerMethodField(read_only=True)
@@ -1861,7 +1910,10 @@ class InternalApplicationSerializer(BaseApplicationSerializer):
             on_active = True
 
         return on_active
-
+    
+    def get_permit(self, obj):
+        if obj.licence_document and obj.licence_document._file:
+            return obj.licence_document._file.url
 
 class ApplicationUserActionSerializer(serializers.ModelSerializer):
     who = serializers.CharField(source='who.get_full_name')
@@ -1920,7 +1972,7 @@ class ApplicationConditionSerializer(serializers.ModelSerializer):
             'source_name',
             'require_return',
             )
-        readonly_fields = ('order', 'condition')
+        read_only_fields = ('order', 'condition')
 
     def get_purpose_name(self, obj):
         return obj.licence_purpose.short_name if obj.licence_purpose else None

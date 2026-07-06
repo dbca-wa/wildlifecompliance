@@ -28,11 +28,21 @@ def is_officer(context):
     return wildlifecompliance_helpers.is_officer(request)
 
 @register.simple_tag(takes_context=True)
+def is_wildlifecompliance_officer(context):
+    request = context['request']
+    return wildlifecompliance_helpers.is_wildlife_compliance_officer(request)
+
+@register.simple_tag(takes_context=True)
 def is_wildlifecompliance_admin(context):
     # checks if user is an AdminUser
     request = context['request']
     return wildlifecompliance_helpers.is_wildlifecompliance_admin(request)
 
+@register.simple_tag(takes_context=True)
+def is_compliance_management_user(context):
+    # checks if user is an AdminUser
+    request = context['request']
+    return wildlifecompliance_helpers.is_compliance_management_user(request)
 
 @register.simple_tag(takes_context=True)
 def is_wildlifecompliance_payment_officer(context):
@@ -51,10 +61,14 @@ def is_internal(context):
 
 @register.simple_tag(takes_context=True)
 def is_model_backend(context):
-    # Return True if user logged in via single sign-on (or False via
-    # social_auth i.e. an external user signing in with a login-token)
-    request = context['request']
-    return wildlifecompliance_helpers.is_model_backend(request)
+    ''' Return True if user logged in via single sign-on (or False via
+        social_auth i.e. an external user signing in with a login-token)
+
+        Now replaced by Auth2 Pin Code - jm 
+    '''
+    #request = context['request']
+    #return wildlifecompliance_helpers.is_model_backend(request)
+    return True
 
 @register.simple_tag(takes_context=True)
 def is_compliance_management_user(context):
@@ -85,6 +99,11 @@ def is_compliance_management_callemail_readonly_user(context):
 def is_external_url(context):
     request = context['request']
     return wildlifecompliance_helpers.is_external_url(request)
+
+@register.simple_tag(takes_context=True)
+def is_internal_url(context):
+    request = context['request']
+    return wildlifecompliance_helpers.is_internal_url(request)
 
 @register.simple_tag()
 def system_maintenance_due():

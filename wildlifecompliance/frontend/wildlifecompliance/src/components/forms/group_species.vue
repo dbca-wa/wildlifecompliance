@@ -2,15 +2,13 @@
     <div class="top-buffer bottom-buffer">
         <div class="panel panel-default">
             <div class="panel-body">
-                <label :id="id" class="inline">{{label}}</label>
+                <label :id="id" class="inline" style="white-space: pre-line;">{{label}} <HelpTextUrl :help_text_url="help_text_url" /></label>
                     <!--<i data-toggle="tooltip" v-if="help_text" data-placement="right" class="fa fa-question-circle" :title="help_text"> &nbsp; </i>-->
                 <template v-if="help_text">
                     <HelpText :help_text="help_text" /> 
                 </template>
 
-                <template v-if="help_text_url">
-                    <HelpTextUrl :help_text_url="help_text_url" /> 
-                </template>
+                
                 
                 <a class="collapse-link-top pull-right" @click.prevent="expand"><span class="glyphicon glyphicon-chevron-down"></span></a>
                 <div class="children-anchor-point collapse in" style="padding-left: 0px"></div>

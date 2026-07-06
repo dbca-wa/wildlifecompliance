@@ -50,7 +50,7 @@ class RegionAdmin(admin.ModelAdmin):
 
 @admin.register(models.District)
 class DistrictAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('region',)
 
 
 class ComplianceManagementGroupAdminFormTemplate(django_forms.ModelForm):
@@ -113,6 +113,7 @@ def ComplianceManagementPermissionTemplate(model_instance):
 @admin.register(models.ComplianceManagementSystemGroup)
 class ComplianceManagementSystemGroupAdmin(admin.ModelAdmin):
     list_display = ('id','name','region', 'district')
+    raw_id_fields = ('region',)
     #inlines = [ComplianceManagementPermissionTemplate(self)]
     #inlines = [ComplianceManagementAdminTemplate("what what")]
     form = ComplianceManagementGroupAdminFormTemplate

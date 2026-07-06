@@ -98,7 +98,7 @@ def serialize_export(app_obj):
     ap = ActivityPurposeMap()
     # cross-reference name_label_pairs with key_value_pairs, and combine
     for key_value in key_value_pairs:
-        for k, v in key_value.iteritems():
+        for k, v in key_value.items():
             name = k.split('.')[-1]
             activity = k.split('.')[0]
             try:
@@ -171,7 +171,7 @@ def search(dictionary, search_list=[''], delimiter='.'):
     """
     result = []
     flat_dict = flatten(dictionary, delimiter=delimiter)
-    for k, v in flat_dict.iteritems():
+    for k, v in flat_dict.items():
         if any(x.lower() in str(v).lower() for x in search_list):
             result.append({k: str(v)})
 
@@ -191,7 +191,7 @@ def search_keys(dictionary, search_list=['help_text', 'label']):
     search_item2 = search_list[1]
     result = []
     flat_dict = flatten(dictionary)
-    for k, v in flat_dict.iteritems():
+    for k, v in flat_dict.items():
         if any(x in k for x in search_list):
             result.append({k: v})
 
@@ -242,7 +242,7 @@ def search_multiple_keys(
     all_search_list = [primary_search] + search_list
     result = []
     flat_dict = flatten(dictionary)
-    for k, v in flat_dict.iteritems():
+    for k, v in flat_dict.items():
         if any(x in k for x in all_search_list):
             result.append({k: v})
 

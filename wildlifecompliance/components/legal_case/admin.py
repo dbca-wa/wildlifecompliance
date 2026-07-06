@@ -6,7 +6,7 @@ from reversion.admin import VersionAdmin
 
 @admin.register(models.LegalCase)
 class LegalCaseAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('call_email', 'assigned_to', 'legal_case_priority')
 
 @admin.register(models.LegalCasePriority)
 class LegalCasePriorityAdmin(admin.ModelAdmin):

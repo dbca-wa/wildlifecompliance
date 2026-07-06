@@ -1,14 +1,12 @@
 <template lang="html">
     <div>
         <div class="form-group">
-            <label :id="id" :num_files="num_documents()">{{label}}</label>
+            <label :id="id" :num_files="num_documents()" style="white-space: pre-line;">{{label}} <HelpTextUrl :help_text_url="help_text_url" /></label>
             <template v-if="help_text">
                 <HelpText :help_text="help_text" />
             </template>
 
-            <template v-if="help_text_url">
-                <HelpTextUrl :help_text_url="help_text_url" />
-            </template>
+            
 
             <CommentBlock 
                 :label="label"
@@ -16,10 +14,10 @@
                 :field_data="field_data"
                 />
 
-            <div v-if="files">
+            <div v-if="files" :class="getClass">
                 <div v-for="v in documents">
                     <p>
-                        File: <a :href="v.file" target="_blank">{{v.name}}</a> &nbsp;
+                        File: <a :href="v.file" target="_blank" :title="v.name.toString()">{{ truncatedName(v.name) }}</a>
                         <span v-if="!readonly && v.can_delete">
                             <a @click="delete_document(v)" class="fa fa-trash-o" title="Remove file" :filename="v.name" style="cursor: pointer; color:red;"></a>
                         </span>
@@ -48,6 +46,7 @@ import {
 from '@/utils/hooks';
 import CommentBlock from './comment_block.vue';
 import HelpText from './help_text.vue';
+import HelpTextUrl from './help_text_url.vue';
 import { mapGetters } from 'vuex';
 export default {
     props:{
@@ -74,8 +73,10 @@ export default {
         isRepeatable:Boolean,
         readonly:Boolean,
         docsUrl: String,
+        help_text_url: String,
+        isTableField: Boolean
     },
-    components: {CommentBlock, HelpText},
+    components: {CommentBlock, HelpText, HelpTextUrl},
     data:function(){
         return {
             repeat:1,
@@ -83,7 +84,6 @@ export default {
             show_spinner: false,
             documents:[],
             filename:null,
-            help_text_url:'',
         }
     },
     computed: {
@@ -95,6 +95,10 @@ export default {
         },
         value: function() {
             return this.field_data.value;
+        },
+        getClass: function (){
+            const file_class = this.isTableField ? "file-class" : "";
+            return file_class;
         }
     },
 
@@ -139,6 +143,14 @@ export default {
             }
 
             vm.show_spinner = false;
+        },
+        truncatedName: function (name){
+            if(name.length > 10){
+                return name.substring(0, 6) + '...';
+            }
+            else{
+                return name;
+            }
         },
 
         /*
@@ -247,4 +259,7 @@ export default {
     input {
         box-shadow:none;
     }
+.file-class {
+    margin-top: -20px;
+}
 </style>
