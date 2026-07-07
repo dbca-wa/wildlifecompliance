@@ -54,7 +54,7 @@ RUN apt-get install --no-install-recommends -y software-properties-common imagem
 RUN apt-get install --no-install-recommends -y npm bzip2
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt-get update
-RUN apt-get install --no-install-recommends -y python3.7 python3.7-dev python3.7-distutils python3.7-venv
+RUN apt-get install --no-install-recommends -y python3.7 python3.7-dev python3.7-distutils
 RUN apt-get install --no-install-recommends -y graphviz libgraphviz-dev pkg-config
 
 RUN ln -s /usr/bin/python3.7 /usr/bin/python 
