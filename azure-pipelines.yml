@@ -12,7 +12,7 @@ variables:
   tag: '$(Build.BuildId)'
   tagDate: $[ format('{0:yyyy}.{0:MM}.{0:dd}.{0:HH}.{0:mm}{0:ss}', pipeline.startTime) ]
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/django_upgrade_5_node')]
-  imageName: 'ghcr.io/dbca-wa/appmonitor'
+  imageName: 'ghcr.io/dbca-wa/wildlifecompliance'
   devImageName: 'ghcr.io/dbca-wa/docker_app_dev'
 
 stages:
@@ -42,7 +42,7 @@ stages:
         docker build \
           --build-arg IMAGE_TAG="$(tagDate)-$(shortSha)" \
           --build-arg IMAGE_NAME="$(imageName)" \
-          -t $(imageName):latest \
+          -t $(imageName):latest_seg \
           -t $(imageName):$(tagDate)-$(shortSha) \
           -f $(Build.SourcesDirectory)/Dockerfile .
       displayName: 'Docker Build Main Image'     
