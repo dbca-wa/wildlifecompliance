@@ -49,7 +49,7 @@ stages:
 
     # 4. Push Main Image tags
     - bash: |
-        docker push $(imageName):latest
+        docker push $(imageName):latest_seg
         docker push $(imageName):$(tagDate)-$(shortSha)
       displayName: 'Push Main Image'
 
@@ -59,14 +59,14 @@ stages:
         docker build \
           --build-arg IMAGE_TAG="$(tagDate)-$(shortSha)" \
           --build-arg IMAGE_NAME="$(devImageName)" \
-          -t $(devImageName):wildlifecompliance_dev_latest \
+          -t $(devImageName):wildlifecompliance_dev_latest_seg \
           -t $(devImageName):wildlifecompliance_dev_$(tagDate)-$(shortSha) \
           -f $(Build.SourcesDirectory)/dockerdev/Dockerfile .
       displayName: 'Docker Build Dev Image'
 
     # 6. Push Dev Image tags
     - bash: |
-        docker push $(devImageName):wildlifecompliance_dev_latest
+        docker push $(devImageName):wildlifecompliance_dev_latest_seg
         docker push $(devImageName):wildlifecompliance_dev_$(tagDate)-$(shortSha)
       displayName: 'Push Dev Image'
               
