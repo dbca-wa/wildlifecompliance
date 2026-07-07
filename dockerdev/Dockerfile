@@ -1,5 +1,5 @@
 # Prepare the base environment.
-FROM dbcawa/wildlifecompliance:latest as builder_base_wildlifelcompliancedev
+FROM ghcr.io/dbca-wa/wildlifecompliance:latest_seg as builder_base_wildlifelcompliancedev
 USER root
 RUN apt-get update
 #RUN apt-get install --no-install-recommends -y npm patch
