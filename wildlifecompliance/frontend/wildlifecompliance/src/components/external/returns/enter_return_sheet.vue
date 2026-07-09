@@ -1,5 +1,20 @@
 <template>
+
+
 <div class="panel panel-default">
+        <div class="row">
+            <div class="col-sm-12">
+
+                <div class="alert alert-info">
+                    <h4>Collection Notice Wildlife Licensing</h4>
+                    <p>The Department of Biodiversity, Conservation and Attractions collects personal information in order to assess, approve and grant licences and authorisations to allow you to legally undertake activities involving flora and/or fauna.</p>
+                    <p>This information is required and may be used and disclosed in accordance with sections 274 and 275 of the Biodiversity Conservation Act 2016 (WA), the Conservation and Land Management Act 1984 and the Conservation and Land Management Regulations 2002. This may include use for monitoring and compliance, to inform you of any licence or legislative requirements or changes, to seek feedback on wildlife related licensing and legislation, and disclosure to other approved information sharing agencies for administration or enforcement purposes.</p>
+                    <p>If you choose not to provide required personal information, please understand that we will not be able to determine a licence or authorisation.</p>
+                    <p>For further details on how DBCA manage your personal information, you can read our <a href="https://www.dbca.wa.gov.au/media/6324/download">Privacy Policy</a>. If you have any questions about how your personal information will be handled, or if you would like to access your personal information, please contact DBCA at email <a href="mailto:privacy@dbca.wa.gov.au">privacy@dbca.wa.gov.au</a>.</p>
+                </div>
+        </div>
+    </div>
+
     <div class="panel-heading">
         <h3 class="panel-title">{{ sheetTitle }}
             <a class="panelClicker" :href="'#'+pdBody" data-toggle="collapse"  data-parent="#userInfo" expanded="true" :aria-controls="pdBody">
@@ -7,6 +22,9 @@
             </a>
         </h3>
     </div>
+
+
+
     <div class="panel-body panel-collapse in" :id="pdBody">
         <div class="col-sm-12">
             <div class="row">
