@@ -1,7 +1,7 @@
 import traceback
 import os
 import logging
-
+from django.conf import settings
 from datetime import datetime, timedelta
 from django.db.models import Q
 from django.db import transaction
@@ -1067,6 +1067,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 lines=product_lines,
                 invoice_text=application_submission,
                 add_checkout_params={
+                    'return_preload_url': settings.WILDLIFECOMPLIANCE_EXTERNAL_URL + reverse('external-licence-fee-success-invoice-preload',kwargs={"lodgement_number": instance.lodgement_number}),
                     'return_url': request.build_absolute_uri(
                         reverse('external-licence-fee-success-invoice'))
                 },

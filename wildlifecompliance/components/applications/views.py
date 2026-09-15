@@ -1,5 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
+from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import View, TemplateView
 from django.conf import settings
@@ -36,6 +37,7 @@ import subprocess
 import traceback
 from rest_framework import status
 from rest_framework.views import APIView
+from ledger_api_client.ledger_models import Invoice
 
 import logging
 logger = logging.getLogger(__name__)
@@ -178,9 +180,12 @@ class ApplicationSuccessViewPreload(APIView):
                 # can only submit again if application is in Draft.
                 if application.can_user_edit:
                     application.submit(request)
-                send_application_invoice_email_notification(
-                    application, invoice_ref, request)
-
+                try:
+                    send_application_invoice_email_notification(
+                        application, invoice_ref, request)
+                except Exception as e:
+                    logger.error("send_application_invoice_email_notification failed:",e)
+                    print("send_application_invoice_email_notification failed:",e)
             else:
                 delete_session_application(request.session)
                 return redirect(reverse('external'))
@@ -191,7 +196,6 @@ class ApplicationSuccessViewPreload(APIView):
             return redirect(reverse('external'))
 
         return HttpResponse(status=status.HTTP_200_OK)
-
 
 class ApplicationSuccessView(TemplateView):
     template_name = 'wildlifecompliance/application_success.html'
@@ -227,12 +231,128 @@ class ApplicationSuccessView(TemplateView):
         return render(request, self.template_name, context)
 
 
+class LicenceFeeSuccessViewPreload(APIView):
+
+    def get(self, request, lodgement_number, format=None):
+        print("LicenceFeeSuccessViewPreload")
+        invoice_ref = request.GET.get('invoice')
+
+        try:
+            application = Application.objects.get(lodgement_number=lodgement_number)
+        except Exception as e:
+            print(e)
+            traceback.print_exc
+
+        try:
+            from wildlifecompliance.components.wc_payments.utils import get_invoice_payment_status
+            invoice_ref = ApplicationInvoice.objects.filter(application=application).order_by('invoice_datetime').last().invoice_reference
+            activities = ApplicationSelectedActivity.objects.filter(
+                application_id=application.id,
+                processing_status=ApplicationSelectedActivity.PROCESSING_STATUS_AWAITING_LICENCE_FEE_PAYMENT)
+            
+            invoice = Invoice.objects.get(
+                reference=invoice_ref
+            )
+            payment_status = get_invoice_payment_status(invoice.id)
+            if payment_status in [
+                ApplicationInvoice.PAYMENT_STATUS_NOT_REQUIRED,
+                ApplicationInvoice.PAYMENT_STATUS_PAID,
+                ApplicationInvoice.PAYMENT_STATUS_OVERPAID,
+            ]:
+                i = 1
+                for activity in activities:
+                    # For each activity record the invoice ref and application fee
+                    # paid as this amount may need to be refunded.
+                    with transaction.atomic():
+                        
+                        invoice = ActivityInvoice.objects.get_or_create(
+                            activity=activity,
+                            invoice_reference=invoice_ref
+                        )
+
+                        paid_purposes = [
+                            p for p in activity.proposed_purposes.all()
+                            if p.is_payable
+                        ]
+
+                        inv_lines = []
+
+                        for p in paid_purposes:
+                            fee = p.additional_fee
+                            l_type = ActivityInvoiceLine.LINE_TYPE_ADDITIONAL
+
+                            if fee > -1:
+                                inv_lines.append(ActivityInvoiceLine(
+                                    invoice=invoice[0],
+                                    licence_activity=activity.licence_activity,
+                                    licence_purpose=p.purpose,
+                                    invoice_line_type=l_type,
+                                    amount=fee
+                                ))
+
+                            fee = p.adjusted_licence_fee
+                            l_type = ActivityInvoiceLine.LINE_TYPE_LICENCE
+
+                            if fee > -1:
+
+                                inv_lines.append(ActivityInvoiceLine(
+                                    invoice=invoice[0],
+                                    licence_activity=activity.licence_activity,
+                                    licence_purpose=p.purpose,
+                                    invoice_line_type=l_type,
+                                    amount=fee
+                                ))
+
+                            fee = p.get_payable_application_fee()
+                            l_type = ActivityInvoiceLine.LINE_TYPE_APPLICATION
+
+                            if fee > -1:
+                                inv_lines.append(ActivityInvoiceLine(
+                                    invoice=invoice[0],
+                                    licence_activity=activity.licence_activity,
+                                    licence_purpose=p.purpose,
+                                    invoice_line_type=l_type,
+                                    amount=fee
+                                ))
+
+                        ActivityInvoiceLine.objects.bulk_create(inv_lines)
+                        # update the status from awaiting fee payment.
+                        activity.processing_status = ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED
+                        generate = True if i == activities.count() else False
+                        activity.application.issue_activity(
+                            request, activity, generate_licence=generate
+                        )
+                        activity.save()
+
+                    i = i + 1
+
+                try:
+                    send_activity_invoice_email_notification(
+                        activities[0].application,
+                        activities[0],
+                        invoice_ref,
+                        request)
+                except Exception as e:
+                    logger.error("send_activity_invoice_email_notification failed:",e)
+                    print("send_activity_invoice_email_notification failed:",e)
+                    
+            else:
+                raise ValidationError("Invoice not yet paid")
+        except Exception as e:
+            print(e)
+            logger.error('LicenceFeeSuccessViewPreload.get() AppID {0} - {1}'.format(
+                application.id, e
+            ))
+            delete_session_activity(request.session)
+            return redirect(reverse('external'))
+        
+        return HttpResponse(status=status.HTTP_200_OK)
+
 class LicenceFeeSuccessView(TemplateView):
     template_name = 'wildlifecompliance/licence_fee_success.html'
 
     def get(self, request, *args, **kwargs):
         print("LicenceSuccessView")
-        ACCEPTED = ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED
         session_activity = get_session_activity(request.session)
         try:
             application = Application.objects.get(
@@ -243,98 +363,7 @@ class LicenceFeeSuccessView(TemplateView):
             invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
             activities = ApplicationSelectedActivity.objects.filter(
                 application_id=session_activity.application_id,
-                processing_status=ApplicationSelectedActivity.PROCESSING_STATUS_AWAITING_LICENCE_FEE_PAYMENT)
-
-            i = 1
-            for activity in activities:
-                # For each activity record the invoice ref and application fee
-                # paid as this amount may need to be refunded.
-
-                with transaction.atomic():
-
-                    invoice = ActivityInvoice.objects.get_or_create(
-                        activity=activity,
-                        invoice_reference=invoice_ref
-                    )
-
-                    paid_purposes = [
-                        p for p in activity.proposed_purposes.all()
-                        if p.is_payable
-                    ]
-
-                    inv_lines = []
-
-                    for p in paid_purposes:
-
-                        # Check if refund is required and can be included.
-                        # clear_inv = LicenceFeeClearingInvoice(application)
-
-                        fee = p.additional_fee
-                        l_type = ActivityInvoiceLine.LINE_TYPE_ADDITIONAL
-
-                        if fee > -1:
-                            inv_lines.append(ActivityInvoiceLine(
-                                invoice=invoice[0],
-                                licence_activity=activity.licence_activity,
-                                licence_purpose=p.purpose,
-                                invoice_line_type=l_type,
-                                amount=fee
-                            ))
-
-                        fee = p.adjusted_licence_fee
-                        l_type = ActivityInvoiceLine.LINE_TYPE_LICENCE
-
-                        if fee > -1:
-
-                            inv_lines.append(ActivityInvoiceLine(
-                                invoice=invoice[0],
-                                licence_activity=activity.licence_activity,
-                                licence_purpose=p.purpose,
-                                invoice_line_type=l_type,
-                                amount=fee
-                            ))
-
-                        fee = p.get_payable_application_fee()
-                        l_type = ActivityInvoiceLine.LINE_TYPE_APPLICATION
-
-                        if fee > -1:
-                            inv_lines.append(ActivityInvoiceLine(
-                                invoice=invoice[0],
-                                licence_activity=activity.licence_activity,
-                                licence_purpose=p.purpose,
-                                invoice_line_type=l_type,
-                                amount=fee
-                            ))
-
-                        # if clear_inv.is_refundable:
-                        #     inv_lines.append(
-                        #         clear_inv.get_invoice_line_refund_for(
-                        #             p, invoice[0])
-                        #     )
-
-                    ActivityInvoiceLine.objects.bulk_create(inv_lines)
-
-                    # There may be adjustments to application fee.
-                    # if activity.application_fee > 0:
-                    #     ActivityInvoiceLine.objects.get_or_create(
-                    #         invoice=invoice[0],
-                    #         licence_activity=activity.licence_activity,
-                    #         amount=activity.application_fee
-                    #     )
-                    # update the status from awaiting fee payment.
-                    activity.processing_status = ACCEPTED
-                    generate = True if i == activities.count() else False
-                    activity.application.issue_activity(
-                        request, activity, generate_licence=generate
-                    )
-
-                i = i + 1
-
-            send_activity_invoice_email_notification(
-                activities[0].application,
-                activities[0],
-                invoice_ref,
-                request)
+                processing_status=ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED)
 
             invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
 
@@ -347,8 +376,8 @@ class LicenceFeeSuccessView(TemplateView):
             return redirect(reverse('external'))
 
         context = {
-            'application': activity.application,
-            'activity': activity,
+            'application': application,
+            'activity': activities[0] if activities.exists() else None,
             'invoice_ref': invoice_ref,
             'invoice_url': invoice_url
         }

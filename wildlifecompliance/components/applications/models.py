@@ -1520,6 +1520,7 @@ class Application(RevisionedMixin):
 
     def submit(self, request):
         with transaction.atomic():
+            print("Application submit")
             #import ipdb; ipdb.set_trace()
             requires_refund = self.requires_refund_at_submit()
             if self.can_user_edit:
