@@ -404,6 +404,13 @@ SO_TYPE_CHOICES = (
 HEAD_OFFICE_NAME=env('HEAD_OFFICE_NAME', 'KENSINGTON')
 HTTP_HOST_FOR_TEST = env('HTTP_HOST_FOR_TEST', 'localhost:8123')
 
+GDAL_LIBRARY_PATH = os.environ.get(
+    "GDAL_LIBRARY_PATH",
+)
+GEOS_LIBRARY_PATH = os.environ.get(
+    "GEOS_LIBRARY_PATH",
+)
+
 GROUP_CALL_EMAIL_TRIAGE = "call_email_triage"
 GROUP_OFFICER = "officer"
 GROUP_INSPECTION_OFFICER = "inspection_officer"
