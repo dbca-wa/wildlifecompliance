@@ -3,6 +3,8 @@ from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import View, TemplateView
+from wildlifecompliance.helpers import is_wildlife_compliance_officer
+from django.db.models import Q
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.db import transaction
@@ -210,6 +212,17 @@ class ApplicationSuccessView(TemplateView):
                 logger.error(f"ApplicationInvoice record does not exist for application {application}")
                 return redirect(reverse('external'))
 
+            authorised = False
+            user = request.user
+            if is_wildlife_compliance_officer(request):
+                authorised = True
+            elif user.is_authenticated:
+                user_orgs = [org.id for org in user.wildlifecompliance_organisations.all()]
+                authorised = Application.objects.filter(Q(org_applicant_id__in=user_orgs) | Q(proxy_applicant=user) | Q(submitter=user)).filter(id=application.id).exists()
+
+            if not authorised:
+                return redirect(reverse('external'))
+
             invoice_ref = ApplicationInvoice.objects.filter(application=application).order_by('invoice_datetime').last().invoice_reference
             invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
             
@@ -245,10 +258,12 @@ class LicenceFeeSuccessViewPreload(APIView):
 
         try:
             from wildlifecompliance.components.wc_payments.utils import get_invoice_payment_status
-            invoice_ref = ApplicationInvoice.objects.filter(application=application).order_by('invoice_datetime').last().invoice_reference
+            invoice_ref = request.GET.get('invoice')
             activities = ApplicationSelectedActivity.objects.filter(
                 application_id=application.id,
                 processing_status=ApplicationSelectedActivity.PROCESSING_STATUS_AWAITING_LICENCE_FEE_PAYMENT)
+
+            print("\n\nDEBUG",activities.count(), invoice_ref)
             
             invoice = Invoice.objects.get(
                 reference=invoice_ref
@@ -328,8 +343,8 @@ class LicenceFeeSuccessViewPreload(APIView):
 
                 try:
                     send_activity_invoice_email_notification(
-                        activities[0].application,
-                        activities[0],
+                        application,
+                        activities[0], #NOTE and potential TODO - multiple activities can be paid for but we only highlight one in the email - is there a reason for this?
                         invoice_ref,
                         request)
                 except Exception as e:
@@ -359,7 +374,18 @@ class LicenceFeeSuccessView(TemplateView):
                 id=session_activity.application_id
             )
 
-            invoice_ref = ApplicationInvoice.objects.filter(application=application).order_by('invoice_datetime').last().invoice_reference
+            authorised = False
+            user = request.user
+            if is_wildlife_compliance_officer(request):
+                authorised = True
+            elif user.is_authenticated:
+                user_orgs = [org.id for org in user.wildlifecompliance_organisations.all()]
+                authorised = Application.objects.filter(Q(org_applicant_id__in=user_orgs) | Q(proxy_applicant=user) | Q(submitter=user)).filter(id=application.id).exists()
+
+            if not authorised:
+                return redirect(reverse('external'))
+
+            invoice_ref = ActivityInvoice.objects.filter(activity__application=application).order_by('invoice_datetime').last().invoice_reference
             invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
             activities = ApplicationSelectedActivity.objects.filter(
                 application_id=session_activity.application_id,
@@ -377,7 +403,7 @@ class LicenceFeeSuccessView(TemplateView):
 
         context = {
             'application': application,
-            'activity': activities[0] if activities.exists() else None,
+            'activity': activities[0] if activities.exists() else None, #NOTE and potential TODO - multiple activities can be paid for but we only highlight one in the template - is there a reason for this?
             'invoice_ref': invoice_ref,
             'invoice_url': invoice_url
         }

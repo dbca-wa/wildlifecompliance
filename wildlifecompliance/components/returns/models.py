@@ -920,11 +920,18 @@ class ReturnUserAction(UserAction):
 
     @classmethod
     def log_action(cls, return_obj, action, user):
-        return cls.objects.create(
-            return_obj=return_obj,
-            who=user,
-            what=str(action)
-        )
+        if isinstance(user, EmailUser):
+            return cls.objects.create(
+                return_obj=return_obj,
+                who=user,
+                what=str(action)
+            )
+        else:
+            return cls.objects.create(
+                return_obj=return_obj,
+                who=None,
+                what=str(action)
+            )
 
     return_obj = models.ForeignKey(Return, related_name='action_logs', on_delete=models.CASCADE)
 
