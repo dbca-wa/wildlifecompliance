@@ -280,7 +280,7 @@ def send_activity_invoice_email_notification(
     recipients = [application.submitter.email]
     msg = email.send(recipients, context=context, attachments=[
                      (filename, invoice_pdf, 'application/pdf')])
-    sender = request.user if request else settings.DEFAULT_FROM_EMAIL
+    sender = settings.DEFAULT_FROM_EMAIL
     _log_application_email(msg, application, sender=sender)
     return True
 

@@ -157,7 +157,7 @@ class District(models.Model):
 
 @python_2_unicode_compatible
 class UserAction(models.Model):
-    who = models.ForeignKey(EmailUser, null=False, blank=False, on_delete=models.CASCADE)
+    who = models.ForeignKey(EmailUser, null=True, blank=True, on_delete=models.CASCADE)
     when = models.DateTimeField(null=False, blank=False, auto_now_add=True)
     what = models.TextField(blank=False)
 
