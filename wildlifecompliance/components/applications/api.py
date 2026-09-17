@@ -765,7 +765,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             print(traceback.print_exc())
             raise serializers.ValidationError("Internal System Error")
 
-    @action(detail=False, methods=['GET', ])
+    @action(detail=False, methods=['POST', ])
     def active_licence_application(self, request, *args, **kwargs):
         active_application = Application.get_first_active_licence_application(
             request
@@ -1883,7 +1883,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                     action=action
                 )
                 if is_submit:
-                    instance.submitter = request.user
+                    instance.submitter = request.user #TODO ensure this is not overridden by internal users submitting on applicant's behalf
                     if instance.amendment_requests:
                         instance.log_user_action(ApplicationUserAction.ACTION_ID_REQUEST_AMENDMENTS_SUBMIT.format(instance.lodgement_number), request)
                     else:
@@ -1976,7 +1976,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 submit_type = Application.SUBMIT_TYPE_ONLINE
 
             data = {
-                'submitter': request.user.id,
+                'submitter': request.user.id, #TODO allow internal users to submit this on behalf of other users
                 'org_applicant': org_applicant,
                 'proxy_applicant': proxy_applicant,
                 'licence_purposes': licence_purposes,
@@ -2171,6 +2171,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
         return Response({'processing_status': ApplicationSelectedActivity.PROCESSING_STATUS_DISCARDED}, status=http_status)
 
+    #TODO this does not work - possibly not needed
     @action(detail=True, methods=['DELETE', ])
     def discard_activity(self, request, *args, **kwargs):
         http_status = status.HTTP_200_OK

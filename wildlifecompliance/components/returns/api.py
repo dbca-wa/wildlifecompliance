@@ -463,7 +463,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
                 ReturnService.store_request_details_for(instance, request)
                 instance.set_submitted(request)
-                instance.submitter = request.user
+                instance.submitter = request.user #TODO ensure this is not overridden by internal users submitting on applicant's behalf
                 instance.save()
 
             logger.debug('ReturnViewSet.save_and_submit() - end')
@@ -495,7 +495,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
             with transaction.atomic():
                 instance.set_submitted(request)
-                instance.submitter = request.user
+                instance.submitter = request.user #TODO ensure this is not overridden by internal users submitting on applicant's behalf
                 instance.save()
                 serializer = self.get_serializer(instance)
             logger.debug('ReturnViewSet.submit() - end')

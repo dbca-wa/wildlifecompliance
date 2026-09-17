@@ -795,6 +795,7 @@ class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ReadOnlyModelViewSet)
             return LicenceCategory.objects.all()
         return LicenceCategory.objects.none()
 
+    #TODO user_id override for internals user to use
     def list(self, request, *args, **kwargs):
         """
         Returns a queryset of LicenceCategory objects and a queryset of LicencePurpose objects allowed for
@@ -819,6 +820,7 @@ class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ReadOnlyModelViewSet)
         licence_no = request.GET.get('licence_no')
         select_activity_id = request.GET.get('select_activity')
         select_purpose_id = request.GET.get('select_purpose')
+
         # active_applications are applications linked with licences that have CURRENT or SUSPENDED activities
         active_applications = Application.get_active_licence_applications(request, application_type)
         active_current_applications = active_applications.exclude(
@@ -930,30 +932,6 @@ class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ReadOnlyModelViewSet)
                 Application.APPLICATION_TYPE_RENEWAL,
                 Application.APPLICATION_TYPE_REISSUE,
             ]:
-                '''
-                NOTE: No filtering required as purposes are not selected by
-                applicant for amendment/renewals. Not applicable for REISSUE.
-                '''
-                # amendable_purpose_ids = active_current_applications.values_list(
-                #     'licence_purposes__id',
-                #     flat=True
-                # )
-
-                # select_activity_id = int(select_activity_id)
-                # activitys = [
-                #     a for a in current_activities if a.id == select_activity_id
-                # ]
-                # p_ids = [
-                #     p.purpose_id for p in activitys[0].proposed_purposes.all()
-                #     if p.id == int(select_purpose_id)
-                # ]
-                # amendable_purpose_ids = p_ids
-
-                # available_purpose_records = available_purpose_records.filter(
-                #     id__in=amendable_purpose_ids,
-                #     licence_activity_id__in=current_activities.values_list(
-                #         'licence_activity_id', flat=True)
-                # )
                 queryset = queryset.filter(id__in=active_licence_activity_ids)
 
         # Filter by Licence Category ID if specified or return empty queryset 
@@ -966,18 +944,6 @@ class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ReadOnlyModelViewSet)
                 queryset = queryset.filter(id=licence_category_id)
             else:
                 queryset = LicenceCategory.objects.none()
-
-        # Set any changes to base fees.
-        # if application_type == Application.APPLICATION_TYPE_AMENDMENT:
-        #     policy = ApplicationFeePolicyForAmendment
-        #     for purpose in available_purpose_records:
-        #         policy.set_zero_licence_fee_for(purpose)
-        #         policy.set_base_application_fee_for(purpose)
-
-        # if application_type == Application.APPLICATION_TYPE_RENEWAL:
-        #     policy = ApplicationFeePolicyForRenew
-        #     for purpose in available_purpose_records:
-        #         policy.set_base_application_fee_for(purpose)
 
         serializer = LicenceCategorySerializer(queryset, many=True, context={
             'request': request,

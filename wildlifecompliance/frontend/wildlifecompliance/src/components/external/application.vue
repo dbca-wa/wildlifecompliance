@@ -148,16 +148,16 @@ export default {
     showCardPayButton: function() {
       return !this.isProcessing && this.requiresCheckout && !this.showCashPayButton && !this.showNonePayButton;
     },
-    showCashPayButton: function() {
+    showCashPayButton: function() { //TODO this does not work and may not be needed
       return !this.isProcessing && this.application.is_reception_paper;
     },
-    showNonePayButton: function() {
+    showNonePayButton: function() { //TODO this does not work and may not be needed
       return !this.isProcessing && this.application.is_reception_migrate;          
     },
     showSubmitButton: function() {
       return !this.isProcessing && !this.requiresCheckout && !this.showCardPayButton && !this.showNonePayButton;
     },
-    canDiscardActivity: function() {
+    canDiscardActivity: function() { //TODO this does not work and may not be needed
       return this.application.activities.find(
               activity => activity.licence_activity == this.selected_activity_tab_id &&
               activity.processing_status == 'draft'

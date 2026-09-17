@@ -526,7 +526,7 @@ class SubmitRequestCommand(ApplicationCommand):
             return
 
         self.application.customer_status = self.UNDER_REVIEW
-        self.application.submitter = self.request.user
+        self.application.submitter = self.request.user #TODO ensure this is not overridden by internal users submitting on applicant's behalf
         self.application.lodgement_date = timezone.now()
 
         # set assess status to True everytime. Flag is only used for

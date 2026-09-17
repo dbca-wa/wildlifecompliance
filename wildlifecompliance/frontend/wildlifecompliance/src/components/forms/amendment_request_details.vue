@@ -52,8 +52,10 @@ export default {
     isVisible: function() {
         return this.activity_id == this.selected_activity_tab_id;
     },
-    visibleRequests: function() {
-        return this.amendment_requests.filter(request => request.licence_activity.id == this.activity_id);
+    visibleRequests() {
+        return (this.amendment_requests || []).filter(
+            request => request.licence_activity.id == this.activity_id
+        );
     }
   },
   methods: {

@@ -95,7 +95,7 @@ export default {
     },
     fetchCurrentActiveLicenceApplication: function(params){
         return new Promise ((resolve,reject) => {
-            let request = fetch_util.fetchUrl(`${api.applications}active_licence_application`, {"params": params})
+            let request = fetch_util.fetchUrl(`${api.applications}active_licence_application/`, {method:'POST', body: JSON.stringify(params)})
             request.then((response) => {
                 resolve(response);
             }).catch((error) => {

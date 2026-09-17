@@ -501,7 +501,7 @@
                                     </div>
                                     {{ this.$slots.default }}
 
-                                    <div v-if="showNavBarBottom" class="row" style="margin-bottom:50px;">
+                                    <!--<div v-if="showNavBarBottom" class="row" style="margin-bottom:50px;">
                                         <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5; display: block; ">
                                             <div class="navbar-inner">
                                                     <p class="float-end" style="margin-top:5px;">
@@ -513,6 +513,38 @@
                                                         <button v-else-if="showSpinner && !showRequestSpinner" type="button" class="btn btn-primary" ><i class="fa fa-spinner fa-spin"/>Saving</button>                                                    
                                                         <button v-else="!applicationIsDraft && canSaveApplication" class="btn btn-primary" @click.prevent="save_button()">Save Changes</button>
                                                     </p>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                    <div v-if="!application.readonly" class="row" style="margin-bottom:50px;">
+                                        <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5; display:block;">
+                                            <div class="navbar-inner">
+                                                
+                                                    <p class="float-end" style="margin-top:5px;">
+                                                        <span v-if="showCardPayButton" style="margin-right: 5px; font-size: 18px; display: block;">
+                                                            <strong>Estimated application fee: {{toCurrency(application.application_fee)}}</strong>
+                                                            &nbsp;
+                                                            <strong>Estimated licence fee: {{toCurrency(application.licence_fee)}}</strong>
+                                                        </span>
+                                                        <input v-if="!showSpinner && canSaveApplication" type="button" @click.prevent="saveExit" class="btn btn-primary" value="Save and Exit"/>
+                                                        <input v-if="!showSpinner && canSaveApplication" type="button" @click.prevent="save_button" class="btn btn-primary" value="Save and Continue"/>
+                                                        <input v-show="showSubmitButton" type="button" @click.prevent="submit" class="btn btn-primary" value="Submit"/>
+                                                        <input v-show="showCardPayButton" type="button" @click.prevent="pay_and_submit" class="btn btn-primary" value="Pay and Submit"/>           
+                                                        <button v-if="showSpinner" disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Processing</button>
+                                                    </p>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-else class="row" style="margin-bottom:50px;">
+                                        <div class="navbar navbar-fixed-bottom" style="background-color: #f5f5f5 ">
+                                            <div class="navbar-inner">
+                                                <div class="container">
+                                                    <p class="float-end" style="margin-top:5px;">
+                                                        <button v-if="showSpinner" disabled class="float-end btn btn-primary"><i class="fa fa-spin fa-spinner"></i>&nbsp;Processing</button>
+                                                        <router-link v-else class="btn btn-primary" :to="{name: 'external-applications-dash'}">Back to Dashboard</router-link>
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -727,6 +759,16 @@ export default {
             'selected_activity_tab_workflow_state',
             'application_workflow_state',
         ]),
+        requiresCheckout: function() {
+            return ((this.application.application_fee > 0 || this.application.licence_fee > 0)
+            && ['draft', 'awaiting_payment', 'amendment_required','partially_approved'].includes(this.application.customer_status.id))
+        },
+        showCardPayButton: function() {
+            return !this.showSpinner && this.requiresCheckout;
+        },
+        showSubmitButton: function() {
+            return !this.showSpinner && !this.requiresCheckout && !this.showCardPayButton && !this.showNonePayButton;
+        },
         applicationDetailsVisible: function() {
             return !this.isSendingToAssessor && !this.isofficerfinalisation && this.unfinishedActivities.length && !this.showingConditions;
         },
@@ -772,7 +814,7 @@ export default {
             // Assessors can save the Assessor Comments field.
             if(this.selected_activity_tab_id &&
                 this.userHasRole('assessor', this.selected_activity_tab_id) &&
-                this.selectedActivity.processing_status.id == 'with_assessor') {
+                (this.selectedActivity.processing_status.id == 'with_assessor' || this.selectedActivity.processing_status.id == 'draft')) {
                     return true;
             }
             let workflow = ['with_officer'].includes(this.selectedActivity.processing_status.id)
@@ -902,7 +944,8 @@ export default {
         showNavBarBottom: function() {
             // let show = this.canReturnToConditions || (!this.applicationIsDraft && this.canSaveApplication)
             let show = !this.applicationIsDraft && this.canSaveApplication
-            return show
+            //return show
+            return true
         },
         showAssignToOfficer: function(){
             if (this.showingApplicant) {
@@ -1328,15 +1371,129 @@ export default {
             },(error) => {
             });
         },
-        save: async function(props = { showNotification: true }) {
+        submit: async function(){
+            let vm = this;
+            let swal_title = 'Submit Application'
+            let swal_html = 'Are you sure you want to submit this application?'
+            swal.fire({
+                title: swal_title,
+                html: swal_html,
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: 'Submit'
+
+            }).then( async (result) => {
+                if (result.isConfirmed) {
+                    let is_submitting = true
+                    let is_saved = await this.save(props = { showNotification: false }, is_submitting=true);
+                    if (is_saved) {
+                        this.spinner = true;
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/submit'),{method:'POST'})
+                        request.then(res=>{
+                            this.setApplication(res);
+                            this.spinner = false;
+                            vm.$router.push({
+                                name: 'submit_application',
+                                params: { application: vm.application }
+                            });
+
+                        },err=>{
+                            swal.fire(
+                                'Submit Error',
+                                helpers.apiVueResourceError(err),
+                                'error'
+                            ).then((result) => {
+                                this.spinner = false;
+                            });
+                        });
+                    }
+
+                } else {
+
+                this.spinner = false;
+
+                }
+
+            },(error) => {
+                swal.fire(
+                    'Error',
+                    'There was an error submitting your application',
+                    'error'
+                ).then((result) => {
+                    this.spinner = false;
+                })
+            });
+
+        },
+        pay_and_submit: async function(){
+            let vm = this;
+            let swal_title = 'Checkout and Submit Application'
+            let swal_html = 'Are you sure you want to pay and submit this application?<br><br>'
+            swal.fire({
+                title: swal_title,
+                html: swal_html,
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: 'Submit'
+
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                let is_submitting = true;
+                let is_saved = await this.save(props = { showNotification: false }, is_submitting=true);
+
+                if (is_saved) {
+                    vm.spinner = true;
+                    if (this.adjusted_application_fee > 0 || this.application.licence_fee > 0) { //refund not required.
+
+                        let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,vm.application.id+'/application_fee_checkout/'), {method:'POST'})
+                        request.then(res=>{
+                            window.location.href = res;
+                        },err=>{
+                            swal.fire(
+                                'Submit Error',
+                                helpers.apiVueResourceError(err),
+                                'error'
+                            ).then((result) => {
+                                this.spinner = false;
+                            })
+                        });
+
+                    } else {
+                        vm.spinner = false;
+                        vm.$router.push({
+                            name: 'submit_application',
+                            params: { application: vm.application }
+                        });
+
+                    }
+
+                }
+
+                } else {
+
+                    vm.spinner = false;
+                }
+            },(error) => {
+                swal.fire(
+                    'Error',
+                    'There was an error submitting your application',
+                    'error'
+                ).then((result) => {
+                    vm.spinner = false;
+                })
+            });
+        },
+        save: async function(props = { showNotification: true }, is_submitting=false) {
             this.spinner = true;
             const { showNotification } = props;
+            let is_saved = false;
 
             this.missing_fields.length = 0;
             this.highlight_missing_fields();
 
-            await this.saveFormData({ url: this.form_data_application_url }).then(response => {
+            await this.saveFormData({ url: this.form_data_application_url, draft: this.selectedActivity.processing_status.id==='draft' , submit: is_submitting }).then(response => {
                 this.resetUpdateFeeStatus();
+                is_saved = true;
                 showNotification && swal.fire(
                     'Saved',
                     'Your application has been saved',
@@ -1350,10 +1507,6 @@ export default {
                         this.missing_fields.push(missing_field)
                     }
                     this.highlight_missing_fields()
-                    /*var top = ($('#error').offset() || { "top": NaN }).top;
-                    $('html, body').animate({
-                        scrollTop: top
-                    }, 1);*/
                     return false;
                 }
                 swal.fire(
@@ -1362,7 +1515,7 @@ export default {
                     'error'
                 )
             });
-
+            return is_saved
         },
         highlight_missing_fields: function(){
             $('.missing-field').removeClass('missing-field');
@@ -1377,6 +1530,21 @@ export default {
         save_button: async function() {
             await this.save()
             this.spinner = false;
+        },
+        saveExit: async function(e) {
+        let is_saved = await this.save();
+        if (is_saved) {
+            swal.fire(
+                'Saved',
+                'Your application has been saved',
+                'success'
+
+            ).then((result) => {
+                this.spinner = false;
+                window.location.href = "/";
+            });
+        }
+        this.spinner = true;
         },
         save_wo: async function() {
             await this.save({ showNotification: false });

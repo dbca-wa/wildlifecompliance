@@ -11,6 +11,7 @@ import {
     UPDATE_CURRENT_USER,
     UPDATE_CURRENT_USER_ID,
     UPDATE_SELECTED_APPLY_ORG_ID,
+    UPDATE_SELECTED_APPLY_USER_ID,
     UPDATE_SELECTED_APPLY_PROXY_ID,
     UPDATE_SELECTED_APPLY_LICENCE_SELECT,
     UPDATE_APPLICATION_WORKFLOW_STATE,
@@ -23,6 +24,7 @@ export const userStore = {
         selected_activity_tab_name: '',
         selected_activity_tab_workflow_state: [],
         selected_apply_org_id: null,
+        selected_apply_user_id: null,
         selected_apply_proxy_id: null,
         selected_apply_licence_select: null,
         application_workflow_state: false,
@@ -40,6 +42,7 @@ export const userStore = {
         selected_activity_tab_name: state => state.selected_activity_tab_name,
         selected_activity_tab_workflow_state: state => state.selected_activity_tab_workflow_state,
         selected_apply_org_id: state => state.selected_apply_org_id,
+        selected_apply_user_id: state => state.selected_apply_user_id,
         selected_apply_proxy_id: state => state.selected_apply_proxy_id,
         selected_apply_licence_select: state => state.selected_apply_licence_select,
         application_workflow_state: state => state.application_workflow_state,
@@ -200,6 +203,9 @@ export const userStore = {
         [UPDATE_SELECTED_APPLY_ORG_ID] (state, org_id) {
             state.selected_apply_org_id = org_id;
         },
+        [UPDATE_SELECTED_APPLY_USER_ID] (state, user_id) {
+            state.selected_apply_user_id = user_id;
+        },
         [UPDATE_SELECTED_APPLY_PROXY_ID] (state, proxy_id) {
             state.selected_apply_proxy_id = proxy_id;
         },
@@ -226,6 +232,9 @@ export const userStore = {
         },
         setApplyOrgId({ commit }, { id }) {
             commit(UPDATE_SELECTED_APPLY_ORG_ID, id);
+        },
+        setApplyUserId({ commit }, { id }) {
+            commit(UPDATE_SELECTED_APPLY_USER_ID, id);
         },
         setApplyProxyId({ commit }, { id }) {
             commit(UPDATE_SELECTED_APPLY_PROXY_ID, id);
