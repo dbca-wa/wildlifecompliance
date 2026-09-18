@@ -39,7 +39,7 @@ from wildlifecompliance.components.main.utils import (
 
 from wildlifecompliance.components.inspection.models import Inspection
 from wildlifecompliance.components.licences.utils import LicencePurposeUtil
-from wildlifecompliance.components.organisations.models import Organisation
+from wildlifecompliance.components.organisations.models import Organisation, OrganisationContact
 from wildlifecompliance.components.organisations.emails import (
     send_org_id_update_request_notification
 )
@@ -1532,7 +1532,12 @@ class Application(RevisionedMixin):
                 self.customer_status = Application.CUSTOMER_STATUS_UNDER_REVIEW
 
                 if request.user and isinstance(request.user,EmailUser):
-                    self.submitter = request.user #TODO ensure this is not overridden by internal users submitting on applicant's behalf
+                    if not self.submitter:
+                        self.submitter = request.user #NOTE: this should be able to happen, submitter should already be set
+                    #Same org, different submitter
+                    if self.org_applicant:
+                        if OrganisationContact.objects.filter(organisation=self.org_applicant,email=request.user.email).exists():
+                            self.submitter = request.user
                 
                 self.lodgement_date = timezone.now()
                 # set assess status to True everytime.

@@ -1883,7 +1883,13 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                     action=action
                 )
                 if is_submit:
-                    instance.submitter = request.user #TODO ensure this is not overridden by internal users submitting on applicant's behalf
+                    if not instance.submitter:
+                        instance.submitter = request.user #NOTE: this should be able to happen, submitter should already be set
+                    #Same org, different submitter
+                    if instance.org_applicant:
+                        if OrganisationContact.objects.filter(organisation=instance.org_applicant,email=request.user.email).exists():
+                            instance.submitter = request.user
+
                     if instance.amendment_requests:
                         instance.log_user_action(ApplicationUserAction.ACTION_ID_REQUEST_AMENDMENTS_SUBMIT.format(instance.lodgement_number), request)
                     else:

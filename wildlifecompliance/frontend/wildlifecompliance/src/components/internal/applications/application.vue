@@ -1385,7 +1385,7 @@ export default {
             }).then( async (result) => {
                 if (result.isConfirmed) {
                     let is_submitting = true
-                    let is_saved = await this.save(props = { showNotification: false }, is_submitting=true);
+                    let is_saved = await this.save({ showNotification: false }, is_submitting=true);
                     if (is_saved) {
                         this.spinner = true;
                         let request = fetch_util.fetchUrl(helpers.add_endpoint_json(api_endpoints.applications,vm.application.id+'/submit'),{method:'POST'})
@@ -1439,12 +1439,15 @@ export default {
             }).then(async (result) => {
                 if (result.isConfirmed) {
                 let is_submitting = true;
-                let is_saved = await this.save(props = { showNotification: false }, is_submitting=true);
-
+                let is_saved = await this.save({ showNotification: false }, is_submitting=true);
+                console.log("is_saved")
+                console.log(is_saved)
                 if (is_saved) {
                     vm.spinner = true;
-                    if (this.adjusted_application_fee > 0 || this.application.licence_fee > 0) { //refund not required.
-
+                    console.log(this.application.application_fee)
+                    console.log(this.application.licence_fee)
+                    if (this.application.application_fee > 0 || this.application.licence_fee > 0) { //refund not required.
+                        console.log("application_fee_checkout")
                         let request = fetch_util.fetchUrl(helpers.add_endpoint_join(api_endpoints.applications,vm.application.id+'/application_fee_checkout/'), {method:'POST'})
                         request.then(res=>{
                             window.location.href = res;
