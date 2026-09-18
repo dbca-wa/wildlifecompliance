@@ -39,7 +39,7 @@ from wildlifecompliance.components.main.utils import (
 
 from wildlifecompliance.components.inspection.models import Inspection
 from wildlifecompliance.components.licences.utils import LicencePurposeUtil
-from wildlifecompliance.components.organisations.models import Organisation
+from wildlifecompliance.components.organisations.models import Organisation, OrganisationContact
 from wildlifecompliance.components.organisations.emails import (
     send_org_id_update_request_notification
 )
@@ -1532,7 +1532,12 @@ class Application(RevisionedMixin):
                 self.customer_status = Application.CUSTOMER_STATUS_UNDER_REVIEW
 
                 if request.user and isinstance(request.user,EmailUser):
-                    self.submitter = request.user
+                    if not self.submitter:
+                        self.submitter = request.user #NOTE: this should be able to happen, submitter should already be set
+                    #Same org, different submitter
+                    if self.org_applicant:
+                        if OrganisationContact.objects.filter(organisation=self.org_applicant,email=request.user.email).exists():
+                            self.submitter = request.user
                 
                 self.lodgement_date = timezone.now()
                 # set assess status to True everytime.
@@ -3768,7 +3773,11 @@ class Application(RevisionedMixin):
             "organisation_id",
             request.GET.get("organisation_id")
         )
-        return Application.validate_request_user_proxy_details(request, proxy_id, organisation_id)
+        user_id = request.data.get(
+            "user_id",
+            request.GET.get("user_id")
+        )
+        return Application.validate_request_user_proxy_details(request, proxy_id, organisation_id, user_id)
 
     @staticmethod
     def get_request_user_permission_group(request, permission_codename, activity_id=None, first=True):
@@ -3795,25 +3804,38 @@ class Application(RevisionedMixin):
         return qs.first() if first else qs
 
     @staticmethod
-    def validate_request_user_proxy_details(request, proxy_id, organisation_id):
+    def validate_request_user_proxy_details(request, proxy_id, organisation_id, user_id):
+        from wildlifecompliance.helpers import is_wildlife_compliance_officer
         proxy_details = {
             'proxy_id': proxy_id,
             'organisation_id': organisation_id,
+            'user_id': user_id,
         }
 
         if organisation_id:
             user = EmailUser.objects.get(pk=proxy_id) if proxy_details['proxy_id'] else request.user
-            if not user.wildlifecompliance_organisations.filter(pk=organisation_id):
+            if not user.wildlifecompliance_organisations.filter(pk=organisation_id) and not is_wildlife_compliance_officer(request):
                 proxy_details['organisation_id'] = None
 
         return proxy_details
 
     @staticmethod
     def get_request_user_applications(request):
+        from wildlifecompliance.helpers import is_wildlife_compliance_officer
         proxy_details = Application.get_request_user_proxy_details(request)
         proxy_id = proxy_details.get('proxy_id')
         organisation_id = proxy_details.get('organisation_id')
-        if request.user.is_authenticated:
+        user_id = proxy_details.get('user_id')
+
+        if is_wildlife_compliance_officer(request) and user_id:
+            return Application.objects.filter(
+                Q(org_applicant_id=organisation_id) if organisation_id
+                else (
+                    Q(submitter=user_id) | Q(proxy_applicant=proxy_id)
+                ) if proxy_id
+                else Q(submitter=user_id, proxy_applicant=None, org_applicant=None)
+            )
+        elif request.user.is_authenticated:
             return Application.objects.filter(
                 Q(org_applicant_id=organisation_id) if organisation_id
                 else (

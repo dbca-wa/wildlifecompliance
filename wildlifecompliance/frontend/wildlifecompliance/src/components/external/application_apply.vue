@@ -62,6 +62,7 @@ export default {
         "application": null,
         agent: {},
         selected_apply_org_id_details : {},
+        selected_apply_user_id_details : {},
         selected_apply_proxy_id_details: {},
         current_user: {
             wildlifecompliance_organisations: []
@@ -78,6 +79,7 @@ export default {
   computed: {
     ...mapGetters([
         'selected_apply_org_id',
+        'selected_apply_user_id',
         'selected_apply_proxy_id',
         'application_workflow_state',
     ]),
@@ -87,6 +89,8 @@ export default {
     title: function() {
         if (this.selected_apply_org_id && this.selected_apply_org_id_details != undefined) {
             return this.applicationTitle + " for " + this.selected_apply_org_id_details.name + " " + this.selected_apply_org_id_details.abn
+        } else if (this.selected_apply_user_id && this.selected_apply_user_id_details != undefined) {
+            return this.applicationTitle + " for " + this.selected_apply_user_id_details.first_name + " " + this.selected_apply_user_id_details.last_name + " " + this.selected_apply_user_id_details.email
         } else if (this.selected_apply_proxy_id && this.selected_apply_proxy_id_details != undefined) {
             return this.applicationTitle + " for " + this.selected_apply_proxy_id_details.first_name + " " + this.selected_apply_proxy_id_details.last_name + " " + selected_apply_proxy_id_details.email
         } else {
@@ -126,9 +130,11 @@ export default {
             utils.fetchCurrentActiveLicenceApplication({
                     "proxy_id": vm.selected_apply_proxy_id,
                     "organisation_id": vm.selected_apply_org_id,
+                    "user_id": vm.selected_apply_user_id,
                 }),
             vm.selected_apply_org_id ? utils.fetchOrganisation(vm.selected_apply_org_id) : '',
             vm.selected_apply_proxy_id ? internal_utils.fetchUser(vm.selected_apply_proxy_id) : '',
+            vm.selected_apply_user_id ? internal_utils.fetchUser(vm.selected_apply_user_id) : '',
         ]
         Promise.all(initialisers).then(data => {
             vm.current_user = data[0];
@@ -143,6 +149,7 @@ export default {
             vm.application = data[1].application;
             vm.selected_apply_org_id_details = data[2];
             vm.selected_apply_proxy_id_details = data[3];
+            vm.selected_apply_user_id_details = data[4];
         })
     })
   }

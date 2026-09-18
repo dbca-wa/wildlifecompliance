@@ -27,6 +27,7 @@ from ledger_api_client.ledger_models import EmailUserRO as EmailUser, Address as
 from ledger_api_client.country_models import Country
 from datetime import datetime, timedelta, date
 from wildlifecompliance.helpers import user_has_perm, is_wildlife_compliance_officer
+from ledger_api_client.utils import get_search_organisation
 from wildlifecompliance.components.organisations.models import (
     Organisation,
     OrganisationContact,
@@ -782,6 +783,41 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
             qs = self.get_queryset().filter(requester=request.user, status=OrganisationRequest.ORG_REQUEST_STATUS_WITH_ASSESSOR)
             serializer = OrganisationRequestDTSerializer(qs, many=True, context={'request': request})
             return Response(serializer.data)
+        except serializers.ValidationError:
+            print(traceback.print_exc())
+            raise
+        
+        except Exception as e:
+            print(traceback.print_exc())
+            raise serializers.ValidationError("Internal System Error")
+
+    @action(detail=True, methods=['GET', ])
+    def get_approved_org_id(self, request, *args, **kwargs):
+        try:
+            if not is_wildlife_compliance_officer(request):
+                return Response("user not authorised to check organisation request")
+
+            instance = self.get_object()
+            if instance.status != OrganisationRequest.ORG_REQUEST_STATUS_APPROVED:
+                return Response("org not yet approved")
+
+            organisation_response = get_search_organisation(instance.name, instance.abn)
+            response_status = organisation_response.get("status", None)
+
+            if response_status == status.HTTP_404_NOT_FOUND:
+                raise NotImplementedError(
+                    "Organisation does not exist in the ledger."
+                )
+
+            if response_status != status.HTTP_200_OK:
+                raise ValidationError(
+                    "Failed to retrieve organisation details from the ledger."
+                )
+
+            ledger_org = organisation_response.get("data", {})[0]
+            org = Organisation.objects.filter(organisation_id=ledger_org["organisation_id"]).first()
+            return Response({"org_id":org.id})
+
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise

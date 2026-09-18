@@ -1712,7 +1712,7 @@ class InternalApplicationSerializer(BaseApplicationSerializer):
         return activities
 
     def get_readonly(self, obj):
-        return True
+        return not obj.can_user_edit
 
     def get_licences(self, obj):
         logger.debug('InternalApplicationSerializer.get_licences() - start')

@@ -502,6 +502,7 @@ class SubmitRequestCommand(ApplicationCommand):
         from wildlifecompliance.components.applications.email import (
             send_application_submit_email_notification,
         )
+        from wildlifecompliance.components.organisations.models import OrganisationContact
 
         if not self.application.can_user_edit:
             raise ApplicationServiceException('Incorrect status for Submit')
@@ -526,7 +527,12 @@ class SubmitRequestCommand(ApplicationCommand):
             return
 
         self.application.customer_status = self.UNDER_REVIEW
-        self.application.submitter = self.request.user
+        if not self.application.submitter:
+            self.application.submitter = self.request.user #NOTE: this should be able to happen, submitter should already be set
+        #Same org, different submitter
+        if self.application.org_applicant:
+            if OrganisationContact.objects.filter(organisation=self.application.org_applicant,email=self.request.user.email).exists():
+                self.application.submitter = self.request.user
         self.application.lodgement_date = timezone.now()
 
         # set assess status to True everytime. Flag is only used for

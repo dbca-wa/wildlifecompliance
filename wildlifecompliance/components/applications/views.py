@@ -262,8 +262,6 @@ class LicenceFeeSuccessViewPreload(APIView):
             activities = ApplicationSelectedActivity.objects.filter(
                 application_id=application.id,
                 processing_status=ApplicationSelectedActivity.PROCESSING_STATUS_AWAITING_LICENCE_FEE_PAYMENT)
-
-            print("\n\nDEBUG",activities.count(), invoice_ref)
             
             invoice = Invoice.objects.get(
                 reference=invoice_ref

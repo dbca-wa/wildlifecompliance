@@ -116,7 +116,9 @@ def checkout(
         'no_payment': False,
     }
     print(basket_params)
-    basket_hash = create_basket_session(request, request.user.id, basket_params)
+    basket_owner = application.submitter.id if application.submitter else request.user.id
+
+    basket_hash = create_basket_session(request, basket_owner, basket_params)
 
     checkout_params = {
         'system': settings.WC_PAYMENT_SYSTEM_ID,
@@ -126,7 +128,7 @@ def checkout(
         'force_redirect': True,
         #'proxy': True if internal else False,
         'invoice_text': invoice_text,
-        'basket_owner': request.user.id,
+        'basket_owner': basket_owner,
         'session_type': 'ledger_api',
     }
     

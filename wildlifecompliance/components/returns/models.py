@@ -526,7 +526,7 @@ class Return(SanitiseMixin):
             CURATOR = Return.RETURN_PROCESSING_STATUS_WITH_CURATOR
             if self.processing_status in submit_status:
                 self.processing_status = CURATOR
-                self.submitter = request.user
+                self.submitter = request.user #TODO ensure this is not overridden by internal users submitting on applicant's behalf
                 self.save()
 
             # code for amendment returns is still to be added, so

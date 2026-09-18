@@ -40,7 +40,7 @@
                                                 <div v-if="category.checked" class="col-sm-9">
 
                                                     <div v-for="(type,index1) in category.activity" class="checkbox margin-left-20">
-                                                        <div v-if="!(selected_apply_org_id != '' && type.not_for_organisation == true)">
+                                                        <div v-if="(!selected_apply_org_id || !type.not_for_organisation)">
                                                         <input type="checkbox" ref="selected_activity_type" name ="activity" :value="type.id" :id = "type.id" v-model="category.activity[index1].selected" @change="handleActivityCheckboxChange(index,index1)"> {{type.short_name}}
 
                                                         <div v-if="type.selected">
@@ -160,6 +160,7 @@ export default {
         application_fee: 0,
         licence_fee: 0,
         selected_apply_org_id_details : {},
+        selected_apply_user_id_details : {},
         selected_apply_proxy_id_details: {},
         customer_pay_method: 'card',
         spinner: false,
@@ -171,6 +172,7 @@ export default {
   computed: {
         ...mapGetters([
             'selected_apply_org_id',
+            'selected_apply_user_id',
             'selected_apply_proxy_id',
             'selected_apply_licence_select',
             'application_workflow_state',
@@ -180,6 +182,8 @@ export default {
         title: function() {
             if (this.selected_apply_org_id && this.selected_apply_org_id_details != undefined) {
                 return this.applicationTitle + " for " + this.selected_apply_org_id_details.name + " " + this.selected_apply_org_id_details.abn
+            }else if (this.selected_apply_user_id && this.selected_apply_user_id_details != undefined) {
+                return this.applicationTitle + " for " + this.selected_apply_user_id_details.first_name + " " + this.selected_apply_user_id_details.last_name + " " + this.selected_apply_user_id_details.email
             } else if (this.selected_apply_proxy_id && this.selected_apply_proxy_id_details != undefined) {
                 return this.applicationTitle + " for " + this.selected_apply_proxy_id_details.first_name + " " + this.selected_apply_proxy_id_details.last_name + " " + selected_apply_proxy_id_details.email
             } else {
@@ -381,6 +385,7 @@ export default {
             vm.spinner = false;
         } else {
             data.organisation_id=vm.selected_apply_org_id;
+            data.user_id=vm.selected_apply_user_id;
             data.proxy_id=vm.selected_apply_proxy_id;
             data.application_fee=vm.application_fee;
             data.licence_fee=vm.licence_fee;
@@ -416,6 +421,7 @@ export default {
         let licence_purposes = [vm.select_licence_purpose];
         let data = new FormData()
         data.organisation_id=vm.selected_apply_org_id;
+        data.user_id=vm.selected_apply_user_id;
         data.proxy_id=vm.selected_apply_proxy_id;
         data.application_fee=vm.application_fee;
         data.licence_fee=vm.licence_fee;
@@ -447,23 +453,26 @@ export default {
     setupInitialisers: function() {
         let initialisers = [
             utils.fetchLicenceAvailablePurposes({
-                "application_type": this.selected_apply_licence_select,
-                "licence_category": this.licence_category,
-                "licence_activity": this.licence_activity,
-                "proxy_id": this.selected_apply_proxy_id,
+                //"application_type": this.selected_apply_licence_select,
+                //"licence_category": this.licence_category,
+                //"licence_activity": this.licence_activity,
+                //"proxy_id": this.selected_apply_proxy_id,
+                "user_id": this.selected_apply_user_id,
                 "organisation_id": this.selected_apply_org_id,
-                "licence_no": this.licence_no,
-                "select_activity": this.select_activity,
-                "select_purpose": this.select_purpose,
+                //"licence_no": this.licence_no,
+                //"select_activity": this.select_activity,
+                //"select_purpose": this.select_purpose,
             }),
             this.selected_apply_org_id ? utils.fetchOrganisation(this.selected_apply_org_id) : '',
             this.selected_apply_proxy_id ? internal_utils.fetchUser(this.selected_apply_proxy_id) : '',
+            this.selected_apply_user_id ? internal_utils.fetchUser(this.selected_apply_user_id) : '',
         ];
 
         Promise.all(initialisers).then(data => {
             this.licence_categories = data[0];
             this.selected_apply_org_id_details = data[1];
             this.selected_apply_proxy_id_details = data[2];
+            this.selected_apply_user_id_details = data[3];
         });
     }
   },

@@ -20,7 +20,7 @@ from wildlifecompliance.components.applications.serializers import (
 )
 from ledger_api_client.ledger_models import Invoice
 from rest_framework import serializers
-
+from ledger_api_client.ledger_models import EmailUserRO as EmailUser
 
 class WildlifeLicenceSerializer(serializers.ModelSerializer):
     licence_document = serializers.CharField(
@@ -459,8 +459,8 @@ class LicenceCategorySerializer(serializers.ModelSerializer):
                 ]
 
         activities = sorted(activities, key=lambda x: x.id, reverse=False)
-        request = self.context.get('request')
-        user = request.user if request and request.user else None
+        user = self.context.get('user')
+        user = EmailUser.objects.filter(id=user).first() if user else None
         serializer = ActivitySerializer(
             activities,
             many=True,
