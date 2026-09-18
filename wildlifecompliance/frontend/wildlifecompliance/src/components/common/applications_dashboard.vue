@@ -196,6 +196,9 @@ export default {
                     if (!vm.is_external && vm.canViewPayments && ['paid','partially_paid'].includes(full.payment_status)){
                         links +=  `<a href='${full.all_payments_url}' target='_blank' >View Payment</a><br/>`;
                     }
+                    if (!vm.is_external && full.processing_status.id == 'awaiting_payment'){
+                        links +=  `<a href='#${full.id}' data-pay-application-licence-fee='${full.id}' pay-licence-fee-for='0'>Pay Additional Fee</a><br/>`;
+                    }
                     if (!vm.is_external && vm.canViewPayments && full.payment_status=='under_paid'){
                         links = ''
                         links +=  `<a href='${full.all_payments_url}' target='_blank' >Record Payment</a><br/>`;
