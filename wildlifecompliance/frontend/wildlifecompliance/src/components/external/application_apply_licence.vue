@@ -40,7 +40,7 @@
                                                 <div v-if="category.checked" class="col-sm-9">
 
                                                     <div v-for="(type,index1) in category.activity" class="checkbox margin-left-20">
-                                                        <div v-if="!(selected_apply_org_id != '' && type.not_for_organisation == true)">
+                                                        <div v-if="(!selected_apply_org_id || !type.not_for_organisation)">
                                                         <input type="checkbox" ref="selected_activity_type" name ="activity" :value="type.id" :id = "type.id" v-model="category.activity[index1].selected" @change="handleActivityCheckboxChange(index,index1)"> {{type.short_name}}
 
                                                         <div v-if="type.selected">
@@ -453,15 +453,15 @@ export default {
     setupInitialisers: function() {
         let initialisers = [
             utils.fetchLicenceAvailablePurposes({
-                "application_type": this.selected_apply_licence_select,
-                "licence_category": this.licence_category,
-                "licence_activity": this.licence_activity,
-                "proxy_id": this.selected_apply_proxy_id,
+                //"application_type": this.selected_apply_licence_select,
+                //"licence_category": this.licence_category,
+                //"licence_activity": this.licence_activity,
+                //"proxy_id": this.selected_apply_proxy_id,
                 "user_id": this.selected_apply_user_id,
                 "organisation_id": this.selected_apply_org_id,
-                "licence_no": this.licence_no,
-                "select_activity": this.select_activity,
-                "select_purpose": this.select_purpose,
+                //"licence_no": this.licence_no,
+                //"select_activity": this.select_activity,
+                //"select_purpose": this.select_purpose,
             }),
             this.selected_apply_org_id ? utils.fetchOrganisation(this.selected_apply_org_id) : '',
             this.selected_apply_proxy_id ? internal_utils.fetchUser(this.selected_apply_proxy_id) : '',

@@ -795,8 +795,8 @@ class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ReadOnlyModelViewSet)
             return LicenceCategory.objects.all()
         return LicenceCategory.objects.none()
 
-    #TODO user_id override for internals user to use
-    def list(self, request, *args, **kwargs):
+    @action(detail=False, methods=["post"])
+    def available_purposes(self, request, *args, **kwargs):
         """
         Returns a queryset of LicenceCategory objects and a queryset of LicencePurpose objects allowed for
         licence activity/purpose selection.
@@ -807,6 +807,7 @@ class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ReadOnlyModelViewSet)
         - organisation_id (Organisation, id), used in Application.get_active_licence_applications
         - proxy_id (EmailUser, id), used in Application.get_active_licence_applications
         - licence_no (WildlifeLicence, id)
+        - overriding user_id, if an internal user want to submit on an external user's behalf
         """
         from wildlifecompliance.components.licences.models import LicencePurpose
 
@@ -814,15 +815,17 @@ class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ReadOnlyModelViewSet)
         available_purpose_records = LicencePurpose.objects.filter(
             replaced_by=None    # current versions only.
         )
-        application_type = request.GET.get('application_type')
-        licence_category_id = request.GET.get('licence_category')
-        licence_activity_id = request.GET.get('licence_activity')
-        licence_no = request.GET.get('licence_no')
-        select_activity_id = request.GET.get('select_activity')
-        select_purpose_id = request.GET.get('select_purpose')
+        application_type = request.data.get('application_type')
+        licence_category_id = request.data.get('licence_category')
+        licence_activity_id = request.data.get('licence_activity')
+        licence_no = request.data.get('licence_no')
+        select_activity_id = request.data.get('select_activity')
+        select_purpose_id = request.data.get('select_purpose')
+        override_user_id = request.data.get('user_id')
 
         # active_applications are applications linked with licences that have CURRENT or SUSPENDED activities
         active_applications = Application.get_active_licence_applications(request, application_type)
+
         active_current_applications = active_applications.exclude(
             selected_activities__activity_status=ApplicationSelectedActivity.ACTIVITY_STATUS_SUSPENDED
         )
@@ -838,43 +841,40 @@ class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ReadOnlyModelViewSet)
                     ).values_list('id', flat=True)
                 )
 
-        if request.user.is_staff:
-            # filter out purposes not related to selected licence.
-            active_purpose_ids = []
-            if licence_no:
-                licence = WildlifeLicence.objects.get(id=licence_no)
-                for selected_activity in licence.current_activities:
-                    active_purpose_ids.extend(
-                        [purpose.id for purpose in selected_activity.purposes])
-
-            if application_type in [
-                Application.APPLICATION_TYPE_ACTIVITY,
-                Application.APPLICATION_TYPE_NEW_LICENCE,
-            ]:
+        #if request.user.is_staff: #TODO/NOTE unsure what this block does or why it was here and only for staff (it has likely never been used, disabling for now)
+        #    # filter out purposes not related to selected licence.
+        #    active_purpose_ids = []
+        #    if licence_no:
+        #        licence = WildlifeLicence.objects.get(id=licence_no)
+        #        for selected_activity in licence.current_activities:
+        #            active_purpose_ids.extend(
+        #                [purpose.id for purpose in selected_activity.purposes])
+        #    if application_type in [
+        #        Application.APPLICATION_TYPE_ACTIVITY,
+        #        Application.APPLICATION_TYPE_NEW_LICENCE,
+        #    ]:
                 # filter out currently active purposes from available records.
-                available_purpose_records = available_purpose_records.exclude(
-                    id__in=active_purpose_ids,
-                    apply_multiple=False,
-                )
-
-            if application_type in [
-                Application.APPLICATION_TYPE_AMENDMENT,
-                Application.APPLICATION_TYPE_RENEWAL,
-                Application.APPLICATION_TYPE_REISSUE,
-            ]:
+        #        available_purpose_records = available_purpose_records.exclude(
+        #            id__in=active_purpose_ids,
+        #            apply_multiple=False,
+        #        )
+        #    if application_type in [
+        #        Application.APPLICATION_TYPE_AMENDMENT,
+        #        Application.APPLICATION_TYPE_RENEWAL,
+        #        Application.APPLICATION_TYPE_REISSUE,
+        #    ]:
                 # rebuild available records with active purposes for Activity 
                 # Amendments.
-                active_purpose_ids = []
-                current = licence.current_activities.filter(
-                    licence_activity__id=licence_activity_id
-                )
-                for selected_activity in current:
-                    active_purpose_ids.extend(
-                        [purpose.id for purpose in selected_activity.purposes])
-
-                available_purpose_records = LicencePurpose.objects.filter(
-                    id__in=active_purpose_ids
-                )
+        #        active_purpose_ids = []
+        #        current = licence.current_activities.filter(
+        #            licence_activity__id=licence_activity_id
+        #        )
+        #        for selected_activity in current:
+        #            active_purpose_ids.extend(
+        #                [purpose.id for purpose in selected_activity.purposes])
+        #        available_purpose_records = LicencePurpose.objects.filter(
+        #            id__in=active_purpose_ids
+        #        )
 
         if not active_applications.count() and application_type == Application.APPLICATION_TYPE_RENEWAL:
             # Do not present with renewal options if no activities are within the renewal period
@@ -946,7 +946,7 @@ class UserAvailableWildlifeLicencePurposesViewSet(viewsets.ReadOnlyModelViewSet)
                 queryset = LicenceCategory.objects.none()
 
         serializer = LicenceCategorySerializer(queryset, many=True, context={
-            'request': request,
+            'user': override_user_id if override_user_id else request.user.id,
             'purpose_records': available_purpose_records
         })
         return Response(serializer.data)

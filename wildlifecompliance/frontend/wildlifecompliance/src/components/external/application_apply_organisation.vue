@@ -121,14 +121,16 @@ export default {
             if (vm.personOrgEntity.entity_type == "org") {
                 //get org id from org request id 
                 const org_id = await vm.fetchOrgId(vm.personOrgEntity.id);
-                console.log(org_id)
                 vm.setApplyOrgId({id: org_id});
+                vm.setApplyUserId({id: ''});
             } else if (vm.personOrgEntity.entity_type == "user") {
                 vm.setApplyUserId({id: vm.personOrgEntity.id});
+                vm.setApplyOrgId({id: ''});
             }
         }
         else {
             vm.setApplyOrgId({id: vm.org_applicant});
+            vm.setApplyUserId({id: ''});
         }
         vm.setApplicationWorkflowState({bool: true});
         vm.$router.push({

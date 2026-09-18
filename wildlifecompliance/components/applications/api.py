@@ -81,7 +81,7 @@ from wildlifecompliance.components.applications.serializers import (
     DTApplicationSelectSerializer,
 )
 from wildlifecompliance.components.main.process_document import process_generic_document
-
+from wildlifecompliance.components.organisations.models import OrganisationContact, Organisation
 from rest_framework_datatables.pagination import DatatablesPageNumberPagination
 from rest_framework_datatables.filters import DatatablesFilterBackend
 
@@ -1959,6 +1959,36 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             application_type = request.data.get('application_type')
             customer_pay_method = request.data.get('customer_method_id')
 
+            user_id = request.data.get('user_id')
+            submitter = None
+            if user_id and is_wildlife_compliance_officer(request) and request.user.id != user_id:
+                submitter = user_id
+            elif is_wildlife_compliance_officer(request) and org_applicant:
+                try:
+                    #check org membership
+                    if OrganisationContact.objects.filter(organisation_id=org_applicant,email=request.user.email).exists():
+                        submitter = request.user.id
+                    else:
+                        #if not a member, get one of the organisations admins and use them
+                        org_admins = OrganisationContact.objects.filter(organisation_id=org_applicant,is_admin=True)
+                        organisation = Organisation.objects.get(id=org_applicant)
+                        #if the organisation has an email and the email belongs to an organisation, prioritise that, otherwise pick first on the list
+                        ledger_org = organisation.organisation
+                        if 'organisation_email' in ledger_org and ledger_org['organisation_email']:
+                            if org_admins.filter(email=ledger_org['organisation_email']).exists():
+                                submitter = EmailUser.objects.get(email=ledger_org['organisation_email']).id
+                        else:
+                            submitter = EmailUser.objects.get(email=org_admins.first().email).id
+                except Exception as e:
+                    print(e)
+                    logger.error(e)
+                    raise serializers.ValidationError("Problem with organisation admins")
+            else:
+                if org_applicant:
+                    if not OrganisationContact.objects.filter(organisation_id=org_applicant,email=request.user.email).exists():
+                        raise serializers.ValidationError("Submitter not a member of the organisation")
+                submitter = request.user.id
+
             # Amendment to licence purpose requires the selected activity it
             # belongs to - allows for multiple purposes of same type.
             selected_activity = request.data.get('selected_activity', None)
@@ -1976,7 +2006,7 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                 submit_type = Application.SUBMIT_TYPE_ONLINE
 
             data = {
-                'submitter': request.user.id, #TODO allow internal users to submit this on behalf of other users
+                'submitter': submitter,
                 'org_applicant': org_applicant,
                 'proxy_applicant': proxy_applicant,
                 'licence_purposes': licence_purposes,
