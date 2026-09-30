@@ -108,6 +108,7 @@ def get_activity_sys_answers(activity):
     return ordered_dict
 
 
+#TODO does not appear to be in use - review and remove
 def pdflatex(request, application):
 
     now = timezone.localtime(timezone.now())

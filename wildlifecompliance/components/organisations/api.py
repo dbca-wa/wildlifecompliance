@@ -657,7 +657,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def action_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            if is_wildlife_compliance_officer(request) or instance.can_user_edit(request.user.email):
+            if is_wildlife_compliance_officer(request):
                 qs = instance.action_logs.all()
                 serializer = OrganisationActionSerializer(qs, many=True)
                 return Response(serializer.data)
@@ -690,7 +690,7 @@ class OrganisationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def comms_log(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            if is_wildlife_compliance_officer(request) or instance.can_user_edit(request.user.email):
+            if is_wildlife_compliance_officer(request):
                 qs = instance.comms_logs.all()
                 serializer = OrganisationCommsSerializer(qs, many=True)
                 return Response(serializer.data)
@@ -986,6 +986,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
 
     @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
+        #TODO sec review: gate behind officer check
         try:
             instance = self.get_object()
             qs = instance.action_logs.all()
@@ -1001,6 +1002,7 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
 
     @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
+        #TODO sec review: gate behind officer check
         try:
             instance = self.get_object()
             qs = instance.comms_logs.all()

@@ -486,8 +486,7 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
     @action(detail=True, methods=['POST', ])
     #@renderer_classes((JSONRenderer,))
     def update_person(self, request, instance=None, *args, **kwargs):
-        print("cm user update")
-        print(request.data)
+        #TODO sec review: gate behind officer check (?)
         with transaction.atomic():
             try:
                 if not instance:
