@@ -288,7 +288,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['POST', ])
     def upload_details(self, request, *args, **kwargs):
-        #TODO sec review: gate behind status check
+        #NOTE: return status is in a tentative state where submit functionality does not appear to be supported - if this changes status gates will need to be added
         try:
             logger.debug('ReturnViewSet.upload_details() - start')
             instance = self.get_object()
@@ -435,7 +435,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['POST', ])
     def save(self, request, *args, **kwargs):
-        #TODO sec review: gate behind status check (?)
+        #NOTE: return status is in a tentative state where submit functionality does not appear to be supported - if this changes status gates will need to be added
         try:
             logger.debug('ReturnViewSet.save() - start')
             instance = self.get_object()
@@ -458,7 +458,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['POST', ])
     def save_and_submit(self, request, *args, **kwargs):
-        #TODO sec review: gate behind status check (?)
+        #NOTE: return status is in a tentative state where submit functionality does not appear to be supported - if this changes status gates will need to be added
         try:
             logger.debug('ReturnViewSet.save_and_submit() - start')
             instance = self.get_object()
@@ -493,7 +493,7 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['POST', ])
     def submit(self, request, *args, **kwargs):
-        #TODO sec review: gate behind status check (?)
+        #NOTE: return status is in a tentative state where submit functionality does not appear to be supported - if this changes status gates will need to be added
         try:
             logger.debug('ReturnViewSet.submit() - start')
             instance = self.get_object()
@@ -644,7 +644,10 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['post'])
     @renderer_classes((JSONRenderer,))
     def officer_comments(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             ReturnService.record_deficiency_request(request, instance)
@@ -659,7 +662,10 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             qs = instance.comms_logs.all()
@@ -676,7 +682,10 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['POST', ])
     @renderer_classes((JSONRenderer,))
     def add_comms_log(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             with transaction.atomic():
                 instance = self.get_object()
@@ -730,7 +739,10 @@ class ReturnViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+        
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+
         try:
             instance = self.get_object()
             qs = instance.action_logs.all()

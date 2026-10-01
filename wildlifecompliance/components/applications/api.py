@@ -535,16 +535,17 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @renderer_classes((JSONRenderer,))
     def process_document(self, request, *args, **kwargs):
 
-        #TODO sec review: gate behind status/officer check
-
         try:
             instance = self.get_object()
+            
             action = request.POST.get('action')
             section = request.POST.get('input_name')
             if action == 'list' and 'input_name' in request.POST:
                 pass
 
             elif action == 'delete' and 'document_id' in request.POST:
+                if not (instance.can_user_edit or is_wildlife_compliance_officer(request)):
+                    raise serializers.ValidationError("User not authorised to add, remove, or alter documents at current application status.")
                 document_id = request.POST.get('document_id')
                 document = instance.documents.get(id=document_id)
 
@@ -557,6 +558,8 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
                     document.name))  # to allow revision to be added to reversion history
 
             elif action == 'save' and 'input_name' in request.POST and 'filename' in request.POST:
+                if not (instance.can_user_edit or is_wildlife_compliance_officer(request)):
+                    raise serializers.ValidationError("User not authorised to add, remove, or alter documents at current application status.")
                 application_id = request.POST.get('application_id')
                 filename = request.POST.get('filename')
                 _file = request.POST.get('_file')
@@ -596,7 +599,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
 
-        #TODO sec review: gate behind officer check
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             qs = instance.action_logs.all()
@@ -613,7 +618,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
 
-        #TODO sec review: gate behind officer check
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             qs = instance.comms_logs.all()
@@ -631,7 +638,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @renderer_classes((JSONRenderer,))
     def add_comms_log(self, request, *args, **kwargs):
         
-        #TODO sec review: gate behind officer check
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             with transaction.atomic():
                 instance = self.get_object()
@@ -706,7 +715,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['GET', ])
     def assessments(self, request, *args, **kwargs):
 
-        #TODO sec review: gate behind officer check
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             qs = instance.assessments
@@ -723,7 +734,8 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['POST', ])
     def assign_application_assessment(self, request, *args, **kwargs):
 
-        #TODO sec review: gate behind officer check
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
         try:
             instance = self.get_object()
             instance.assign_application_assessment(request)
@@ -741,7 +753,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['POST', ])
     def complete_application_assessments(self, request, *args, **kwargs):
 
-        #TODO sec review: gate behind officer check
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             validator = ValidCompleteAssessmentSerializer(data=request.data)
             validator.is_valid(raise_exception=True)
@@ -765,7 +779,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['POST', ])
     def add_assessment_inspection(self, request, *args, **kwargs):
 
-        #TODO sec review: gate behind officer check
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             for assessment in instance.assessments:
@@ -816,7 +832,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     #TODO consider removal, may not be needed
     @action(detail=False, methods=['GET', ])
     def internal_datatable_list(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check 
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         queryset = self.get_queryset()
         serializer = DTInternalApplicationSerializer(
             queryset, many=True, context={'request': request})
@@ -841,7 +859,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['GET', ])
     def internal_application(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         logger.debug('ApplicationViewSet.internal_application() - start')
         instance = self.get_object()
         serializer = InternalApplicationSerializer(
@@ -1361,7 +1381,9 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['POST', ])
     def unassign_officer(self, request, *args, **kwargs):
 
-        #TODO sec review: gate behind officer check 
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             instance.unassign_officer(request)
@@ -1451,7 +1473,10 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['POST', ])
     def unassign_activity_approver(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check 
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             activity_id = request.data.get('activity_id', None)
@@ -1474,7 +1499,10 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['POST', ])
     def return_to_officer(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check 
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             activity_id = request.data.get('activity_id')
@@ -1503,10 +1531,11 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         '''
         Update the Licence Type Data on the application to set the status for 
         a selected Licence Activity.
-
-        NOTE: there is no check whether user has correct privileges.
         '''
-        #TODO sec review: gate behind officer check - remove above not (check before fixing if this needs external access)
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         PROCESS = 'process'
         ASSESS = 'assess'
         try:
@@ -1551,7 +1580,10 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['POST', ])
     def complete_assessment(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+        
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             instance.complete_assessment(request)
@@ -1594,7 +1626,10 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['GET', ])
     def get_proposed_decisions(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check 
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             qs = instance.get_proposed_decisions(request)
@@ -1619,14 +1654,15 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         Process assessment data for officer management by setting the workflow
         status to Officer with Conditions.
 
-        NOTE: there is no check whether user has correct privileges.
-
         :param __assess is a boolean indicating whether assessing or viewing.
         :param __licence_activity is Licence Activity identifier.
 
         :return updated instance.licence_type_data property.
         '''
-        #TODO sec review: gate behind officer check - double check and remove aboive NOTE
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         logger.debug('assessment_data_and_save()')
         STAT = ApplicationSelectedActivity.PROCESSING_STATUS_OFFICER_CONDITIONS
         correct_status = [
@@ -1711,14 +1747,15 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         Process assessment data for officer management by setting the workflow
         status to Officer with Conditions.
 
-        NOTE: there is no check whether user has correct privileges.
-
         :param __assess is a boolean indicating whether assessing or viewing.
         :param __licence_activity is Licence Activity identifier.
 
         :return updated instance.licence_type_data property.        
         '''
-        #TODO sec review: gate behind officer check - double check and remove aboive NOTE
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         logger.debug('assessment_data()')
         STAT = ApplicationSelectedActivity.PROCESSING_STATUS_OFFICER_CONDITIONS
         correct_status = [
@@ -1779,7 +1816,10 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['post'])
     @renderer_classes((JSONRenderer,))
     def final_decision_data(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
 
@@ -1811,7 +1851,10 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['POST', ])
     def final_decision(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             serializer = IssueLicenceSerializer(data=request.data)
@@ -1836,7 +1879,10 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['POST', ])
     def proposed_decline(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             serializer = ProposedDeclineSerializer(data=request.data)
@@ -1860,7 +1906,8 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['post'])
     @renderer_classes((JSONRenderer,))
     def draft(self, request, *args, **kwargs):
-        #TODO sec review: gate behind status check (check if that is happening or not)
+        if not (instance.can_user_edit or is_wildlife_compliance_officer(request)):
+            raise serializers.ValidationError("User not authorised to update application.")
         parser = SchemaParser(draft=True)
         try:
             instance = self.get_object()
@@ -1883,7 +1930,10 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['post'])
     @renderer_classes((JSONRenderer,))
     def officer_comments(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
 
@@ -1904,10 +1954,13 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['post'])
     @renderer_classes((JSONRenderer,))
     def form_data(self, request, *args, **kwargs):
-        #TODO sec review: gate behind status check (check if that is happening or not)
         logger.debug('form_data()')
         try:
             instance = self.get_object()
+
+            if not (instance.can_user_edit or is_wildlife_compliance_officer(request)):
+                raise serializers.ValidationError("User not authorised to update application.")
+
             is_submit = self.request.data.pop('__submit', False)
 
             if is_submit:
@@ -1976,7 +2029,10 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     @action(detail=True, methods=['post'])
     @renderer_classes((JSONRenderer,))
     def application_officer_save(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+
         try:
             instance = self.get_object()
             parser = SchemaParser()
@@ -2223,9 +2279,11 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             raise serializers.ValidationError(str(e))
 
     def update(self, request, *args, **kwargs):
-        #TODO sec review: gate behind status/officer check (may already be done)
+        #TODO Unsure if this endpoint is used but we'll place it behind a status/officer check for now
         try:
             instance = self.get_object()
+            if not (instance.can_user_edit or is_wildlife_compliance_officer(request)):
+                raise serializers.ValidationError("User not authorised to update application.")
             serializer = SaveApplicationSerializer(instance, data=request.data)
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
@@ -2271,7 +2329,10 @@ class ApplicationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['GET', ])
     def assessment_details(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         instance = self.get_object()
         queryset = Assessment.objects.filter(application=instance.id)
         licence_activity = self.request.query_params.get(
@@ -2348,7 +2409,10 @@ class ApplicationConditionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
 
     @action(detail=True, methods=['POST', ])
     def update_condition(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             serializer = self.get_serializer(instance, data=request.data)
@@ -2401,7 +2465,10 @@ class ApplicationConditionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
 
     @action(detail=True, methods=['GET', ])
     def move_up(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             instance.up("application_id",instance.application_id)
@@ -2421,7 +2488,10 @@ class ApplicationConditionViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
 
     @action(detail=True, methods=['GET', ])
     def move_down(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+        
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+
         try:
             instance = self.get_object()
             instance.down("application_id",instance.application_id)

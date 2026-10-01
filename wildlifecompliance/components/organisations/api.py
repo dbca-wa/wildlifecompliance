@@ -986,7 +986,10 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
 
     @action(detail=True, methods=['GET', ])
     def action_log(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             qs = instance.action_logs.all()
@@ -1002,7 +1005,10 @@ class OrganisationRequestsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelM
 
     @action(detail=True, methods=['GET', ])
     def comms_log(self, request, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             instance = self.get_object()
             qs = instance.comms_logs.all()

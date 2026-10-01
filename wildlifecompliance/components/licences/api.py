@@ -380,7 +380,10 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     @action(detail=True, methods=['POST', ])
     def add_licence_inspection(self, request, pk=None, *args, **kwargs):
-        #TODO sec review: gate behind officer check
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             if pk:
                 instance = self.get_object()
