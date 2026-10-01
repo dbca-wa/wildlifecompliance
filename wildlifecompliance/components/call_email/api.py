@@ -393,7 +393,7 @@ class CallEmailViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         try:
             with transaction.atomic():
                 instance = self.get_object()
-                request_data = request.data.copy()
+                request_data = {k: v for k, v in request.data.items() if k != 'files'}
                 request_data['call_email'] = u'{}'.format(instance.id)
                 if request_data.get('comms_log_id'):
                     comms_instance = CallEmailLogEntry.objects.get(id=request_data.get('comms_log_id'))

@@ -852,7 +852,7 @@ class OffenceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
                 if not instance:
                     instance = self.get_object()
                 # add offence outcome attribute to request_data
-                request_data = request.data.copy()
+                request_data = {k: v for k, v in request.data.items() if k != 'files'}
                 request_data['offence'] = u'{}'.format(instance.id)
                 if request_data.get('comms_log_id'):
                     comms = OffenceCommsLogEntry.objects.get(

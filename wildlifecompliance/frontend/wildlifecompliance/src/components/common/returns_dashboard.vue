@@ -84,7 +84,7 @@ export default {
             filterReturnStatus: 'All',
             filterDueDateFrom: '',
             filterDueDateTo: '',
-            dateFormat: 'DD/MM/YY',
+            dateFormat: 'DD/MM/YYYY',
             datepickerOptions:{
                 format: 'YYYY-MM-DD',
                 showClear:true,

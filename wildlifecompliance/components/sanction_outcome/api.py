@@ -1485,7 +1485,7 @@ class SanctionOutcomeViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, m
                 if not instance:
                     instance = self.get_object()
                 # add sanction outcome attribute to request_data
-                request_data = request.data.copy()
+                request_data = {k: v for k, v in request.data.items() if k != 'files'}
                 request_data['sanction_outcome'] = u'{}'.format(instance.id)
                 if request_data.get('comms_log_id'):
                     comms = SanctionOutcomeCommsLogEntry.objects.get(id=request_data.get('comms_log_id'))

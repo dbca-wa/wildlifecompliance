@@ -26,6 +26,7 @@ from wildlifecompliance.components.wc_payments.utils import get_invoice_payment_
 
 logger = logging.getLogger('payment_checkout')
 
+#NOTE: nothing here currently in use, may require auth review if put in use
 
 class InfringementPenaltyView(TemplateView):
     template_name = 'wildlifecompliance/wc_payments/success.html'

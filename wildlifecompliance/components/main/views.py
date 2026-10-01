@@ -94,7 +94,7 @@ class SearchKeywordsView(views.APIView):
             search_application = request.data.get('searchApplication')
             search_licence = request.data.get('searchLicence')
             search_returns = request.data.get('searchReturn')
-            is_internal = request.data.get('is_internal')
+            is_internal = request.data.get('is_internal') and is_internal(request)
             if search_words:
                 qs = search_keywords(search_words, search_application, search_licence, search_returns, is_internal)
             serializer = SearchKeywordSerializer(qs, many=True)
@@ -129,7 +129,6 @@ class CreateWeakLinkView(views.APIView):
                 #can_user_action = request.data.get('can_user_action')
                 comment = request.data.get('comment')
                 
-                #the first object should be checked by the user to ensure they can update it
                 if is_internal(self.request) and checkWeakLinkAuth(request,first_content_type_str,first_object_id):
                     # transform request data to create new Weak Links obj
                     second_object_id_int = int(second_object_id)
@@ -199,7 +198,6 @@ class RemoveWeakLinkView(views.APIView):
                 calling_instance = None
                 paired_instance = None
 
-                #TODO the first object should be checked by the user to ensure they can update it
                 if is_internal(self.request) and checkWeakLinkAuth(request,first_content_type_str,first_object_id):
                     # transform request data to search for Weak Link obj to delete
                     second_object_id_int = int(second_object_id)
@@ -289,7 +287,7 @@ class SearchReferenceView(views.APIView):
     renderer_classes = [JSONRenderer]
 
     def post(self, request, format=None):
-        #TODO not clear is this should be internal only or not, but at least should be authed
+        #NOTE: this is a search that returns a link. Generally used by internal only but resulting links are protected where required.
         try:
             if request.user.is_authenticated:
                 reference_number = request.data.get('reference_number')

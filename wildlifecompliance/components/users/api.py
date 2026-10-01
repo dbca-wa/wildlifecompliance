@@ -486,8 +486,10 @@ class ComplianceManagementUserViewSet(viewsets.GenericViewSet, mixins.RetrieveMo
     @action(detail=True, methods=['POST', ])
     #@renderer_classes((JSONRenderer,))
     def update_person(self, request, instance=None, *args, **kwargs):
-        print("cm user update")
-        print(request.data)
+
+        if not is_compliance_internal_user(request):
+            raise serializers.ValidationError("User not authorised")
+        
         with transaction.atomic():
             try:
                 if not instance:

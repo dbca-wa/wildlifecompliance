@@ -235,6 +235,7 @@ class LicencePaginatedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['GET', ])
     def internal_datatable_list(self, request, *args, **kwargs):
+        #NOTE: intended for internal user but no sensitive/privileged data served to external
         queryset = self.get_queryset()
         # Filter by org
         org_id = request.GET.get('org_id', None)
@@ -377,9 +378,12 @@ class LicenceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    #TODO should external users be able to request an inspection on their own licence? Not a high risk, but odd
     @action(detail=True, methods=['POST', ])
     def add_licence_inspection(self, request, pk=None, *args, **kwargs):
+
+        if not is_wildlife_compliance_officer(request):
+            raise serializers.ValidationError("User not authorised")
+        
         try:
             if pk:
                 instance = self.get_object()
