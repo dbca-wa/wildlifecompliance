@@ -128,7 +128,7 @@ export default {
               },
               { data: "doa",
                 mRender: function(data, type, full) {
-                   let _date = new Date(full.doa);
+                   let _date = vm.parseDate(full.doa);
                    return _date.toLocaleDateString("en-GB")
                 }
                },
@@ -225,6 +225,19 @@ export default {
         'setReturnsSpecies',
         'setSpeciesCache',
     ]),
+    parseDate: function(dateStr) {
+        // yyyy-mm-dd
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+            const [year, month, day] = dateStr.split('-').map(Number);
+            return new Date(year, month - 1, day);
+        }
+        // mm/dd/yyyy
+        if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateStr)) {
+            const [month, day, year] = dateStr.split('/').map(Number);
+            return new Date(year, month - 1, day);
+        }
+        return null; // invalid format
+    },
     isTrue: function(_value) {
       return (_value === 'true');
     },
