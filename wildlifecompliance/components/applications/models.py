@@ -4962,8 +4962,8 @@ class ApplicationSelectedActivity(SanitiseMixin):
                 for line in lines:
                     amount += line.amount
                 # exclude the refunds
-                detail = Invoice.objects.get(
-                    reference=invoice.invoice_reference)
+                #detail = Invoice.objects.get( NOTE: commented out as it would cause errors and does even appear to be used
+                #    reference=invoice.invoice_reference)
                 #amount -= detail.refund_amount TODO: investigate - ledger_api_client does not support this
 
         return amount
