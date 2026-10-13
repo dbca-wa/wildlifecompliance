@@ -27,7 +27,6 @@
 {% endif %}
 
 {% if is_wildlifecompliance_admin_login %}
-    <li><a class="dropdown-item" href="/internal/schema">Manage Licence Schema</a></li>
     {% if request.user.is_superuser %}
         <li><a class="dropdown-item" href="{% url 'mgt-commands' %}">Management Commands</a></li>
     {% endif %}
