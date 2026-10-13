@@ -15,8 +15,8 @@
         <li><a class="nav-link" href="/internal/call_email">Call/Emails</a></li>     
         <li><a class="nav-link" href="/infringement">Infringement Notice</a></li>                       
     {% elif is_wildlifecompliance_officer and not prefer_compliance_management %}
-        {% if is_compliance_internal_login and compliance_url %}
-            <li><a class="nav-link" href="{{compliance_url}}/internal/call_email">Call/Emails</a></li>     
+        {% if is_compliance_internal_login %}
+            <li><a class="nav-link" href="/internal/call_email">Call/Emails</a></li>     
         {% endif %}
         <li><a class="nav-link" href="/internal/">Applications</a></li>
         <li><a class="nav-link" href="/internal/licences">Licences</a></li>
