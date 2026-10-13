@@ -120,13 +120,12 @@
                     </div>
                     <div class="row mb-3">
                         
-                        <ul v-if="showSearchKeywords" style="margin-left:25px">
+                        <ul style="margin-left:25px">
                             <li>Applications (e.g. A000001)</li>
                             <li>Licences (e.g. L000001)</li>
                             <li>Returns (e.g. R000001)</li>
                             <li>Organisation Access Requests (e.g. OAR000001)</li>
-                        </ul>
-                        <ul else style="margin-left:25px">
+
                             <li>Calls/Emails (e.g. C000001)</li>
                             <li>Offences (e.g. OF000001)</li>
                             <li>Inspections (e.g. IN000001)</li>

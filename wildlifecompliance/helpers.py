@@ -134,8 +134,15 @@ def is_internal_url(request):
         internal = True
     return internal
 
-def prefer_compliance_management(request=None):
-    return settings.COMPLIANCE_APP
+def prefer_compliance_management(request):
+    ret_value = False
+
+    if request.user.is_authenticated:
+        preference = ComplianceManagementUserPreferences.objects.get(email_user=request.user)
+        if preference.prefer_compliance_management:
+            ret_value = True
+
+    return ret_value
 
 def is_wildlife_compliance_officer(request):
     wildlife_compliance_user = user_has_perm(request.user, 'wildlifecompliance.system_administrator') or request.user.is_superuser
@@ -245,19 +252,18 @@ def is_authorised_to_modify(request, instance):
 #non-request auth check
 def is_internal_user(user):
 
-    if not settings.COMPLIANCE_APP:
-        licence_officer_groups = [
-            group.name for group in ActivityPermissionGroup.objects.filter(
-                permissions__codename__in=[
-                    'wildlifecompliance.organisation_access_request',
-                    'wildlifecompliance.licensing_officer',
-                    'wildlifecompliance.issuing_officer',
-                    'wildlifecompliance.assessor',
-                    'wildlifecompliance.return_curator',
-                    'wildlifecompliance.payment_officer'
-                ]
-            )
-        ]
+    licence_officer_groups = [
+        group.name for group in ActivityPermissionGroup.objects.filter(
+            permissions__codename__in=[
+                'wildlifecompliance.organisation_access_request',
+                'wildlifecompliance.licensing_officer',
+                'wildlifecompliance.issuing_officer',
+                'wildlifecompliance.assessor',
+                'wildlifecompliance.return_curator',
+                'wildlifecompliance.payment_officer'
+            ]
+        )
+    ]
       
     return (
         user.is_superuser or
@@ -265,24 +271,19 @@ def is_internal_user(user):
         WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_OFFICERS).wildlifesystemgroupuser_set.filter(emailuser_id=user.id).exists() or
         WildlifeSystemGroup.objects.get(name=settings.GROUP_WILDLIFE_COMPLIANCE_PAYMENT_OFFICERS).wildlifesystemgroupuser_set.filter(emailuser_id=user.id).exists() or
         (
-            settings.COMPLIANCE_APP and (
-                user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_MANAGER).exists() or
-                user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_INFRINGEMENT_NOTICE_COORDINATOR).exists() or
-                user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_COMPLIANCE_ADMIN).exists() or
-                user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_LICENSING_ADMIN).exists() or
-                user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_OFFICER).exists() or
-                user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_INSPECTION_OFFICER).exists() or
-                user.compliancemanagementsystemgrouppermission_set.filter(
-                    Q(group__name=settings.GROUP_PROSECUTION_COORDINATOR) |
-                    Q(group__name=settings.GROUP_PROSECUTION_MANAGER) |
-                    Q(group__name=settings.GROUP_PROSECUTION_COUNCIL)
-                ).exists()
-            )
+            user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_MANAGER).exists() or
+            user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_INFRINGEMENT_NOTICE_COORDINATOR).exists() or
+            user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_COMPLIANCE_ADMIN).exists() or
+            user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_LICENSING_ADMIN).exists() or
+            user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_OFFICER).exists() or
+            user.compliancemanagementsystemgrouppermission_set.filter(group__name=settings.GROUP_INSPECTION_OFFICER).exists() or
+            user.compliancemanagementsystemgrouppermission_set.filter(
+                Q(group__name=settings.GROUP_PROSECUTION_COORDINATOR) |
+                Q(group__name=settings.GROUP_PROSECUTION_MANAGER) |
+                Q(group__name=settings.GROUP_PROSECUTION_COUNCIL)
+            ).exists()
         ) or
-
         (
-            not settings.COMPLIANCE_APP and (
-                belongs_to_list(user, licence_officer_groups)       
-            )
+            belongs_to_list(user, licence_officer_groups)       
         )
     )
