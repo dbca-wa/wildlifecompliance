@@ -114,6 +114,7 @@ def checkout(
         'booking_reference': application.lodgement_number,
         'booking_reference_link': application.lodgement_number,
         'no_payment': False,
+        'tax_override': True
     }
     print(basket_params)
     basket_owner = application.submitter.id if application.submitter else request.user.id
