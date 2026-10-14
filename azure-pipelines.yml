@@ -31,5 +31,6 @@ stages:
         tags: | 
               wlc_reporting_latest
               wlc_reporting_$(tagDate)
-        containerRegistry: DockerHub
-        repository: dbcawa/wildlifecompliance
+        containerRegistry: DockerGitHub
+        repository: ghcr.io/dbca-wa/wildlifecompliance
+        
