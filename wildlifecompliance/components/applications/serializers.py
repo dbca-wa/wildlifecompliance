@@ -1170,22 +1170,25 @@ class BaseApplicationSerializer(serializers.ModelSerializer):
     def get_can_current_user_edit(self, obj):
         logger.debug('BaseApplicationSerializer.can_user_edit() - start')
         result = False
-
-        if obj.customer_status == \
-                Application.CUSTOMER_STATUS_AWAITING_PAYMENT:
+        try:
+            if obj.customer_status == \
+                    Application.CUSTOMER_STATUS_AWAITING_PAYMENT:
+                result = False
+            elif obj.processing_status == \
+                    Application.PROCESSING_STATUS_AWAITING_APPLICANT_RESPONSE:
+                # Outstanding amendment request - edit required.
+                result = True
+            elif not obj.licence:
+                result = obj.can_user_edit
+            elif not obj.licence.has_proposed_purposes_in_current() and not obj.application_fee_paid:
+                # no active purposes ie. licence is expired, and never previously submitted.
+                result = False
+            else:
+                result = obj.can_user_edit
+            logger.debug('BaseApplicationSerializer.can_user_edit() - end')
+        except Exception as e:
+            logger.error(e)
             result = False
-        elif obj.processing_status == \
-                Application.PROCESSING_STATUS_AWAITING_APPLICANT_RESPONSE:
-            # Outstanding amendment request - edit required.
-            result = True
-        elif not obj.licence:
-            result = obj.can_user_edit
-        elif not obj.licence.has_proposed_purposes_in_current() and not obj.application_fee_paid:
-            # no active purposes ie. licence is expired, and never previously submitted.
-            result = False
-        else:
-            result = obj.can_user_edit
-        logger.debug('BaseApplicationSerializer.can_user_edit() - end')
 
         return result
 
