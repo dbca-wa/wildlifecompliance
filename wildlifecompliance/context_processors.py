@@ -35,6 +35,12 @@ def wildlifecompliance_processor(request):
     checkouthash = None
     if 'payment_model' in request.session and 'payment_pk' in request.session:
         checkouthash =  hashlib.sha256(str(str(request.session["payment_model"])+str(request.session["payment_pk"])).encode('utf-8')).hexdigest()
+        if 'token_payment_session' in request.session:
+            del request.session['payment_model']
+            del request.session['payment_pk']
+
+    if 'token_payment_session' in request.session:
+        checkouthash =  hashlib.sha256(str(request.session["token_payment_session"]).encode('utf-8')).hexdigest()
 
     return {
         'public_url': web_url,
