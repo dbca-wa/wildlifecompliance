@@ -39,7 +39,8 @@ import subprocess
 import traceback
 from rest_framework import status
 from rest_framework.views import APIView
-from ledger_api_client.ledger_models import Invoice
+from ledger_api_client.ledger_models import Invoice, Basket
+from ledger_api_client.utils import validate_booking_and_invoice_references
 
 import logging
 logger = logging.getLogger(__name__)
@@ -100,6 +101,11 @@ class ApplicationSuccessViewPreload(APIView):
         except Exception as e:
             print(e)
             traceback.print_exc
+
+        if not validate_booking_and_invoice_references(lodgement_number,invoice_ref):
+            logger.error("booking and invoice reference are not part of the same basket/order")
+            print("booking and invoice reference are not part of the same basket/order")
+            return redirect(reverse('external'))
         
         try:
             try:
@@ -202,15 +208,31 @@ class ApplicationSuccessViewPreload(APIView):
 class ApplicationSuccessView(TemplateView):
     template_name = 'wildlifecompliance/application_success.html'
 
+    def valid_token_payment_session(self, request, booking_reference, invoice_reference):
+        if 'token_payment_session' in request.session:
+            
+            del request.session['token_payment_session']
+            return validate_booking_and_invoice_references(booking_reference, invoice_reference)
+
     def get(self, request, *args, **kwargs):
         print("ApplicationSuccessView")
 
         submit_success = True
         try:
-            application = get_session_application(request.session)
+            if 'token_payment_session' in request.session:
+                basket = Basket.objects.filter(status='Submitted', id=request.session['token_payment_session']).order_by('-id').first()
+                try:
+                    application = Application.objects.get(lodgement_number=basket.booking_reference)
+                except:
+                    application = get_session_application(request.session)
+            else:
+                application = get_session_application(request.session)
+
             if not ApplicationInvoice.objects.filter(application=application).exists():
                 logger.error(f"ApplicationInvoice record does not exist for application {application}")
                 return redirect(reverse('external'))
+
+            invoice_ref = ApplicationInvoice.objects.filter(application=application).order_by('invoice_datetime').last().invoice_reference
 
             authorised = False
             user = request.user
@@ -219,11 +241,12 @@ class ApplicationSuccessView(TemplateView):
             elif user.is_authenticated:
                 user_orgs = [org.id for org in user.wildlifecompliance_organisations.all()]
                 authorised = Application.objects.filter(Q(org_applicant_id__in=user_orgs) | Q(proxy_applicant=user) | Q(submitter=user)).filter(id=application.id).exists()
+            elif basket and self.valid_token_payment_session(request, basket.booking_reference, invoice_ref):
+                authorised = True
 
             if not authorised:
                 return redirect(reverse('external'))
-
-            invoice_ref = ApplicationInvoice.objects.filter(application=application).order_by('invoice_datetime').last().invoice_reference
+            
             invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
             
         except Exception as e:
@@ -255,6 +278,11 @@ class LicenceFeeSuccessViewPreload(APIView):
         except Exception as e:
             print(e)
             traceback.print_exc
+
+        if not validate_booking_and_invoice_references(lodgement_number,invoice_ref):
+            logger.error("booking and invoice reference are not part of the same basket/order")
+            print("booking and invoice reference are not part of the same basket/order")
+            return redirect(reverse('external'))
 
         try:
             from wildlifecompliance.components.wc_payments.utils import get_invoice_payment_status
@@ -364,14 +392,33 @@ class LicenceFeeSuccessViewPreload(APIView):
 class LicenceFeeSuccessView(TemplateView):
     template_name = 'wildlifecompliance/licence_fee_success.html'
 
+    def valid_token_payment_session(self, request, booking_reference, invoice_reference):
+            if 'token_payment_session' in request.session:
+                basket = Basket.objects.filter(status='Submitted', id=request.session['token_payment_session']).order_by('-id').first()
+                del request.session['token_payment_session']
+                return validate_booking_and_invoice_references(booking_reference, invoice_reference)
+
     def get(self, request, *args, **kwargs):
         print("LicenceSuccessView")
-        session_activity = get_session_activity(request.session)
+        
         try:
-            application = Application.objects.get(
-                id=session_activity.application_id
-            )
+            
+            if 'token_payment_session' in request.session:
+                basket = Basket.objects.filter(status='Submitted', id=request.session['token_payment_session']).order_by('-id').first()
+                try:
+                    application = Application.objects.get(lodgement_number=basket.booking_reference)
+                except:
+                    session_activity = get_session_activity(request.session)
+                    application = Application.objects.get(
+                        id=session_activity.application_id
+                    )
+            else:
+                session_activity = get_session_activity(request.session)
+                application = Application.objects.get(
+                    id=session_activity.application_id
+                )
 
+            invoice_ref = ActivityInvoice.objects.filter(activity__application=application).order_by('invoice_datetime').last().invoice_reference
             authorised = False
             user = request.user
             if is_wildlife_compliance_officer(request):
@@ -379,14 +426,15 @@ class LicenceFeeSuccessView(TemplateView):
             elif user.is_authenticated:
                 user_orgs = [org.id for org in user.wildlifecompliance_organisations.all()]
                 authorised = Application.objects.filter(Q(org_applicant_id__in=user_orgs) | Q(proxy_applicant=user) | Q(submitter=user)).filter(id=application.id).exists()
+            elif basket and self.valid_token_payment_session(request, basket.booking_reference, invoice_ref):
+                authorised = True
 
             if not authorised:
                 return redirect(reverse('external'))
 
-            invoice_ref = ActivityInvoice.objects.filter(activity__application=application).order_by('invoice_datetime').last().invoice_reference
             invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
             activities = ApplicationSelectedActivity.objects.filter(
-                application_id=session_activity.application_id,
+                application_id=application.id,
                 processing_status=ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED)
 
             invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
