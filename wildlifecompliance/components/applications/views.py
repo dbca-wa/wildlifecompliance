@@ -400,22 +400,25 @@ class LicenceFeeSuccessView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         print("LicenceSuccessView")
-        session_activity = get_session_activity(request.session)
+        
         try:
-
+            
             if 'token_payment_session' in request.session:
                 basket = Basket.objects.filter(status='Submitted', id=request.session['token_payment_session']).order_by('-id').first()
                 try:
                     application = Application.objects.get(lodgement_number=basket.booking_reference)
                 except:
+                    session_activity = get_session_activity(request.session)
                     application = Application.objects.get(
                         id=session_activity.application_id
                     )
             else:
+                session_activity = get_session_activity(request.session)
                 application = Application.objects.get(
                     id=session_activity.application_id
                 )
-            
+
+            invoice_ref = ActivityInvoice.objects.filter(activity__application=application).order_by('invoice_datetime').last().invoice_reference
             authorised = False
             user = request.user
             if is_wildlife_compliance_officer(request):
@@ -429,10 +432,9 @@ class LicenceFeeSuccessView(TemplateView):
             if not authorised:
                 return redirect(reverse('external'))
 
-            invoice_ref = ActivityInvoice.objects.filter(activity__application=application).order_by('invoice_datetime').last().invoice_reference
             invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
             activities = ApplicationSelectedActivity.objects.filter(
-                application_id=session_activity.application_id,
+                application_id=application.id,
                 processing_status=ApplicationSelectedActivity.PROCESSING_STATUS_ACCEPTED)
 
             invoice_url = f'/ledger-toolkit-api/invoice-pdf/{invoice_ref}/'
