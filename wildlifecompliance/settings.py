@@ -382,10 +382,7 @@ TSC_AUTH = env('TSC_AUTH', 'NO_AUTH')
 CRON_RUN_AT_TIMES = env('CRON_RUN_AT_TIMES', '02:05')
 
 if env('CONSOLE_EMAIL_BACKEND', False):
-   EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# if DEBUG:
-#     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-#
+    EMAIL_BACKEND = "wagov_utils.components.utils.email_backend.EmailBackend"
 
 SO_TYPE_INFRINGEMENT_NOTICE = 'infringement_notice'
 SO_TYPE_CAUTION_NOTICE = 'caution_notice'
@@ -465,6 +462,7 @@ REPORTING_EMAIL = env('REPORTING_EMAIL', '').lower()
 FILE_UPLOAD_PERMISSIONS = None
 
 EMAIL_INSTANCE = decouple.config("EMAIL_INSTANCE", default="DEV")
+EMAIL_DELIVERY = decouple.config("EMAIL_DELIVERY", default="off")
 
 DJANGO_VITE_DEV_MODE = env("DJANGO_VITE_DEV_MODE", False)
 if DEBUG and not DJANGO_VITE_DEV_MODE:
