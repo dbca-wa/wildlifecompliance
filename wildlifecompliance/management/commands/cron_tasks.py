@@ -5,10 +5,16 @@ from django.conf import settings
 from pathlib import Path
 import subprocess
 import logging
+from wildlifecompliance.components.emails.emails import TemplateEmailBase
 
 logger = logging.getLogger(__name__)
 
 LOGFILE = 'logs/cron_tasks.log'
+
+class CronTaskNotificationEmail(TemplateEmailBase):
+    subject = '{0} - Cronjob'.format(settings.SYSTEM_NAME)
+    html_template = 'wildlifecompliance/emails/cron_task_notification.html'
+    txt_template = None
 
 class Command(BaseCommand):
     help = 'Run the Wildlife Compliance Cron tasks'
@@ -39,10 +45,10 @@ class Command(BaseCommand):
         Reads stdout_redirect (LOGFILE) and emails to notification list.
         '''
         log_txt = Path(LOGFILE).read_text()
-        subject = '{0} - Cronjob'.format(settings.SYSTEM_NAME)
-        body = ''
-        to = settings.NOTIFICATION_EMAIL if isinstance(settings.NOTIFICATION_EMAIL, list) else [settings.NOTIFICATION_EMAIL]
-        send_mail(subject, body, settings.EMAIL_FROM, to, fail_silently=False, html_message=log_txt)
+        context = {"log_txt":log_txt}
+        recipients = settings.NOTIFICATION_EMAIL if isinstance(settings.NOTIFICATION_EMAIL, list) else [settings.NOTIFICATION_EMAIL]
+        email = CronTaskNotificationEmail()
+        email.send(recipients, context=context)
 
 
 #TODO fix this - it does not work as it references a model that no longer exists - but this is used by several cron tasks
