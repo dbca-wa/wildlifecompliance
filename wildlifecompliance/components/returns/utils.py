@@ -330,7 +330,7 @@ class ReturnSpeciesUtility(ReturnUtility):
         super(ReturnUtility, self).__init__()
         self._return = a_return
 
-    def set_species_list_future(self, a_species_list=None):
+    def set_species_list_future(self, a_species_list=[]):
         '''
         Set list of species for future Return.
         '''
@@ -347,7 +347,7 @@ class ReturnSpeciesUtility(ReturnUtility):
                 e
             ))
 
-    def set_species_list(self, a_species_list=None):
+    def set_species_list(self, a_species_list=[]):
         '''
         Set list of species for the Return.
         '''
@@ -437,7 +437,7 @@ class ReturnSpeciesUtility(ReturnUtility):
         '''
         from wildlifecompliance.components.licences.pdf import HtmlParser
 
-        the_species_list = None
+        the_species_list = []
         try:
             # attempt to build from raw data type with a html parser.
             parser = HtmlParser(raw_species_list)
