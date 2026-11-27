@@ -250,8 +250,8 @@ export default {
     addSheetRow: function () {
       if (document.getElementById("species_selector").value === '' || null) {
         swal.fire(
-          'Select Specie',
-          'Please select a specie before adding a new entry.',
+          'Select Species',
+          'Please select a species before adding a new entry.',
           'error'
         )
       } else {
